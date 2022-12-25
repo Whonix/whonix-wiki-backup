@@ -1,0 +1,101 @@
+{{Header}} {{Title|title=
+Mixmaster: Tor Remailer
+}} {{#seo:
+|description=Send anonymous E-Mails. Mixmaster over Tor. Tunnelling mixmaster through Tor. Connection Schema: user &rarr; Tor &rarr; mixmaster &rarr; recipient
+|image=Mixmaster.jpg
+}}
+__NOINDEX__
+[[image:Mixmaster.jpg|thumb]]
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This page is now deprecated. Mixmaster is dead upstream and has been [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=880101 permanently removed from Debian].
+}}
+{{archived}}
+= Mixmaster =
+
+== Introduction ==
+
+Motivation behind this: "''What if there where a bookmark pointing to mail.local (or something like that) where you can simply enter an e-mail address, from sender (optional), subject and text, click send and mail is on its way?''
+
+''No sign-up/registration/smtp server required.''"
+
+Mixmaster <ref>https://en.wikipedia.org/wiki/Mixmaster_anonymous_remailer</ref> is a Remailer. Please read the [[Remailer]] article first as introduction.
+
+There are two ways of using the Mixmaster network. Using Mixmaster inside {{project_name_workstation_long}} is the recommended way but more difficult. Unfortunately, there is no nice graphical user interface for Mixmaster on Debian GNU/Linux. The other way is using a webinterface, which is documented in the [[Remailer]] article.
+
+This is quite an unusual setup. At time of writing there where no references that ever anyone ever successfully used the mixmaster software to remail over Tor. Therefore it might make clear, that you are a {{project_name_long}} user.
+
+== Mixmaster inside {{project_name_workstation_long}} ==
+A fresh list of Mixmaster nodes is required. You can either update using the ncurses interface or using the Debian method. Both are documented below.
+
+{{CodeSelect|code=
+sudo mixmaster-update --verbose
+}}
+
+If it fails, enumerate other available pingers to update stats from. This shows a list of all available sources (banana, austria, etc…):
+
+{{CodeSelect|code=
+sudo mixmaster-update --verbose --list-sources
+}}
+
+Update via selected source. For example source austria worked:
+
+{{CodeSelect|code=
+sudo mixmaster-update --verbose --source austria
+}}
+
+Mails can be send by command line.
+
+/var/lib/mixmaster/stats/mlist2.txt
+
+{{CodeSelect|code=
+echo "mail text" | mixmaster --verbose --to=email@recipient.org --copies=1 --chain=banana
+}}
+
+{{Code|banana}} is an example here.
+
+If it says, {{Code2|Error: No such remailer: breaka}}, then choose another one. You can get a list of them and availability stats by looking at the file {{Code|/var/lib/mixmaster/stats/mlist2.txt}}.
+
+Or instead of using echo text, you can also read the text from a file. This is handy, because you can (and should) use a spell checker and because you can (and should if applicable) encrypt the text beforehand.
+
+{{CodeSelect|code=
+echo "`cat maildraftfile`" | mixmaster --verbose --to=email@recipient.org --copies=1 --chain=breaka
+}}
+
+Or if you want to add a subject. (Which you most likely don't want, because the subject can not be encrypted.)
+
+{{CodeSelect|code=
+echo "mail text" | mixmaster --verbose --to=email@recipient.org --subject="mail subject" --copies=1 --chain=breaka
+}}
+
+Takes a moment and shows.
+
+<pre>
+Chain: banana
+</pre>
+
+Here is a command which will allow you to post to newsgroups.
+
+{{CodeSelect|code=
+Working: echo "mail text" | mixmaster --verbose --post-to=alt.privacy.anon-server --copies=2 --chain=*,*,* -s 'Subject Text' --header=
+}}
+
+Done.
+
+Note, that it can due to the nature of the remailer network take a long time until your mail arrives.
+
+==Nymservers How-To==
+
+See [[Nymservers]]
+
+== Credits ==
+
+* [http://lists.mixmin.net/pipermail/remops/2012-December/000671.html Remops mailing list] helped creating this page with advice.
+
+== References ==
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

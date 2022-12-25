@@ -1,0 +1,50 @@
+{{Title|title=System Timezone}}
+{{Header}}
+{{#seo:
+|description=Information about system timezone setting. How to change the System Timezone.
+|image=https://www.{{project_clearnet}}/w/images/d/d4/Timezone123123451.png
+}}
+[[file:Timezone123123451.png|thumb]]
+
+= Information =
+Quote {{project_name_long}} [[Post Install Advice]]:
+
+<blockquote>
+To protect against time zone leaks, the system clock inside {{project_name_long}} is set to UTC. This means it may be a few hours before or ahead of your host system clock. <u>Do not change this setting!</u>
+</blockquote>
+
+= Change System Timezone =
+{{project_name_long}} specific part: To prevent package [https://github.com/whonix/anon-apps-config anon-apps-config] from changing the timezone to UTC during upgrades, create either file <code>/etc/noutc</code> or <code>/usr/local/etc/noutc</code>. <ref>
+https://github.com/Whonix/anon-apps-config/commit/85dcdaaeafe150a740949d5b8d167e6f0fa10c7d
+</ref>
+
+{{CodeSelect|code=
+sudo touch /etc/noutc
+}}
+
+<ref>
+{{CodeSelect|code=
+sudo mkdir -p /usr/local/etc/
+}}
+
+{{CodeSelect|code=
+sudo touch /usr/local/etc/noutc
+}}
+</ref>
+
+{{project_name_long}} unspecific part: Time zone can be adjusted as per [[Support#Free_Support_Principle|Free Support Principle]].
+
+Note: system timezone as configured <code>/etc/timezone</code> / <code>/etc/localtime</code> is a "system setting". What (Xfce) graphical user interface clock widget is showing and its setting might be independent from the "system setting" since that is a "user setting".
+
+= Timezone vs sdwdate =
+[[sdwdate]] is mostly unrelated. It can operate independently of system timezone setting. It is a time synchronization daemon. It does not alter the system timezone.
+
+= Related =
+* [[sdwdate]]
+
+= Footnotes / References =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

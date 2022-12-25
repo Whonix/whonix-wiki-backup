@@ -1,0 +1,450 @@
+{{Title|title=Essential {{project_name_long}} Functionality Tests}}
+{{Header}}
+{{#seo:
+|description=Help to test {{project_name_long}}. {{project_name_gateway_short}}, {{project_name_workstation_long}}, browser and application tests.
+|image=Essential1231234.jpg
+}}
+[[image:Essential1231234.jpg|thumb]]
+= Introduction =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Advanced users, developers and willing testers only.
+}}
+
+{{Test}}
+
+= {{project_name_gateway_long}} Tests =
+{{Box|text=
+# After logging in, the {{project_name_long}} Setup Wizard / Anon Connection Wizard should appear.
+# Check the Tor version. {{CodeSelect|code=
+anon-info
+}}
+# Check Tor config. {{CodeSelect|code=
+anon-verify
+}}
+# Check Tor warnings. [[Tor#Non-Issues|Some messages can be safely ignored]]. {{CodeSelect|code=
+grep -i warn /var/run/tor/log
+}}
+# Check Tor errors. {{CodeSelect|code=
+grep -i error /var/run/tor/log
+}}
+# Check for clock skew. {{CodeSelect|code=
+grep -i clock /var/run/tor/log
+}}
+# Test if arm is fully functional. {{CodeSelect|code=
+arm
+}}
+# Test [[Bridges#How_to_Use_Bridges_in_{{project_name_long}}|obfsproxy bridge]] connectivity is functional.
+}}
+
+= {{project_name_workstation_long}} Tests =
+
+== Basic Tests ==
+{{Box|text=
+# Power off {{project_name_gateway_long}}. Try to ping outside or to use the browser in {{project_name_workstation_long}}. Obviously this should <u>not</u> work.
+# Power on {{project_name_gateway_long}} again. Visit https://check.torproject.org/ with Tor Browser. You should see a “Congratulations”.
+# Ping the {{project_name_gateway_long}}; this will <u>not</u> work. <ref>
+You will not be able to ping the {{project_name_gateway_long}} because ICMP is blocked by the firewall. If you want to test it, you have to adjust the firewall or deactivate it while testing on both, {{project_name_gateway_long}} and {{project_name_workstation_long}}.
+</ref> {{CodeSelect|code=
+ping 10.152.152.10
+}}
+# Note: Ping commands should NOT work for external addresses from your {{project_name_workstation_long}}; ICMP traffic <ref>
+https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol
+</ref> is not proxied, and filtered by {{project_name_long}} Firewall ({{W_Firewall}}) because [[Tor#UDP|Tor does not support UDP]]. For more information on ping inside {{project_name_workstation_long}}, see [[Whonix-Workstation_Firewall#Ping|Whonix-Workstation Firewall, ping]].
+# Use Tor Browser to visit an onion address - try the [{{Torproject_web_onion}} torproject.org onion service].
+# Test Tor Button's New Identity Feature.
+# {{Code2|dig google.com}} must only return a single IP; compare that with the output on {{project_name_gateway_long}} or Host. {{CodeSelect|code=
+dig google.com
+}}
+# See if syste gets autostarted.
+# Setup an [[Onion Services|Onion Service]].
+# Test the onion service by connecting to its address with Tor Browser.
+# Test [[HexChat]] and connect to a an SSL protected IRC server.
+# Test HexChat and connect to an onion IRC server.
+# Run [https://www.kicksecure.com/wiki/Systemcheck systemcheck] leak tests. {{CodeSelect|code=
+systemcheck --leak-tests
+}}
+# After downloading the key, the user should verify its authenticity: {{CodeSelect|code=
+gpg --keyid-format long --import --import-options show-only --with-fingerprint {{{source_filename}}}
+}}
+# Before importing the key: {{CodeSelect|code=
+gpg --import {{{source_filename}}}
+}}
+# Test curl uwt wrapper. {{CodeSelect|code=
+curl {{Torproject_web_onion}}
+}}
+# Install lighttpd. {{CodeSelect|code=
+sudo apt install lighttpd
+}}
+# Restart lighttpd. {{CodeSelect|code=
+sudo service lighttpd restart
+}}
+# Try to download the local index.html. {{CodeSelect|code=
+curl 127.0.0.1
+}}
+# Check. {{CodeSelect|code=
+cat index.html
+}}
+# Install git. {{CodeSelect|code=
+sudo apt install git
+}}
+# Check if regular git servers are reachable. {{CodeSelect|code=
+git clone https://github.com/{{project_name_short}}/derivative-maker
+}}
+# Check if [http://xtlfhaspqtkeeqxk6umggfbr3gyfznvf4jhrge2fujz53433i2fcs3id.onion Tor Project git onion service] is online.
+# If yes, try to clone its onion Tor git repository. {{CodeSelect|code=
+git clone http://xtlfhaspqtkeeqxk6umggfbr3gyfznvf4jhrge2fujz53433i2fcs3id.onion/tor.git
+}}
+}}
+
+== DNS Test ==
+Inside {{project_name_workstation_long}}.
+
+Run.
+
+{{CodeSelect|code=
+nslookup check.torproject.org
+}}
+
+Expected output:
+
+<blockquote>{{check.torproject.org IP}}</blockquote>
+
+== TCP Test ==
+Inside {{project_name_workstation_long}}.
+
+Run.
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 scurl -H 'Host: check.torproject.org' -k https://{{Check.torproject.org IP}}/api/ip
+}}
+
+Expected output:
+
+<blockquote>{"IsTor":true,"IP":"xxx.xxx.xxx.xxx"}</blockquote>
+
+== TCP and DNS Test ==
+Inside {{project_name_workstation_long}}.
+
+Run.
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 scurl https://check.torproject.org/api/ip
+}}
+
+Expected output:
+
+<blockquote>{"IsTor":true,"IP":"xxx.xxx.xxx.xxx"}</blockquote>
+
+== Port Tests ==
+=== SocksPort ===
+Inside {{project_name_workstation_long}}.
+
+Run.
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl --head 10.152.152.10:9050
+}}
+
+Expected output:
+
+<blockquote>HTTP/1.0 501 Tor is not an HTTP Proxy<br />
+Content-Type: text/html; charset=iso-8859-1</blockquote>
+
+=== ControlPort ===
+Inside {{project_name_workstation_long}}.
+
+Run. <ref>
+[[Dev/onion-grater|onion-grater, a Tor Control Port Filter Proxy, design documentation]]
+</ref>
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl --max-time 2 10.152.152.10:9051
+}}
+
+Expected output:
+
+<blockquote>510 Command filtered<br />
+510 Command filtered<br />
+510 Command filtered<br />
+510 Command filtered<br />
+curl: (28) Operation timed out after 2001 milliseconds with 88 bytes received</blockquote>
+
+=== Closed Port ===
+Inside {{project_name_workstation_long}}.
+
+Run. <ref>
+There is nothing running on {{project_name_gateway_short}} on port <code>80</code>.
+</ref>
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl --head 10.152.152.10:80
+}}
+
+Expected output:
+
+<blockquote>curl: (7) Failed to connect to 10.152.152.10 port 80: Connection refused</blockquote>
+
+=== TransPort ===
+Inside {{project_name_workstation_long}}.
+
+[https://2019.www.torproject.org/docs/tor-manual.html.en#TransPort <code>TransPort</code>] reachability test. Run.
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl --head 10.152.152.10:9040
+}}
+
+Expected output:
+
+<blockquote>curl: (56) Recv failure: Connection reset by peer</blockquote>
+
+Or.
+
+<blockquote>curl: (52) Empty reply from server</blockquote>
+
+== Default Browser ==
+
+=== Quick Launcher ===
+Check if the Tor Browser quick launcher (fav icon) next to the start menu button is visible and startable.
+
+=== Text Links ===
+{{Box|text=
+1. Open a terminal.
+
+2. Run the following command.
+
+{{CodeSelect|code=
+echo http://127.0.0.1
+}}
+
+3. Right-click on the echoed {{Code2|http://127.0.0.1}} and choose open link.
+
+4. Check it is fully functional.
+
+It should open and ask for confirmation to open that file in Tor Browser. Check that nothing happens when pressing {{Code2|No}} (which should be the default!) and conversely a new Tor Browser window is opened when pressing {{Code2|Yes}}.
+}}
+=== File Links ===
+{{Box|text=
+1. Create a file {{Code2|~/test.html}} with the following content.
+
+<pre>
+test
+</pre>
+
+2. Open Thunar (default file manager) and double-click on that file.
+
+3. Check if it opens and asks for confirmation to open that file in Tor Browser.
+}}
+=== Terminal Tests ===
+{{Box|text=
+1. Open a terminal.
+
+2. Run the following command.
+
+{{CodeSelect|code=
+x-www-browser http://127.0.0.1
+}}
+
+3. Check if it asks for confirmation to open that file in Tor Browser.
+
+4. Check the same for.
+
+{{CodeSelect|code=
+gnome-www-browser http://127.0.0.1
+}}
+
+5. Check the same for.
+
+{{CodeSelect|code=
+xdg-open http://127.0.0.1
+}}
+
+6. Check the same for.
+
+{{CodeSelect|code=
+gnome-open http://127.0.0.1
+}}
+
+7. Next, remove open-link-confirmation.
+
+{{CodeSelect|code=
+sudo apt purge open-link-confirmation
+}}
+
+And repeat the tests above.
+}}
+== Applications ==
+{{Box|text=
+Test that all the following applications are fully functional:
+# [[Metadata]]
+# [[Tor Browser]]
+# [[Tor_Browser/Manual_Download|Manually Downloading Tor Browser]]
+# Check if Tor Browser runs in {{project_name_long}} out of the box -- without use of the {{Code|torbrowser}} script -- by running <code>/home/user/.tb/tor-browser/start-tor-browser</code>.
+}}
+== Leak Tests ==
+See [[Dev/Leak Tests]].
+
+= {{project_name_workstation_long}} and {{project_name_gateway_long}} =
+
+== Miscellaneous ==
+{{Box|text=
+1. Check locale.
+
+{{CodeSelect|code=
+locale
+}}
+
+2. Check apt config and see if periodic updates are disabled.
+
+{{CodeSelect|code=
+apt-config dump
+}}
+
+3. Install a [https://wiki.debian.org/HowToUpgradeKernel new kernel] for testing purposes. <ref>The latest Debian kernel versions can be found [https://tracker.debian.org/pkg/linux here].</ref>
+
+{{CodeSelect|code=
+apt-cache search linux-image
+}}
+
+{{CodeSelect|code=
+sudo apt install linux-image-flavour
+}}
+
+4. Check the content of {{Code2|/etc/network/interfaces}}
+
+{{CodeSelect|code=
+cat /etc/network/interfaces
+}}
+
+5. Check the content of {{Code2|/etc/resolv.conf}}
+
+{{CodeSelect|code=
+cat /etc/resolv.conf
+}}
+
+6. Check {{Code2|/etc/apt/sources.list}}
+
+{{CodeSelect|code=
+cat /etc/apt/sources.list
+}}
+
+7. Check iptables.
+
+{{CodeSelect|code=
+sudo iptables-save-deterministic
+}}
+
+8. Reboot from terminal while X is running.
+
+<pre>
+Switch to terminal.
+</pre>
+
+Reboot.
+
+{{CodeSelect|code=
+sudo reboot
+}}
+
+No errors should appear like "failed to kill service".
+}}
+== Extra Tests ==
+{{Box|text=
+1. Check if aptitude is functional.
+
+{{CodeSelect|code=
+sudo aptitude update
+}}
+
+See the footnotes if additional manual tests are preferred. <ref>
+These checks are not as important because relevant messages would probably be shown during <code>sudo systemctl list-units --failed</code>.
+
+Check if ''/var/run/bootclockrandomization/success'' exists.
+
+{{CodeSelect|code=
+ls -la /var/run/bootclockrandomization/success
+}}
+
+Check the boot clock randomization log.
+
+{{CodeSelect|code=
+cat /var/log/bootclockrandomization.log
+}}
+{{CodeSelect|code=
+sudo service bootclockrandomization status
+}}
+{{CodeSelect|code=
+echo $?
+}}
+
+Check if ''/var/run/timesanitycheck/success'' exists.
+
+{{CodeSelect|code=
+ls -la /var/run/timesanitycheck/success
+}}
+
+Inspect the time sanity check log.
+
+{{CodeSelect|code=
+cat /var/log/timesanitycheck.log
+}}
+
+Confirm the time sanity check status.
+
+{{CodeSelect|code=
+sudo service timesanitycheck status
+}}
+{{CodeSelect|code=
+echo $?
+}}
+</ref> <ref>These checks are not as important because sdwdate-gui would likely identify any issues beforehand.
+
+Check if ''/var/run/sdwdate/success'' exists.
+
+{{CodeSelect|code=
+ls -la /var/run/sdwdate/success
+}}
+
+Check the sdwdate log.
+
+{{CodeSelect|code=
+cat /var/log/sdwdate.log
+}}
+
+Check the sdwdate status.
+
+{{CodeSelect|code=
+sudo service sdwdate status
+}}
+{{CodeSelect|code=
+echo $?
+}}
+</ref>
+
+2. Test the re-installation of x11-common.
+
+{{CodeSelect|code=
+sudo apt install --reinstall x11-common
+}}
+}}
+== Display Manager ==
+[[{{non_q_project_name_short}}|{{non_q_project_name}}]] only.
+
+Check lightdm stops and restarts correctly.
+
+{{CodeSelect|code=
+sudo service lightdm stop
+}}
+
+{{CodeSelect|code=
+sudo service lightdm start
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Development]] [[Category:Design]] [[Category:Documentation]]

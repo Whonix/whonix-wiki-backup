@@ -1,0 +1,1908 @@
+{{Header}}
+<!--
+Copyright:
+
+   {{project_name_long}} Tor Browser wiki page Copyright (C) Amnesia <amnesia at boum dot org>
+   {{project_name_long}} Tor Browser wiki page Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to:
+
+    Free Software Foundation, Inc.
+    51 Franklin St, Fifth Floor
+    Boston, MA 02110-1301, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License can be found in the /usr/share/common-licenses' directory.
+
+The complete text of the GNU General Public License can also be found online on gnu.org <https://www.gnu.org/licenses/gpl.html>, in {{project_name_long}} virtual machine images in /usr/share/common-licenses/GPL-3 file or on Github <https://github.com/{{project_name_short}}/derivative-maker/blob/master/GPLv3>.
+--> <!--
+The {{project_name_long}} Tor Browser wiki page is forked from the Tails Browsing the web with Iceweasel page, from this exact source <https://git.immerda.ch/?p=amnesia.git;a=blob;f=wiki/src/doc/anonymous_internet/iceweasel.mdwn;hb=c65e9614d6df9784072ac1e506e2fc83b062f2b0>.
+-->
+{{Title|
+title=Tor Browser Essentials
+}}
+{{#seo:
+|description=Using Tor Browser in {{project_name_long}}. Anonymity vs Pseudonymity, HTTPS Everywhere, Torbutton, Protection against dangerous JavaScript, NoScript, Tips, Update Tor Browser, Browser Plugins, Change Language
+|image=Torbrowser.png
+}} {{Responsive Thumbnails}}
+<div class="mininav">
+* [[Tor Browser|Tor Browser Essentials]]
+* [[Tor Browser/Advanced Users|Tor Browser Advanced]]
+</div>
+[[File:Torbrowser_icon.png|thumb|50px|Tor Browser Icon]]
+{{#widget:Icon_Bullet_List
+
+|addClass=minimal margin-bottom-20
+
+|fontSize=17px
+
+|item=fas fa-check cs-green,Hiding your identity is harder than just hiding your <a href=/wiki/Data_Collection_Techniques#IP>IP</a>. Tor Browser provides protection from <a href=/wiki/Data_Collection_Techniques#Browser_Fingerprinting>browser fingerprinting</a>.
+
+|item=fas fa-check cs-green,<a href=#New_Identity_Function>Use the new identity function to get rid of trackers.</a>
+
+|item=fas fa-check cs-green,Tor Browser is the only serious and actively developed browser designed and recommended for anonymity.
+
+}}
+
+__TOC__
+
+= Introduction =
+[[File:tor_browser_youtube.jpeg|250px|thumb]]
+[[File:tor_browser_duckduckgo2.png|250px|thumb]]
+[[File:tor_browser_how_tor_works.png|250px|thumb]]
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' Only Tor Browser is recommended for use in {{project_name_long}} when browsing the Internet. <ref>
+For a comprehensive list of reasons, readers are encouraged to review some or all of the references in this section.
+</ref>
+}}
+
+[https://www.torproject.org/download/ Tor Browser] <ref>
+https://tb-manual.torproject.org/
+</ref> is a [https://en.wikipedia.org/wiki/Fork_(software_development) fork] of the Mozilla [https://www.mozilla.org/en-US/firefox/enterprise/ Firefox ESR] web browser. It is developed by [https://www.torproject.org/ The Tor Project] and [https://2019.www.torproject.org/projects/torbrowser/design/ optimized] and [https://2019.www.torproject.org/docs/torbutton/en/design/ designed] for [[Tor]], anonymity and security. <ref>
+https://blogs.gnome.org/muelli/2018/12/the-patch-that-converts-a-firefox-to-a-tor-browser/
+</ref> Most will have browsed with Firefox and be familiar with the user interface that resembles those found in other popular, modern browsers. <ref>
+A good overview of the browser component is provided by [https://2019.www.torproject.org/projects/torbrowser/design/#Implementation The Tor Project design document].
+
+<blockquote>The Tor Browser is based on Mozilla's Extended Support Release (ESR) Firefox branch. We have a series of patches against this browser to enhance privacy and security. Browser behavior is additionally augmented through the Torbutton extension, though we are in the process of moving this functionality into direct Firefox patches. We also change a number of Firefox preferences from their defaults.
+
+Tor process management and configuration is accomplished through the Tor Launcher add-on, which provides the initial Tor configuration splash screen and bootstrap progress bar. Tor Launcher is also compatible with Thunderbird, Instantbird, and XULRunner.
+
+To help protect against potential Tor Exit Node eavesdroppers, we include HTTPS-Everywhere. To provide users with optional defense-in-depth against JavaScript and other potential exploit vectors, we also include NoScript. We also modify several extension preferences from their defaults.
+
+To provide censorship circumvention in areas where the public Tor network is blocked either by IP, or by protocol fingerprint, we include several Pluggable Transports in the distribution. As of this writing, we include Obfs3proxy, Obfs4proxy, Scramblesuit, meek, and FTE.</blockquote>
+</ref>
+
+It is strongly encouraged to read this entire chapter so Tor Browser is used effectively and safely on the {{project_name_long}} platform. Advanced users may also be interested in the [[Tor_Browser/Advanced_Users#Tor_Browser_Adversary_ Model|Tor Browser Adversary Model]]. Regularly consult the [https://blog.torproject.org Tor Project blog] to stay in tune with Tor / Tor Browser news and the latest release information. The Tor Browser release schedule for each platform can also be found [https://gitlab.torproject.org/tpo/applications/tor-browser/-/wikis/Release_Schedule here].
+
+= Anonymity vs Pseudonymity =
+If browsers other than Tor Browser are used in {{project_name_long}}, the IP address and Domain Name Service (DNS) requests <ref>
+{{Code|DNS is a distributed database which keeps track of computer's names and their corresponding IP addresses on the Internet}} https://web.stanford.edu/class/msande91si/www-spr04/readings/week1/InternetWhitepaper.htm. DNS servers enable the browser to know where resources are located on the Internet, and the corresponding IP address for fetching these.
+</ref> are still protected (proxy obedience). However, only Tor Browser provides [[#Torbutton|protocol level cleanup]], which includes unique features like state separation, network isolation, and anonymity set preservation.
+
+In stark contrast to regular browsers, Tor Browser is optimized for anonymity and has a plethora of [https://gitweb.torproject.org/tor-browser.git privacy-enhancing patches] and add-ons. <ref>
+See below for a further description of these features.
+</ref> By sharing the [[Fingerprint]] with around [https://metrics.torproject.org/userstats-relay-country.html two million other people], <ref>
+On average. Mid-2019 has seen a sudden spike to over 3 million users -- in recent years, sharp increases in the number of Tor clients were suspected to be adversary attacks on the network.
+</ref> Tor Browser users "blend in" with the larger population and better protect their privacy.
+
+= Browsers other than Tor Browser =
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' Using regular browsers is [[Tips_on_Remaining_Anonymous#Study:_Anonymity_and_Pseudonymity_are_not_the_same|pseudonymous rather than anonymous]].
+}}
+
+= Encryption =
+== HTTPS Encryption ==
+It is important to understand the difference between HTTP and HTTPS: <ref name=whatishttps>https://en.wikipedia.org/wiki/HTTPS</ref>
+
+<blockquote>Hypertext Transfer Protocol Secure (HTTPS) is an extension of the [https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol Hypertext Transfer Protocol] (HTTP). It is used for [https://en.wikipedia.org/wiki/Communications_security secure communication] over a [https://en.wikipedia.org/wiki/Network_operating_system computer network], and is widely used on the Internet. In HTTPS, the [https://en.wikipedia.org/wiki/Communication_protocol communication protocol] is [https://en.wikipedia.org/wiki/Encryption encrypted] using [https://en.wikipedia.org/wiki/Transport_Layer_Security Transport Layer Security] (TLS), or, formerly, its predecessor, Secure Sockets Layer (SSL). The protocol is therefore also often referred to as HTTP over TLS, or HTTP over SSL. <br />
+
+The principal motivation for HTTPS is [https://en.wikipedia.org/wiki/Authentication authentication] of the accessed [https://en.wikipedia.org/wiki/Website website] and protection of the [https://en.wikipedia.org/wiki/Information_privacy privacy] and [https://en.wikipedia.org/wiki/Data_integrity integrity] of the exchanged data while in transit. ...</blockquote>
+
+=== HTTPS Advantages ===
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Only rely on services providing HTTPS when sensitive information is sent or received. Otherwise, passwords, financial / personal information or other sensitive data can be easily stolen or intercepted by eavesdroppers. HTTP webpage contents can also be modified on their way to the browser for malicious purposes.
+}}
+
+HTTPS advantages include: <ref name=whatishttps />
+
+* Authentication of the website and web server that is being communicated with.
+* Protection against [[Warning#Man-in-the-middle_Attacks|Man-in-the-middle Attacks]].
+* Bidirectional encryption of communications between a client and server. This protects against [[Warning#Exit_Relays_can_Eavesdrop_on_Communications|eavesdropping]] and tampering with / forging of communication contents.
+* A <i>reasonable</i> expectation that the website being communicated with is genuine. <ref>HTTPS is not foolproof due to reliance on the Certificate Authority (CA) system that issues digital certificates (private keys) for websites. As a trusted third party, this trust can be abused or the CAs can be subject to adversary attacks.</ref>
+
+In the Tor Browser context, this means HTTPS should be preferred over HTTP so communication is encrypted while browsing the Internet. While traffic is encrypted throughout the Tor network, the exit relay (third of three servers) can see traffic sent into Tor if it is plain HTTP. If HTTPS is used, the exit relay will only know the destination address. <ref>
+https://2019.www.torproject.org/docs/faq#AmITotallyAnonymous
+</ref>
+
+As an example, the screenshot below captures the browser appearance when visiting the {{project_name_long}} website. <ref>https://www.whonix.org</ref>
+
+'''Figure:''' ''A Secure Connection to www.whonix.org''
+
+[[File:tbbbbbb.png|600px]]
+
+Take note of the small, left-hand area of the address bar. Indicators of an encrypted connection are  <code>www.whonix.org</code> is highlighted with a padlock and "<span style="color:#008000">Secure Connection</span>" in green writing, and the URL begins with ''https://'' instead of ''http://''
+
+===  HTTPS-Only Mode ===
+Nowadays when visiting a website that does not support encryption (http<code>s</code>), Tor Browser will show a warning. This is because nowadays HTTPS-Only Mode is enabled by default in Tor Browser.
+
+'''Figure:''' ''Tor Browser HTTPS-Only Mode Alert - Warning when visiting a unencrypted (http only) website''
+
+[[File:Httpsonlymodewarningforhttpwebsit.png|700px]]
+
+=== HTTP / HTTPS Connections with and without Tor ===
+
+The following figures from EFF provide an overview of HTTP / HTTPS connections with and without Tor, and what information is visible to various third parties. The descriptors are as follows: <ref>https://www.eff.org/pages/tor-and-https</ref>
+
+<blockquote>Potentially visible data includes: the site you are visiting (SITE.COM), your username and password (USER/PW), the data you are transmitting (DATA), your IP address (LOCATION), and whether or not you are using Tor (TOR).</blockquote>
+
+'''Figure:''' ''Tor and HTTPS''
+
+{{Box|text=
+[[File:tor-with-https.png|800px]]
+}}
+<br />
+'''Figure:''' ''Tor and No HTTPS''
+
+{{Box|text=
+[[File:tor-without-https.png|800px]]
+}}
+<br />
+'''Figure:''' ''No Tor and HTTPS''
+
+{{Box|text=
+[[File:without-tor-with-https.png|800px]]
+}}
+<br />
+'''Figure:''' ''No Tor and No HTTPS''
+
+{{Box|text=
+[[File:without-tor-https.png|800px]]
+}}
+
+== Onion Services Encryption ==
+Whenever possible, utilize [[Onion_Services|Onion Services]] (<code>.onion</code> addresses) so communications and web browsing stay within the Tor network. These resources are still commonly referred to as "hidden services", even when their location is publicly known. <ref>
+https://riseup.net/en/security/network-security/tor/onionservices-best-practices
+</ref>
+
+=== Onion Services Advantages ===
+URLs ending in the <code>.onion</code> extension provide a superior level of security and privacy, since the connection forms a tunnel which is encrypted (end-to-end) using a random rendezvous point within the Tor network; HTTPS is not required. These connections also incorporate [https://en.wikipedia.org/wiki/Forward_secrecy perfect forward secrecy (PFS)]. PFS means the compromise of long-term keys does not compromise past session keys. As a consequence, past encrypted communications and sessions cannot be retrieved and decrypted if long-term secrets keys or passwords are compromised in the future by adversaries. <ref>This does not however defend against improved cryptanalysis that breaks underlying ciphers being used, for example by the emergence of quantum computers. Only post-quantum ciphers resistant to these attacks will prevail.</ref>
+
+Onion services provide several other benefits: <ref>
+https://2019.www.torproject.org/docs/onion-services
+</ref>
+
+* Passive surveillance by both network observers and the Tor exit node is prevented, unlike the plain Tor + HTTPS configuration. Adversaries cannot easily determine which destination is being connected from/to.
+* Onion services establish "rendezvous points" in the Tor network for web services, meaning neither the hosting service nor the user can discover the other's network identity.
+* Onion services can be combined with [[SSL|SSL/TLS]] to provide additional protection. Only a handful of sites currently provide this service with v3 onions, such as DuckDuckGo: https://duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion/ <ref>Tests reveal the v3 onion address defaults to the clearnet search engine if JavaScript is not enabled.</ref> <ref>
+Extra layers of encryption are not strictly necessary, since a completely encrypted tunnel is already formed (but it certainly does not hurt). Until recently, these certificates would not validate because of the *.onion hostname.</ref> <ref>https://riseup.net/en/security/network-security/tor/onionservices-best-practices
+</ref>
+* Onion services do not use the insecure DNS system. Strong authentication comes from the self-authenticating address: the address itself forms a cryptographic proof of the <code>.onion</code>'s identity. <ref>
+https://blog.torproject.org/cooking-onions-names-your-onions
+</ref> <ref>
+This is why onion addresses appear absurdly long and random.
+</ref>
+
+To learn more about how onion services work, refer to the [[Onion_Services#How_Onion_Services_Connections_Work|technical description]].
+
+= Tor Browser Add-Ons =
+
+== Introduction ==
+
+Any default add-ons that are installed in Tor Browser should not be removed or disabled in the <code>about:addons</code> page. Tor developers have considered the security and anonymity benefits of this configuration, even though [https://gitlab.torproject.org/legacy/trac/-/issues/3007 NoScript blocking is disabled (JavaScript is enabled) in Tor Browser by default] (see footnote). <ref>Experienced Tor developer Mike Perry has noted that even with scripts globally enabled, [https://gitlab.torproject.org/legacy/trac/-/issues/3007#comment:3 NoScript still provides significant protection in Tor Browser]:
+<blockquote>We provide NoScript mostly for the non-filter features it provides, such as click-to-play for media, webgl and plugins, XSS protection, remote font blockage, and so on.</blockquote></ref> Developers have reasoned that this helps to avoid feature breakage and focuses efforts on designing a private browsing environment that does not rely on filters.
+
+== HTTPS Everywhere ==
+
+[[File:httpseverywhere.png|150px|HTTPS Everywhere logo|thumb]]
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Following the Tor Browser 11.5 release in July 2022, HTTPS Everywhere is no longer shipped as an extension.
+}}
+
+The Tor Project recently announced: <ref>https://blog.torproject.org/new-release-tor-browser-115/</ref>  <blockquote>Now, HTTPS is actually everywhere, and all major web browsers include native support to automatically upgrade to HTTPS. Firefox – the underlying browser on which Tor Browser is based – calls this feature HTTPS-Only Mode. Starting in Tor Browser 11.5, HTTPS-Only Mode is enabled by default for desktop, and HTTPS-Everywhere will no longer be bundled with Tor Browser.</blockquote>
+
+[https://www.eff.org/https-everywhere HTTPS Everywhere] is a Firefox extension previously shipped in Tor Browser and was produced as a collaboration between [https://www.torproject.org/ The Tor Project] and the [https://www.eff.org/ Electronic Frontier Foundation]. It helps to encrypt communications with a number of major sites.
+
+Many sites on the Internet offer some limited support for encryption over HTTPS, but make it difficult to use. For instance, sites may default to unencrypted HTTP or fill encrypted pages with links that return to the unencrypted version of site. The HTTPS Everywhere extension helped to address these problems by rewriting all site requests to HTTPS.
+
+Interested readers can learn more about HTTPS Everywhere here:
+
+* The [https://www.eff.org/https-everywhere HTTPS Everywhere homepage].
+* The [https://www.eff.org/https-everywhere/faq/ HTTPS Everywhere FAQ].
+
+== NoScript ==
+
+[[Image:noscript.png|NoScript logo|thumb]]
+
+NoScript is a free, open source extension that comes bundled with Tor Browser and other Mozilla-based web browsers. NoScript can provide significant protection with the correct configuration: <ref name=no_script>https://en.wikipedia.org/wiki/NoScript</ref>
+
+<blockquote>By default, NoScript blocks active (executable) web content, which a user can wholly or partially unblock by whitelisting a site or domain from the extension's toolbar menu: Sites can be set as 'allowed', 'trusted', or 'untrusted', and the whitelist persists between sessions. Temporarily allowed sites won't by added to the permanent whitelist, and work only until the browser session ends. Active content may consist of [https://en.wikipedia.org/wiki/JavaScript JavaScript], web fonts, [https://en.wikipedia.org/wiki/Java_(programming_language) Java], [https://en.wikipedia.org/wiki/Adobe_Flash Flash], [https://en.wikipedia.org/wiki/Microsoft_Silverlight Silverlight], and other [https://en.wikipedia.org/wiki/Plug-in_(computing) plugins]. The add-on also offers specific countermeasures against security exploits. ... This is based on the assumption that malicious websites can use these technologies in harmful ways.</blockquote>
+
+NoScript protects against [https://en.wikipedia.org/wiki/Cross-site_scripting cross-site scripting] (XSS), whereby attackers inject malicious client-side scripts into destination web pages, bypassing the [https://en.wikipedia.org/wiki/Same-origin_policy same-origin policy]. <ref><blockquote>XSS effects vary in range from petty nuisance to significant security risk, depending on the sensitivity of the data handled by the vulnerable site and the nature of any security mitigation implemented by the site's owner.</blockquote></ref> The same-origin policy refers to web browser enforcement of permissions -- scripts in the first web page are usually only allowed to access data in a second web page if they have the same origin (URL scheme, hostname and port number). <ref>[https://noscript.net/faq#clearclick Anti-clickjacking] was previously available to protect against hidden or disguised user interface elements masquerading as trusted web page buttons, links and so on. This is no longer available following the shift to Firefox extensions in Tor Browser based on Firefox 60 ESR. This feature protected against malicious activation of microphones or webcams, as well as user interaction with hidden elements to steal important financial, personal or other data.</ref>
+
+When NoScript is enabled, a host of tracking / profiling services are neutralized because they rely on JavaScript. For example, various operating system and browser configuration details are revealed if JavaScript is not disabled.
+<ref name=no_script /> Another unintended benefit concerns the use of system resources. When JavaScript is disabled, studies reveal that bandwidth consumption can be reduced by more than 40 per cent on the top 150 Alexa websites. Similarly, less system resources are required to display a web page in the browser. <ref>https://ianix.com/pub/firefox-addons-and-bandwidth-consumption.html</ref>
+
+=== Security vs Usability Trade-off ===
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = The [[#Security_Slider|Security Slider]] (see further below) also involves a security versus usability trade-off. Higher slider levels improve security and reduce usability, while the opposite is true of other settings. Fingerprinting risks are greatly reduced at higher slider levels, but some site functionality may also be lost.
+}}
+
+In the stock Tor Browser configuration, JavaScript is enabled by default for greater usability. The Tor Project FAQ provides a rationale for this decision: <ref>
+https://2019.www.torproject.org/docs/faq#TBBJavaScriptEnabled
+</ref>
+
+<blockquote>We configure NoScript to allow JavaScript by default in Tor Browser because many websites will not work with JavaScript disabled. Most users would give up on Tor entirely if a website they want to use requires JavaScript, because they would not know how to allow a website to use JavaScript (or that enabling JavaScript might make a website work).<br />
+There's a trade-off here. On the one hand, we should leave JavaScript enabled by default so websites work the way users expect. On the other hand, we should disable JavaScript by default to better protect against browser vulnerabilities ([https://blog.torproject.org/tor-security-advisory-old-tor-browser-bundles-vulnerable not just a theoretical concern!]). But there's a third issue: websites can easily determine whether you have allowed JavaScript for them, and if you disable JavaScript by default but then allow a few websites to run scripts (the way most people use NoScript), then your choice of whitelisted websites acts as a sort of cookie that makes you recognizable (and distinguishable), thus harming your anonymity.</blockquote>
+
+The take-home message is disabling all JavaScript with white-list based, pre-emptive script-blocking may better protect against vulnerabilities (many attacks are based on scripting), <ref>
+Javascript has previously been used in Windows to [https://www.pcworld.com/article/453223/tor-project-stop-using-windows-disable-javascript.html deanonymize Tor Browser users with a zero-day exploit] which revealed the computer's MAC address to the attackers.
+</ref> but it reduces usability on many sites and acts as a fingerprinting mechanism based on the select sites where it is enabled. <ref name=no_script /> On the other hand, allowing JavaScript by default increases usability and the risk of exploitation, but the specific fingerprint has more in common with the larger user pool. <ref>
+Having a large user base is important for strong anonymity, as Roger Dingledine explains [https://www.mail-archive.com/liberationtech@lists.stanford.edu/msg00022.html here].
+</ref> <ref>
+Another related discussion justifying JavaScript's enabling by default was held on tor-talk; see [https://lists.torproject.org/pipermail/tor-talk/2012-May/024227.html Tor Browser disabling Javascript anonymity set reduction].
+</ref> <ref>
+The Tor Project bug report: [https://gitlab.torproject.org/legacy/trac/-/issues/3007 NoScript configured to globally allow all scripts]
+</ref>
+
+Developers are unaware of any JavaScript vulnerabilities that could compromise {{project_name_long}} anonymity. That said, it is inadvisable to change NoScript settings in Tor Browser unless the potential impacts are known. To enable/disable JavaScript, Java and/or plugin execution, left-click the NoScript status bar icon or use the the [https://www.techopedia.com/definition/2828/contextual-menu contextual menu]. <ref>
+https://noscript.net/
+</ref> Permissions can be granted either temporarily or on a permanent basis using a whitelist. "Temporarily Trusted" will only enable a script(s) for that site until the browser session is closed, or until the permission is manually revoked.
+
+For further information, refer to the [https://noscript.net/ NoScript website] and [https://noscript.net/features features overview], or the [https://2019.www.torproject.org/docs/torbutton/en/design/ Torbutton design document].
+
+=== You should Disable JavaScript by Default! ===
+As noted in the [[#Security vs Usability Trade-off|previous section]], disabling JavaScript by default may worsen fingerprinting. There are several other reasons why {{project_name_long}} has not made any modifications:
+
+* Tor Browser is developed by a different development team, The Tor Project. From {{project name long}} (and others) perspective this is often called upstream because {{project name long}} as a Linux distribution is downstream from the provider of the software project Tor Browser. For an elaboration of the organisational differences, see {{kicksecure_wiki
+|wikipage=Linux User Experience versus Commercial Operating Systems
+|text=Linux User Experience versus Commercial Operating Systems
+}}.
+* There is no stable application programmable interface (API) to reliably disable JavaScript by default in Tor Browser <ref>
+https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/25391
+</ref> that {{project name long}} developers could use and there won’t be <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/25391#note_2277828
+</ref> one unless someone contributes this feature to upstream, Tor Browser. <ref>
+{{project_name_long}} for a while shipped a desktop file and menu options which affect the [[#Security Slider|security slider]] setting after first launching Tor Browser but it was removed due to unreliability, see [https://forums.whonix.org/t/ship-an-additional-version-of-tor-browser-with-security-slider-settings-to-high-by-default/7591 this forum thread] for further details.
+</ref>
+* {{project_name_long}} is not a "secure browser" project - the focus is on creating a stable, reliable anonymity distribution which aligns with best practice security and privacy principles, informed by educated researchers in the field.
+* Possible fingerprinting or security issues with default settings in Tor Browser are the domain of core Tor developers.
+* {{project_name_long}} has limited manpower, meaning the resources do not exist to create a more secure browser, even if it was desirable. <ref>Even if the manpower existed, it would make more sense to establish a new "Privacy Browser" project, rather than merge its development with {{project_name_long}}. At a later stage, the theoretically more secure browser could then be bundled with the {{project_name_long}} platform.</ref>
+* Tor Browser is not significantly modified for the same reasons {{project_name_long}} does not [[Tor#Does_Whonix_.E2.84.A2_Modify_Tor.3F|modify]] or attempt to [[Tor#Can_Whonix_.E2.84.A2_Improve_Tor.3F|improve]] Tor. <ref>{{project_name_long}} includes Tor Browser by default, with only [[Tor_Browser#{{project_name_long}}_Tor_Browser_Differences|minor]] differences.</ref>
+* Having {{project_name_long}} share the [[Fingerprint|fingerprint]] of other Tor Browser users is good for anonymity.
+
+Experienced Tor developer Mike Perry has provided justification for enabling JavaScript by default in a tor-talk mailing list topic; see [https://lists.torproject.org/pipermail/tor-talk/2012-May/024227.html "Tor Browser disabling Javascript anonymity set reduction"]. In summary, Tor Button and Tor Browser patches handle the most serious JavaScript concerns, such as IP address / location bypass problems. <ref>Although there are unresolved [https://gitlab.torproject.org/search?scope=issues&search=tor+browser+fingerprinting&state=opened tbb-fingerprinting] and [https://gitlab.torproject.org/search?scope=issues&search=linkability&state=opened tbb-linkability] issues.</ref>
+
+Due to the loss in functionality, disabling JavaScript by default might place {{project_name_long}} users in a small subset of the Tor Browser population. The JavaScript behavior of the broader population is an open research question, so it safest to avoid changes which might ''reduce'' the anonymity set. Keep in mind the fingerprinting potential is also dependent on Tor Browser's [https://gitlab.torproject.org/legacy/trac/-/issues/9387 security] [[Tor_Browser#Security_Slider|slider]] settings. Ultimately individuals are free to turn JavaScript on or off, depending on their [https://2019.www.torproject.org/docs/faq#TBBJavaScriptEnabled security, anonymity and usability preferences].
+
+=== NoScript Custom Setting Persistence ===
+
+It is possible to save custom NoScript settings between browser restarts with a preference. <ref>This preference was first offered in alpha Tor Browser v8.5a2, but is now available in both the alpha and stable Tor Browser series.</ref> This preference is disabled by default, which means custom NoScript settings will not persist across successive Tor Browser sessions.
+
+==== Warning ====
+
+This preference sacrifices privacy for convenience and is therefore <u>not</u> recommended. While frequently visited sites do not require the constant enabling/disabling of scripts across separate Tor Browser sessions, a number of anonymity risks are introduced: <ref>https://gitlab.torproject.org/legacy/trac/-/issues/27175</ref>
+
+* <u>Disk hygiene:</u> Tor Browser is designed to prevent the persistent storage of history records and other on-disk information. This preference violates that design principle by allowing the storage of NoScript per-site permissions, thereby increasing the chance an adversary can extract valuable information from that data.
+* <u>Long-term fingerprinting vectors:</u> Persistent per-site settings allow a website to profile Tor Browser users, particularly if [https://www.maketecheasier.com/first-party-isolation-firefox/ first-party isolation] is not enforced. For example, consider the negative anonymity impact of whitelisting Google or Facebook, since their advertisements and tracking widgets are ubiquitous.
+* <u>Expert opinion:</u> Experienced Tor developers have confirmed that enabling this preference is dangerous and caution should be exercised. <ref name=caution>https://gitlab.torproject.org/legacy/trac/-/issues/27175#comment:12</ref>
+
+==== Persistent NoScript Settings ====
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Note:</u>
+# By defining custom settings in NoScript, this will override the current Tor Browser Security Slider setting.
+# When <code>extensions.torbutton.noscript_persist</code> is set to <code>true</code>, these changes will persist across Tor Browser restarts.
+}}
+
+If this is acceptable, in the Tor Browser address bar:
+* <code><i>"Type"</i> about:config</code> &rarr; <code><i>"Press"</i> enter</code> &rarr; <code><i>"Choose"</i> I accept the risk!</code> &rarr; <code><i>"Type"</i> extensions.torbutton.noscript_persist</code> &rarr; <code><i>"Toggle"</i> to true</code> <ref>https://blog.torproject.org/new-release-tor-browser-85a2</ref>
+
+This preference will be overridden and all custom per-site settings lost, if:
+
+* The security slider setting is changed afterwards; or <ref name=caution />
+* <code>extensions.torbutton.noscript_persist</code> is again set to <code>false</code>, <ref>The default Tor Browser setting.</ref> since NoScript settings are reset after Tor Browser syncs with the Security Slider position.
+
+== Non-default Add-ons ==
+As Tor Browser is based on Firefox, any browser add-on that is compatible with Firefox can also be installed in Tor Browser. In this context, add-ons are the collective name given to extensions, themes and plugins: <ref name=plugins>https://tb-manual.torproject.org/plugins/</ref>
+
+* Extensions add new features to Firefox or modify existing ones, like video downloaders, ad blockers and so on.
+* Themes change the appearance of the browser, such as buttons, menus and the background image.
+* [[Browser Plugins|browser plugins]] add support for Internet content and often include patented formats like Flash and Silverlight which are used for video, audio, online games and more. <ref>https://support.mozilla.org/en-US/kb/find-and-install-add-ons-add-features-to-firefox</ref>
+
+=== Non-default Add-on Risks ===
+The Tor Project explicitly warns against using non-default add-ons with Tor Browser: <ref name=plugins />
+
+<blockquote>However, the only add-ons that have been tested for use with Tor Browser are those included by default. Installing any other browser add-ons may break functionality in Tor Browser or cause more serious problems that affect your privacy and security. It is strongly discouraged to install additional add-ons, and the Tor Project will not offer support for these configurations.
+
+...
+
+Video websites, such as Vimeo make use of the Flash Player plugin to display video content. Unfortunately, this software operates independently of Tor Browser and cannot easily be made to obey Tor Browser’s proxy settings. It can therefore reveal your real location and IP address to the website operators, or to an outside observer. For this reason, Flash is disabled by default in Tor Browser, and enabling it is not recommended.</blockquote>
+
+=== Recommendations ===
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' For the safest Tor Browser experience, it is recommended to avoid Java, JavaScript, Flash, themes, browser plugins and other non-default add-ons.
+}}
+
+The problem with non-default add-ons is that they are often comprised of [[non-free]] software, which can lead to the linkage of activities conducted under one pseudonym. They also worsen fingerprinting and open up attack vectors in the form of remote exploits.
+
+This advice holds true even though {{project_name_long}} is configured to prevent these applications (along with malware) from leaking the real external IP address, even if they are misconfigured (see [[Features]]). Before installing non-default add-ons, first consider the various alternatives such as HTML5 or online media converters. <ref>For example, most [https://www.youtube.com/html5|Youtube videos] can be viewed in HTML5 which Tor Browser supports and prefers.</ref>
+
+= Torbutton =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = As noted in the [[Tor_Browser/Advanced_Users#Torbutton_Design|Tor Button Design]] entry, the [https://blog.torproject.org/new-release-tor-browser-90 release of Tor Browser 9.0] resulted in both the Torbutton and Tor Launcher extensions being tightly integrated into Tor Browser: <blockquote>... Torbutton has been moved from the URL bar and neither appears on the <code>about:addons</code> page. Other changes include the New Identity function shifting to the URL bar and the New Tor Circuit function being accessible via the hamburger menu. ... No functionality has been lost -- Torbutton's functions in Tor Browser behavior have [https://gitlab.torproject.org/legacy/trac/-/issues/10760 simply moved into direct Firefox patches].</blockquote>
+}}
+
+Tor alone is not enough to protect anonymity and privacy while browsing the Internet. All modern web browsers support [https://en.wikipedia.org/wiki/JavaScript JavaScript], [https://en.wikipedia.org/wiki/Adobe_Flash Adobe Flash], [https://en.wikipedia.org/wiki/HTTP_cookie cookies] and other features which are capable of defeating the anonymity <ref>[[Tips_on_Remaining_Anonymous#Study:_Anonymity_and_Pseudonymity_are_not_the_same]]</ref> provided by the Tor network.
+
+In Tor Browser, these features are handled from inside the browser, because it is a [https://gitweb.torproject.org/tor-browser.git modified (patched) version of Firefox] and it contains direct patches (based on the former [https://2019.www.torproject.org/docs/torbutton/ Torbutton extension]) that take care of application-level security and privacy concerns in Firefox. This means many types of active content are disabled. <ref>https://2019.www.torproject.org/docs/torbutton/torbutton-faq.html.en</ref>
+
+It is recommended to learn more about [[Fingerprint|Fingerprinting]] and [[Data Collection Techniques]] to better understand the potential threats. Advanced users can also review detailed information about the former Torbutton design and its various functions [[Tor_Browser/Advanced_Users#Torbutton_Design|here]].
+
+== New Identity Function ==
+[[File:Newidentityicon.png|thumb|New Identity Broom Symbol]]
+
+There are two ways to get a new identity in Tor Browser. Chose one.
+
+* '''A)''' <u>Restart Tor Browser Method:</u> Simply close all Tor Browser windows and restart Tor Browser. <u>Or,</u>
+* '''B)''' <u>New Identity Button Method:</u> Use Tor Browser "New Identity" button. It clears the browser state, closes all browser tabs, and obtains a fresh Tor circuit for future requests. <ref>
+* "New Identity" button sends the protocol command "signal newnym" to Tor's <code>ControlPort</code>.
+** Further, "signal newnym" does not interfere with long-lived connections such as an SSH or IRC connection originating from other applications.
+* https://blog.torproject.org/torbutton-141-released
+* [https://gitlab.torproject.org/legacy/trac/-/issues/3455 Tor Browser's tab isolation by socks user name] should result in using new socks user names and therefore in using new circuits.
+</ref>
+
+There are two ways to reach the New Identity button. Chose one.
+
+# <code>Left-click the Hamburger Icon</code> &rarr; <code>Select "New Identity"</code>
+# <code>Left-click the 'broom' icon in the URL bar</code>
+
+'''Figure:''' ''New Identity in Tor Browser''
+
+[[File:NewToridentitypointingtoit.png|800px]]
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px|alt=Whonix / {{kicksecure}} default admin password is: changeme]]
+| text    = The New Identity feature will ''likely'' create a new Tor exit relay and a new IP address, but this is not guaranteed.
+}}
+
+Sometimes Tor only replaces the middle relay while using the same Tor exit relay; this is by design and the Tor default. 
+
+In [[{{q_project_name_short}}|{{q_project_name}}]], the safest option when performing sensitive activities is using a {{project_name_workstation_long}} [[Qubes/Disposables|Disposable]]. To completely separate distinct activities, shut down the Disposable and create a new one between sessions.
+
+Please read [[Tor_Browser/Advanced_Users#New_Tor_Circuit_Design|New Tor Circuit Design]] and the [[Tor_Browser/Advanced_Users#New_Identity_Design|New Identity Design]] to learn more about this option and its limitations as well as consider reading about [[Stream Isolation]] more more background information and ever stronger isolation features.
+
+== New Tor Circuit Function ==
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' This function does not attempt to clear Tor browsing session data or unlink activity, unlike the "New Identity" feature.
+}}
+
+The "New Tor Circuit for this Site" feature creates a new circuit for the <i>current</i> Tor Browser tab, including other open tabs or windows from the same website. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/9442</ref> If it is really necessary to separate contextual identities, it is always safer to close and then restart Tor Browser.
+
+There are several, potential use cases for this feature: <ref>https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html</ref>
+
+* The Tor exit relay is located in a country which negatively affects the presentation of the website due to language localization.
+* The site is censored due to the current Tor exit relay in use (caused by Tor IP address blacklisting).
+* To bypass Google [https://en.wikipedia.org/wiki/CAPTCHA CAPTCHA] or [https://www.google.com/recaptcha/about/ reCAPTCHA] systems protecting sites from abuse if these are showing unsolvable captcha or no captcha at all.
+* Connections to websites become unresponsive or slow.
+* To change the Tor exit relay IP address without losing all open tabs.
+
+To use it: <code>Left-click the Hamburger Icon</code> &rarr; <code>Select "New Tor Circuit for this Site"</code>
+
+'''Figure:''' ''New Tor Circuit Button In Tor Browser''
+
+[[File:NewTorCircuitHamburger.png|px400]]
+
+Advanced users who want to learn more about this function should refer to the [[Tor_Browser/Advanced_Users#New_Tor_Circuit_Design|New Tor Circuit Design]] entry.
+
+== Check for Tor Browser Update ==
+
+Notifications will automatically appear if a Tor Browser update is available; see [[#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] for further information and screenshots of this process. Note that [[#Update_Tor_Browser|multiple methods]] exist for updating Tor Browser.
+
+To manually check for Tor Browser updates: <code>Enter about:preferences in the URL bar</code> &rarr; <code>Scroll down to "Tor Browser Updates"</code> &rarr; <code>Click "<u>C</u>heck for updates"</code>
+
+== Disabled Functions ==
+
+Readers who are interested in why the "Open Networking Settings" and "Tor Circuit View" features have been disabled in {{project_name_long}} can learn more [[Tor_Browser/Advanced_Users#Disabled_Torbutton_Functions|here]].
+
+= Tor Browser: How-To =
+
+== Security Slider ==
+
+Tor Browser includes a “Security Slider” that allows the disabling of certain web features that can be used to compromise security and anonymity. At present there are three levels: "Safest", "Safer" and "Standard". It is necessary to make a trade-off between security, usability and privacy. At the higher levels the slider will prevent some sites from working properly. <ref>https://tb-manual.torproject.org/security-settings/</ref> Note that as of Tor Browser release v8.5, the security slider function has shifted to the taskbar. <ref>https://blog.torproject.org/new-release-tor-browser-85</ref> <ref>https://gitlab.torproject.org/legacy/trac/-/issues/29825</ref>
+
+To use this feature: <code>Click Security Level button (taskbar 'shield')</code> &rarr; <code>Click "Advanced Security Settings..."</code> &rarr; <code>Select desired security level</code>
+
+'''Figure:''' ''Tor Browser Security Slider''
+
+[[Image:Torsecurityslider.png|border]]
+
+To learn more about the exact effect of each setting level, refer to the [[Tor_Browser/Advanced_Users#Security_Slider_Design|Security Slider design]] entry. For information on related Tor plans for redesigning browser security controls, see [https://gitweb.torproject.org/tor-browser-spec.git/tree/proposals/101-security-controls-redesign.txt here].
+
+== Start Tor Browser ==
+
+=== From the Menu ===
+Start Tor Browser.
+
+Using Tor Browser Starter by {{project_name_long}}. <ref>
+Tor Browser Starter by {{project_name_long}} (<code>/usr/bin/torbrowser</code>) simply navigates to the Tor Browser folder and runs <code>./start-tor-browser</code>. The former has more features like reporting error conditions or the absence of a Tor Browser folder, generation of non-zero exit code failures, and more.
+</ref>
+
+{{Box|text=
+<u>If you are using [[{{q_project_name_short}}|{{q_project_name}}]]</u>.
+
+<code>Qubes Start Menu</code> &rarr; <code>{{project_name_workstation_long}} App Qube (commonly called {{Code2|{{project_name_workstation_vm}}}})</code> &rarr; <code>Tor Browser</code>
+
+<u>If you are using [[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>.
+
+<code>Start Menu</code> &rarr; <code>Tor Browser</code>
+}}
+
+{{Anchor|From the Command Line}}
+=== From the Command Line ===
+Using Tor Browser Starter by {{project_name_long}}.
+
+From the command line, Tor Browser can either be started normally, in verbose mode or in debugging mode (see next sections).
+
+{{Open_a__product_ws_terminal}}
+
+To start Tor Browser "normally" in a terminal, run.
+
+{{CodeSelect|code=
+torbrowser
+}}
+
+{{Anchor|From the Command Line or Debugging Mode}}
+
+=== In Verbose Mode ===
+Using Tor Browser Starter by {{project_name_long}}.
+
+This will show verbose output messages which might be useful for the user to identify eventual issues issue. In doubt, [[Support]] might help interpreting these messages. Verbose mode is not useful unless there are actual issue or for purpose of curiosity. In the latter case, please se [[Reporting_Bugs#Support_Request_Policy|support request policy]].
+
+{{Open_a__product_ws_terminal}}
+
+To start  Tor Browser Starter by {{project_name_long}} in verbose mode in a terminal, run.
+
+{{CodeSelect|code=
+bash -x torbrowser
+}}
+
+=== In Debugging Mode ===
+If Tor Browser problems emerge, launch it from the command line in debugging mode for detailed output. This will show verbose output messages which might be useful for the user to identify the issue. In doubt, [[Support]] might help interpreting these messages.
+
+<div class="mw-collapsible-content">
+Starting Tor Browser directly without Tor Browser Starter by {{project_name_long}}.
+
+{{Open_a__product_ws_terminal}}
+
+To start Tor Browser in debugging mode, run. <ref>Or manually navigate to the Tor Browser folder and then launch it in debugging mode.
+{{CodeSelect|code=
+cd ~/.tb/tor-browser/Browser
+}}
+
+{{CodeSelect|code=
+./start-tor-browser --debug
+}}</ref>
+
+{{CodeSelect|code=
+~/.tb/tor-browser/Browser/start-tor-browser --debug
+}}
+
+=== Successful Tor Browser Connection ===
+
+If Tor Browser successfully launches and connects to the Tor network, [https://check.torproject.org/ Check Torproject] should show the following message.
+
+'''Figure:''' ''Successful Tor Network Check in {{project_name_long}}''
+
+[[Image:Checktorproject.png|border]]
+
+== File Downloads ==
+=== Warnings ===
+
+{{Download_Warnings}}
+
+=== Secure Downloads ===
+
+==== Preventing SSLStrip Attacks ====
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = If clicking or pasting a download link, make sure it is <code>http'''s'''://</code>. The <code>s</code> in <code>http'''s'''://</code> stands for "secure".
+}}
+
+A common misconception is that a secure, green padlock and a <code>http'''s'''://</code> URL makes any download from that particular website secure. This is not the case because the website might be redirecting to <code>http</code>. In fact, an [https://security.stackexchange.com/questions/41988/how-does-sslstrip-work SSLstrip attack] might succeed if a link is pasted or typed into the address bar without the <code>https://</code> component (e.g. <code>www.torproject.org</code> instead of <code>https://www.torproject.org</code>) -- the reason is a padlock is not visible; it just appears empty. <ref>And that website does not:
+
+* Use [https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security HTTP Strict Transport Security (HSTS)]. See also: https://security.stackexchange.com/questions/91092/how-does-bypassing-hsts-with-sslstrip-work-exactly. Without HSTS, sites with non-encrypted resources or sub-domains are vulnerable to SSLstrip.
+* Have a [https://www.eff.org/https-everywhere HTTPS Everywhere] rule in effect.
+* Use [https://blog.mozilla.org/security/2012/11/01/preloading-hsts/ HSTS preloading].
+* Use [https://en.wikipedia.org/wiki/HTTP_Public_Key_Pinning HTTP Public Key Pinning]. See also: https://news.netcraft.com/archives/2016/03/22/secure-websites-shun-http-public-key-pinning.html. HPKP limits trust to a handful of Certificate Authorities, but is not used by many websites due to the risk of site breakage if keys are not managed vigilantly.
+</ref>
+
+To avoid this risk and similar threats, <u>always explicitly type or paste <code>https://</code> in the URL / address bar</u>. The SSL certificate button or padlock will not appear, but that is nothing to be concerned about. Unfortunately, few people follow this sage advice; instead most mistakenly believe pasting or typing www.torproject.org into the address bar is safe.
+
+==== Other Precautions ====
+
+For improved safety when downloading files or installing software, follow the advice below.
+
+'''Table:''' ''Software and File Download Advice''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Category'''
+! scope="col"| '''Recommendations'''
+|-
+
+! scope="row"| File Source and Verification
+|
+* If files are already available in repositories, then prefer mechanisms which simplify and automate software upgrades and installations (like APT functions), rather than download Internet resources. <br />
+* Avoid installing unsigned software and always [[Verifying_Software_Signatures|verify key fingerprints and digital signatures of signed software]] from the Internet, <i>before</i> importing keys or completing installations; see {{kicksecure_wiki
+|wikipage=Install_Software#Best_Practices
+|text=Installing Software Best Practices
+}}.
+|-
+
+! scope="row"| [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]]
+| Consider using [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] when downloading and installing additional software. It is safer to compartmentalize discrete activities and minimize the threat of misbehaving applications.
+|-
+
+! scope="row"| Onion Service Downloads
+| Files should be downloaded from [[Onion_Services|Onion Services]] (via <i>.onion</i> addresses) whenever possible. Onion service downloads improve security for several reasons: <br />
+* The connection is encrypted end-to-end (with PFS). <br />
+* It is difficult for network adversaries to: <br />
+** Target specific individuals. <br />
+** Determine where someone is connecting to/from.
+|-
+
+|}
+
+=== Navigating Tor Browser Downloads ===
+{{Tor_Browser_Downloads}}
+
+=== Savings Files in Shared Folder ===
+For advanced users only, see [[Tor Browser/Advanced Users#Savings Files in Shared Folder|Savings Files in Shared Folder]].
+
+== Prioritize Onion Connections ==
+
+The release of Tor Browser v9.5 provides a new Onion Location function: <ref>https://blog.torproject.org/new-release-tor-browser-95</ref>
+
+<blockquote>Website publishers now can advertise their onion service to Tor users by adding an HTTP header. When visiting a website that has both an .onion address and Onion Location enabled via Tor Browser, users will be prompted about the onion service version of the site and will be asked to opt-in to upgrade to the onion service on their first use.</blockquote>
+
+This feature has been implemented across the entire <code>whonix.org</code> ecosystem, including the homepage, wiki, forums, phabricator and repository. <ref>https://forums.whonix.org/t/onion-forum-site-redirects-to-clearnet/197</ref>
+
+'''Figure:''' ''Onion Location Indicator for {{project_name_long}} Forums''
+
+[[Image:Whonixonionnotification.png|border]]
+
+Once the "Always Prioritize Onions" option is set in Tor Browser, the relevant onion resource will always be preferred in the future. If you want to only upgrade to the onion resource one time, click "Not Now" and then press the "Onion Available" button one more time. This browser feature is located in <code>about:preferences#privacy</code> and can be changed at any time. <ref>
+The Tor Project server side Onion Location feature is documented [https://gitweb.torproject.org/tor-browser-spec.git/tree/proposals/100-onion-location-header.txt here].
+</ref>
+
+'''Figure:''' ''Prioritize the Onion Site''
+
+[[Image:Prioritizeonions.png|border]]
+
+'''Figure:''' ''Prioritized {{project_name_long}} Onion Forums''
+
+[[Image:Whonixonionforum.png|border]]
+
+Security impact: none. <ref>Onion location header is a server side feature. Not a client side feature.
+
+Quote [https://gitweb.torproject.org/tor-browser-spec.git/tree/proposals/100-onion-location-header.txt Onion redirects using Onion-Location HTTP header]:
+
+<blockquote>3. Drawbacks
+
+3.1. No security/performance benefits
+
+   While we could come up with onion redirection proposals that provide
+   security and performance benefits, this proposal does not actually provide
+   any of those.
+
+   As a matter of fact, the security remains the same as connecting to normal
+   websites, since for this proposal to work we need to trust their HTTP headers,
+   and the user might have already provided identifying information
+   (e.g. cookies) to the website. The performance is worse than connecting to a
+   normal website, since Tor first needs to connect to the website, get its
+   headers, and then finally connect to the onion.
+
+   Still _all_ the website approaches mentioned in the "Motivation" section
+   suffer from the above drawbacks, and sysadmins still come up with ad-hoc
+   ways to inform users about their onions. So this simple proposal will still
+   help those websites and also pave the way forward for future auto-redirect
+techniques.</blockquote></ref>
+
+For security improvement it might help to force connections to onions for websites that are reachable over clearnet and onion. This is currently only documented for [[Forcing .onion on Project]] but [[Unsupported|undocumented]] for arbitrary websites. Doing so would be possible as per [[Support#Free_Support_Principle|Free Support Principle]].
+
+== Onion Client Authorization ==
+There are two options to setup Onion Service Client Authentication. Chose <u>either</u> option '''A)''' <u>or</u> '''B)'''.
+
+* '''A)''' [[Tor_Browser#Onion_Client_Authorization|Tor Browser Onion Client Authorization]], see below. <u>Or</u>,
+* '''B)''' [[Onion_Services#Onion_Service_Authentication_Client_Setup|Onion Service Client Authentication setup on {{project name gateway long}}]].
+
+These options should never be combined for the same onion service.
+
+'''Figure:''' ''Tor Browser Onion Client Authorization'' <ref>
+* https://tb-manual.torproject.org/onion-services/
+* https://blog.torproject.org/new-release-tor-browser-95
+</ref>
+
+[[File:Client-auth.png|border|800]]
+
+Before Tor Browser Onion Client Authorization in {{project name long}} can be used, in other words, before private keys can be pasted into Tor Browser's Onion Client Authorization popup, an additional configuration step must be applied on {{project name gateway long}}.
+
+Tor Browser Onion Client Authorization requires additional Tor control protocol access. A supported [[{{project_name_gateway_short}}|{{project_name_gateway_long}}]] modification is therefore necessary for full functionality; see instructions below.
+
+This is not enabled by default as this is a potential cross VM linking identifier in context of using [[Multiple Whonix-Workstation]]. When one {{project name workstation long}} would login to an authenticated onion v3 services, this would login potential other {{project name workstation long}} too. In any case, [[About|{{project_name_long}}]] is the safest choice for running it.
+
+<ref>
+* https://github.com/Whonix/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_onion_authentication.yml
+* This was successfully tested with Tor Browser version <code>11.0.3</code> and <code>11.5a1</code>.
+</ref>
+
+Before proceeding, two things are required:
+
+* '''A)''' The onion domain name, <u>and</u>
+* '''B)''' The onion client authorization private key.
+
+To setup Tor Browser Onion Client Authorization, perform the following instructions.
+
+{{box|text=
+'''1.''' {{Control_Port_Filter_Python_Profile_Add
+|filename_new=40_onion_authentication
+}}
+
+'''2.''' Learn how a client authorization private key looks.
+
+Sample onion client authorization private key.
+
+NOTE: The user must not use the following private key because it is only an example and will not work.
+
+<pre>
+XAJKD2BRVOI4C4IHK2OWF3EKIJNVIDBVCP2IM2Z2ZHPN456HNRZA
+</pre>
+
+'''3.''' Open the onion service link in Tor Browser in {{project name workstation long}}.
+
+'''4.''' Get the onion client authorization private key from the onion service host.
+
+The onion client authorization private key can only be provided by the onion service administrator.
+
+'''5.''' Tor Browser Onion Client Authorization normally.
+
+'''6.''' Done.
+
+Tor Browser Onion Client Authorization setup is complete.
+}}
+
+Troubleshooting:
+
+# Consider to always check the <code>Remember this key</code> option. In the experience of the author, this works more reliable.
+# Make sure regular torified internet connections are functional.
+# Make sure regular connections to unauthenticated onions service are functional.
+# When setting up your own onion service:
+
+* Exercise setting up the following outside of {{project name long}} first before attempting to replicate the same inside of {{project name long}} for simplicity. See also [[unspecific]].
+* Exercise setting up a unauthenticated onion service first before attempting setting up an authenticated onion service.
+* Exercise authenticated onion service but first attempt to use it without using Tor Browser's Onion Client Authorization feature. Try using it using Tor on the command line first.
+* Only then attempt the same using an authenticated onion service in combination with Tor Browser's Onion Client Authorization feature.
+
+== Browser Language ==
+In 2021, the stable and experimental Tor Browser binaries with additional language packs support 34 languages. Recent additions include: Catalan, Irish, Indonesian, Icelandic, Norwegian, Danish, Hebrew, Swedish, Traditional Chinese, Macedonian and Romanian. <ref>https://blog.torproject.org/new-release-tor-browser-80</ref> <ref>https://blog.torproject.org/new-release-tor-browser-90</ref> <ref>https://www.torproject.org/download/languages/</ref> For instructions on changing the Tor Browser interface to a language other than English, see [[Language#Tor_Browser|Tor Browser Language]]. <ref>Language packs might be another fingerprinting vector, but this issue requires further investigation.</ref>
+
+== Local Connections ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Web HTTP(S)/SOCKS proxies have different instructions and will not work with these steps, see [[Tor_Browser/Advanced_Users#Change_Proxy_Settings|Tor Browser Proxy Configuration]].
+}}
+
+Sometimes it is necessary to access the local application interface on <code>127.0.0.1</code> in order to run specific applications like I2P. <ref>Since it uses predetermined ports on the localhost.</ref> Due to potential fingerprinting and information leakage risks, this behavior is no longer possible in Tor Browser unless an exception is configured. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/10419</ref> <ref>https://gitlab.torproject.org/legacy/trac/-/issues/11493</ref>
+
+To configure an exception for local connections in Tor Browser: <ref>Alternatively it is possible to  [[Tor_Browser/Advanced_Users#Remove_Proxy_Settings|remove Tor Browser's proxy settings]], but this method is still vulnerable to the same fingerprinting issues as configuring an exception. There are also other factors which will worsen the user's fingerprint, such as the breaking of both stream isolation and the tab isolation by socks user name in Tor Browser.</ref>
+
+URL bar &rarr; Type: <code>about:config</code> &rarr; Press <code>Enter</code> key &rarr;  search for and modify <code>network.proxy.no_proxies_on</code> &rarr; write addresses separated by comma: <code>localhost, 127.0.0.1</code> &rarr; <code>click "Save"</code>
+
+The configured exception means a small trade-off in privacy, but it is much safer than using another browser (see [[Tor_Browser/Advanced_Users#Local_Connections_Exception_Threat_Analysis|Local Connections Exception Threat Analysis]]).
+
+=== Recommendations ===
+
+For better anonymity:
+
+* Browse with JavaScript disabled in Tor Browser and enable it only when needed. Disabled JavaScript mitigates these browser fingerprinting issues completely.
+* Set passwords for web interfaces listening on the localhost.
+* Run sensitive daemons with local WebGUIs on a separate, dedicated {{project_name_workstation_long}} and virtual network instance. TODO: expand or link how to do that
+
+{{Anchor|Bypass Tor Censorship}}
+== Tor Censorship ==
+=== Censors ===
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Tor Censorship can mean two different things.
+
+* '''A)''' <u>Destination website level:</u> This section outlines Tor blocks by destination websites.
+* '''B)''' <u>{{isp}} level:</u> If connections to the Tor network are blocked by the user's ISP, then [[Bridges|bridges]] or other circumvention tools are necessary.
+}}
+
+A number of websites or services [https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor actively block Tor users] via:
+
+* A DNS query-based list used to tag IP addresses.
+* Content delivery network (CDN) and/or blocking software like [https://www.akamai.com/ Akamai] and [https://www.cloudflare.com/ Cloudflare].
+* Other individual blocks.
+
+This issue is [[unspecific|unspecific to {{project name long}}]] and specific to [[Tor]].
+
+Can {{project name long}} be the cause of the inability to access specific destination websites? No. If connectivity is generally functional (some websites can be reached), never in the history of {{project name long}}, any website were reachable in Tor Browser outside of {{project name long}} (such as Tor Browser on Debian) while unreachable in Tor Browser inside of {{project name long}}. The [[#{{project_name_long}} Tor Browser Differences|{{project_name_long}} Tor Browser Differences]] nor {{project_name_long}} firewall discriminates against specific websites.
+
+A potential cause for confusion is the following. Cloudflare treats Tor Browser users different than other browsers (such as Firefox) or command line substitutes (such as curl) when being used over Tor. Quote Cloudflare [https://blog.cloudflare.com/cloudflare-onion-service/ Introducing the Cloudflare Onion Service]:
+
+<blockquote>Today’s edition of the Crypto Week introduces an “opportunistic” solution to this problem, so that under suitable conditions, anyone using Tor Browser 8.0 will benefit from improved security and performance when visiting Cloudflare websites without having to face a CAPTCHA.</blockquote>
+
+It is therefore possible that some websites can be visited with Tor Browser while attempting to fetch these websites with command line utilities such as curl would lead to a different result, a captcha.
+
+The CDN provider Cloudflare is used by millions of websites. <ref>
+* https://community.cloudflare.com/t/statistically-speaking-whats-the-percentage-of-total-sites-that-use-cf/372054
+* https://blog.cloudflare.com/application-security/
+</ref> Many of the top websites are using Cloudflare. See also the [https://framagit.org/dCF/deCloudflare/-/blob/master/README.md Great Cloudwall / Stop Cloudflare / #deCloudflare #Crimeflare project] ([http://crimeflare.eu.org This redirection link might always link to a functional version.]) ([https://news.ycombinator.com/item?id=31801947 on hackernews]), which has (non-exhaustive list):
+
+* [https://framagit.org/dCF/deCloudflare/-/blob/master/readme/en.md English version readme] / [https://framagit.org/dCF/deCloudflare/-/blob/master/README.md non-English versin] contains a long list of arguments why cloudflare should not be used,
+* [https://framagit.org/dCF/deCloudflare/-/blob/master/readme/en.ethics.md ethics],
+* [https://framagit.org/dCF/deCloudflare/-/blob/master/PEOPLE.md anti-cloudflare citations, memes, outage report collections],
+* [https://framagit.org/dCF/deCloudflare/-/blob/master/HISTORY.md incidents],
+* [https://framagit.org/dCF/deCloudflare/-/blob/master/INSTRUCTION.md list of websites using cloudflare],
+* [https://framagit.org/dCF/deCloudflare/-/blob/master/anti-tor_users/domains/attd.txt list of Tor blocking websites]
+
+=== Bypass Tor Censorship ===
+There are various ad-hoc methods available to try and circumvent blocks. In most cases it is unnecessary to [[Tunnels/Introduction|create a tunnel]] which pairs {{project_name_long}} with other protocols (such as a VPN) in order to access the content.
+
+The following services fetch content via other websites, which is a privacy trade-off. Further, only some services are effective with embedded, non-static content or support specific file types like PDF, <code>.exe</code> and <code>mp3</code>. <ref>
+https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor#ad-hoc-solutions-for-accessing-blocked-content-on-tor
+</ref>
+
+'''Table:''' ''Tor Censorship Circumvention Options'' <ref>
+* Source: [https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor#ad-hoc-solutions-for-accessing-blocked-content-on-tor Ad-hoc Solutions for accessing blocked content on Tor]
+* License: Content on this site is Copyright The Tor Project, Inc.. Reproduction of content is permitted under a [https://creativecommons.org/licenses/by/3.0/us/ Creative Commons Attribution 3.0 United States License].
+</ref>
+
+<div class="scroll-table">
+{| class="wikitable"
+|-
+
+! scope="col"| '''Service'''
+! scope="col"| '''URL'''
+! scope="col"| '''Comment'''
+! scope="col"| '''Non-static Embedded Content'''
+! scope="col"| '''PDF, .exe, mp3'''
+|-
+
+! scope="row"| The Internet Archive's WaybackMachine
+| <code><nowiki>https://</nowiki>web.archive.org/web/<b><u><URL></u></b></code><br/>
+<code><nowiki>https://</nowiki>web.archive.org/save/_embed/<b><u><URL></u></b></code>
+| Archive.org respects robots.txt restrictions, works best with JS enabled
+| No
+| Yes
+|-
+
+! scope="row"| Archive.is
+| <code><nowiki>https://archive.ph/?run=1&url=</nowiki><b><u><URL></u></code>
+| Ideal for news sites, doesn't require JS
+| No
+| No
+|-
+
+! scope="row" | Google Cache
+| <code><nowiki>https://webcache.googleusercontent.com/search?q=cache:</nowiki><b><u><URL without "http://"></u></b></code>
+| Google sometimes blocks these requests
+| No - static only
+| No
+|-
+
+! scope="row" | Startpage.com
+|
+# Go to {{Archive_link|url=https://www.startpage.com/|archive=none|text=startpage.com}}
+# Find the URL by searching for the URL
+# Click on the Anonymous View mask icon (proxy option) next to the search result <ref>
+Note the icon is not visible with Tor Browser's security slider set to safest, but can still be clicked. [https://support.startpage.com/hc/en-us/articles/4521579122964-How-to-use-Anonymous-View Startpage documentation] states: <blockquote>Pages viewed through the proxy are served to you anonymously. No connection is made between your computer and the remote site. Because of their potential for being used to identify you, JavaScript is modified and cookies are disabled for proxied pages.</blockquote>
+</ref>
+| Not always efficacious
+| No
+| No
+|-
+
+! scope="row" | Any Searx Instance <ref>
+Searx instances utilizing v3 onions can be found {{Archive_link|url=https://searx.space/|onion=http://searxspbitokayvkhzhsnljde7rqmn7rvoga6e4waeub3h7ug3nghoad.onion|text=here}}.
+</ref>
+|
+# Choose one from {{Archive_link|url=https://searx.space|text=searx available instances}}.
+# Find the URL by searching
+# Click on the proxied option
+| Not always efficacious
+| No
+| No
+|-
+
+! scope="row" | Hypothes.is
+| <code><nowiki>https://</nowiki>via.hypothes.is/<b><u><URL></u></b></code>
+| Behind Cloudflare
+| Yes
+| Yes
+|-
+
+! scope="row" | Online Proxies
+| hide.me/en/proxy, proxysite.com, hidester.com/proxy
+| -
+| Yes
+| Yes
+|-
+
+|}
+</div>
+
+The Tor community also recommends: <ref>
+https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor#other-relevant-services
+</ref>
+
+<blockquote>To avoid captchas that are sometimes required when visiting YouTube, use hooktube.com/ (behind Cloudflare).<br /> <br />
+imgur.com blocks Tor uploads, to upload images on an imgur domain go to a stackexchange website (for example tor.stackexchange.com), click on Ask a Question, use the image upload tooltip to upload the image, the resulting url will have a i.stack.imgur.com/... form.</blockquote>
+
+== Harden Tor Browser ==
+
+Anonymity and safety can be materially improved via: AppArmor, Firejail confinement, Tor Browser settings, sandboxing, multiple Tor Browser instances, and operation of {{project_name_workstation_long}} Disposables ([[{{q_project_name_short}}|{{q_project_name}}]]) or multiple {{project_name_workstation_long}}.
+
+Tor Browser provides reasonable security in its stock configuration. However, mitigating the risk of Tor Browser security breaches makes sense, because it is an untrusted application with a huge attack surface; it is frequently  attacked successfully in the wild by adversaries.
+
+'''Table:''' ''Tor Browser Hardening Options''
+
+<div class="scroll-table">
+{| class="wikitable"
+|-
+! scope="col"| Domain
+! scope="col"| Recommendations
+|-
+! scope="row"| AppArmor Confinement
+|
+* [[{{project_name_gateway_short}}_Security#AppArmor|AppArmor]] can help to protect the user's system and data. <ref>It confines programs according to a set of rules that specify what files a given program can access, and with what privileges. This also provides some protection against zero-day attacks and exploits via unknown application flaws.</ref> <ref>If AppArmor is applied, Tor Browser can only read and write to a limited number of folders. Permission denied errors are quite common, for example when trying to download files directly to the {{Code2|home}} folder.</ref> To mitigate the threat of specific attacks against Tor Browser, the {{project_name_long}} Tor Browser [[AppArmor]] profile can be easily applied -- see the footnote for download workarounds. <ref>The workaround for AppArmor denied errors is saving files from Tor Browser to the {{Code2|~/Downloads}} folder that is located within the {{Code2|home}} folder. In order to upload files with Tor Browser, first copy them to that folder.</ref> <br />
+* {{Update}} Install the {{Code2|apparmor-profile-torbrowser}} package.
+{{CodeSelect|code=
+sudo apt update
+}}
+{{CodeSelect|code=
+sudo apt install apparmor-profile-torbrowser
+}}
+|-
+
+{{Anchor|Hardening}}
+! scope="row"| Firejail Confinement
+| Firejail can be used as an alternative sandboxing measure to restrict the Tor Browser process. The Tor Browser Starter by {{project_name_long}} developers in {{project_name_long}} testers repository includes a “hardening” option that permits certain features to be enabled that on the upside increase security, but on the downside might decrease anonymity. <ref>[https://github.com/Kicksecure/tb-starter/blob/master/usr/bin/torbrowser tb-starter] will enable the Tor Browser Firejail profile. [https://forums.whonix.org/t/automatically-firejailing-tor-browser/4767/21 development discussion]
+</ref>
+
+It is necessary to make a trade-off between security, usability and privacy. With “hardening” enabled, certain website features might be non-functional or Tor Browser may no longer start after an upgrade. Also, the [[Fingerprint#Visited_Websites|fingerprint]] seen by websites ('web fingerprint') might reveal subtle differences between Tor Browser instances that have enabled this feature compared to the default configuration. The population of Linux Tor Browser users who regularly utilize Firejail is likely to be tiny. At the time of writing (2019) there were no reports confirming a detectable fingerprint, but there is also no known research being undertaken in this area. <ref>The Tor Project does not currently provide a hardened / sandboxed Tor Browser build, see: [https://gitlab.torproject.org/legacy/trac/-/issues/25540 Stop building and distributing sandboxed-tor-browser binaries].</ref> <ref>[https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorBrowser/Sandbox/Linux Linux Sandboxed Tor Browser Documentation]: <blockquote>WARNING: This project is no longer maintained. DO NOT EXPECT ANY FURTHER FIXES, INCLUDING SECURITY AND STOP USING THIS AS SOON AS POSSIBLE.<br />
+
+WARNING: There are several unresolved issues that affect security and fingerprinting. Do not assume that this is perfect, merely "an improvement over nothing".
+
+WARNING: Active development is on indefinite hiatus. DO NOT EXPECT ANY SIGNIFICANT NEW FEATURES OR IMPROVEMENTS.</blockquote></ref> <ref>
+https://forums.whonix.org/t/tor-browser-hardening-hardened-malloc-firejail-apparmor-vs-web-fingerprint/7851
+</ref> This issue is [[Linux User Experience versus Commercial Operating Systems|not]] within the control of the {{project_name_long}} project.
+
+To use this feature, apply the following instructions.
+
+{{Box|text=
+'''1.''' Open <code>/etc/torbrowser.d/50_user.conf</code> in an editor with root rights.
+
+{{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''2.''' Add the following setting.
+
+{{CodeSelect|code=
+tb_hardening=true
+}}
+
+'''3.''' Save the file.
+
+The procedure is complete.
+}}
+
+|-
+! scope="row"| Multiple Tor Browser Instances and {{project_name_workstation_long}}
+|
+* <u>Multiple Tor Browser Instances</u>: To better separate different contextual identities, consider starting [[{{project_name_workstation_short}}_Security_Hardening#Multiple_Tor_Browser_Instances|multiple Tor Browser instances]] and running them through different SocksPorts. This method is less secure than the method outlined below.<br />
+* <u>Multiple {{project_name_workstation_long}}</u>: For tasks requiring different identities and/or additional software, it is recommended to compartmentalize activities and use [[Multiple Whonix-Workstation|two or more {{project_name_workstation_long}} VMs]]. In this way, an exploit in Tor Browser in one {{project_name_workstation_long}} cannot simultaneously read the individual's identity in another VM (for example, an IRC account). <ref>This does not protect against the sudden loss of networking, which could reveal to the attacker that two activities / accounts suddenly going off-line are probably related.</ref> This method is less secure than using a {{project_name_workstation_long}} Disposable with Tor Browser (see below).
+|-
+! scope="row"| Sandboxing and Disposables
+|
+* <u>Sandboxing</u>: The Tor Project's official sandboxed Tor Browser is compatible with {{project_name_long}} 14 and later releases, however it is no longer recommended since The Tor Project has officially abandoned its development. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/25540</ref>
+* <u>{{project_name_workstation_long}} Disposables</u>: One of the safest configurations is to assume future compromise and run all instances of Tor Browser in an uncustomized {{project_name_workstation_long}} [[Qubes/Disposables|Disposable]] in [[{{q_project_name_short}}|{{q_project_name}}]]. This configuration creates fresh {{project_name_workstation_long}} and Tor Browser instances for discrete Internet activities, while ensuring that previous, potentially compromised versions of both are destroyed. <ref>This does not protect against potential infection of dom0 or the {{project_name_workstation_long}} Disposable Template by advanced adversaries. Traces of activity may also be left on storage media or in RAM.</ref>
+|-
+! scope="row"| Tor Browser Series and Settings
+|
+* <u>Series</u>: Prefer the stable Tor Browser release over the alpha series in line with Tor developer recommendations; see footnotes. <ref>https://blog.torproject.org/new-release-tor-browser-90a1</ref> <ref>[https://www.ics.uci.edu/~perl/pets16_selfrando.pdf Selfrando] (load-time memory randomization) protection is [https://gitlab.torproject.org/legacy/trac/-/issues/30377 being removed from alpha Tor Browser Linux builds]. Although Selfrando provides a security improvement over standard address space layout randomization (ASLR) present in Tor Browser and other browsers, Tor developers believe it is relatively easy for attackers to bypass and not worth the effort.</ref> <ref>The "hardened" Tor Browser series has been deprecated, see: https://gitlab.torproject.org/legacy/trac/-/issues/21912</ref> <ref>Following the official release of the v8.0+ Tor Browser series (based on Firefox 60 ESR), the stable and alpha Tor Browser versions both have a [https://wiki.mozilla.org/Security/Sandbox native sandbox].</ref> Both the stable and alpha Tor Browser series now benefit from Mozilla's content level sandboxing, as well as being multi-process (e10s) compatible.
+* <u>Settings</u>: Follow relevant [[System_Hardening_Checklist#Tor_Browser_Series_and_Settings|System Hardening Checklist recommendations]], such as routinely using onion services for search queries and browsing (where possible), running the Security Slider in the highest position and disabling Javascript by default.<br />
+|}
+</div>
+
+{{Anchor|reinstall}}
+
+= Update Tor Browser =
+== Introduction ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = It is recommended to follow [https://blog.torproject.org The Tor Project blog] to stay informed about recent updates.
+}}
+
+Unfortunately, updating Tor Browser is more complex than regular system updates due to technical limitations outside of {{project_name_long}} control. <ref>
+[[Tor_Browser/Advanced_Users#Tor_Browser_Update:_Technical_Details|Tor Browser Update:Technical Details]]
+</ref> However, the following instructions will keep Tor Browser up-to-date at all times.
+
+There are three options for updating Tor Browser in {{project_name_long}}:
+
+# The <code>{{project_name_long}}</code> [[#Tor_Browser_Downloader_by_{{project_name_long}}|Tor Browser Downloader]]. <ref>This does [https://phabricator.whonix.org/T400 not yet notice upgrades] performed by Tor Browser's Internal Updater.</ref>
+# <code>The Tor Project</code>'s Tor Browser [[#Tor_Browser_Internal_Updater|Internal Updater]]. <ref>Since v5.0, Tor Browser is configured to [https://blog.torproject.org/tor-browser-50-released update itself].</ref>
+# Tor Browser [[#Tor_Browser_Manual_Update|manual updates]].
+
+The first two methods are suitable in most circumstances. Manual updates are only required if the {{project_name_long}} Tor Browser update script ever breaks. Never continue to use an outdated version of Tor Browser, otherwise serious security flaws may degrade anonymity or result in a VM compromise. <ref>https://tb-manual.torproject.org/updating/</ref>
+
+{{Anchor|Tor Browser Updater ({{project_name_short}})}}
+
+{{Anchor|Tor Browser Downloader by}}
+== Tor Browser Downloader by {{project_name_long}} ==
+=== Configuration ===
+==== Manual Download Version Choice ====
+If the online detected version (for example <code>INFO: Online detected version: 10.5</code>) is different from the version number intended for download, it is possible to manually choose the download version on the command line. This can be useful when a new version of Tor Browser has been released but the version file <ref>
+At time of writing: https://aus1.torproject.org/torbrowser/update_3/release/downloads.json
+</ref> has not been updated yet by The Tor Project. The version file which is used to programmatically detect the latest Tor Browser version is usually updated a few days after new releases. <ref>
+This might be due to pragmatic reasons (work flow) or perhaps this is a staged rollout release strategy. (The term staged rollout hasn't been seen; see this definition [https://medium.com/bleeding-edge/the-art-of-staging-a-rollout-8e203b337b75 here].)
+
+</ref>
+
+Syntax:
+
+{{CodeSelect|code=
+tbb_version=version.number update-torbrowser
+}}
+
+Example:
+
+Note: Replace <code>10.5</code> with the actual version number.
+
+{{CodeSelect|code=
+tbb_version=10.5 update-torbrowser
+}}
+
+==== Onion Download ====
+It is possible to download over onion rather than clearnet.
+
+To permanently set downloads over onion, apply the following instructions.
+
+{{Box|text=
+'''1.''' Open <code>/etc/torbrowser.d/50_user.conf</code> in an editor with root rights.
+
+{{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''2.''' Add the following setting.
+
+{{CodeSelect|code=
+tb_onion=true
+}}
+
+'''3.''' Save the file.
+
+The procedure is complete.
+}}
+
+Alternatively, the following command could be used to download over onion only once.
+
+{{CodeSelect|code=
+update-torbrowser --onion
+}}
+
+{{Anchor|alpha}}
+{{Anchor|Alpha}}
+
+==== Alpha Version ====
+{{Testers-only}}
+
+It is possible to configure the downloading of alpha rather than stable Tor Browser versions. Becoming a tester is a helpful way to [[contribute]] to {{project_name_long}}.
+
+To permanently enable downloading alpha versions, apply the following instructions.
+
+{{Box|text=
+'''1.''' Open <code>/etc/torbrowser.d/50_user.conf</code> in an editor with root rights.
+
+{{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''2.''' Add the following setting.
+
+{{CodeSelect|code=
+tbb_download_alpha_version=true
+}}
+
+'''3.''' Save the file.
+
+The procedure is complete.
+}}
+
+Alternatively, the following command could be used to download the alpha version only once. Choose either option '''A)''' or '''B)'''.
+
+* '''A)''' tb-updater {{cli}} version: {{CodeSelect|code=
+update-torbrowser --alpha
+}}
+* '''B)''' tb-updater {{gui}} version: {{CodeSelect|code=
+update-torbrowser --alpha --input gui
+}}
+
+=== Installation Process ===
+'''Note:''' {{Code2|Tor Browser Downloader ({{project_name_long}})}} is really just a downloader, not an updater. This means it is incapable of retaining user data such as bookmarks and passwords. In order to preserve data, use the [[#Tor_Browser_Internal_Updater|Internal Updater]] method instead.
+
+To use {{Code2|Tor Browser Downloader ({{project_name_long}})}}, follow these instructions in {{project_name_workstation_long}}.
+
+{{Box|text=
+'''1.''' Perform [[Update|standard ("everyday") upgrades]]. <ref>
+Issues such as outdated signing keys, updated file locations might have been fixed in the upgraded version.
+
+Tor Browser Downloader can download Tor Browser. Tor Browser Downloader cannot upgrade itself. It's upgraded together with standard ("everyday") upgrades.
+</ref>
+
+'''2.''' Launch Tor Browser Downloader.
+
+{{Box|text=
+<u>If you are using [[Qubes|{{q_project_name}}]]</u>, to ensure that <u>new</u> App Qubes and [[Qubes/Disposables|Disposables]] are created with a copy of the latest Tor Browser version, complete the following steps:
+
+<code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>{{project_name_workstation_long}} Template</code> (<code>{{project_name_workstation_template}}</code>) &rarr; <code>Tor Browser Downloader ({{project_name_long}})</code>
+
+<u>If you are using [[Qubes|{{q_project_name}}]]</u>, to re-install the latest Tor Browser version in <u>existing</u> {{project_name_workstation_long}} App Qubes, complete the following steps:
+
+<code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>{{project_name_workstation_long}} App Qube</code> (<code>{{project_name_workstation_vm}}</code>) &rarr; <code>Tor Browser Downloader ({{project_name_long}})</code>
+
+<u>If you are using a graphical {{project_name_workstation_long}}</u>, complete the following steps:
+
+<code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Tor Browser Downloader ({{project_name_long}})</code>
+
+<u>If you are using a terminal</u>, complete the following steps:
+{{CodeSelect|code=
+update-torbrowser
+}}
+}}
+
+The downloader will show it is checking for updates.
+
+'''Figure:''' ''Checking for Updates''
+
+[[File:Tor Browser Downloader({{project_name_short}}) checking for updates.png|400px|Tor Browser Downloader ({{project_name_long}}) checking for updates.]]
+
+'''3.''' Selected the preferred Tor Browser version when prompted.
+
+Select the Tor Browser version and confirm installation. Take heed of the warning in the confirmation box stating <u>the existing Tor Browser user profile (including bookmarks and passwords) will be lost during this process.</u>
+
+'''Figure:''' ''Download Confirmation''
+
+[[File:torbrowserdownloader.png|Tor Browser Downloader ({{project_name_long}}) Download Confirmation]]
+
+After agreeing to the download process, a progress indicator will be displayed by the downloader. This process can be lengthy depending on the speed of the Tor network connection.
+
+'''Figure:''' ''Downloading Tor Browser''
+
+[[File:Tor Browser Downloader({{project_name_short}}) downloading.png|400px|Tor Browser Downloader ({{project_name_long}}) Downloading Tor Browser.]]
+
+'''4.''' Check the Tor Browser signature was correctly verified.
+
+Once the download has finished, the downloader will provide verification (or not) of the cryptographic signature associated with the Tor Browser binary, highlighting the key used to sign it and the date. The downloader will then ask for confirmation to install the package: see [[#Installation_Confirmation_Notification|Installation Confirmation Notification]] for steps on identifying a possible targeted attack.
+
+'''Figure:''' ''Tor Browser Installation Confirmation''
+
+[[File:torbrowserdownloader2.png|Tor Browser Downloader ({{project_name_long}}) Installation Confirmation.]]
+
+'''5.''' Confirm installation of Tor Browser.
+
+If the installation process is confirmed, the downloader will extract Tor Browser.
+
+'''Figure:''' ''Extracting Tor Browser''
+
+[[File:Tor Browser Downloader({{project_name_short}}) Extracting.png|400px|Tor Browser Downloader ({{project_name_long}}) Extracting.]]
+
+'''6.''' ''Optional:'' Launch Tor Browser.
+
+In the final step, the downloader will prompt whether the upgraded Tor Browser should be launched, unless the procedure was completed in a Qubes {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>).
+
+'''Figure:''' ''Finalized Tor Browser Installation''
+
+[[File:Tor Browser Downloader({{project_name_short}})FInished2.png|600px|Tor Browser Downloader ({{project_name_long}}) Finished Installing Tor Browser.]]
+
+<font size=-3>(Also available as [https://www.whonix.org/w/images/f/f2/Tor_Browser_Update_Check_005.png CLI version].)</font>
+}}
+
+=== Download Confirmation Notification ===
+
+This step is designed to keep {{project_name_long}} users safe, since at present there is no reliable and secure way for a program to determine the latest stable version of Tor Browser with reasonable certainty. <ref>[https://gitlab.torproject.org/legacy/trac/-/issues/14383 Finalize RecommendedTBBVersions format]</ref> <ref>[https://gitlab.torproject.org/legacy/trac/-/issues/13065 Counter downgrade / stale mirror attacks on RecommendedTBBVersions - sign / verify tbb versions file]</ref> When the version format changes, the automated parser of version information could falsely suggest:
+
+* An earlier stable version that is still considered secure.
+* An alpha series release.
+* A beta Tor Browser build.
+* A release candidate or nightly Tor Browser build.
+
+Alternatively, one might be targeted by a denial of service, indefinite freeze or rollback (downgrade) attack. <ref>For a definition of these attacks, see the [https://theupdateframework.io/security/ threat model] of [https://theupdateframework.io/ TUF] ([https://github.com/theupdateframework/python-tuf The Update Framework]).</ref>
+<ref>Adversaries capable of breaking [[SSL]] could mount these attacks by replacing [https://aus1.torproject.org/torbrowser/update_3/release/downloads.json RecommendedTBBVersions] with invalid, frozen or outdated version information.</ref>
+
+To counter these threats, user intelligence is utilized as a sanity check. The Download Confirmation Notification provides a way to detect such situations and abort the procedure. In this instance, it is recommended to rotate the Tor circuits and attempt the download process again.
+
+Version numbers that are visible under {{Code2|Online versions}} come from an online resource. The Tor Browser [https://aus1.torproject.org/torbrowser/update_3/release/downloads.json RecommendedTBBVersions] versions file is provided by The Tor Project, and is parsed by {{project_name_long}} Tor Browser Downloader. The {{project_name_long}} downloader will indicate that no upgrade is required if the installed Tor Browser version matches the up-to-date online version.
+
+TODO: expand.
+
+=== Installation Confirmation Notification ===
+
+This step is also designed to protect users, since at present there is no reliable and secure way for a program to determine (with reasonable certainty) if the Tor Browser download was targeted by an indefinite freeze or rollback attack. <ref>Unfortunately, Tor Browser signatures do not yet provide expiration dates in a manner similar to Debian's [https://blog.ganneff.de/2008/09/valid-until-field-in-release-f.html valid-until] field.</ref> <ref>Rollback attacks are possible because if a computer's clock is wrong, there is no solid basis for comparison.</ref>
+
+When verifying cryptographic signatures, several important aspects must be considered:
+
+* The signature should be made by a trusted key.
+* Trusted keys will have signed other files in the past. It is also necessary to check if the right file was received, and not just any file that was signed by a trusted key.
+* Even if the correct file type is received, <ref>
+That is, a browser and not a messenger or other application.
+</ref> it is necessary to check it has a <i>current</i> signature attached and not a historical one. This step counters the threat of indefinite freeze and rollback attacks.
+
+By the time the Installation Confirmation Notification is visible, the verification of the signature (and hash) will have already succeeded. However, the signature creation dates in the figure below must be carefully examined to confirm that an indefinite freeze or downgrade attack did not occur.
+
+<u>Previous Signature Creation Date</u>: When Tor Browser was previously installed by tb-updater, the creation date of the accompanying signature that signed Tor Browser will have been stored. The {{Code2|Previous Signature Creation Date}} field displays that date.<br />
+<u>Last Signature Creation Date</u>: This field displays the date of signature creation for the downloaded file.
+
+'''Figure:''' ''Tor Browser Installation Confirmation''
+
+[[File:torbrowserdownloader2.png|torbrowser-updater_signature_verification_screen.]] <br />
+
+<ref>[[OpenPGP#Common_Misconceptions|GnuPG (OpenPGP) common misconceptions]].</ref>
+<ref>The name of the file is stored in the hash file and verified to match the downloaded file name and hash.</ref>
+
+TODO: expand.
+
+{{Anchor|Running_Tor_Browser_in_Qubes_Template}}
+{{Anchor|Running_Tor_Browser_in_Qubes_Template}}
+{{Anchor|Running_Tor_Browser_in_Qubes_Disposable_Template}}
+{{Anchor|in_qubes-whonix}}
+{{Anchor|Disposable Template}}
+
+=== In {{q_project_name}} ===
+{{Qubes_Tor_Browser_Update}}
+
+{{anchor|download_failure}}
+=== Tor Browser Downloader (by {{project name short}} developers) Issues downloading Tor Browser ===
+'''Figure:''' ''Tor Browser Downloader (by {{project name short}} developers) failed to download Tor Browser''
+
+[[File:tb_failed_to_install.png]]
+
+Possible reasons:
+
+* Internet connectivity issue.
+* The download server is down.
+* File size exceeded (endless data attack triggered).
+* Tor Browser Downloader (by {{project_name_long}} developers) has been broken due to upstream changes.
+
+Recommendations:
+
+* If this happened during an APT upgrade, this will not fix itself. In that case, the user must manually take steps to [[#Update Tor Browser|Update Tor Browser]].
+* Wait a bit and try again later.
+** If the error persists it probably won't solve itself before the next update.
+* Check News: [[Stay Tuned]]
+* Last resort, [[#Tor_Browser_Manual_Update|Tor Browser  manual updates]].
+
+=== Expired Key ===
+Tor Browser Downloader (by {{project_name_long}} Developers):
+
+* Can only automate what is supported by upstream, The Tor Project anyhow.
+* Is fully optional. A usability feature. It does not do anything that could not also be done manually by the user.
+
+First, exercise: [https://support.torproject.org/tbb/how-to-verify-signature/ verify Tor Browser according to upstream instructions]. [[Unspecific|Unspecific to {{project_name_long}}]]. If that is not possible, if that includes "key expired" then nothing that can be fixed in {{project_name_long}}.
+
+== Tor Browser Internal Updater ==
+Tor Browser upgrades are possible from within the browser using Tor Browser Internal Updater (by <code>The Tor Project</code>). <ref>
+https://blog.torproject.org/tor-browser-50-released
+
+<blockquote>Starting with this release, Tor Browser will now also download and apply upgrades in the background, to ensure that users upgrade quicker and with less interaction. This behavior is governed by the about:config pref app.update.auto, but we do not recommend disabling it unless you really know what you're doing.</blockquote>
+</ref> When a new Tor Browser version is available but the browser has not completed an automatic upgrade in the background (the default), a warning prompt appears recommending a manual upgrade. To upgrade, either:
+
+* <code>Enter about:preferences in the URL bar</code> &rarr; <code>Scroll down to "Tor Browser Updates"</code> &rarr; <code>Click "<u>C</u>heck for updates"</code>; or
+* <code>Open Menu</code> &rarr; <code>Help</code> &rarr; <code>About Tor Browser</code> &rarr; <code>Wait until the download finishes</code> &rarr; <code>Restart to update Tor Browser</code>
+
+'''Figure:''' ''Tor Browser Update Notification''
+
+[[File:TBBupdater.png|600px]]
+
+Using Tor Browser Internal Updater automatically makes use of its built-in [[Verifying Software Signatures|software signatures verification]] feature. <ref>
+The internal updater process involves several automatic steps ([https://blog.torproject.org/new-release-tor-browser-951/#comment-288479 source]):
+
+<blockquote>1) Tor Browser contacts server "A" and asks if an update is available. If there is an update, then server "A" responds with metadata about the update file (a URL for that file, the size of the file, the SHA512 hash of the file).
+2) Tor Browser follows the provided URL and connects to server "B" and downloads the file
+3) Tor Browser verifies the size of the file and sha512 hash of the file are as expected
+4) Tor Browser verifies the cryptographic signature on the file. Tor Browser has two public keys hard-coded for which signatures on updates will be accepted.
+
+The update is installed after all checks pass.</blockquote>
+</ref> Manual software resignation verification is not required when using this update method.
+
+== Tor Browser Manual Update ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = If the Tor Browser update script ever breaks it is advised to [[Tor_Browser/Manual_Download#Tor_Browser/Manual_Download|update manually]].
+}}
+
+Modern Tor Browser releases are generally easy to install and update on well-supported platforms like {{project_name_long}}, leading most to have a comfortable and reliable experience over long periods. However, if/when Tor Browser "breaks", some might find it difficult to perform a manual installation. <ref>Before the introduction of [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser's internal updater]], manual installation was a difficult task which required the renaming (or deletion) of the old Tor Browser folder before the new version was extracted. If Tor Browser functions "under the hood" are a mystery, then unsurprisingly problems are often encountered during manual installation, particularly on the host.</ref>
+
+=== {{project_name_long}} Bugs ===
+Sometimes [[Tor_Browser#Tor_Browser_Downloader_by_Whonix_.E2.84.A2|Tor Browser Downloader]] inside {{project_name_workstation_long}} breaks because torproject.org changes the way Tor Browser can be downloaded or verified. This program is maintained by the [[Contributors|{{project_name_long}} contributors]] and The Tor Project is not responsible for necessary fixes. Generally, [https://forums.whonix.org/c/news {{project_name_long}} news] will be published within a few days with working instructions on how to fix the problem. If this does not happen, then {{project_name_long}} developers are unaware of the issue.
+
+Any bugs should be discussed in the {{project_name_long}} [https://forums.{{project_clearnet}} User Help Forum]. To date, no bugs were ever discovered in Tor Browser that were directly related to {{project_name_long}} code and which might cause serious problems such as website pages failing to load.
+
+=== Prerequisite Knowledge ===
+The [[Tor_Browser/Manual_Download|manual Tor Browser download]] procedure assumes essential knowledge of:
+
+* <u>Software Verification</u>: For better security, the Tor Browser package should be verified with GnuPG, using the associated file signature and Tor signing keys (relevant links are provided). <ref>
+{{project_name_long}} is not a standalone package, but a complete operating system. {{project_name_long}} has a small team, while torproject.org has a much larger community and dedicated, paid support staff. Therefore, {{project_name_long}} users are expected to learn Tor Browser essentials in the first instance.
+</ref>
+* <u>Troubleshooting</u>: If Tor Browser problems occur in {{project_name_long}} such as webpages failing to resolve, then:
+** The same tests should be performed on the host ({{non_q_project_name_short}}) or in a non-{{project_name_long}} VM ({{q_project_name}}); see [[Install Tor Browser Outside of Whonix|Non-{{project_name_long}} Tor Browser]]. This step helps to determine whether the problem is related to {{project_name_long}} or not.
+** It is also sensible to search for the problem on [https://gitlab.torproject.org/search torproject.org's bug tracker] and report a bug upstream if it has not been notified yet. In that case, when upstream (TPO) fixes the issue, the issue will most likely also get fixed in {{project_name_long}}.
+
+= Unsafe Tor Browser Habits =
+It is important to develop a set of safe habits when communicating, browsing or downloading with Tor Browser. Even the world's premier anonymity software cannot protect people if they shoot themselves in the foot.
+
+The following is an inexhaustive list of unsafe behaviors. It is recommended to also read the {{project_name_long}} [[Tips_on_Remaining_Anonymous|Tips on Remaining Anonymous]] entry, along with [https://2019.www.torproject.org/docs/documentation.html.en Tor Project documentation] before using Tor Browser for serious activities necessitating anonymity.
+
+'''Table:''' ''Unsafe Tor Browser Habits''
+
+{| class="wikitable"
+|-
+
+! scope="col"| '''Category'''
+! scope="col"| '''Unsafe Configuration or Behavior'''
+|-
+
+! scope="row"| Add-ons
+| Add [[#Non-default_Add-ons|non-default add-ons]] to Tor Browser. <br /> Configure [[#NoScript_Custom_Setting_Persistence|persistent, customized NoScript settings]]. <br /> [[#Introduction_2|Remove or disable default add-ons]] in Tor Browser.
+|-
+
+! scope="row"| Anonymity Modes
+| Mix [[Tips_on_Remaining_Anonymous#Keep_Anonymity_Modes_separate|modes of anonymity]]. <br /> Fail to [[Tor_Browser#Harden_Tor_Browser|compartmentalize Tor Browser activities]].
+|-
+
+! scope="row"| Bookmarks
+| Use the bookmarking feature in Tor Browser; bookmarks can be used as a tracker if the page is special/unique to you. <ref>https://blog.torproject.org/comment/291401#comment-291401</ref> <ref>This does not relate to websites being able to read the bookmarks in the library, but rather addresses that are [https://blog.torproject.org/new-release-tor-browser-10014/#comment-291422 appended with unique parameters] like a string of random characters. The implication is: <blockquote>If you save a bookmark that contains parameters that mark you as unique and then you start a New Identity, if you open that bookmark, those parameters can be used to continue tracking you in your New Identity.</blockquote></ref>
+|-
+
+! scope="row"| Bridges
+| Expect that [[Bridges|Tor relay bridges]] will absolutely disguise all use of Tor / Tor Browser.
+|-
+
+! scope="row"| Browser Settings
+| [[Tips_on_Remaining_Anonymous#Change_Settings_ONLY_if_the_Consequences_are_KNOWN|Change browser settings]] if the implications are unknown. <ref>
+For example, it is unsafe to disable Tor Browser protections in order to [https://forums.whonix.org/t/save-cookies-for-tor-browser/7538 save cookies] for the sake of convenience.
+</ref> <br />
+Display the Menu Bar or remove the Bookmark Toolbar. <ref>This changes Tor Browser's fingerprint slightly. Tor project member sysrqb [https://blog.torproject.org/new-release-tor-browser-10016/#comment-291884 has stated]: <blockquote>Your browser is likely not unique, but it is one additional distinguisher from other users.
+
+You can see the effect of it on https://arkenfox.github.io/TZP/tzp.html. Under the "screen" section, the "resolution" and "inner/outer window" values should change.</blockquote></ref>
+|-
+
+! scope="row"| Communications
+| Send "anonymous" communications or other data over [https://2019.www.torproject.org/docs/faq.html.en#CanExitNodesEavesdrop unencrypted channels using plain HTTP].
+|-
+
+! scope="row"| File Downloads
+| [[#Warnings|Torrent]] over Tor. <br /> [[#Warnings|Open documents]] or other files downloaded by Tor while online. <br /> Open [[Tips_on_Remaining_Anonymous#Be_Wary_of_Random_Files_or_Links|random files or links]]. <br /> [[Tor_Browser#Preventing_SSLStrip_Attacks|Paste or type download links into the address bar]] without <code>https://</code> <br /> Download and install unsigned software from the Internet. <br /> Download and install signed software or import keys without first [[Verifying_Software_Signatures|verifying key fingerprints and digital signatures]].
+|-
+
+! scope="row"| Full Screen
+|
+* [[{{non_q_project_name_short}}|{{Non_q_project_name}}]]: Not using full screen. [[Desktop#Use_Full-screen_Mode|Use Full-screen Mode]].
+* [[{{Q_project_name_short}}|{{Q_project_name}}]]: Using full screen. [[Desktop#Avoid_VM_Full_Screen_Mode|Avoid VM Full Screen Mode]].
+|-
+
+! scope="row"| HTML5 Canvas Image Data
+| Allow [[Data_Collection_Techniques#HTML5_Canvas_Image_Data|extraction of canvas image data]] by websites.
+|-
+
+! scope="row"| Identities
+| Disclose [[Tips_on_Remaining_Anonymous#Always_Withhold_your_Identifying_Data|identifying data]].
+Use [[Tips_on_Remaining_Anonymous#Change_Pseudonyms_Regularely|different online identities]] at the same time.
+|-
+
+! scope="row"| JavaScript
+| [[#Security_vs_Usability_Trade-off|Enable JavaScript]] for websites of a dubious nature.
+|-
+
+! scope="row"| Links
+| Enter sensitive information into websites before verifying their authenticity due to potential [[Social_Engineering#Common_Phishing_Attacks|phishing attacks]].
+Routinely click on URL-shortened links. <ref>
+URL shorteners are often used to mask phishing sites that seek user credentials; for example, this is common for websites designed to look identical to Google Mail, Yahoo Mail, Facebook and others.
+</ref><br />
+Regularly click on links to popular websites via emails, social networking or other sites due to the threat of [[Social_Engineering#IDN_Homograph_Attacks|IDN homograph attacks]].<br />
+Use search engines to find out links to important websites. There have been visually undetectable scam links on search engines. Search engines usually show the domain name, website title and excerpt in search results. However, Google allowed the domain name to be chosen by the advertiser, which was a scammer impersonating a real company. <ref>
+https://www.bleepingcomputer.com/news/security/beware-malicious-home-depot-ad-gets-top-spot-in-google-search/
+</ref><br />
+Instead, manually type the website address into the URL bar, use bookmarks or local notes text files.
+|-
+
+! scope="row"| Logins
+| Login to Google, Facebook or other corporate accounts with a [[Tips_on_Remaining_Anonymous#Be_aware_that_Social_Networks_Most_Often_Know_Who_You_Are|real name or pseudonym]]. <ref>https://2019.www.torproject.org/docs/faq.html.en#AmITotallyAnonymous</ref> <br /> Login to accounts that have ever been [[Tips_on_Remaining_Anonymous#Always_separate_Non-Tor_and_Tor_Accounts|used without Tor]]. <br /> Generally login to banking, financial, personal or [[Tips_on_Remaining_Anonymous#Exceptions_for_Online_Banking_and_Online_Payment_Accounts|other important accounts.]]
+|-
+
+! scope="row"| Local Connections
+| [[#Local_Connections|Configure a local connection exception]] for applications, unless aware of the risks.
+|-
+
+! scope="row"| Multiple Tab Isolation
+| Do not assume that different tabs in Tor Browser are completely isolated and recognized as different pseudonyms by destination websites. Tor Browser has some first party isolation that isolates local storage such as cookies per-website. However, there are certain side channel attacks that can be used to bypass this. <ref>
+See [https://2019.www.torproject.org/projects/torbrowser/design/#identifier-linkability identifier-linkability], [https://www.usenix.org/system/files/sec19-shusterman.pdf sec19-shusterman.pdf], [https://leakuidatorplusteam.github.io/ leakuidator].
+</ref> [[Browser_Tests#FingerprintJS|FingerprintJS]] ([[Browser Tests]]) demonstrates its capability of linking two different tabs in Tor Browser to the same identifier. A malicious or compromised website may also be able to exploit a vulnerability in the browser to see your activities in website y since Firefox's sandbox does not isolate websites from each other yet. <ref>
+[https://wiki.mozilla.org/Project_Fission Fission] is still work in progress.
+</ref> Better use [[Multiple Whonix-Workstation#Safety_Precautions|Multiple {{project_name_workstation_long}}]].
+|-
+
+! scope="row"| Networking
+| Configure Tor Browser so that it leads to a [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor scenario]].
+|-
+
+! scope="row"| Other Browsers
+| Use [[#Anonymity_vs_Pseudonymity|browsers other than Tor Browser]] with Tor. <br /> Use [[Tips_on_Remaining_Anonymous#Either_use_Clearnet_OR_Tor,_not_both|a clearnet browser and Tor Browser]] at the same time.
+|-
+
+! scope="row"| Passwords and Usernames
+| Save passwords and usernames with the [https://support.mozilla.org/en-US/kb/password-manager-remember-delete-edit-logins Tor Browser Password Manager] feature. <ref>https://forums.whonix.org/t/tor-browser-8-5-in-whonix-no-longer-can-save-passwords-and-it-deleted-all-existing-ones/7424</ref> <ref>Mozilla notes: <blockquote>Even though the Password Manager stores your usernames and passwords on your hard drive in an encrypted format, someone with access to your computer user profile can still see or use them. The Use a Master Password to protect stored logins and passwords article shows you how to prevent this and keep you protected in the event your computer is lost or stolen.</blockquote> </ref> <ref>Unless a strong master password is used to protect usernames and passwords, anyone with access to the computer (remote or physical) can easily see them; see [https://www.techrepublic.com/article/why-you-should-never-allow-your-web-browser-to-save-your-passwords/ here] for further information. Due to their relatively large attack surface, security professionals suggest it is far safer to use a password manager rather than trust browsers with sensitive information.</ref> <ref>A [https://security-tracker.debian.org/tracker/CVE-2018-12383 critical security bug] was found in the Password Manager in 2018: "If a user saved passwords before Firefox 58 and then later set a master password, an unencrypted copy of these passwords is still accessible."</ref>
+|-
+
+! scope="row"| Personal Websites and Links
+| Visit [[Tips_on_Remaining_Anonymous#Behave_like_most_other_users_on_your_websites|personal websites]] over Tor. <br /> Be the first person to [[Tips_on_Remaining_Anonymous#Let_others_spread_your_social_links_first|spread a personal link]].
+|-
+
+! scope="row"| Phone Verification
+| Use [[Tips_on_Remaining_Anonymous#Avoid_(Mobile)_Phone_Verification|(mobile) phone verification]].
+|-
+
+! scope="row"| Proxy Settings
+| [[Tor_Browser/Advanced_Users#Proxy_Settings|Change or remove default proxy settings]] if unaware of the implications.
+|-
+
+! scope="row"| {{q_project_name}}
+| Launch Tor Browser in a [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Template (<code>{{project_name_workstation_template}}</code>) or Disposable Template (<code>{{project_name_workstation_template}}-dvm</code>)]]. <br /> Launch [[Tor_Browser#Disposable_Template|Tor Browser Downloader]] in a Disposable Template (<code>{{project_name_workstation_template}}-dvm</code>).
+Launch Tor Browser in a [https://www.qubes-os.org/doc/standalones-and-hvms/ Standalone <code>{{project_name_workstation_vm}}</code>]. <ref>Unlike App Qubes where only the ''/rw/'' directories are persistent, Standalones are complete clones of the template which have independent file systems. This means it is more vulnerable to the threat of persistent malware.</ref> <ref>https://forums.whonix.org/t/running-whonix-workstation-as-standalonevm/12008</ref>
+|-
+
+! scope="row"| Server Connections
+| Connect to a [[Tips_on_Remaining_Anonymous#Do_not_Connect_to_a_Server_Anonymously_and_Non-anonymously_at_the_Same_Time|server anonymously and non-anonymously]] at the same time.
+|-
+
+! scope="row"| Tor Browser Functions
+| Use the [[Tor_Browser/Advanced_Users#New_Identity_Design|"New Identity"]] and [[Tor_Browser/Advanced_Users#New_Tor_Circuit_Design|"New Tor Circuit for this Site"]] functions and expect complete anonymity in the following browsing session.
+|-
+
+! scope="row"| Updates
+| Ignore [[#Download_Confirmation_Notification|download]] and/or [[#Installation_Confirmation_Notification |installation]] confirmation notifications or warnings when updating Tor Browser. <br /> Use an [[#Update_Tor_Browser|outdated version]] of Tor Browser.
+|-
+
+! scope="row" | User Mentality
+| Feel invincible running Tor Browser (irrespective of the platform), due to [[Tor_Browser/Advanced_Users#Tor_Browser_Adversary_Model|significant adversary capabilities]] and interest in unmasking or infecting Tor users.
+|-
+
+! scope="row" | Window Size
+| [https://gitlab.torproject.org/legacy/trac/-/issues/7255 Maximize or change] <ref>
+https://forums.whonix.org/t/should-still-recommend-against-maximizing-tor-browser-window
+</ref> the default window size setting. <ref>
+[https://blog.torproject.org/new-release-tor-browser-90 New Release: Tor Browser 9.0]:
+
+<blockquote>Tor Browser in its default mode is starting with a content window rounded to a multiple of 200px x 100px  to prevent fingerprinting the screen dimensions. The strategy here is to put all users in a couple of buckets to make it harder to single them out. That worked so far until users started to resize their windows (e.g. by maximizing them or going into fullscreen mode). Tor Browser 9 ships with a fingerprinting defense for those scenarios as well, which is called Letterboxing, a technique developed by Mozilla and presented earlier this year. It works by adding white margins to a browser window so that the window is as close as possible to the desired size while users are still in a couple of screen size buckets that prevent singling them out with the help of screen dimensions.</blockquote>
+</ref> Keep the default window size. -- [https://forums.whonix.org/t/is-anyone-having-white-bars-in-the-tbb-tor-browser-letterboxing/8345 Letterboxing] which was introduced in Tor Browser version 9 does not change this recommendation. <ref>
+[https://blog.torproject.org/new-release-tor-browser-90/#comment-284602 Anonymous (not verified) said]:
+
+<blockquote>Is using the default window size still recommended?</blockquote>
+
+[https://blog.torproject.org/new-release-tor-browser-90/#comment-284655 gk said]:
+
+<blockquote>Yes, the default size is still recommended. But, if users are resizing their window they should get some protection now. Before that we only had the notification bar popping up and essentially saying "Don't do that! Danger!" which was kind of lame. Now, we have something better to offer which fits more to our privacy-by-design goal.</blockquote>
+</ref>
+|-
+
+! scope="row" | Virtual Machine (VM) Multiple Purpose Use
+| Re-using the same VM for browsing and other applications.
+
+* <u>[[Qubes|{{q_project_name}}]]</u>: Do not install additional applications in a Template that is intended to serve as base for App Qubes / Disposables that run Tor Browser. Use multiple Templates. Use a dedicated Template, ideally [[Operating System Software and Updates|updated]] and otherwise unmodified for App Qubes / Disposables for browsing with Tor Browser.
+* <u>[[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>: Use a dedicated or multiple {{project_name_workstation_long}} for browsing with Tor Browser.
+
+Consider using [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] if installing additional software. It is safer to compartmentalize discrete activities to minimize the threat of [[VM Fingerprinting]]. This protects from the [https://forums.whonix.org/t/protocol-flooding-attack-scheme-flood-browser-fingerprinting/11729 schemeflood vulnerability], which could be used for browser fingerprinting / identity correlation among VM / browser restarts. See also [[Browser_Tests#schemeflood.com|schemeflood.com]] ([[Browser Tests|Browser Test]]).
+|-
+
+|}
+
+= {{project_name_long}} Tor Browser Differences =
+=== Tor Browser Downloader (by {{project name short}} developers) Differences ===
+Tor Browser Downloader (by {{project name short}} developers) essentially is and does:
+
+# An optional usability enhancement, a tool, Tor Browser Downloader.
+# Download Tor Browser.
+# Perform digital signature verification.
+# Extracts Tor Browser to folder <code>~/.tb/tor-browser</code>.
+
+Tor Browser Downloader (by {{project name short}} developers) <u>is not</u> and <u>does not</u>:
+
+# A mandatory requirement to download and use Tor Browser inside {{project name long}}.
+# Modify any files inside the Tor Browser folder <code>~/.tb/tor-browser</code>.
+
+{{Anchor|Does {{project_name_long}} Change Default Tor Browser Settings?}}
+
+== Does {{project_name_long}} Change Default Tor Browser Settings? ==
+
+Tor Browser changes implemented by Tor developers are sometimes mistakenly attributed to {{project_name_long}} developers: <ref>
+https://www.mail-archive.com/qubes-users@googlegroups.com/msg29899.html
+</ref> <ref>
+https://www.mail-archive.com/qubes-users@googlegroups.com/msg29573.html
+</ref>
+
+<blockquote>I've been looking for how to fix some bad default settings in the {{project_name_long}} tor browser. Namely, they removed NoScript from the toolbar, so that the NoScript cannot be used as intended.</blockquote>
+
+As noted in the [[#Tor Browser Bundle versus {{project_name_long}} Tor Browser|{{project_name_long}} Tor Browser Differences]] entry, {{project_name_long}} does <u>not</u>:
+
+* change Tor Browser's internal updater checking mechanism;
+* change or remove proxy settings by default; or
+* modify Tor Browser's startup script, default settings and so on.
+
+In fact, the NoScript URL bar change was a conscious decision by Tor developers which became part of a recent release: <ref>
+[https://gitlab.torproject.org/legacy/trac/-/issues/30600 Tor Bug 30600: Restore NoScript control widget icon to the Tor Browser toolbar]
+</ref> <ref>
+https://blog.torproject.org/new-release-tor-browser-853/#comment-282733
+</ref> <ref>
+https://blog.torproject.org/new-release-tor-browser-853/#comment-282735
+</ref> <ref>
+The same blog discussion confirms that moving the NoScript icon back onto the URL bar does not pose a known fingerprinting risk.
+</ref> <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/30570
+</ref>
+
+Quote Tor Browser developer Nicolas Vigier ([https://gitlab.torproject.org/boklm @boklm]):
+
+<blockquote>NoScript and HTTPS Everywhere are still present in the URL bar if you upgraded from an older version. They are not present if you did a new install with a recent version.</blockquote>
+
+<blockquote>If you want to turn off javascript, then you can change the security level. There is also nothing preventing you from adding NoScript on the toolbar even if it is not there by default.</blockquote>
+
+== Tor Browser Bundle versus {{project_name_long}} Tor Browser ==
+
+The regular Tor Browser Bundle and {{project_name_long}} Tor Browser slightly differ. The reason is Tor Browser must be adjusted by {{project_name_long}} to work behind {{project_name_gateway_long}}.
+
+The main {{project_name_long}} Tor Browser differences can be summarized as follows: <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/19652
+</ref>
+
+* Environmental variable adjustments. <ref>
+* [https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/etc/X11/Xsession.d/20torbrowser <code>/etc/X11/Xsession.d/20torbrowser</code>]
+* [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh <code>/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh</code>]
+</ref> Despite environmental variable adjustments, the network and browser fingerprint remain the same.
+* [[Tor_Browser/Advanced_Users#tor-launcher|tor-launcher]] (Tor connection wizard) will not be shown in {{project_name_workstation_long}} Tor Browser. Instead, [[Anon Connection Wizard]] is available in {{project_name_gateway_long}}.
+* The Tor Circuit View and Open Network Settings functions have been [[Tor_Browser/Advanced_Users#Disabled_Tor_Browser_Functions|disabled]]. The former is [[unsupported]] for security reasons, <ref>This is so {{project_name_workstation_long}} does not have access to the information about which Tor middle relay or Tor entry guard or [[Bridges]] are in use. See also: [[Dev/onion-grater#Indicator_for_current_Circuit_Status_and_Exit_IP|Indicator for current Circuit Status and Exit IP]].</ref> while the latter would have no effect since Tor must be configured in {{project_name_gateway_long}}.
+* The default landing page after Tor Browser starts is set to a local {{project_name_long}} resource through an environment variable. <ref>
+* https://github.com/Whonix/whonix-welcome-page/blob/master/etc/profile.d/20_whonix-welcome-page.sh
+* https://github.com/Whonix/whonix-welcome-page/blob/master/etc/X11/Xsession.d/20whonix-welcome-page
+* [https://github.com/Whonix/whonix-welcome-page/blob/master/usr/libexec/whonix-welcome-page/env_var.sh <code>/usr/libexec/whonix-welcome-page/env_var.sh</code>]
+* The default Tor Browser Bundle uses <code>about:tor</code> as the landing page. See: https://gitlab.torproject.org/legacy/trac/-/issues/13835
+</ref>
+* [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor scenarios]] are prevented in {{project_name_workstation_long}}. <ref>
+[[Dev/anon-ws-disable-stacked-tor]]
+</ref>
+* Extracted to folder <code>~/.tb/tor-browser</code>.
+
+{{project_name_long}} <u>does not</u>:
+
+* Change Tor Browser's [[#Tor_Browser_Internal_Updater|Internal Updater checking mechanism]].
+* Modify Tor Browser's startup script, default settings and so on. <ref>In {{project_name_workstation_long}}, [https://github.com/Whonix/anon-ws-disable-stacked-tor anon-ws-disable-stacked-tor] listens on {{Code2|127.0.0.1}} {{Code2|9150}} and {{Code2|9151}} (Tor Browser's default ports) and forwards them to {{project_name_gateway_long}} {{Code2|10.152.152.10 9150}} (where a Tor SocksPort is listening) and {{Code2|9151}} (where [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] is listening). Tor does not get started by the {{Code2|[https://gitweb.torproject.org/tor-launcher.git tor-launcher]}} Firefox add-on because the {{Code2|[https://gitlab.torproject.org/legacy/trac/-/issues/6009 TOR_SKIP_LAUNCH]}} environment variable has been set set to {{Code2|1}}. See also: [[Dev/anon-ws-disable-stacked-tor]].</ref>
+* [[Tor_Browser/Advanced_Users#Proxy_Settings|Change or remove proxy settings]] by default.
+
+== Tor Browser Functionality on Different Platforms ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = It is not [https://forums.whonix.org/t/just-curious-why-no-warning-to-not-maximize-your-window-whilst-using-whonix-browsers/3932/9 valid to make a comparison] between the Windows version of {{tbb}} and the {{project_name_long}} Tor Browser concerning functionality, for instance why the warning message does not appear in {{project_name_long}} when maximizing the browser window. <ref>
+No changes have been made in {{project_name_long}} code to prevent such a warning.
+</ref>
+}}
+
+The reason is this comparison includes a host of platform-specific differences which confound the result. For example, a more valid comparison would examine the differences between:
+
+* TBB in Debian (real Debian, not in Qubes) versus Tor Browser in [[{{non_q_project_name_short}}|{{non_q_project_name}}]].
+* TBB in a Qubes App Qube based on a Debian Template versus Tor Browser in [[Qubes|{{q_project_name}}]].
+
+Similarly, these comparisons would be helpful in order to help with TBB (non-{{project_name_long}}) development:
+
+* TBB in Debian (real Debian, not in Qubes) vs TBB in Windows.
+* TBB in different Linux distributions.
+* TBB in different Windows platforms.
+
+= Troubleshooting =
+== Tor Browser Download, Installation and Digital Software Verification Issues ==
+
+# Check [https://forums.{{project_clearnet}} {{project_name_long}} forums] for existing discussions.
+# Compare with Tor Browser outside of {{project name long}} as per [[#Tor Browser Reliability Recommendations|Tor Browser Reliability Recommendations]].
+# See [[#Tor Browser Manual Update|Tor Browser Manual Update]].
+
+== Tor Browser Reliability Recommendations ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = It is recommended to always have the latest [https://www.torproject.org/download/ <u>T</u>or <u>B</u>rowser <u>B</u>undle (TBB)] [http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion/download/ (.onion)] installed outside of {{project name long}}. Just in case. This can be useful in case there are any [[#Tor Browser Download, Installation and Digital Software Verification Issues|Tor Browser Download, Installation and Digital Software Verification Issues]] or other problems such as browser crashes or high CPU usage.
+
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]] users: It is recommended to always have TBB installed on the host operating system (OS).
+* [[{{q_project_name_short}}|{{q_project_name}}]] users: It is recommended to always have TBB installed in a non-{{project_name_long}} Template, like (preferably) Debian, Fedora.
+
+For avoidance of doubt, {{project_name_long}} users should always prefer using Tor Browser inside of {{project_name_long}}. A copy of Tor Browser outside of {{project_name_long}} is only recommended in case there will be any issues with future Tor Browser versions.
+
+This is an application of the [[Reporting_Bugs#Generic_Bug_Reproduction|Generic Bug Reproduction]] concept.
+}}
+
+This process is useful to test whether or not there are any issues related to TBB with:
+
+* downloading,
+* digital software verification, or
+* installation.
+* Another benefit of installing TBB in this fashion is that if Tor Browser unexpectedly stops running in {{project_name_long}}, then Tor Browser can still be independently used to visit the {{project_name_long}} website for a solution to this issue.
+
+If TBB fails to properly download, pass digital software signature verification or installation on the host operating system or from a non-{{project_name_long}} App Qube in Qubes, then Tor Browser inside {{project_name_long}} will similarly fail to work.
+
+There are two options to install TBB outside of {{project_name_long}}.
+
+* '''A)''' Using Tor Browser Downloader (by {{project_name_long}} developers).
+** Refer to the [[Install_Tor_Browser_Outside_of_{{project_name_short}}|Install Non-{{project_name_long}} Tor Browser using Tor Browser Downloader (by {{project_name_long}} developers)]] chapter for TBB installation instructions on all platforms.
+** The disadvantage of this method is that it will break in case there are TBB download or digital software verification issues. <ref>
+Still very useful for comparison of TBB outside of {{project_name_long}} versus Tor Browser inside {{project_name_long}}.
+</ref>
+* '''B)''' Manually install Tor Browser.
+
+This process is [[unspecific|unspecific to {{project_name_long}}]].
+
+# Navigate to https://www.torproject.org/download/ ([http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion/download/ .onion]) website and download Tor Browser and the associated file signature (<code>.asc</code>).
+# Read https://support.torproject.org/tbb/how-to-verify-signature/ ([http://rzuwtpc4wb3xdzrj3yeajsvm3fkq4vbeubm2tdxaqruzzzgs5dwemlad.onion/tbb/how-to-verify-signature/ .onion]) and learn how to perform digital software signature verification ("<code>gpg</code>"). Download and import the necessary keys.
+# Perform digital software signature verification for the Tor Browser download.
+# If the old version of Tor Browser is still open, close it.
+# Extract Tor Browser: <code>Right-click on the downloaded archive</code> &rarr; <code>extract</code> &rarr; <code>extract archive here</code>
+# The process is complete.
+# Start Tor Browser.
+
+For any issues during manual download, digital software verification and installation of TBB, the user should perform [[Reporting_Bugs#Generic_Bug_Reproduction|Generic Bug Reproduction]].
+
+{{Anchor|Tor Browser ended with non-zero (error) exit code}}
+{{Anchor|Tor Browser Launch Errors}}
+{{Anchor|Whonix Prevents Tor Browser from Launching!}}
+
+== Tor Browser Crash Errors ==
+
+Occasionally, Tor Browser might crash. Either:
+
+* At browser startup. For example, after a new Tor Browser update is released, errors might occur upon launch. <ref>
+https://forums.whonix.org/t/tor-browser-error-perhaps-from-9-0-1-update/8468
+</ref> <ref>
+The error is likely related to existing Tor bugs reported against [https://gitlab.torproject.org/search?scope=issues&search=incremental&state=opened (incremental)] [https://gitlab.torproject.org/search?scope=issues&search=update&state=opened updates].
+</ref>
+* At browser runtime. <ref>
+https://forums.whonix.org/t/tor-browser-ended-with-non-zero-error-exit-code-again/10889
+</ref>
+
+<pre>
+ERROR: Tor Browser ended with non-zero (error) exit code!
+
+Tor Browser was started with:
+
+/home/user/.tb/tor-browser/Browser/start-tor-browser --allow-remote /usr/share/homepage/whonix-welcome-page/whonix.html
+
+Tor Browser exited with code: 1
+
+To see this for yourself, you could try:
+Start Menu -> System -> Xfce Terminal
+Then run:
+torbrowser
+</pre>
+
+* '''A)''' 1) Happening inside VirtualBox? 2) Using Linux as host operating system? 3) Tor Browser crash issues happening recently since upgrade to host kernel version <code>5.10.0-15</code> or above? If the answer to all 3 questions is "yes" then see {{kicksecure_wiki
+|wikipage=VirtualBox/Troubleshooting#Linux_Host_Kernel_versus_Tor_Browser_and_other_Crashes
+|text=Linux Host Kernel versus Tor Browser and other Crashes
+}}.
+* '''B)''' Otherwise, see below.
+
+Even though this is happening inside {{project_name_long}}, the cause is most often unrelated to {{project_name_long}} code. Tor Browser is developed by [https://www.torproject.org The Tor Project], which is an independent entity. The is the norm in Linux distributions. To learn more about such relationships see {{kicksecure_wiki
+|wikipage=Linux User Experience versus Commercial Operating Systems
+|text=Linux User Experience versus Commercial Operating Systems
+}}.
+
+{{project_name_long}} does integration work to get Tor Browser into the platform. To use a simple analogy, {{project_name_long}} stays "on the outside". Very few internal modifications are made to Tor Browser as described in the [[Tor_Browser#Whonix_.E2.84.A2_Tor_Browser_Differences|{{project_name_long}} Tor Browser Differences]] chapter.
+
+Before attempting to resolve the issue, the user might want to consider to [[#Backup and Restore Browser Settings|Backup and Restore Browser Settings]] (or alternatively [[Backup VMs]]) if there are any browser bookmarks or settings the user would rather keep.
+
+To remedy this kind of issue, there are three different promising approaches.
+
+* '''A)''' [[Factory Reset]]
+* '''B)''' [[#Delete and Reinstall Tor Browser|Delete and Reinstall Tor Browser]]
+* '''C)''' [[#Attempt to Debug the Issue|Attempt to Debug the Issue]]
+
+=== Delete and Reinstall Tor Browser ===
+
+If browser settings like bookmarks, saved passwords and so on are not too important, Tor Browser can be completely deleted and reinstalled. Tor Browser usually functions normally after this procedure. The easiest method is using [[Tor_Browser#Tor_Browser_Downloader_by_Whonix_.E2.84.A2|Tor Browser Downloader by {{project_name_long}}]] for this process.
+
+=== Attempt to Debug the Issue ===
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Debugging attempts are not guaranteed to work, but are encouraged to help fix outstanding issues.
+}}
+
+* During debug attempts, do not use <code>torbrowser</code> command (<code>/usr/bin/torbrowser</code> script) or the Tor Browser start menu entry because these are provided by {{project_name_long}} and are not the cause here.
+* The Tor Project is responsible for errors that emerge when Tor Browser is started manually or in debug mode.
+** Issues such as <code>Segmentation fault (core dumped)</code> are very most likely caused by Tor Browser, not {{project name long}}.
+
+'''A)''' Advanced users can try to start Tor Browser without the help of <code>/usr/bin/torbrowser</code> by {{project_name_long}}, thereby bypassing that part of {{project_name_long}} Tor Browser integration. Tor Browser resides in folder <code>~/.tb/tor-browser</code>. Therefore Tor Browser can be launched in [[Tor_Browser#In_Debugging_Mode|Debugging Mode]], which is a Tor Browser (not {{project_name_long}}) feature. If that does not help...
+
+'''B)''' Additionally, the whole <code>~/.tb/tor-browser</code> folder could be copied to a Debian <code>{{stable project version based on Debian codename}}</code> machine or better yet, a virtual machine. For better security, a virtual machine might even be non-networked before attempts are made to launch Tor Browser. This error is likely to be reproducible outside {{project_name_long}} and this step will provide confirmation.
+
+'''1.''' [[Reporting_Bugs#Generic_Bug_Reproduction|Generic Bug Reproduction]] is unfortunately required.
+
+'''2.''' Meaning, the issue is unfortunately required to be reproduced without any reference to {{project name long}}, without using {{project name long}}, outside of {{project name long}}. On Debian.
+
+'''3.''' The whole <code>~/.tb/tor-browser</code> folder needs to be copied to a Debian <code>{{stable project version based on Debian codename}}</code> machine, ideally a VM.
+
+'''4.''' The issue needs to be reproduced on Debian. Not {{project name long}}.
+
+'''5.''' Report the bug to The Tor Project.
+
+'''6.''' Please notify {{project name long}} forums about any outcomes.
+
+Be aware the [https://gitlab.torproject.org/tpo/team Tor Bug Tracker] already has various, existing bug reports related to incremental updates via the Tor Browser internal updater. These are most likely related to Tor Browser launch failures:
+
+* https://gitlab.torproject.org/legacy/trac/-/issues/29771
+* https://gitlab.torproject.org/legacy/trac/-/issues/16028
+* https://gitlab.torproject.org/search?scope=issues&search=incremental&state=opened
+* https://gitlab.torproject.org/search?scope=issues&search=update&state=opened
+
+=== Backup and Restore Browser Settings ===
+
+Steps to perform a backup and restore of browser settings (like bookmarks) is currently [[Unsupported|undocumented]] in the {{project_name_long}} wiki. However, any online instructions for this process in Tor Browser or even Firefox should equally apply in {{project_name_long}}. The only difference is the {{project_name_long}} Tor Browser folder location: <code>~/.tb/tor-browser</code>.
+
+== Close Tor Browser ==
+
+Sometimes the following error message appears when no Tor Browser window is open.
+
+'''Figure:''' ''Running Tor Browser Instance''
+[[File:Tor browser already running.png]]
+
+<blockquote>Tor Browser is already running, but is not responding. To use Tor Browser, you must first close the existing Tor Browser process, restart your device, or use a different profile.</blockquote>
+
+Most likely Tor Browser is still/already running in the background but without a visible desktop environment window due to an existing software bug.
+
+To kill the Tor Browser process, run the following command.
+
+{{CodeSelect|code=
+pkill firefox.real
+}}
+
+See also: [[#Tor Browser Crash Errors|Tor Browser Crash Errors]].
+
+== Why do I have White Bars around my Tor Browser Content? ==
+
+Users who [[Tor_Browser#Unsafe_Tor_Browser_Habits|ignore advice]] to not maximize/resize the Tor Browser window will now notice white borders surrounding the Tor Browser content: <ref>https://forums.whonix.org/t/is-anyone-having-white-bars-in-the-tbb-tor-browser-letterboxing/8345</ref>
+
+<blockquote>Ever since 9 update I have had white bars at the bottom and top of my browser. Even with using the TBB on non-whonix I still have them. Am I the only one & am I exposed?</blockquote>
+
+This is not an [[Malware_and_Firmware_Trojans#Detection_of_System_Changes|indicator of compromise]], but a new fingerprinting defense called [https://blog.torproject.org/new-release-tor-browser-90 Letterboxing]:
+
+<blockquote>Tor Browser in its default mode is starting with a content window rounded to a multiple of 200px x 100px to prevent fingerprinting the screen dimensions. The strategy here is to put all users in a couple of buckets to make it harder to single them out. That worked so far until users started to resize their windows (e.g. by maximizing them or going into fullscreen mode). Tor Browser 9 ships with a fingerprinting defense for those scenarios as well, which is called [https://en.wikipedia.org/wiki/Letterboxing_(filming) Letterboxing], a technique developed by Mozilla and presented [https://www.zdnet.com/article/firefox-to-add-tor-browser-anti-fingerprinting-technique-called-letterboxing/ earlier this year]. It works by adding white margins to a browser window so that the window is as close as possible to the desired size while users are still in a couple of screen size buckets that prevent singling them out with the help of screen dimensions.</blockquote>
+
+== Tor Browser Consumes 100% CPU after Clock Sync or Suspend/Resume ==
+
+An upstream [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/29497 bug] in Tor Browser causes the <code>firefox.real</code> process to consume excessive CPU whenever the connection to Tor's <code>ControlPort</code> is broken, which continues until Tor Browser is restarted. This is known to occur when the [[sdwdate]] clock synchronization daemon is restarted in Whonix-Gateway, whether manually via the [[sdwdate-gui]] time synchronization systray, or automatically via post-resume hooks. For details, refer to the related forum [https://forums.whonix.org/t/bug-restart-of-sdwdate-in-whonix-gateway-causes-100-cpu-use-of-tor-browser-in-whonix-workstation/9541/18 discussion]. ([https://github.com/QubesOS/qubes-issues/issues/4969 original report on Qubes issue tracker])
+
+As a workaround:
+
+# Open <code>about:config</code> in the Tor Browser URL bar.
+# Search for and set <code>extensions.torbutton.display_circuit</code> to <code>false</code>.
+# Restart Tor Browser.
+
+In {{q_project_name}}, see [https://www.qubes-os.org/doc/disposable-customization/ Disposable Customization] to make this change persistent in Disposables.
+
+== Permission Issues ==
+<ref>
+https://www.reddit.com/r/Whonix/comments/ky7jqr/troubleshooting_i_just_installed_whonix_when_i/
+</ref>
+
+<u>Tip</u>: If something does not work, do not arbitrarily try to use sudo / root without indication that this would be appropriate. That only risks messing up user home folder permissions. See [[Root#Inappropriate_Use_of_Root_Rights|Inappropriate Use of Root Rights]].
+
+<u>Attempt to fix</u>:
+
+'''1.''' {{Open a product ws terminal}}
+
+'''2.''' Owner Permissions Fix
+
+Run the following command to reset permissions of user <code>user</code>'s home folder <code>/home/user</code> back to owner <code>user</code> and group <code>user</code>. That command is often sufficient to fix previous inappropriate use of root rights issues.
+
+{{CodeSelect|code=
+sudo chown --recursive user:user /home/user
+}}
+
+'''3.''' Folder Permission Fix
+
+If that does not resolve permission issues, run the following slightly more experimental command to set <code>chmod</code> [https://chmodcommand.com/chmod-770/ <code>0770</code>] on all folders inside the user <code>user</code>'s home folder. <ref>
+* As per Debian default [https://wiki.debian.org/UserPrivateGroups <u>u</u>ser <u>p</u>rivate <u>g</u>roups UPGs] each created user will be given their own group to use. Therefore <code>chmod</code> [https://chmodcommand.com/chmod-700/ <code>0700</code>] is not required and <code>chmod</code> <code>0770</code> is OK for all folders inside the user home folder.
+* The following command <code>find</code>s all directories inside user home folder <code>/home/user</code> and sets the "executable" bit on them. If that seems strange or a security issue, it's not, see [https://askubuntu.com/questions/443789/what-does-chmod-x-filename-do-and-how-do-i-use-it Why must a folder be executable?]. It also grants user <code>user</code> and UPG <code>user</code> the required read and write access inside the user home folder.
+</ref>
+
+{{CodeSelect|code=
+find /home/user -type d -print0 {{!}} xargs -0 chmod 0770
+}}
+
+'''4.''' Files Permission Fix
+
+Similar to the previous step, if that does not resolve permission issues, run the following slightly more experimental command to grant user <code>user</code> read and write access on all files inside the user <code>user</code>'s home folder. This may have some disadvantages. The only known example is for users of <code>git</code>. See footnote for further information. <ref>
+Some applications might create write protected files inside the user's home folder.
+
+As user. Do not do this. It is just an example for explanation!
+
+{{CodeSelect|code=
+rm -r .git
+}}
+
+<pre>
+rm: remove write-protected regular file '.git/objects/1c/f2f7161f7529fd600a706278e06df20eb6dfd6'
+</pre>
+
+After running the following command, this protection would be gone. In that case, the user is free to modify the following command to have a more narrow scope, for example.
+
+{{CodeSelect|code=
+chmod --recursive ug+rw /home/user/.tb
+}}
+
+{{CodeSelect|code=
+chmod --recursive ug+rw /home/user/.cache/tb
+}}
+</ref>
+
+{{CodeSelect|code=
+chmod --recursive ug+rw /home/user
+}}
+
+'''6.''' Done.
+
+Chances are good that permission issues have been resolved. Try starting Tor Browser. In case the issue is persisting, the following options could be considered.
+
+<u>Attempt to debug</u>:
+
+Start Tor Browser Start by {{project_name_long}} in [[#In Verbose Mode|In Verbose Mode]]. This will show verbose output messages which might be useful for the user to identify the issue. In doubt, [[Support]] might help interpreting these messages.
+
+<u>Other options</u>:
+
+* [[#Delete and Reinstall Tor Browser|Delete and Reinstall Tor Browser]]
+* [[Tor_Browser/Manual_Download|Tor Browser Manual Download]]
+* [[Factory Reset]], re-install method
+
+= Onion v2 Deprecation =
+<blockquote>Version 2 Onion Sites will be deprecated soon
+
+This onion site will not be reachable soon. Please contact the site administrator and encourage them to upgrade.
+
+Tor is ending its support for version 2 onion services beginning in July 2021, and this onion site will no longer be reachable at this address. If you are the site administrator, upgrade to a version 3 onion service soon.
+
+[https://support.torproject.org/onionservices/#onionservices_v2-deprecation Learn more…]</blockquote>
+
+This is [[unspecific]] to {{project_name_long}}.
+
+'''Figure:''' ''onion v2 deprecation notice''
+
+[[File:Tor Browser Onion v2 deprecation.jpg|onion v3 deprecation notice|700px]]
+
+The "learn more" link can be clicked. It links to https://support.torproject.org/onionservices/#onionservices_v2-deprecation which explains what is an onion v2 and an onion v3 and contains additional information.
+
+<blockquote>How do I know if I'm using v2 or v3 onion services?
+
+You can identify v3 onion addresses by their 56 character length, e.g. Tor Project's v2 address:http://expyuzz4wqqyqhjn.onion/, and Tor Project's v3 address: http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion/</blockquote>
+
+If there is such a notice, you're visiting an onion v2. In this case, look if there is an onion v3.
+
+* If there is no onion v3: either contact site administrator or do nothing.
+* if there is an onion v3: use the onion v3; update your bookmarks.
+
+= Glossary and Key Terminology =
+== Glossary ==
+It is recommended to become familiar with terms regularly used by The Tor Project and {{project_name_long}}. One useful resource is the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/community/glossary v1.0 Tor glossary] which is now available on The Tor Project community wiki page.
+
+== Key Terminology ==
+=== Tor vs Tor Browser ===
+
+[[Tor]] is an anonymizer developed by The Tor Project. Tor Browser is a web browser developed by the Tor Project which is optimized for privacy. Please do not confuse {{Code2|Tor}} with {{Code2|Tor Browser}} when conversing about {{project_name_long}} topics.
+
+=== Tor Browser Transparent Proxying ===
+
+The Tor Browser "transparent proxying" feature <ref>https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxy</ref> and/or the environment variable <code>TOR_TRANSPROXY=1</code> often cause confusion. It was an unfortunate naming decision by The Tor Project. This feature actually <u>[[Tor_Browser/Advanced_Users#Remove_Proxy_Settings|removes proxy settings]]</u>. With no proxy set, the user's system reverts to its default configuration. The effect of this decision is that Tor Browser networking will work in a similar fashion to an unconfigured Firefox browser.
+
+This is potentially dangerous when done outside of {{project_name_long}} because Tor Browser's transparent proxying feature could result in clearnet traffic; for instance if the gateway does not have a transparent torification feature (like {{project_name_gateway_long}}). In the case of {{project_name_long}}, even if the transparent proxying feature is set, {{project_name_gateway_long}} will "torify" traffic and force it through Tor. Similarly, if transparent proxying is set and happens to use a JonDo-Gateway, traffic will be forced through JonDo.
+
+One downside of the transparent proxying feature is that even when it is used inside {{project_name_long}}, it breaks Tor Browser's [https://gitlab.torproject.org/legacy/trac/-/issues/3455 top level isolation for each separate tab].
+
+Transparent proxying should not be confused with:
+
+* Tor's <code>TransPort [address:]port|auto [isolation flags]</code> [https://2019.www.torproject.org/docs/tor-manual.html.en setting].
+* Tor's [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IsolatingProxy IsolatingProxy].
+
+TODO: expand.
+
+{{Anchor|tb-updater postinst}}
+
+= Advanced Users =
+Refer to [[Tor_Browser/Advanced_Users|this wiki entry]] if any of the following advanced topics are of interest:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* Tor Browser and former Torbutton design.
+* Tor Browser without Tor.
+* Setting a custom homepage.
+* A custom {{project_name_long}} configuration or Workstation is in use.
+* Proxy settings changes are necessary.
+* Differences between tor-launcher and tor-browser launcher.
+* {{q_project_name}} topics:
+** Split Tor Browser.
+** Tor Browser in a Disposable.
+** Tor Browser in a Qubes Disposable Template.
+* Tor Browser debugging is required.
+</div>
+
+= Running Tor Browser in Qubes Disposable Template =
+This entry has been moved [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template_or_Disposable_Template|here]].
+
+= See Also =
+
+* [[YouTube|Watching YouTube Videos in {{project_name_long}}]]
+* [[youtube-dl|Downloading YouTube Videos in {{project_name_long}}]]
+* [[Qubes/Tor_Browser|Using Tor Browser in {{q_project_name}}]]
+* [[Tor_Browser/Advanced_Users|Tor Browser, Advanced Users]]
+* [[Install Tor Browser Outside of Whonix|Non-{{project_name_long}} Tor Browser]]
+* [[Verify_Tor_Browser_in_Windows|Verify Tor Browser in Microsoft Windows]]
+* [[Browser Tests]]
+* [[Tor-ctrl-observer|tor-ctrl-observer - Tor Connection Destination Viewer]]
+* [[Browser Plugins]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+= License =
+<blockquote>{{project_name_long}} Tor Browser wiki page Copyright (C) Amnesia <amnesia at boum dot org>
+{{project_name_long}} Tor Browser wiki page Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+
+This program comes with ABSOLUTELY NO WARRANTY; for details see the wiki source code.
+This is free software, and you are welcome to redistribute it under certain conditions; see the wiki source code for details.</blockquote>
+
+{{Footer}}
+
+[[Category:Documentation]]

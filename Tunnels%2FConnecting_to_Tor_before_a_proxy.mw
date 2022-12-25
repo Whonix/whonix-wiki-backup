@@ -1,0 +1,134 @@
+{{Header}}
+{{Title|
+title=Connecting to Tor before a Proxy
+}}
+{{#seo:
+|description=Instructions on how to connect to Tor before a proxy (User &rarr; Tor &rarr; Proxy &rarr; Internet)
+|image=Balloon-936780640.jpg
+}}
+[[image:Balloon-936780640.jpg|thumb]]
+
+'''<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Proxy</code> &rarr; <code>Internet</code>'''
+
+= Introduction =
+
+{{Tunnels_Introduction}}
+
+== Proxy Warning ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt={{project_name_long}} first time users warning]]
+| text    = '''<u>Warning!</u>'''
+Take careful note of the following issues when using standard, common http(s)/SOCKS4(a)/5 proxies -- anonymizers that only use http(s)/SOCKS4(a)/5 as an interface <ref>Like the Tor, [[JonDonym]] or [[I2P]] software.</ref> are exempt.
+* Most problems with these proxies are not caused by {{project_name_long}}.
+** These problems are [[unspecific|unspecific to {{project_name_long}}]].
+* Tor exit relays and their ISPs can still monitor your connection to its destination.
+* Be especially careful with http(s) proxies. Some of them send the [[Whonix_versus_Proxies#Summary|<code>X-Forwarded-For</code>]] header which discloses the IP address. http(s) proxies that do not send this header are sometimes called "elite" or "anonymous" proxies.
+* When using <code>X-Forwarded-For</code> http(s) proxies, destination servers can determine the IP of your Tor exit relay.
+
+For further detailed information on proxies, see: [[Whonix_versus_Proxies|Tor vs. Proxies, Proxy Chains]].
+}}
+
+== Comparison of Post-Tor Proxy Connection Methods ==
+There are three different methods to connect to Tor before a proxy.
+
+'''<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Proxy</code> &rarr; <code>Internet</code>'''
+
+'''Table:''' ''Comparison of Post-Tor Proxy Connection Methods''
+
+<div class="scroll-table">
+{| class="wikitable" style="background-color: #fff;text-align: center"
+
+|
+! [[Tunnels/Connecting_to_Tor_before_a_proxy/Proxy_Settings_Method|Proxy Settings Method]]
+! [[Tunnels/Connecting_to_Tor_before_a_proxy/Proxyfier_Method|Proxifier Method]]
+! [[Tunnels/Connecting_to_Tor_before_a_proxy/Transparent_Proxying_Method|Transparent Proxying Method]]
+|-
+
+! Examples
+| Tor Browser proxy settings; foxyproxy
+| torsocks; proxychains
+| iptables; redsocks
+|-
+
+! Application requires no support for proxy settings
+| {{No}}
+| {{Yes}}
+| {{Yes}}
+|-
+
+! Likelihood of leaks <ref>
+TCP or DNS
+</ref> going <code>user</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>
+| Depends <ref>Depends if the application has any proxy bypass bugs.</ref>
+| Depends <ref>Depends on how bug free the socksifier is.</ref>
+| style="background-color: {{Green}}"| Lower <ref>Because redirection happens at the iptables level, not at the application level.
+</ref>
+|-
+
+! Leak-shield possible in theory 
+| {{No}}
+| {{No}}
+| {{Yes}}
+|-
+
+! DNS can be resolved by the same proxy
+| {{Yes}}
+| {{Yes}}
+| Needs extra DNS resolver <ref>
+See [[Tunnels/Connecting_to_Tor_before_a_proxy/Transparent_Proxying_Method#DNS_resolution]].
+</ref>
+|-
+
+! Does not need separate DNS server.
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+|-
+
+! Per application configuration required
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+|-
+
+! System wide configuration
+| {{No}}
+| {{No}}
+| {{Yes}}
+|-
+
+! Proxy chains possible
+| No
+| Yes, but see footnote. <ref>
+Questionable if that adds anything. See: [[Whonix_versus_Proxies#Proxy_Chains_Introduction|Aren't 10 proxies (proxychains) better than Tor with only 3 hops? - proxychains vs Tor]]
+</ref>
+| No, would require custom development. <ref>
+Would require adding a proxy chains feature to redsocks.
+</ref>
+|-
+
+! Setup difficulty
+| Very difficult because different settings required for every application.
+| Initial setup very difficult. Afterwards similar usage for most applications.
+| Initial setup very difficult. Afterwards easy and reliable leak-shield.
+|-
+
+|}
+</div>
+
+= Proxy Settings Method =
+Moved to [[Tunnels/Connecting_to_Tor_before_a_proxy/Proxy_Settings_Method]].
+
+= Proxyfier Method =
+Moved to [[Tunnels/Connecting to Tor before a proxy/Proxyfier Method]].
+
+= Transparent Proxying  Method =
+Moved to [[Tunnels/Connecting_to_Tor_before_a_proxy/Transparent_Proxying_Method]].
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

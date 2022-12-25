@@ -1,0 +1,43 @@
+{{Header}}
+{{#seo:
+|description={{project_name_workstation_long}} Security Hardening. This page is targeted at users who wish to improve the security of their {{project_name_workstation_long}} to become even more secure.
+|image=Doors-1767563_640.jpg
+}}
+[[image:Doors-1767563_640.jpg|thumb]]
+{{security_intro}}
+
+This page is targeted at users who wish to improve the security of their {{project_name_workstation_long}} to become even more secure.
+
+= Introduction =
+
+{{project_name_long}} is by no means a perfectly hardened system. Additional hardening measures are most welcome, but at the same time hardening by default is very difficult. Until the {{project_name_long}} project realizes a significant increase in resources or community assistance, extra measures will remain out of scope and hardening will be left to the upstream operating system. See [[Dev/Virtualization_Platform|Virtualization Platform]] for further details.
+
+= AppArmor =
+
+Learn more about [https://wiki.apparmor.net AppArmor], which helps to protect against vulnerabilities by confining a program's file access based upon strict rule-sets. It is recommended to apply the available [[AppArmor#Installation|{{project_name_long}} AppArmor profiles]] to contain various applications which are run in {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) and/or {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>), like Tor, Tor Browser, Thunderbird and others.
+
+= Disable TCP SACK =
+
+[https://en.wikipedia.org/wiki/Transmission_Control_Protocol#Selective_acknowledgments TCP Selective Acknowledgement (SACK)] is a commonly exploited option in the TCP protocol and not needed for many people. <ref>For example, it has been used for [https://en.wikipedia.org/wiki/SACK_Panic#SACK_Panic remote denial of service attacks] and can even lead to a Linux kernel panic.</ref>  For this reason, it is recommended to disable it unless required.
+
+{{Open with root rights|filename=
+/etc/sysctl.d/30_security-misc.conf
+}}
+
+Uncomment all lines starting with <code>net.ipv4</code>.
+
+This procedure can also be repeated on the {{project_name_gateway_short}}.
+
+TCP SACK is not disabled by default because on some systems it can greatly decrease network performance. <ref>
+https://forums.whonix.org/t/disabling-tcp-sack-dsack-fack/8109/5
+</ref>
+
+= Restrict Hardware Information to Root =
+See [[Security-misc#Restrict_Hardware_Information_to_Root|Restrict Hardware Information to Root]].
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

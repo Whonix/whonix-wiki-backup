@@ -1,0 +1,114 @@
+{{Header}}
+{{forkme}}
+{{#seo:
+|description=The {{project_name_long}}-Windows-Installer for Windows is a simple and fast way to set-up {{project_name_long}} on a system running Microsoft Windows. Screenshots. Rationale. Build documentation. Source code. whonix-installer.exe
+|image=Whonix_installer_wizard.png
+}} {{title|title=
+OLD {{project_name_long}} Windows Installer
+}}
+{{Archived}}
+[[File:Whonix_installer_wizard.png|thumb]]
+= Introduction =
+
+The {{project_name_long}}-Windows-Installer for Windows is a simple and fast way to set-up {{project_name_long}} on a system running Microsoft Windows.
+
+{{#widget:Download_Button
+ |text=Download Whonix ™ Xfce
+ |url=/wiki/Windows_Quick_Start
+ |os=windows|os=virtualbox
+}}
+
+{{Anchor|Rationale}}
+The {{project_name_long}} Windows Installer was developed with a focus on providing users with an fast and easy method to install {{project_name_long}} in Microsoft Windows. This gives users the opportunity to experiment with {{project_name_long}} in a familiar environment without the necessity of complex virtual machine imports or host operating system changes. When the <code>whonix-installer.exe</code> is executed, the latest VirtualBox version and both {{project_name_long}} VMs are seamlessly installed on the Windows machine. From there, users can immediately start using {{project_name_long}} with no further configuration required. <ref>While no further action is required to install or configure the {{project_name_long}} VMs, it is ''possible'' (in some cases) that host bios settings or workarounds for VirtualBox bugs will require user intervention. These are <u>not</u> {{project_name_long}} issues.</ref>
+
+= Screenshots =
+'''Figure:''' ''Run {{project_name_long}} Installer''
+
+[[Image:Install_Whonix.gif]]
+
+'''Figure:''' ''Install Whonix''
+
+[[Image:Whonix_installer_wizard.png]]
+
+'''Figure:''' ''License Agreement''
+
+[[Image:Whonix_windows_installer_license_agreement.png]]
+
+'''Figure:''' ''Extracting Files''
+
+[[Image:Installing_whonix.png]]
+
+'''Figure:''' ''Complete {{project_name_long}} Installation''
+
+[[Image:Whonix_setup_wizard_complete.png]]
+
+= Building from source =
+
+== Preparation ==
+
+Download a copy of this repository. Use its folder to collect required files for building.
+ https://github.com/Whonix/Whonix-Windows-Installer
+Download the {{project_name_long}} VirtualBox XFCE image to the folder and renamed it to "whonix.ova"
+ https://www.whonix.org/wiki/VirtualBox/XFCE
+Download and install Inno Setup
+ https://www.jrsoftware.org/isdl.php
+Whonix-UI executable in the folder
+ Built from source: https://www.whonix.org/wiki/Building_Whonix-UI_for_Windows
+Download the newest "Windows hosts" VirtualBox installer to any location.
+ https://www.virtualbox.org/wiki/Downloads
+Navigate in the commandline to that location and run
+{{CodeSelect|code=
+VirtualBox[Characters based on your version].exe -extract
+}}
+A window will open telling you where its files have been extracted. Navigate to this folder, rename <code>VirtualBox</code><code>[Characters based on your version]</code><code>amd64.msi</code> to <code>virtualbox_x64.msi</code> and move it to the repository/build folder.
+
+== Building ==
+
+Your build folder should have at least:
+
+* <code>license.txt</code>
+* <code>logo.ico</code>
+* <code>virtualbox_x64.msi</code>
+* <code>Whonix.exe</code>
+* <code>Whonix.iss</code>
+* <code>whonix.ova</code>
+
+Optional: Open <code>Whonix.iss</code> and change <code>AppVersion</code>. Set <code>Compression</code> as desired (https://documentation.help/Inno-Setup/topic_setup_compression.htm)
+
+Right-click <code>Whonix.iss</code> and select <code>Compile</code> (Or inside Inno Setup select <code>Build</code> &rarr; <code>Compile</code>). The executable is in <code>Output</code>.
+
+Note: If the <code>.ova</code> becomes greater than 2GB, <code>Whonix.iss</code> must be set to use <code>DiskSpanning=Yes</code>. This will output an <code>.exe</code> and <code>.bin</code> file. To combine, add <code>7za.exe</code> and <code>7zSD.sfx</code> to the 7zip folder. Open <code>7zip/make self extract.bat</code>, which combines everything in <code>Output</code> into a <code>.7z</code> archive and then into a self-extracting-and-running <code>.exe</code>.
+
+== Obtaining 7zSD.sfx and 7za.exe ==
+ https://www.7-zip.org/download.html
+
+<code>7zSD.sfx</code>
+Download the 7-zip compressed archive file and extract it.
+
+<br>
+
+[[Image:windows_installer_7zSD-sfx.png]]
+<br>
+
+<code>7za.exe</code>
+Download the <code>.7z</code> compressed archive file under <code>7-Zip 16.04 Extra</code> and extract it.
+
+<br>
+[[Image:windows_installer_7za-exe.png]]
+
+= Forum Discussion =
+https://forums.whonix.org/t/testing-whonix-installer-for-windows/2987/210
+
+= Deprecated Installer =
+There used to be a version of this installer based on NSIS which has been discontinued, due to stability and a host of other issues. It can still be found here: https://github.com/{{project_name_short}}/{{project_name_short}}-Windows-Installer-deprecated
+
+= See Also =
+* [[Dev/Windows User Interface|{{project_name_long}} Windows User Interface]]
+* [[Verify the Project Windows Installer|Verify the {{project_name_long}} Windows Installer]]
+
+= Footnotes =
+<references />
+
+{{Footer}}
+
+[[Category:Development]]

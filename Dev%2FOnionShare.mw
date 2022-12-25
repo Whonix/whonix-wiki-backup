@@ -1,0 +1,75 @@
+{{Header}}
+{{#seo:
+|description=OnionShare in {{project_name_long}} - Development Notes
+|image=https://www.{{project_clearnet}}/w/images/0/0d/OnionShare_logo.png
+}}
+[[Image:OnionShare_logo.png|<code>OnionShare Logo</code>|thumb|128px]]
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Developers only! Risk of [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]]!
+}}
+
+= Notes =
+* [[Qubes|{{q_project_name}}]] users should consider creating a separate, cloned <code>{{project_name_workstation_template}}-onionshare</code> Template before installing OnionShare/flatpak.
+* OnionShare from the Debian stable repository is suitable for most users. Flatpak can be utilized for later OnionShare versions; v2.4 is packaged at the time of writing. <ref>
+https://flathub.org/apps/details/org.onionshare.OnionShare
+</ref>
+
+== Flatpak OnionShare Installation ==
+
+{{Flatpak Install|package=
+onionshare
+}}
+
+== Issue ==
+Flatpak installed OnionShare does not listen on all network interfaces but 127.0.0.1 only. It is therefore unreachable from {{project name gateway long}}. This is because file <code>/usr/share/anon-ws-base-files/workstation</code> does not exist inside the Flatpak folder.
+
+related:
+https://github.com/onionshare/onionshare/blob/develop/cli/onionshare_cli/web/web.py#L360_L364
+
+Does the following help?
+
+{{CodeSelect|code=
+sudo mkdir /var/lib/flatpak/app/org.onionshare.OnionShare/current/active/files/share/anon-ws-base-files
+}}
+
+{{CodeSelect|code=
+sudo touch /var/lib/flatpak/app/org.onionshare.OnionShare/current/active/files/share/anon-ws-base-files/workstation
+}}
+
+[https://github.com/flatpak/flatpak/issues/4640 flatpak breaks application's Whonix detection #4640]
+
+= Debugging =
+To see what's happening "under the hood". When using Debian package installed OnionShare version only. This does not work for Flatpak installed OnionShare version.
+
+{{CodeSelect|code=
+uwtwrapper_verbose=1 onionshare
+}}
+
+View listener.
+
+{{CodeSelect|code=
+netstat -tulpen
+}}
+
+Should show <code>Local Address</code> <code>0.0.0.0</code>, meaning listening on all interfaces which is required in case of {{project_name_long}} so onionshare running inside {{project_name_workstation_long}} can be reached from {{project_name_gateway_short}}. (As opposed to onionshare running on a host without {{project_name_long}} where it should listen on localhost <code>127.0.0.1</code> onl.y
+
+<pre>
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       User       Inode      PID/Program name
+[...]
+tcp        0      0 0.0.0.0:17605           0.0.0.0:*               LISTEN      1000       30959      4009/python3
+</pre>
+
+[https://github.com/Whonix/uwt <code>uwt</code>] and [https://github.com/Whonix/bindp <code>bindp</code>] is no longer required since {{project_name_long}} 16 (Debian <code>bullseye</code> based).
+
+{{CodeSelect|code=
+/usr/bin/onionshare.anondist-orig a
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Development]]

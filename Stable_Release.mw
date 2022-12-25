@@ -1,0 +1,1384 @@
+__NOINDEX__
+{{Header}}
+{{#seo:
+|description={{project_name_long}} Release Notes, Changelog, {{project_name_long}} {{VersionShort}} Stable Release
+|image=https://www.{{project_clearnet}}/w/images/b/b5/Releasenots.png
+}}
+{{Contributor|
+|status=stable
+|about=About this {{Code2|{{PAGENAME}}}} Page
+|difficulty=easy
+|contributor=[https://forums.whonix.org/users/torjunkie torjunkie]
+|support=[[Support]]
+}}
+[[image:Releasenots.png|thumb]]
+
+= Missing Changes =
+Since {{project name long}} is based on {{kicksecure}}, maintained by the same contributors, the reader should also take notice of the {{kicksecure_wiki
+|wikipage=Stable_Release
+|text=Kicksecure Stable Release Changelog
+}} since changes in {{Kicksecure}} also apply to {{project name long}} but are not listed (duplicated) here.
+
+= {{project_name_long}} 16 Changelog =
+
+{{project_name_long}} 16 was released on September 11 and 12, 2021 for KVM and VirtualBox. <ref>[https://forums.whonix.org/t/whonix-16-0-2-7-kvm-debian-11-bullseye-based-major-stable-release/12264 Whonix 16.0.2.7 KVM (Debian 11 bullseye based) - Major Stable Release].</ref> <ref>[https://forums.whonix.org/t/whonix-16-has-been-released-debian-11-bullseye-based-for-virtualbox-major-release/12297 Whonix 16 has been Released! (Debian 11 bullseye based) - for VirtualBox - Major Release].</ref> {{q_project_name}} 16 was released on 28 September, 2021. <ref>[https://forums.whonix.org/t/qubes-whonix-16-has-been-released-debian-11-bullseye-based-major-release/12465 Qubes-Whonix 16 has been Released! (Debian 11 bullseye based) - Major Release].</ref> As per the [[About#Support_Schedule|Support Schedule]], {{project_name_long}} 15 was deprecated on 14 November, 2021 -- all users should upgrade as soon as possible. <ref>[https://forums.whonix.org/t/whonix-15-end-of-security-support-and-deprecation-notice-all-users-should-move-to-whonix-16/12473 Whonix 15 End of Security Support and Deprecation Notice - All users should move to Whonix 16!]</ref>
+
+Significantly, {{project_name_long}} 16 is based on the Debian <code>bullseye</code> (Debian 11) distribution which was [https://www.debian.org/News/2021/20210814 officially released] on August 14, 2021 instead of Debian <code>buster</code> (Debian 10). The bullseye release has nearly 60,000 packages and around 72 per cent of them were updated. <ref><blockquote>This release contains over 11,294 new packages for a total count of 59,551 packages, along with a significant reduction of over 9,519 packages which were marked as "obsolete" and removed. 42,821 packages were updated and 5,434 packages remained unchanged.</blockquote></ref>
+
+This means users have access to many new software packages in concert with existing packages. In addition, this release will serve as a development foundation for many exciting upcoming security enhancements such as [[Hardened_Malloc_Kicksecure|Hardened Malloc {{kicksecure}} (HMK)]], [[Linux_Kernel_Runtime_Guard_LKRG|Linux Kernel Runtime Guard (LKRG)]] and other items on the [[Security Roadmap|{{project_name_long}} Security Roadmap]].
+
+== Major Changes ==
+
+* Ported the Debian base from Debian 10 <code>buster</code> to Debian 11 <code>bullseye</code>. <ref>[https://forums.whonix.org/t/debian-bullseye-port/12056/5  Debian bullseye port].</ref>
+* Updated Monero GUI wallet (XMR) to version <code>0.17.2.3</code>.
+* Updated Electrum Bitcoin (BTC) wallet to version <code>4.0.9</code> (Debian stable version).
+* Deprecated the <code>binaries-freedom</code> package; Electrum is now installed from <code>packages.debian.org</code> stable repository. <ref>[https://forums.whonix.org/t/policy-for-inclusion-of-compiled-software/6635/17 Policy for Inclusion of Compiled Software]</ref>
+* Switched the <code>tor</code> package back from <code>deb.torproject.org</code> to <code>packages.debian.org</code> stable version. <ref>[[Dev/Tor|Tor integration in {{project_name_long}} Development Notes]]</ref>
+* Enabled [https://fasttrack.debian.net/ Debian Fast Track repository] by default. <ref><blockquote>Debian Fast Track is a repository that allows making “backports” of packages available to users of the stable distribution, if those packages cannot be maintained in testing and backported in the usual way.<blockquote></ref>
+* Updated paths from <code>/usr/lib</code> to <code>/usr/libexec</code> where appropriate as per lintian Debian [https://wiki.debian.org/FilesystemHierarchyStandard File System Hierarchy Standard (FHS)].
+* [[VirtualBox]] version: this release utilizes VirtualBox guest additions version <code>6.1.26-dfsg-3</code> from <code>fasttrack.debian.net</code>. <ref>[https://forums.whonix.org/t/challenges-installing-virtualbox/9984 Challenges Installing VirtualBox]</ref>
+
+== Known Issues ==
+
+* The desktop background image is currently the same for both {{project_name_gateway_long}} and {{project_name_workstation_long}}. This will be corrected in a future release.
+
+== Notable Changes ==
+
+[https://github.com/Kicksecure/anon-apt-sources-list <code>anon-apt-sources-list</code>]:
+* Added and enabled <code>fasttrack.debian.net</code> by default. <ref>https://github.com/Kicksecure/anon-apt-sources-list/commit/14e7fc11fdcb036ce99e4651e348369152341d15</ref> <ref>https://github.com/Kicksecure/anon-apt-sources-list/commit/beb7359ef219a99ebe2aedbfcdeff649706adbb3</ref>
+* Enabled backports repository by default. <ref>https://github.com/Kicksecure/anon-apt-sources-list/commit/05f19b546e5f0ff11c57e313e1baeae2c369c7ca</ref>
+
+[https://github.com/whonix/anon-gw-anonymizer-config <code>anon-gw-anonymizer-config</code>]:
+* Corrected the setting to <code>ControlPort 9052</code>.  <ref>https://github.com/Whonix/anon-gw-anonymizer-config/commit/b35428a33f790b60fda382658eb85f2062f2622e</ref>
+* <code>ControlPort 9052</code> is required for onion-grater updates. <ref>See: [https://gitlab.torproject.org/tpo/core/tor/-/issues/25173 No Control Socket when DisableNetwork and User options are set].</ref> <ref>https://github.com/Whonix/anon-gw-anonymizer-config/commit/8648d8ad040d965f8018b542b033e3c6bcf8e498</ref>
+
+[https://github.com/whonix/anon-meta-packages <code>anon-meta-packages</code>]:
+* Changed the <code>binaries-freedom</code> dummy dependency to <code>electrum</code>. <ref>https://github.com/whonix/anon-meta-packages/commit/b62db95a20df69f8e75fcc4e9dece8f5c9017525</ref>
+* <code>whonix-shared-packages-recommended-cli</code>: added <code>kicksecure-recommended-cli</code>. <ref>https://github.com/whonix/anon-meta-packages/commit/8096d3d57d85298c56e7f05a4d06f555e257148f</ref>
+* Removed <code>flashproxy-client</code> and <code>fteproxy</code> from {{project_name_gateway_long}} because it is deprecated in Debian <code>bullseye</code>. <ref>https://github.com/whonix/anon-meta-packages/commit/7488c0bdea6a1c2a415d514ba1dc4d4b60fa2709</ref>
+* Removed <code>obfsproxy</code> (deprecated obfsproxy version 3) but kept <code>obfs4proxy</code>. <ref>https://github.com/whonix/anon-meta-packages/commit/6054e957db7b86249905e1108e30211236434b05</ref>
+
+[https://github.com/whonix/anon-ws-disable-stacked-tor <code>anon-ws-disable-stacked-tor</code>]:
+* Provides: <code>obfsproxy</code>, <code>obfs4proxy</code>. <ref>https://github.com/Whonix/anon-ws-disable-stacked-tor/commit/6ee5b5b03d09dae202f2f55ff603c96dca2bf386</ref>
+
+[https://github.com/Kicksecure/apparmor-profile-dist <code>apparmor-profile-dist</code>] changed settings:
+* <code>security-misc /run/faillock/** rwc,</code> <ref>https://github.com/Kicksecure/apparmor-profile-dist/commit/41e3bb610efbff440299694bf00117240ed8b12e</ref>
+* <code>pam security-misc bullseye</code> <ref>https://github.com/Kicksecure/apparmor-profile-dist/commit/51c82b715fe47fecf9fb0c76317ba3558f5af455</ref>
+* <code>/etc/security/ r,</code> <ref>https://github.com/Kicksecure/apparmor-profile-dist/commit/b6f37eccd785cc3dfdc3e6295948be0233ddd418</ref>
+* <code>/etc/security/faillock.conf r,</code> <ref>https://github.com/Kicksecure/apparmor-profile-dist/commit/4554d97de8cbc126b11fc8504739bd138a8f1922</ref>
+
+[https://github.com/Kicksecure/apparmor-profile-everything <code>apparmor-profile-everything</code>]:
+* Removed the following file because it was renamed due to <code>usrmerge</code>: <code>rm_conffile /etc/apparmor.d/sbin.networking-aae</code>. <ref>https://github.com/Kicksecure/apparmor-profile-everything/commit/51d75f497ac629d7d82f8c96623edd985b52bf85</ref>
+* <code>usrmerge</code> - renamed <code>etc/apparmor.d/sbin.networking-aae</code> to <code>etc/apparmor.d/usr.sbin.networking-aae</code>. <ref>https://github.com/Kicksecure/apparmor-profile-everything/commit/895ddd1c06289dab673906cbdf19d61ea1bdf794</ref>
+* <code>usrmerge</code> - renamed <code>sbin/networking-aae</code> to <code>usr/sbin/networking-aae</code>. <ref>https://github.com/Kicksecure/apparmor-profile-everything/commit/6d70eefe95d3399faed96352a339810393e4833a</ref>
+
+[https://github.com/Kicksecure/genmkfile <code>genmkfile</code>]:
+* genmkfile deb-install: now install using <code>apt install</code> instead of <code>dpkg -i</code> for dependency resolution (sdwdate vs time-deamon). <ref>https://github.com/Kicksecure/genmkfile/commit/87258fc755b5744b4ae4233484ce320f73e388f8</ref>
+* Updated <code>make_dependencies_filter_helper</code>.  <ref>https://github.com/Kicksecure/genmkfile/commit/ae57c0c32ec1f7e6b57fd0ca9e766e5d7c564a2c</ref>
+* Excluded the <code>/debian</code> folder from upstream tarball to avoid lintian warning <code>no-debian-changes</code>.  <ref>https://github.com/Kicksecure/genmkfile/commit/45a3bec7a01b34c6fa6ae0db1a5bdf3bfdb04eca</ref>
+* Now force the inclusion of the original source if the Debian package revision number is higher than 1. Also implemented a LKRG package compatibility fix. <ref>https://github.com/Kicksecure/genmkfile/commit/2a0d7eb4a9e606a909258281f514aa82b99b6212</ref>
+* Added and improved support for <code>debian/changelog</code> file without epoch. <ref>https://github.com/Kicksecure/genmkfile/commit/76a79fb21defa258f51933db9ab1f314852ee6c8</ref> <ref>https://github.com/Kicksecure/genmkfile/commit/2c68f84894608617337fb2fb0c9f37cd17325514</ref>
+* Ensured LKRG v0.9.1 compatibility. <ref>https://github.com/Kicksecure/genmkfile/commit/43bedd4677b12f62bed54c6d3aa8781fc673a6d9</ref>
+* Cleaned up the temporary file <code>debian/$package.dkms.debhelper</code>. <ref>https://github.com/Kicksecure/genmkfile/commit/56611936b5cdef54edd02285eeee0f9786476879</ref>
+
+[https://github.com/Kicksecure/helper-scripts <code>helper-scripts</code>]:
+* <code>etc/apparmor.d/abstractions/tor-circuit-established-check</code>: <code>deny /etc/ssl/openssl.cnf r,</code> is not needed. <ref>It is functional without it.</ref> <ref>https://github.com/Kicksecure/helper-scripts/commit/4ff5276723b765ec3da4e1c465bc3d16aa5a8c20</ref>
+* Implemented <code>/usr/libexec/helper-scripts/first-boot-skel force</code> to ease [[Desktop#Default_Home_Folder_Configuration_Files_Reset|Default Home Folder Configuration Files Reset]]. <ref>https://github.com/Kicksecure/helper-scripts/commit/e021874a31e4a4ed9f2c46ff1925c5dfa79691de</ref>
+* Moved <code>usr/lib/helper-scripts/</code> to <code>usr/libexec/helper-scripts</code> and moved <code>usr/lib/curl-scripts</code> to <code>usr/libexec/helper-scripts</code> as per lintian FHS.  <ref>https://github.com/Kicksecure/helper-scripts/commit/8a95a1cb7f1e01762ec607abbe5702c0ee766010</ref>
+
+[https://github.com/Kicksecure/kicksecure-base-files <code>kicksecure-base-files</code>]:
+* Set <code>/etc/kicksecure_version</code> to 16. <ref>https://github.com/Kicksecure/kicksecure-base-files/commit/c002d6b6029644c3bbf9c1311ab512a70d1397a7</ref>
+
+[https://github.com/Kicksecure/kicksecure-meta-packages <code>kicksecure-meta-packages</code>]:
+* Added Chromium to <code>dummy-dependency</code> so it can be removed. <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/8f1eae9599746177b1e42458ec44ae5c6890c618</ref>
+* <code>binaries-freedom</code> was replaced with <code>electrum</code>. <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/d0151d51e90b0e59b933a25d908c1c5f5f22ac2f</ref>
+* Moved <code>obfs4proxy</code> from <code>kicksecure-dependencies-cli</code> to <code>kicksecure-recommended-cli</code>. <ref>See: [https://forums.whonix.org/t/meta-packages-development-discussion/11948 Meta Packages Development Discussion].</ref> <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/3bfcf3cf9c48fc370b36789b5ae5ad89a7b53ffc</ref>
+* <code>kicksecure-cli</code> Depends: <code>kicksecure-recommended-cli</code>. <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/3e08328b9439ab46560c366b45da765e1ac1a409</ref>
+* Introduce <code>kicksecure-recommended-cli</code> and install <code>fasttrack-archive-keyring</code> by default. <ref>See: [https://forums.whonix.org/t/install-debian-fasttrack-archive-keyring-enable-debian-fasttrack-repository-by-default/11456 Install Debian fasttrack-archive-keyring by default?].</ref> <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/a0d9bd549e99d7c84dcda226bffb9ffcafb4d02e</ref>
+* <code>bullseye</code>: ugprade <code>libexo-1-0</code> to <code>libexo-2-0</code>. <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/1269ce8533dd521f670bded1deb33459768ce4de</ref>
+* Merged branch "HulaHoop0-master-patch-35409" into "master" and added <code>obfs4proxy</code> and <code>firefox-esr</code>. <ref>See merge request <code>whonix/kicksecure-meta-packages!1</code>.</ref> <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/5bad8176bb3634e4a64d51edb3e58c7d07f94e8a</ref>
+* Added <code>obfs4proxy</code> and <code>firefox-esr</code>.  <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/7ba985581cfd02092186bc8cbe584ac4c0f086f9</ref>
+
+[https://github.com/whonix/onion-grater <code>onion-grater</code>]:
+* Upgraded to a newer <code>onion-grater</code> version by Tails. <ref>https://github.com/Whonix/onion-grater/commit/5655e2f3bf4cffc5f6c2336a542d0c9ea5ca952b</ref>
+
+[https://github.com/Kicksecure/open-link-confirmation <code>open-link-confirmation</code>]:
+* Upgraded to a new upstream version. <ref>https://github.com/Kicksecure/open-link-confirmation/commitfae6451754a39a83b6f46f56bdb6e7d6086162b4</ref>
+
+[https://github.com/whonix/qubes-whonix <code>qubes-whonix</code>]:
+* Migrated from <code>yum</code> to <code>dnf</code>. <ref>https://github.com/Whonix/qubes-whonix/commit/ef6b132f45a00601415f2d48a94a2357eef46ae1</ref>
+* Honor <code>skip-torified-updates-proxy-check qvm-service</code> and reintroduced the ability (from {{q_project_name}} < v15.4) to skip the <code>torified-updates-proxy-check</code> script by enabling a <code>qvm-service</code>. <ref>This allows a {{project_name_long}} template to be updated via a non-Whonix qubes.UpdatesProxy VM if necessary.</ref> <ref>https://github.com/Whonix/qubes-whonix/commit/07367f83fbbea9c9a1811c88e0fd12b0d0e615d4</ref>
+
+[https://github.com/Kicksecure/rads <code>rads</code>]:
+* Ensure a display manager is not started if it was disabled (for example using <code>sudo systemctl disable lightdm</code>). <ref>https://github.com/Kicksecure/rads/commit/74fbd3b6a460de94bbdfedd1d863dba9bee3d855</ref>
+
+[https://github.com/Kicksecure/repository-dist <code>repository-dist</code>]:
+* Added further legacy tests. <ref>https://github.com/Kicksecure/repository-dist/commit/d01e9cc3724ee6e65760dddac40651ba8a5be5f3</ref>
+* Required change: <code>/etc/apt/trusted.gpg.d/derivative.gpg</code> to <code>/etc/apt/trusted.gpg.d/derivative.asc</code>. <ref>https://github.com/Kicksecure/repository-dist/commit/4b7228db4a038d36315880cf6878dd713a0bcb37</ref>
+* Now use an ASCII armored gpg key; this simplifies code since APT folder <code>/etc/apt/trusted.gpg.d</code> supports ASCII armored gpg keys from Debian <code>bullseye</code>. <ref>https://github.com/Kicksecure/repository-dist/commit/3a1764721f24c3d2cb681a9f49da2f11e51c9f12</ref>
+* Migrated from <code>gnupg2</code> (dummy transitional package) to <code>gnupg</code>. <ref>https://github.com/Kicksecure/repository-dist/commit/08de96e54385678bc3db5b47c26721dfa14711bf</ref>
+
+[https://github.com/Kicksecure/sdwdate <code>sdwdate</code>] setting changes:
+* <code>deny /usr/sbin/ldconfig rix,</code> <ref>https://github.com/Kicksecure/sdwdate/commit/23a24206567bd27134b68e459ae9b1c4b75f68de</ref>
+* <code>Conflicts: time-daemon</code> <ref>https://github.com/Kicksecure/sdwdate/commit/046a1c00b9aa4b578f16e88e0cc355776dd15c08</ref>
+* <code>Replaces: time-daemon</code> <ref>https://github.com/Kicksecure/sdwdate/commit/11361d7fbfdf4a5e5762d407fef25e9bd1593d07</ref>
+* Reverted “bullseye”: this reverts commit 67222afa9b01c8bba1f814d5c57b1c7632355d6d. <ref>https://github.com/Kicksecure/sdwdate/commit/9fee551dca38a7cc5cf940224f3a08cdae6c1956</ref>
+* <code>Provides: time-daemon</code> to avoid systemd pulling <code>Depends: systemd-timesyncd</code>. <ref>https://github.com/Kicksecure/sdwdate/commit/0c38702517df5b3344f14635f4b9700217e697f4</ref>
+* <code>config-test</code> <ref>https://github.com/Kicksecure/sdwdate/commit/4eb6536d3e7cdd33fc00565f87c2fbe0e9947010</ref>
+
+[https://github.com/Kicksecure/security-misc <code>security-misc</code>]:
+* Added <code>hardened malloc</code> compatibility for <code>haveged</code> workaround <code>/lib/systemd/system/haveged.service.d/30_security-misc.conf SystemCallFilter=getrandom</code>. <ref>Otherwise <code>haveged</code> will exit with a core dump.</ref> <ref>https://github.com/Kicksecure/security-misc/commit/7d73b3ffa0bf13ba78debfb7f099758b0d0fbef3</ref>
+* Ported from <code>pam_tally2</code> to <code>pam_faillock</code> since <code>pam_tally2</code> was deprecated upstream. <ref>https://github.com/Kicksecure/security-misc/commit/582492d6d8c5f756be4d809898707cb196c5c765</ref> <ref>https://github.com/Kicksecure/security-misc/commit/2bf0e7471cbd3b813ce385d994e43e48636f7a0b</ref>
+* Enabled <code>apt --error-on=any</code> by default. This makes <code>apt</code> exit non-zero for transient failures, see: <code>/etc/apt/apt.conf.d/40error-on-any</code>. <ref>See: [https://forums.whonix.org/t/debian-bullseye-apt-get-error-on-any/12068 Debian bullseye apt --error-on=any].</ref> <ref>https://github.com/Kicksecure/security-misc/commit/0492f28aa10dc93063ff3b46107fa705c5ee0d7e</ref>
+* Replaced the no longer required <code>/usr/libexec/security-misc/apt-get-wrapper</code> with <code>apt --error-on=any</code>. <ref>https://github.com/Kicksecure/security-misc/commit/240ec7672a4d513e7e6cca280aca3d67c265d1cc</ref>
+* Ported LKRG compatibility settings automation for VirtualBox hosts from <code>systemd</code> to <code>dpkg trigger</code>. <ref>https://github.com/Kicksecure/security-misc/commit/5a65c35479f267b026c03e195658ef9d98ee519c</ref>
+* Improved the LKRG VirtualBox host configuration, see: [https://github.com/lkrg-org/lkrg/issues/82#issuecomment-886188999 VirtualBox host software compatibility]. <ref>https://github.com/Kicksecure/security-misc/commit/7e128636b3a4ea7fe5dfa12018685ab7b5dda706</ref>
+* Added LKRG compatibility settings automation for VirtualBox hosts, see: [https://github.com/lkrg-org/lkrg/issues/82 VirtualBox host software compatibility]. <ref>https://github.com/Kicksecure/security-misc/commit/257cef24baa038b21ef511e9d95c4229a5e16f68</ref>
+
+[https://github.com/Kicksecure/systemcheck <code>systemcheck</code>] improved settings:
+* Implemented necessary AppArmor changes for <code>bullseye</code>. <ref>https://github.com/Kicksecure/systemcheck/commit/83244c59499cd9e593bc4ee1849ec887e0d781fe</ref>
+* Added <code>@{PROC}/sys/kernel/osrelease r,</code> for the <code>systemcheck</code> canary. <ref>https://github.com/Kicksecure/systemcheck/commit/0acf98f71b91bff962a8c6c30ade1d52015baee5</ref>
+* Replaced the no longer required <code>/usr/libexec/security-misc/apt-get-wrapper</code> with <code>apt --error-on=any</code>. <ref>https://github.com/Kicksecure/systemcheck/commit/aaaa46d9c7f7bf2ea96c0c6b7534ca1333079da0</ref>
+
+[https://github.com/Kicksecure/tb-starter <code>tb-starter</code>]:
+* Improved the function of <code>tb_prefs_js_file_patches</code>. <ref>https://github.com/Kicksecure/tb-starter/commit/f6c7fa071c96100c96ba5622f9a8d7c8ea8a495d</ref>
+* Updated the path to the local browser homepage. <ref>Patched <code>prefs.js</code> in user home folder. This was necessary because it changed during the {{project_name_long}} 15 to 16 upgrade from <code>/usr/share/homepage/whonix-welcome-page/whonix.html</code> to <code>/usr/share/doc/homepage/whonix-welcome-page/whonix.html</code>.</ref> <ref>https://github.com/Kicksecure/tb-starter/commit/a656c7e67d3adb80e989a089821433d38007e4d4</ref>
+* Deleted <code>/usr/share/tb-profile-i2p/profile.i2p/bookmarks.html</code> because it is unused. <ref>https://github.com/Kicksecure/tb-starter/commit/549d20a92b90379b18221e0ae1b96f9405e81da4</ref>
+* Migrated <code>usr/share/homepage</code> to <code>usr/share/doc/homepage</code>. <ref>https://github.com/Kicksecure/tb-starter/commit/e9c41b7a645a526aec8764c82259d3c2234eb49f</ref>
+
+[https://github.com/Kicksecure/tb-updater <code>tb-updater</code>] updated versions:
+* <code>alpha tbb_hardcoded_version=“11.0a4”</code> <ref>https://github.com/Kicksecure/tb-updater/commit/a070941c05a9879f4a6e0b009bf2237f28b10268</ref>
+* <code>tbb_hardcoded_version=“10.5.5”</code> <ref>https://github.com/Kicksecure/tb-updater/commit/fe840f6446087b2ed5b09e144e517c2875e21aa0</ref>
+
+[https://github.com/Kicksecure/usability-misc <code>usability-misc</code>]:
+* Replaced the no longer required <code>/usr/libexec/security-misc/apt-get-wrapper</code> with <code>apt --error-on=any</code>. <ref>https://github.com/Kicksecure/usability-misc/commit/7291238c1752bc88be73b1f1d031169034db340b</ref>
+
+[https://github.com/whonix/uwt <code>uwt</code>]:
+* Migrated <code>usr/lib/uwt_settings_show</code> to <code>usr/bin/uwt_settings_show</code>. <ref>https://github.com/Whonix/uwt/commit/8fad01d11eddc1f44cd15cef50903bc96156dfe3</ref>
+
+[https://github.com/Kicksecure/vm-config-dist <code>vm-config-dist</code>]:
+* VirtualBox guest additions installer: switched to <code>interest-await</code> trigger. <ref><code>interest-await</code> is used instead of <code>interest-noawait</code> because when <code>virtualbox-guest-additions-iso</code> was simultaneously upgraded with <code>vm-config-dist</code>, the trigger was not executed.</ref> <ref>https://github.com/Kicksecure/vm-config-dist/commit/9a3d7b64a65a32839cf3edc0ef469c9a5e17f586</ref>
+* Removed a folder existence conditional to prevent a catch-22 situation. <ref>https://github.com/Kicksecure/vm-config-dist/commit/2ed18a9d67b519ce6b85ab1de03fd3b91af491ca</ref>
+
+[https://github.com/whonix/whonix-base-files <code>whonix-base-files</code>]:
+* Updated <code>/etc/whonix_version</code> to 16. <ref>https://github.com/Whonix/whonix-base-files/commit/4ebfe6691120f45aed43b9b28c88252ab0184955</ref>
+* Renamed <code>usr/lib/whonix/whonix.sh</code> to <code>usr/libexec/whonix-base-files/whonix.sh</code>. <ref>https://github.com/Whonix/whonix-base-files/commit/69c6312a8ec8976fbfb61b5336e6c595512d9e5d</ref>
+
+[https://github.com/Kicksecure/developer-meta-files <code>developer-meta-files</code>]:
+* Renamed <code>migrate_to_buster_proposed_updates_repository</code> to <code>migrate_to_proposed_updates_repository</code>.
+* Renamed <code>migrate_to_buster_repository</code> to <code>migrate_to_stable_repository</code>.
+* Renamed <code>migrate_to_buster_testers_repository</code> to <code>migrate_to_testers_repository</code>. <ref>https://github.com/Kicksecure/developer-meta-files/commit/126c8592c92fa4b78b71867b471f63508ed51325</ref>
+* Modified the warrant canary text as per [https://www.whonix.org/w/index.php?title=Dev/Warrant_Canary_Draft&oldid=65156 this change]. <ref>See: [https://forums.whonix.org/t/whonix-warrant-canary/3208/29 Whonix Warrant Canary].</ref> <ref>https://github.com/Kicksecure/developer-meta-files/commit/a6289a8b5e0b3db83b9c00f1df5818f6a2c7d2b6</ref>
+
+[https://github.com/whonix/whonix-firewall <code>whonix-firewall</code>] setting changes:
+* TODO: <code>/{,usr/}bin/qubesdb-cmd rUx,</code> <ref>https://github.com/Whonix/whonix-firewall/commit/69e89b344c3cffaa9553b83b77858d60f040fba8</ref>
+* <code>owner /run/updatesproxycheck/** rw,</code> <ref>https://github.com/Whonix/whonix-firewall/commit/3f49f174091e5e84a801c81fc36082c7ad135e5a</ref>
+* TODO: <code>/{,usr/}bin/qubesdb-read rUx</code> <ref>https://github.com/Whonix/whonix-firewall/commit/c9356e1e34b50fbc2de0a3d73e0f0c50cd486f92</ref>
+* <code>After=systemd-modules-load.service</code> is required for LKRG, otherwise iptables modules cannot be auto loaded. <ref>https://github.com/Whonix/whonix-firewall/commit/98a0b91a53d115cd042bb3c7663a4470be02aece</ref>
+* <code>/var/log/journal/{,**} r,</code> <ref>https://github.com/Whonix/whonix-firewall/commit/fa732e9634a44fa5a5952eebef953d735be64106</ref>
+
+[https://github.com/Kicksecure/initializer-dist <code>whonix-initializer</code>]:
+* Changed the path. <ref>https://github.com/Kicksecure/initializer-dist/commit/37cb445a84c2f3918bccb14ba3dc102723ad15fd</ref>
+
+[https://github.com/Kicksecure/legacy-dist <code>whonix-legacy</code>]:
+* Updated the version. <ref>https://github.com/Kicksecure/legacy-dist/commit/3c8753f51a9ffb4a4f2c7c74ddc13b9ee597c66a</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/2a8bef6ea2c33c2a4ff14630ae99ce1ee31ad89b</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/131f50b2da9f81c76f53ab4ec97f733611d0f005</ref>
+* Multiple improvements to <code>release-upgrade</code>. <ref>https://github.com/Kicksecure/legacy-dist/commit/eb9a4bff0b846f9516d9b7719d73705641db2c27</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/ee1a9b03c02df748b0b3df9c30eaa5db5d88b188</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/2389f276d6d5e12a4f3ced5f0c99b52ba085687c</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/80c8c6f0f98531f27ad0155902a007db8738bc7b</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/9bc51f4e35fb6728977437f8d0228ef6e16d69b7</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/2aef1e530169e7790e5f5447a0bcd6e501cedd45</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/63f9469ad0db93bee2ecc8c72def7bfc30edb149</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/c59f6b48a7a7e866b8b2a430fc46fe20da3a6bc0</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/17e041cdea34f0c5421fb23b5222e34c14e636d3</ref>
+* <code>release-upgrade</code>: fixed and ensure onion sources are respected. <ref>https://github.com/Kicksecure/legacy-dist/commit/456a0e638b04cc9dab474ecb58ff77bee29c8857</ref>
+* Added a workaround for Qubes-specific perl: <code>warning: Setting locale failed</code> issue. <ref>[https://github.com/QubesOS/qubes-issues/issues/4889 locales-all package not installed by default in all Debian templates].</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/10a72921677881eb85283ff4ad46b03f5b49a8b6</ref>
+* Legacy fixes. <ref>https://github.com/Kicksecure/legacy-dist/commit/59c56c41e2a23be96d451a79fc744f2cc0f0536e</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/1319af851b969d63fa77471e3da162d9ca5c41d8</ref>
+* Implemented forward port release-upgrade improvements. <ref>https://github.com/Kicksecure/legacy-dist/commit/9628a8136c971370a1c1efaf2317b2d72770de4a</ref>
+* Renamed <code>usr/libexec/release-upgrade</code> to <code>usr/sbin/release-upgrade</code>. <ref>https://github.com/Kicksecure/legacy-dist/commit/eb3fc5d912798b98d240aa1788d966bc8d151433</ref>
+* <code>release-upgrade script</code>: replaced the <code>apt</code> functionality test package <code>python-qt4</code> with <code>nano</code> since the former installs too many packages (dependencies) and the latter is installed by default. <ref>This also leads to a much faster test.</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/bbad2596cffa06c6156d2ca784c8271fe89fa4e9</ref>
+* Ported the release upgrade script to <code>bullseye</code>. <ref>https://github.com/Kicksecure/legacy-dist/commit/f3add80f849c7080fceeaf86da2104aea0b2dd4c</ref>
+
+[https://github.com/whonix/whonix-welcome-page <code>whonix-welcome-page</code>]:
+* Migrated <code>usr/share/homepage</code> to <code>usr/share/doc/homepage</code>. <ref>https://github.com/Whonix/whonix-welcome-page/commit/e260ebb241936d17d5699d90e6cf568e7eeecde7</ref>
+
+[https://github.com/whonix/derivative-maker Whonix build script]:
+* Removed <code>virtualbox-guest-dkms</code>; it is deprecated in Debian (integrated into the kernel). <ref>https://github.com/Whonix/derivative-maker/commit/d6f4b0beeb7da7c857a0944d5341f738a1825ca0</ref>
+* Implemented fasttrack changes. <ref>https://github.com/Whonix/derivative-maker/commit/993dc55adef8fd6227dcf028a31f78df7af4af38</ref> <ref>https://github.com/Whonix/derivative-maker/commit/4117aa571c4c54268098949377fec890be300edf</ref> <ref>https://github.com/Whonix/derivative-maker/commit/1097167d5d947b2591319ba7c727380bfdbb9852</ref>
+* Migrated <code>.gpg</code> to <code>.asc</code>. <ref>https://github.com/Whonix/derivative-maker/commit/61a4fa8feb1ca8bb66f8692f98fe0ed0b0f6a347</ref>
+* Reverted “build sources, Debian fasttrack: disable temporarily”;  this reverts commit 288323a86e2dc037b03e004c62ab3f8ce2b1f616. <ref>https://github.com/Whonix/derivative-maker/commit/ea0ea5ed5b66bb99c4b1851954d4c116b690a3c4</ref>
+* Avoided a build dependency on <code>ftpsync</code> (for <code>rsync</code> test script). <ref>https://github.com/Whonix/derivative-maker/commit/db2b3b0439da69198e6fe15da14cd539f89a48bb</ref>
+* VirtualBox builds: switched back to guest additions packages - <code>virtualbox-guest-utils</code>, <code>virtualbox-guest-dkms</code> and <code>virtualbox-guest-x11</code>. (Previously <code>virtualbox-guest-additions-iso</code>.) <ref>https://github.com/Whonix/derivative-maker/commit/22c9e145a9fdb53358e56fd37fa34ebe3db5fb6c</ref>
+* VirtualBox builds: temporarily download the <code>virtualbox</code> package from Debian sid until it becomes available from either Debian fasttrack or <code>virtualbox.org</code>. <ref>[https://forums.whonix.org/t/challenges-installing-virtualbox/9984/6 Challenges Installing VirtualBox].</ref> <ref>https://github.com/Whonix/derivative-maker/commit/79f73c563c0c12afbf19b479e2c6426ac9ebc005</ref>
+* VirtualBox builds: accept both sources of VirtualBox packages - either package <code>virtualbox</code> (by Debian), or package <code>virtualbox-6.1</code> (by virtualbox.org). <ref>https://github.com/Whonix/derivative-maker/commit/2e9b99f5991dd5a62083a91bde597ccd4100f108</ref>
+* Build sources, Debian fasttrack: disabled temporarily until https://salsa.debian.org/fasttrack-team/support/-/issues/24 is fixed. <ref>https://github.com/Whonix/derivative-maker/commit/288323a86e2dc037b03e004c62ab3f8ce2b1f616</ref> <ref>Note: the https://fasttrack.debian.net/debian offline issue has now been resolved.</ref>
+* <code>help-steps/repo_download_chroot_script</code>: fixed for Debian <code>bullseye</code> - updated the order of parameters passed to APT. <ref>https://github.com/Whonix/derivative-maker/commit/4c4b6899446b65ff98b0c714806e22879cd22ea6</ref>
+* Disabled <code>download_virtualbox_packages_virtualbox_guest_additions_iso_from_debian_sid</code> moving to Debian fasttrack version. <ref>https://github.com/Whonix/derivative-maker/commit/37a58d3ccef9e055fa77375f08f609c37f34a4dc</ref>
+* Disabled <code>download_virtualbox_packages_virtualbox_org</code> moving to Debian fasttrack version. <ref>https://github.com/Whonix/derivative-maker/commit/d18114145217bd0fa97c5b90a162fa4115a44675</ref>
+* Default <code>derivative-maker_auto_retry=“0”</code> auto retry function error handler trap lacks variables such as variable APTGETOPT. <ref>This would miss security-related APT configuration options: <code>apt --error-on=any / -o APT::Update::Error-Mode=any</code>.</ref> <ref>https://github.com/Whonix/derivative-maker/commit/a00bd523073aaceb1f5cd674b54e734fb93c7518</ref>
+* Added backports and fasttrack to build sources by default to support downloading VirtualBox from Debian fasttrack. <ref>https://github.com/Whonix/derivative-maker/commit/067b8c2f6dafbbcb6ea00eaf2f25c90b88508764</ref>
+* Added build dependencies for maintainers. <ref>https://github.com/Whonix/derivative-maker/commit/6a0f72a701799879b23de92a2855aba7f756bb22</ref>
+* Removed <code>python</code> from cowbuilder image. It is no longer necessary because the <code>apt-get-update</code> wrapper is no longer required. <ref>https://github.com/Whonix/derivative-maker/commit/21451c66870549e441e50f2bdd8008ba33f8d4a5</ref> <ref>https://github.com/Whonix/derivative-maker/commit/ff75fd30f698c61a3276a811c8fcd5a5be7a1298</ref>
+* Reverted to the Tor version from <code>packages.debian.org</code> (instead of the earlier <code>deb.torproject.org</code>), see: [[Dev/Tor|Tor integration in {{project_name_long}} Development Notes]]. <ref>[https://forums.whonix.org/t/tor-integration-in-whonix/10593 Tor integration in Whonix].</ref> <ref>https://github.com/Whonix/derivative-maker/commit/e6b372d18f582b35900899d2aa076e4d1b5073a2</ref>
+* Removed <code>mmdebstrap</code> copy from the source code; it is no longer required as the Debian <code>bullseye</code> package is sufficient. <ref>https://github.com/Whonix/derivative-maker/commit/37d3c0062d8fbb4413d3113cc67f2ea4020e9cba</ref>
+* <code>python3.9</code> is no longer required in <code>grml_packages</code> because <code>apt --error-on=any</code> obsoleted any need for a python-based <code>apt</code> wrapper. <ref>https://github.com/Whonix/derivative-maker/commit/a8aaeddad3feb15ba894c4c0c75288b20642a3e1</ref>
+* Replaced the unnecessary <code>/usr/libexec/security-misc/apt-get-wrapper</code> with <code>apt --error-on=any</code>. <ref>https://github.com/Whonix/derivative-maker/commit/2ba4bcec1cd56c58cec7cb18b82d801abc58a0ae</ref> <ref>https://github.com/Whonix/derivative-maker/commit/9cdc94271739b373ff19eeb7506193c6a9b47250</ref>
+
+= {{project_name_long}} 16 Updates =
+
+As {{project_name_long}} is a rolling distribution, users will benefit from regular small security and usability improvements, features and bug fixes as they enter the {{project_name_long}} stable repository. The most notable changes will be announced here.
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = The majority of the enhancements below also also apply to {{q_project_name}}. Exceptions include:
+* [[Keystroke_Deanonymization#Kloak|kloak]]
+* [[Linux_Kernel_Runtime_Guard_LKRG|Linux Kernel Runtime Guard (LKRG)]]
+* [https://github.com/kicksecure/tirdad tirdad] (TCP ISN CPU Information Leak Protection)
+* [https://github.com/Kicksecure/security-misc/blob/master/etc/default/grub.d/40_kernel_hardening.cfg Kernel Hardening through Kernel Boot Parameters]
+* [https://github.com/Kicksecure/security-misc Strong Linux User Account Separation] / [[Dev/Permissions#Bruteforcing_Linux_User_Account_Passwords_Protection|Protection against Bruteforcing Linux User Account Passwords]]
+* [[apparmor-profile-everything]] <ref>https://github.com/Kicksecure/apparmor-profile-everything</ref> (AppArmor for everything: APT, systemd, init, all systemd units, all applications)
+* [https://www.kicksecure.com/wiki/Hardened-kernel hardened-kernel patch] and [https://github.com/Kicksecure/hardened-kernel/blob/master/usr/share/hardened-kernel/hardened-vm-kernel configuration]
+
+Many of these will be possible once the use of in-VM kernels is simplified and promoted in Qubes OS. <ref>https://github.com/QubesOS/qubes-issues/issues/5212</ref> <ref>https://forums.whonix.org/t/qubes-whonix-security-disadvantages-help-wanted/8581</ref>
+}}
+
+== {{project_name_long}} 16.0.9.0 ==
+[https://github.com/whonix/anon-apps-config <code>anon-apps-config</code>]:
+* I2P config: Disable Frequent connection to news letter server No need to make unnecessary connections to external server for each couple of minutes. Harmful anonymity practice. <ref>
+https://github.com/Whonix/anon-apps-config/commit/f8aa6c26e8c38f3504a5540aad6a920d421f69bb
+</ref> (Thanks to TNT BOM BOM!)
+* I2P config: Update router.config.anondist Since I2P going to run over Tor which is a socks5 then reseeding should be over socks5 as well. <ref>
+https://github.com/Whonix/anon-apps-config/commit/1556b5f152622cb72045e800ee13df03e50ca420
+</ref> (Thanks to TNT BOM BOM!)
+[https://github.com/whonix/anon-gw-anonymizer-config <code>anon-gw-anonymizer-config</code>]:
+* add onion-grater-list manpage <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/6a531fd46f07f79b9dfb564f2cf7b1fd867c2fda
+</ref> (Thanks to nyxnor!)
+* improve onion-grater-list <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/6ca9097f099d8848858793d6c5e56b2da183522e
+</ref> (Thanks to nyxnor!)
+* add onion-grater-list <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/12e9103b7d84ca602d6a3951a82d041e36dd4da0
+</ref> (Thanks to nyxnor!)
+[https://github.com/whonix/anon-meta-packages <code>anon-meta-packages</code>]:
+* install Thunderbird by default https://forums.whonix.org/t/thunderbird-no-longer-installed-by-default/6505/12 <ref>
+https://github.com/Whonix/anon-meta-packages/commit/d7a64ffa81fa03c431382a00d55b0cb6c8161eb1
+</ref>
+[https://github.com/whonix/onion-grater <code>onion-grater</code>]:
+* signed commit <ref>
+https://github.com/Whonix/onion-grater/commit/73b5aeb85e3defb65cd5da16102777f34fabd4ad
+</ref>
+* revert <ref>
+https://github.com/Whonix/onion-grater/commit/196c69cca36d593d17a811ec0000c02327097c97
+</ref>
+* support multiple directories and multiple matchers allow support for different hosts for remote connections, deprecating onion-grater-merger. Sorting made in reverse to honor precedence as parsing stops at first match. https://forums.whonix.org/t/onion-grater-wiki-improvements/15845 <ref>
+https://github.com/Whonix/onion-grater/commit/884d6eba523ec98a88b3cc1326d71c7fd83847c8
+</ref> (Thanks to nyxnor!)
+* no need to edit systemd file to set arguments <ref>
+https://github.com/Whonix/onion-grater/commit/2353be12767d933ebc43b6dd3f49928191a43b41
+</ref> (Thanks to nyxnor!)
+* fix old apparmor variable <ref>
+https://github.com/Whonix/onion-grater/commit/ed4af1fcc9b07f6e6278dad18a4ecfc080c35fb7
+</ref> (Thanks to nyxnor!)
+* make bitcoind accept 127.0.0.1 and 0.0.0.0 <ref>
+https://github.com/Whonix/onion-grater/commit/9addd1d6dd9671b18e5415a196b92d7f6ee5846c
+</ref> (Thanks to nyxnor!)
+[https://github.com/whonix/whonix-welcome-page <code>whonix-welcome-page</code>]:
+* Revert "Revert "Depends: kicksecure-welcome-page"" This reverts commit f9c5482f4e55002412a0e0e1df3ca06110886302. <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/8b524f98f6f25acd4ab38bad878dcfa966f67059
+</ref>
+* End of year banner for welcome page <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/ce0001668678fd4bd0fe10eb15a2c3378d389a38
+</ref> (Thanks to Your Name!)
+* Revert "Depends: kicksecure-welcome-page" This reverts commit 36ad250c1dbb3436b93f0b96f25b7ef88e9aab26. <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/f9c5482f4e55002412a0e0e1df3ca06110886302
+</ref>
+* Merge branch 'master' of https://github.com/Whonix/whonix-welcome-page <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/aa6485dd3f04d4e21685d7f27f90c3daef42ab35
+</ref> (Thanks to Your Name!)
+* Revert local HP back to without endofyear banner <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/97402c419f26178a1cd642957aabdabd365f6d9e
+</ref> (Thanks to Your Name!)
+* set Firefox ESR from Debian package sources homepage to about:blank This is to disable kicksecure-welcome-page in Whonix. <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/e5f6f06e3d4af99505bd507be509d19c2dde9765
+</ref>
+* Depends: kicksecure-welcome-page <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/36ad250c1dbb3436b93f0b96f25b7ef88e9aab26
+</ref>
+* Whonix local HP referencing Kicksecure local HP <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/e9a09e154a4686876cd81e534be766a4144410e1
+</ref> (Thanks to Your Name!)
+* Whonix End of Year Banner <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/5a8bca82b700ef1060bd4fa9fcbf886bd6f6f2e6
+</ref> (Thanks to Your Name!)
+
+== {{project_name_long}} 16.0.8.2 ==
+[https://github.com/whonix/anon-apps-config <code>anon-apps-config</code>]:
+* pref(“mailnews.start_page.enabled”, false); <ref>
+https://github.com/Whonix/anon-apps-config/commit/49ecbc1c2a8d9fc20b5784a8c81c06e685449b86
+</ref>
+* Drop everything related to  Enigmail Updated to reflect Tails version as of 2022 <ref>
+https://github.com/Whonix/anon-apps-config/commit/906f86ba462ef8fb0a8f84a2dc540511fe18fb88
+</ref> (Thanks to @HulaHoop!)
+* Updated to reflect Tails version as of 2022 <ref>
+https://github.com/Whonix/anon-apps-config/commit/113998b6453c61c8861eb0cae80e55d2624f8ebb
+</ref> (Thanks to @HulaHoop!)
+* update onionjuggler conf <ref>
+https://github.com/Whonix/anon-apps-config/commit/b0654176ae94091eb4e0920ec1a1e15d8b2d2ecc
+</ref> (Thanks to nyxnor!)
+* chmod +x etc/onionjuggler/conf.d/30_whonix.conf to fix lintian warning W: anon-apps-config: script-not-executable etc/onionjuggler/conf.d/30_whonix.conf <ref>
+https://github.com/Whonix/anon-apps-config/commit/8773f211e508b26f4ee3ec21cb5e47faaf75cb11
+</ref>
+* add onionjuggler whonix conf <ref>
+https://github.com/Whonix/anon-apps-config/commit/73aa4a4668a4d1d55ac9f454217dab3c2d0ca04b
+</ref> (Thanks to nyxnor!)
+* disable ntp time check disabled time check since it uses ntp which doesnt exist in whonix. (it has no effect on the connection) <ref>
+https://github.com/Whonix/anon-apps-config/commit/dc2b157e61dfb7b324a3f61589c75c9acca23ac8
+</ref> (Thanks to TNT BOM BOM!)
+[https://github.com/whonix/anon-gw-anonymizer-config <code>anon-gw-anonymizer-config</code>]:
+* fix AppArmor <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/32368cbbcc4f09302836fba67a58f927514ac141
+</ref>
+* addgroup -> adduser fix <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/3e16fad210bc03b18320bf740238966d85c504cb
+</ref>
+* improve anon-verify output <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/d619a1bf3edeb463dfb75dde15f870e910da6965
+</ref>
+* anon-verify: fix enumeration of all Tor config drop-in snippets for new `%include /etc/torrc.d/*.conf` syntax <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/02f368f72e03e202f1b4e749678d48c4b6396eba
+</ref>
+[https://github.com/whonix/anon-ws-disable-stacked-tor <code>anon-ws-disable-stacked-tor</code>]:
+* addgroup -> adduser fix <ref>
+https://github.com/Whonix/anon-ws-disable-stacked-tor/commit/6f4104b0db9d2b70d43e16a1af59a6f2338a8582
+</ref>
+[https://github.com/whonix/onion-grater <code>onion-grater</code>]:
+* correct bitcoind binding ports <ref>
+https://github.com/Whonix/onion-grater/commit/38316044dc73eab7519890514db44f044f479d69
+</ref> (Thanks to nyxnor!)
+* correct bitcond pattern for all default ports of the chains <ref>
+https://github.com/Whonix/onion-grater/commit/12477ae6da0c82bc79898184c086287a6512a8db
+</ref> (Thanks to nyxnor!)
+* fix systemd seccomp violation after suspend/resume by adding `SystemCallFilter` `select` Sep 25 01:06:57 host audit[841]: SECCOMP auid=4294967295 uid=106 gid=116 ses=4294967295 subj==/usr/lib/onion-grater (enforce) pid=841 comm="onion-grater" exe="/usr/bin/python3.9" sig=31 arch=c000003e syscall=23 compat=0 ip=0x792fb3bac2a3 code=0x80000000 <ref>
+https://github.com/Whonix/onion-grater/commit/86584992cb4e83873617a9471ac7b05c9e1a0981
+</ref>
+[https://github.com/whonix/whonix-firewall <code>whonix-firewall</code>]:
+* shfmt <ref>
+https://github.com/Whonix/whonix-firewall/commit/48eb9e019551ea714fb6b1ee8de54c3b7c168571
+</ref>
+* shfmt <ref>
+https://github.com/Whonix/whonix-firewall/commit/ebc69f2718c9edb8ae6cbb6dc9070108b9a902d1
+</ref>
+* shfmt <ref>
+https://github.com/Whonix/whonix-firewall/commit/9d364febd84cdb739f3703975ee39324f21e4d87
+</ref>
+* shfmt <ref>
+https://github.com/Whonix/whonix-firewall/commit/4d036535a3ef0faeb7b27d0f5cc4d7e76ca5761c
+</ref>
+* verbosity <ref>
+https://github.com/Whonix/whonix-firewall/commit/058c03186f9474ba7223a4766d4ed92e89a750ba
+</ref>
+* set all defaults first before parsing config folder Thanks to @nyxnor for the report! https://forums.whonix.org/t/how-to-unset-firewall-array/15604 <ref>
+https://github.com/Whonix/whonix-firewall/commit/cdf359736aa6e81e0c7200723849afd0b2ba9277
+</ref>
+* not opening ports instead of closing, wording <ref>
+https://github.com/Whonix/whonix-firewall/commit/5ec6e1fac57c5dd6d5f6a80170c61476e95141b3
+</ref> (Thanks to nyxnor!)
+* be verbose no port is being opened <ref>
+https://github.com/Whonix/whonix-firewall/commit/3c5fd6b4eb446cd997384818bee35d2baf0629bc
+</ref> (Thanks to nyxnor!)
+* double quote "$@" <ref>
+https://github.com/Whonix/whonix-firewall/commit/682be4c3c74668f21aa873bfe92c3a52d8caf81b
+</ref> (Thanks to nyxnor!)
+* always inform SOCKSIFIED if set to '0' <ref>
+https://github.com/Whonix/whonix-firewall/commit/b303e37017a25fe6893cc739cde430755f3c1f92
+</ref> (Thanks to nyxnor!)
+* print informational messages https://forums.whonix.org/t/print-ports-opened-in-the-firewall/15469 <ref>
+https://github.com/Whonix/whonix-firewall/commit/950cdaf1a721aa3e5230ab83d1fe678b84a64a56
+</ref> (Thanks to nyxnor!)
+* make the main script pass arguments to child also make the script be called by path, so easier to test by placing script at /usr/local/bin <ref>
+https://github.com/Whonix/whonix-firewall/commit/6e0dd7bed6138f2121938399b6d30bc9f2016ce1
+</ref> (Thanks to nyxnor!)
+[https://github.com/whonix/whonix-welcome-page <code>whonix-welcome-page</code>]:
+* new file:   usr/share/doc/homepage/whonix-welcome-page/img/Search-ahmia.png <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/b62cec05bed9a9c88d4d8db08e0d95f397a05b1a
+</ref>
+* minor: link to root domain, not index.html <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/6c09f925606c04de7ca9a3a538efeaa6cf32ed8f
+</ref>
+* ahmia <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/d22f55e315780a68c84f2b718196ed782b8bbb59
+</ref>
+* add icon for brave search <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/79cb1bf2f159dcb7beb65b6bacb93e04c39d3962
+</ref>
+* Add onions as much as possible instead of TLS only https://forums.whonix.org/t/local-browser-homepage-for-tor-browser-in-whonix/347/106 <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/50837699666ce86e922ab215e09f615924885956
+</ref> (Thanks to TNT BOM BOM!)
+
+== {{project_name_long}} 16.0.5.3 ==
+TODO: https://forums.whonix.org/t/whonix-16-0-5-3-for-virtualbox-point-release/13817
+
+== {{project_name_long}} 16.0.5.0 ==
+
+[https://github.com/{{project_name_short}}/derivative-maker <code>derivative-maker</code>]:
+* rename `Whonix-Workstation-CUSTOM` to `Whonix-Custom-Workstation` <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/59f0feb3e06633b08551156a0229a8ef88514aac
+</ref>
+* fix qcow2 Whonix-Custom-Workstation build <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/bb3e5d175cadc123cd4444d4d18703d4a93a2b28
+</ref>
+* improve images upload script <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/5dbfc39d33f420c769343e5893bf1da5a378392e
+</ref>
+* introduce variable `dist_build_files_to_upload` <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/0f4f4822602c987ac5f3b07919ff24b6345c4691
+</ref>
+* improve error message if build dependency is missing <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/380d0552bc6365afcdce55822cb9def002f5dcb7
+</ref>
+* sanity test <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/a28bd92eff008ad480112f5ca7a9f48059c360e8
+</ref>
+* sanity test <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/7f0c73d95e0a09c1c962f50e13e14b7c577b2ffe
+</ref>
+* add `--delete --utm` incomplete boilerplate implementation <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/2fdcce77c69de6bed06fc27481cae63ccb260ef6
+</ref>
+* rename /etc/derivative-makerconfig.d to /etc/buildconfig-dist.d rename derivative-maker to derivative-maker <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/cac7bf755068b4977dbaf034df069ac6a95f3ba0
+</ref>
+* generic variables names <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/6a0c415fc1bd98e42d4bd3ad2102a6cd954f459c
+</ref>
+* generic variables names <ref>
+https://github.com/{{project_name_short}}/derivative-maker/commit/1c9855844e3483033daff2f169f89af71e028357
+</ref>
+[https://github.com/whonix/anon-gw-anonymizer-config <code>anon-gw-anonymizer-config</code>]:
+* remove torrc-d-cleaner since no longer required because Tor now has wildcard support and is configured to parse config files ending with `*.conf` only. <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/decc367b9412c6171a18a496744353637353cc8c
+</ref>
+* run repair-torrc from tor-config-sane <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/827c46e6ec1899ca78200ca626961ebb9aa1e914
+</ref>
+* only `%include` config files ending with `*.conf` https://www.whonix.org/wiki/Dev/Tor <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/3dd761b7a745496e9ad27ef4b8275262175aa1a6
+</ref>
+* cleanup, remove workaround for old bug https://forums.whonix.org/t/configuring-onion-service/9042 <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/0c083154890edf39829ab9038ba5d556f4295395
+</ref>
+* downgrade copyright to avoid Tor Duplicate Config File Restart Bug https://www.whonix.org/wiki/Dev/Tor#Tor_Duplicate_Config_File_Restart_Bug <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/e8189b7b9cf72eae1d6dcffd863edd4eb8a79ec1
+</ref>
+* workaround for Tor Duplicate Config File Restart Bug https://www.whonix.org/wiki/Dev/Tor#Tor_Duplicate_Config_File_Restart_Bug <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/032aedbdba67fcf2697d946afdf2c980957bba0b
+</ref>
+[https://github.com/whonix/anon-meta-packages <code>anon-meta-packages</code>]:
+* add `tor-ctrl` to `whonix-shared-packages-recommended-cli` <ref>
+https://github.com/Whonix/anon-meta-packages/commit/70773aef3432fb380c5e8aeb302d1d7ada65628c
+</ref>
+[https://github.com/whonix/qubes-whonix <code>qubes-whonix</code>]:
+* lower debugging <ref>
+https://github.com/Whonix/qubes-whonix/commit/1e81681e31ed64def79994f273bceecd064df1fa
+</ref>
+[https://github.com/whonix/whonix-firewall <code>whonix-firewall</code>]:
+* lower debugging <ref>
+https://github.com/Whonix/whonix-firewall/commit/8c682cc28ad2fe0537672c94ebe6e6a232de9356
+</ref>
+[https://github.com/whonix/whonix-welcome-page <code>whonix-welcome-page</code>]:
+* remove hardcoded font, use font from Debian package sources instead <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/2785b2c01eb307d2652391297a6b6fc42730e47b
+</ref>
+* update copyright since complete rewrite <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/a709e46407a5ffac5977a749b412b256aabc38a4
+</ref>
+* Welcome Page Revision <ref>
+https://github.com/Whonix/whonix-welcome-page/commit/56b8aa8b677ac4bc1d9d7c62ab52ab6100c2581f
+</ref> (Thanks to Your Name!)
+
+== {{project_name_long}} 16.0.4.2 ==
+
+[https://github.com/whonix/anon-apps-config <code>anon-apps-config</code>]:
+* disable Thunderbird default homepage by default to avoid https connection for better security hardening Thanks to @HulaHoop for the suggestion! https://forums.whonix.org/t/canning-thunderbirds-startpage/13007/1 <ref>
+https://github.com/Whonix/anon-apps-config/commit/7892543371ccc224c8fca50a76e71e08704f8afe </ref>
+[https://github.com/Kicksecure/anon-connection-wizard <code>anon-connection-wizard</code>]:
+* add tag ap_conn_done_pt <ref>
+https://github.com/Kicksecure/anon-connection-wizard/commit/c6685af1a9fc4bbd1c912e7ff3277538baaff893
+</ref>
+* add tag conn_done_pt <ref>
+https://github.com/Kicksecure/anon-connection-wizard/commit/850604b878fd1208bdb1c6b08324efac717a5285
+</ref>
+* update default bridges <ref>
+https://github.com/Kicksecure/anon-connection-wizard/commit/54fb98886fcbfbce235633773287cb838d382cb5
+</ref>
+[https://github.com/whonix/anon-gw-anonymizer-config <code>anon-gw-anonymizer-config</code>]:
+* fix Tor Browser 11.06 - New Identity function error message suppressed subscription to event 'STREAM related to: https://www.whonix.org/wiki/Tor_Browser#New_Tor_Circuit_Function Thanks to @torjunkie to the bug report! https://forums.whonix.org/t/tb-v11-06-new-identity-function-error-message/13326 <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/39f623f968bb1e143e3c402f008e7c0f7b71a817
+</ref>
+* arm -> nyx <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/2ee2f10eb0115f6b49d6c10df33b35ef9c1db12d
+</ref>
+* renamed:    usr/share/applications/gateway-arm.desktop -> usr/share/applications/gateway-nyx.desktop <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/0ac977c2ba3b636ed8402e2bf76b3214276bec3a
+</ref>
+* fix onion-grater-remove <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/822fe4e4f79dc9f0a3b24ce8a78d6908edbc5985
+</ref>
+[https://github.com/Kicksecure/icon-pack-dist <code>anon-icon-pack</code>]:
+* renamed:    usr/share/icons/anon-icon-pack/arm.ico -> usr/share/icons/anon-icon-pack/nyx.ico <ref>
+https://github.com/Kicksecure/icon-pack-dist/commit/6592b37cfed4db2b6e8a2cb856a6f4550ccbbfa7
+</ref>
+[https://github.com/whonix/anon-meta-packages <code>anon-meta-packages</code>]:
+* install kicksecure-default-applications-cli per default on the workstation due to recent kicksecure-meta-packages refactoring <ref>
+https://github.com/whonix/anon-meta-packages/commit/ae6cb1ce8027606782e4202377c2926fc227276a
+</ref>
+* install kicksecure-recommended-cli by default on gateway and workstation due to refactoring of kicksecure-meta-packages <ref>
+https://github.com/whonix/anon-meta-packages/commit/9c160f1492fd634e0e4baf0a9c498a68476ba571
+</ref>
+* remove setup-dist from whonix-shared-packages-dependencies-cli because now part of kicksecure-dependencies-cli <ref>
+https://github.com/whonix/anon-meta-packages/commit/bb5ae8c8580e522406ebd4c255b0c9cf1df237be
+</ref>
+* improve multiple architecture support / split dummy-dependency package into multiple packages <ref>
+https://github.com/whonix/anon-meta-packages/commit/b52179af6e0db1dfc6e65802b836addb14f13974
+</ref>
+[https://github.com/Kicksecure/anon-shared-build-apt-sources-tpo <code>anon-shared-build-apt-sources-tpo</code>]:
+* fix, update path <ref>
+https://github.com/Kicksecure/anon-shared-build-apt-sources-tpo/commit/6c529f3d83b8fd34c88b7940d38b4e0efb12c283
+</ref>
+[https://github.com/whonix/anon-ws-disable-stacked-tor <code>anon-ws-disable-stacked-tor</code>]:
+* Tor emulation: fix, pass all command line options to `tor` when being called with `--verify-config` https://github.com/nyxnor/tor-ctrl/issues/9 <ref>
+https://github.com/Whonix/anon-ws-disable-stacked-tor/commit/e6c05d99006849caf4326d58d4cca4cb0e001c1b
+</ref>
+* implement `tor --verify-config` tor-ctrl uses 'tor --verify-config' fixes https://github.com/nyxnor/tor-ctrl/issues/9 <ref>
+https://github.com/Whonix/anon-ws-disable-stacked-tor/commit/7a1e0b59d39bc705c1e39be69a2c3dedb04c0f04
+</ref>
+[https://github.com/Kicksecure/apparmor-profile-everything <code>apparmor-profile-everything</code>]:
+* ConditionPathExists=!/run/qubes-service/no-sdwdate <ref>
+https://github.com/Kicksecure/apparmor-profile-everything/commit/da5e8a834380e520877ec51f2bcfe78e3e688cf3
+</ref>
+[https://github.com/Kicksecure/apparmor-profile-hexchat <code>apparmor-profile-hexchat</code>]:
+* harden profile and remove xchat support https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=951331#23 <ref>
+https://github.com/Kicksecure/apparmor-profile-hexchat/commit/d2a9d37b0e387144ed8e73a16c4a0c4037d1f984
+</ref>
+[https://github.com/Kicksecure/bootclockrandomization <code>bootclockrandomization</code>]:
+* ConditionPathExists=!/run/qubes-service/no-bootclockrandomization ConditionPathExists=!/run/qubes-service/no-bcr <ref>
+https://github.com/Kicksecure/bootclockrandomization/commit/f02a3553c61a901d6ce98d1d5629be4c2a032cdf
+</ref>
+* Make delay_plus_or_minus overridable via env var <ref>
+https://github.com/Kicksecure/bootclockrandomization/commit/1837346b080132d3f7ca8dac81d13d489cfa2662
+</ref> (Thanks to deeplow!)
+[https://github.com/Kicksecure/helper-scripts <code>helper-scripts</code>]:
+* `/usr/libexec/helper-scripts/terminal-wrapper`: add support for `gnome-terminal` <ref>
+https://github.com/Kicksecure/helper-scripts/commit/d3390d4c0889794204791329555615756ed4aa40
+</ref>
+* hardened-malloc-type-test: Hardened Malloc version 10 compatibility <ref>
+https://github.com/Kicksecure/helper-scripts/commit/893974f9ee9ac69a9e55c37692818fd7d63b48b7
+</ref>
+* anon-consensus-del: also restart vanguards <ref>
+https://github.com/Kicksecure/helper-scripts/commit/a70612f9ca94a2b84697dc27792fdd0f7f74ad40
+</ref>
+* `/usr/libexec/helper-scripts/curl_exit_codes`: add newer curl exit codes <ref>
+https://github.com/Kicksecure/helper-scripts/commit/54e2888ccf378ae60127b26774407460041cb8e5
+</ref>
+[https://github.com/Kicksecure/kicksecure-meta-packages <code>kicksecure-meta-packages</code>]:
+* install kicksecure-default-applications-cli by default in Kicksecure <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/ea7851dedf6b7a7f5df9b6b3a71d35726793e116
+</ref>
+* split into kicksecure-recommended-cli and kicksecure-default-applications-cli <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/f1790451a9ccb3883a3fef70963cdf7266a8a271
+</ref>
+* add setup-wizard-dist to kicksecure-desktop-applications-recommended <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/dbb182f8b4de5f13f3f82efc103f06a5236832f0
+</ref>
+* add setup-dist to kicksecure-dependencies-cli <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/4dd31bd6d25e43a8cf4d675b8f030d13fd7d1057
+</ref>
+* add systemcheck to kicksecure-recommended-cli <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/0062df31d04a136b013bccabfac9c4f28e2e699d
+</ref>
+* move a lot packages from kicksecure-dependencies-cli to kicksecure-dependencies-cli since this is more apprpriate. haveged, jitterentropy-rngd, man-db, bzip2, net-tools, dnsutils, iputils-ping, file, lsof, pciutils, strace, sysfsutils, procps, e2fsprogs, less, most, apparmor-utils, bash-completion, nano, udisks2, libblockdev-crypto2, sensible-utils, secure-delete, openvpn, curl, wget, usability-misc, open-link-confirmation, hardened-malloc | dummy-dependency <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/2e4eec07603c539807a5429f26ef81fbe7769c0a
+</ref>
+* no longer install zsh by default <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/19eaae178b143662f0309a2505705d943cf97cd6
+</ref>
+* add equivs to kicksecure-recommended-cli <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/80704660561357a7f377dbc562968386b2173613
+</ref>
+* legacy <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/cb20b19da6400f83b59bd5f5b601c9bbf20e86d4
+</ref>
+* legacy <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/0c14c945ed13d36ff78ccc0a30b544b40ac63da9
+</ref>
+* hardened-malloc-kicksecure-enable -> hardened-malloc-light-enable <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/d7e51eebebe6faeb1a580cc7cde83412da9e68f3
+</ref>
+* improve multiple architecture support / split dummy-dependency package into multiple packages <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/bdfcbc1d60fd39368715e39b3a5ca6b6d84a2726
+</ref>
+* dummy-dependency: remove lkrg, binaries-freedom, orca-screen-reader-support for simplicity because these packages are not a dependency yet <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/3f1cea7767ccc6e01b6a9e5a0d6893571b3d70ba
+</ref>
+[https://github.com/Kicksecure/live-config-dist <code>live-config-dist</code>]:
+* version <ref>
+https://github.com/Kicksecure/live-config-dist/commit/f9aa298ec0b8cf38e52ead61daa5093bb1b4f445
+</ref>
+[https://gitlab.com/kicksecure/monero-gui <code>monero-gui</code>]:
+* monero-gui-linux-x64-v0.17.3.0.tar.bz2 https://web.archive.org/web/20211213200018/https://github.com/monero-project/monero-gui/releases/tag/v0.17.3.0 https://web.archive.org/web/20211213200116/https://downloads.getmonero.org/gui/monero-gui-linux-x64-v0.17.3.0.tar.bz2 https://web.archive.org/web/20211213200210/https://www.getmonero.org/downloads/hashes.txt <ref>
+https://gitlab.com/kicksecure/monero-gui/-/commit/0d9356e5f8815fd9cade046e1a357e853814884b
+</ref>
+* delete for upcoming update <ref>
+https://gitlab.com/kicksecure/monero-gui/-/commit/198b2df3c2c23767f7f9b6f1dbc4078bcd67ed0b
+</ref>
+[https://github.com/Kicksecure/msgcollector <code>msgcollector</code>]:
+* `/usr/libexec/msgcollector/error_handler`: fix exit code capturing <ref>
+https://github.com/Kicksecure/msgcollector/commit/77a6c4d465dc998470e290a5ada5356ad70cc748
+</ref>
+[https://github.com/whonix/onion-grater <code>onion-grater</code>]:
+* disable `ProcSubset=pid` due to onion-grater crash at startup > onion-grater[23859]: FileNotFoundError: [Errno 2] No such file or directory: '/proc/stat' <ref>
+https://github.com/Whonix/onion-grater/commit/4b13181ac4743c9a969164b81bf840eb85325fb7
+</ref>
+* fix, prevent dh_compress from compressing the OnionShare onion-grater profile Thanks to @DaemonFuu for the bug report! https://forums.whonix.org/t/onion-grater-deb-package-contains-compressed-40-onionshare-yml/13154 <ref>
+https://github.com/Whonix/onion-grater/commit/e36db8f769230959ea07ce44ede333aef00a39e5
+</ref>
+* towards OnionShare 2.4 support <ref>
+https://github.com/Whonix/onion-grater/commit/63eb2f20b302dbdb902629d166c444bb4826d4df
+</ref>
+* towards OnionShare 2.4 support <ref>
+https://github.com/Whonix/onion-grater/commit/132ac995c750d6fd19e095bf1f2fc76f41985ee6
+</ref>
+* towards OnionShare 2.4 support <ref>
+https://github.com/Whonix/onion-grater/commit/2d67dfddb301ed0589f368b47051cdd74e745c61
+</ref>
+[https://github.com/Kicksecure/open-link-confirmation <code>open-link-confirmation</code>]:
+* add infinite recursive loop protection <ref>
+https://github.com/Kicksecure/open-link-confirmation/commit38e03d1737b185934fc0a6f4c3558b1666c2a978
+</ref>
+[https://github.com/whonix/qubes-whonix <code>qubes-whonix</code>]:
+* `/usr/share/tinyproxy/default.html.anondist`: also customize html body in case tinyproxy does not show html head <ref>
+https://github.com/Whonix/qubes-whonix/commit/47fb073dae35b9e6b23b6c5a227a85ed7f129ee3
+</ref>
+* qvm-sync-clock.anondist code simplification <ref>
+https://github.com/Whonix/qubes-whonix/commit/1359ef3e47715c04d4a4d071b3ca0679a4020b01
+</ref>
+* initial version of qvm-sync-clock.anondist <ref>
+https://github.com/Whonix/qubes-whonix/commit/f2190c69cb5859b0f0b6242fc20a84811ef83fb3
+</ref>
+[https://github.com/Kicksecure/sdwdate <code>sdwdate</code>]:
+* do not start `qubes-sync-time` (conflicts with `sdwdate`), if file `/etc/sdwdate.d/qubes-sync-time-disabled-by-sdwdate.marker` exists. That file exists in a default sdwdate installation. <ref>
+https://github.com/Kicksecure/sdwdate/commit/96151eb6a7c061f7ce56bb1c76a327cbc90046a3
+</ref>
+* fix sdwdate-log-viewer to include seccomp failures https://forums.whonix.org/t/sdwdate-loop-conclusion-tor-already-reports-circuit-established-seccomp-issue/13260/13 <ref>
+https://github.com/Kicksecure/sdwdate/commit/8bb53ef360939fe4529f3c39e5811ee44ea96c75
+</ref>
+* update 20_arch_syscall_whitelist.conf unlinkat needs to be whitelisted otherwise sdwdate fails with error: SECCOMP auid=4294967295 uid=102 gid=108 ses=4294967295 subj==/usr/bin/sdwdate (enforce) pid=3328 comm="sdwdate" exe="/usr/bin/python3.9" sig=31 arch=c00000b7 syscall=35 compat=0 ip=0xf37077846c74 code=0x80000000 <ref>
+https://github.com/Kicksecure/sdwdate/commit/6b5f10195133d88fdc89d2fe737651fbf2e07063
+</ref> (Thanks to Emanuele Rossi!)
+* ConditionPathExists=!/run/qubes-service/no-sdwdate <ref>
+https://github.com/Kicksecure/sdwdate/commit/e6032989d3053e92758aefc83e3413c593de354c
+</ref>
+* add qubes-sync-time.service and qubes-sync-time.timer to sdwdate-log-viewer <ref>
+https://github.com/Kicksecure/sdwdate/commit/8911f33e4d48877ad415379c7e252318c255a9d9
+</ref>
+* add `bootclockrandomization.service` to sdwdate-log-viewer <ref>
+https://github.com/Kicksecure/sdwdate/commit/caca7f412c4b19b5c7db2e3394a870e4d5124fa7
+</ref>
+* Qubes suspend post: disable qubes.GetRandomizedTime since no longer required. sdwdate / anondate can nowadays fix the time without it. <ref>
+https://github.com/Kicksecure/sdwdate/commit/6215a9ea996e9db970059c3b4ad58d17016b7483
+</ref>
+* Qubes suspend pre/post: disable restart of Tor since that is no longer required. And even if it was required, this would be handled by sdwdate / anondate. <ref>
+https://github.com/Kicksecure/sdwdate/commit/7a43153a2fe80eb492b1abf14f1f20bb66da02f5
+</ref>
+* `date --utc` https://forums.whonix.org/t/whonix-ws-16-fails-to-update-due-to-timing-issue/12739/17 <ref>
+https://github.com/Kicksecure/sdwdate/commit/0d43f1a2a6f8796d6d46e34a81788a0a7293f089
+</ref>
+[https://github.com/Kicksecure/sdwdate-gui <code>sdwdate-gui</code>]:
+* notify-shutdown: skip notify shutdown if sdwdate is not running <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/374bc31c8bd97de6e2f4f578e120daf70527e9eb
+</ref>
+* do no autostart if file /run/qubes-service/no-sdwdate exists <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/c694998f22e36ff142213ff177e789acec3f2dce
+</ref>
+* ConditionPathExists=!/run/qubes-service/no-sdwdate <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/7d9b5044a35d19e44454e0fbdf34efa055b30ef5
+</ref>
+* restart action: use `sdwdate-clock-jump` instead of restarting sdwdate manually <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/a60a996ce2228830607aa7afdde8aec9d512daa0
+</ref>
+* port to QREXEC_REMOTE_DOMAIN part of https://phabricator.whonix.org/T930 <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/21d35022ab47dde44eacbef75c5d6c2260125521
+</ref>
+* fix "Denied: whonix.NewStatus" dom0 permission when shutting down Whonix-Gateway [Qubes OS 4.1] Thanks to @unknown for the bug report! https://forums.whonix.org/t/qubes-os-4-1-denied-whonix-newstatus-dom0-permission/12954 <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/e371e234a15cbaf89181798a204192d2a92df089
+</ref>
+* `sdwdate-gui-shutdown-notify.service`: `Before=shutdown.target umount.target final.target` <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/d4f963b6e5aa434dfc38229faaf2a7eef932dde4
+</ref>
+* avoid start/restart of sdwdate-gui notify shutdown service during package install/upgrade dh_installsystemd --no-start --no-stop-on-upgrade <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/5141ec63cd230ec825e7f15ff5d74e81605b174f
+</ref>
+[https://github.com/Kicksecure/security-misc <code>security-misc</code>]:
+* fix, skip deletion of system.map files on read-only filesystems This is required for Qubes /lib/modules read-only implementation at time of writing. Thanks to @marmarek for the bug report! https://forums.whonix.org/t/remove-system-map-cannot-work-lib-modules-is-mounted-read-only/13324 <ref>
+https://github.com/Kicksecure/security-misc/commit/4f6f588fb53d2756d867ac7e29fb42f4f8fdb335
+</ref>
+[https://github.com/Kicksecure/setup-wizard-dist <code>setup-wizard-dist</code>]:
+* Kicksecure <ref>
+https://github.com/Kicksecure/setup-wizard-dist/commit/30a03972b164f91faa20e11d50fb4ec2d5ffea0d
+</ref>
+[https://github.com/Kicksecure/systemcheck <code>systemcheck</code>]:
+* Kicksecure <ref>
+https://github.com/Kicksecure/systemcheck/commit/3f2d5f8b4082e148c9d293c1f22bf7f50697655b
+</ref>
+* Kicksecure <ref>
+https://github.com/Kicksecure/systemcheck/commit/9ba59c89e4f651463cb23007a7f921be419145c1
+</ref>
+* fix, skip check_network_interfaces eth0 on Kicksecure <ref>
+https://github.com/Kicksecure/systemcheck/commit/4051ffb6afc07dddee329117e93e3656d971d6d3
+</ref>
+* use `curl` with `--cert-status` Thanks for @yodawins for the suggestion! https://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/8 <ref>
+https://github.com/Kicksecure/systemcheck/commit/f200d0fd05a097734f346e89a50fc1a4dab39574
+</ref>
+[https://github.com/Kicksecure/tb-starter <code>tb-starter</code>]:
+* update links to documentation <ref>
+https://github.com/Kicksecure/tb-starter/commit/756060c7ee158d3d156c1d9129b90c57f4bbd664
+</ref>
+[https://github.com/Kicksecure/tb-updater <code>tb-updater</code>]:
+* alpha tbb_hardcoded_version="11.5a2" <ref>
+https://github.com/Kicksecure/tb-updater/commit/4cdf6dbbf79c19ecfc8f8a9ff0cc4f48f494b14e
+</ref>
+* tbb_hardcoded_version="11.0.6" <ref>
+https://github.com/Kicksecure/tb-updater/commit/e4f73a11bd0e01ccbee63eccd2c04b01c6234110
+</ref>
+* update links to documentation <ref>
+https://github.com/Kicksecure/tb-updater/commit/b6d5ef20fcca243e32f7c0c51f63dbc74c04915a
+</ref>
+* update links to documentation <ref>
+https://github.com/Kicksecure/tb-updater/commit/c3a7e8205a2474f6d12afe8810b51a3c6691dd84
+</ref>
+* tbb_hardcoded_version="11.0.4" <ref>
+https://github.com/Kicksecure/tb-updater/commit/13b84940fe14cce61a3c9046e320d49461ae695e
+</ref>
+* tbb_hardcoded_version="11.0.3" <ref>
+https://github.com/Kicksecure/tb-updater/commit/09c73931fef1bfa39f59a5395baef2757ac66688
+</ref>
+* switch to "direct" digital signature verification - no longer download and verify sha256 hash file as this is no longer required - use only `gpg` to verify digital signature of Tor Browser - higher security - code simplification This is also a workaround for upstream issue `sha256sums-unsigned-build.incrementals.txt and sha256sums-unsigned-build.txt are not signed with torbrowser key`. - https://forums.whonix.org/t/tor-browser-downloader-needs-to-update-its-pgp-keys/13077 - https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/40759 Unfortunately this breaks arm64 downloads. - https://forums.whonix.org/t/arm64-tor-browser/11806 <ref>
+https://github.com/Kicksecure/tb-updater/commit/f79cb405e16aebbb70f63032089ae7fbac6df9f1
+</ref>
+* tbb_hardcoded_version="11.0.2" <ref>
+https://github.com/Kicksecure/tb-updater/commit/279125241b1f27c167792a56d14830deb1a39836
+</ref>
+* alpha tbb_hardcoded_version="11.5a1" <ref>
+https://github.com/Kicksecure/tb-updater/commit/161a93905fed20c969603eef8359f233da94735a
+</ref>
+* add updated signing key as annoucned here: https://blog.torproject.org/new-release-tor-browser-115a1/ Thanks to @pgerber for the bug report! fixes https://github.com/Kicksecure/tb-updater/issues/16 <ref>
+https://github.com/Kicksecure/tb-updater/commit/ab1700b724bfb50002ac5d3a793765b96ebc3ca8
+</ref>
+* use `curl` with `--cert-status` Thanks for @yodawins for the suggestion! https://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/8 <ref>
+https://github.com/Kicksecure/tb-updater/commit/57e9817fd41d70462dbc04908db7bebbafa5140c
+</ref>
+[https://github.com/Kicksecure/tor-control-panel <code>tor-control-panel</code>]:
+* add tag ap_conn_done_pt <ref>
+https://github.com/Kicksecure/tor-control-panel/commit/4e4f87b865c61dcc98a8611e3306dbd39ccdc6dd
+</ref>
+* fix parsing Tor config file is using plain (not using pluggable transport) bridge https://forums.whonix.org/t/bridges-dont-work/13210/12 <ref>
+https://github.com/Kicksecure/tor-control-panel/commit/05a733f9952054708786b158201f2d431f6cb3b1
+</ref>
+* add tag conn_done_pt <ref>
+https://github.com/Kicksecure/tor-control-panel/commit/dabfac891b3defb46900db8821805cee02b0025e
+</ref>
+* update default bridges <ref>
+https://github.com/Kicksecure/tor-control-panel/commit/15fd57ac7aa82196a64361e9891690ed49ac68b8
+</ref>
+[https://github.com/Kicksecure/developer-meta-files <code>developer-meta-files</code>]:
+* disable buster <ref>
+https://github.com/Kicksecure/developer-meta-files/commit/be5c0f984e3745f3a7361bd345c25d5bdf967ddb
+</ref>
+* delete unused release/new_release <ref>
+https://github.com/Kicksecure/developer-meta-files/commit/c47672486c5a7b86b067206787ffe9e9ca5d5e8d
+</ref>
+* remove old Whonix news files <ref>
+https://github.com/Kicksecure/developer-meta-files/commit/812dd00037a4d02bb8ed10d425a1b0f0eb35da2a
+</ref>
+* disable buster <ref>
+https://github.com/Kicksecure/developer-meta-files/commit/d7d07a729ef28467bcdb348bcd4514067433d293
+</ref>
+* whonixdevelopermetafiles -> developer-meta-files <ref>
+https://github.com/Kicksecure/developer-meta-files/commit/8da9fac06e1f3799bf267bbc63a997802b013631
+</ref>
+* use `curl` with `--cert-status` Thanks for @yodawins for the suggestion! https://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/8 <ref>
+https://github.com/Kicksecure/developer-meta-files/commit/99e2726a2e36bfdda5572fb03a5647a54747b32a
+</ref>
+* deleted:    release/upload_whonix_news_v4 <ref>
+https://github.com/Kicksecure/developer-meta-files/commit/f36b3550f849f6cef3fd372276973c82c98107ce
+</ref>
+* include kicksecure <ref>
+https://github.com/Kicksecure/developer-meta-files/commit/9af0fd941b3ec7a7befcdbdf12442197a90e1e5d
+</ref>
+[https://github.com/whonix/whonix-firewall <code>whonix-firewall</code>]:
+* use `curl` with `--cert-status` Thanks for @yodawins for the suggestion! https://forums.whonix.org/t/scurl-secure-curl-wrapper/7125/8 <ref>
+https://github.com/Whonix/whonix-firewall/commit/cda126ad2bdde60c42a3fc3349845ad3afc5ebf4
+</ref>
+[https://github.com/whonix/derivative-maker <code>Whonix build script</code>]:
+* tor-ctrl <ref>
+https://github.com/Whonix/derivative-maker/commit/38827606b04cd08e7439e27e3c79216ab36879bf
+</ref>
+* add tor-ctrl <ref>
+https://github.com/Whonix/derivative-maker/commit/e90bc12bfbbb1754cf4b3863c772b38e9e116acb
+</ref>
+* squashfs-tools-ng <ref>
+https://github.com/Whonix/derivative-maker/commit/0f682f9dd382897fc55f87f35b8b0462e336aa89
+</ref>
+* remove buster repository <ref>
+https://github.com/Whonix/derivative-maker/commit/ed5a8a6fce5f6d3963c6dcc2966138354a6858fe
+</ref>
+
+== {{project_name_long}} 16.0.3.7 ==
+
+[https://github.com/Kicksecure/anon-apt-sources-list <code>anon-apt-sources-list</code>]:
+* Depends: <code>fasttrack-archive-keyring</code>. <ref>
+https://github.com/Kicksecure/anon-apt-sources-list/commit/9f7f8a607b5410672fb3d35d5613de5f83cdc6de
+</ref>
+[https://github.com/whonix/anon-gw-anonymizer-config <code>anon-gw-anonymizer-config</code>]:
+* Moved <code>anon-consensus-delete</code> to <code>helper-scripts</code> (as <code>anon-consensus-del</code>). <ref>
+https://github.com/Whonix/anon-gw-anonymizer-config/commit/a4977845b00c43253bbcd7972bf91ddf88497f0f
+</ref>
+[https://github.com/whonix/anon-gw-base-files <code>anon-gw-base-files</code>]:
+* KVM desktop background. <ref>
+https://github.com/Whonix/anon-gw-base-files/commit/654f88a52a649c92b52e2304f886be7260d4ff77
+</ref>
+[https://github.com/whonix/anon-meta-packages <code>anon-meta-packages</code>]:
+* Moved <code>kicksecure-recommended-cli</code> from <code>whonix-shared-packages-recommended-cli</code> to <code>kicksecure-recommended-cli</code>. <ref>
+https://github.com/whonix/anon-meta-packages/commit/eca63bd00415f7f2365aff736bd5a76d9fb0968b
+</ref>
+* Removed packages <code>pwgen</code>, <code>codecrypt</code>, <code>gpg</code>, <code>gpg-agent</code>, <code>dirmngr</code>, <code>magic-wormhole</code>, <code>diceware</code>, and <code>makepasswd</code> from <code>whonix-workstation-packages-recommended-cli</code> since these will be moved to <code>kicksecure-meta-packages</code>. <ref>
+https://github.com/whonix/anon-meta-packages/commit/ad8163d84b826f18bf3cfe50c98dabe8c9b41d59
+</ref>
+* No longer install <code>python3-msgpack</code> by default; it is no longer needed and was removed from <code>whonix-workstation-packages-recommended-cli</code>. <ref>
+https://github.com/whonix/anon-meta-packages/commit/fd008df8d2a0f9bcebdaef7c9281837c2827f628
+</ref>
+* Remove legacy packages. <ref>
+https://github.com/whonix/anon-meta-packages/commit/e9ea226efe8ad88735383bdb5b43e701604f3604
+</ref> <ref>
+https://github.com/whonix/anon-meta-packages/commit/3f029f172961d28458e3ed7cdffa61285d06dd3c
+</ref>
+[https://github.com/Kicksecure/anon-shared-build-apt-sources-tpo <code>anon-shared-build-apt-sources-tpo</code>]:
+* Ensure compatibility with APT signed-by; port to `apt-key-install` by package <code>helper-scripts</code>. <ref>
+https://github.com/Kicksecure/anon-shared-build-apt-sources-tpo/commit/15e0d448a25d91f1f258c44c70452efb0f74c2e8
+</ref>
+* `/etc/apt/sources.list.d/torproject.list`: use APT `signed-by`. <ref>https://forums.whonix.org/t/apt-repository-signing-keys-per-apt-sources-list-signed-by/12302</ref> <ref>https://support.torproject.org/apt/</ref> <ref>
+https://github.com/Kicksecure/anon-shared-build-apt-sources-tpo/commit/882a14d0627b2fc0afa06bd7fed56070d78b4ed5
+</ref>
+[https://github.com/whonix/anon-ws-base-files <code>anon-ws-base-files</code>]:
+* KVM desktop background. <ref>
+https://github.com/Whonix/anon-ws-base-files/commit/e859c9baa21176f39c9c5310c03d59710893678a
+</ref>
+[https://github.com/Kicksecure/apparmor-profile-everything <code>apparmor-profile-everything</code>]:
+* `sdwdate-aae.service`: Backported changes from <code>sdwdate</code>. <ref>
+https://github.com/Kicksecure/apparmor-profile-everything/commit/3b2c68137002add0126462bc8bc03f1d26f8922a
+</ref>
+[https://github.com/Kicksecure/grub-live <code>grub-live</code>]:
+* Fixed dependencies. <ref>
+https://github.com/Kicksecure/grub-live/commit/c8e7c06774a25cb4da426641701c6622ebb52642
+</ref>
+[https://github.com/Kicksecure/helper-scripts <code>helper-scripts</code>]:
+* Disabled <code>anondate</code> AppArmor profiles because they are not ready. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/d7d9e5323bf68925090b1965d4955185b77387d7
+</ref>
+* `onion-time-pre-script`: Do not use `anondate-set` on {{project_name_workstation_long}} because <code>sdwdate</code> can establish onion connections irrespective of {{project_name_workstation_long}} system clock (so long as {{project_name_gateway_long}} Tor is functional). <ref>
+https://github.com/Kicksecure/helper-scripts/commit/79ed8b3ceb1cd1e96a5e84c9006da756f0e69180
+</ref>
+* `/usr/libexec/helper-scripts/terminal-wrapper`: Added support for adding window title for `xfce4-terminal` emulator through the `terminal_emulator_window_title` environment variable. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/c65c560cee7ba194b374a0f75370bd215d60a69d
+</ref>
+* <code>anondate-get</code>: If Tor consensus time is later than the system clock, but minimum time is later than the Tor consensus time, show the minimum time instead of no result. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/73e232e41e8b24a7cfa9db22ee23ad365a18bb05
+</ref>
+* <code>onion-time-pre-script</code>: Added a user check to prevent broken file permissions. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/1b5397fd6b3a3826ab6dfaa2121a8f98aee276c2
+</ref>
+* <code>anondate-set</code>: Disabled Tor restart code since it is not needed. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/9e8627cf147cdabe36d65bc69a24eb987ce95374
+</ref>
+* Added `usr/sbin/anon-consensus-del-files`. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/4c4c2ba5d5ae76ab0400ee1f0dc9736f967ec087
+</ref>
+* Split into `anon-consensus-del` and `anon-consensus-del-files`. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/4b0497157282b44598e1c5b6d1eefa6372b5c531
+</ref>
+* Created a more descriptive file name: `/run/sdwdate/request_tor_restart` &rarr; `/run/sdwdate/request_anondate-set`. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/3de950184dc5c7d08230dd865f226ce9e124310b
+</ref>
+* <code>anondate</code>: Unduplicated output in journal <ref>
+https://github.com/Kicksecure/helper-scripts/commit/18e02945bd021996a0a4d90c04a6dd0cae5e79c0
+</ref> and lowered verbosity to avoid spamming logs. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/21f03ed1009107e10b36695881ca86b43013ed8f
+</ref>
+* <code>onion-time-pre-script</code>: Added a counter for how many times a script was run; output. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/84c4121938d8d8d1d73bc43fd0c842777b8508f0
+</ref>
+* Added `/usr/libexec/helper-scripts/origins-parser`. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/0493bc3de3a561b66e309fa9e936cd2e6433f583
+</ref>
+* <code>anondate-set</code>: Ensure the system clock is not set backwards. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/543978493b230fb77616a7ce59551c8595603e2a
+</ref>
+* Updated `minimum_unixtime`. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/f583d7d0041ab4cec4031346591f2206e130ba62
+</ref>
+* <code>aa-logprof</code> corrections. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/634368a2e49f554cdfaa1c4a00d7a4d73daad404
+</ref>
+* <code>anondate-get</code>: The minimum time is shown instead if it is later than Tor certificate lifetime. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/3659666a92054b628c2b8c762a56cdfc5a184452
+</ref>
+* Fixed certificate lifetime parsing by <code>anondate</code>. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/b752d08ac8797211953bc5361e3411e5db4133bc
+</ref>
+* Fixed parsing Tor consensus time if Tor has not fetched a Tor consensus yet. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/d6b085322005f92f1aeb8ae9cb951921c7f77ab4
+</ref>
+* Added <code>anondate</code> output to journal (and therefore <code>sdwdate-log-viewer</code>). <ref>
+https://github.com/Kicksecure/helper-scripts/commit/3449194476ab5e31035fe011c259aa4074fa508e
+</ref>
+* Rebased AppArmor profiles on <code>aa-logprof</code>. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/ba05cd447fab73c1f95bb47008ab3721fc39a512
+</ref>
+* Redesigned recovery from a slow clock. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/4746cbd02d32b4e513accaed677c0bee28b531f6
+</ref>
+* Imported <code>anon-consensus-del</code> from <code>anon-gw-anonymizer-config</code>. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/48a0adb850051907efcb41e1643453ac08d966ce
+</ref>
+[https://github.com/Kicksecure/kicksecure-meta-packages <code>kicksecure-meta-packages</code>]:
+* Removed <code>fasttrack-archive-keyring</code> from <code>kicksecure-recommended-cli</code> (added to <code>anon-apt-sources-list</code>). <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/fb962e2c0062c086a0034f5ef3ac2a31416a278b
+</ref>
+* Added <code>pwgen</code>, <code>codecrypt</code>, <code>gpg</code>, <code>gpg-agent</code>, <code>dirmngr</code>, <code>magic-wormhole</code>, <code>diceware</code>, <code>makepasswd</code> to <code>kicksecure-recommended-cli</code>. <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/13f4ca0314080f2d2591462252bb929a9a20bfd1
+</ref>
+* Added <code>firefox-esr</code>. <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/a973ec1758afce15af75be1a63972edb140a61e2
+</ref> <ref>Appreciation is expressed to @HulaHoop.</ref>
+* Continued removal of Chromium. <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/7a41d45da8d3692484c97d27947183234ff4a79d
+</ref> <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/d458baa0ec28b46ed88ba72273b5748eed54d6c0
+</ref> <ref>Appreciation is expressed to @HulaHoop.</ref>
+* Legacy fixes. <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/92fa630d2b242b350beed87fc0465fa9adf6f6ce
+</ref>
+[https://github.com/Kicksecure/msgcollector <code>msgcollector</code>]:
+* Improved `/usr/lib/systemd/user/usertest.service`. <ref>
+https://github.com/Kicksecure/msgcollector/commit/807d3ed9154a226ff9bb737c69fbf05a59f52efb
+</ref>
+* `/usr/libexec/msgcollector/one-time-popup`: Create a folder if not existing (mkdir -p). <ref>
+https://github.com/Kicksecure/msgcollector/commit/2febd8e861b1fafb4c6a55fba8dc09473805263e
+</ref>
+[https://github.com/Kicksecure/rads <code>rads</code>]:
+* Removed unnecessary `--no-restart-after-upgrade` ("Undo a previous --restart-after-upgrade (or the default of compat 10). If no other options are given, this will cause the service to be stopped in the prerm script and started again in the postinst script."). <ref>
+https://github.com/Kicksecure/rads/commit/c79945c2103b5c049f6411747b6aa472a65d726d
+</ref>
+* Removed `--no-restart-on-upgrade` ("Note that the --no-restart-on-upgrade alias is deprecated and will be removed in compat 14. This is to avoid confusion with the --no-restart-after-upgrade option."). <ref>
+https://github.com/Kicksecure/rads/commit/372540203b789c1b6eb615f5ad942d76a52c0796
+</ref>
+* Added a hint on how to switch virtual console, see: [[Desktop#Virtual_Consoles|Virtual Consoles]]. <ref>
+https://github.com/Kicksecure/rads/commit/9bebad7d1e8dd8cb0cdc5244f19203be3045c667
+</ref>
+* Added a workaround for issue "no login prompt / getty started on tty1 anymore in Whonix 16 (Debian bullseye based)". Gnome's gdm display manager's systemd unit replaces tty1 even in case gdm is not started. <ref>This workaround essentially runs `chvt 2` in case rads does not start a display manager such as gdm (in case there is not enough RAM). This has restored the behavior of a user being greeted with an agetty login prompt. See: [https://forums.whonix.org/t/no-login-prompt-getty-started-on-tty1-anymore-in-whonix-16-debian-bullseye-based/12475 no login prompt / getty started on tty1 anymore in Whonix 16 (Debian bullseye based)].</ref> <ref>
+https://github.com/Kicksecure/rads/commit/0fdcee7f930e6f7af5e838b3a273b9b76accd904
+</ref>
+[https://github.com/Kicksecure/sdwdate <code>sdwdate</code>]:
+* Improved tests. <ref>
+https://github.com/Kicksecure/sdwdate/commit/ed4f91095545414539d8a9e14e8f4e81afa9883a
+</ref>
+* Run `/usr/libexec/sdwdate/sdwdate-start-anondate-set-file-watcher` under user/group `sdwdate`. <ref>
+https://github.com/Kicksecure/sdwdate/commit/33f2667c404103f3d39fd139c2cedf55b1731a97
+</ref>
+* Renamed: `lib/systemd/system/sdwdate-restart-tor-request-file-watcher.service` &rarr; `lib/systemd/system/sdwdate-start-anondate-set-file-watcher.service`. <ref>
+https://github.com/Kicksecure/sdwdate/commit/df3c81a547181e2ff6774a2d963c2d8eeb85475b
+</ref>
+* Renamed: `usr/libexec/sdwdate/sdwdate-restart-tor-request-file-watcher` &rarr; `usr/libexec/sdwdate/sdwdate-start-anondate-set-file-watcher`. <ref>
+https://github.com/Kicksecure/sdwdate/commit/6ac8dea8aa72b88cc89e78176c0fdc260180093d
+</ref>
+* Implemented a more descriptive file name: `/usr/libexec/sdwdate/sdwdate-restart-tor-request-file-watcher` &rarr; `/usr/libexec/sdwdate/sdwdate-start-anondate-set-file-watcher`. <ref>
+https://github.com/Kicksecure/sdwdate/commit/7c14d799afd992c3ec98122f1cf9da75fd75588c
+</ref>
+* Implemented a more descriptive file name: `/run/sdwdate/request_tor_restart` &rarr; `/run/sdwdate/request_anondate-set`. <ref>
+https://github.com/Kicksecure/sdwdate/commit/ff0dba14988e482eeab00e74367f302835fadfae
+</ref>
+* Added `/usr/libexec/sdwdate/sdwdate-test`. <ref>
+https://github.com/Kicksecure/sdwdate/commit/73e3b075d70ca08a8bd75a4e80933fa20d22af93
+</ref>
+* Moved <code>sclockadj</code> compilation from a postinst to systemd unit to allow simplification of dependency resolution during release upgrade. <ref>
+https://github.com/Kicksecure/sdwdate/commit/3986d420d44f147a3ca489c075ab564f1410fe10
+</ref>
+* Ported to pathlib fix TypeError: 'missing_ok' is an invalid keyword argument for remove(). <ref> https://github.com/Whonix/updates-status/issues/105</ref> <ref>
+https://github.com/Kicksecure/sdwdate/commit/bfdea776ba638541c4d2b168a32588c3721a71a3
+</ref> <ref>Appreciation is expressed to @marmarek for the bug report.</ref>
+* Added seccomp utimensat Sep 23 15:37:39 host audit[33040]: SECCOMP auid=4294967295 uid=111 gid=121 ses=4294967295 subj==/usr/bin/sdwdate (enforce) pid=33040 comm="touch" exe="/usr/bin/touch" sig=31 arch=c000003e syscall=280 compat=0 ip=0x70ca67e4bafa code=0x80000000. <ref>
+https://github.com/Kicksecure/sdwdate/commit/525716fb646d7654d065fbc16ae4af802ec552df
+</ref>
+* Added <code>sdwdate-log-viewer</code>. <ref>
+https://github.com/Kicksecure/sdwdate/commit/ecf9e8a38b248ff4815caafb0d8c9548c1a7aadb
+</ref>
+* Rewrite profile using <code>aa-logprof</code>. <ref>
+https://github.com/Kicksecure/sdwdate/commit/540df96abf3dbc338ff48c38b2896a11615fc293
+</ref>
+* Redesigned recovery from a slow clock. <ref>
+https://github.com/Kicksecure/sdwdate/commit/87cab6af3ed8b9f18c74e47f3f93afaab833ffe8
+</ref>
+* Ensure Tor consensus is deleted before restarting Tor in `/usr/libexec/sdwdate/sdwdate-restart-tor-request-file-watcher` to increase robustness of recovering from skewed time. <ref>See: [[Dev/TimeSync|TimeSync: {{project_name_long}} Time Synchronization Mechanism]].</ref> <ref>
+https://github.com/Kicksecure/sdwdate/commit/650ee383881a3223310b576ffe0c480bd4535d3f
+</ref>
+* Fixed and excluded sdwdate-pre (addgroup) from SystemCallFilter. <ref>See: [https://forums.whonix.org/t/whonix-on-mac-m1-arm/11310/165 Whonix on Mac M1 (ARM)].</ref> <ref>
+https://github.com/Kicksecure/sdwdate/commit/efb78881f58d5c4198deac881a1123281b4d741c
+</ref>
+* `usr/libexec/sdwdate/sdwdate-addgroup` &rarr; `usr/libexec/sdwdate/sdwdate-pre`. <ref>
+https://github.com/Kicksecure/sdwdate/commit/7d93312c1a7bdb288a36227410d1df5898586bc9
+</ref>
+* Fixed sdwdate addgroup if failed during build process. <ref>
+https://github.com/Kicksecure/sdwdate/commit/0f509ebc045ae88314f0abfe6faac1ddd48a8440
+</ref>
+[https://github.com/Kicksecure/sdwdate-gui <code>sdwdate-gui</code>]:
+* <code>sdwdate-gui</code> log viewer: set the window title. <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/933883ec710eb0a5a43a276e0c6789b7744d42a3
+</ref>
+* Fixed harmless but nuisance warnings in Qubes R4.1 <ref>"Denied: whonix.NewStatus Denied whonix.NewStatus+whonix-gw-16_shutdown from whonix-gw-16 to sys-whonix" "Denied: whonix.NewStatus Denied whonix.NewStatus+whonix-ws-16_shutdown from whonix-ws-16 to sys-whonix"</ref> by preventing `sdwdate-gui-shutdown-notify.service` from running inside the Template. <ref>Appreciation is expressed to @zellchristensen for the bug report and @marmarek for the bug diagnosis.</ref> <ref>https://github.com/QubesOS/qubes-issues/issues/6983</ref> <ref>
+https://github.com/Kicksecure/sdwdate-gui/commit/5d844f993af7bc69c30140d35de8b8cf72331780
+</ref>
+[https://github.com/Kicksecure/swap-file-creator <code>swap-file-creator</code>]:
+* `dh_installsystemd --no-stop-on-upgrade`: Use --no-stop-on-upgrade to not stop (and therefore not restart) the swap-file-creator systemd unit after package upgrade since there is no reason to re-create the swap file during upgrade of this package. --no-start is unused because a swap file should be created after installation of this package. dh_installsystemd manpage: --no-stop-on-upgrade "Do not stop service on upgrade. This has the side-effect of not restarting the service as a part of the upgrade." <ref>
+https://github.com/Kicksecure/swap-file-creator/commit/f03cd0c0c18a384a3440e9dbe1adebdeafa6d496
+</ref>
+* Lowered the verbosity of output during boot to avoid a "swap file created" message overwriting the console login prompt. <ref>The alternative, configuring the login prompt to wait for swap-file-creator to be done instead would lead to a slower boot process.</ref> <ref>
+https://github.com/Kicksecure/swap-file-creator/commit/b2b9dae3c16cacc6f786a74ac0fe723cd7794735
+</ref>
+[https://github.com/Kicksecure/systemcheck <code>systemcheck</code>]:
+* Moved the location of the deprecation popup. <ref>
+https://github.com/Kicksecure/systemcheck/commit/078eb326852c504640fc12c0dcff0fca35ee74ed
+</ref>
+* Ensure the deprecation notice is shown during a package upgrade. <ref>
+https://github.com/Kicksecure/systemcheck/commit/e3a5ee7d47f761b7c920e80ac0e15fd25cd24536
+</ref>
+* Added a deprecation notice popup. <ref>
+https://github.com/Kicksecure/systemcheck/commit/5f0c7deab97101c0217af07e4cf62cf2c45c8b06
+</ref>
+* `usr/libexec/systemcheck/canary-download.py` &rarr; `usr/libexec/systemcheck/canary-download`. <ref>
+https://github.com/Kicksecure/systemcheck/commit/001fa395bf22f62a12296b719600b06fbf56c944
+</ref>
+* `etc/apparmor.d/usr.lib.systemcheck.canary` &rarr; `etc/apparmor.d/usr.libexec.systemcheck.canary`. <ref>
+https://github.com/Kicksecure/systemcheck/commit/8e8b0854a37f19626e2f017457a67d4e8ce506e0
+</ref>
+[https://github.com/Kicksecure/tb-updater <code>tb-updater</code>]:
+* Update: tbb_hardcoded_version="11.0.1". <ref>
+https://github.com/Kicksecure/tb-updater/commit/79c0779916d9707a4a75e0bdf39749395f979d74
+</ref>
+* Took out the passage about removed backup functionality. <ref>
+https://github.com/Kicksecure/tb-updater/commit/d9a5d7d11d4caf198f21a2f32b9aaa733a4ad17d
+</ref> <ref>Appreciation is expressed to Frank.</ref>
+* Update: alpha tbb_hardcoded_version="11.0a10". <ref>
+https://github.com/Kicksecure/tb-updater/commit/862bc8c882af3ce06435d7197787420376d8fd51
+</ref>
+* Update: tbb_hardcoded_version="11.0". <ref>
+https://github.com/Kicksecure/tb-updater/commit/73c5d33fbfb63552cbbc8e501f197bd51efa8573
+</ref>
+* Update: alpha tbb_hardcoded_version="11.0a9". <ref>
+https://github.com/Kicksecure/tb-updater/commit/9f0ab50d81b662ff54f915d58b800c8151976958
+</ref>
+* Update: tbb_hardcoded_version="10.5.10". <ref>
+https://github.com/Kicksecure/tb-updater/commit/3ae332a8726a45359b1a323593816f93b61fb00b
+</ref>
+* Further updates: tbb_hardcoded_version. <ref>
+https://github.com/Kicksecure/tb-updater/commit/5bbbbcb4e2bd3792c8fbeb81e68360d75fcdbb4a
+</ref>
+[https://github.com/Kicksecure/timesanitycheck <code>timesanitycheck</code>]:
+* Updated `/usr/share/timesanitycheck/minimum_unixtime`. <ref>
+https://github.com/Kicksecure/timesanitycheck/commit/a2ae8d50a0ff51fae27b65971f3751b7d071c082
+</ref>
+* Fixed a typo, renamed `/usr/share/timesanitycheck/date-minium-file-create` &rarr; `/usr/share/timesanitycheck/date-minimum-file-create`. <ref>
+https://github.com/Kicksecure/timesanitycheck/commit/84e27705b4b547f885ac7aa1af18fff12ecbb0dd
+</ref>
+* Updated `/usr/share/timesanitycheck/minimum_unixtime`. <ref>
+https://github.com/Kicksecure/timesanitycheck/commit/256b6feabfc8aba4eecf3d0388ed508d98a29301
+</ref>
+[https://github.com/whonix/uwt <code>uwt</code>]:
+* Added a uwt wrapper for `dnf-3` (for {{q_project_name}} 16 <code>dom0</code> UpdateVM support). <ref>https://github.com/QubesOS/qubes-issues/issues/6913</ref> <ref>https://github.com/QubesOS/qubes-issues/issues/6891#issuecomment-920220943</ref> <ref>
+https://github.com/Whonix/uwt/commit/bd48b023a99b575ea7cd3ea598ea98f43fb8eded
+</ref>
+[https://github.com/whonix/whonix-firewall <code>whonix-firewall</code>]:
+* Added an opt-in configuration for outgoing IP filtering through `outgoing_allow_ip_list`. <ref>
+https://github.com/Whonix/whonix-firewall/commit/0dcdd8d318f895aee862d618778edbdb27647443
+</ref>
+[https://github.com/Kicksecure/legacy-dist <code>whonix-legacy</code>]:
+* Improved <code>release-upgrade</code>. <ref>
+https://github.com/Kicksecure/legacy-dist/commit/2cc3e23b7c9318560e82041d8510b464e18604cf
+</ref> <ref>
+https://github.com/Kicksecure/legacy-dist/commit/9df84beded4c52493789c0b5966e4e8de755d305
+</ref> <ref>
+https://github.com/Kicksecure/legacy-dist/commit/da7a850ea0bb8ba7f49edab080ee5a82b859f407
+</ref> <ref>
+https://github.com/Kicksecure/legacy-dist/commit/50a25523032ab8938e234f0888f9777a620b639f
+</ref>
+* <code>release-upgrade</code>: Ensure the meta package is downloaded and installed. <ref>
+https://github.com/Kicksecure/legacy-dist/commit/3aa25297c40c5fe4890d2cfad7b1c8d34a8433e3
+</ref>
+* <code>release-upgrade</code>: Abort if no installed meta package has been detected. <ref>
+https://github.com/Kicksecure/legacy-dist/commit/d8cda99a5a376981ff8dfc3dda2534f982fa86e3
+</ref>
+* <code>release-upgrade</code>: Added meta package detection. <ref>
+https://github.com/Kicksecure/legacy-dist/commit/2d998d2884388ccad6e1110905522fc14352b892
+</ref>
+[https://github.com/Kicksecure/libvirt-dist <code>whonix-libvirt</code>]:
+* RAM reduced to 1.5GB <ref>Appreciation is expressed to @HulaHoop.</ref> <ref>
+https://github.com/Kicksecure/libvirt-dist/commit/c2962f7e9fdafa5486b0998110c18976d0410780
+</ref> <ref>
+https://github.com/Kicksecure/libvirt-dist/commit/68249c4f7af9aae47444d51ee0d5b6e6d7480ed8
+</ref> <ref>
+https://github.com/Kicksecure/libvirt-dist/commit/a38adbfe7c087919959e0c0331a7a0d1fd36a551
+</ref>
+* Decreased RAM to 256MB, updated descriptionp, and updated the description for activating desktop. <ref>
+https://github.com/Kicksecure/libvirt-dist/commit/039cf62f31784193158711321964375b8cf0bff8
+</ref> <ref>Appreciation is expressed to @HulaHoop.</ref>
+[https://github.com/Kicksecure/xfce-desktop-config-dist <code>whonix-xfce-desktop-config</code>]:
+* KVM desktop background. <ref>
+https://github.com/Kicksecure/xfce-desktop-config-dist/commit/94d1c6a8048755235e924420ca9cf19da3758e6a
+</ref>
+[https://github.com/Whonix/derivative-maker <code>Whonix build script</code>]:
+* Re-enabled downloading of Tor from `deb.torproject.org`. <ref>See: [[Dev/Tor|Tor integration in {{project_name_long}} Development Notes]].</ref> <ref>[https://forums.whonix.org/t/tor-integration-in-whonix/10593 Tor integration in Whonix].</ref> <ref>
+https://github.com/Whonix/derivative-maker/commit/8360f544bcd4bba4cb60f3fde9011f43d5d89803
+</ref>
+* CI changes. <ref>
+https://github.com/Whonix/derivative-maker/commit/6850283e88d52dd96a5f82412f99d0818117d905
+</ref>
+* Fixed `help-steps/repo_download_chroot_script`. <ref>
+https://github.com/Whonix/derivative-maker/commit/5542f3491045ac2ef9db42f8ffcc112baef4cd7b
+</ref>
+* {{project_name_long}} [[KVM]]: Enable extended L2 entries, and reduced cluster size.
+** I/O perf should improve thanks to extended L2, see: [https://blogs.igalia.com/berto/2020/12/03/subcluster-allocation-for-qcow2-images/ Subcluster allocation for qcow2 images].
+** Decreasing cluster size produces smaller images. <ref>
+https://github.com/Whonix/derivative-maker/commit/bec122d15dc891a9b7ecad9fba702f3979783b65
+</ref> <ref>Appreciation is expressed to @HulaHoop.</ref>
+
+== {{project_name_long}} 16.0.3.1 ==
+
+[https://github.com/whonix/anon-gw-base-files <code>anon-gw-base-files</code>]:
+* Fixed the background image. <ref>
+https://github.com/Whonix/anon-gw-base-files/commit/2ca7a856386a14f6dd69e7547e4977d652867841
+</ref>
+
+[https://github.com/whonix/anon-ws-base-files <code>anon-ws-base-files</code>]:
+* Fixed the desktop background. <ref>
+https://github.com/Whonix/anon-ws-base-files/commit/05e6e06250df24e72cb9aa14f5ab294f10dc17c1
+</ref> <ref>
+https://github.com/Whonix/anon-ws-base-files/commit/706a7eff48adab1306cd127e85062286c77392ca
+</ref>
+
+[https://github.com/whonix/corridor <code>corridor</code>]:
+* Changelog. <ref>
+https://github.com/Whonix/corridor/commit/cd7d2d4ba8ed55ff7b4f9508621c37d4afd3ce1d
+</ref>
+
+[https://github.com/Kicksecure/grub-live <code>grub-live</code>]:
+* Fixed <code>grub-live</code> (<code>initramfs-tools</code> version). <ref>[https://forums.whonix.org/t/bullseye-live-boot-needs-grub-disable-linux-uuid-true-parameter-in-etc-grub-d-11-linux-live/9066 Bullseye: live-boot needs GRUB_DISABLE_LINUX_UUID="true" parameter in /etc/grub.d/11_linux_live].</ref> <ref>https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=994138</ref> <ref>
+https://github.com/Kicksecure/grub-live/commit/42e806430a90829c8f06df873a1aa82a0c05a4ca
+</ref>
+
+[https://github.com/Kicksecure/hardened-kernel <code>hardened-kernel</code>]:
+* Added <code>--remote-name</code>. <ref>
+https://github.com/Kicksecure/hardened-kernel/commit/dd4d64c70d36d854f6b3f8faff281677000bd1cb
+</ref>
+
+[https://github.com/Kicksecure/helper-scripts <code>helper-scripts</code>]:
+* Added `/usr/libexec/helper-scripts/desktop-background-skel-test`. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/6472efd1ce1769338881020e5aac03a221ccb6e1
+</ref>
+* <code>terminal-wrapper</code>: <code>xfce4-terminal --hold</code> supported since Debian <code>bullseye</code>. <ref>
+https://github.com/Kicksecure/helper-scripts/commit/0199146c78a421c0429654636299a6e2fd795672
+</ref>
+
+[https://github.com/Kicksecure/kicksecure-meta-packages <code>kicksecure-meta-packages</code>]:
+* Fixed and installed <code>policykit-1-gnome</code> by default. <ref>[https://forums.whonix.org/t/zulucrypt-appears-blank/12322 zuluCrypt appears blank].</ref> <ref>
+https://github.com/Kicksecure/kicksecure-meta-packages/commit/aa3b4ff0c6f977da88ebad2c94fdbd6b38ea0160
+</ref>
+
+[https://github.com/Kicksecure/repository-dist <code>repository-dist</code>]:
+* Legacy. <ref>
+https://github.com/Kicksecure/repository-dist/commit/d3b7a4284aefd17d9173c65a95f0d6cb037e07e9
+</ref>
+* Legacy: upgraded existing `/etc/apt/sources.list.d/derivative.list` to use `[signed-by=/usr/share/keyrings/derivative.asc]`. <ref>
+https://github.com/Kicksecure/repository-dist/commit/eb569b6225a67d78bee385c9d30981cdf7aeb91a
+</ref>
+* Changed `Depends: python3` to `Depends: python3:any` <ref>
+https://github.com/Kicksecure/repository-dist/commit/73ccff0d64314490703eda5c376e04129fd6170e
+</ref>
+* Removed the no loner required `Depends: gnupg`. <ref>
+https://github.com/Kicksecure/repository-dist/commit/3781fc5bd5e8396675b304e309427cc02e752a57
+</ref>
+* Implemented `Depends: helper-scripts`. <ref>
+https://github.com/Kicksecure/repository-dist/commit/de2c03eb1e97ef4cc51979bbf0a51ac9d35879cf
+</ref>
+* Cleanup and removed legacy transitional package <code>whonix-repository</code>. <ref>
+https://github.com/Kicksecure/repository-dist/commit/d25317d734052fee49bef8cd3d2e11161872e26f
+</ref>
+* Renamed: `usr/share/keyrings/derivative-distribution-signing-key.asc` to `usr/share/keyrings/derivative.asc` and renamed `usr/share/keyrings/derivative-distribution-signify-key.pub` to `usr/share/keyrings/derivative.pub`. <ref>
+https://github.com/Kicksecure/repository-dist/commit/4afbd86c840c81fb64fdd27f5676accf854cad20
+</ref>
+* Deleted legacy `/etc/apt/trusted.gpg.d/derivative.asc` because now using `signed-by` and `/usr/share/keyrings/derivative.asc` <ref>
+https://github.com/Kicksecure/repository-dist/commit/c7836751a6cc25cab5888815011df5a1d493e75c
+</ref>
+* Ported to APT sources.list `signed-by`. <ref>
+https://github.com/Kicksecure/repository-dist/commit/e3e2db96441401015c4fa61f423b43a240390b97
+</ref>
+* Renamed:
+** `usr/share/repository-dist/derivative-distribution-signing-key.asc` to `usr/share/keyrings/derivative-distribution-signing-key.asc` (gpg)
+** `usr/share/repository-dist/derivative-distribution-signify-key.pub` to `usr/share/keyrings/derivative-distribution-signify-key.pub (signify) <ref>
+https://github.com/Kicksecure/repository-dist/commit/d3f117937ecfd89d0a5159dd35e5813bd99d9aca
+</ref>
+* Use APT sources.list `signed-by`. <ref>[https://forums.whonix.org/t/apt-repository-signing-keys-per-apt-sources-list-signed-by/12302 APT repository signing keys per APT sources.list - signed-by].</ref> <ref>
+https://github.com/Kicksecure/repository-dist/commit/f113c374a5e36f25c98441d166d34863fdd9268a
+</ref>
+
+[https://github.com/Kicksecure/sdwdate <code>sdwdate</code>]:
+* AppArmor fix. <ref>
+https://github.com/Kicksecure/sdwdate/commit/a68789aa1fa4d753b724fe99c03fbb29b4fb859b
+</ref>
+
+[https://github.com/Kicksecure/security-misc <code>security-misc</code>]:
+* Fixed: unduplicate kernel command line. <ref>
+https://github.com/Kicksecure/security-misc/commit/d62bbaab82a33a485a82d42d8db5674d200a1c3d
+</ref>
+* Removed Debian <code>buster</code> support in `/etc/default/grub.d`. <ref>
+https://github.com/Kicksecure/security-misc/commit/bd31b4085c853d8b182e3a13534827a695f5493a
+</ref>
+
+[https://github.com/Kicksecure/systemcheck <code>systemcheck</code>]:
+* Updated the path APT `signed-by`. <ref>[https://forums.whonix.org/t/apt-repository-signing-keys-per-apt-sources-list-signed-by/12302 APT repository signing keys per APT sources.list - signed-by].</ref> <ref>
+https://github.com/Kicksecure/systemcheck/commit/5ac0a09063e7a90d2e340f25b7e6bc854f376b1e
+</ref>
+
+[https://github.com/Kicksecure/tb-updater <code>tb-updater</code>]:
+* <code>alpha tbb_hardcoded_version="11.0a6"</code>. <ref>
+https://github.com/Kicksecure/tb-updater/commit/778637418b37389e9d42769f6d200398e5544cda
+</ref>
+* <code>tbb_hardcoded_version="10.5.6"</code> <ref>
+https://github.com/Kicksecure/tb-updater/commit/6011e9e5dc2833892eadce7c0be2a6b65431cf04
+</ref>
+
+[https://github.com/Kicksecure/usability-misc <code>usability-misc</code>]:
+* Added <code>--remote-name</code>. <ref>
+https://github.com/Kicksecure/usability-misc/commit/ae50fc3e75b16b4f54004cd9d0c2a74d38cb5c06
+</ref>
+* Ported to APT `signed-by`. <ref>[https://forums.whonix.org/t/apt-repository-signing-keys-per-apt-sources-list-signed-by/12302 APT repository signing keys per APT sources.list - signed-by].</ref> <ref>
+https://github.com/Kicksecure/usability-misc/commit/02486c1af3053828001f55fe3ed02b46be1aefcd
+</ref>
+
+[https://github.com/Kicksecure/xfce-desktop-config-dist <code>whonix-xfce-desktop-config</code>]:
+* Fixed the desktop background. <ref>
+https://github.com/Kicksecure/xfce-desktop-config-dist/commit/2c986f88f3e85fec6412acd2fcfb9f254e92c479
+</ref> <ref>
+https://github.com/Kicksecure/xfce-desktop-config-dist/commit/829286e9e0291fefc87f4031ce1b3276cfb1045b
+</ref>
+
+== {{project_name_long}} 16.0.2.7 ==
+
+[https://github.com/whonix/anon-gw-base-files <code>anon-gw-base-files</code>]:
+* Fixed the <code>bullseye</code> background image. <ref>[https://forums.whonix.org/t/whonix-xfce-wallpaper-background-image/7984 Whonix XFCE Wallpaper / Background Image].</ref> <ref>https://github.com/Whonix/anon-gw-base-files/commit/ef3ac0fdda5d56ecfb9c946cb0224b7aa627a25e</ref>
+
+[https://github.com/whonix/anon-meta-packages <code>anon-meta-packages</code>]:
+* Integrated <code>kicksecure-dependencies-system</code>. <ref>[https://forums.whonix.org/t/replacing-initramfs-tools-with-dracut/4487 replacing initramfs-tools with dracut].</ref> <ref>https://github.com/whonix/anon-meta-packages/commit/bd10983f849960f6176be2886b7287a2a9a48959</ref>
+
+[https://github.com/whonix/anon-ws-base-files <code>anon-ws-base-files</code>]:
+* Fixed the <code>bullseye</code> background image. <ref>[https://forums.whonix.org/t/whonix-xfce-wallpaper-background-image/7984 Whonix XFCE Wallpaper / Background Image].</ref> <ref>https://github.com/Whonix/anon-ws-base-files/commit/4990b0578dbecddac34682104d844f4a7a8d3589</ref>
+
+[https://github.com/Kicksecure/binaries-freedom <code>binaries-freedom</code>]:
+* Added the Debian install file (generated using <code>genmkfile debinstfile</code>). <ref>https://github.com/Kicksecure/binaries-freedom/commit/3cca621377fe9191e45ac40eecacbc45a702658f</ref>
+* <code>binaries-freedom</code> is an empty package at present. <ref>[https://forums.whonix.org/t/policy-for-inclusion-of-compiled-software/6635 Policy for Inclusion of Compiled Software].</ref> <ref>https://github.com/Kicksecure/binaries-freedom/commit/86223e3cbb5c6aab67616201a2936266d677c6bf</ref>
+
+[https://github.com/Kicksecure/debug-misc <code>debug-misc</code>]:
+* <code>dracut</code>. <ref>https://github.com/Kicksecure/debug-misc/commit/eb232484bc4d248d866456c0eb236c17a137cc4c</ref>
+* Removed ‘rhgb’ from GRUB_CMDLINE_LINUX_DEFAULT. <ref>https://github.com/Kicksecure/debug-misc/commit/017c41ed068e5b675f741bc34c3d1f1733a5c8af</ref>
+* <code>add_dracutmodules+=" debug "</code> <ref>https://github.com/Kicksecure/debug-misc/commit/915882889918bf7969fa7b9f7bb6f7dfcb5bb554</ref>
+
+[https://github.com/Kicksecure/grub-live <code>grub-live</code>]:
+* <code>dracut</code>. <ref>https://github.com/Kicksecure/grub-live/commit/7a1b20db9185b4cbbe04937f7993783f2261195b</ref> <ref>https://github.com/Kicksecure/grub-live/commit/df99255112d9eae360cce8534b9cfa92795125c6</ref>
+* Fixed and removed <code>dracut</code> <code>kernel_cmdline="rootovl"</code> since that is already conditionally set in the <code>grub</code> boot menu (otherwise the system will always boot into live mode). <ref>https://github.com/Kicksecure/grub-live/commit/cb94f18bd47a56d0427e9ae822f966f32fd55f2e</ref>
+* Removed <code>dracut</code> <code>hostonly="yes"</code> since that is already the Debian default. <ref>https://github.com/Kicksecure/grub-live/commit/3bded2153eb311ee6f8571bf67483d3514d97ed0</ref>
+* Added <code>dracut</code> support based on [https://github.com/friedrich12/dracut-grub-live friedrich12 / dracut-grub-live]. <ref>[https://forums.whonix.org/t/replacing-initramfs-tools-with-dracut/4487/10 replacing initramfs-tools with dracut].</ref> <ref>https://github.com/Kicksecure/grub-live/commit/1989d6e12ac4e5eec03ed3b492c4c84fd6695fd9</ref>
+
+[https://github.com/Kicksecure/helper-scripts <code>helper-scripts</code>]:
+* Improved diagnostic messages. <ref>https://github.com/Kicksecure/helper-scripts/commit/8a4939227c4ff0016451a3be8a8de8f7c7360b56</ref>
+
+[https://github.com/Kicksecure/kicksecure-meta-packages <code>kicksecure-meta-packages</code>]:
+* Installed <code>flatpak</code> by default and added it to <code>kicksecure-recommended-cli</code>. <ref>[https://forums.whonix.org/t/flatpak-as-a-software-source-flathub-as-a-source-of-software/8500 FlatPak as a Software Source / flathub as a source of software].</ref> <ref>See: [[Install_Software#flatpak|flatpak]].</ref> <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/be19b89acba35c5b6e9350b3f4aa5d8c13288ba3</ref>
+* Installed <code>extrepo</code> by default and added it to <code>kicksecure-recommended-cli</code>. <ref>[https://forums.whonix.org/t/extrepo-safely-adding-repos/8539 extrepo - safely adding repos].</ref> <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/7f4f2930d720836cd4051a4ba6e38959037f2d95</ref>
+* Switched from <code>lightdm</code> to <code>gdm3</code> because <code>lightdm</code> autologin is non-functional. <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/e11275ee58b15bbb9ec5d745046b4b369b681c99</ref>
+* <code>kicksecure-dependencies-system</code> Depends: <code>linux-initramfs-tool</code>, <code>dracut</code> and <code>initramfs-tools</code>. <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/b1616daee3c2c228de8db866ea168be088e4ea5c</ref> <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/7c1ed0864ec1916497df39f1660d5fb97ba01e80</ref>
+* Introduced and integrated <code>kicksecure-dependencies-system</code>. <ref>[https://forums.whonix.org/t/replacing-initramfs-tools-with-dracut/4487 replacing initramfs-tools with dracut].</ref> <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/a586c06595c836122c6f357d07f28541b16f988d</ref> <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/6b42c87bef0ee62fd57f4435cb69997243b3f6d8</ref>
+* Removed <code>initramfs-tools</code> from <code>non-qubes-vm-enhancements-cli</code> for <code>dracut</code> support. <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/3b67c5c18981c7a3072ece594f94f98e9537cb1f</ref>
+* Introduced <code>kicksecure-qubes-cli</code> and <code>kicksecure-qubes-gui</code>. <ref>https://github.com/Kicksecure/kicksecure-meta-packages/commit/eac116b98463f9b50812fe4c43b5420181b62b3e</ref>
+
+[https://gitlab.com/kicksecure/monero-gui <code>monero-gui</code>]:
+* Updated to <code>monero-gui-linux-x64-v0.17.2.3.tar.bz2</code>. <ref>https://web.archive.org/web/20210902155943/https://github.com/monero-project/monero-gui/releases/tag/v0.17.2.3</ref> <ref>https://web.archive.org/web/20210902155938/https://downloads.getmonero.org/gui/monero-gui-linux-x64-v0.17.2.3.tar.bz2</ref> <ref>https://web.archive.org/web/20210902160006/https://www.getmonero.org/downloads/hashes.txt</ref> <ref>https://gitlab.com/kicksecure/monero-gui/-/commit/a34bac079c2a31b533117070cf38c7a4957f36c3</ref>
+
+[https://github.com/whonix/qubes-whonix <code>qubes-whonix</code>]:
+* Dropped <code>initramfs-tools</code> from <code>qubes-whonix-shared-packages-recommended</code>; this is left to Qubes for <code>dracut</code> support. <ref>[https://forums.whonix.org/t/replacing-initramfs-tools-with-dracut/4487/13 replacing initramfs-tools with dracut].</ref> <ref>https://github.com/Whonix/qubes-whonix/commit/683c5ee6247dd562fa52789c5475621f43a95377</ref>
+
+[https://github.com/Kicksecure/sdwdate <code>sdwdate</code>]:
+* Fixed a dependency issue. <ref>https://github.com/Kicksecure/sdwdate/commit/95f62a51727ab153c83a1a5650786b2ffd778038</ref>
+
+[https://github.com/Kicksecure/security-misc <code>security-misc</code>] improvements:
+* Do not set kernel parameter <code>quiet loglevel=0</code> for recovery boot option for easier debugging. <ref>https://github.com/Kicksecure/security-misc/commit/ac0c492663b9d90f99e5969193b35b53d4175d1d</ref>
+* Moved grub quiet to a separate configuration file <code>/etc/default/grub.d/41_quiet.cfg</code>. <ref>https://github.com/Kicksecure/security-misc/commit/49902b8c56512c3ee8b3d16b0ca513e44349c66d</ref>
+* <code>dracut reproducible=yes</code>. <ref>https://github.com/Kicksecure/security-misc/commit/a4e18a2ae8c19a664bb1be5bc4ec43f10a876969</ref>
+* <code>Depends: libpam-modules-bin</code>. <ref>https://github.com/Kicksecure/security-misc/commit/e2810f348b413bb307449a911c12a46924686a9f</ref>
+* Fixed faillock implementation - <code>dovecot / ssh</code> are exempted. <ref>https://github.com/Kicksecure/security-misc/commit/be8c10496f26d33378deb2427e56892771456ee5</ref>
+* Fixed and added <code>sshd</code> to <code>pam_service_exclusion_list</code> to avoid faillock. <ref>https://github.com/Kicksecure/security-misc/commit/8b104f544a9e4e8da1691659fefa4999a4f6f085</ref>
+
+[https://github.com/Kicksecure/systemcheck <code>systemcheck</code>]:
+* Now run <code>check_sudo</code> earlier. <ref>https://github.com/Kicksecure/systemcheck/commit/09129d482c339a21c1b5c55447d50906a0b64fd9</ref>
+
+[https://github.com/Kicksecure/usability-misc <code>usability-misc</code>]:
+* Removed <code>/etc/lightdm/lightdm.conf.d/autologin.conf</code> (comments only) since it might interfere with autologin. <ref>https://github.com/Kicksecure/usability-misc/commit/b6461000a276594155ab88d994b4b4268451030e</ref>
+
+[https://github.com/Kicksecure/vm-config-dist <code>vm-config-dist</code>]:
+* <code>config-package-dev</code> displaces <code>/etc/gdm3/daemon.conf</code>. <ref>https://github.com/Kicksecure/vm-config-dist/commit/c071e8b630fe63963fbf5554986c0fecdcb6bd74</ref>
+* Added and enabled <code>gdm</code> autologin. <ref>https://github.com/Kicksecure/vm-config-dist/commit/1417726fc0a08bae8fe94c3dca3555aeef82677b</ref> <ref>https://github.com/Kicksecure/vm-config-dist/commit/fc802381584056fbaef1e7388c720c2c3c3dcb19</ref> <ref>https://github.com/Kicksecure/vm-config-dist/commit/bf00f606b3188c5a023f446cb31f910349708b4e</ref>
+* Added the original <code>/etc/gdm3/daemon.conf</code>. <ref>https://github.com/Kicksecure/vm-config-dist/commit/ee1f0c3a4b8f7c18c4228385506e18e9a0cfe0ee</ref>
+* Fixed autologin. <ref>https://github.com/Kicksecure/vm-config-dist/commit/b0c1af96519f82a9dcd2baf4f414c5efbc5d87f2</ref> <ref>https://github.com/Kicksecure/vm-config-dist/commit/a41b9d9bd270dec8a3cb76ddade164d0de914696</ref>
+* Disabled <code>dracut</code> module resume in VMs since it might break the boot process if built inside <code>chroot</code>. <ref>https://github.com/Kicksecure/vm-config-dist/commit/ee07d87be47c3c48f4369b5816876d5d826999a4</ref>
+* <code>vbox-guest-installer</code>: recommend, migrate from VirtualBox guest addition ISO to VirtualBox guest addition packages. <ref>[[VirtualBox/Guest_Additions#Migration_to_Guest_Additions_Packages|Migration to Guest Additions Packages]].</ref> <ref>https://github.com/Kicksecure/vm-config-dist/commit/b23e33b69dde7a62d8b63884900095aeacc19024</ref>
+
+[https://github.com/Kicksecure/legacy-dist <code>whonix-legacy</code>]:
+* Updated version. <ref>https://github.com/Kicksecure/legacy-dist/commit/b9d166ff16d3f8d61a0554784df9976cd88c6e72</ref>
+* Improved <code>release-upgrade</code>. <ref>https://github.com/Kicksecure/legacy-dist/commit/8a17fef51a03c62205172494704dad11c361c31d</ref> <ref>https://github.com/Kicksecure/legacy-dist/commit/8d8fb6be0628a19e32c76fcd3edd732d7ba3bd5f</ref>
+
+[https://github.com/Kicksecure/xfce-desktop-config-dist <code>whonix-xfce-desktop-config</code>]:
+* Fixed the <code>bullseye</code> background image (actually still broken). <ref>[https://forums.whonix.org/t/whonix-xfce-wallpaper-background-image/7984 Whonix XFCE Wallpaper / Background Image].</ref> <ref>https://github.com/Kicksecure/xfce-desktop-config-dist/commit/9d386ab84f420cf28a2661787500366af1088da1</ref>
+
+= Documentation Updates =
+
+New wiki chapters:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* [[Bitcoin_Core|Bitcoin Core]]
+* [https://www.kicksecure.com/wiki/Mental_Model Computer Security Mental Model]
+* [https://www.kicksecure.com/wiki/Cryptocurrency_Security_Threats Cryptocurrency Security Threats]
+* [[PyLRU|How-to: Install PyLRU in {{project_name_long}}]]
+* [[ElectrumX|How-to: Use ElectrumX Personal Server in {{project_name_long}}]]
+* [[Monero_Wallet_Isolation|How-to: Use Monero with Wallet Isolation in {{q_project_name}}]]
+* [https://www.kicksecure.com/wiki/Keepassxc KeePassXC Password Manager]
+</div>
+
+Wiki improvements/enhancements:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* [https://www.kicksecure.com/wiki/Dev/About_Computer_(In)Security About Computer (In)Security]
+* {{kicksecure_wiki
+|wikipage=Mobile_Phone_Security
+|text=Mobile Devices Privacy and Security
+}}
+* [[Qubes/Create_Gateway_ProxyVMs|Create {{project_name_gateway_long}} ProxyVMs]]
+* [[Social_Engineering|Social Engineering and (Spear) Phishing]]
+* [[Systemcheck|systemcheck]]
+* [[Two-factor_authentication_2FA|Two-factor Authentication (2FA)]]
+</div>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

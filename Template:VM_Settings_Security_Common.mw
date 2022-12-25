@@ -1,0 +1,66 @@
+<u>[[Qubes|{{q_project_name}}]] users</u> can skip this.
+
+----
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<u>For [[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>, click on Expand on the right.
+<div class="mw-collapsible-content">
+<div class="toccolours mw-collapsible mw-collapsed">
+If the {{project_name_customworkstation_long}} template was downloaded and imported, this section can be skipped. <ref>The {{project_name_customworkstation_long}} template already comes with these settings by default.</ref>
+
+If a VirtualBox VM was manually created, click on Expand on the right.
+<div class="mw-collapsible-content">
+
+Find out the name of the VM you are using.
+
+<pre>
+vboxmanage list vms
+</pre>
+
+Apply these settings. <ref>For further reading on why these settings are beneficial, see {{Code2|build-steps.d/2500_create-vbox-vm}} in the {{project_name_long}} source code folder.</ref>
+
+<pre>
+VBoxManage modifyvm "yourvmname" --synthcpu on
+VBoxManage modifyvm "yourvmname" --acpi on
+VBoxManage modifyvm "yourvmname" --ioapic on
+VBoxManage modifyvm "yourvmname" --rtcuseutc on
+VBoxManage setextradata "yourvmname" "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled" "1"
+</pre>
+
+Disable clipboard sharing. <ref>This is a precautionary measure.</ref>
+
+<pre>
+VBoxManage modifyvm "yourvmname" --clipboard disabled
+</pre>
+
+Disable Drag'n'Drop support. <ref>This is a precautionary measure.</ref>
+
+<pre>
+VBoxManage modifyvm "yourvmname" --draganddrop disabled
+</pre>
+
+<div class="toccolours mw-collapsible mw-collapsed">
+Assistance is welcome in verifying that the settings on this wiki page match those we are using in {{project_name_long}} source code. This ensures that no settings have been forgotten. If interested, click on Expand on the right.
+<div class="mw-collapsible-content">
+In {{project_name_long}} source code,  examine {{Code2|build-steps.d/2500_create-vbox-vm}} for the functions general_setup and workstation_specific. Apply any missing settings from {{Code2|build-steps.d/2500_create-vbox-vm}}. It is also sensible to drop the "sudo -u $USERNAME" setting.
+
+The following settings are not required. They are either recommended earlier on, or done by the gui creation process:
+
+* --name
+* storagectl
+* storageattach
+* --memory
+* --pae
+* --intnet1
+* --cableconnected
+* --macaddress1
+* --audiocontroller
+* --audio
+* --rtcuseutc
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+----

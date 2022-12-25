@@ -1,0 +1,290 @@
+{{Title|title=Platform-specific Desktop Tips}}
+{{Header}}
+{{#seo:
+|description={{project_name_long}} Platform-specific Desktop Tips and Tricks, RAM Adjusted Desktop Starter, Virtual Console, Full-Screen
+|image=https://www.{{project_clearnet}}/w/images/3/32/RAMAdjustedDesktopStarter.png
+}}
+[[image:RAMAdjustedDesktopStarter.png|thumb]]
+= All Platforms =
+
+== Disable Terminal Emulator Banner ==
+The following greeting banner appears when a terminal shell <code>bash</code> prompt is opened.
+
+<blockquote>Welcome to {{project_name_short}}!
+https://www.{{project_clearnet}}
+
+{{project_name_short}} Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP
+{{project_name_short}} is Freedom Software, and you are welcome to redistribute it under certain conditions; type "{{project_name_short_lowercase}}-license" <enter> for details.
+{{project_name_short}} is a compilation of software packages, each under its own copyright and license. The exact license terms for each program are described in the individual files in /usr/share/doc/*/copyright.
+
+{{project_name_short}} GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent permitted by applicable law; for details type "{{project_name_short_lowercase}}-disclaimer" <enter>.
+
+{{project_name_short}} is a derivative of Debian GNU/Linux and based on Tor.
+
+{{project_name_short}} is produced independently from the Tor (r) anonymity software and carries no guarantee from The Tor Project about quality, suitability or anything else.
+
+{{project_name_short}} is experimental software by means of concept and design.
+Do not rely on it for strong anonymity.
+
+Type: "{{project_name_short_lowercase}}" <enter> for help.
+uwt INFO: Stream isolation for some applications enabled. uwt / torsocks will be automatically prepended to some commands. What is that? See:
+uwt INFO: https://www.whonix.org/wiki/Stream_Isolation/Easy</blockquote>
+
+To disable the banner, follow these steps.
+{{Box|text=
+'''1.''' {{Open_a__product_ws_terminal}}
+
+'''2.''' Run the following command.
+
+{{CodeSelect|code=
+cp /etc/skel/.bashrc.{{project_name_short_lowercase}}-orig ~/.bashrc
+}}
+
+The process is now complete.
+}}
+See also: [[#Disable Virtual Console Banner|Disable Virtual Console Banner]].
+
+== Shut Down {{project_name_long}} ==
+
+To shut down {{project_name_long}}, open a terminal and run.
+
+{{CodeSelect|code=
+sudo poweroff
+}}
+
+Alternatively, use the menu option:
+
+* [[{{q_project_name_short}}|{{q_project_name}}]]: <code>Blue Q button</code> &rarr; <code>{{project_name_gateway_vm}}</code> &rarr; <code>Shutdown</code>
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]]: <code>Start</code> &rarr; <code>Leave...</code>
+
+== Virtual Consoles ==
+=== On the Host ===
+[https://en.wikipedia.org/wiki/Virtual_console Virtual consoles] is a feature inherited from Debian GNU/Linux which is unfamiliar to many users. The following keyboard shortcuts activate the Debian (not {{project_name_long}}) feature:
+
+* Text console: Press <code>Alt + Crtl + F1</code>
+** Additional text consoles: Press <code>Alt + Crtl + F2</code> or <code>F3</code> and so on. Try these in case <code>F1</code> is not functional.
+* Graphical console: Press <code>Alt + Crtl + F7</code>
+
+=== Virtual Machines ===
+'''Table:''' ''Virtual Console Activation''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Platform'''
+! scope="col"| '''Steps'''
+|-
+! scope="row"| KVM
+| The desired virtual console key shortcut can be selected under the <code>Send Key</code> option in a VM's graphical window.
+|-
+! scope="row"| Qubes dom0
+| Qubes dom0 inherited the same feature (<code>Alt + Crtl + F1</code>...).
+|-
+! scope="row"| Qubes VMs
+| In order to access VMs in dom0, run: <ref>
+This is not a real virtual console, but using login.
+</ref> <code>sudo xl console vm-name</code>. Replace "vm-name" with the name of the actual VM, for example.
+
+{{CodeSelect|code=
+sudo xl console {{project_name_gateway_vm}}
+}}
+
+See also [https://github.com/QubesOS/qubes-issues/issues/5492 add Qubes host key to allow switching virtual console (ctrl + alt + F1) or SysRq for HVM].
+|-
+! scope="row"| VirtualBox
+| The VirtualBox default is <code>Right Ctrl + F2</code>. <ref>
+Inside VirtualBox, the <code>Alt + Ctrl</code> keys are already registered by the host operating system.
+Host key can be changed using <code>VirtualBox</code> &rarr; <code>Global Settings</code> &rarr; <code>Input</code> &rarr; <code>Host Key</code>.
+</ref>
+
+* Text console: Press <code>Right Ctrl + F2 (F1, F2, F3, F4...)</code> for one or more text consoles.
+* Graphical console: Press <code>Host Key + F7</code> for a graphical console inside VirtualBox.
+|}
+
+Due to technical limitations, an easier to understand presentation like <code>{{project_name_long}} username login:</code> or something similar cannot be shown. <ref>
+The <code>login</code> program unfortunately does not provide this option.
+</ref>
+
+# Enter your username (this is most likely <code>user</code>) and press <code><enter></code>.
+# Enter your password and press <code><enter></code>.
+{{Default_Passwords}}
+
+=== Banner Explanation ===
+In the {{project name long}} case, the virtual console will show <code>host login:</code>. This can be confusing and has nothing to do with the actual host that {{project name long}} is running on. The string <code>host</code> is retrieved from file <code>/etc/hostname</code> which for privacy reasons is set to <code>host</code> in {{project name long}}. Therefore <u>do not</u> enter your host (the system {{project name long}} is running on) username or host password.
+
+Due to technical limitations, an easier to understand presentation like <code>{{project_name_long}} username login:</code> or something similar cannot be shown. <ref>
+The <code>login</code> program unfortunately does not provide this option.
+</ref>
+
+=== Login Instructions ===
+# Note the [[#Banner Explanation|Banner Explanation]].
+# Enter your username (this is most likely <code>user</code>) and press <code><enter></code>.
+# Enter your password and press <code><enter></code>.
+{{Default_Passwords}}
+
+=== Disable Virtual Console Banner ===
+
+This process is similar to [[#Disable Terminal Emulator Banner|Disable Terminal Emulator Banner]].
+
+'''1.''' Open a [[#Virtual Consoles|virtual console]].
+
+'''2.''' Run the following command to restore the original bashrc (untested). <ref>
+Please leave feedback if this step works correctly.
+</ref>
+
+{{CodeSelect|code=
+cp /etc/skel/.bashrc.whonix-orig ~/.bashrc
+}}
+
+<ref>
+Run the following command.
+
+{{CodeSelect|code=
+sudo unlink /etc/motd
+}}
+</ref>
+
+'''3.''' Done.
+
+The procedure is complete.
+
+= {{non_q_project_name_short}} =
+
+== Disable Autologin ==
+Not very useful inside VMs, see also [[Protection_Against_Physical_Attacks#Login_Screen|Login Screen]].
+
+'''1.''' {{Open with root rights|filename=
+/etc/gdm3/daemon.conf.dist
+}}
+
+'''2.''' Search for the following.
+
+<pre>
+AutomaticLoginEnable=true
+AutomaticLogin=user
+</pre>
+
+'''3.''' Modify.
+
+Out-comment, add a hash symbol ("<code>#</code>") in front of the two lines. Or replace the content, copy/paste the following which does the same.
+
+{{CodeSelect|code=
+#AutomaticLoginEnable=true
+#AutomaticLogin=user
+}}
+
+'''4.''' Save.
+
+'''5.''' Reboot.
+
+'''6.''' Done.
+
+Autologin should be disabled after reboot.
+
+== RAM Adjusted Desktop Starter ==
+{{RAM_Adjusted_Desktop_Starter}}
+
+For more information, see [[RAM Adjusted Desktop Starter]].
+
+== Use Full-screen Mode ==
+It is recommended to work in full-screen; this feature is also inherited from [[VirtualBox]]. To activate and deactivate full-screen mode, press the VirtualBox Host Key + F. The current Host Key is visible in the bottom right corner of VirtualBox. The VirtualBox default is <code>Right Ctrl + F</code>.
+
+Host key can be changed using <code>VirtualBox</code> &rarr; <code>Global Settings</code> &rarr; <code>Input</code> &rarr; <code>Host Key</code>.
+
+Full-screen mode leads to the {{project_name_long}} (and Debian) default resolution and color depth of <code>1920x1080x24</code>. Having a common value for these identifiers reduces the [[Protocol-Leak-Protection_and_Fingerprinting-Protection#Major_Identifiers|fingerprinting risk]] to the user. Full-screen mode also helps to prevent users from accidentally launching applications on the host (such as a clearnet browser), instead of within {{project_name_long}}.
+
+{{Anchor|Whonixcheck / Timesync Writing to tty1}}
+
+== XFCE Scaling ==
+
+A number of displays found in high-end laptops and desktops have High Dots Per Inch (HiDPI), providing a high resolution in a relatively small format. High-resolution mode can cause problems with certain software and the following adjustments may be necessary to improve HiDPI presentation in XFCE. <ref name=HiDPI>https://wiki.archlinux.org/title/HiDPI#Xfce</ref>
+
+'''Table:''' ''XFCE Scaling Options''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Configuration'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Fonts
+| Change the DPI parameter as follows: <ref name=HiDPI /> <br />
+* <code>Settings Manager</code> &rarr; <code>Appearance</code> &rarr; <code>Fonts</code> &rarr; <code>DPI</code> &rarr; <code>Increase</code> <br />
+For example, it is reported that a value of <code>180</code> or <code>192</code> seems to work well on Retina screens, but trial and error may be necessary to get a more precise number for the relevant display.
+|-
+! scope="row"| gtk2 Menus and Buttons
+| Follow these steps to change the default icon sizes of gtk2 menus, buttons and so on: <ref name=HiDPI /> <br />
+* <code>Settings Manager</code> &rarr; <code>Settings Editor</code> &rarr; <code>xsettings</code> &rarr; <code>Gtk</code> &rarr; <code>IconSizes</code> &rarr; in row <code>Value</code> &rarr; add the following line. <br />
+{{CodeSelect|code=
+gtk-large-toolbar=96,96:gtk-small-toolbar=64,64:gtk-menu=64,64:gtk-dialog=96,96:gtk-button=64,64:gtk-dnd=64,64
+}}
+Note that the "gtk-dnd" parameter is for the icons during drag'n'drop, while the others are self-evident based on their name. Any value supported by the icon theme can be used.
+|-
+! scope="row"| System Tray Icon Size
+| Follow these steps to enlarge icons in the system tray: <ref name=HiDPI /> <br />
+# <code>Right-click on system tray</code>: aim for empty space / top pixels / bottom pixels, so the the icons are not activated themselves. <br />
+# <code>Properties</code> &rarr; <code>Set "Maximum icon size"</code> to <code>32</code>, <code>48</code> or <code>64</code>.
+|-
+! scope="row"| Task Bar Size
+| To change the size of the task bar: <br />
+* <code>Right-click on empty space in task bar</code> &rarr; <code>Panel</code> &rarr; <code>Panel Preferences</code> &rarr; <code>Row Size (Pixels)</code> &rarr; <code>move slider</code>
+|-
+! scope="row"| Window Manager Style
+| Xfwm has two hidpi themes: Default-hdpi and Default-xhdpi. Change the theme as follows: <ref name=HiDPI /> <br />
+* <code>Settings Manager</code> &rarr; <code>Window Manager</code> &rarr; <code>Style</code> &rarr; <code>Theme</code> &rarr; <code>Default-hdpi</code> or <code>Default-xhdpi</code>
+|}
+
+{{Anchor|XFCE Settings Reset}}
+== Default Home Folder Configuration Files Reset ==
+Before following these instructions to wipe the whole Xfce settings folder and restore defaults, it is recommended to backup existing Xfce settings.
+{{Box|text=
+'''1.''' Open a [[Desktop#Virtual_Consoles|virtual console]].
+
+'''2.''' Logout from and stop Xfce by halting {{project_name_long}} default <code>login manager</code> <code>gdm3</code>.
+
+{{CodeSelect|code=
+sudo systemctl stop gdm3
+}}
+
+'''3.''' Delete folder <code>~/.config/xfce4</code>.
+
+{{CodeSelect|code=
+rm -r ~/.config/xfce4
+}}
+
+'''4.''' Delete the <code>first-boot-skel.done</code> file.
+
+{{CodeSelect|code=
+sudo rm /var/cache/anon-base-files/first-boot-skel.done
+}}
+
+'''5.''' Re-add {{project_name_long}} Xfce configuration files.
+
+{{CodeSelect|code=
+sudo /usr/libexec/helper-scripts/first-boot-skel
+}}
+
+'''6.''' Restart lightdm to restart Xfce.
+
+{{CodeSelect|code=
+sudo systemctl restart gdm3
+}}
+
+'''7.''' Done.
+
+The process has been completed.
+}}
+
+= {{q_project_name_short}} =
+
+== Avoid VM Full Screen Mode ==
+
+It is unrecommended to allow [[Qubes|{{q_project_name}}]] or other VMs to [https://www.qubes-os.org/doc/how-to-enter-fullscreen-mode/ completely "own" the full screen]. Overriding Qubes' GUI virtualization daemon restrictions means the colored decorations drawn by each VM window will not be visible. In this case, a malicious application might not actually release the full screen (while it appears normal), or the full desktop may be emulated so users are tricked into entering sensitive information inside false "trusted" domains. <ref>https://www.qubes-os.org/doc/full-screen-mode/</ref>
+
+= See Also =
+* [[Keyboard Layout]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

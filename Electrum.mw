@@ -1,0 +1,185 @@
+{{Title|
+title=How-to: Use Electrum Bitcoin Wallet in {{project_name_long}}
+}}
+{{Header}}
+{{#seo:
+|description=How-to: Use Electrum Bitcoin Wallet in {{project_name_long}}
+|image=Electrum.png
+}}
+{{bitcoin_mininav}}
+{{electrum_mininav}}
+__FORCETOC__
+[[File:Electrum-appimage.png|thumb|Electrum Logo]]
+[[File:BC Logo .png|thumb|Bitcoin Logo|128px]]
+= Introduction =
+
+[https://electrum.org/#home Electrum] is a popular Bitcoin wallet. According to the [https://electrum.readthedocs.io/en/latest/faq.html#how-does-electrum-work Electrum FAQ]:
+
+<blockquote><b>How does Electrum work?</b>
+
+Electrum’s focus is speed, with low resource usage and simplifying Bitcoin. Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the Bitcoin system.</blockquote>
+
+Electrum does not need to download/verify the blockchain and users store their private keys locally.
+
+This is an advantage over some other Bitcoin wallets which are affected by this: if the third-party server were ever compromised, all of the users' bitcoins could be stolen. There is also the possibility that the third-party could lose a user's private keys or walk away with them.
+
+= Warnings =
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' This documentation is not comprehensive. It should not be viewed as a complete guide to cryptocurrency privacy and security, and does not cover all possible threats that can cause users to lose their cryptocurrency.
+}}
+
+See also dedicated wiki pages:
+
+* [[Money|Anonymous Money]]
+* [[Bitcoin]]
+
+Electrum is configured by electrum upstream default to use public third party servers. If users are not using their own self-hosted electrum server ([[ElectrumX]]), consider the following quote from the electrum upstream documentation [https://electrum.readthedocs.io/en/latest/faq.html#does-electrum-trust-servers Does Electrum trust servers?]:
+
+<blockquote>[...]
+
+One of the servers, arbitrarily, is selected as the “main” server.
+
+* The client subscribes to its own addresses (nit: sha256 hashes of scriptPubKeys) so that it would be notified of new transactions touching them. It also synchronizes the existing history of its addresses. This means the client sacrifices some privacy to the server, as the server can now reasonably guess that all these addresses belong to the same entity.
+* As above, confirmed transactions are verified via SPV.
+* The server is trusted about unconfirmed transactions.
+* The server can lie by omission. That is, it can “forget” to mention (both confirmed and unconfirmed) transactions that are relevant to the client.
+* The main server is also used for fee estimates, and is trusted with those (low-high sanity limits are applied in the client)
+* The main server is also used to broadcast the transactions the client makes.
+
+[...]</blockquote>
+
+There can be no blanket recommendation for all users which Bitcoin wallet should be used. It depends on:
+
+* Technical skill.
+* Personal risk assignment.
+* Financial value in Bitcoin.
+* Time.
+* And probably other factors as well.
+
+While Electrum has better usability (is easier to use), above warnings apply. However, for best security, the official Bitcoin client (bitcoin-qt) should be seriously considered for balances of Bitcoin representing serious financial value. For reasons, see [[Bitcoin_Core|Bitcoin Core]].
+
+= Install Electrum =
+<ref>
+[[Dev/electrum|Electrum Bitcoin Wallet in {{project_name_long}} Development Notes]]
+</ref>
+
+Installed by default in {{project_name_workstation_long}}.
+
+= Version Numbers =
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Prerequisite knowledge</u>: refer to the [[Operating_System_Software_and_Updates#Frozen_Packages|Frozen Packages]] and [[Operating_System_Software_and_Updates#Application_Specific_Update_Indicators|Application Specific Update Indicators]] entries in the [[Operating_System_Software_and_Updates|Operating System Software and Updates]] chapter.
+}}
+
+Should the user wish to use a newer version of Electrum than available in the [https://packages.debian.org/electrum packages.debian.org electrum package] since [[About#Based_on_Debian|{{project_name_long}} is based on Debian]], the user can optionally install Electrum using the usual instructions from the Electrum website. Recommendations from the {{kicksecure_wiki
+|wikipage=Install_Software#Install_Newer_Software_Versions
+|text=safely installing software
+}} wiki page such as [[Verifying Software Signatures]] applies. See also {{kicksecure_wiki
+|wikipage=Install_Software#Install_Newer_Software_Versions
+|text=Install Newer Software Versions
+}}.
+
+It is possible to [[#Uninstallation|uninstall the electrum package]] but and uninstallation is optional if Electrum is manually installed in home folder.
+
+See also [[Electrum/Manual_Installation|Electrum, Manual Installation]].
+
+= Start Electrum =
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Users should create a wallet with a [[Passwords#Generating_Unbreakable_Passwords|strong password]]!
+}}
+
+Please refer to the [https://electrum.readthedocs.io/en/latest/ official Electrum documentation] for comprehensive instructions, as well as more advanced topics like [https://electrum.readthedocs.io/en/latest/coldstorage.html Cold Storage] of private keys.
+
+To start Electrum from start menu.
+
+<code>Start Menu</code> &rarr; <code>Internet</code> &rarr; <code>Electrum</code>
+
+To start Electrum from command line, run.
+
+{{CodeSelect|code=
+electrum
+}}
+
+[[{{q_project_name_short}}|{{q_project_name}}]] users are recommended to configure a [https://github.com/Qubes-Community/Contents/blob/master/docs/security/split-bitcoin.md Split Bitcoin Wallet] to better protect their private keys. To protect against identity correlation through Tor circuit sharing, follow the instructions below (see [[Stream_Isolation|Stream Isolation]] for more information).
+
+= Electrum: First Run =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = These steps enable [[Stream Isolation]] for the Electrum application.
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=warning]]
+| text    =
+'''Warning:'''
+
+This is a notice for users of the [[ElectrumX]] server. Do <u>not</u> set up stream isolation if electrum should be used in combination with a self-hosted [[ElectrumX]] server running inside the same virtual machine since that would circumvent the [[ElectrumX#Isolating_Proxy_Setup|isolating proxy]] setup.
+}}
+
+{{Box|text=
+'''1.''' Configure a manual server connection.
+
+When Electrum is started for the first time, users are met with the prompt: <code>"How do you want to connect to a server?"</code>.
+
+Choose <code>Select server manually</code> and press <code>Next</code>.
+
+'''Figure:''' ''Server Setting''
+
+[[Image:Electrum_select_server_manually.png]]
+
+'''2.''' Change the proxy settings. This is useful for [[Stream Isolation]].
+
+The necessary settings are:
+
+* Proxy: <code>SOCKS5</code>
+* Host: <code>10.152.152.10</code>
+* Port: <code>9111</code>
+
+Press <code>Next</code> and the application should be fully functional.
+
+'''Figure:''' ''SOCKS5 Proxy Configuration''
+
+[[Image:Electrum_use_proxy_socks5_.png]]
+
+'''Note:''' If Electrum is already set up but stream isolation was not enabled, then navigate to <code>Tools</code> &rarr; <code>Network</code> in Electrum to bring up the server and proxy settings.
+}}
+
+= Uninstallation =
+To avoid any issues with [[Debian_Packages|{{project_name_long}} meta package]] removal, first install the <code>dummy-dependency-electrum</code> package.
+
+{{install Package
+|package=dummy-dependency-electrum
+}}
+
+Remove the <code>electrum</code> package.
+
+{{CodeSelect|code=
+sudo apt purge electrum
+}}
+
+Done, removal of the <code>electrum</code> package is complete.
+
+= See Also =
+* [[Money|Anonymous Money]]
+* [[Bitcoin]]
+* [[ElectrumX|How-to: Use ElectrumX Personal Server in {{project_name_long}}]]
+
+= Donations =
+
+After installing Electrum, please consider making a [[Donate|donation]] to {{project_name_long}} to keep it running for many years to come.
+
+{{Pay_Bitcoin_Specific}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

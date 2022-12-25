@@ -1,0 +1,534 @@
+{{Header}}
+{{Title|
+title=Connecting to Tor before a VPN
+}}
+{{#seo:
+|description=Instructions on how to connect to Tor before a VPN (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>)
+|image=Ball-443853640.jpg
+}}
+[[image:Ball-443853640.jpg|thumb]]
+
+'''<code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>'''
+
+__TOC__
+
+= Introduction =
+
+{{Tunnels_Introduction}}
+
+By design, a VPN routes all your applications -- those without any proxy settings -- through the VPN. This may be undesirable as explained below; for example, it increases the threat of identity correlation. To circumvent this possibility, only use this {{project_name_workstation_long}} for particular applications that should be routed through the tunnel-link. Refer to the [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] wiki chapter for further instructions.
+
+= Security Precautions =
+
+== Prevent Bypassing of the Tunnel-Link ==
+
+{{Prevent_Bypassing_the_Tunnel-Link}}
+
+{{Anchor|Fail_Closed_Mechanism}}
+
+== Use a Fail Closed Mechanism ==
+
+{{Fail_Closed_Mechanism}}
+
+Instructions below include a fail closed mechanism.
+
+== VPN Client Choice ==
+
+* It is recommended to utilize OpenVPN.
+* Using [https://bitmask.net/en Bitmask VPN] for this use case is not possible. <ref>
+https://0xacab.org/leap/bitmask-vpn
+</ref> In other words, you cannot use <code>user</code> &rarr; <code>Tor</code> &rarr; <code>bitmask</code> &rarr; <code>Internet</code>. <ref>
+Previously Bitmask did not support Tor. Broken link: <nowiki>https://github.com/leapcode/bitmask_client/issues/1009</nowiki>
+</ref>
+* Other VPN clients are [[unsupported]].
+
+= Set Up Tor before a VPN (User &rarr; Tor &rarr; VPN &rarr; Internet) =
+
+== Introduction ==
+
+Two configurations are available:
+
+* [[{{q_project_name_short}}|{{q_project_name}}]] users have the option of <u>either</u> using
+** '''A)''' [[#Separate VPN-Gateway|Separate VPN-Gateway]], <u>or</u> alternatively could also use
+** '''B)''' [[#Inside {{project_name_workstation_long}}|Inside {{project_name_workstation_long}}]] instructions.
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]] users should prefer [[#Inside {{project_name_workstation_long}}|Inside {{project_name_workstation_long}}]] instructions.
+
+== Separate VPN-Gateway ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = [[{{q_project_name_short}}|{{q_project_name}}]] only; [[{{non_q_project_name_short}}|{{non_q_project_name}}]] is [[unsupported]].
+}}
+
+This configuration has a separate VPN-Gateway between {{project_name_gateway_long}} and {{project_name_workstation_long}}: <code>{{project_name_workstation_long}}</code> &rarr; <code>VPN-Gateway</code> &rarr; <code>{{project_name_gateway_long}}</code>.
+
+<code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>
+
+Qubes bugs maybe breaking this, maybe fixed:
+
+* https://github.com/QubesOS/qubes-issues/issues/7123#issuecomment-1245292312
+* https://github.com/QubesOS/qubes-issues/issues/7261#issuecomment-1242979914
+* <ref>
+https://github.com/QubesOS/qubes-core-agent-linux/blob/master/network/setup-ip
+</ref>
+* in short: Contents of <code>/usr/lib/qubes/setup-ip</code> need to re replaced with [https://raw.githubusercontent.com/QubesOS/qubes-core-agent-linux/master/network/setup-ip <code>setup-ip</code>]
+
+{{Box|text=
+'''1.''' Clone a Template. For example, clone <code>debian-{{Stable_project_version_based_on_Debian_version_short}}</code> and name the new template clone <code>debian-{{Stable_project_version_based_on_Debian_version_short}}-vpn</code>. <ref>
+At the time of writing Debian 11 <code>bullseye</code> was the stable release version.
+</ref>
+
+<code>Qube Manager</code> &rarr; <code>debian-{{Stable_project_version_based_on_Debian_version_short}}</code> &rarr; <code><u>C</u>lone qube</code> &rarr; <i><code>Enter name for Qube clone:</i> debian-{{Stable_project_version_based_on_Debian_version_short}}-vpn</code> &rarr; <code>Press: OK</code>
+
+'''2.''' Create a new ProxyVM based on the newly cloned template.
+
+Name the VM VPN-Gateway and set the {{project_name_gateway_long}} ProxyVM (<code>{{project_name_gateway_vm}}</code>) as NetVM. Make sure to check [✔] the box for "provides network".
+
+{{Box|text=
+<code>Qube Manager</code> &rarr; <code><u>Q</u>ube</code> &rarr; <code>Create <u>n</u>ew qube</code>
+
+* Name and label: <code>VPN-Gateway</code> (Set the preferred color)
+* Type: <code>Qube based on a template (AppVM)</code>
+* Template: <code>debian-{{Stable_project_version_based_on_Debian_version_short}}-vpn</code>
+* Networking: <code>{{project_name_gateway_vm}}</code>
+* Advanced:   [<code>✔</code>] Provides network
+* Press: <code><u>O</u>K</code>
+}}
+
+'''3.''' Set up the VPN-Gateway as per [https://github.com/Qubes-Community/Contents/blob/master/docs/configuration/vpn.md Qubes VPN Documentation].
+
+It is recommended to follow the [https://github.com/Qubes-Community/Contents/blob/master/docs/configuration/vpn.md#set-up-a-proxyvm-as-a-vpn-gateway-using-iptables-and-cli-scripts ''Set up a ProxyVM as a VPN gateway using iptables and CLI scripts''] instructions because this prevents clearnet leaks if/when the VPN breaks down.
+
+Note:
+* Without configuring a fail closed configuration, all traffic originating from the {{project_name_workstation_long}} App Qube (<code>{{project_name_workstation_vm}}</code>) would <u>only</u> be forced through Tor if/when the VPN connection breaks down (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>).
+* UDP-style VPN connections are incompatible with Tor because it requires the VPN to be configured to use TCP. <ref>See [[Tor#UDP|UDP]].</ref> This requires adding <code>proto tcp</code> to the VPN configuration file <code>/rw/config/vpn/openvpn-client.ovpn</code>. Nearly all VPN providers support this configuration.
+
+'''4'''. Check the VPN-Gateway is fully functional.
+
+Test connectivity from inside the VPN-Gateway as per [https://github.com/Qubes-Community/Contents/blob/master/docs/configuration/vpn.md Qubes VPN Documentation].
+
+'''5'''. ''Recommended:'' In {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>), apply instructions from the [[#Prevent Bypassing of the Tunnel-Link|Prevent Bypassing of the Tunnel-Link]] section.
+
+'''6.''' ''Optional:'' It is recommended to run the related [[#Leak_Tests|Leak Tests]].
+
+The VPN-Gateway configuration is complete.
+}}
+
+Notes:
+
+* No DNS configuration is required when using a separate VPN Gateway and system DNS should work out of the box. <ref>This is because a properly configured Qubes VPN-Gateway will be able to resolve DNS.</ref>
+* For troubleshooting, see footnote. <ref>
+* Check the VPN-Gateway is fully functional. Test connectivity from inside the VPN-Gateway.
+* When testing the VPN connection <u>do not</u> add any VMs that have been previously used for non-anonymous activities behind the VPN-Gateway. This will burn the VPN, making it unsuitable for use with {{project_name_long}}!
+* Create a fresh, newly created VM if intending to use a non-{{project_name_long}} VM behind the VPN-Gateway for testing purposes.
+</ref>
+* {{project_name_long}} user forum discussion: [https://forums.whonix.org/t/setup-a-vpn-in-proxyvm-over-{{project_name_gateway_vm}} Set up a VPN in ProxyVM over {{project_name_gateway_vm}}] <ref>
+* Qubes users mailing list discussion: https://groups.google.com/g/qubes-users/c/AXOwf1f9jd0/m/UkHwQmKVQQAJ
+* Qubes development ticket: https://github.com/QubesOS/qubes-issues/issues/2060</ref>
+* The following warning will appear when using [[Tor Browser]] and is expected (see technical footnote): <ref>This is because Tor Browser can no longer access Tor's ControlPort ([[Dev/onion-grater|onion-grater]]) on {{project_name_gateway_long}}.</ref>
+
+<i><pre>
+Something Went Wrong!
+Tor is not working in this browser.
+</pre></i>
+
+== Inside {{project_name_workstation_long}} ==
+
+This configuration will connect to the VPN using your preferred software <u>inside</u> the ({{project_name_long}}-)Workstation.
+
+{{VPN UDP Tor|/etc/openvpn/openvpn.conf}}
+
+<code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>
+
+=== {{project_name_long}} TUNNEL_FIREWALL vs Standalone VPN-Firewall ===
+
+{{Whonix_TUNNEL_FIREWALL_vs_standalone_VPN-Firewall}}
+
+=== Preparation ===
+'''NOTE: might be broken, see https://forums.whonix.org/t/user-tor-vpn-internet-doesnt-work-in-whonix-16/13786'''
+
+{{VPN/Setup/Preparation}}
+
+=== Prerequisite Knowledge ===
+
+Before proceeding, it is strongly recommended to read and understand the [[Debian_Packages|{{project_name_long}} Debian Packages]] chapter.
+
+=== Firewall Settings ===
+
+{{Firewall_Settings_Workstation}}
+
+Add the following settings.
+
+<pre>
+WORKSTATION_FIREWALL=1
+TUNNEL_FIREWALL_ENABLE=true
+</pre>
+
+Save.
+
+=== Reload Firewall ===
+
+{{Reload_Firewall_ws}}
+
+=== sudoers Configuration ===
+
+{{VPN/Setup/Tor_Before_VPN/sudoers_configuration}}
+
+=== VPN Setup ===
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Update</u>: The Riseup "legacy" VPN appears to have been discontinued. The Riseup replacement service (Bitmask) has not been tested. If you do not have a Riseup invite code then tailor the instructions in this section to work with any other OpenVPN provider.
+}}
+
+==== Introduction ====
+
+{{VPN/Setup/Introduction}}
+
+==== Get VPN Certificate ====
+
+{{VPN/Setup/Get VPN Certificate}}
+
+==== VPN Credentials ====
+
+{{VPN/Setup/VPN Credentials}}
+
+==== VPN IP Address ====
+
+{{VPN/Setup/VPN IP Address}}
+
+==== VPN Configuration File ====
+
+{{Box|text=
+
+'''1.''' {{Open with root rights|filename=
+/etc/openvpn/openvpn.conf
+}}
+
+'''2.''' Add.
+
+<u>Note</u>: It is necessary to adjust the {{Code|remote 198.252.153.226 80}} variable in the configuration below unless you are using {{Code|nyc.vpn.riseup.net}} as the VPN service. Replace the IP ({{Code|198.252.153.226}}) and port ({{Code|80}}) to match your VPN service.
+
+<pre>
+##############################
+## VPN provider specific settings ##
+##############################
+auth-user-pass auth.txt
+
+## using nyc.vpn.riseup.net 80
+remote 198.252.153.226 80
+
+ca RiseupCA.pem
+
+remote-cert-tls server
+
+####################################
+## TUNNEL_FIREWALL specific settings ##
+####################################
+client
+dev tun0
+persist-tun
+persist-key
+
+script-security 2
+up "/etc/openvpn/update-resolv-conf script_type=up dev=tun0"
+down "/etc/openvpn/update-resolv-conf script_type=down dev=tun0"
+
+user tunnel
+iproute /usr/bin/ip_unpriv
+
+############################################
+## Connecting to Tor before a VPN specific settings #
+############################################
+
+proto tcp
+</pre>
+
+<ref>
+* The [https://github.com/{{project_name_short}}/usability-misc/blob/master/usr/bin/ip_unpriv /usr/bin/ip_unpriv] wrapper script is provided by the [https://github.com/{{project_name_short}}/usability-misc usabilty-misc] package.
+* The [https://github.com/{{project_name_short}}/usability-misc/blob/master/etc/sudoers.d/tunnel_unpriv /etc/sudoers.d/tunnel_unpriv] wrapper script is provided by the [https://github.com/{{project_name_short}}/usability-misc usabilty-misc] package.
+* The [https://github.com/{{project_name_short}}/usability-misc/blob/master/lib/systemd/system/openvpn%40openvpn.service.d/50_unpriv.conf /lib/systemd/system/openvpn@openvpn.service.d/50_unpriv.conf] wrapper script is provided by the [https://github.com/{{project_name_short}}/usability-misc usabilty-misc] package.
+</ref> <ref>It is necessary to run OpenVPN as user 'tunnel' because that is the only user besides user <code>clearnet</code> that is allowed to establish external connections when using {{project_name_long}} Firewall setting VPN_FIREWALL=1.</ref>
+
+'''3.''' Save.
+}}
+
+==== Install resolvconf ====
+
+{{VPN/Setup/install_resolvconf}}
+
+==== DNS Configuration ====
+
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/usr/lib/tmpfiles.d/50_openvpn_unpriv.conf
+}}
+
+'''2.''' Add. <ref name=Whonix14 />
+
+<pre>
+d       /run/resolvconf 0775    root      tunnel    -       -
+d       /run/resolvconf/interface         0775      root    tunnel    -    -
+</pre>
+
+Save the file.
+
+'''3.''' Adjust permissions. <ref name=Whonix14>This is removeable since {{project_name_long}} 14 because it was merged in the <code>usablity-misc</code> package.</ref>
+
+{{CodeSelect|code=
+sudo chown --recursive root:tunnel /run/resolvconf
+}}
+
+{{CodeSelect|code=
+sudo chmod --recursive 775 /run/resolvconf
+}}
+
+'''4.''' {{VPN/Setup/DNS Configuration}}
+}}
+
+=== Additional Setup ===
+
+==== Configuration Folder Permissions ====
+
+{{VPN/Setup/Configuration Folder Permissions}}
+
+==== systemd Setup ====
+
+{{Template:VPN/Setup/Systemd}}
+
+==== resolvconf Adjustments ====
+
+{{VPN/Setup/resolvconf adjustments}}
+
+==== Verify DNS Settings ====
+
+{{Box|text=
+'''1.''' Open the <code>/etc/resolv.conf</code> file.
+
+{{CodeSelect|code=
+sudo cat /etc/resolv.conf
+}}
+
+'''2.''' Check the current settings.
+
+It should <u>not</u> include the following setting; this is the standard {{project_name_long}} DNS server.
+
+<pre>
+nameserver 10.152.152.10
+</pre>
+
+It should also <u>not</u> include the following settings; these are the standard Qubes DNS servers.
+
+<pre>
+nameserver 10.137.3.1
+nameserver 10.137.3.254
+</pre>
+
+'''3.''' Confirm it <u>only</u> includes the DNS server of your DNS provider.
+
+For example.
+
+<pre>
+nameserver 10.5.0.1
+</pre>
+}}
+
+==== systemcheck ====
+
+<code>systemcheck</code> configuration. <code>systemcheck</code> cannot work in this configuration out of the box. Perform the following steps to unbreak it.
+
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/etc/systemcheck.d/50_user.conf
+}}
+
+'''2.''' Add the following text.
+
+{{CodeSelect|code=
+systemcheck_skip_functions+=" check_tor_bootstrap "
+systemcheck_skip_functions+=" check_tor_socks_port_reachability "
+systemcheck_skip_functions+=" check_tor_socks_port "
+systemcheck_skip_functions+=" check_tor_trans_port "
+systemcheck_skip_functions+=" check_stream_isolation "
+systemcheck_skip_functions+=" download_whonix_news "
+
+## {{ Alternative to disabling check_tor_trans_port.
+
+## Make the Tor TransPort test work by simulating the Tor SocksPort test succeeded.
+#CHECK_TOR_RESULT_SOCKS_PORT=0
+
+## Do not warn if Tor was not detected. (Will be the VPN.)
+#SYSTEMCHECK_NO_EXIT_ON_TRANS_PORT_DETECTION_FAILURE=1
+
+## }}
+
+## {{ Alternative to download_whonix_news.
+
+## Download news through system default.
+#CURL_PROXY_WHONIX_NEWS="--fail"
+
+## }}
+}}
+
+'''3.''' Save the file.
+
+'''4.''' Done.
+
+<code>systemcheck</code> configuration has been completed.
+}}
+
+==== Qubes-specific ====
+
+<div class="toccolours mw-collapsible mw-collapsed">
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This is a placeholder; ignore this Qubes-specific section for now. TODO.
+}}
+<div class="mw-collapsible-content">
+{{Box|text=
+'''1.''' When using an App Qube, persistent changes require the Qubes bind dirs mechanism.
+
+{{CodeSelect|code=
+sudo mkdir /rw/config/qubes-bind-dirs.d
+}}
+
+'''2.''' {{Open with root rights|filename=
+/rw/config/qubes-bind-dirs.d/50_user.conf
+}}
+
+'''3.''' Add the following content.
+
+<pre>
+binds+=( '/etc/sudoers.d/tunnel_unpriv' )
+binds+=( '/etc/openvpn' )
+binds+=( '/lib/systemd/system/openvpn@openvpn.service' )
+binds+=( '/etc/systemd/system/multi-user.target.wants/openvpn@openvpn.service' )
+</pre>
+
+TODO: This does not work yet because the files need to exist first.
+
+<pre>
+/usr/lib/qubes/bind-dirs.sh umount
+</pre>
+
+<pre>
+/usr/lib/qubes/bind-dirs.sh
+</pre>
+}}
+</div>
+</div>
+
+==== Test ====
+
+{{Box|text=
+'''1.''' Test the ping functionality.
+
+Utilize a suitable IP address such as Google's DNS server or an alternative server of your choice.
+
+{{CodeSelect|code=
+ping 8.8.8.8
+}}
+
+'''2.''' Test DNS to check it correctly resolves a suitable domain.
+
+Utilize <code>check.torproject.org</code> or an alternative server of your choice.
+
+{{CodeSelect|code=
+nslookup check.torproject.org
+}}
+
+'''3.''' Test DNS and output IP address.
+
+<pre>
+whonixcheck_skip_functions="" \
+CHECK_TOR_RESULT_SOCKS_PORT=0 \
+WHONIXCHECK_NO_EXIT_ON_TRANS_PORT_DETECTION_FAILURE=1 \
+whonixcheck --function check_tor_trans_port
+</pre>
+}}
+
+=== Additional Information ===
+
+The procedure is complete. If you have any issues, refer to the [[#Troubleshooting|Troubleshooting]] section below. Once the setup is functional, it is recommended to perform [[#Leak Tests|Leak Tests]].
+
+= Troubleshooting =
+
+{{VPN-Firewall/Troubleshooting}}
+
+=== How to Submit a Support Request ===
+
+{{VPN/Setup/Support Requests}}
+
+= Leak Tests =
+
+== Introduction ==
+
+It is important to verify the network traffic configuration enforces <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> and <u>not</u> only <code>User</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>. Therefore, it is recommended to run the following related leak tests inside {{project_name_workstation_long}}. Test Tor Browser, a uwt wrapper deactivated application, as well as a regular application for leaks.
+
+== Regular Application Test ==
+
+Use <code>curl</code> without pre-configured [[Stream Isolation|stream isolation]].
+
+<!-- EDITORS NOTE: '{{!}}' is a magic word for '|'.-->
+{{CodeSelect|code=
+{{Curl_Plain}} --silent {{Curl_Secure}} https://check.torproject.org {{!}} grep IP
+}}
+
+<ref name=nodns>
+In the absence of functional system DNS, an alternative is to just test TCP.
+
+The IP <code>{{Check.torproject.org_IP}}</code> might change. To discover the current one, run the following command inside a VM with functional system DNS. (Ideally inside a {{project_name_workstation_long}}.)
+
+{{CodeSelect|code=
+nslookup check.torproject.org
+}}
+</ref> <ref>
+
+<!-- EDITORS NOTE: '{{!}}' is a magic word for '|'.-->
+{{CodeSelect|code=
+{{Curl_Plain}} --silent {{Curl_Secure}} -H 'Host: check.torproject.org' -k https://{{Check.torproject.org IP}} {{!}} grep IP
+}}
+</ref>
+
+The output should show something similar to: {{Code2|Your IP address appears to be: xxx.xxx.xxx.xxx}}<br />
+It should also list the VPN's IP address.
+
+== uwt-wrapped Application Test ==
+
+Connect to <code>check.torproject.org</code>.
+
+<!-- EDITORS NOTE: '{{!}}' is a magic word for '|'.-->
+{{CodeSelect|code=
+curl --silent {{Curl_Secure}} https://check.torproject.org {{!}} grep IP
+}}
+
+<ref name=nodns /> <ref>
+<!-- EDITORS NOTE: '{{!}}' is a magic word for '|'.-->
+{{CodeSelect|code=
+curl --silent {{Curl_Secure}} -H 'Host: check.torproject.org' -k https://{{Check.torproject.org IP}} {{!}} grep IP
+}}
+</ref>
+
+== Browser IP Test ==
+
+This test can be skipped if Tor Browser will not be used through the VPN.
+
+If everything was configured correctly, test the setup. Open <code>https://check.torproject.org</code> in Tor Browser. It will state "{{Code2|You are not using Tor.}}" and the VPN's IP address will be visible. In fact this means the VPN was tunneled through Tor first because {{project_name_workstation_long}} can not make any non-Tor connections by design (everything is tunneled over Tor).
+
+== DNS Leak Test ==
+
+{{DNS_Leak_Tests_Online}}
+
+== Other Leak Tests ==
+
+Advanced users can also run a host of additional, general leak tests that are unrelated to tunneling. However, these are more difficult to perform and are targeted at developers rather than general users. For further information, see: [[Dev/Leak_Tests|Leak Tests]].
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

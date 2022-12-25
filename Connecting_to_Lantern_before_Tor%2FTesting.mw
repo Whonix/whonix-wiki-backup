@@ -1,0 +1,163 @@
+= <u>Note: This Page is for Testing Only!</u> =
+
+'''Please use the stable [[Lantern#Connecting_to_Lantern_before_Tor|Connecting to Lantern before Tor]] Wiki page for Lantern configuration.'''
+
+{{Tunnel_Automation_Sale}}
+<code>User</code> &rarr; <code>Lantern</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>
+
+= Introduction  =
+== Combining Tunnels with Tor ==
+{{Tunnel_Introduction}}
+
+== Tunnel-link before Tor use cases ==
+{{Tunnel_Introduction/Tunnel-link_before_Tor}}
+
+= Warnings =
+<u>Note:</u> The following warnings are not {{project_name_long}} specific issues. They are general issues associated with combining Tor with tunnel-links.
+{{Tunnel-link_Warnings/Common}}
+----
+{{Tunnel/Hiding Tor Usage from ISP}}
+
+= Introduction to Lantern =
+[https://getlantern.org/en_US/index.html Lantern] is a censorship circumvention tool which can provide an alternative to Tor [[bridges]]. The design is similar to a VPN and encrypts all of a user's data through their servers and then proxies blocked sites. Note that Lantern in isolation is not an anonymity tool because it is ''technically'' possible to spy on user activity under this model. Another downside is that bandwidth limits also exist for non-subscribers: <ref>https://getlantern.org/en_US/faq.html</ref>
+
+<blockquote>Lantern is designed to provide you with fast unfettered access to information online. Lantern is secure and encrypts your connection to blocked sites, but it is not an anonymity tool, so if you need or would like to be anonymous online, please use Tor. Otherwise, Lantern will give you faster access to blocked sites. ... To keep our free version running, we implemented a bandwidth limitation of 500 MB/ month. When the bandwidth limit is reached, the connection is slowed down and Free users are prompted to upgrade to Lantern Pro.</blockquote>
+
+After bandwidth limits are reached the connection slows down to approximately 20KB/s, making Lantern virtually unusable. In order to remove this restriction, users must pay for the 'Lantern Pro' service. <ref>In early-2019, this costs $32 (USD) for one year, or $48 (USD) for two years.</ref> The available options mean any payment is likely traceable, but this is not necessarily any more 'damaging' to privacy and/or anonymity than connecting to Lantern in the first place. <ref>This is because advanced adversaries can discover that a user connected to Lantern (via logs), and [[Hide Tor from your Internet Service Provider|pluggable transports]] are incapable of successfully hiding Tor use in all cases. Therefore, a payment trail simply acts as another confirmation mechanism and is not necessarily 'worse' under the circumstances.</ref> Interested readers can learn more at the [https://groups.google.com/g/lantern-users-en Lantern forums] and [https://github.com/getlantern/lantern/wiki/%5Bdevelopers%5D-Questions-and-Answers develeopers Q&A].
+
+= Connecting to Lantern before Tor =
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Testers only! [[{{q_project_name_short}}|{{q_project_name}}]] only! <ref>[[{{non_q_project_name_short}}|{{non_q_project_name}}]] is [[unsupported]] at present.</ref>
+}}
+It is possible to configure Tor to use Lantern as a proxy to establish the following tunnel: <code>User</code> &rarr; <code>Lantern</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>
+
+Before applying the following instructions, it is recommended to first read:
+
+* [[Tunnels/Introduction|Combining Tunnels with Tor]]
+* Current limitations discussed in [https://www.whonix.org/blog/connecting-to-lantern-before-tor this blog post / forums discussion].
+
+{{Box|text=
+'''1.''' Create a new standalone ProxyVM called <code>Lantern-Gateway</code> based on the <code>debian-{{Stable_project_version_based_on_Debian_version_short}}</code> template.
+
+'''2.''' Unload all firewall rules in <code>Lantern-Gateway</code> ProxyVM.
+
+{{Firewall_Unload_Home_Folder}}
+
+'''3.''' Disable IP Forwarding in the <code>Lantern-Gateway</code> ProxyVM.
+
+This should be disabled since it is not required.
+
+<pre>
+sudo sysctl -w net.ipv4.ip_forward=0
+</pre>
+
+'''4.''' Install a missing Lantern dependency. <ref>
+[https://github.com/getlantern/lantern/issues/4836 Lack of a dependency declaration when installing Lantern on Debian] - broken link.
+</ref>
+
+<pre>
+sudo apt install libappindicator3-1
+</pre>
+
+'''5.''' Download and install Lantern.
+
+Check if the path to the downloadable deb file is still correct. Navigate to https://getlantern.org/ and check for Linux desktop downloads.
+
+{{CodeSelect|code=
+curl {{Curl_Secure}} https://s3.amazonaws.com/lantern/lantern-installer-beta-64-bit.deb --output ~/lantern-installer-beta-64-bit.deb
+}}
+
+Install Lantern. <ref>
+* Proper Debian deb package: https://github.com/getlantern/lantern/issues/4837
+* Debian APT repository with Lantern: https://github.com/getlantern/lantern/issues/4837
+* Add Lantern to official Debian repositories: https://github.com/getlantern/lantern/issues/4837
+* Debian Lantern [https://wiki.debian.org/RFP RFP (request for packaging)]: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=828932
+</ref>
+
+<pre>
+sudo dpkg -i ~/lantern-installer-beta-64-bit.deb
+</pre>
+
+'''6.''' Launch Lantern and configure HTTP proxy requests.
+
+Start Lantern while listening on all, not just the internal, network interfaces so it is reachable from <code>{{project_name_gateway_vm}}</code>.
+
+Let Lantern listen for HTTP proxy requests.
+<pre>
+lantern -addr 0.0.0.0:8787
+</pre>
+Or let Lantern listen for SOCKS5 proxy requests which is preferred.
+<pre>
+lantern -socksaddr 0.0.0.0:8788
+</pre>
+
+<ref>
+In <code>Lantern-Gateway</code>, check if Lantern's HTTP port is functional.
+
+{{CodeSelect|code=
+curl {{Curl_Secure}} --proxytunnel --proxy 127.0.0.1:8788 https://check.torproject.org
+}}
+
+In <code>Lantern-Gateway</code>, check if Lantern's SOCKS port is functional.
+
+{{CodeSelect|code=
+curl {{Curl_Secure}} --socks5-hostname socks5h://127.0.0.1:8788 https://check.torproject.org
+}}
+</ref>
+
+'''7.''' Change <code>{{project_name_gateway_vm}}</code> NetVM settings.
+
+Shut down <code>{{project_name_gateway_vm}}</code> if it is running. Set the <code>{{project_name_gateway_vm}}</code> NetVM to <code>Lantern-Gateway</code>, then restart <code>{{project_name_gateway_vm}}</code>.
+
+It is also encouraged to run various Tor tests at this step; see footnote. <ref>
+In <code>{{project_name_gateway_vm}}</code>, test if Tor is able to connect to the HTTP proxy that Lantern is providing.
+
+{{CodeSelect|code=
+{{Curl_Plain}} {{Curl_Secure}} --proxytunnel --proxy 10.137.11.1:8788 https://check.torproject.org
+}}
+
+In <code>{{project_name_gateway_vm}}</code>, test if Tor is able to connect to the SOCKS proxy that Lantern is providing.
+
+{{CodeSelect|code=
+{{Curl_Plain}} {{Curl_Secure}} --socks5-hostname socks5h://10.137.11.1:8788 https://check.torproject.org
+}}
+</ref>
+
+'''8.''' Edit the Tor configuration file in <code>{{project_name_gateway_vm}}</code>.
+
+{{Open_/usr/local/etc/torrc.d/50_user.conf}}
+
+Depending on the proxy type configured at step 6, add the relevant setting below. <ref>SOCKS is considered to be better. According to [https://github.com/getlantern/lantern/issues/2075 this issue], Lantern already has SOCKS support. Open issues: https://github.com/getlantern/lantern/issues/4838
+
+<pre>
+Socks5Proxy 10.137.11.1:8788
+</pre>
+</ref> <ref>
+Setup should now be easier (less need for IP changes) because Qubes has implemented [https://github.com/QubesOS/qubes-issues/issues/1477 optional static IP addresses].
+</ref>
+
+<code>10.137.11.1</code> is just an example and it must be replaced with the IP of the <code>Lantern-Gateway</code> ProxyVM. To discover the <code>Lantern-Gateway</code> ProxyVM IP, run the following command in <code>{{project_name_gateway_vm}}</code>:
+<code>qubesdb-read /qubes-gateway</code>
+
+<pre>
+HTTPSProxy 10.137.11.1:8787
+</pre>
+
+<pre>
+Socks5Proxy 10.137.11.1:8788
+</pre>
+
+'''9.''' Reload Tor.
+
+{{Reload_Tor}}
+
+The procedure is complete and Tor will now use Lantern as a proxy.
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

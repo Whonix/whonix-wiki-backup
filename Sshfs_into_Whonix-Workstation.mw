@@ -1,0 +1,191 @@
+{{Title|title=SSHFS into Whonix-Workstation}}
+{{Header}}
+{{#seo:
+|description=Mount {{project_name_workstation_long}} files on your Host using sshfs
+|image=Sshfs.jpg
+}}
+[[image:Sshfs.jpg|thumb]]
+= Introduction =
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = <u>Note</u>: this is intended for developers/experts only!
+}}
+
+This wiki chapter should only be used for debugging purposes.
+
+= SSHFS Procedure =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Only complete these steps once.
+}}
+
+== Add Membership ==
+
+Perform these steps on the host.
+
+If you are not already a member of the fuse group, add yourself.
+
+{{CodeSelect|code=
+sudo adduser `whoami` fuse
+}}
+
+If you were not already a member, this message will appear.
+
+<pre>
+Adding user `user' to group `fuse' ...
+Adding user user to group fuse
+Done.
+</pre>
+
+And should reboot. <ref>If not, restarting X may also work.</ref>
+
+If this message appears.
+
+<pre>
+The user `user' is already a member of `fuse'.
+</pre>
+
+Then you are already a member of the fuse group and do not have to reboot.
+
+== Import {{project_name_long}} VMs ==
+
+Perform these steps on the host.
+
+* import {{project_name_gateway_long}}
+* import {{project_name_workstation_long}}
+
+== Modify the {{project_name_gateway_long}} VM ==
+
+Perform this step on the host.
+
+Be careful if you did not name your VM "{{project_name_gateway_short}}"!
+
+{{CodeSelect|code=
+VBoxManage modifyvm "{{project_name_gateway_short}}" --natpf1 "ssh",tcp,127.0.0.1,2200,,22 ; echo $?
+}}
+
+If there is an error, the following message will appear.
+
+<pre>
+VBoxManage: error: The machine '{{project_name_gateway_short}}8.1' is already locked for a session (or being unlocked)
+VBoxManage: error: Details: code VBOX_E_INVALID_OBJECT_STATE (0x80bb0007), component Machine, interface IMachine, callee nsISupports
+Context: "LockMachine(a&rarr;session, LockType_Write)" at line 377 of file VBoxManageModifyVM.cpp
+1
+</pre>
+
+If the procedure is successful, the following message will appear.
+
+<pre>
+0
+</pre>
+
+== Update and Install OpenSSH ==
+
+Perform these steps on both {{project_name_gateway_long}} <u>and</u> {{project_name_workstation_long}}.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+{{CodeSelect|code=
+sudo apt install openssh-server
+}}
+
+== Open Ports ==
+
+Perform these steps on both {{project_name_gateway_long}} <u>and</u> {{project_name_workstation_long}}.
+
+{{CodeSelect|code=
+echo 'EXTERNAL_OPEN_PORTS+=" 22 "' {{!}} sudo tee -a "/etc/whonix_firewall.d/50_user.conf"
+}}
+
+{{CodeSelect|code=
+sudo whonix_firewall
+}}
+
+== Open an SSH Connection ==
+
+Perform these steps on {{project_name_gateway_long}}.
+
+{{CodeSelect|code=
+ssh.anondist-orig 10.152.152.11
+}}
+
+Yes (accept fingerprint).
+
+Terminate the SSH connection.
+
+{{CodeSelect|code=
+exit
+}}
+
+== Troubleshooting ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = If SSH is used on the host for other purposes, it might be better to switch to an extra user.
+}}
+
+If necessary, these steps should be performed on the host.
+
+Try the following if you experience problems. This might not be necessary; so <u>think first</u>!
+
+{{CodeSelect|code=
+killall ssh
+}}
+
+{{CodeSelect|code=
+killall sshfs
+}}
+
+There also seems to be a bug with existing SSH known_hosts files; try these steps if you experience problems. This might not be necessary; so <u>think first</u>!
+
+The "rm" command can be used instead if you know what you are doing.
+
+{{CodeSelect|code=
+trash-put ~/.ssh/known_hosts
+}}
+
+{{CodeSelect|code=
+trash-put ~/.ssh/known_hosts.old
+}}
+
+Or.
+
+{{CodeSelect|code=
+#rm ~/.ssh/known_hosts
+}}
+
+{{CodeSelect|code=
+#rm ~/.ssh/known_hosts.old
+}}
+
+== Create Necessary Folders ==
+
+Perform this step on the host.
+
+{{CodeSelect|code=
+mkdir ~/mountworkstation
+}}
+
+= SSHFS into {{project_name_workstation_long}} =
+
+Perform these steps on the host.
+
+{{CodeSelect|code=
+ssh -f user@127.0.0.1 -p 2200 -L 2222:10.152.152.11 :22 -N
+}}
+
+{{CodeSelect|code=
+sshfs -p 2222 user@127.0.0.1:/ ~/mountworkstation
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

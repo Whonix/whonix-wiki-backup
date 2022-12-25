@@ -1,0 +1,162 @@
+{{Header}}
+
+== Covert Channels ==
+
+This page is a brain-dump all known covert channels and mitigation ideas. A brushed up version for users will be written later when countermeasures are deployed.
+
+See also:<br />
+[[Advanced Deanonymization Attacks]]
+
+ticket:<br />
+[https://phabricator.whonix.org/T540 Covert Channels Meta Ticket]
+
+=== Topics ===
+
+
+Intro
+
+choices: Some can be eliminated outright, Other channels need to be degraded sufficiently). Good news is it is possible to defend against them all but not without cost.
+
+
+All problems linked (keystroke dynamics, cpu-induced network latency, TCP ISN CPU temp-induced timer skew, DRAMA cross-vm keystroke monitoring, cpu-cache crypto sidechannels).
+
+covert channels are part of TEMPEST category of attacks. Cryptographers had to deal with them forever but they pose serious problems for systems aiming to isolate untrusted malicious processes. They can be classified as snooping on activity outside a VM or being able to communicate secretly with the outside world.
+
+
+***
+
+keystroke fingerprinting:
+
+
+Excellent paper on covert channels in general:
+
+https://www.usenix.org/legacy/events/sec06/tech/shah/shah_html/jbug-Usenix06.html
+
+cpu stress solution for keystrokes? not effective
+
+
+
+Question: How to delay keystrokes?:
+
+https://stackoverflow.com/a/33134735
+
+Answer: funnel all system input events through a local network interface which you inject random latency in. On host so its system wide.
+
+uinput is the kernel input device API but needs C expertise to write a program to do this directly.
+
+
+
+usbip? - in mainline.
+--Not a solution for PCI input devices - most of PCs.
+
+network latency: iperf stress tool or Ethan's netfilter_queue soltion
+
+alternatives:
+https://superuser.com/questions/67659/linux-share-keyboard-over-network
+https://unix.stackexchange.com/questions/46363/share-keyboard-over-network-as-separate-device
+https://github.com/Blub/netevent/wiki/Share-devices-over-the-net
+
+netevent cobbles netcat host/client together. set on loopback. Run as service with client as localhost. Apply netfilter_queing on loopback to introduce random delays. Pros: kernel solution, display server agnostic. (It uses uinput interface to capture all events)
+
+
+New research results on obfuscation - no working tool. Contact them and ask if they can write one?
+
+https://github.com/vmonaco/keystroke-obfuscation
+
+https://github.com/vmonaco/keystroke-obfuscation/issues/1
+
+
+***
+
+
+block tcp isn firewall? rewrite tcp isn?
+
+Not possible and needed for security anyway. Are a part of all modern OSs
+
+https://events.ccc.de/congress/2006/Fahrplan/attachments/1211-23c3hotornotpres.pdf
+
+https://events.ccc.de/congress/2006/Fahrplan/events/1513.en.html
+
+https://events.ccc.de/congress/2005/fahrplan/events/798.en.html
+
+https://murdoch.is/papers/ccs06hotornot.pdf
+
+https://murdoch.is/talks/eurobsdcon07hotornot.pdf
+
+
+https://www.lightbluetouchpaper.org/2006/09/04/hot-or-not-revealing-hidden-services-by-their-clock-skew/
+
+
+23C3 Slide 30:
+
+Run CPU at full load
+Inefficient  and  must  be  done  with
+care  since  different  types  of  tasks
+can  have  varying  temperature  ef-
+fects
+
+CPU stress must be full load - (what about c-states and temp? Is there a technique less damaging to hardware?) - mitigation for TCP ISN. Maintains constant CPU temperature hence foils skew patterns in timers/crystal clock.
+
+on host out of reach of malicious code in vm.
+
+
+***
+
+cpu activity induced latency:
+
+QoS solution by Ethan White
+
+Concept originally proposed in 23C3 slides and has now been realized.
+
+Status: Awaiting deployment as a host and GW package.
+
+
+***
+
+
+very dangerous - process in anon vm can sniff keystrokes in other vms unmasking and stealing user data. /Scenario: JS in browser can pull this off:
+
+https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/pessl
+
+Test PoC:
+https://github.com/IAIK/drama
+
+memory stress - DRAMA attack mitigation
+
+stress-m2
+in parallel (i.e., the attacker’s core is under stress) made any measurements impossible. While
+no false positive detections occurred, only 9 events were correctly detected. Thus, our attack is susceptible to
+noise especially if the attacker only gets a fraction of
+CPU time on its core.
+
+
+NUMA combined with CPU pinning also described as valid mitigation. Problem is NUMA environments exist for server systems only for the most part.
+
+on host out of reach of malicious code in vm.
+
+
+"In
+this attack, the spy and the victim can run on sepa-
+rate CPUs and do not share memory,
+i.e.
+, no access
+to shared libraries and no page deduplication between
+VMs. "
+
+
+***
+
+crypto side channels:
+
+vcpu pinning to physical to guarantee no cross cache attacks on cryptoand make other attacks harder.
+
+***
+
+See also:<br />
+[[Advanced Deanonymization Attacks]]
+
+ticket:<br />
+[https://phabricator.whonix.org/T540 Covert Channels Meta Ticket]
+
+{{Footer}}
+[[Category:Development]]

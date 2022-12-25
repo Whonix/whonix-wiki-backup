@@ -1,0 +1,382 @@
+{{Header}}
+<!--
+Copyright:
+
+   {{project_name_long}} Download wiki page Copyright (C) Amnesia <amnesia at boum dot org>
+   {{project_name_long}} Download wiki page Copyright (C) 2014 Patrick Schleizer <adrelanos@whonix.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to:
+
+    Free Software Foundation, Inc.
+    51 Franklin St, Fifth Floor
+    Boston, MA 02110-1301, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License can be found in the /usr/share/common-licenses' directory.
+
+The complete text of the GNU General Public License can also be found online on gnu.org <https://www.gnu.org/licenses/gpl.html>, in {{project_name_long}} virtual machine images in /usr/share/common-licenses/GPL-3 file or on Github <https://github.com/{{project_name_short}}/derivative-maker/blob/master/GPLv3>.
+-->
+<!--
+This wiki page is a fork of the Tails Why Tor page, from this exact source <https://git-tails.immerda.ch/tails/tree/wiki/src/doc/about/tor.mdwn?id=0711acb611042850264302d7687d009343afe287>.
+-->
+{{#seo:
+|description=Why does {{project_name_long}} use Tor?
+|image=Whonix-4x-tor.jpg
+}}
+{{other_networks_mininav}}
+[[File:Whonix-4x-tor.jpg|thumb|Tor uses 4 servers thanks to [[vanguards]].]]
+[[File:Onion_diagram.svg.png|thumb|[[#Onion-Layered Encryption|Tor Onion Encryption Layers Diagram]] ([[#onion_diagram_license|license]])]]
+[[File:Tor-logo.png|thumb|Tor logo]]
+[[File:Osi standard logo 0.png|thumb|Tor is Open Source / Freedom Software.]]
+{{#widget:Icon_Bullet_List
+
+|addClass=minimal margin-bottom-20
+
+|fontSize=17px
+
+|item=fas fa-check cs-green,{{project_name_long}} uses Tor because it is the best anonymity network available today.
+
+|item=fas fa-check cs-green,Multiple server hops. Shared IP addresses. Route randomization. No logs architecture. Anonymity by design. Need to know architecture. Onion-layered encryption. Stream isolation.
+
+|item=fas fa-check cs-green,Tor is Open Source&comma; Freedom Software&comma; has partnered with leading research institutions and been subject to intensive academic research.
+
+}}
+== Introduction ==
+Tor a software providing anonymity on the internet. Thousands of volunteers are running computer servers that keep users anonymous on the Internet. It works by directing the user's internet connection through multiple Tor servers, called Tor relays. The role of each server is to move that data to another server, with the final hop moving data to the end site.
+
+== IP Cloaking ==
+On the internet, the user's [[Data_Collection_Techniques#IP_Address|IP address]] acts as a globally unique identifier that is commonly used to track all of the user's activity. In simple terms, Tor is an IP cloak. Tor hides the user's IP address.
+
+Tor does that by replacing the user's real IP address with an IP of a Tor exit relay server. When using Tor, websites visited by the user, can only see the IP address of the Tor exit relay. The website can not see the user's real IP address.
+
+== Multiple Server Hops ==
+[[File:Whonix_connection_design_vanguards.jpg|thumb|
+In the past, Tor used 3 servers. Nowadays Tor uses 4 servers, thanks to [[vanguards]].
+]]
+
+Number of servers between the user and the destination:
+
+* '''Past:'''  In the past, there used to be 3 hops. A chain of 3 servers. In other words, there used to be 3 servers between the user and the destination shielding the user's IP address.
+* '''Nowadays:''' Nowadays inside {{project name long}} thanks to [[vanguards]], which is installed by default in {{project name long}}, the number of Tor relays is at least <u>4</u>.
+
+== Shared IP Addresses ==
+When vising websites using Tor, the Tor exit relay necessarily needs to know the server which the user is connecting to. This is for technical reasons. Otherwise the user could not visit the website. Thanks to Tor's [[#Need to Know Architecture|need to know architecture]], the Tor exit relay does not know the user's IP address, let alone identity.
+
+Tor exit relays are used by thousands of other users at the same time. Therefore thousands of users are sharing the same IP addresses every day. The advantage of this is, that this improves the anonymity for everybody.
+
+== Route Randomization ==
+There are thousands of Tor relays. <ref>
+Only a subset of them can be used as Tor exit relays.
+</ref>
+
+When visiting different websites, for better anonymity, Tor uses different routes through the Tor network. In other words, Tor does not always use the same [[#Multiple Server Hops|4 Tor relays]].
+
+A route that Tor chooses is called a Tor circuit that is used for a limited time for a limited purpose.
+
+The first two Tor relays in a Tor circuit are called Tor entry guards. The third Tor relay is called the middle relay and the fourth Tor relay is called the Tor exit relay.
+
+Tor entry guards selected by Tor are being kept for longer amounts of time because that is more secure according to anonymity research. See also [[Tor Entry Guards]]. The middle relay and exit relay changes more regularity. This makes it harder for snooping spies to track a user.
+
+A Tor circuit is usually used for 10 minutes before Tor automatically changes the Tor circuit. Long running connections that cannot be interrupted (such as the download of a big file or an IRC connection) however are running as long until these are completed.
+
+Tor actually always has multiple different Tor circuits active at the same time. This is related to stream isolation which is elaborated in the next chapter.
+
+== No Logs Architecture ==
+The Tor software run by Tor relays has no IP logging feature that could be turned on. <ref>
+https://tor.stackexchange.com/questions/21721/do-relay-and-entry-nodes-keep-logs
+</ref> Malicious Tor relays would have to add an IP logging feature themselves. Therefore there is no risk for Tor relays to accidentally keep IP logs. The logging features are also designed to sanitize sensitive data in case a user posts them online in bug reports. 
+
+Requesting Tor relays to start logging makes limited sense because of [[#Route_Randomization|route randomization]], jurisdictional friction across multiple countries, unenforceability due to the the voluntary and ephemeral nature of participating running Tor relays in the Tor the network as opposed to running it as a business like VPNs/ISPs which can be regulated by laws in many countries.
+
+The fact that The Tor Project is not in any way related to hosting of relays gives it immunity from from such legal attacks ([[#Organisational_Separation|Organisational Separation]]) since their code design is protected under free speech laws and cannot be compelled to add subversive features like logging or backdoors.
+
+== Stream Isolation ==
+[[File:WhonixStreamIsolation.jpg|thumb]]
+
+For better anonymity, when visiting different websites using multiple browser tabs in [[Tor Browser]] these are using different, isolated network paths (Tor circuits) through the Tor network. <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/3455
+</ref> These Tor circuits are isolated from each other. This is called stream isolation. Also connections to different Tor [[Onion Services]] are automatically stream isolated. <ref>
+https://lists.torproject.org/pipermail/tor-talk/2012-September/025432.html
+</ref>
+
+In {{project name long}}, distinct pre-installed applications are routed through different paths in the Tor network, stream isolated. For example, operating system updates are always isolated from web browsing traffic. These are never sharing the same Tor circuit. This prevents malicious Tor exit relays and other observers <ref>
+Such as the {{isp}} of the Tor exit relay.
+</ref> from correlating all internet activity from the same user to the same pseudonym.
+
+See also [[Stream Isolation]].
+
+== Anonymity Enforcement ==
+
+The {{project_name_long}} Project wants to enforce good security by default for our users. That is why a fundamental {{project_name_long}} design is to force all outgoing traffic through the Tor anonymity network.
+
+After around [https://archives.seul.org/or/dev/Sep-2002/msg00019.html 20 years of development], Tor has become a large network with [https://metrics.torproject.org/torperf.html good throughput] ([http://hctxrvjzfpvmzh2jllqhgvvkoepxb4kfzdjm6h7egcwlumggtktiftid.onion/torperf.html .onion]) and [https://metrics.torproject.org/bandwidth.html a lot of capacity] ([http://hctxrvjzfpvmzh2jllqhgvvkoepxb4kfzdjm6h7egcwlumggtktiftid.onion/bandwidth.html .onion)].
+
+Virtual Private Networks (VPNs) are usually faster than Tor, but [[Whonix_versus_VPNs|VPNs are not designed for anonymity]]. VPN administrators can log both where a user is connecting from and the destination website, breaking anonymity in the process. <ref>
+Promises made by VPN operators are meaningless, since they cannot be verified.
+</ref> '''Tor provides anonymity by design''' rather than policy, making it impossible for a single point in the network to know both the origin and the destination of a connection. Anonymity by design provides a higher standard, since trust is removed from the equation.
+
+When using a VPN, an adversary can break anonymity by monitoring the incoming and outgoing connections of the limited set of servers. On the other hand, the Tor network is formed by over [https://metrics.torproject.org/networksize.html 6000 relays and nearly 2000 bridges] ([http://hctxrvjzfpvmzh2jllqhgvvkoepxb4kfzdjm6h7egcwlumggtktiftid.onion/networksize.html .onion]) run worldwide by volunteers. <ref>
+Admittedly the network has an unknown proportion of malicious relay operators.
+</ref> This makes it far more difficult to conduct successful, end-to-end correlation (confirmation) attacks, although not impossible.
+
+Despite Tor's superiority to VPNs, poisoned Tor nodes pose a threat to anonymity. If an adversary runs a malicious Tor entry guard and exit node in a network of 7,000 relays (2,000 entry guards and 1,000 exit nodes), the odds of the Tor circuit crossing both are around one in 2 million. If an adversary can increase their malicious entry and exit relays to comprise 10 percent of the bandwidth, they could deanonymize 1 percent of all Tor circuits. <ref>
+https://arstechnica.com/information-technology/2016/08/building-a-new-tor-that-withstands-next-generation-state-surveillance/
+</ref>
+
+== User Base ==
+
+Tor has the largest user base of all available anonymity networks. More than [https://metrics.torproject.org/userstats-relay-country.html 2 million users] ([http://hctxrvjzfpvmzh2jllqhgvvkoepxb4kfzdjm6h7egcwlumggtktiftid.onion/userstats-relay-country.html .onion]) connect to Tor daily. Tor's adoption by a substantial audience proves its maturity, stability and usability. It has also led to rapid development and significant community contributions.
+
+Tor is equally used by journalists, law enforcement, governments, human rights activists, business leaders, militaries, abuse victims and average citizens concerned about online privacy. <ref>https://2019.www.torproject.org/about/torusers.html.en</ref> This diversity actually provides stronger anonymity because it makes it more difficult to identify or target a specific profile of Tor user. {{Code2|Anonymity loves company.}} <ref>
+https://www.freehaven.net/anonbib/cache/usability:weis2006.pdf
+</ref>
+
+== Technical Merits and Recognition ==
+
+Tor has partnered with leading research institutions and been subject to intensive academic research. It is the anonymity network which benefits from the most auditing and peer review. For example, see [https://www.freehaven.net/anonbib/ Anonymity Bibliography | Selected Papers in Anonymity].
+
+Tor has received awards from institutions like the [https://www.eff.org/awards/pioneer/2012 Electronic Frontier Foundation] and the [https://www.fsf.org/news/2010-free-software-awards-announced Free Software Foundation], to [https://en.wikipedia.org/wiki/The_Tor_Project#Recognition name a few].
+
+An extract of a Top Secret appraisal by the NSA characterized Tor as "[https://www.theguardian.com/world/interactive/2013/oct/04/tor-high-secure-internet-anonymity the King of high secure, low latency Internet anonymity]" with "no contenders for the throne in waiting". <ref>
+https://boingboing.net/2013/10/04/nsa-and-uk-intel-agency-gchq-t.html
+</ref>
+
+== Need to Know Architecture ==
+The Tor architecture is based on a strict implementation of the need-to-know principle. Each Tor relays in the chain of anonymizing relays has only access to information which are required for its operation. In short:
+
+'''1.''' The first Tor relay knows who you are (your IP address), but not where you are connecting to.
+
+'''2.''' The second Tor relays knows your Tor entry guards, but doesn't know you.
+
+'''3.''' The third knows your second Tor relays, but of course also doesn't know you.
+
+'''4.''' The fourth Tor relay (also called a Tor exit relay) knows your third Tor relay, necessarily needs to know the destination server (such as a website) you're connecting to, but of course has no idea who you are.
+
+The overview below [[#Which Tor relay knows what?|Which Tor relay knows what?]] and [[#Tor Relay Information Awareness|Tor Relay Information Awareness]] are expressing the same principles in different words and formats with more details.
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    =
+
+* <u>3 or more Tor relays:</u> The overview below lists only 3 Tor relays. Entry Guard, Middle Relay and Exit Relay. This has been true in the past. Nowadays thanks to [[vanguards]] however the number of Tor relays is at least 4. The overview below hasn't been rewritten from 3 to 4 relays for better readability, to avoid repetition since the principles are still the same.
+* <u>Tor Entry guards versus Bridges:</u> For better readability, the overview below mentions only Entry Guard, not Entry Guard / Bridges. <u>Only</u> for the purpose of the flowing overview, using a Tor Entry Guard is the same as using a Tor Bridge. For more information on Bridges, whether to use them or net, see [[Bridges]].
+}}
+
+=== Which Tor relay knows what? ===
+
+* Entry Guard
+** knows:
+*** the Tor user's IP/location
+*** middle relay's IP/location
+** doesn't know:
+*** IP/location of exit relay
+*** message for middle relay
+*** message of exit relay
+
+* Middle Relay
+** knows:
+*** IP/location of guard
+*** IP/location of exit relay
+** doesn't know:
+*** Tor user's IP/location
+*** message for exit's relay
+*** message for the guard's relay
+
+* Exit Relay
+** knows:
+*** IP/location of middle relay
+**** content of the message from the user
+***** When not using end-to-end encryption, such as SSL, or if end-to-end encryption is broken (malicious certificate authority, yes happened):
+****** For example it knows some things like:
+******* "Someone wants to know what IP has the DNS name example.com, which is 1.2.3.4."
+******* "Someone wants to view 1.2.3.4."
+******* Date and time of transmission.
+******* When fetching 1.2.3.4: the content of that transmission (how the site looks like).
+******* A pattern, amount of x traffic send from time y to time z.
+******* "Login with username: exampleuser and password: examplepassword."
+****** When using end-to-end encryption:
+******* For example it knows some things like:
+******* "Someone wants to know what IP has the DNS name example.com, which is 1.2.3.4."
+******* "Someone wants to view 1.2.3.4."
+******* Date and time of transmission.
+******* When fetching 1.2.3.4: how much traffic has been transmitted.
+******* A pattern, amount of x traffic send from time y to time z.
+** doesn't know:
+*** Tor user's IP/location
+*** guard's IP/location
+*** message for the guard's relay
+*** message for the middle relay
+
+=== Tor Relay Information Awareness ===
+The information available to each of the Tor relay is summarized below.
+
+'''Table:''' ''Tor Relay Information Awareness'' <ref>
+https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorFAQ#which-tor-node-knows-what
+</ref>
+
+<div class="scroll-table">
+{| class="wikitable"
+|-
+
+! scope="col"| '''Category'''
+! scope="col"| '''Entry Guard'''
+! scope="col"| '''Middle Relay'''
+! scope="col"| '''Exit Relay'''
+|-
+
+! scope="row"| Tor user's IP/location
+| Yes
+| No
+| No
+|-
+
+! scope="row"| IP of Entry Guard
+| Yes
+| Yes
+| No
+|-
+
+! scope="row"| Message for Entry Guard
+| Yes
+| No
+| No
+|-
+
+! scope="row"| IP of Middle Relay
+| Yes
+| Yes
+| Yes
+|-
+
+! scope="row"| Message for Middle Relay
+| No
+| Yes
+| No
+|-
+
+! scope="row"| IP of Exit Relay
+| No
+| Yes
+| Yes
+|-
+
+! scope="row"| Message for Exit Relay
+| No
+| No
+| Yes
+|-
+
+! scope="row"| IP of destination server
+| No
+| No
+| Yes
+|-
+
+! scope="row"| Message for destination server
+| No
+| No
+| Yes
+|-
+
+|}
+</div>
+
+The user's Tor client is aware of all information from above categories. This is because by Tor design, the Tor client plans its Tor circuits (paths through the Tor network).
+
+== Organisational Separation ==
+There is a clean organisational separation between,
+
+* '''A)''' the developers of the Tor software (The Tor Project),
+* '''B)''' the volunteers running the Tor network,
+* '''C)''' and the {{project_name_long}} project.
+
+== Onion-Layered Encryption ==
+For the implementation of the [[#Need to Know Architecture|Need to Know Architecture]] Tor uses multiple layers of encryption.
+
+The message and IP address for the destination server (such as for example a website) is wrapped into at least 4 layers of encryption as illustrated in the following diagram.
+
+'''Figure:''' ''Tor Onion Encryption Layers Diagram ([[#onion_diagram_license|license]])''
+
+[[File:Onion_diagram.svg.png|border|400px|Tor Onion Encryption Layers Diagram ([[#onion_diagram_license|license]])]]
+
+'''1.''' The communication between the locally running Tor client and the user's machine with the first Tor relay is encrypted.
+
+'''2.''' The first Tor relay can only unwrap 1 layer of encryption. The decrypted message includes the IP address of the second relays in the chain and an encrypted message for second relay.
+
+'''3.''' The message is passes through the Tor network from the Tor relay chain (as decided by the user's Tor client) until it reaches the last Tor relay, the Tor exit relay.
+
+'''4.''' The Tor exit relay received a message that includes the IP address of the destination server as well as a message for the destination server.
+
+'''5.''' The actual message for the destination server could be either encrypted or unencrypted. That depends on the application chosen by the user, if:
+
+* <u>Unencrypted:</u> This has in the past been a bigger issue when many websites and applications did not use encryption yet because as mentioned in [[Warning#Exit_Relays_can_Eavesdrop_on_Communications|Warning: Exit Relays can Eavesdrop on Communications]] if unencrypted.
+* <u>Encrypted:</u> In case of an encrypted message, that is called end-to-end encryption which is very much recommended. Most applications nowadays are using end-to-end encryption
+** For example, when browsing the internet, using end-to-end encryption is easily done by using http<code>s</code>. The <code>s</code> stands for secure. http<code>s</code> is nowadays standard. Most websites support http<code>s</code>. Modern browsers such as [[Tor Browser]] have [[Tor_Browser#HTTPS-Only Mode|HTTPS-Only Mode]] enabled by default and would show an ominous warning if http<code>s</code> is unavailable and would abort connecting to the website. See also, [[Tor_Browser#Encryption|Tor Browser, Encryption]].
+** For other applications (such as [[Chat|Instant Messengers]]) is is recommended that the user chooses applications which are known to use encryption. Most modern and Freedom Software applications do. In doubt, the user could attempt to look up the application in [[Documentation]].
+
+== Location Hidden Servers ==
+<div class="mininav">
+* [[Onion Services]]
+* [[Hosting Location Hidden Services]]
+</div>
+
+TODO: expand
+
+== Technical Features ==
+
+Tor provides:
+
+* <code>SocksPort</code>s
+* and can also provide a <code>TransPort</code> that {{project name long}} requires.
+* <code>.onion</code> domain connectivity, which is required by [[sdwdate]].
+* Has <code>/etc/torrc'''.d'''</code> drop-in configuration snippet support.
+* Compatibility with Tor-friendly applications such as [[OnionShare]], cwtch, [[Bisq]], Ricochet IM, [[ZeroNet]], wahay, [[Bitcoin Core]].
+
+TODO: expand
+
+== Relationship between the Tor Project and {{project_name_long}} ==
+
+* The Tor {{Archive_link
+|url=https://2019.www.torproject.org/docs/trademark-faq.html.en
+|text=®
+|archive=none
+}} software is made by [https://www.torproject.org/ The Tor Project].
+* The Tor network is run by a worldwide community of volunteers.
+* {{project_name_long}} is a completely separate project developed by a different [[Contributors|team]].
+* {{project_name_long}} is a complete operating system which uses Tor as its default networking application.
+
+Many people use Tor outside of {{project_name_long}}. Similarly, a significant number use {{project_name_long}} for activities other than accessing the Internet through Tor, for example [[Hosting Location Hidden Services|hosting onion services]], [[I2P|tunnelling I2P through Tor]], [[Features#Tunnel_Support|tunnelling VPNs or other anonymity networks through Tor]], [[Features#{{project_name_long}}_Features|and more]].
+
+== Further Reading ==
+
+* [[Whonix versus VPNs]]
+* [[Whonix_versus_Proxies|Tor vs. Proxies, Proxy Chains]]
+* [[Dev/Anonymity_Network|Anonymity Network Review]]
+<!--
+This wiki page is a fork of the Tails Why is Tor slow page, from this exact source <https://git-tails.immerda.ch/tails/tree/wiki/src/doc/anonymous_internet/why_tor_is_slow.mdwn?id=31b348e2b974555bac5b7457c89c99429c6799cf>.
+-->
+
+= Footnotes =
+{{reflist|close=1}}
+
+= License =
+{{anchor|onion_diagram_license}}
+English Wikipedia user HANtwister, [http://creativecommons.org/licenses/by-sa/3.0/ CC BY-SA 3.0], via [https://commons.wikimedia.org/wiki/File:Onion_diagram.svg File:Onion_diagram.svg Wikimedia Commons]
+
+{{License_Amnesia|{{FULLPAGENAME}}}}
+
+{{Footer}}
+
+[[Category:Documentation]]

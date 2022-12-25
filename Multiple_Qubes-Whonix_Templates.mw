@@ -1,0 +1,254 @@
+{{Header}}
+{{Title|title=
+Multiple Qubes-{{project_name_long}} Templates
+}}
+{{#seo:
+|description=Compartmentalization. Managing multiple {{q_project_name}} Templates.
+|image=Multiplequbeshwonix.jpg
+}}
+{{multiple-vms-mininav}}
+[[image:Multiplequbeshwonix.jpg|thumb]]
+= Introduction =
+
+Multiple [[{{q_project_name_short}}|{{q_project_name}}]] Templates provides much greater flexibility over a single template when choosing software packages. The additional cloned templates can be customized with software to meet specific requirements; something impossible to achieve with a single Template. <ref>Optionally, the default template can be cloned and used as the default template for App Qubes. Having a “known-good” backup template available at all times is best practice.</ref>
+
+= Rationale =
+
+* <u>Packages from a later release</u>: Installing packages from a later release could end up breaking the system. For example, mixing packages from [https://wiki.debian.org/DebianStable Debian Stable] with those of a later release like [https://wiki.debian.org/DebianTesting Debian Testing] can lead to an unstable system because of associated software dependencies required for full functionality. <ref>Using packages from different repositories can lead to {{kicksecure_wiki
+|wikipage=Install_Software#Dependency_Hell
+|text=Dependency Hell
+}}.</ref> <ref>This problem can be avoided by cloning additional {{project_name_long}} templates and preferring packages from a single repository in each Template.</ref> Prior to installing Debian packages from a later release, first read {{kicksecure_wiki
+|wikipage=Install_Software#Install_from_Debian_Testing
+|text=Install from Debian Testing
+}}.
+* <u>Custom software</u>: Additional cloned templates makes it easy to install custom software used for a specific application. For example, users could [[Tunnel UDP over Tor]] by configuring <code>{{project_name_workstation_template}}</code> to route all applications through a VPN tunnel. However, this method also increases the risk of identity correlation. To mitigate this risk, the App Qube based on this template should only be used for the particular application that must be routed through the <i>tunnel-link</i>.  Before installing custom software it is recommended to first read [[Install Software#General_Advice|Install Software: General Advice]].
+* <u>Untrusted packages</u>: It is unwise to install untrusted packages in a template used for sensitive activities. With multiple cloned Templates, a single template can be designated as a less trusted domain for that purpose. <ref>It is strongly encouraged to only install signed packages from a trusted source.</ref> Read [https://www.qubes-os.org/doc/templates/#trusting-your-templates Trusting your templates] prior to installing untrusted packages.
+
+= Cloning Templates =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = '''Note:''' Each Template's root filesystem runs independently from all other Templates. <ref>This applies to all Templates, even if they were cloned.</ref> Therefore, each individual Template must be updated separately. This is a Qubes default and [[unspecific]] to {{q_project_name}}.
+}}
+
+== Qube Manager ==
+
+Cloning templates in [[{{q_project_name_short}}|{{q_project_name}}]] is easily accomplished via Qube Manager.
+
+'''1.''' Naming convention advice.
+
+Be careful with naming conventions for both Templates and App Qubes (based on those templates) so they are not confused with each other. This will minimize the chance of basing an App Qube on the wrong template.
+
+When creating App Qubes based on cloned Templates, a purpose-based naming convention is sensible so there is no ambiguity regarding the intended function of an App Qube. For example, if an App Qube is created to tunnel UDP over Tor, appending <code>tunnel-udp</code> (the purpose) to the end of <code>{{project_name_workstation_vm}}</code> would lead to the name <code>{{project_name_workstation_vm}}-tunnel-udp</code>.
+
+'''2.''' Template cloning.
+
+To clone [[Qubes|{{q_project_name}}]] Templates, follow the steps below in Qube Manager:
+
+<code>Qube Manager</code> &rarr; <code>VM to be Cloned</code> &rarr; <code>Clone qube</code> &rarr; <code>Enter name for Qube clone</code> <br />
+
+'''Figure:''' ''Cloning {{project_name_long}} qubes''
+
+[[Image:Qubesmanagercloning.png]]
+
+When prompted, give the newly cloned VM a name that is not easily confused with other VMs. This minimizes the chances of basing an App Qube on the wrong template; there could be serious security concerns if a "trusted" App Qube was based on the wrong Template with untrusted packages.
+
+'''Figure:''' ''Clone Renaming''
+
+[[Image:Qubeclonerenaming.png]]
+
+'''3.''' Done.
+
+Cloning has been completed.
+
+'''4.''' UpdatesProxy Settings.
+
+The user might wish to customize the [[#UpdatesProxy Settings|UpdatesProxy Settings]].
+
+{{Anchor|Additional Settings}}
+== UpdatesProxy Settings ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    =
+<u>Reminder</u>: The <code>net qube</code> setting of Templates should be set to <code>None</code>. <ref>
+Since Templates in Qubes R4 and above are supposed to be upgraded through qrexec based Qubes updates proxy.
+
+* [https://www.qubes-os.org/doc/how-to-install-software/#technical-details Qubes documentation: How to install software - Technical details]
+* [https://github.com/QubesOS/qubes-issues/issues/1854 Qubes issues: implement qrexec based updates proxy]
+</ref>
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt={{project_name_long}} first time users warning]]
+| text    = A cloned {{project_name_long}} Template will by default be upgraded through <code>{{project_name_gateway_vm}}</code>. <ref>
+Because [https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.UpdatesProxy.policy <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code>] contains:
+{{CodeSelect|code=
+$tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
+}}
+Quote:
+<blockquote>
+Note that policy parsing stops at the first match, [...]
+</blockquote>
+</ref> This is a known Qubes usability issue. <ref>
+* [https://github.com/QubesOS/qubes-issues/issues/3412 add UpdateVM setting to qubes-vm-settings]
+* [https://forums.whonix.org/t/cloned-whonix-templatevm-connects-upgrades-through-{{project_name_gateway_vm}}-even-if-netvm-is-set-to-a-different-whonix-gateway-proxyvm/5840 cloned {{project_name_long}} templateVM connects / upgrades through {{project_name_gateway_vm}} even if net qube is set to a different Whonix-Gateway net qube]
+</ref>
+}}
+
+If you would like to change the UpdatesProxy setting for any Template, apply the following steps. Choose either Option A (stable) or Option B (testers only). In doubt, choose Option A.
+
+=== Option A ===
+
+{{Box|text=
+'''1.''' In dom0, open <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> with root rights.
+
+{{CodeSelect|code=
+sudo nano /etc/qubes-rpc/policy/qubes.UpdatesProxy
+}}
+
+'''2.''' Add <u>at the top of that file</u>.
+
+Syntax:
+
+<pre>
+name-of-template-vm $default allow,target=name-of-net-qube
+</pre>
+
+Example line entry example:
+
+Note: Replace <code>{{project_name_gateway_vm}}-cloned</code> with the actual name of the VM such as for example <code>{{project_name_gateway_vm}}2</code>.
+
+{{CodeSelect|code=
+whonix-ws-{{VersionShort}}-clone-1 $default allow,target={{project_name_gateway_vm}}-cloned
+}}
+
+Full example:
+
+If the user already completed adding above line entry, the following is not required. It's just for illustrative purposes. A complete file could look like this.
+
+{{CodeSelect|code=
+## Note that policy parsing stops at the first match,
+## so adding anything below "$anyvm $anyvm action" line will have no effect
+
+## Please use a single # to start your custom comments
+
+# Upgrade all Templates through {{project_name_gateway_vm}}.
+#$type:TemplateVM $default allow,target={{project_name_gateway_vm}}
+
+# Upgrade whonix-gw-{{VersionShort}}-clone-1 through {{project_name_gateway_vm}}-cloned.
+whonix-gw-{{VersionShort}}-clone-1 $default allow,target={{project_name_gateway_vm}}-cloned
+
+# Upgrade whonix-ws-{{VersionShort}}-clone-1 through {{project_name_gateway_vm}}-cloned.
+whonix-ws-{{VersionShort}}-clone-1 $default allow,target={{project_name_gateway_vm}}-cloned
+
+# Upgrade {{project_name_long}} Templates through {{project_name_gateway_vm}}.
+$tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
+
+# Deny {{project_name_long}} Templates using UpdatesProxy of any other VM.
+$tag:whonix-updatevm $anyvm deny
+
+# Default rule for all Templates - direct the connection to sys-net
+# Note: 'TemplateVM' not only 'Template' is correct. The 'VM' cannot be omitted.
+$type:TemplateVM $default allow,target=sys-net
+
+$anyvm $anyvm deny
+}}
+
+'''4.''' Save the file.
+
+<pre>
+<Ctrl-X> --> press Y --> <Enter>
+</pre>
+
+'''5.''' Done.
+
+The procedure is now complete.
+}}
+
+=== Option B ===
+{{Box|text=
+
+'''1.''' Disable Qubes old-style UpdatesProxy qrexec configuration file.
+
+In dom0, move the Qubes old-style configuration file <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> out of the way. <ref>
+Qubes dom0 configuration folder <code>/etc/qubes-rpc/policy</code> is legacy. It was replaced with the new-style qrexec config folder <code>/etc/qubes/policy.d/</code> which is used here in the documentation. This is [[unspecific|unspecific to {{project name long}}.
+</ref>
+
+If there is an error that this file no longer exists that is OK too. The only purpose of this step is to make sure <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> no longer exists.
+
+{{CodeSelect|code=
+sudo mv /etc/qubes-rpc/policy/qubes.UpdatesProxy ~/
+}}
+
+'''2.''' In dom0, open <code>/etc/qubes/policy.d/30-user.policy</code> with root rights.
+
+{{CodeSelect|code=
+sudo nano /etc/qubes/policy.d/30-user.policy
+}}
+
+'''3.''' Add.
+
+Syntax: <ref>
+This works because as per Qubes default, Qubes parses configuration file <code>/etc/qubes/policy.d/30-user.policy</code> before <code>/etc/qubes/policy.d/90-default.policy</code>.
+
+See also Qubes dom0 file <code>/etc/qubes/policy.d/90-default.policy</code>.
+
+{{CodeSelect|code=
+cat /etc/qubes/policy.d/90-default.policy
+}}
+
+<code>/etc/qubes/policy.d/90-default.policy</code> comes with the following comment on top.
+
+<pre>
+## Do not modify this file, create a new policy file with a lower number in the
+## filename instead. For example `30-user.policy`.
+</pre>
+</ref>
+
+<pre>
+qubes.UpdatesProxy      *   name-of-template-vm    @default    allow target=name-of-net-qube
+</pre>
+
+Example line entry example:
+
+Note: Replace <code>{{project_name_gateway_vm}}-cloned</code> with the actual name of the VM such as for example <code>{{project_name_gateway_vm}}2</code>.
+
+{{CodeSelect|code=
+qubes.UpdatesProxy      *   whonix-ws-{{VersionShort}}-clone-1    @default    allow target={{project_name_gateway_vm}}-cloned
+}}
+
+Full example:
+
+If the user already completed adding above line entry, the following is not required. It's just for illustrative purposes. A complete file could look like this.
+
+{{CodeSelect|code=
+qubes.UpdatesProxy      *   whonix-gw-{{VersionShort}}-clone-1    @default    allow target={{project_name_gateway_vm}}-cloned
+qubes.UpdatesProxy      *   whonix-ws-{{VersionShort}}-clone-1    @default    allow target={{project_name_gateway_vm}}-cloned
+}}
+
+'''4.''' Save the file.
+
+<pre>
+<Ctrl-X> --> press Y --> <Enter>
+</pre>
+
+'''5.''' Done.
+
+The procedure is now complete.
+}}
+
+= See Also =
+
+{{multiple-vms-mininav}}
+
+* [[{{project_name_gateway_short}}|{{project_name_gateway_short}}]]
+* [[{{project_name_workstation_short}}|{{project_name_workstation_short}}]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,53 @@
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Prior to installing [https://packages.debian.org/{{Debian_Codename_Unstable}}/{{{package}}} <code>{{{package}}}</code>] from Debian <code>unstable</code> read [[Install_Software#Install_from_Debian_unstable|Install software from Debian unstable]] to understand the risks involved and circumvention options. Mixing packages from Debian <code>stable</code> with later release packages like Debian <code>unstable</code> can lead to [[Install_Software#Dependency_Hell|instability]]. <ref>Due to these risks, it is recommended to utilize [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] before installing the package.</ref>
+}}
+{{Box|text=
+'''1.''' {{Open_a__product_ws_terminal}}
+
+'''2.''' In {{project_name_workstation_long}} (<code>{{project_name_workstation_template}}</code> [[Qubes|{{q_project_name}}]]) konsole, add Debian stable codename <code>{{Stable_project_version_based_on_Debian_codename}}</code> to the <code>apt-conf</code> <i>default-release</i>.
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'APT::Default-Release {{Stable_project_version_based_on_Debian_codename}};' > /etc/apt/apt.conf.d/70defaultrelease"
+}}
+
+'''3.''' Add the current Debian unstable codename <code>{{Debian_Codename_Unstable}}</code> to <i>sources.list.d</i>.
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb https://deb.debian.net/debian {{Debian_Codename_Unstable}} main' > /etc/apt/sources.list.d/unstable.list"
+}}
+
+Or alternatively use the <i>.onion</i> mirror.
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb tor+http://{{Debian_onion}}/debian {{Debian_Codename_Unstable}} main' > /etc/apt/sources.list.d/unstable.list"
+}}
+
+'''4.''' [[Operating_System_Software_and_Updates#Updates|Update]] the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''5.''' Install {{{package}}} from the current Debian unstable codename <code>{{Debian_Codename_Unstable}}</code> repository.
+
+{{CodeSelect|code=
+sudo apt install {{{package}}}/{{Debian_Codename_Unstable}}
+}}
+
+'''6.''' Undo.
+
+On occasion it is necessary to undo this configuration, for example when upgrading from Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> to <code>{{Debian_Codename_Testing}}</code>. <ref>Most often this step applies before attempting major {{project_name_long}} upgrades; upgrade instructions are also made available at that time (see [[Stay_Tuned|Follow {{project_name_long}} Developments]]).</ref> To proceed, run.
+
+Delete Debian testing repository list.
+
+{{CodeSelect|code=
+sudo rm /etc/apt/sources.list.d/unstable.list
+}}
+
+Delete apt Default-Release configuration.
+
+{{CodeSelect|code=
+sudo rm /etc/apt/apt.conf.d/70defaultrelease
+}}
+}}

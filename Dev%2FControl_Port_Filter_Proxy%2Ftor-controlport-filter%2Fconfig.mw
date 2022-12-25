@@ -1,0 +1,553 @@
+{{Header}}
+{{#seo:
+|description=Control Port Filter Proxy - filtering dangerous Tor Control Port commands - Design Documentation
+}}
+
+__TOC__
+
+----
+
+==== Use Case ====
+{{project_name_long}} by default needs to ship some default config so {{project_name_long}} deployed in its default setup will work out of the box. <code>30_whonix.conf</code>
+
+Now, sometimes users want to modify the config that {{project_name_long}} is provided by default. Either by the user changing the setting themselves or by installing some package that changes the config.
+
+The problem is, we really don't want users to modify <code>30_whonix.conf</code>. This is because, next time {{project_name_long}} is updated, we might need to modify <code>30_whonix.conf</code>. If both, the user and {{project_name_long}} wants to modify that file, it won't work. apt/dpkg will throw an interactive conflict resolution dialog, asking the user to keep its user modified version or the new {{project_name_long}} version or to manually merge these changes. This usually confuses users. If they keep their old file, something might not work. If they install the new config by {{project_name_long}}, they loose their settings. And merging the files is difficult during upgrading for users. Also it makes the upgrade process interactive rather than easy non-interactive.
+
+Also other packages who want to extend onion-grater config must not modify <code>30_whonix.conf</code>. dpkg does not allow another package to modify an existing file on the system. (without hacks such as dpkg-divert which should be avoided due to issues) And some echo/sed style replacement by the new package would also throw an interactive dpkg confict resolution dialog when {{project_name_long}} is updated. echo/sed style config file modifications are a Debian policy violation as well.
+
+{{project_name_long}} will ship by default a locked down config. Opening as little attack surface as possible. If users want to use other functions such as [[OnionShare]] they need to compromise security. They need to allow additional Tor control protocol commands so their application such as OnionShare can work.
+
+----
+
+==== on various .d style implementation flavors ====
+Different software packages such as apt vs grub all implement their '.d' folders a bit differently. They're most times sources in lexical order and the new convention is to only use configs ending with '.conf'.
+
+* For example for <code>/etc/grub.d</code> lets one add additional boot menu entries. It however does not allow (without bad hacks) to remove/modify existing boot menu entries.
+
+* <code>/etc/default/grub.d</code> lets users (and packages) change global grub settings. Such as <code>/etc/default/grub.d/30_debian.conf</code> could say <code>resolution=640x480</code> (made up that variable name for the sake of an example) and <code>/etc/default/grub.d/50_user.conf</code> <code>resolution=1024x768</code>. Ultimately <code>resolution=1024x768</code> would win.
+
+* With <code>/etc/default/grub.d</code> it is also possible to unset changes. (I think.) <code>/etc/default/grub.d/60_test.conf</code> could say <code>resolution=</code>. So <code>resolution=</code> would win.
+
+* <code>/etc/bashrc.d</code> does something like this
+
+<pre>
+for file_name in /etc/bashrc.d ; do
+   source "$file_name"
+done
+</pre>
+
+* For <code>/etc/onion-grater-merger.d</code> configuration drop-in folder which is configuration language wise complicated enough, best we can do is merging all config files.
+** This means, higher priority config files will probably not be able to disable settings my lower priority config files. However, that should not matter. At the moment there is no use case where this would be useful.
+** While <code>30_whonix.conf</code> comes by default, {{project_name_long}} user documentation will explain how to get [[OnionShare]], ricochet etc. to work.
+** For OnionShare for example we can just say symlink <code>/usr/share/doc/onion-grater-merger/examples/40_onionshare.yml</code> to <code>/usr/local/etc/onion-grater-merger.d/</code>.
+*** {{CodeSelect|code=
+sudo ln -s /usr/share/doc/onion-grater-merger/examples/40_onionshare.yml /usr/local/etc/onion-grater-merger.d/
+}}
+** Similar for other applications such as ricochet etc.
+** So users who just have both <code>50_onionshare.conf</code> and <code>50_ricochet.conf</code> can use both programs.
+** Running commands, creating files and pasting stuff is usually something that users easily understand. What they don't easily understand is to explain "open file <code>30_whonix.conf</code> and then inject X at that line and Y and that line etc.".
+
+----
+
+==== How ====
+onion-grater in {{project_name_long}} cannot filter per application. {{project_name_gateway_long}} does not have access to the program name it is talking to it. Therefore onion-grater in {{project_name_long}} can only have one global whitelist. However, that global whitelist can be split into multiple files.
+
+Configuration drop-in snippets are processes in lexical order.
+
+* <code>/etc/onion-grater-merger.d</code> gets processed first (lower priority)
+* <code>/usr/local/etc/onion-grater-merger.d</code> gets processed second (higher priority)
+
+pseudo code in shell / bash:
+
+<pre>
+for file_name in /etc/onion-grater-merger.d/*.yml ; do
+   file_list="$file_list $file_name"
+done
+
+for file_name in /usr/local/etc/onion-grater-merger.d/*.yml ; do
+   file_list="$file_list $file_name"
+done
+
+for item in $file_list ; do
+   source "$item"
+done
+</pre>
+
+----
+
+==== match-exe-paths ====
+{{project_name_long}} is currently using the following.
+
+<pre>
+ match-exe-paths:
+   - '*'
+</pre>
+
+This is because that information gets lost during the workstation &rarr; gateway transfer. Hard to have it both ways at the same time. One one hand, fine tuned restricted application white lists (which are great). And at the same time at the other hand the {{project_name_long}} workstation &rarr; gateway split model.
+
+----
+
+==== match-users ====
+<pre>
+  match-users:
+    - '*'
+</pre>
+
+Same as above.
+
+----
+
+==== match-hosts ====
+{{project_name_long}} is currently using the following.
+
+<pre>
+  match-hosts:
+    - '*'
+</pre>
+
+Using something other than <code>*</code> is not possible in {{project_name_long}}. <ref>
+More fine tuned control however would be desirable. A user using multiple {{project_name_workstation_long}} could configure the "default" match host <code>*</code> for Tor Browser / whonixcheck. And then configure another workstation (with IP <code>10.152.152.12</code> with <code>match-hosts '10.152.152.12'</code>.
+</ref>
+
+----
+
+==== variables at the python level ====
+For python everything in a yaml file is a _recursive_ key value pair. E.g.
+
+<pre>
+{'match-exe-paths:',''*''}
+</pre>
+
+<pre>
+{'Command','a bunch of key value pairs'}
+{'Command','{'SIGNAL',NEWNYM},{'SAVECONF',CRLF}',....}
+</pre>
+
+<pre>
+{'events',bunch of key value pairs}
+{'events',{'SIGNAL',another key value pair},{'CONF_CHANGED',another key value pair},....}
+{'events',{'SIGNAL',{'suppress',false}},{'CONF_CHANGED',{'suppress',false}},....}
+</pre>
+
+----
+
+==== overwriting vs merge/union ====
+* 1) *overwriting *a "value" for a key
+* b) *keeping both* the "value"s for a single key - i.e. merge/union them.
+
+----
+
+==== Current Rules Implemented in onion-grater-merger ====
+We will merge/unionise in all cases except
+
+* 1) <code>{suppress, true/false}</code> - Will be overwritten
+* 2) <code>{match-hosts, ipaddress}</code> - Will be overwritten
+* 3) <code>{match-exe, '*'}</code> - overwrite with <code>*</code> always
+* 4) <code>{match-user,'*'}</code> - overwrite with <code>*</code> always
+* 5) If Response: Pattern is same, then overwrite values of the "replacement" [ else, merge]
+
+Typically, everything is key value pair. What we should do with "value", depends upon *its* "key".
+But in case of #5, what we do with "replacement"s value depends on the value of previous element "pattern".
+
+----
+
+==== suppress overwriting example ====
+<code>1_file.yml</code>:
+
+<pre>
+  events:
+    SIGNAL:
+      suppress: true
+    CONF_CHANGED:
+      suppress: true
+</pre>
+
+<code>2_file.yml</code>:
+
+<pre>
+  events:
+    SIGNAL:
+      suppress: true
+    CONF_CHANGED:
+      suppress: false
+</pre>
+
+<code>merged_file.yml</code>:
+
+<pre>
+  events:
+    SIGNAL:
+      suppress: true
+    CONF_CHANGED:
+      suppress: false
+</pre>
+
+----
+
+==== yml config file merging ====
+Perhaps the following will become {{project_name_long}} minimal config file. It white lists everything required by Tor Browser and whonixcheck. Perhaps we name it [https://github.com/{{project_name_short}}/onion-grater/blob/master/etc/onion-grater-merger.d/30_whonix.yml <code>30_whonix.conf</code>].
+
+{{CodeSelect|code=
+---
+- match-exe-paths:
+    - '*'
+  match-users:
+    - '*'
+  match-hosts:
+    - '*'
+  commands:
+    SIGNAL:
+      - 'NEWNYM'
+    GETINFO:
+      - 'status/circuit-established'
+      - 'version'
+      - pattern: 'net/listeners/socks'
+        response:
+        - pattern:     '250-net/listeners/socks=".*"'
+          replacement: '250-net/listeners/socks="127.0.0.1:9150"'
+  confs:
+    __owningcontrollerprocess:
+  events:
+    SIGNAL:
+      suppress: true
+    CONF_CHANGED:
+      suppress: true
+}}
+
+-----
+
+Most likely the following config file allows all stuff that is required for onionshare. Perhaps we name it [https://github.com/{{project_name_short}}/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_onionshare.yml 40_onionshare.conf].
+
+{{CodeSelect|code=
+---
+- match-exe-paths:
+    - '*'
+  match-users:
+    - '*'
+  match-hosts:
+    - '*'
+  commands:
+    GETINFO:
+      - 'onions/current'
+    ADD_ONION:
+      - pattern:     'NEW:BEST Port=80,(176[0-5][0-9])'
+        replacement: 'NEW:BEST Port=80,{client-address}:{} Flags=DiscardPK'
+    DEL_ONION:
+      - '.+'
+  confs:
+    __owningcontrollerprocess:
+  events:
+    SIGNAL:
+      suppress: true
+    CONF_CHANGED:
+      suppress: true
+    HS_DESC:
+      response:
+        - pattern:     '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+          replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+        - pattern:     '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+          replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+        - pattern:     '650 HS_DESC UPLOADED (\S+) (\S+) .+'
+          replacement: '650 HS_DESC UPLOADED {} {} redacted'
+        - pattern:     '.*'
+          replacement: ''
+}}
+
+-----
+
+Now, ideally, once onion-grater start it would read both (or any number) config files and for internal use merge them to the following. It still does everything that <code>30_whonix.conf</code> is white listing and goes beyond that, also allows everything <code>40_onionshare.conf</code> is white listing.
+
+{{CodeSelect|code=
+---
+- match-exe-paths:
+    - '*'
+  match-users:
+    - '*'
+  match-hosts:
+    - '*'
+  commands:
+    SIGNAL:
+      - 'NEWNYM'
+    GETINFO:
+      - 'status/circuit-established'
+      - 'version'
+      - pattern: 'net/listeners/socks'
+        response:
+        - pattern:     '250-net/listeners/socks=".*"'
+          replacement: '250-net/listeners/socks="127.0.0.1:9150"'
+      - 'onions/current'
+    ADD_ONION:
+      - pattern:     'NEW:BEST Port=80,(176[0-5][0-9])'
+        replacement: 'NEW:BEST Port=80,{client-address}:{} Flags=DiscardPK'
+    DEL_ONION:
+      - '.+'
+  confs:
+    __owningcontrollerprocess:
+  events:
+    SIGNAL:
+      suppress: true
+    CONF_CHANGED:
+      suppress: true
+    HS_DESC:
+      - pattern:     '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+        replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+      - pattern:     '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+        replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+      - pattern:     '650 HS_DESC UPLOADED (\S+) (\S+) .+'
+        replacement: '650 HS_DESC UPLOADED {} {} redacted'
+      - pattern:     '.*'
+        replacement: ''
+}}
+
+----
+
+==== {{project_name_long}} 14 onionshare example log ====
+Using these two config files:
+
+* [https://github.com/{{project_name_short}}/onion-grater/blob/master/etc/onion-grater-merger.d/30_whonix.yml <code>30_whonix.conf</code>]
+* [https://github.com/{{project_name_short}}/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_onionshare.yml 40_onionshare.conf]
+
+<pre>
+sudo journalctl -f -u onion-grater
+</pre>
+
+<pre>
+Jan 12 01:06:26 host onion-grater[4115]: Merged Filter File is [{'match-users': '*', 'commands': {'GETCONF': ['hiddenservicesinglehopmode'], 'ADD_ONION': [{'replacement': 'NEW:BEST Port=80,{client-address}:{} Flags=DiscardPK', 'pattern': 'NEW:BEST Port=80,(176[0-5][0-9])'}, {'replacement': 'NEW:BEST Flags=BasicAuth Port=1,{client-address}:1 ClientAuth=onionshare Flags=DiscardPK', 'pattern': 'NEW:BEST Flags=BasicAuth Port=1,1 ClientAuth=onionshare'}, {'replacement': 'NEW:BEST Port=80,{client-address}:1 Flags=DiscardPK', 'pattern': 'NEW:BEST Port=80,0'}, {'replacement': 'NEW:BEST Flags=BasicAuth Port=80,{client-address}:{} ClientAuth=onionshare', 'pattern': 'NEW:BEST Flags=BasicAuth Port=80,(176[0-5][0-9]) ClientAuth=onionshare', 'response': [{'replacement': '250-PrivateKey={}:redacted', 'pattern': '250-PrivateKey=(\\S+):\\S+'}]}], 'DEL_ONION': ['.+'], 'SIGNAL': ['NEWNYM'], 'GETINFO': ['status/circuit-established', 'version', {'pattern': 'net/listeners/socks', 'response': [{'replacement': '250-net/listeners/socks="127.0.0.1:9150"', 'pattern': '250-net/listeners/socks=".*"'}]}, 'onions/current']}, 'confs': {'__owningcontrollerprocess': None}, 'events': {'SIGNAL': {'suppress': True}, 'CONF_CHANGED': {'suppress': True}, 'HS_DESC': {'response': [{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}, {'replacement': '650 HS_DESC UPLOAD {} {} redacted redacted', 'pattern': '650 HS_DESC UPLOAD (\\S+) (\\S+) .*'}, {'replacement': '650 HS_DESC UPLOADED {} {} redacted', 'pattern': '650 HS_DESC UPLOADED (\\S+) (\\S+) .+'}, {'replacement': '', 'pattern': '.*'}]}}, 'match-exe-paths': '*', 'name': 'merged_filter_files', 'match-hosts': ['*']}]
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files) connected: loaded filter: merged_filter_files
+Jan 12 01:06:26 host onion-grater[4115]: Final rules:
+Jan 12 01:06:26 host onion-grater[4115]: commands:
+Jan 12 01:06:26 host onion-grater[4115]: ADD_ONION:
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: 'NEW:BEST Port=80,(176[0-5][0-9])', replacement: 'NEW:BEST Port=80,{client-address}:{}
+Jan 12 01:06:26 host onion-grater[4115]: Flags=DiscardPK'}
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: 'NEW:BEST Flags=BasicAuth Port=1,1 ClientAuth=onionshare', replacement: 'NEW:BEST
+Jan 12 01:06:26 host onion-grater[4115]: Flags=BasicAuth Port=1,{client-address}:1 ClientAuth=onionshare Flags=DiscardPK'}
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: 'NEW:BEST Port=80,0', replacement: 'NEW:BEST Port=80,{client-address}:1
+Jan 12 01:06:26 host onion-grater[4115]: Flags=DiscardPK'}
+Jan 12 01:06:26 host onion-grater[4115]: - pattern: NEW:BEST Flags=BasicAuth Port=80,(176[0-5][0-9]) ClientAuth=onionshare
+Jan 12 01:06:26 host onion-grater[4115]: replacement: NEW:BEST Flags=BasicAuth Port=80,{client-address}:{} ClientAuth=onionshare
+Jan 12 01:06:26 host onion-grater[4115]: response:
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: '250-PrivateKey=(\S+):\S+', replacement: '250-PrivateKey={}:redacted'}
+Jan 12 01:06:26 host onion-grater[4115]: DEL_ONION:
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: .+}
+Jan 12 01:06:26 host onion-grater[4115]: GETCONF:
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: hiddenservicesinglehopmode}
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: (__owningcontrollerprocess)}
+Jan 12 01:06:26 host onion-grater[4115]: GETINFO:
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: status/circuit-established}
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: version}
+Jan 12 01:06:26 host onion-grater[4115]: - pattern: net/listeners/socks
+Jan 12 01:06:26 host onion-grater[4115]: response:
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: 250-net/listeners/socks=".*", replacement: '250-net/listeners/socks="127.0.0.1:9150"'}
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: onions/current}
+Jan 12 01:06:26 host onion-grater[4115]: SIGNAL:
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: NEWNYM}
+Jan 12 01:06:26 host onion-grater[4115]: events:
+Jan 12 01:06:26 host onion-grater[4115]: CONF_CHANGED: {suppress: true}
+Jan 12 01:06:26 host onion-grater[4115]: HS_DESC:
+Jan 12 01:06:26 host onion-grater[4115]: response:
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: 650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+), replacement: '650
+Jan 12 01:06:26 host onion-grater[4115]: HS_DESC CREATED {} {} {} redacted {}'}
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: 650 HS_DESC UPLOAD (\S+) (\S+) .*, replacement: '650 HS_DESC UPLOAD
+Jan 12 01:06:26 host onion-grater[4115]: {} {} redacted redacted'}
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: 650 HS_DESC UPLOADED (\S+) (\S+) .+, replacement: '650 HS_DESC UPLOADED
+Jan 12 01:06:26 host onion-grater[4115]: {} {} redacted'}
+Jan 12 01:06:26 host onion-grater[4115]: - {pattern: .*, replacement: ''}
+Jan 12 01:06:26 host onion-grater[4115]: SIGNAL: {suppress: true}
+Jan 12 01:06:26 host onion-grater[4115]: restrict-stream-events: false
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; PROTOCOLINFO 1
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250-PROTOCOLINFO 1
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250-AUTH METHODS=NULL
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250-VERSION Tor="0.2.9.8 (git-a0df013ea241b026)"
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 OK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; AUTHENTICATE
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 OK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; SETEVENTS CONF_CHANGED SIGNAL
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): suppressed subscription to event 'CONF_CHANGED'
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): suppressed subscription to event 'SIGNAL'
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 OK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; GETCONF __owningcontrollerprocess
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 __OwningControllerProcess
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; GETINFO version
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- (multi-line)
+Jan 12 01:06:26 host onion-grater[4115]: 250-version=0.2.9.8 (git-a0df013ea241b026)
+Jan 12 01:06:26 host onion-grater[4115]: 250 OK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; GETCONF hiddenservicesinglehopmode
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 HiddenServiceSingleHopMode=0
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; ADD_ONION NEW:BEST Flags=BasicAuth Port=1,1 ClientAuth=onionshare
+Jan 12 01:06:26 host onion-grater[4115]: line: 'ADD_ONION NEW:BEST Flags=BasicAuth Port=1,1 ClientAuth=onionshare'
+Jan 12 01:06:26 host onion-grater[4115]: r: '{'replacement': 'ADD_ONION NEW:BEST Flags=BasicAuth Port=1,{client-address}:1 ClientAuth=onionshare Flags=DiscardPK', 'pattern': 'ADD_ONION NEW:BEST Flags=BasicAuth Port=1,1 ClientAuth=onionshare'}'
+Jan 12 01:06:26 host onion-grater[4115]: pattern: 'ADD_ONION NEW:BEST Flags=BasicAuth Port=1,1 ClientAuth=onionshare'
+Jan 12 01:06:26 host onion-grater[4115]: replacement: 'ADD_ONION NEW:BEST Flags=BasicAuth Port=1,{client-address}:1 ClientAuth=onionshare Flags=DiscardPK'
+Jan 12 01:06:26 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 65), match='ADD_ONION NEW:BEST Flags=BasicAuth Port=1,1 Clien>'
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote command:
+Jan 12 01:06:26 host onion-grater[4115]: ADD_ONION NEW:BEST Flags=BasicAuth Port=1,1 ClientAuth=onionshare
+Jan 12 01:06:26 host onion-grater[4115]: to:
+Jan 12 01:06:26 host onion-grater[4115]: ADD_ONION NEW:BEST Flags=BasicAuth Port=1,10.137.11.80:1 ClientAuth=onionshare Flags=DiscardPK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- (multi-line)
+Jan 12 01:06:26 host onion-grater[4115]: 250-ServiceID=[manually redacted]
+Jan 12 01:06:26 host onion-grater[4115]: 250-ClientAuth=onionshare:[manually redacted]
+Jan 12 01:06:26 host onion-grater[4115]: 250 OK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; DEL_ONION [manually redacted]
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 OK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; SETEVENTS CONF_CHANGED SIGNAL HS_DESC
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): suppressed subscription to event 'CONF_CHANGED'
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): suppressed subscription to event 'SIGNAL'
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): subscribed to event 'HS_DESC'
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 OK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; ADD_ONION NEW:BEST Port=80,17600
+Jan 12 01:06:26 host onion-grater[4115]: line: 'ADD_ONION NEW:BEST Port=80,17600'
+Jan 12 01:06:26 host onion-grater[4115]: r: '{'replacement': 'ADD_ONION NEW:BEST Port=80,{client-address}:{} Flags=DiscardPK', 'pattern': 'ADD_ONION NEW:BEST Port=80,(176[0-5][0-9])'}'
+Jan 12 01:06:26 host onion-grater[4115]: pattern: 'ADD_ONION NEW:BEST Port=80,(176[0-5][0-9])'
+Jan 12 01:06:26 host onion-grater[4115]: replacement: 'ADD_ONION NEW:BEST Port=80,{client-address}:{} Flags=DiscardPK'
+Jan 12 01:06:26 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 32), match='ADD_ONION NEW:BEST Port=80,17600'>'
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote command:
+Jan 12 01:06:26 host onion-grater[4115]: ADD_ONION NEW:BEST Port=80,17600
+Jan 12 01:06:26 host onion-grater[4115]: to:
+Jan 12 01:06:26 host onion-grater[4115]: ADD_ONION NEW:BEST Port=80,10.137.11.80:17600 Flags=DiscardPK
+Jan 12 01:06:26 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- (multi-line)
+Jan 12 01:06:26 host onion-grater[4115]: 250-ServiceID=[manually redacted]
+Jan 12 01:06:26 host onion-grater[4115]: 250 OK
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC CREATED [manually redacted] UNKNOWN UNKNOWN [manually redacted] REPLICA=0'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 95), match='650 HS_DESC CREATED [manually redacted] UNKNOWN UNKN>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC CREATED [manually redacted] UNKNOWN UNKNOWN [manually redacted] REPLICA=0
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC CREATED [manually redacted] UNKNOWN UNKNOWN redacted REPLICA=0
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC CREATED [manually redacted] UNKNOWN UNKNOWN redacted REPLICA=0
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC CREATED [manually redacted] UNKNOWN UNKNOWN [manually redacted] REPLICA=1'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 95), match='650 HS_DESC CREATED [manually redacted] UNKNOWN UNKN>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC CREATED [manually redacted] UNKNOWN UNKNOWN [manually redacted] REPLICA=1
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC CREATED [manually redacted] UNKNOWN UNKNOWN redacted REPLICA=1
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC CREATED [manually redacted] UNKNOWN UNKNOWN redacted REPLICA=1
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: 'None'
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC UPLOAD {} {} redacted redacted', 'pattern': '650 HS_DESC UPLOAD (\\S+) (\\S+) .*'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 126), match='650 HS_DESC UPLOAD [manually redacted] UNKNOWN $6ABA>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~kanmon [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: 'None'
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~kanmon [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC UPLOAD {} {} redacted redacted', 'pattern': '650 HS_DESC UPLOAD (\\S+) (\\S+) .*'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 125), match='650 HS_DESC UPLOAD [manually redacted] UNKNOWN $6AD6>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~kanmon [manually redacted]
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: 'None'
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC UPLOAD {} {} redacted redacted', 'pattern': '650 HS_DESC UPLOAD (\\S+) (\\S+) .*'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 129), match='650 HS_DESC UPLOAD [manually redacted] UNKNOWN $6ADA>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~anatomypark [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: 'None'
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~anatomypark [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC UPLOAD {} {} redacted redacted', 'pattern': '650 HS_DESC UPLOAD (\\S+) (\\S+) .*'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 130), match='650 HS_DESC UPLOAD [manually redacted] UNKNOWN $DB0D>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~anatomypark [manually redacted]
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: 'None'
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC UPLOAD {} {} redacted redacted', 'pattern': '650 HS_DESC UPLOAD (\\S+) (\\S+) .*'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 134), match='650 HS_DESC UPLOAD [manually redacted] UNKNOWN $DB15>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: 'None'
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC UPLOAD {} {} redacted redacted', 'pattern': '650 HS_DESC UPLOAD (\\S+) (\\S+) .*'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 134), match='650 HS_DESC UPLOAD [manually redacted] UNKNOWN $DB19>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN [manually redacted]~[manually redacted] [manually redacted]
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC UPLOAD [manually redacted] UNKNOWN redacted redacted
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOADED [manually redacted] UNKNOWN [manually redacted]~[manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC CREATED {} {} {} redacted {}', 'pattern': '650 HS_DESC CREATED (\\S+) (\\S+) (\\S+) \\S+ (.+)'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC CREATED (\S+) (\S+) (\S+) \S+ (.+)'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC CREATED {} {} {} redacted {}'
+Jan 12 01:06:59 host onion-grater[4115]: match: 'None'
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOADED [manually redacted] UNKNOWN [manually redacted]~[manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC UPLOAD {} {} redacted redacted', 'pattern': '650 HS_DESC UPLOAD (\\S+) (\\S+) .*'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC UPLOAD (\S+) (\S+) .*'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC UPLOAD {} {} redacted redacted'
+Jan 12 01:06:59 host onion-grater[4115]: match: 'None'
+Jan 12 01:06:59 host onion-grater[4115]: line: '650 HS_DESC UPLOADED [manually redacted] UNKNOWN [manually redacted]~[manually redacted]'
+Jan 12 01:06:59 host onion-grater[4115]: r: '{'replacement': '650 HS_DESC UPLOADED {} {} redacted', 'pattern': '650 HS_DESC UPLOADED (\\S+) (\\S+) .+'}'
+Jan 12 01:06:59 host onion-grater[4115]: pattern: '650 HS_DESC UPLOADED (\S+) (\S+) .+'
+Jan 12 01:06:59 host onion-grater[4115]: replacement: '650 HS_DESC UPLOADED {} {} redacted'
+Jan 12 01:06:59 host onion-grater[4115]: match: '<_sre.SRE_Match object; span=(0, 95), match='650 HS_DESC UPLOADED [manually redacted] UNKNOWN $6A>'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): rewrote received event:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOADED [manually redacted] UNKNOWN [manually redacted]~[manually redacted]
+Jan 12 01:06:59 host onion-grater[4115]: to:
+Jan 12 01:06:59 host onion-grater[4115]: 650 HS_DESC UPLOADED [manually redacted] UNKNOWN redacted
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 650 HS_DESC UPLOADED [manually redacted] UNKNOWN redacted
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; SETEVENTS CONF_CHANGED SIGNAL
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): unsubscribed to event 'HS_DESC'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): suppressed subscription to event 'CONF_CHANGED'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): suppressed subscription to event 'SIGNAL'
+Jan 12 01:06:59 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 OK
+Jan 12 01:07:41 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): &rarr; DEL_ONION [manually redacted]
+Jan 12 01:07:41 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files): <- 250 OK
+Jan 12 01:07:41 host onion-grater[4115]: 10.137.11.80:52642 (filter: merged_filter_files) disconnected: client quit
+</pre>
+
+{{Footer}}
+
+[[Category:Development]]

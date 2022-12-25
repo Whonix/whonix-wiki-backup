@@ -1,0 +1,74 @@
+{{Header}}
+
+Debugging.
+
+{{stub}}
+
+= General Connectivity Test =
+{{connectivity_test}}
+
+= Dante Connectivity Test =
+'''1.''' Check dante socks server without authentication using curl (non-uwt version).
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl --tlsv1.3 --proto =https --proxy socks5h://127.0.0.1:9150 https://check.torproject.org/api/ip
+}}
+
+'''2.''' Check dante socks server with authentication using curl (non-uwt version).
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl --tlsv1.3 --proto =https --proxy socks5h://x:y@127.0.0.1:9150 https://check.torproject.org/api/ip
+}}
+
+Both commands are functional. It seems that curl negotiates socks authentication method <code>none</code> even if given a socks username and password.
+
+= DNS =
+== /etc/resolv.conf ==
+Maybe issue. Maybe not.
+
+vpn-ed-anon-whonix <code>/etc/resolv.conf</code> might require same DNS settings as <code>sys-vpn</code> (Qubes VPN-Gateway) <code>/etc/resolv.conf</code>.
+
+'''1.''' Look at <code>/etc/resolv.conf</code> in <code>sys-vpn</code>
+
+'''2.''' Use the same config for <code>/etc/resolv.conf</code> in <code>vpn-ed-whonix-gw-16</code> Template.
+
+= Tor Browser Error Messages =
+
+<pre>
+Hmm. We’re having trouble finding that site.
+</pre>
+
+Indicates broken DNS.
+
+= Dante =
+== Check Dante Log for DNS Issues ==
+{{CodeSelect|code=
+sudo journalctl -u danted {{!}} grep -i DNS-resolve
+}}
+
+== Why is a Modification of Dante required? ==
+Tor Browser however does not seem to negotiate at the socks protocol level.
+
+{{CodeSelect|code=
+sudo journalctl -f --output cat {{!}} grep --invert-match kernel
+}}
+
+<pre>
+Sep 25 22:35:49 (1664145349.839004) danted[5755]: debug: recv_clientrequest(): initiating negotiation with client at 127.0.0.1.47726 which connected to us on 127.0.0.1.9150
+Sep 25 22:35:49 (1664145349.839025) danted[5755]: debug: recv_methods(): client 127.0.0.1.47726 offered 1 authentication method: 0x2 (username)
+Sep 25 22:35:49 (1664145349.839029) danted[5755]: debug: recv_methods(): socksmethod to use not set, selecting amongst the following 1 method: none
+Sep 25 22:35:49 (1664145349.839031) danted[5755]: debug: recv_methods(): sending authentication reply: VER: 5 METHOD: 255 (<no acceptable method>)
+Sep 25 22:35:49 (1664145349.839092) danted[5755]: debug: run_negotiate(): recv_clientrequest() from client 127.0.0.1.47726 returned 1, errno is 0 (no error)
+</pre>
+
+When using <code>socksmethod: none username</code>:
+
+<pre>
+Sep 25 22:44:38 (1664145878.640687) danted[7218]: debug: accesscheck(): no match for authentication: could not access user "torproject.org"'s records in the system password file: no system error
+</pre>
+
+Tor Browser does not seem to fall back to using no socks user name. While dante would allow using the socks proxy without authentication, dante still prohibits Tor Browser because Tor Browser unnecessarily attempts to to set a socks user name.
+
+(Tor Browser by default sets the top level domain name as socks user name for the purpose of stream isolation (<code>IsolateSOCKSAuth</code>).)
+
+{{Footer}}

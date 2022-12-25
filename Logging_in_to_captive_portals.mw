@@ -1,0 +1,217 @@
+<!--
+Copyright:
+
+ {{project_name_long}} Warning wiki page Copyright (C) Amnesia <amnesia at boum dot org>
+ {{project_name_long}} Warning wiki page Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to:
+
+  Free Software Foundation, Inc.
+    51 Franklin St, Fifth Floor
+    Boston, MA 02110-1301, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License can be found in the /usr/share/common-licenses' directory.
+
+The complete text of the GNU General Public License can also be found online on gnu.org <https://www.gnu.org/licenses/gpl.html>, in {{project_name_long}} virtual machine images in /usr/share/common-licenses/GPL-3 file or on Github <https://github.com/{{project_name_short}}/derivative-maker/blob/master/GPLv3>.
+-->
+<!--
+This wiki page is a fork of the Unsafe Browser page, from this exact source <https://git.immerda.ch/?p=amnesia.git;a=blob;f=wiki/src/doc/anonymous_internet/unsafe_browser.mdwn;hb=21aa4cc26d72a02adf3f9818d6beca1a6a03fcd1>.
+-->
+{{Title|title=Logging into Captive Portals‎}}
+{{Header}}
+{{#seo:
+|description=Captive Portals Login. {{project_name_long}} in WiFi Hotspots.
+|image=https://www.{{project_clearnet}}/w/images/7/7d/Wireless-lan-152413640.png
+}}
+[[image:Wireless-lan-152413640.png|200px|thumb]]
+= Introduction =
+
+Many publicly accessible Internet connections found at cafes, libraries, airports, hotels, universities and other locations require its users to register and login in order to get access to the Internet. This means newly connected users of the (free or paid) Wi-Fi or wired network have their browser redirected to a "captive portal" landing or login page, which requires either authentication, payment, acceptance of end-user license agreements, acceptable use policy, survey completion or other credentials before broader access to network resources is granted. <ref>https://en.wikipedia.org/wiki/Captive_portal</ref> <ref>Captive portals are sometimes used for access to enterprise or residential wired networks, such as business centers, apartments or hotel rooms.</ref>
+
+'''Figure:''' ''Sample Captive Portal'' <ref>https://en.wikipedia.org/wiki/File:Captive_Portal.png</ref>
+
+[[Image:Captiveportal.png|border]]
+
+== Privacy Concerns ==
+
+In general, captive portals pose a number of privacy concerns. Depending on the portal in question, it may be necessary to enter personal information such as an email or social media account, account number (when in a library), hotel room number, or other identifying details. <ref>https://www.eff.org/deeplinks/2017/08/how-captive-portals-interfere-wireless-security-and-privacy</ref> Recent research on Wi-Fi hotspots has revealed: <ref>https://arxiv.org/pdf/1907.02142v1.pdf</ref>
+* Social login providers may share several privacy-sensitive fields - for example LinkedIn shares the full name, email address profile picture, current location and full employment history.
+* The vast majority of hotspots utilize tracking technologies in their captive portals and landing pages - multiple third-party tracking domains and persistent third-party HTTP cookies are common.
+* Personal and unique device information is sometimes shared with third-party domains (even without HTTPS).
+* A majority expose the user's device MAC address.
+* Sometimes personally sensitive information is leaked via HTTP, including full name, email address, phone number, address, postal code, date of birth and age.
+* Some hotspots explicitly link MAC address to collected personal information, allowing long-term user tracking.
+
+This research confirms that while VPNs and the adoption of HTTPS on most websites mostly secures users' personal information from malicious hotspot providers, device/user tracking is still a serious privacy threat.
+
+= Logging into Captive Portals =
+
+== When using VMs ==
+
+It is not possible to access captive portals inside {{project_name_workstation_long}}. Therefore, in {{non_q_project_name}} it is necessary to use the browser on the host operating system for this purpose, since it has unrestricted network access. In {{q_project_name_short}}, a separate dedicated VM must be used such as a Debian or Fedora AppVM.
+
+It must be stressed that this configuration is <u>not</u> anonymous, so it must be used carefully.
+
+== When using Physical Isolation ==
+
+There is no unsafe browser installed by default on {{project_name_gateway_long}} (see below for instructions). As a workaround a third machine can be used which has access to clearnet, or the hardware which runs {{project_name_gateway_long}} can be booted with another operating system (from USB), which is not torified.
+
+== Security Recommendations ==
+
+* While this browser can be used without any restrictions, it is ''strongly'' recommended to only use it for the purpose stated above, that is to access and login on captive portals.
+* Do not run this browser at the same time as the normal, anonymous Tor Browser. Otherwise, it is easy to  mistake one browser for the other, which could have catastrophic consequences for anonymity.
+* It is suggested to run this browser from a dedicated VM and lock it down with NoScript and isolation programs like FireJail (Linux only).
+
+= Unsafe Browser =
+
+== Installation ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = This procedure is discouraged!
+}}
+
+These steps must be completed while you still have an Internet connection. It cannot be done later on when an Internet connection is required, since no unsafe browser is installed by default.
+{{Box|text=
+The following instructions are applied on {{project_name_gateway_long}}.
+
+'''1.''' Configure user home of user <code>clearnet</code> to <code>/home/clearnet</code> as it is not set by {{project_name_long}} default.
+
+{{CodeSelect|code=
+sudo usermod -m -d /home/clearnet clearnet
+}}
+
+'''2.''' Create folder <code>/home/clearnet</code>.
+
+{{CodeSelect|code=
+sudo mkdir -p /home/clearnet
+}}
+
+'''3.''' Set owner of folder <code>/home/clearnet</code> to be user <code>clearnet</code>.
+
+{{CodeSelect|code=
+sudo chown -R clearnet:clearnet /home/clearnet
+}}
+
+'''4.''' Install a browser.
+
+{{Install_Package|
+package=firefox-esr
+}}
+}}
+
+== Usage ==
+
+{{Box|text=
+'''1.''' Start <code>bash</code> as user <code>clearnet</code>. <ref>
+The <code>sudo</code> <code>--set-home</code> parameter is important to prevent file permission issues since a GUI application is to be started under a different user account. Similar to {{kicksecure_wiki
+|wikipage=Install_Software#GUI_Applications_with_Root_Rights
+|text=GUI Applications with Root Rights
+}}.
+
+Quote <code>sudo</code> man page:
+
+<blockquote>
+-H, --set-home<br />
+    Request that the security policy set the HOME environment variable to the home directory specified by the target user's password database entry. Depending on the policy, this may be the default behavior.
+</blockquote>
+</ref>
+
+{{CodeSelect|code=
+sudo --set-home -u clearnet bash
+}}
+
+'''2.''' Change directory into user <code>clearnet</code> home folder.
+
+{{CodeSelect|code=
+cd ~
+}}
+
+'''3.''' Start the browser.
+
+{{CodeSelect|code=
+firefox
+}}
+}}
+
+== Uninstallation ==
+To remove the unsafe browser, apply the following instructions.
+
+{{Box|text=
+'''1.''' Purge <code>firefox-esr</code>.
+
+{{CodeSelect|code=
+sudo apt purge firefox-esr
+}}
+
+'''2.''' Autoremove.
+
+{{CodeSelect|code=
+sudo apt autoremove
+}}
+
+'''3.''' ''Optional'': Delete the Firefox data directory.
+
+{{CodeSelect|code=
+rm -r /home/user/clearnet/.mozilla/firefox
+}}
+}}
+
+= Find out real external IP Address from inside Whonix-Gateway =
+Some users wish to find out the real external IP address which their Whonix-Gateway is using to connect to the Tor network. In other words, some users wish to find out their {{isp}} assigned IP address. Yet in other words, some users wish to find out their clearnet IP address.
+
+There are at least 3 different methods, A), B) or C). Choose one.
+
+'''A)''' <u>Curl Method:</u>
+
+[[Troubleshooting#Clearnet_Connectivity_Test|Clearnet Connectivity Test]]
+
+'''B)''' <u>Using an unsafe browser on Whonix-Gateway</u>
+
+'''1.''' Enable [[Whonix-Gateway_System_DNS|Whonix-Gateway System DNS]].
+
+'''2.''' Install a browser inside Whonix-Gateway as per [[#Unsafe_Browser|unsafe browser]] instructions.
+
+'''3.''' Visit some IP check website such as for example https://check.torproject.org.
+
+'''3.''' Done.
+
+'''C)''' <u>Tor Control Protocol Method:</u>
+
+On Whonix-Gateway using tor-ctrl and Tor control protocol.
+
+{{CodeSelect|code=
+tor-ctrl GETINFO address
+}}
+
+Or the same command but with better machine readable output.
+
+{{CodeSelect|code=
+tor-ctrl -m GETINFO address
+}}
+
+'''C)''' <u>Other Methods:</u>
+
+[[Unspecific|Unspecific to {{project name long}}.]]
+
+= License =
+{{License_Amnesia|{{FULLPAGENAME}}}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

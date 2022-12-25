@@ -1,0 +1,202 @@
+{{Header}}
+{{#seo:
+|description=Using Litecoin Core in {{project_name_long}}. Fully verifying a Litecoin wallet.
+}}
+
+= Introduction =
+{{stub}}
+
+= Litecoin Core Setup =
+
+== Installation ==
+
+Perform these steps inside {{project_name_workstation_long}} ({{Q_project_name}}: <code>{{project_name_workstation_vm}}</code> App Qube).
+
+{{Box|text=
+'''1.''' Retrieve, verify and add the signing key. <ref>
+* https://github.com/litecoin-project/litecoin/issues/769
+* https://web.archive.org/web/20220903191335/https://litecoin.org/
+</ref>
+
+{{gpg key download}}
+
+{{CodeSelect|code=
+gpg --keyserver keyserver.ubuntu.com --recv-keys 0xD35621D53A1CC6A3456758D03620E9D387E55666
+}}
+
+Verify the key fingerprint.
+
+{{CodeSelect|code=
+gpg --fingerprint 0xD35621D53A1CC6A3456758D03620E9D387E55666
+}}
+
+Expected output:
+
+<pre>
+Key fingerprint = D356 21D5 3A1C C6A3 4567  58D0 3620 E9D3 87E5 5666
+</pre>
+
+'''2.''' Download the signed hash sum verification file.
+
+{{CodeSelect|code=
+scurl-download https://web.archive.org/https://download.litecoin.org/litecoin-0.21.2.1/linux/litecoin-0.21.2.1-x86_64-linux-gnu.tar.gz.asc
+}}
+
+'''3.''' Download Litecoin.
+
+{{CodeSelect|code=
+scurl-download https://web.archive.org/https://download.litecoin.org/litecoin-0.21.2.1/linux/litecoin-0.21.2.1-x86_64-linux-gnu.tar.gz
+}}
+
+'''4.''' Verify the hash sum digital signature file.
+
+{{CodeSelect|code=
+gpg --verify litecoin-0.21.2.1-x86_64-linux-gnu.tar.gz.asc
+}}
+
+<u>If the file is correctly verified</u>, the output will include a statement the signature is good:
+
+<pre>
+Good signature
+</pre>
+
+This output might be followed by a warning as follows.
+
+{{Template:GnuPG-Warning}}
+
+'''5.''' Extract the tar file.
+
+{{CodeSelect|code=
+tar xzf litecoin-0.21.2.1-x86_64-linux-gnu.tar.gz
+}}
+
+'''6.''' Done.
+
+Download, digital signature verification and extraction of Litecoin Core is complete.
+}}
+
+== Enable Stream Isolation ==
+
+{{Box|text=
+'''1.''' ''Optional:'' Disable networking for the virtual machine.
+
+This step is optional but recommended to ensure stream isolation is always used from the first connection. This step can be omitted if:
+
+* '''A)''' The {{project_name_long}} [[Stream_Isolation#Transparent_Proxy|transparent proxy]] feature has been [[Stream_Isolation#Disable_Transparent_Proxying|disabled]]; <ref>
+Because then Litecoin Core cannot connect using transparent proxying anyhow.
+</ref> <u>and/or</u>
+* '''B)''' Proxy settings are configured using the Litecoin Core configuration file <code>~/.litecoin/litecoin.conf</code> before the first start. <ref>
+Perhaps as part of the [[ElectrumX]] instructions.
+</ref>
+
+'''2.''' Start Litecoin-Qt as documented further below.
+
+'''3.''' Enable [[Stream_Isolation|Stream Isolation]] in the client.
+
+* '''A)''' navigate to the client settings
+* '''B)''' locate the Network tab
+* '''C)''' enable the SOCKS proxy as follows:
+** Host: <code>10.152.152.10</code>
+** Port: <code>9111</code>
+** Proxy: <code>SOCKS5</code>
+
+'''4.''' Re-enable networking for the virtual machine.
+}}
+
+== Add a Litecoin-Qt Start Menu Entry ==
+
+Perform the following steps to create a <code>litecoin-qt</code> start menu entry; this procedure is optional.
+
+{{Box|text=
+Inside {{project_name_workstation_long}} ({{Q_project_name}}: <code>{{project_name_workstation_vm}}</code> App Qube).
+
+'''1.''' Create folder <code>~/.local/share/applications</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.local/share/applications
+}}
+
+'''2.''' Open file <code>~/.local/share/applications/litecoin.desktop</code> in an editor as a regular, non-root user.
+
+{{CodeSelect|code=
+mousepad ~/.local/share/applications/litecoin.desktop
+}}
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+[Desktop Entry]
+Name=Litecoin-Qt
+Comment=litecoin-qt
+Exec=bash -c '~/litecoin-*/bin/litecoin-qt'
+Terminal=false
+Type=Application
+Icon=money-manager-ex
+StartupWMClass=litecoin
+MimeType=x-scheme-handler/litecoin;
+Categories=Finance;
+}}
+
+'''4.''' Save.
+
+'''5.''' {{Q_project_name}}: perform platform-specific steps.
+
+In <code>dom0</code>, refresh Qubes' appmenu: <code>VM settings</code> &rarr; <code>Applications</code> &rarr; <code>Refresh Applications</code> &rarr; <code>Add desktop shortcut</code>.
+
+'''6.''' Done.
+
+The <code>Litecoin-Qt</code> start menu entry should now be available.
+}}
+
+== Autostart Litecoin-Qt ==
+
+Perform these steps to automatically start <code>Litecoin-Qt</code>; this step is optional.
+
+{{Box|text=
+Inside {{project_name_workstation_long}} ({{Q_project_name}}: <code>{{project_name_workstation_vm}}</code> App Qube).
+
+'''1.''' Apply the [[#Add a Litecoin-Qt Start Menu Entry|Add a Litecoin-Qt Start Menu Entry]] instructions first.
+
+'''2.''' Create folder <code>~/.config/autostart</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.config/autostart
+}}
+
+'''3.''' Create a symlink from <code>~/.local/share/applications/litecoin.desktop</code> to <code>~/.config/autostart/litecoin.desktop</code>.
+
+{{CodeSelect|code=
+ln -s ~/.local/share/applications/litecoin.desktop ~/.config/autostart/litecoin.desktop
+}}
+
+'''4.''' Done.
+
+<code>Litecoin-Qt</code> will now automatically start the next time the VM is booted.
+}}
+
+== Start from Command Line ==
+
+To start <code>Litecoin-Qt</code> (part of Litecoin Core) from the command line, run.
+
+{{CodeSelect|code=
+~/litecoin-*/bin/litecoin-qt
+}}
+
+== Creating a Watch-Only Wallet ==
+
+# Start <code>Litecoin-Qt</code>.
+# <code>Window</code> &rarr; <code>Console</code>
+# Import address.
+
+Note: replace <code>address</code> with the actual address to be watched.
+
+{{CodeSelect|code=
+importaddress address
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

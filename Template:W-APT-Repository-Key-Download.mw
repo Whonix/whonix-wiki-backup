@@ -1,0 +1,34 @@
+'''2.''' Download [[Signing Key|{{project_name_long}} Signing Key]]. <ref>
+See [[Secure_Downloads|Secure Downloads]] to understand why <code>curl</code> and the parameters <code>--tlsv1.3 --proto =https</code> are used instead of <code>wget</code>.
+</ref>
+
+{{Box|text=
+<u>'''If''' you are using Debian</u>, run.
+
+{{CodeSelect|code=
+curl --tlsv1.3 --proto =https --max-time 180 --output ~/derivative.asc https://www.{{project_clearnet}}/keys/derivative.asc
+}}
+
+<u>'''If''' you are using a Qubes Debian Template</u>, run.
+
+{{CodeSelect|code=
+curl --proxy http://127.0.0.1:8082/ --tlsv1.3 --proto =https --max-time 180 --output ~/derivative.asc https://www.{{project_clearnet}}/keys/derivative.asc
+}}
+}}
+
+'''3.''' Users can [[Signing Key|<u>check</u> {{project_name_long}} Signing Key]] for better security.
+
+'''4.''' Add the {{project_name_long}} signing key to APT's keyring folder. <ref>
+Placing an additional signing key into folder <code>/usr/share/keyrings</code> by itself alone has no impact on security as this folder is not automatically used by Debian's APT by default. Only when an APT sources list configuration file points to folder <code>/usr/share/keyrings</code> using the <code>signed-by</code> keyword the signing key will be actually used. Therefore deleting keys in <code>/usr/share/keyrings</code> is optional if intending to disable an APT repository. See also {{kicksecure_wiki|
+|wikipage=Dev/APT
+|text=APT Signing Key Folders
+}}.
+</ref>
+
+{{CodeSelect|code=
+sudo cp ~/derivative.asc /usr/share/keyrings/derivative.asc
+}}
+
+'''5.''' Done.
+
+The procedure of adding {{project_name_long}} signing key is now complete.

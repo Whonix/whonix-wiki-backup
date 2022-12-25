@@ -1,0 +1,363 @@
+{{Title|title=Uninstall {{q_project_name}}}}
+{{Header}}
+{{#seo:
+|description=How to uninstall {{q_project_name}}.
+|image=https://www.{{project_clearnet}}/w/images/7/7a/Qubesunintall123123.png
+}}
+[[image:Qubesunintall123123.png|250px|thumb]]
+
+= Introduction =
+
+This procedure of a complete uninstallation of {{project_name_long}} as documented on this page is useful before a complete re-installation of [[Qubes|{{q_project_name}}]]. <ref>Or if deciding not to use {{project_name_long}} at all.</ref>
+
+Alternatively, it is possible to [[Qubes/Reinstall|Reinstall {{q_project_name}} Templates]] without a complete a uninstallation.
+
+In any case, these procedures are [[unspecific|unspecific to {{project_name_long}}]].
+
+* Qubes R4.<u>0</u>: Before {{q_project_name}} Template packages can be uninstalled, the Template must not be used as the underlying template by any VMs (otherwise Qubes prohibits removal). Therefore, either delete the VMs as documented below or follow the step to: [[#Stop using {{project_name_long}} Templates in VM Template Settings|Stop using {{project_name_long}} Templates in VM Template Settings]].
+* Qubes R4.<u>1</u>: Similar to above but in some situations [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html <code>qvm-template</code>] with the [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#purge <code>purge</code>] instead of the [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#purge <code>remove</code>] [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#subcommands subcommand] might be simpler.
+** <code>remove</code>: <blockquote>Remove installed templates.</blockquote>
+** <code>purge</code>: <blockquote>Remove installed templates and associated VMs.</blockquote>
+
+Users can replace {{project_name_long}} version <code>16</code> with <code>15</code> or any other version number if that is the goal.
+
+= Purge =
+* Qubes R4.<u>0</u> <code>qvm-template purge</code> unsupported. Other method as document in following chapters can be considered.
+* Qubes R4.<u>1</u> <code>qvm-template purge</code> supported.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Data loss possible if used wrong! Before proceeding with the <code>qvm-template purge</code> the user should carefully review the output of the <code>qvm-template</code> command before confirming. In doubt, a different method as document in other chapters should be used.
+}}
+
+<u>Might not work due to Qubes issue [https://github.com/QubesOS/qubes-issues/issues/7285 qvm-template purge whonix-gw-16 results in ERROR: The dummy qube does not provide network].</u>
+
+'''1.''' Shutdown required App Qubes.
+
+Shutdown of all {{project name long}} App Qubes is required that are using <code>{{project_name_gateway_template}}</code> <u>or</u> <code>{{project_name_workstation_template}}</code> as a <code>Template</code> <u>or</u> <code>Net Qube</code>
+
+'''2.''' App Qubes Configuration
+
+If no App Qubes that the user intents to keep are using <code>{{project_name_gateway_template}}</code> <u>or</u> <code>{{project_name_workstation_template}}</code> as a <code>Template</code> <u>or</u> <code>Net Qube</code>, proceeding with <code>qvm-template purge</code> should be safe.
+
+'''3.''' Purge {{project name gateway long}}
+
+{{CodeSelect|code=
+qvm-template purge whonix-gw-{{VersionShort}}
+}}
+
+'''4.''' Review the output.
+
+Sample output:
+
+<div class="pre"><nowiki>This will completely remove the selected VM(s)...
+  {{project_name_gateway_template}}
+  sys-whonix
+  anon-whonix
+  {{whonix-ws-dvm}}
+  custom-vm-using-{{project_name_workstation_template}}-template
+Are you sure? [y/N]</nowiki></div>
+
+'''5.''' Confirm or abort.
+
+To proceed, a capital (big lettter) <code>Y</code> needs be be written and confirmed with enter.
+
+'''6.''' Purge {{project name workstation long}}
+
+{{CodeSelect|code=
+qvm-template purge whonix-ws-{{VersionShort}}
+}}
+
+= {{project_name_workstation_long}} Removal =
+
+== Remove {{project_name_workstation_long}} App Qubes ==
+
+The <code>{{project_name_workstation_vm}}</code> {{project_name_workstation_long}} App Qube <ref name=vm-type-spelling>
+[https://www.qubes-os.org/doc/glossary/ Qubes glossary] documents <code>TemplateBasedVM</code>, <code>TemplateBasedVMs</code> and <code>TemplateBasedHVM</code>. So the spelling of <code>TemplateBasedAppVMs</code> and <code>TemplateBasedProxyVMs</code> should be correct.
+</ref> must be manually removed. Alternatively, you can [[#Stop using {{project_name_long}} Templates in VM Template Settings|Stop using {{project_name_long}} Templates in VM Template Settings]].
+
+If <code>{{project_name_workstation_vm}}</code> was previously used, strongly consider backups of any important files before proceeding.
+
+{{Box|text=
+'''1.''' Remove <code>{{project_name_workstation_vm}}</code>.
+
+* <code>Qube Manager</code> &rarr; <code>right-click {{project_name_long}} App Qube</code> <code>{{project_name_workstation_vm}}</code> &rarr; <code><u>D</u>elete qube</code> <ref>
+{{CodeSelect|code=
+qvm-remove {{project_name_workstation_vm}}
+}}
+</ref>
+
+'''2.''' Repeat the above step for any other App Qubes based on {{project_name_workstation_long}} Template <code>{{project_name_workstation_template}}</code> that were created earlier. Replace <code>vm-name</code> with the actual name of the VM.
+
+* <code>Qube Manager</code> &rarr; <code>right-click {{project_name_long}} App Qube</code> <code>vm-name</code> &rarr; <code><u>D</u>elete qube</code> <ref>
+{{CodeSelect|code=
+qvm-remove vm-name
+}}
+</ref>
+}}
+
+== Remove the {{project_name_workstation_long}} Disposable Template ==
+
+The <code>{{project_name_workstation_template}}-dvm</code> domain must be manually removed. Alternatively, you can [[#Stop using {{project_name_long}} Templates in VM Template Settings|Stop using {{project_name_long}} Templates in VM Template Settings]].
+
+In the case of a customized {{project_name_workstation_long}} Disposable Template, strongly consider backups of any important files before proceeding.
+
+{{Box|text=
+{{Qubes_Terminal}}
+
+'''1.''' Set the default Disposable for <code>{{project_name_workstation_vm}}</code> to <code>""</code>. This is only required if you chose to skip removal of <code>{{project_name_workstation_vm}}</code> as documented above.
+
+{{CodeSelect|code=
+qvm-prefs {{project_name_workstation_vm}} default_dispvm ""
+}}
+
+'''2.''' Repeat the above step for all other App Qubes that are based on {{project_name_workstation_long}} Template <code>{{project_name_workstation_template}}</code> that were created earlier. Replace <code>vm-name</code> with the actual name of the VM.
+
+{{CodeSelect|code=
+qvm-prefs vm-name default_dispvm ""
+}}
+
+'''3.''' Set the default Disposable for <code>{{project_name_workstation_template}}-dvm</code> to <code>""</code>.
+
+{{CodeSelect|code=
+qvm-prefs {{project_name_workstation_template}}-dvm default_dispvm ""
+}}
+
+'''4.''' Remove <code>{{project_name_workstation_template}}-dvm</code>.
+
+{{CodeSelect|code=
+qvm-remove {{project_name_workstation_template}}-dvm
+}}
+
+'''5.''' The process of removing <code>{{project_name_workstation_template}}-dvm</code> is now complete.
+}}
+
+= {{project_name_gateway_long}} Removal =
+
+== Stop using {{project_name_gateway_long}} as Qubes UpdateVM ==
+
+Set Qubes <code>dom0</code> UpdateVM to <code>sys-firewall</code> or any VM of your choice.
+
+Note: Upgrades will be no longer torified.
+
+This is only required if you previously elected to update <code>dom0</code> through {{project_name_long}}. Regardless, it is a good idea to check the Qubes <code>dom0</code> UpdateVM setting.
+
+* <code>Qubes Manager</code> &rarr; <code><u>S</u>ystem</code> &rarr; <code><u>G</u>lobal Settings</code> &rarr; <code>Dom0 UpdateVM:</code> <code>sys-firewall</code></code> &rarr; <code>OK</code> <ref>
+To revert this change, run.
+
+{{CodeSelect|code=
+qubes-prefs updatevm sys-firewall
+}}
+</ref>
+
+== Stop using {{project_name_gateway_long}} as NetVM for any VM ==
+
+If you configured any VM to use <code>{{project_name_gateway_vm}}</code> as NetVM, this change must be undone.
+
+Note: The VM's traffic will be no longer torified.
+
+This is only required if you previously elected to torify a VM's network traffic through {{project_name_long}}. Regardless, it is a good idea to check the NetVM setting of Qubes VMs.
+
+{{Box|text=
+To set the NetVM of any VM to <code>None</code>, in other words, to disable networking.
+
+<code>Qube Manager</code> &rarr; <code>right-click</code> <code>vm-name</code> &rarr; <code>Qube s<u>e</u>ttings</code> &rarr; <code>NetVM</code> &rarr; <code>None</code> &rarr; <code>OK</code> <ref>
+{{CodeSelect|code=
+qubes-prefs --set vm-name netvm ""
+}}
+</ref>
+
+Alternatively, you can set the <code>NetVM</code> to <code>sys-firewall</code> or another ProxyVM of your choice. However, traffic will not be torified (unless you are using cloned VMs).
+}}
+
+== Remove {{project_name_gateway_long}} ProxyVMs ==
+
+The <code>{{project_name_gateway_vm}}</code> {{project_name_gateway_long}} ProxyVM <ref name=vm-type-spelling /> must be manually removed. Alternatively, you could [[#Stop using {{project_name_long}} Templates in VM Template Settings|Stop using {{project_name_long}} Templates in VM Template Settings]].
+
+In the case of a previously used <code>{{project_name_gateway_vm}}</code> ProxyVM, consider backups before proceeding. This might be a custom [[Tor]] configuration, [[Onion Services]] configuration, [[Bridges]] configuration or Tor data for persistent [[Tor Entry Guards]].
+
+{{Box|text=
+'''1.''' Remove <code>{{project_name_gateway_vm}}</code>.
+
+* <code>Qube Manager</code> &rarr; <code>right-click</code> <code>{{project_name_gateway_vm}}</code> &rarr; <code><u>D</u>elete qube</code> <ref>
+{{CodeSelect|code=
+qvm-remove {{project_name_gateway_vm}}
+}}
+</ref>
+
+'''2.''' Repeat the above step for any other ProxyVM based on {{project_name_gateway_long}} Template <code>{{project_name_gateway_template}}</code> that was created earlier. Replace <code>vm-name</code> with the actual name of the VM.
+
+* <code>Qube Manager</code> &rarr; <code>right-click</code> <code>vm-name</code> &rarr; <code><u>D</u>elete qube</code> <ref>
+{{CodeSelect|code=
+qvm-remove vm-name
+}}
+</ref>
+}}
+
+= Qubes Adjustments =
+
+== Stop using {{project_name_long}} Templates in VM Template Settings ==
+
+If a {{project_name_long}} Template is set as the underlying Template for any VMs, the Template cannot be removed. Therefore, either delete the VM as documented above or unset the Template using Qube Manager. <ref>
+Or use the command line.
+</ref>
+
+The VMs can optionally be set to use a dummy template. The advantage of setting a <code>dummy</code> template as the underlying Template is the ability to retain any VMs, along with the user storage contents.
+
+{{Box|text=
+{{Box|text=
+'''1.''' {{Qubes_Dummy_Template}}
+}}
+
+'''2.''' Shut down the {{project_name_long}} Template if already running.
+
+* <code>Qube Manager</code> &rarr; <code>right-click {{project_name_long}} Template</code> &rarr; <code><u>S</u>hutdown qube</code> <ref>
+{{CodeSelect|code=
+qvm-shutdown vm-name
+}}
+</ref><br />
+'''3.''' Set the <code>dummy</code> template as the Template.
+
+* <code>right-click VM</code> &rarr; <code>Qube s<u>e</u>ttings</code> &rarr; <code>Template:</code> <code>dummy</code> <ref>
+{{CodeSelect|code=
+qvm-prefs --set vm-name template dummy
+}}
+</ref>
+
+The process of setting the <code>dummy</code> template as the VM's underlying Template is complete.
+}}
+
+== Stop using {{project_name_gateway_long}} for Torified Template Updates ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Skip this chapter if you intend to [[Qubes/Install|Install {{q_project_name}}]] again.
+}}
+
+If you do <u>not</u> intend to use {{q_project_name}} again, apply the following steps.
+
+{{Box|text=
+In technical terms, stop using {{project_name_gateway_long}} as <code>dom0</code> UpdatesProxy for any Templates. This is only required if you previously elected to update Qubes Templates through {{project_name_long}}.
+
+'''1.''' Open <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> with root rights.
+
+'''2.''' Search for.
+
+{{CodeSelect|code=
+$type:Template $default allow,target={{project_name_gateway_vm}}
+}}
+
+'''3.''' Comment out that line; add a hash (<code>#</code>) in front of it.
+
+{{CodeSelect|code=
+#$type:Template $default allow,target={{project_name_gateway_vm}}
+}}
+
+<ref>
+The entry
+{{CodeSelect|code=
+$tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
+}}
+and
+{{CodeSelect|code=
+$tag:whonix-updatevm $anyvm deny
+}}
+can remain. These will not have any effect once Qubes Templates are removed since no VM has the tag <code>whonix-updatevm</code>.
+</ref>
+
+'''4.''' Save.
+
+'''5.''' The steps to remove {{project_name_gateway_long}} as <code>dom0</code> UpdatesProxy are complete.
+}}
+
+= Uninstall {{project_name_long}} Templates =
+
+== Introduction ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt={{project_name_long}} first time users warning]]
+| text    = <br />
+* Note the root filesystem will be lost when uninstalling the Template.
+* In the case of customized Templates, strongly consider creating backups of anything important before proceeding.
+* {{project_name_long}} (or any) Template in Qubes cannot be removed if any other VM is still using them; see [[#Introduction|Introduction]].
+}}
+
+== {{project_name_gateway_long}} ==
+
+# Open a <code>dom0</code> terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
+# Uninstall <u>all</u> {{q_project_name}} {{project_name_gateway_long}} template packages matching <code>qubes-template-whonix-gw*</code>: <ref name=matching>
+Note the matching syntax below and the effect of running <code>qubes-template-whonix-gw'''*'''</code> or <code>qubes-template-whonix-ws<u>*</u></code>. Also note the asterisk <code>*</code> wildcard at the end. Depending on the {{project_name_long}} version, this leads to multiple template packages being uninstalled if they are present:
+
+* <code>qubes-template-whonix-gw</code> (deprecated {{project_name_long}} <code>13</code> release)
+* <code>qubes-template-whonix-ws</code> (deprecated {{project_name_long}} <code>13</code> release)
+* <code>qubes-template-whonix-gw-14</code> (deprecated {{project_name_long}} release)
+* <code>qubes-template-whonix-ws-14</code> (deprecated {{project_name_long}} release)
+* <code>qubes-template-whonix-gw-15</code> (deprecated {{project_name_long}} release)
+* <code>qubes-template-whonix-ws-15</code> (deprecated {{project_name_long}} release)
+* <code>qubes-template-whonix-gw-16</code> (stable {{project_name_long}} release)
+* <code>qubes-template-whonix-ws-16</code> (stable {{project_name_long}} release)
+* <code>qubes-template-whonix-gw-17</code> (future {{project_name_long}} release)
+* <code>qubes-template-whonix-ws-17</code> (future {{project_name_long}} release)
+
+Wildcards are used so these instructions are valid for all old and future versions of {{project_name_long}}. Alternatively, the asterisk <code>*</code> syntax could be replaced with a specific template package listed above.
+</ref>
+
+* R4.0: {{CodeSelect|code=
+sudo dnf remove qubes-template-whonix-gw*
+}}
+* R4.1: {{CodeSelect|code=
+sudo qvm-template remove qubes-template-whonix-gw*
+}}
+
+Review the output of the command before confirming to proceed.
+
+== {{project_name_workstation_long}} ==
+
+# Open a <code>dom0</code> terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
+# Uninstall <u>all</u> Qubes-{{project_name_workstation_long}} template packages matching <code>qubes-template-whonix-ws*</code>: <ref name=matching />
+
+* R4.0: {{CodeSelect|code=
+sudo dnf remove qubes-template-whonix-ws*
+}}
+* R4.1: {{CodeSelect|code=
+sudo qvm-template remove qubes-template-whonix-ws*
+}}
+
+Review the output of the command before confirming to proceed.
+
+== All {{project_name_long}} Template Packages ==
+
+# Open a <code>dom0</code> terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
+# Uninstall <u>all</u> {{q_project_name}} template packages matching <code>qubes-template-whonix*</code>: <ref name=matching />
+
+* R4.0: {{CodeSelect|code=
+sudo dnf remove qubes-template-whonix*
+}}
+* R4.1:{{CodeSelect|code=
+sudo qvm-template remove qubes-template-whonix*
+}}
+
+Review the output of the command before confirming to proceed.
+
+== Troubleshooting ==
+
+If the following error appears when removing the Templates, a manual fix is required.
+
+<pre>
+“ERROR: VM installed by package manager: template-vm-name”
+</pre>
+
+For instruction on how to work around this issue, see: [https://www.qubes-os.org/doc/vm-troubleshooting/#can-not-uninstall-a-vm--error-vm-installed-by-package-manager-template-vm-name Remove VM Manually].
+
+= Done =
+The process of uninstalling {{q_project_name}} is now complete.
+
+In order to use {{q_project_name}} again in the future, follow the [[Qubes/Install|Install {{q_project_name}}]] instructions.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

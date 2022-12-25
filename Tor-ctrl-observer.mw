@@ -1,0 +1,61 @@
+{{Header}}
+{{#seo:
+|description=Ever wanted to know which information is sent by an application? tor-ctrl-observer shows connection information of applications using Tor.
+|image=https://www.whonix.org/w/images/7/79/TorControl12312.png
+}}
+{{Title|title=
+tor-ctrl-observer - Tor Connection Destination Viewer
+}}
+[[File:TorControl12312.png|thumb]]
+__FORCETOC__
+= What tor-ctrl-observer is =
+Ever wanted to know which information is sent by an application? <code>tor-ctrl-observer</code> shows connection information of applications using Tor.
+
+Sample printout:
+
+<pre>
+250-stream-status=1094 SENTCONNECT 20 firefox.settings.services.mozilla.com:443
+250-stream-status=1094 SUCCEEDED 20 18.64.79.82:443
+</pre>
+
+<code>tor-ctrl-observer</code> is especially useful in combination with {{project name long}} because:<br />
+{{TorifiedGateway}}
+
+<code>tor-ctrl-observer</code> operates in sane, secure way by using Tor's control protocol to make information visible to users that Tor is internally processing and ready to share with users on request anyhow.
+
+= tor-ctrl-observer Advantages =
+* <u>application level leak testing:</u> <code>tor-ctrl-observer</code> can be used to observe application's network connections.
+** For example, issue [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/40788 Tor Browser 11.0.4-11.0.6 phoning home] (which is a regression of [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/31575 Firefox is phoning home during start-up in Tor Browser based on ESR 68]) has been identified and bug reported to The Tor Project by <code>tor-ctrl-observer</code> developer [https://github.com/nyxnor nyxnor].
+
+= Usage =
+In {{project name gateway long}}.
+
+'''1.''' Open a terminal.
+
+'''2.''' Run <code>tor-ctrl-observer</code>.
+
+{{CodeSelect|code=
+tor-ctrl-observer
+}}
+
+'''3.''' Terminate <code>tor-ctrl-observer</code> with signal sigint.
+
+Press keyboard keys <code>Ctrl</code> + <code>C</code>.
+
+= What tor-ctrl-observer is not =
+<code>tor-ctrl-observer</code> does not attempt to be, is not and cannot be a:
+
+* <u>Network level [[Dev/Leak Tests|leak tests]] replacement:</u> In illustrative language, this is because <code>tor-ctrl-observer</code> does only nicely ask Tor "please show me all the connections you are creating". It is then up to Tor to honor the request. Tor might generally do so but if there were bugs in the Tor control protocol then <code>tor-ctrl-observer</code> could not catch these. If connections are by-passing Tor, in other words not using Tor then Tor is obviously not aware of these connections and therefore <code>tor-ctrl-observer</code> cannot observe such connections.
+* <u>Tor auditor:</u> For the same reason as above, <code>tor-ctrl-observer</code> cannot be expected to find bugs in Tor.
+* <u>[[Tor Controller]]:</u> Such as [[Nyx]]. What is the difference between <code>nyx</code> and <code>tor-ctrl-observer</code>? <code>nyx</code> shows information about which Tor circuits ([[Bridges]], [[Tor Entry Guards]], [[Tor]] middle or exit relays) are used but not the final connection destinations. On the other hand, <code>tor-ctrl-observer</code> shows information about final connection destinations.
+
+= Forum Discussion =
+https://forums.whonix.org/t/tor-ctrl-tor-control-port-command-line-tool/8074/41
+
+= See Also=
+* [[Tor Controller]]
+
+= Footnotes =
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]

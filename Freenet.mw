@@ -1,0 +1,215 @@
+{{Header}}
+{{#seo:
+|description=Freenet over Tor. Tunneling Freenet through Tor. Connection Schema: User &rarr; Tor &rarr; Freenet &rarr; Destination
+|image=https://www.{{project_clearnet}}/w/images/2/20/Freenet-bunny-with-name-flying.png
+}}
+[[File:Freenet-bunny-with-name-flying.png|thumb|256px|Freenet Icon]]
+= Introduction =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Freenet is recommended for advanced users.
+}}
+
+== Overview ==
+
+The Freenet 'About' page provides a simple overview of the protocol: <ref>https://freenetproject.org/pages/about.html</ref>
+
+<blockquote>Freenet is free software which lets you anonymously share files, browse and publish "freesites" (web sites accessible only through Freenet) and chat on forums, without fear of censorship. Freenet is decentralised to make it less vulnerable to attack, and if used in "darknet" mode, where users only connect to their friends, is very difficult to detect.
+
+Communications by Freenet nodes are encrypted and are routed through other nodes to make it extremely difficult to determine who is requesting the information and what its content is.
+
+Users contribute to the network by giving bandwidth and a portion of their hard drive (called the "data store") for storing files. Files are automatically kept or deleted depending on how popular they are, with the least popular being discarded to make way for newer or more popular content. Files are encrypted, so generally the user cannot easily discover what is in his datastore, and hopefully can't be held accountable for it. Chat forums, websites, and search functionality, are all built on top of this distributed data store.</blockquote>
+
+In simple terms, Freenet <ref>https://freenetproject.org/</ref> <ref>https://en.wikipedia.org/wiki/Freenet</ref> is a peer-based, encrypted datastore with version control that aims to give anonymity to both publishers and readers. Launched in 1999, it is the oldest of the 'big four' anonymity networks <ref>https://web.archive.org/web/20160314110509/http://www.planetpeer.de/wiki/index.php/Main_Page</ref> alongside Tor, I2P and GNUnet (GNUnet is based on similar concepts). Its robustness has brought it into the cross-hairs of advanced adversaries. <ref>https://daserste.ndr.de/panorama/aktuell/nsa230_page-4.html</ref> <ref>https://web.archive.org/web/20191221182453/https://search.edwardsnowden.com/docs/TorOverviewofExistingTechniques2014-12-28nsadocs</ref> Though it has less users compared to Tor and I2P, it is still the largest network of its kind. Joining the ranks of these other anonymity networks, Freenet has [https://old.reddit.com/r/Freenet/comments/i21dca/freenet_mobile_01_beta/ released a beta version] of an Android app for mobile platforms as of August 2020. The app is designed to be highly battery efficient by limiting writes to RAM by default and limiting network activity when not in use. It is also available in the [https://f-droid.org/en/packages/org.freenetproject.mobile/ F-Droid repository].
+
+== Technical Properties ==
+
+This section provides a brief introduction to Freenet's technical properties. For more in-depth reading on this subject, refer to the [https://freenetproject.org/pages/documentation.html#understand official documentation].
+
+Freenet's design is very different from other anonymity networks. Instead of obfuscating traffic streams between endpoints, the data itself is sliced up into encrypted blocks and distributed across other peers' datastores -- hard drive space contributed by Freenet nodes to store encrypted pieces of files -- for redundancy and plausible deniability. <ref>Encrypted blocks are stored in both the datastore directory and Freenet installation directory.</ref> Users have virtually no control over what ends up in the datastore, since the popularity of files dictates if they are kept or deleted. This also increases resistance to censorship. <ref>https://freenetproject.org/pages/documentation.html#understand</ref>
+
+After uploading, the publisher obtains a key which acts as the content's [https://en.wikipedia.org/wiki/Uniform_Resource_Identifier Uniform Resource Identifier (URI)] <ref>In simple terms, this is a character string that definitively identifies a specific resource.</ref> that can be optionally shared to allow others access. These are known as Freesites and host only static content on the Freenet network; active content like databases or server-side scripts are not possible. <ref>https://en.wikipedia.org/wiki/Freenet#Freesite</ref> The data remains available even after the uploader goes offline, meaning it is asynchronous. Freenet is a self-contained network with no access to the wider web.
+
+Reader requests are routed through multiple hops. Each hop acts as a caching proxy for some of the requested data blocks, propagating the material and providing scalability and availability when demand grows. Understand that Freenet's data storage is not permanent and cannot be, otherwise an attacker could flood it with garbage data and render it useless for users. Unpopular content that is rarely accessed tends to be 'forgotten' and lost over time. Censors cannot rely on [https://en.wikipedia.org/wiki/Denial-of-service_attack Denial-of-service (DoS) attacks] to block content because it actually spreads the information further. You can think of it as a digital embodiment of the [https://en.wikipedia.org/wiki/Streisand_effect Streisand Effect]. <ref><blockquote>The Streisand effect is a phenomenon whereby an attempt to hide, remove, or censor a piece of information has the unintended consequence of publicizing the information more widely, usually facilitated by the Internet.</blockquote></ref>
+
+Freenet's FProxy is the component that allows browsers to interact and view pages in the datastore (to access a particular piece of data). <ref>The key or link to the data has the following form: <code>http://localhost:8888/[Freenet Key]</code></ref> Many precautions are taken to protect users from malicious pages, including:
+* JavaScript is completely unavailable on Freenet;
+* only a safe subset of HTML standard is whitelisted; and
+* users are prompted before downloading files or when being redirected to a clearnet site.
+
+Freenet does not utilize telescopic tunnels like Tor, but instead bundles requests together for cover traffic and routes them through a varying number of hops to confuse adversaries as to who is forwarding versus requesting the data. Freenet can also operate in several modes: a 'Darknet' mode that turns it into a private friend-only network; 'Opennet' mode which connects to a public network; and a hybrid mode that includes both.
+
+Freenet's properties make it an excellent and safer choice for disseminating data because it tackles "The Hosting Problem", while providing strong cryptography to guarantee the integrity of files fetched. In short, centralized hosting remains an Achilles Heel for onionspace <ref>https://mascherari.press/onionscan-report-june-2016/</ref> because traditional anonymous publishing mechanisms like onion services or eepsites require a user resource commitment (an always online server), which places them out of reach for most people. Securing a server is no easy task, particularly in the hostile environment of the dark web. Extensive hardening, auditing and system administrator skills are necessary, but this is no guarantee against a certain class of adversaries; see footnote. <ref>A server is a sitting duck for attackers to probe and test their weapons against. It is also a single point of failure that can be DoS'd offline. Once rooted, the server can be used to mount [https://www.techopedia.com/definition/31858/watering-hole-attack watering hole attacks] on site visitors whereby the site is infected with malware to target users.</ref>
+
+== Liability ==
+
+Freenet was designed to protect users from liability. <ref>[https://github.com/freenet/wiki/wiki/Plausible-Deniability]</ref> The software can also take steps to increase protection from network threats and physical seizure. <ref>https://github.com/freenet/wiki/wiki/Security-Levels</ref> These settings are selected by the user at first start and can be changed at any time. Even though Freenet helps to protect user data on the computer, it is not perfect and traces (like browser history) may remain. Full-disk encryption is recommended.
+
+According to a Freenet developer in Germany, EU users have strong liability protections when caching content as a side-effect of participating in a network; see footnote. <ref>[https://www.reddit.com/r/OpenBazaar/comments/4e2cqx/comment/d1z43af/ Ademan's Whitepaper on how to improve OpenBazaar by adding anonymity using Freenet]: <blockquote>Note that you’re not actively storing: The storage is just a byproduct of transmission in the network. As an example for a similar assessment, the European Court of Justice ruled in 2014 that third parties who reproduce a work in an “integral and essential part of a technological process and carried out for the sole purpose of enabling either efficient transmission in a network between third parties by an intermediary” are exempt from copyright concerns (only the uploader is liable). See https://curia.europa.eu/juris/document/document_print.jsf?doclang=EN&text=&pageIndex=0&part=1&mode=DOC&docid=153302&occ=first&dir=&cid=93105</blockquote></ref>
+
+Uploaders of original content benefit the most from Freenet's threat model. <ref>https://github.com/freenet/wiki/wiki/Threat-Model</ref> There is also an emphasis on data survivability. The network is somewhat able to cope with network churn and node loss.
+
+Darknet mode was created for situations where connecting to public nodes is unwanted or dangerous. <ref>https://github.com/freenet/wiki/wiki/Darknet</ref> This design feature protects against many attacks, and would be critical for bypassing state-level network blocks. The disadvantage to Darknet is that a user either needs to know others who use the network or be able to self-host other nodes.
+
+= How-to: Use Freenet in {{project_name_long}} =
+
+There are three methods of using Freenet in {{project_name_long}}:
+# [[#Freenet inside Whonix-Workstation|Freenet inside Whonix-Workstation]] (recommended); or
+# [[#Inproxies inside Whonix-Workstation|Inproxies inside Whonix-Workstation]]; or
+# [[#Freenet SSH Workaround|Freenet SSH Workaround]]
+
+{{Anchor|Freenet inside Whonix-Workstation}}
+
+== Freenet inside Whonix-Workstation ==
+
+The preferred configuration is to connect to Tor, then a VPN before Freenet inside {{project_name_workstation_long}}: <code>user</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Freenet</code> &rarr; <code>Destination</code> <ref>Only Freenet content is available; normal Internet websites cannot be accessed.</ref>
+
+=== Configure Connection Workaround ===
+
+In the "classical sense" a direct connection only over Tor is impossible because Freenet is a UDP-only network. <ref>This has been tested. Freenet installs normally, but even with lowest security settings a connection is never established. The problem is that Tor does not support UDP. (There has been a [https://web.archive.org/web/20160412142711/http://comments.gmane.org/gmane.network.freenet.support/8211 discussion] about this topic. Although it is from 2008, it does not appear the situation has changed.)</ref> As a workaround it is possible to [[Tunnel UDP over Tor]]. Probably the easiest solution is to utilize a VPN, see: [[Tunnels/Connecting_to_Tor_before_a_VPN|Connecting to Tor before a VPN (User &rarr; Tor &rarr; VPN &rarr; Internet)]]
+
+=== Freenet Installation ===
+
+Unfortunately Freenet is unlikely to be available from Debian repositories in the foreseeable future. The fast development cycle is incompatible with Debian stable's policies. <ref>https://www.mail-archive.com/devl@freenetproject.org/msg26975.html</ref> This means it must be manually installed instead.
+
+{{Box|text=
+'''1.''' Download the Freenet signing key.
+
+{{CodeSelect|code=
+scurl-download https://freenetproject.org/assets/keyring.gpg
+}}
+
+'''2.''' Check fingerprints/owners without importing anything.
+
+{{CodeSelect|code=
+gpg --keyid-format long --with-fingerprint keyring.gpg
+}}
+
+Before adding the keyring <ref>https://freenetproject.org/pages/download.html</ref>, verify the fingerprints. Always check the fingerprint for yourself. The output at the moment is:
+
+<pre>
+pub   rsa4096/FF24CA421946AA94 2013-09-24 [SC] [expired: 2018-09-23]
+      Key fingerprint = B76D 4AA7 96D8 403E ED78  C9F9 FF24 CA42 1946 AA94
+uid                           Matthew Toseland (2013-2018 key, higher key length) <matthew@toselandcs.co.uk>
+uid                           Matthew Toseland (2013-2018 key, higher key length) <toad@amphibian.dyndns.org>
+sub   rsa4096/F877E62895C42009 2013-09-24 [E] [expired: 2018-09-23]
+pub   rsa4096/B67C19E817A8D846 2016-01-02 [C] [expired: 2018-01-03]
+      Key fingerprint = 5D77 D9A4 2E28 0F5A FF8F  2EBF B67C 19E8 17A8 D846
+uid                           Stephen Oliver <steve@infincia.com>
+sub   rsa4096/9BCDD1614041F59E 2016-01-02 [S] [expired: 2018-01-03]
+sub   rsa4096/1652EBA5AC1BB386 2016-01-02 [E] [expired: 2018-01-03]
+sub   rsa4096/38A62E479684F2F2 2016-01-02 [A] [expired: 2018-01-03]
+pub   rsa2048/EAC5EBF07AA9C2A3 2013-04-29 [SC]
+      Key fingerprint = DBB7 7338 3BC3 49C9 5203  ED91 EAC5 EBF0 7AA9 C2A3
+uid                           Florent Daigniere <florent.daigniere@trustmatta.com>
+uid                           Florent Daigniere (NextGen$) <nextgens+gpg@freenetproject.org>
+uid                           Florent Daigniere (Personal address) <florent-gpg@daigniere.com>
+sub   rsa2048/65B7118375AB23F2 2013-04-29 [E]
+sub   rsa2048/D21621FD7FA16469 2013-04-29 [A]
+pub   rsa4096/B41A6047FD6C57F9 2017-02-23 [SCEA]
+      Key fingerprint = B30C 3D91 069F 81EC FEFE  D0B1 B41A 6047 FD6C 57F9
+uid                           Arne Babenhauserheide (ArneBab) <arne_bab@web.de>
+uid                           Arne Babenhauserheide (freenet releases) <arne_bab@web.de>
+pub   rsa4096/00100D897EDBA5E0 2013-09-21 [SC] [expired: 2016-09-08]
+      Key fingerprint = 0046 195B 2DCA B176 D394  09CD 0010 0D89 7EDB A5E0
+uid                           Steve Dougherty (operhiem1 Release Signing Key) <steve@asksteved.com>
+sub   rsa4096/7BF0F7B36AC8B380 2013-09-21 [E] [expired: 2016-09-15]
+</pre>
+
+'''3.''' If the output looks sensible, import it with GPG.
+
+{{CodeSelect|code=
+gpg --import keyring.gpg
+}}
+
+'''4.''' Install dependencies.
+
+{{CodeSelect|code=
+sudo apt update
+sudo apt install default-jre
+}}
+
+'''5.''' Create an installation directory.
+
+{{CodeSelect|code=
+mkdir Freenet
+cd Freenet
+}}
+
+'''6.''' Download the offline installer and signature.
+
+{{CodeSelect|code=
+wget https://github.com/freenet/fred/releases/download/build01491/new_installer_offline_1491.jar -O new_installer_offline.jar
+}}
+
+{{CodeSelect|code=
+wget https://github.com/freenet/fred/releases/download/build01491/new_installer_offline_1491.jar.sig -O new_installer_offline.jar.sig
+}}
+
+'''7.''' Verify the installer.
+
+{{CodeSelect|code=
+gpg --verify new_installer_offline.jar.sig
+}}
+
+Check the following message appears before installing anything: <blockquote>Good signature from "Arne Babenhauserheide (freenet releases) <arne_bab@web.de>"</blockquote>
+
+'''8.''' Follow the prompts and install it in the current folder.
+
+{{CodeSelect|code=
+java -jar new_installer_offline.jar -console
+}}
+
+Note that Freenet includes its own secure internal updater that downloads new versions from inside the network. It is unnecessary to repeat these steps after the initial installation.
+}}
+
+=== Tor Browser Configuration Changes ===
+
+{{Template:TBB_localhost}}
+
+=== Usage ===
+
+To access Freenet, open <code>http://127.0.0.1:8888</code> in Tor Browser to utilize the user interface. The UI is also used for plugin installation or any further setting changes.
+
+To start Freenet manually after reboot:
+
+{{CodeSelect|code=
+cd Freenet
+}}
+
+{{CodeSelect|code=
+./run.sh start
+}}
+
+=== Plugins ===
+
+Plugins provide much of the rich functionality of the Freenet experience. They act as an abstraction layer that present text in different layouts for different use cases including forums, wikis, search engines, mail, blogs, code repositories, social networking, IRC and [https://github.com/freenet/wiki/wiki/Projects more]. The [http://freesocial.draketo.de/index_en.html Freenet Social Networking Guide] explains how to set up plugins. <ref>This resource is also available on GitHub, see: [https://github.com/justusranvier/FreenetSocialNetworkingGuide here].</ref> Other relevant guides are also available; see footnote. <ref>[https://web.archive.org/web/20160305114203/https://d6.gnutella2.info/freenet/USK@xedmmitRTj9-PXJxoPbD7RY1gf9pKi0OcsRmjNPPIU4,AzFWTYV~9-I~eXis14tIkJ4XkF17gIgZrB294LjFXjc,AQACAAE/fmsguide/6/ The Unofficial Guide to FMS]</ref>
+
+=== Tips ===
+
+The following tips will provide a smoother user experience when accessing Freenet in {{project_name_long}}:
+* Torbirdy must be disabled for Thunderbird to connect locally to Freemail's SMTP server. <ref>This may no longer apply now that TorBirdy is incompatible with Thunderbird v68.</ref> As a side-effect HTML emails are rendered by Thunderbird. To disable, go to: <code>Options</code> &rarr; <code>View</code> &rarr; <code>Message Body As</code> &rarr; <code>Plain Text</code>. Freemail takes care of privacy concerns by scrubbing mail headers. <ref>https://github.com/freenet/plugin-Freemail/blob/master/src/org/freenetproject/freemail/MailHeaderFilter.java</ref>
+* Freemail encrypts metadata and subject lines by default. However, for extra assurance and to future-proof your mail against quantum computers you can layer end-to-end encryption on top of Freemail with [[PQCrypto#Codecrypt|Codecrypt]]. <ref>This is a GnuPG-like Unix program for encryption and signing that only uses quantum-resistant algorithms.</ref>
+* Technically each plugin's generated data is self-contained under its own folder under the Freenet directory. For example, to archive your mail spool, copy <code>/freenet/freemail-wot</code> to your backups.
+* The menu layout in Freenet has changed slightly since the [http://freesocial.draketo.de/index_en.html Freenet Social Networking Guide] was written. For WoT identities backup the 'Insert URI' to a safe place. This is your identity's private key and should never be shared. This information is found under <code>Edit</code> of an existing identity. To restore it on a new node paste it in: <code>Create an identity</code> &rarr; <code>Use an existing SSK URI key pair for the identity</code>
+
+== Inproxies inside Whonix-Workstation ==
+
+In mid-2021 one functional Freenet gateway is accessible. The [https://web.archive.org/web/20210411193616/https://d6.gnutella2.info/freenet/ gnutella2 Freenet gateway] is a restricted inproxy which only allows access to a small selection of whitelisted Freesites.
+
+'''Figure:''' ''Freenet Inproxy in {{project_name_long}}''
+
+[[Image:Freenet.png|border]]
+
+== Freenet SSH Workaround ==
+
+A final possible workaround for Freenet connections is to buy, administrate and connect a SSH server anonymously though {{project_name_workstation_long}}. In this configuration, you must install Freenet on the remote location and connect from your {{project_name_workstation_long}} (SSL or SSH tunnel). Refer to the [[SSH]] wiki entry for further information.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

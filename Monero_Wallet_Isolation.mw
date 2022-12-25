@@ -1,0 +1,338 @@
+{{Title|
+title=How-to: Use Monero with Wallet Isolation in {{q_project_name}}
+}}
+{{Header}}
+{{#seo:
+|description=Isolate the network part (monerod) from the wallet part (Monero Wallet) for better security.
+|image=https://www.{{project_clearnet}}/w/images/7/79/Moneroheader.png
+}}
+[[File:Monero-symbol-1280.png|thumb|128px|256px|alt=Monero|link=Monero|Monero Logo]]
+
+= Introduction =
+This instructions document how to isolate the network part (<code>monero<u>d</u></code>) from the wallet part (Monero Wallet) for better security. <code>monero<u>d</u></code> is the Monero daemon, a full blockchain verifying background process which downloads and verifies the whole blockchain.
+
+That advantage of this setup is, should there ever be a vulnerability that allows the exploitation of <code>monero<u>d</u></code> by malware, then all user funds would remain safe, since these would remain isolated in the Monero Wallet in a different VM.
+
+If <code>monero<u>d</u></code> was ever compromised, then this setup would have the same issues as descried on the [[Monero]] wiki page in chapter [[Monero#Remote_Node_Security_and_Privacy_Considerations|Remote Node Security and Privacy Considerations]]. This is an issue unspecific to these instructions.
+
+The connection scheme is <code>Monero Wallet</code> &rarr; <code>monero<u>d</u></code> &rarr; <code>Tor</code> &rarr; <code>Monero network</code>.
+
+Instructions on this wiki page are compatible with the {{project_name_long}} isolating proxy feature, i.e. after [[Stream_Isolation#Disable_Transparent_Proxying|disabling transparent proxying]].
+
+[[Root#Inappropriate_Use_of_Root_Rights|Inappropriate Use of Root Rights]] should be avoided. Instructions on this wiki page have been carefully crafted with when to use and when not to use <code>sudo</code> in mind. The user should not use <code>sudo</code> unless instructed in documentation. <ref>
+The <code>systemctl --user</code> must be run as normal, non-root user without <code>sudo</code> because these are <code>systemd</code> <u>user</u> units and <u>not</u> <code>systemd</code> <u>system</u> units.
+</ref>
+
+{{Testers-Only}}
+
+Credits: These instructions are based on [https://www.getmonero.org/resources/user-guides/cli_wallet_daemon_isolation_qubes_whonix.html How to use Monero CLI/daemon with Qubes + Whonix] by [https://www.getmonero.org getmonero.org].
+
+= Prerequisite Knowledge =
+Since this setup is more complex and for advanced users only, it is highly recommended to acquire essential knowledge about the usage of Monero first without reference to the instructions on this wiki page as per the "normal", simpler instructions on the [[Monero]] wiki page. Only after the essential knowledge has been acquired, the more complex setup documented on this wiki page should be layered on top.
+
+Exercising with small amount of value is recommended but not too small (below the dust level, unable to move funds due to funds being worth less than the required transaction fees). Exercising on Monero testnet first should also be considered. This is [[unspecific]] to {{project_name_long}}.
+
+'''1.''' Optional. How to use Monero Wallet GUI.
+
+If the end-goal is using an offline (airgap) Monero Wallet, learning how to use Monero Wallet GUI would be expendable.
+
+'''2.''' How to use Monero Wallet CLI.
+
+Wallet creation, receiving funds, spending funds.
+
+= Setup =
+== Qubes <code>dom0</code> Configuration ==
+=== Create App Qubes ===
+In <code>dom0</code>.
+
+It is easier to use the exact same names as in the example below in this chapter. Otherwise, adjustments in next chapter "Qubes qrexec Policy Configuration" would be required.
+
+<code>Qubes VM Manager</code> &rarr; <code>VM</code> &rarr; <code>Create App Qube</code>
+
+* Create Qubes-{{project_name_workstation_long}} App Qube
+** Name: <code>monero-wallet-ws</code>.
+** Color: Choose a color label for the {{project_name_workstation_long}} App Qube. Optional suggestion: <code>yellow</code>
+** Use this template: Choose the {{project_name_workstation_long}} Template. For example: <code>{{project_name_workstation_template}}</code>.
+** Standalone: Leave the Standalone field unchecked.
+** Type: Choose the type <code>App Qube</code>.
+** Allow networking: Choose <code>none</code>.
+** Press: <code>OK</code>.
+
+<code>Qubes VM Manager</code> &rarr; <code>VM</code> &rarr; <code>Create App Qube</code>
+
+* Create <code>monero<u>d</u>-ws</code> App Qube
+** Name:  <code>monero<u>d</u>-ws</code>.
+** Color: Choose a color label for the {{project_name_workstation_long}} App Qube. Optional suggestion: <code>red</code>
+** Use this template: Choose the {{project_name_workstation_long}} Template. For example: <code>{{project_name_workstation_template}}</code>.
+** Standalone: Leave the Standalone field unchecked.
+** Type: Choose the type <code>App Qube</code>.
+** Allow networking: Choose the desired {{project_name_gateway_long}} ProxyVM from the list. For example: <code>{{project_name_gateway_vm}}</code>.
+** Press: <code>OK</code>.
+** Make sure this workstation has enough private storage. You can estimate how much space you need by checking the size of the raw blockchain. Keep in mind that the blockchain will take up more space with time.
+
+=== Qubes qrexec Policy Configuration ===
+In <code>dom0</code>.
+
+'''1.''' Create the file <code>/etc/qubes-rpc/policy/user.monerod</code>:
+
+{{CodeSelect|code=
+sudo nano /etc/qubes-rpc/policy/user.monerod
+}}
+
+'''2.''' Add the following line:
+
+<u>Note</u>: If the user is using different names for the VMs other than <code>monero-wallet-ws</code> and <code>monero<u>d</u>-ws</code>, the next line would have to be modified accordingly. If the user is using the exact names as suggested in previous chapter "Create App Qubes", then no modifications are required.
+
+{{CodeSelect|code=
+monero-wallet-ws monerod-ws allow
+}}
+
+'''3.''' Save and close file.
+
+'''4.''' Done.
+
+Qubes <code>dom0</code> setup is complete.
+
+== <code>monero<u>d</u>-ws</code> VM Configuration ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>monero<u>d</u>-ws</code>).
+
+'''1.''' Create folder <code>~/.config/systemd/user</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.config/systemd/user
+}}
+
+'''2.''' Create file <code>~/.config/systemd/user/monero<u>d</u>.service</code>.
+
+{{Open File|
+filename=~/.config/systemd/user/monerod.service
+}}
+
+'''3.''' Paste the following contents. <ref>
+Do not use <code>--detach</code> - outdated style for daemons. Better error handling without.
+</ref>
+
+{{CodeSelect|code=
+[Unit]
+Description=Monero Full Node
+After=network.target
+
+[Service]
+Type=simple
+PIDFile=/home/user/.bitmonero/monerod.pid
+
+## https://github.com/monero-project/monero/issues/5098
+KillSignal=SIGKILL
+
+Environment=DNS_PUBLIC=tcp
+Environment=TORSOCKS_ALLOW_INBOUND=1
+
+ExecStart=torsocks monerod --data-dir=/home/user/.bitmonero \
+    --no-igd --hide-my-port --pidfile=/home/user/.bitmonero/monerod.pid \
+    --log-file=/home/user/.bitmonero/bitmonero.log --p2p-bind-ip=127.0.0.1 \
+    --non-interactive
+
+Restart=always
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target
+}}
+
+'''4.''' Save and close file.
+
+'''5.''' Reload systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user daemon-reload
+}}
+
+'''6.''' Optional: Enable autostart for the <code>monero<u>d</u></code> systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user enable monerod
+}}
+
+'''7.''' Start <code>monero<u>d</u></code> systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user restart monerod
+}}
+
+'''8.''' Create folder <code>/rw/usrlocal/etc/qubes-rpc</code>.
+
+{{CodeSelect|code=
+sudo mkdir -p /rw/usrlocal/etc/qubes-rpc
+}}
+
+'''9.''' {{Open with root rights
+|filename=/rw/usrlocal/etc/qubes-rpc/user.monerod
+}}
+
+'''10.''' Add this line:
+
+{{CodeSelect|code=
+socat STDIO TCP:localhost:18081
+}}
+
+'''11.''' Make the <code>/rw/usrlocal/etc/qubes-rpc/user.monerod</code> script executable.
+
+{{CodeSelect|code=
+sudo chmod +x /rw/usrlocal/etc/qubes-rpc/user.monerod
+}}
+
+'''12.''' Done
+
+Creation and configuration of <code>monero<u>d</u></code> systemd user unit has been completed.
+
+== <code>monero-wallet-ws</code> VM Setup ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>monero-wallet-ws</code>).
+
+'''1.''' {{Open with root rights
+|filename=/rw/config/rc.local
+}}
+
+'''2.''' Append at the bottom.
+
+{{CodeSelect|code=
+socat TCP-LISTEN:18081,fork,bind=127.0.0.1 EXEC:"qrexec-client-vm monerod-ws user.monerod"
+}}
+
+'''3.''' Save and close file.
+
+'''4.''' Make the <code>/rw/config/rc.local</code> script executable.
+
+{{CodeSelect|code=
+sudo chmod +x /rw/config/rc.local
+}}
+
+'''5.''' Restart the <code>monero-wallet-ws</code> VM.
+
+'''6.''' Done.
+
+Setting up automatically starting the <code>socat</code> process has been completed.
+
+= Usage =
+== Introduction ==
+'''Note:''' On the host (Qubes users: in <code>dom0</code>).
+
+The involved VMs need to be started using any usual method (using Qubes VM Manger (QVMM), starting a terminal emulator or otherwise).
+
+'''1.''' Start <code>monero<u>d</u>-ws</code> VM.
+
+'''2.''' Expectations.
+
+Nothing is expected to happen. <code>monero<u>d</u></code> is a background service. To monitor it, see chapter [[Monero_Wallet_Isolation#Monitoring|monitoring]].
+
+'''3.''' Start <code>monero-wallet-ws</code> VM.
+
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>monero-wallet-ws</code>).
+
+'''3.''' Start Monero Wallet. Either,
+
+* '''A)''' Start Monero Wallet GUI using any method (from start menu, from command-line or autostart), <u>or</u>
+* '''B)''' Monero Wallet CLI using any method.
+
+== Monero Wallet GUI First Time Setup ==
+This first time setup only needs to be performed once.
+
+Optional. The user could also avoid using Monero Wallet GUI and use Monero Wallet CLI instead.
+
+Monero Wallet GUI lacks support for multisig and offline signing.
+
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>monero-wallet-ws</code>).
+
+'''1.''' Monero Wallet GUI &rarr; Choose <code>Advanced Mode</code>.
+
+'''2.''' After Monero Wallet GUI was started it will ask to create or restore a wallet as usual, which is unspecific to these instructions.
+
+'''3.''' Configure Monero Wallet GUI to use <u>local</u> <code>monero<u>d</u></code> (which is running in <code>monero<u>d</u>-ws</code> VM).
+
+The following settings will be called <code>remote node</code>. This is no need for concern. See footnote. <ref name=local-vs-remote />
+
+Monero Wallet GUI should now be running. Go to: <ref>
+[https://github.com/monero-project/monero-gui/issues/3724 Monero Wallet GUI fails to detect already running <code>monero<u>d</u></code>]
+</ref>
+
+<code>Connect to a remote node</code> &rarr; <code>Add Remote Node</code> &rarr;  <code>Address:</code> <code>127.0.0.1</code> &rarr;  <code>Port:</code> <code>18081</code>
+
+* <code>Damon username</code>: No modifications required. Leave empty.
+* <code>Daemon password</code>: No modifications required. Leave empty.
+* It is discouraged to select <code>Mark as Trusted Daemon</code>. <ref>
+Benefits would need to be researched and why trust if not needed.
+</ref>
+
+Using a "remote node" in this case is safe, see footnote for explanation why it is safe. <ref name=local-vs-remote>
+This is safe, because connection will be made from <code>monero-wallet-ws</code> VM Monero Wallet to a self-hosted server <code>monero<u>d</u></code> running in <code>monero<u>d</u>-ws</code>.
+</ref>
+
+(If Monero Wallet GUI was already started, these settings can be found under: <code>Settings</code> &rarr; <code>Node</code>)
+
+'''4.''' Done.
+
+Monero Wallet GUI First Time Setup has been completed.
+
+== Monero Wallet CLI First Time Setup ==
+Alternatively Monero Wallet GUI can be used.
+
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>monero-wallet-ws</code>).
+
+Start Monero Wallet CLI.
+
+{{CodeSelect|code=
+monero-wallet-cli
+}}
+
+Monero Wallet CLI is more "clever" and automatically detects the already available <code>monero<u>d</u></code>. <ref>
+<code>monero-wallet-cli</code> detects that <code>monero<u>d</u></code>'s default port <code>18081</code> is open on localhost. The detection mechanism is port based. Not process based.
+</ref> Therefore as opposed to Monero Wallet GUI, no "remote node" configuration is neccessary.
+
+= Monitoring =
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>monero<u>d</u>-ws</code>).
+
+Check the status of the <code>monero<u>d</u></code> systemd user service.
+
+{{CodeSelect|code=
+systemctl --user status monerod
+}}
+
+Follow the journal log of the <code>monero<u>d</u></code> systemd user service.
+
+{{CodeSelect|code=
+journalctl --boot --user -f -u monerod
+}}
+
+Follow the log file of the <code>monero<u>d</u></code>.
+
+{{CodeSelect|code=
+tail -f ~/.bitmonero/bitmonero.log
+}}
+
+View the log file of <code>monero<u>d</u></code>.
+
+{{Open File|filename=
+~/.bitmonero/bitmonero.log
+}}
+
+For the initial author of this wiki page it took approximately 7 minutes from <code>monero<u>d</u></code> log file starting <code>SYNCHRONIZATION started</code> until further progress on synchronization having actually started has been reported.
+
+<pre>
+2021-11-02 10:53:55.204	[P2P4]	INFO	global	src/cryptonote_protocol/cryptonote_protocol_handler.inl:413	SYNCHRONIZATION started
+2021-11-02 11:00:20.821	[P2P9]	INFO	global	src/cryptonote_protocol/cryptonote_protocol_handler.inl:1680	Synced 201/2484385 (0%, 2484184 left)
+</pre>
+
+= See Also =
+* [[Money]]
+* [[Monero]]
+
+= Donations =
+After installing the Monero with wallet isolation server, please consider making a donation to Monero and {{project_name_long}} project ([[Donate]]) to help keep it running for many years to come.
+
+{{Pay_Monero_Specific}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

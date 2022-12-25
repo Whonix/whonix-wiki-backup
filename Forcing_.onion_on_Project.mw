@@ -1,0 +1,133 @@
+{{Header}}
+{{title|
+title=Forcing Onion Connections on {{project clearnet}}
+}} {{#seo:
+|description={{project_name_long}} Onion Website - How to consistently access the {{project_name_long}} website through its Tor Onion Service
+|image=Dumbbell-940375640.jpg
+}}
+[[image:Dumbbell-940375640.jpg|thumb]]
+__TOC__
+= Introduction =
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Note</u>:
+
+Consistent use of the {{project_name_long}} onion service affords several benefits. It provides alternative end-to-end encryption which is independent from [[SSL]] certificate authorities and the mainstream Domain Name System and it also reduces the load on Tor exit nodes.
+}}
+
+The onion domain of {{project name long}} is <code>{{project_onion}}</code>.
+
+{{CodeSelect|code=
+{{project_onion}}
+}}
+
+Or in machine readable format ([[API]]), here is a raw link that only shows the onion: {{Archive_link
+|url=https://www.{{project_clearnet}}/w/index.php?title=Template:Project_onion&action=raw
+|onion=http://www.{{project_onion}}/w/index.php?title=Template:Project_onion&action=raw
+|text=raw
+}}
+
+To use <code>.onion</code> services when browsing <code>{{project_clearnet}}</code> follow the links below to the {{project_name_long}} homepage, forums, download, debian repository, issue tracker, or the {{project_name_long}} Debian repository.
+
+* [https://www.{{project_clearnet}} homepage] [http://www.{{project_onion}} onion]
+* [https://forums.{{project_clearnet}} forums] [http://forums.{{project_onion}} onion]
+* [https://download.{{project_clearnet}} download] [http://download.{{project_onion}} onion]
+* [https://deb.{{project_clearnet}} debian repository] [http://deb.{{project_onion}} onion]
+* [https://phabricator.{{project_clearnet}} phabricator] [http://phabricator.{{project_onion}} onion]
+
+Two choices regarding an optional [[#HTTPS_Everywhere_User_Rules|user rule]]:
+
+* '''A)''' If using: Configuration of an optional [[#HTTPS_Everywhere_User_Rules|user rule]] might be useful to further enforce using {{project_name_long}} <code>.onion</code> address and avoid ever being redirected to the clearnet version due to technical imperfections.
+* '''B)''' It not using: Note that if a user rule is not configured, some resources from the clearnet <code>{{project_clearnet}}</code> address might be utilized when navigating the onion address. <ref>
+The reason is MediaWiki and discourse are using the primary {{project_name_long}} https domain. These webapps do not support multiple domains for the same website. See also [[Trust#Web_Application_Shortcomings|Web Application Shortcomings]] and [[Privacy Policy Technical Details#Privacy on the Website|Privacy on the  {{project_name_long}} Website]].
+</ref> Also note that on a few occasions in the past it was not possible to log in to the {{project_name_long}} forums using the onion address. <ref>
+https://forums.{{project_clearnet}}/t/onion-forum-broken/8870
+</ref> <ref>
+This suggests the {{project_name_long}} forums onion address could become (temporarily) inaccessible in the future.
+</ref>
+
+[https://community.torproject.org/onion-services/advanced/onion-location/ <code>Onion-Location</code>]: Tor Browser 9.5 and later features, an opt-in for using onion sites automatically for participating websites. The system administrator of individuals websites can choose to configure this. <ref>
+* {{archive_link
+|url=https://newsletter.torproject.org/archive/2020-06-30-tor-browser-makes-onion-services-easier-to-find-use/
+|onion=http://a4ygisnerpgtc5ayerl22pll6cls3oyj54qgpm7qrmb66xrxts6y3lyd.onion/archive/2020-06-30-tor-browser-makes-onion-services-easier-to-find-use/
+|text=Tor Browser 9.5 makes onion services easier to find and use
+}}
+* https://support.torproject.org/onionservices/onion-location/
+</ref> Direct connects to onion services are harder to track than the opt-in method, which must make DNS requests and web server connections from an exit node before being able to switch to the onion service. The <code>{{project_clearnet}}</code> is participating, setting the <code>Onion-Location</code> header.
+
+= HTTPS Everywhere User Rules =
+
+== Requirements ==
+* The user must have Tor Browser installed, which is the default in {{project_name_long}}.
+* A recent (non-ancient) Tor version. <ref>
+v3 onion connections require Tor v3.2 or above.
+</ref>
+
+== Background ==
+[https://www.eff.org/https-everywhere HTTPS Everywhere] by [https://www.eff.org EFF] is a browser add-on produced as a collaboration between the Tor Project and the [https://www.eff.org EFF]. It uses clever technology to automatically force encrypted communications (HTTPS) on many major websites (where it is offered), preventing the user from browsing the HTTP (insecure) version. However, HTTPS Everywhere supports user rules, and it is not limited to HTTP(S). This means the user can configure it to rewrite requests from the <code>.org</code> extension to <code>.onion</code> domains instead! <ref>
+Because of the way most popular web applications are written, they expect to be at one location, for example <code>forums.{{project_clearnet}}</code>, and not at multiple locations. That is why this workaround is needed.
+
+https://forums.whonix.org/t/whonix-blog-inaccessible-through-hidden-service
+</ref>
+
+[https://www.eff.org/deeplinks/2021/09/https-actually-everywhere HTTPS Everywhere is now in maintenance mode and planned for deprecation.] <ref>
+* https://arstechnica.com/gadgets/2021/09/electronic-frontier-foundation-will-deprecate-https-everywhere-plugin/
+* https://forums.whonix.org/t/forcing-onion-on-whonix-org/510/16
+</ref>
+
+== Adding User Rules ==
+Using "HTTPSEverywhereUserRules" directory for user rules is no longer supported. HTTPS Everywhere developer jeremyn clearly stated <ref> See details here: https://github.com/EFForg/https-everywhere/issues/14375#issuecomment-359449102</ref>:
+
+<blockquote>HTTPSEverywhereUserRules/ is not supported with WebExtensions and won't be supported.</blockquote>
+
+Now that Firefox uses WebExtensions, rules must now be added from the HTTPS Everywhere GUI. The [https://www.whonix.org {{project_name_long}} homepage] is used in this example. Please note it may be necessary to repeat the steps below for redirection of [https://forums.{{project_clearnet}} {{project_name_long}} forums].
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Platform Specific Notice</u>:
+* {{Non q project name}}: No platform specific steps required.
+* {{q_project_name}} users: The procedure below is not persistent for Tor Browser in [[{{q_project_name_short}}|{{q_project_name}}]] DisposableVMs unless the [[Qubes/Disposables#Customization|DVM template is customized]].
+}}
+
+{{box|text=
+Inside {{Project name workstation long}}.
+
+# Go to the site. (https://www.whonix.org)
+# Select the "hamburger" icon on the far right of Tor Browser's toolbar and select "customize". Add the HTTPS Everywhere icon to the toolbar. You can remove it later, when you are finished.
+# Once the site has loaded, click the blue HTTPS Everywhere icon in the upper corner of Tor Browser and select "See more".
+# Click on "Add a rule for this site".
+# Click on "Show advanced" under the host field. For each user rule set two fields require editing.
+# Change "matching regex" from <code>^http://</code> to <code>^https?://</code> so redirects work from both HTTP and HTTPS. If this value is not changed, redirects can be broken (because the default rule set in the extension already has a rule that redirects from HTTP).
+# Change "redirect to" to the onion address you want to use. (http://{{project_onion}}/)
+# Click "Add a new rule for this site" and refresh the page. If configured correctly the page should now redirect automatically. Be mindful that multiple rules may be needed for an address to work completely. In that case, it is necessary to repeat this process.}}
+
+'''What if I made a mistake or the rule won't work?''' <br />
+Broken or unwanted rules can be removed by managing the HTTPS Everywhere extension from the add-ons menu.
+
+''Technical information:'' user rules are stored in a sqlite3 binary file that cannot be edited using a text editor. While it might be possible to edit this file, instructions to do this fall outside the scope of this wiki. Therefore it is recommended that users create periodic backups of this file so it can be restored to its previous state in the event of a broken redirect or if a mistake is made.
+
+If this file is deleted it will be re-created to its defaults on the next browser start. The file is stored in: <code>/home/user/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/storage-sync.sqlite</code>. A rule will look something like this: <blockquote>{"host":"www.whonix.org","redirectTo":"http://{{project_onion}}/","urlMatcher":"^https?://www\\.whonix\\.org/"}, </blockquote>
+A trailing comma and space as shown above will appear if there are multiple rules. As a reminder be sure to create a backup of this file before making any changes.
+
+----
+
+'''What if I am using a DispVM in {{q_project_name}}?''' <br />
+Any changes to the HTTPS Everywhere user rule file will revert to the defaults after the DispVM is stopped. It is necessary to complete these steps again when a new DispVM is launched, unless the [[Qubes/Disposables#Customization|DVM template is customized]].
+
+== Other Rules ==
+
+Other similar rulesets -- like those found on the [https://github.com/chris-barry/darkweb-everywhere Darkweb Everywhere github page] -- do not work either, since they also depend on using the "HTTPSEverywhereUserRules" directory.
+
+= Forum Discussion =
+* https://forums.whonix.org/t/forcing-onion-on-whonix-org/510
+
+= See Also =
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

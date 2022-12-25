@@ -1,0 +1,216 @@
+{{Header}}
+{{#seo:
+|description=Introduction into {{project_name_long}} source code.
+|image=https://www.{{project_clearnet}}/w/images/f/fa/Accept-47587640.png
+}}
+{{title|title=
+{{project_name_long}} Source Code Introduction
+}} {{forkme}}
+= Introduction =
+This chapter is dedicated to give an introduction into the {{project_name_long}} source code. '''''If you prefer to read and understand the source code just by reading scripts you may skip this optional chapter.''''' It can be quite difficult to get started with hacking existing big complex projects.
+
+'''build-steps'''
+
+This is a high level overview. {{project_name_long}}-Example-Implementation can currently be build in nine steps. (There is also a derivative-maker script, which automates these eight steps for your convenience.)
+
+* 1100_prepare-build-machine
+* 1150_export-libvirt-xml
+* 1200_create-debian-packages
+* 1300_create-raw-image
+* 1700_install-packages
+* 2300_run-chroot-scripts-post-d
+* 2400_convert-raw-to-qcow2
+* 2500_convert-raw-to-vdi
+* 2600_create-vbox-vm
+* 2700_export-vbox-vm
+* 2800_create-report
+
+'''help-steps'''
+
+Boring methods, which are required by the build-steps above.
+
+* delete-vbox-vm
+* mount-raw
+* chroot-raw
+* unchroot-raw
+* unmount-raw
+* pre gets sourced by all other scripts.
+* variables gets sourced by all other scripts.
+
+'''derivative-maker'''
+
+Is a script, which simply runs all other build-steps. Actually it is "optional". It has very little functionality besides running all other steps. You are free to run all steps one by one. That is useful for learning and for debugging purposes. In case you want to fix a bug or in case you want to upgrade the distribution or in case you want to switch the operating system or whatever you are better off running the steps manually. Run it with --help to see available switches.
+
+'''''Overview''''':
+
+# prepare-build-machine: installs build dependencies and applies a few other required settings for building from source.
+# export-libvirt-xml: Copies files from {{Code2|libvirt}} folder to {{Code2|~/whonix_binary}} folder and adds version numbers to them.
+# create-debian-packages: Recursively works through {{Code2|packages}} folder, builds them one by one and adds them to a local APT repository.
+# create-raw-image: [https://grml.org/grml-debootstrap/ grml-debootstrap] creates virtual machine images in '''.raw''' image format. It keeps care of creating the image, the partition table, grub boot manager, minimal system debootstrap and apt installing all {{project_name_long}} packages. This step requires most time in the build process.
+# install-packages: Installs meta .deb packages whonix-shared-packages-dependencies/recommended, desktop, desktop-kde, kde-accessibility and whonix-*-packages-dependencies/recommended and whonix-workstation-default-applications. Those only include dependencies and recommended packages which are pulled from Debian's apt repository.
+# run-chroot-scripts-post-d: Post Chroot Scripts are applied.
+# convert-raw-to-qcow2: Only having effect when using {{Code2|--qocw2}} switch. The '''.raw''' image gets converted to a '''.qcow2''' image. Actually not converted, a new file will be created and the old '''.raw''' remains available until cleanup is run or manually deleted or grml-debootstrap runs again. The '''.raw''' format is more "generic". VirtualBox does not support raw ('''.raw''') images, but '''.vdi''' and '''.vmdk''' (and others).
+# convert-raw-to-vdi: The '''.raw''' image gets converted to a '''.vdi''' image. (Actually not converted, as explained above.)
+# create-vbox-vm: A virtual machine (VirtualBox) will be created and the '''.vdi''' image will be attached.
+
+'''''Modularity:'''''
+
+All steps could be easily replaced to add support for additional virtualizers, operating systems and so on. The numbers before the script names (20_..., 25_..., 30..., ...) are honored by derivative-maker (using [https://manpages.ubuntu.com/manpages/kinetic/en/man8/run-parts.8.html run-parts]), which runs these steps in lexical order. Therefore you can easily add steps to the beginning or the end or even wretch steps in between.
+
+'''''File sizes:'''''
+
+Do not get shocked by file sized. Initially the .raw is created with a size of 100 GB, but it will actually only take a fraction of that space on the harddrive. This is because .raw .vdi and .vmdk are all [[sparse files]], which means they do not take their maximum size, but only as much data as really is inside these images.
+
+'''Chroot Scripts'''
+
+* packages/anon-*-build-*/usr/lib/anon-dist/chroot-scripts-post.d/
+
+'''''Summary:'''''
+
+Thus, given the nature of the build step orientated scripts, you can easily work on the different aspects of {{project_name_long}}. For example, once you have created a clean virtual machine with the operating system only, you can make a copy, run either the gateway or the workstation copy routine or Chroot Scripts as often as you need to test your changes and if something goes wrong, go back to backup. You don't have to build everything from scratch again. <ref>If something would go wrong, you would have to reinstall the whole operating system every time again. That's why we use separate steps.</ref>
+
+'''''Another Introduction:'''''
+
+It is really not that difficult after all. If you like, you could read [[Manually Creating Whonix|Manually Creating {{project_name_long}}]], which is a similar topic, which covers part of this in other words.
+
+= Debugging =
+Stuff you may find helpful for debugging.
+
+== Build Configuration ==
+
+See [[Build Configuration]].
+
+== Building without derivative-maker main script ==
+=== most basic ===
+Example using an apt cache (apt-cacher-ng) and building qcow2 images.
+
+<pre>
+sudo apt install apt-cacher-ng
+</pre>
+
+<pre>
+cd derivative-maker </pre>
+
+<pre>
+sudo ./build-steps.d/1100_prepare-build-machine --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/1150_export-libvirt-xml --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/1200_create-debian-packages --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/1300_create-raw-image --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/1700_install-packages --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/2300_run-chroot-scripts-post-d --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/2400_convert-raw-to-qcow2 --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/2500_convert-raw-to-vdi --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/2600_create-vbox-vm --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/2700_export-vbox-vm --build --target qcow2 --flavor whonix-gateway
+</pre>
+<pre>
+sudo ./build-steps.d/2800_create-report --build --target qcow2 --flavor whonix-gateway
+</pre>
+
+=== optional ===
+For example for a qcow2 build, the following steps can be safely skipped, since these would be doing nothing anyway.
+
+* 2500_convert-raw-to-vdi
+* 2700_export-vbox-vm
+* 2800_create-report (not in use currently)
+
+
+When first creating a gateway build and then building a workstation build (or vice versa) the following steps do not need to be repeated:
+
+* 1100_prepare-build-machine
+* 1200_create-debian-packages
+
+= Mount and inspect images =
+
+[[File_Transfer#Mount_and_Inspect_Images|Mount and inspect images]]
+
+= Less Important Goodies =
+
+== Unpacking '''.ova''' images ==
+
+If you want for some reason to unpack an '''.ova''', for example to get the '''.vdmk''' image, you can use tar.
+
+{{CodeSelect|code=
+tar -xvf {{project_name_gateway_short}}.ova
+}}
+
+Will show:
+
+{{CodeSelect|code=
+{{project_name_gateway_short}}.ovf
+{{project_name_gateway_short}}-disk1.vmdk
+}}
+
+== Converting '''.vmdk''' images to '''.raw''' images ==
+
+{{CodeSelect|code=
+#qemu-img info {{project_name_gateway_short}}-disk1.vmdk
+}}
+
+{{CodeSelect|code=
+qemu-img convert {{project_name_gateway_short}}-disk1.vmdk -O raw {{project_name_gateway_short}}.raw
+}}
+
+{{CodeSelect|code=
+#qemu-img info {{project_name_gateway_short}}.raw
+}}
+
+= Build Script Features =
+See https://www.kicksecure.com/wiki/Dev/Derivative-Maker
+
+= Notes =
+<pre>
+sudo ~/derivative-maker/packages/kicksecure/developer-meta-files/debug-steps/interactive-chroot-raw --target raw --flavor whonix-host-xfce --build --freedom false
+</pre>
+
+= Why not Replace grml-debootstrap with 'X'? =
+
+{{project_name_long}} developers are not remotely close to exhausting <code>grml-debootstrap</code>'s extensive feature-set yet. <ref>
+https://forums.whonix.org/t/replacing-grml-debootstrap-debos-build-platform/5582/3
+</ref>
+
+There are two sorts of VM image creation tools:
+
+* [A] Those that use virtualization, boot the image and perform actions.
+* [B] Those that use <code>chroot</code> (or maybe <code>systemd-spawn</code>).
+
+[A] is incompatible with {{project_name_long}} design principles due to files being created during boot, such as entropy seeds. This is a less clean method and is not suitable for redistribution. Similar to [[Dev/Installation_from_Repository#Distro_Morphing_vs_Builds|Distro Morphing vs Builds]].
+
+In either case it would be necessary to compare:
+
+# The image created by grml-debootstrap versus the new tool.
+# Create an image twice using the new tool and inspect the diff.
+
+Related:
+
+* https://github.com/{{project_name_short}}/derivative-maker/blob/master/help-steps/analyze_image
+* [[Verifiable Builds]]
+
+= See Also =
+* [[Dev/coding_style|Coding Style]]
+* [[Dev/Documentation Guidelines|Documentation Guidelines]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Development]] [[Category:Design]]

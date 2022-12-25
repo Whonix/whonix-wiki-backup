@@ -1,0 +1,395 @@
+{{Title|title=Physical One-time Pad}}
+{{Header}}
+{{#seo:
+|description=Creating a Physical One Time Pad. Unbreakable Encryption for Secure Communication.
+|image=https://www.{{project_clearnet}}/w/images/e/ef/Onetimepage13123123.png
+}}
+[[image:Onetimepage13123123.png|200px|thumb]]
+= Introduction =
+
+{{project_name_long}} users with high-security needs can utilize a ''physical'' one-time pad to pair with  encrypted email as a bulletproof, secure communications channel that it is military grade. A one-time pad is: <ref>https://www.amrron.com/wp-content/uploads/2015/05/one_time_pad.pdf</ref>
+
+<blockquote>... the only mathematically unbreakable encryption system, is usually a sheet of paper with random numbers in groups of five or more digits. Typically, the letters of the message are converted into numbers and are added to numbers from the notepad using a simple mathematical operation known as “false addition.” The result is then transmitted. The recipient uses the same page from his own one-time pad and extracts the plain text message by applying “false subtraction” to the encrypted message.
+
+This procedure is simple, yet highly effective: The message can only be decoded by a third party if they get access to recipients’ one-time pads.</blockquote>
+
+Although software options are available to undertake this function such as [https://en.wikipedia.org/wiki/One-time_pad onetime] in Debian, this presupposes an advanced adversary has not already compromised the computer that is being used for secure communications. By creating and utilizing a one-time pad created with physical instruments, this circumvents the threat of any potentially hostile actors and hardware.
+
+= One-time Pad Overview =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = The description of this procedure draws heavily upon the following paper authored by Dirk Rijemnants from [https://web.archive.org/web/20160216191153/http://users.telenet.be/d.rijmenants/ Cipher Machines and Cryptology]: [https://web.archive.org/web/20150924142953/http://users.telenet.be/d.rijmenants/papers/one_time_pad.pdf The Complete Guide to Secure Communications with the One Time Pad Cipher]; all credits go to the author. Readers who are interested in cipher machines, cryptology, intelligence and security matters can also visit Dirk's blog: [https://rijmenants.blogspot.com/ SIGINT CHATTER]. This material has been used with the author's permission.
+}}
+
+This chapter describes how to protect short text messages with one-time pad encryption. Only communication between two parties is described for simplicity. The essence of this technique is a plaintext is paired with a random secret key (also referred to as a one-time pad). Then, each bit or character of the plaintext is encrypted by combining it with the corresponding bit or character from the pad using modular addition.
+
+All that is required is pencil and paper, use of a character-to-digits checkerboard,  physical dice to create the one-time pad encryption key, and a communication channel (computer) for relaying the message.
+
+== Glossary ==
+
+* Cryptography and cryptanalysis: the sciences of making and breaking codes.
+* Plaintext: the readable and unprotected message.
+* Plaincode: plaintext that is encoded into digits (but still in plain readable form)
+* Encryption / enciphering: the process of making the message unintelligible by applying an algorithm under control of a key.
+* Ciphertext: the result of encryption.
+* Decryption or deciphering: the process of turning the ciphertext back into readable plaincode or plaintext with the help of the proper key.
+
+== Perfect Secrecy ==
+
+If this technique is correctly applied it will be mathematically impossible for any eavesdroppers to decrypt the message without the proper decryption key (held on your person and your intended communication partner): <ref>https://en.wikipedia.org/wiki/One-time_pad</ref>
+
+<blockquote>One-time pads are "information-theoretically secure" in that the encrypted message (i.e., the ciphertext) provides no information about the original message to a cryptanalyst (except the maximum possible length of the message). This is a very strong notion of security first developed during WWII by Claude Shannon and proved, mathematically, to be true for the one-time pad by Shannon about the same time...  Properly used one-time pads are secure in this sense even against adversaries with infinite computational power.
+
+Claude Shannon proved, using information theory considerations, that the one-time pad has a property he termed perfect secrecy; that is, the ciphertext C gives absolutely no additional information about the plaintext. This is because, given a truly random key which is used only once, a ciphertext can be translated into any plaintext of the same length, and all are equally likely.
+
+Thus, the a priori probability of a plaintext message M is the same as the a posteriori probability of a plaintext message M given the corresponding ciphertext. Mathematically, this is expressed as H(M)=H(M|C), where H(M) is the entropy of the plaintext and H(M|C) is the conditional entropy of the plaintext given the ciphertext C. Perfect secrecy is a strong notion of cryptanalytic difficulty.</blockquote>
+
+It should be emphasized that although you do not need a computer, special equipment or any knowledge about cryptographic techniques or mathematics, the advice must be carefully read and followed. Nevertheless, if used properly it is impossible for adversaries to decrypt the encrypted data without the physical key, regardless of the possible development of quantum computers or more advanced cryptanalytic attacks and/or technology.
+
+Also note that although the method of combining plaintext with a random key is unbreakable, it does not prevent malicious modification of the cipher text by an adversary, given it does not utilise message authentification protocols.
+
+== Message Authentication ==
+
+It should be noted that one-time pads do not provide message authentication. In comparison, standard encryption computer protocols like OTR, OpenVPN and so on use a message authentication code (MAC) to authenticate messages/data and provide an integrity check to see whether there have been any changes to the content.
+
+MAC is normally achieved via multiple methods, such as crytographic hash functions, universal hashing and block cipher algorithms, but this is impossible with purely manual methods. This means if the message is corrupted and does not make sense when decrypted, this may relate to transmission errors across the network or possible modification of the cipher text by an adversary, with it remaining the exact same size as the original message. <ref>https://crypto.stackexchange.com/questions/74880/why-do-one-time-pads-not-provide-message-authentication</ref>
+
+== One-time Pad Security Prerequisites ==
+
+Ciphers will ''only'' remain unbreakable if the following conditions are fully met:
+
+* Values in the one-time pad are truly random and not pseudo-random. <ref>[https://web.archive.org/web/20190727123642/https://simplicable.com/new/pseudorandom-vs-random Pseudorandom vs Random]: <blockquote>Pseudorandom is an approximated random number generated by software. Software running on regular hardware is highly deterministic, meaning it runs the same every time. As such, it is difficult to generate a real random number in software as it runs too predictably to be considered random.
+
+A true random number is a number selected from a range with each number in the range having equal and completely unpredictable chance of selection.</blockquote></ref>
+* Secure messages require one-time pad values that are at least as long as the message to be encrypted.
+* The sender or receiver never uses the encryption keys more than once.
+* The sender/receiver destroy encryption keys immediately after use. <ref>This is why randomness functions in operating systems are not used to generate keys -- as well as being pseudorandom, traces of computing activity are left scattered throughout the system.</ref>
+* Communicating parties keep one-time pads secure at all times.
+* Only two copies of the key are maintained: one each for the sender and receiver.
+
+In this example, the key and plaintext are calculated utilizing modulo 10 (digits).
+
+== One-time Pad Resources ==
+
+The following resources are necessary for this procedure:
+
+* Two six-sided dice. <ref>If physical dice from game sets are unavailable, it is possible to use [https://timvandevall.com/printable-paper-dice-template/ printed templates that form paper dice].</ref>
+* Sheets of paper and a pencil to write unique keys down.
+* A suitable checkerboard variation (see further below) to convert plain text into digits.
+* Mental calculation ability to perform simple subraction/addition to encrypt/decrypt messages (modulo 10 for numerical keys).
+* A computer and an agreed communication channel for relaying the encrypted message:
+** Persons at high-risk are recommended to avoid sending or receiving messages at their home address -- any evidence of encrypted messages may itself pose a risk. In this case it may be safer to utilize [[USB Installation|{{project_name_long}} on USB]] from a USB on a random computer.
+** If evidence of encrypted messages is not a risk in your circumstances, then common email programs (preferably with OpenPGP encryption configured) can be utilized.
+** Another alternative is to hide the cipher text in plain looking messages or using [https://en.wikipedia.org/wiki/Steganography steganography]; see [[#Appendix|Appendix]].
+
+= Procedure =
+
+== One-time Pad Creation ==
+
+To perform encryption, we need a key aka one-time pad. This could be a single sheet, a booklet or a roll of paper tape that contains a series of truly random digits. <ref>There are also one-time pads with random letters, but they are only suitable to encrypt letters-only text. Therefore, they are ignored for the purpose of flexibility and practicality.</ref> A one-time pad actually consists of <u>two</u> identical one-time pads, one pad called OUT and one called IN:
+
+* For <u>one-way</u> communications, only an OUT pad is required for the sender and an ''identical'' copy called IN pad is held by the receiver.
+* For <u>two-way</u> communications, two different one-time pad sets are required:
+** Person A has an OUT pad and person B has the identical IN copy.
+** Person B has ''another'' OUT pad and person A has the identical IN copy.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Do not use a single pad for communicating in both directions, as this risks simultaneously using the same pad sheet.
+}}
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = '''Reminder:''' One-time pad encryption requires both the sender and receiver to be in possession of the same key -- it is necessary to exchange keys beforehand (physically, not electronically!). It is necessary to have enough key material for all communications until a new exchange of keys is possible.
+}}
+
+'''Figure:''' ''Example One-time Pad Sheet''
+
+           OUT 00036
+
+32065 41228 53555 27266 65125 <br />
+42381 77751 64923 23378 42602 <br />
+32301 35198 55997 10309 17844 <br />
+65103 58856 42733 03499 92585 <br />
+06702 42784 63883 51365 56374 <br />
+80507 19148 80368 28748 20106 <br />
+21459 71827 00362 01538 04614 <br />
+40915 44398 89632 57444 97452 <br />
+18508 32496 73818 88177 92422 <br />
+83366 94296 49126 86947 32382
+
+As can be seen above, each sheet contains 250 digits, which are formatted in five-digit groups. This is enough for a message of approximately 180 characters. It must be reiterated that all digits <u>must</u> be truly random, as this ensures the security of the encryption process.
+
+Note also that each sheet is marked with OUT or IN at the top, with the first five-digit group serving as a key indicator (indicating to the receiver which pad they should decrypt the message with). It is essential that this key indicator group is truly random, and is always different from the first group of all other sheets in the same pad (so there is no confusion). Do <u>not</u> use a serial number or pre-arranged format as the key indicator, as this reveals information about the number of messages sent, their order, or could link the owner to previously sent messages.
+
+To create your own sample one-time pad -- remembering that each pad would be used in turn for each message -- utilize the following table. This will generate true random numbers between 0-9 when using six-sided dice (be sure to discard throws with a black six).
+
+'''Table:''' ''True Random Number Generation Table''
+
+Generating True Random Digits 0 to 9 with <u>B</u>lack and <u>W</u>hite dice.
+THROWS WITH BLACK 6 ARE DISCARDED
+
+{| class="wikitable"
+! '''BW'''
+! '''BW'''
+! '''BW'''
+! '''BW'''
+! '''BW'''
+
+|-
+| 11 = 0
+| 21 = 6
+| 31 = 2
+| 41 = 8
+| 51 = 4
+
+|-
+| 12 = 1
+| 22 = 7
+| 32 = 3
+| 42 = 9
+| 52 = 5
+
+|-
+| 13 = 2
+| 23 = 8
+| 33 = 4
+| 43 = 0
+| 53 = 6
+
+|-
+| 14 = 3
+| 24 = 9
+| 34 = 5
+| 44 = 1
+| 54 = 7
+
+|-
+| 15 = 4
+| 25 = 0
+| 35 = 6
+| 45 = 2
+| 55 = 8
+
+|-
+| 16 = 5
+| 26 = 1
+| 36 = 7
+| 46 = 3
+| 56 = 9
+
+|}
+
+Roll your two six-sided dice to generate each individual number in the pad, until all 250 digits have been generated (throws with black six are discarded). Take special note of the following warning:
+
+<blockquote>Never ever simply use normal six-sided dice by adding the values of two dice. This method is statistically unsuitable to produce values from 0 to 9 and thus absolutely insecure (the total of 7 will occur about 6 times more often that the values 2 or 12). Instead, use one black and one white die and assign a value to each of the 36 combinations, taking in account the order/colour of the dice (see table below). This way, each combination has a .0277 probability (1 on 36). We can produce three series of values between 0 and 9. The remaining 6 combinations (with a black 6) are simply disregarded, which doesn't affect the probability of the other combinations.</blockquote>
+
+​{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = '''Reminder:''' This key material should be stored in a small pad at all times and <u>not</u> stored on a computer or removable media device such as a CD, USB and so on.
+}}
+
+== Message Preparation ==
+
+Once your key material is ready, your message must be prepared for sending. It is recommended to use only short, concise sentences and remove spaces where it does not affect readability. Abbreviations are also recommended. However, do <u>not</u>:
+
+* Use names of persons or places unnecessarily, that is, if the message contents clarifies those names/places or simply the origin/destination of the message does so.
+* Use fixed structures or formatting in the message.
+* Exceed 250 digits in message length (larger messages are split into parts, with each part using a new one-time pad key).
+
+Before encrypting the message, plaintext is converted into a series of digits (plaincode) via the use of a checkerboard. <ref>Letters used often are represented with a single-digit value, with all other characters represented by a double-digit value.</ref> It should be emphasized the plaintext to plaincode conversion provides no security at all -- this is simply a necessary step before final encryption. To illustrate this technique, the checkerboard below will be utilized. Note that various checkerboards exist, particularly for languages other than English.
+
+'''Table:''' ''Conversion Table No.1: English''
+
+{| class="wikitable" style="background-color:#fff;text-align:center"
+|- style="background-color: #f9f9f9"
+| CODE-0
+| B-70
+| P-80
+| FIG-90
+|-
+| A-1
+| C-71
+| Q-81
+| (.)-91
+|-
+| E-2
+| D-72
+| R-82
+| (:)-92
+|-
+| I-3
+| F-73
+| S-83
+| (')-93
+|-
+| N-4
+| G-74
+| U-84
+| ( )-94
+|-
+| O-5
+| H-75
+| V-85
+| (+)-95
+|-
+| T-6
+| J-76
+| W-86
+| (-)-96
+|-
+|
+| K-77
+| X-87
+| (=)-97
+|-
+|
+| L-78
+| Y-88
+| REQ-98
+|-
+|
+| M-79
+| Z-89
+| SPC-99
+|}
+
+Note that it does not matter which checkerboard is used, so long as the recipient also uses the same one. Also, an adversary's awareness of the checkerboard method used does not assist in decryption.
+
+Based on the table above:
+* spaces are represented by 99 (SPC)
+* a comma and apostrophe are both represented by 93 (')
+* 94 ( ) opens and closes parentheses
+* figures are written out three times to avoid errors and preceded and followed by 90 (FIG)
+* request code 98 (REQ) can be replaced by a question mark
+
+Inspect the example below.
+<pre>
+W  H  O N I X     I S     B  E T T E R     T H  A N
+86 75 5 4 3 87 99 3 83 99 70 2 6 6 2 82 99 6 75 1 4 99
+
+U  S  I N G     W  I N D  O Z  E    S  P  Y  W  A R  E (,)
+84 83 3 4 74 99 86 3 4 72 5 89 2 99 83 80 88 86 1 82 2 93 90
+
+1   0   0      P  E R  C  E N T (.) P  A T R  I C  K     R  O C  K  S     O K
+111 000 000 90 80 2 82 71 2 4 6 91  80 1 6 82 3 71 77 99 82 5 71 77 83 99 5 77
+</pre>
+Note that codebooks exist for use with common words, but for simplicity that has not been used in this example.
+​
+To prepare the message for encryption, the numbers above are arranged in groups of five:
+
+86755 43879 93839 97026 62829 96751 49984 83347 49986 34725 89299 83808 88618 22939 01110 00000 90802 82712 46918 01682 37177 99825 71778 39957 79191
+
+The last group is always completed with full stops (9191...), hence the additional (x2) '91' in the series.
+
+== Message Encryption ==
+
+Now the message has been converted into digits, it is possible to start the encryption. The first group of the one-time pad is the key indicator, so it should <u>never</u> be used in the encryption process. To encrypt the message:
+
+# the plaincode from the previous section is written down (in groups of five)
+# the digits of the one-time pad key are written beneath them
+# subtract the one-time pad digits from the plaincode, digit by digit from left to right and by modulo ten. Where necessary, this means subtracting without borrowing e.g. 3 - 8 = 5 because [1]3 - 8 = 5.
+# write the resulting ciphertext at the bottom
+
+Using our earlier one-time pad sample with the plaincode leads to the following ciphertext.
+
+'''Plaincode''' : KEYID 86755 43879 93839 97026 62829 96751 49984 83347 49986 34725 89299 83808 88618 22939 01110   00000 90802 82712 46918 01682 37177 99825 71778 39957 79191
+
+'''OTP Key(-)''': 32065 41228 53555 27266 65125 42381 77751 64923 23378 42602 32301 35198 55997 10309 17844 65103 58856 42733 03499 92585 06702 42784 63883 51365 56374 80507
+
+'''Ciphertext''': 32065 45537 90324 76673 32901 20548 29000 85061 60079 07384 02424 54101 38911 78319 15195 46017 52254 58179 89323 54433 05980 95493 36042 20413 83683 99494
+
+Below is the ciphertext that would be sent, rearranged in five groups per row.
+
+32065 45537 90324 76673 32901 <br />
+20548 29000 85061 60079 07384 <br />
+02424 54101 38911 78319 15195 <br />
+46017 52254 58179 89323 54433 <br />
+05980 95493 36042 20413 83683 <br />
+99494
+
+Be sure to destroy the pad you just used, including any unused part! <u>Never</u> reuse a pad.
+
+== Message Decryption ==
+
+Upon receiving an encrypted message:
+
+* the receiver checks the first group (the key indicator/ID) to check the correct one time pad is used
+* the cipher text is written down first
+* the proper one time pad digits (OTP key) is written directly underneath
+* the first group is ignored, as it only identifies the necessary key to use
+* the digits are added together (without carry; for example 9 + 7 = 6, not 16) to generate the plaincode
+* the checkerboard is used to re-covert the plaincode digits into plaintext
+
+​To decrypt the message, the receiver verifies the first group of the message to ensure that he uses the correct one-time pad sheet. Next, he writes the proper one-time pad digits underneath the ciphertext and adds the key to the ciphertext, digit by digit, without carry (e.g. 9 + 6 = 5 and not 15). The first group is skipped as it is only used to identify the key.
+
+'''Ciphertext''' : 32065 45537 90324 76673 32901 20548 29000 85061 60079 07384 02424 54101 38911 78319 15195 46017 52254 58179 89323 54433 05980 95493 36042 20413 83683 99494
+
+'''OTP Key(+)''' : 32065 41228 53555 27266 65125 42381 77751 64923 23378 42602 32301 35198 55997 10309 17844 65103 58856 42733 03499 92585 06702 42784 63883 51365 56374 80507
+
+'''Plaincode'''  : KEYID 86755 43879 93839 97026 62829 96751 49984 83347 49986 34725 89299 83808 88618 22939 01110 00000 90802 82712 46918 01682 37177 99825 71778 39957 79991
+
+Now the plaincode digits are available, they are converted back into plaintext with the use of the checkerboard. It is simple to separate single-digit from double-digit values:
+
+* if the first-next digit is between 1 and 6, it represent a single digit value.
+* if the first-next digit is 7, 8 or 9, it represents a double-digit value and the following digit must be appended to complete the double-digit value
+
+Using the checkerboard, the message above can be revealed:
+<pre>
+86 75 5 4 3 87 99 3 83 99 70 2 6 6 2 82 99 6 75 1 4
+W  H  O N I X     I S     B  E T T E R     T H  A N
+
+99 84 83 3 4 74 99 86 3 4 72 5 89 2 99 83 80 88 86 1 82 2
+   U  S  I  N G     W I N D  O Z  E    S  P  Y  W  A R  E
+
+93 90 111 000 000 90 80 2 82 71 2 4 6 91 80 1 6 82 3 71 77 99 82 5 71 77 83 99 5 77 99 91
+,     1   0   0      P  E R  C  E N T .  P  A T R  I C  K     R  O C  K  S     O K     .
+</pre>
+Be sure to destroy the one-time pad sheet straight away after decryption!
+
+= Summary =
+
+To encrypt a message, convert the message into plaincode digits with the checkerboard table and subtract (without borrowing) the one time pad from the plaincode. The first group of the one-time pad is used as the key indicator and is <u>not</u> actually used for actual encryption into ciphertext.
+
+To decrypt a message, use the first group of the ciphertext (key indicator) to identify the relevant one-time pad to use. Write the one time pad underneath the ciphertext digits, and add both without carry. Use the checkerboard table to convert the plaincode back into readable text.
+
+= Appendix =
+
+It is possible to go further and conceal ciphertext in seemingly innocent text, emails or letters. For instance, the "Words-Per-Sentence" (WPS) method is one option for full deniability: <ref>https://www.yumpu.com/en/document/view/54705604/secure-communications-one-time-pad-cipher</ref>
+
+<blockquote>The plaintext message (payload) is encrypted and the ciphertext digits are hidden inside a seemingly innocent text, e-mail or letter (carrier). This technique is called steganography (lit. hidden writing) and enables both sender and receiver to fully deny the existence of encrypted communications. Note that the payload must always be encrypted before hiding it in the carrier. Even when the adversary knows the method of hiding, any attempt to extract encrypted information would merely produce unintelligible digits. The message remains fully deniable. However, an attempt to extract non-encrypted data could reveal the message. Protect before hiding! There are various ways to hide ciphertext digits in a seemingly innocent text. Of course, simply inserting strange sequences of digits or some illogical values will draw suspicion.
+
+The Words-Per-Sentence (WPS) system is a simple yet effective text-based method to conceal digits. For each digit, a sentence is composed with as many words as the digit + 5. Adding 5 to the total ensures that all sentences have at least five words. Words like “it’s”, “you’re” or “set-up” are regarded as one word. To retrieve the original digits, the receiver subtracts 5 from the total number of words in each sentence.
+
+To avoid statistical bias, some sentences with less than five words or more than fourteen words should be added (these are later simply ignored). The advantages of this method are an excellent linguistic freedom and the lack of complex calculations or conversions. Always start by writing a meaningful text and then play with the words to obtain the required sentence length. Exclude the salutation in a letter from the system, as a nine-letter salutation would arouse suspicion. The random digits produce an average of ten-words sentences.</blockquote>
+
+Using the example on this page, the first five digit cipher (32065) could be buried in the following email:
+​
+<pre>Dear Patrick,
+
+I really, really love the latest Whonix release!
+
+The vanguards option will certainly protect users. Can't wait until Whonix 16.
+
+Anyhow, letting you know that we truly appreciate all your work.
+
+I'll be sending you a large Bitcoin donation very soon.
+
+Anonymous.
+</pre>
+
+Words per sentence = 8, 7, 5, 11, 10
+WPS (-5) = 32065
+
+​So long as the recipient understood that sentences with less than four words long are ignored (as well as any future sentences of more than 14 words), they would quickly identify the first cipher in the message as 32065.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

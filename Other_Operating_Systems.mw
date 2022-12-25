@@ -1,0 +1,1212 @@
+{{Header}}
+{{title|title=
+Anonymize Other Operating Systems
+}}
+{{#seo:
+|description=Anonymize any Operating System. Your operating system tunneled through the Tor Anonymity Network. Create your {{project_name_customworkstation_long}}.
+|image=Board-832155640.jpg
+}}
+{{intro|
+Anonymize any operating system such as Debian, Ubuntu, Microsoft Windows or others.
+}}
+{{Community_Support2}}
+[[image:Board-832155640.jpg|thumb]]
+= Introduction =
+{{project_name_gateway_long}} supports torification of any operating system, including Microsoft Windows and others.
+
+{{Community_Support}}
+
+'''''Using a default workstation is easier and provides more Security out of the box!''''' It is the user's responsibility to get the same security features for a {{project_name_customworkstation_long}}, see [[Other_Operating_Systems#Security_Comparison:_{{project_name_long}}-Download-Workstation_vs._{{project_name_customworkstation_long}}|Security Comparison: {{project_name_long}}-Download-Workstation vs. {{project_name_customworkstation_long}}]] at the bottom of the page for details.
+
+Also note that it's strongly discouraged to anonymize VMs that have once connected to the clearnet. It could be the case that they might have leaked an identifier or created some network fingerprint that is still recognizable even when running it with Tor. Using it would unmask your traffic.
+
+= Windows-{{project_name_workstation_long}} =
+== Introduction ==
+Microsoft Windows XP, Vista, 7, 8, 10 are known to work behind {{project_name_gateway_long}}. While it is possible, it is not recommended and only for advanced users. This is because, there are issues with Windows. Those are not {{project_name_long}} issues. {{project_name_long}} developers cannot fix those issues. One issue is, that Windows is closed source. Rather, Windows is affected by [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxyLeaks Transparent Proxy Leaks] and [[Windows Hosts|other issues]]. For more information and depending on your security requirements, read the following chapters.
+
+== Easy ==
+{{VM_Settings_Easy_Common}}
+
+'''Configure network.'''
+
+* Windows 11: Cannot change networking settings according to the following documentation? Check [https://youtu.be/ZkdWSWMdUmU?t=165 this video]. Then use the settings below.
+* For {{Code2|Windows}} 7 (similar in {{Code2|Windows}} XP): In Control Panel &rarr; Network and Sharing Center: click on "Change adapter settings" Right-click on local area connection > properties In property window: double-click Internet Protocol Version 4, use the following settings:
+
+{{CodeSelect|code=
+## increment last octet of IP address on additional workstations
+IP address 10.152.152.50
+Subnet netmask 255.255.192.0
+Default gateway 10.152.152.10
+Preferred DNS server 10.152.152.10
+}}
+
+'''Download operating system updates.'''
+
+=== Tor Browser Settings ===
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' ''Untested and unfinished.'' Please [[contribute]] by testing and finishing these instructions.
+}}
+<div class="toccolours mw-collapsible mw-collapsed">
+<u>To Help finish instruction to Prevent [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] when using Tor Browser in Windows-{{project_name_workstation_long}},</u> click on Expand on the right.
+<div class="mw-collapsible-content">
+
+These steps are required to use Tor Browser when operating a [[Other_Operating_Systems|{{project_name_customworkstation_long}}]], specifically a Windows-{{project_name_workstation_long}}.
+
+'''1.''' Install Tor Browser.
+
+* [[Tor_Browser/Manual_Download|Download Tor Browser]] from [https://www.torproject.org/download/ The Tor Project] [http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion/download/index.html (.onion)].
+* Verify the download.
+* Extract the download.
+
+'''2.''' Use Tor Browser without bundled Tor.
+
+Create a new text file in the folder where Tor Browser was extracted. For example, the file could have the following name.
+
+<pre>
+Start TB without Tor.bat
+</pre>
+
+Add the following content to that file. <ref>
+It is necessary to set the <code>SET TOR_SKIP_LAUNCH=1</code> environment variable, then start Tor Browser. The Tor Browser Launcher add-on will detect this, skip the connection wizard and skip launching Tor.
+</ref>
+
+<pre>
+SET TOR_SKIP_LAUNCH=1
+
+"Start Tor Browser.lnk"
+</pre>
+
+Save.
+
+'''3.''' Configure network settings.
+
+Start Tor Browser.
+
+The following links for removing and changing proxy settings do not apply one-to-one for Windows! [[#Remove Proxy Settings|Removal]] of proxy settings is best avoided, while [[#Change Proxy Settings|changing]] proxy settings is a better choice.
+
+How this is accomplished on Windows is currently undocumented, but user contributions to finish these instructions are most welcome.
+
+'''4.''' Figure out missing instructions.
+
+Missing instructions need to be ported from Linux-specific to Windows-specific, see [[#Configure Tor Browser Settings|{{project_name_long}}-Linux-Workstation#Tor Browser Settings]].
+
+'''5.''' Done.
+
+The process has been completed.
+</div>
+</div>
+----
+
+= {{project_name_long}}-FreeBSD-Workstation =
+
+'''Create a new FreeBSD VM on VirtualBox'''
+
+VirtualBox &rarr; Machine &rarr; New &rarr; Next &rarr; Enter Name (for example: myVM) &rarr; Enter Operating System and Version &rarr; Next &rarr; define RAM &rarr; Next &rarr; create a new hdd (or not) &rarr; Next &rarr; disk format doesn't matter, VDI works fine however &rarr; Next &rarr; dynamically or fixed size is a matter of preference &rarr; Next hdd size and location is a matter of preference &rarr; Next &rarr; Create
+
+'''Install FreeBSD and upgrade it'''
+
+This is necessary as freebsd-update or pkg do not support socks.
+
+{{CodeSelect|code=
+## Base OS patches as root
+root_shell> freebsd-update fetch install
+
+#Application updates
+root_shell> pkg upgrade
+}}
+
+You will need a http proxy chained to tor gateway to torify pkg or freebsd-update, else you risk loosing patches.
+Use one of privoxy/proxychains/tsocks when using the {{project_name_gateway_long}}.
+
+Install necessary applications.
+
+{{CodeSelect|code=
+root_shell> pkg install privoxy
+}}
+
+After this shutdown the VM.
+
+{{CodeSelect|code=
+root_shell> shutdown -p now
+}}
+
+'''Change the VirtualBox VM settings'''
+
+Choose the newly created VM (for example: myVM) &rarr; Settings &rarr; System &rarr; Motherboard &rarr; Hardware Clock in UTC
+
+System &rarr; Motherboard &rarr; Pointing Device &rarr; PS/2 Mouse (required so that USB controller may be disabled)
+
+System &rarr; Processor &rarr; Enable PAE/NX if available
+
+Network &rarr; Adapter 1 &rarr; attached to Internal Network (Important!)
+
+Network &rarr; Adapter 1 &rarr; Name (of Internal Network) (Important!): {{project_name_long}}
+(Note: It is {{project_name_long}}, not whonix. Case sensitive. Capital W.)
+
+USB &rarr; uncheck Enable USB controller
+
+&rarr; OK
+
+Start VM and proceed to configure the OS inside the VM.
+
+'''Configure network.'''
+
+In your Custom-Workstation. Open a terminal and edit as a privileged user {{Code|/etc/rc.conf}}
+
+You need to configure a single interface, here it is em0, there should not be any other 'ifconfig' statements:
+
+{{CodeSelect|code=
+## Increment the octect of IP address for configuring other workstations.
+ifconfig_em0="inet 10.152.152.12 netmask 255.255.192.0"
+defaultrouter="10.152.152.10"
+}}
+
+For the address resolution to work. {{Open with root rights|
+filename=/etc/resolv.conf
+}}
+
+and delete everything, then add
+
+{{CodeSelect|code=
+nameserver 10.152.152.10
+}}
+
+Restart network service:
+
+{{CodeSelect|code=
+root_shell> service netif restart
+}}
+
+Confirm changes by running ifconfig.
+
+----
+= {{project_name_long}}-OpenBSD-Workstation =
+
+<div class="toccolours mw-collapsible mw-collapsed">
+{{mbox
+| image   = [[File:Ambox_notice.png|40px]]
+| text    = Note: Chapter <code>{{project_name_long}}-OpenBSD-Workstation</code> not tested, reviewed by {{project_name_long}} developers. Documentation contribution by anonymous user.
+}}
+
+If you are interested, please press expand on the right side.
+<div class="mw-collapsible-content">
+'''1. Download OpenBSD iso.'''
+
+Go to: https://www.openbsd.org/
+
+Download installXX.iso (current version: '''install67.iso''') from https://www.openbsd.org/faq/faq4.html#Download and the '''SHA256''' and '''SHA256.sig''' files.
+
+'''2. Verify OpenBSD iso.'''
+
+In Whonix-Workstation or Debian-based systems.
+Install the signify-openbsd package.
+{{CodeSelect|code=
+sudo apt update
+sudo apt install signify-openbsd
+}}
+
+'''Install OpenBSD keys.'''
+The version in buster only contains older keys, so install a newer version of the '''signify-openbsd-keys''' package.
+Temporarily replace your stable repository with testing:
+{{CodeSelect|code=
+sudo sed -i s/{{Stable project version based on Debian codename}}/testing/g /etc/apt/sources.list.d/debian.list
+}}
+
+{{CodeSelect|code=
+sudo apt update
+sudo apt install signify-openbsd-keys
+}}
+
+Change your repositories back to stable.
+
+{{CodeSelect|code=
+sudo sed -i s/testing/{{Stable project version based on Debian codename}}/g /etc/apt/sources.list.d/debian.list
+}}
+
+Change directory to where you downloaded install67.iso, SHA256, and SHA256.sig.
+{{CodeSelect|code=
+cd /home/user/Downloads
+}}
+
+Verify OpenBSD iso.
+
+{{CodeSelect|code=
+signify-openbsd -C -p /usr/share/signify-openbsd-keys/openbsd-67-base.pub -x SHA256.sig install67.iso
+}}
+
+Must show
+
+{{CodeSelect|code=
+install67.iso: OK
+}}
+
+'''3. Begin installation of OpenBSD.'''
+
+Create, configure and boot your virtual machine from '''install67.iso''' according to [[#Easy|instructions specific to your hypervisor]].
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px]]
+| text    = Note: This guide assumes two virtual disks, one for the system and one for the '''/home''' partition.
+}}
+
+'''4. Install OpenBSD.'''
+
+Once the system boots from the iso, you will be prompted by:
+
+{{CodeSelect|code=
+Welcome to the OpenBSD/amd64 6.7 installation program.
+(I)nstall, (U)pgrade, (A)utoinstall, or (S)hell?
+}}
+
+Type I to install and press Enter.
+
+{{CodeSelect|code=
+Choose your keyboard layout ('?' or 'L' for list) [default]
+}}
+
+Keep default and press Enter.
+
+{{CodeSelect|code=
+System hostname? (short form, e.g. 'foo')
+}}
+
+Type '''host''' and press Enter.
+
+{{CodeSelect|code=
+Which network interface do you wish to configure? (or 'done') [xxx0]
+}}
+
+Press Enter.
+
+{{CodeSelect|code=
+IPv4 address for xxx0? (or 'dhcp' or 'none') [dhcp]
+}}
+
+Note: '''xxx0''' will be something else instead, '''em0''' or specific to your hypervisor.
+
+<u>[[Qubes|{{q_project_name}}]]</u>:
+Enter address of the VM (can be viewed in the qube's settings).
+
+<u>[[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>:
+{{CodeSelect|code=
+10.152.152.12
+}}
+
+{{CodeSelect|code=
+Netmask for xxx0? [255.255.255.0]
+}}
+
+<u>[[Qubes|{{q_project_name}}]]</u>:
+{{CodeSelect|code=255.255.255.255}}
+
+<u>[[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>:
+{{CodeSelect|code=255.255.192.0}}
+
+{{CodeSelect|code=
+IPv6 address for xxx0? (or 'autoconf' or 'none') [none]
+}}
+
+Keep '''none''' and press Enter.
+
+{{CodeSelect|code=
+Which network interface do you wish to configure? (or 'done') [done]
+}}
+
+Continue.
+
+{{CodeSelect|code=
+DNS domain name? (e.g. 'example.com') [my.domain]
+}}
+
+Enter '''localdomain'''.
+
+{{CodeSelect|code=
+DNS nameservers? (IP address list or 'none') [none]
+}}
+
+<u>[[Qubes|{{q_project_name}}]]</u>:
+Enter address of your Whonix-Gateway (can be viewed in the qube's settings).
+
+<u>[[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>:
+{{CodeSelect|code=10.152.152.10}}
+
+{{CodeSelect|code=
+Password for root account? (will not echo)
+}}
+
+Type your desired root password.
+
+{{CodeSelect|code=
+Start sshd(8) by default? [yes]
+}}
+
+Type '''no''' and press Enter.
+
+{{CodeSelect|code=
+Do you expect to run the X Window System? [yes]
+}}
+
+Keep default and continue.
+
+{{CodeSelect|code=
+Do you want the X Window System to be started by xenodm(1)? [no]
+}}
+
+Keep default and continue.
+
+{{CodeSelect|code=
+Setup a user? (enter a lower-case loginname, or 'no') [no]
+}}
+
+Enter '''user'''.
+
+{{CodeSelect|code=
+Available disks are: sd0 sd1 sd2
+
+Which disk is the root disk? ('?' for details) [sd0]
+}}
+
+Continue.
+
+{{CodeSelect|code=
+Use (W)hole disk MBR, whole disk (G)PT or (E)dit? [whole]
+}}
+
+Continue.
+
+{{CodeSelect|code=
+Use (A)uto layout, (E)dit auto layout, or create (C)ustom layout? [a]
+}}
+
+'''E''' to edit, because /usr will need more space than the default.
+
+{{CodeSelect|code=
+sd0>
+}}
+
+Type '''h''' or '''?''' for help.
+
+Type '''p M''' to print the disk layout in megabytes.
+
+Type '''d e''' to remove the /home partition (you will set it up on another disk).
+
+Type '''w''' to write label to disk.
+
+Type '''m d''' to modify the /usr partition and expand it.
+
+{{CodeSelect|code=
+offset: [xxxxxxx]
+}}
+
+Keep and press Enter.
+
+{{CodeSelect|code=
+size: [xxxxxxx]
+}}
+
+Enter your desired size here, either in bytes or megabytes, at least 5120.0M or more recommended.
+
+{{CodeSelect|code=
+FS type: [4.2BSD]
+}}
+
+Keep and press Enter.
+
+{{CodeSelect|code=
+mount point: [/usr]
+}}
+
+Keep and press Enter.
+
+'''w''' to write label to disk.
+
+'''p M''' again to print the disk layout in megabytes and make sure the changes were written correctly.
+
+'''q''' to quit and save changes.
+
+{{CodeSelect|code=
+Which disk do you wish to initialize? (or 'done') [done]
+}}
+
+Enter '''sd1'''
+
+{{CodeSelect|code=
+Use (W)hole disk MBR, whole disk (G)PT or (E)dit? [whole]
+}}
+
+'''E''' to edit.
+
+Type '''edit 0'''
+
+Type '''A6''' and press Enter.
+
+{{CodeSelect|code=
+Do you wish to edit in CHS mode? [n]
+}}
+
+Keep '''n'''.
+
+{{CodeSelect|code=
+Partition offset [0 - xxxxxxx]: [0]
+}}
+
+Keep.
+
+{{CodeSelect|code=
+Partition size [1 - xxxxxxx]
+}}
+
+Type your desired size or use the maximum and enter.
+
+'''w''' to write changes to disk.
+
+'''quit''' to save changes and exit.
+
+{{CodeSelect|code=
+Label editor (enter '?' for help at any prompt)
+}}
+
+'''p M''' to print the disk layout in megabytes.
+
+Type '''a''' to add a partition.
+
+{{CodeSelect|code=
+offset: [0]
+}}
+
+Keep.
+
+{{CodeSelect|code=
+size: [xxxxxxx]
+}}
+
+Type desired size in megabytes or use the maximum and enter.
+
+{{CodeSelect|code=
+FS type: [4.2BSD]
+}}
+
+Keep.
+
+{{CodeSelect|code=
+mount point: [none]
+}}
+
+Type '''/home''' and press Enter.
+
+{{CodeSelect|code=
+sd1*>
+}}
+
+'''w''' to write changes to disk.
+
+'''q''' to save changes and exit.
+
+{{CodeSelect|code=
+Which disk do you wish to initialize? (or 'done') [done]
+}}
+
+Done.
+
+Proceed with the installation.
+
+{{CodeSelect|code=
+Directory does not contain SHA256.sig. Continue without verification?
+}}
+
+'''yes''' can be typed safely (explained in OpenBSD installation FAQ).
+
+{{CodeSelect|code=
+What timezone are you in? ('?' for list)
+}}
+
+Enter '''UTC'''.
+
+{{CodeSelect|code=
+Exit to (S)hell, (H)alt or (R)eboot? [reboot]
+}}
+
+Reboot.
+
+'''5. Configure Whonix-OpenBSD Workstation.'''
+
+Login as root.
+
+Connect the Whonix-OpenBSD workstation to the Gateway.
+
+Run {{CodeSelect|code=vi /etc/mygate}}
+
+Press '''a''' to append text and type the address of the Whonix-Gateway.
+
+<u>[[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>:
+{{CodeSelect|code=10.152.152.10}}
+
+Press Esc.
+
+Type ''':w''' to write the file. Type ''':q''' to exit.
+
+{{CodeSelect|code=
+vi /etc/ntpd.conf
+}}
+
+'''a''' to append text, then comment all lines. They will not be needed as [[Sdwdate#cite_note-1|ntpd is broken behind Whonix-Gateway]].
+
+''':w''' to write the file. ''':q''' to exit.
+
+{{CodeSelect|code=rcctl disable ntpd}}
+to prevent it from starting.
+
+Configure network interface.
+{{CodeSelect|code=ls /etc}}
+
+Should show a file '''hostname.xxx0'''.
+
+{{CodeSelect|code=vi /etc/hostname.xxx0}}
+
+Change the cursor position to the end of {{CodeSelect|code=
+inet [address of VM]
+}} and hold '''x''' to delete everything after {{CodeSelect|code=
+inet [address of VM]
+}} Instead '''a'''ppend, enter a new line, and type
+
+<u>[[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>:
+{{CodeSelect|code=netmask 255.255.192.0}}
+
+<u>[[Qubes|{{q_project_name}}]]</u>:
+{{CodeSelect|code=netmask 255.255.255.255}}
+
+Esc, ''':w''', ''':q'''.
+
+Run {{CodeSelect|code=sh /etc/netstart}} to apply the changes.
+
+'''6. Install system updates.'''
+
+Run {{CodeSelect|code=syspatch}}
+
+Reboot.
+
+'''7. Optional: Install a desktop environment (Xfce used as example here.)'''
+
+As root:
+{{CodeSelect|code=pkg_add xfce consolekit2 slim slim-themes}}
+
+Configure Xfce.
+
+{{CodeSelect|code=touch /etc/rc.conf.local /etc/rc.local /root/.xinitrc /home/user/.xinitrc}}
+{{CodeSelect|code=echo "exec /usr/local/bin/ck-launch-session /usr/local/bin/startxfce4" >> /root/.xinitrc}}
+{{CodeSelect|code=echo "exec /usr/local/bin/ck-launch-session /usr/local/bin/startxfce4" >> /home/user/.xinitrc}}
+{{CodeSelect|code=echo 'pkg_scripts="messagebus avahi_daemon"' >> /etc/rc.conf.local}}
+{{CodeSelect|code=echo "/etc/rc.d/slim start" >> /etc/rc.local}}
+
+'''8. Optional: Install packages to increase usability.'''
+
+As root:
+{{CodeSelect|code=pkg_add bash sudo nano}}
+
+Allow '''user''' to use sudo.
+
+As root, run:
+{{CodeSelect|code=visudo /etc/sudoers}}
+
+Uncomment the line.
+{{CodeSelect|code=%wheel ALL=(ALL) SETENV: ALL}}
+
+Optional: Change shell to bash.
+As root:
+{{CodeSelect|code=chsh -s /usr/local/bin/bash}}
+
+Repeat for user '''user'''.
+
+'''9. Install torsocks.'''
+{{CodeSelect|code=sudo pkg_add torsocks}}
+
+Tor will be installed as a dependency. To prevent it from automatically starting, comment the line
+{{CodeSelect|code=RunAsDaemon 1}}
+
+in /etc/tor/torrc.
+
+'''Configure torsocks.'''
+
+{{CodeSelect|code=sudoedit /etc/torsocks.conf}} or
+{{CodeSelect|code=sudo nano /etc/torsocks.conf}}
+
+Make sure the following lines are present and uncommented:
+
+{{CodeSelect|code=
+TorAddress [address of Whonix-Gateway]
+TorPort 9050
+}}
+</div>
+</div>
+
+= {{project_name_long}}-GNU/Linux-Workstation =
+== Easy ==
+{{VM_Settings_Easy_Common}}
+
+'''Configure network.'''
+
+<u>For [[Qubes|{{q_project_name}}]]</u>, you do not have to configure the network.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<u>For [[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>, click on expand on the right.
+<div class="mw-collapsible-content">
+In your Custom-Workstation.
+
+{{Open with root rights|filename=
+/etc/network/interfaces
+}}
+
+You only need to configure <code>eth0</code>:
+
+TODO:
+
+* https://forums.whonix.org/t/whonix-gateway-cli-15-0-1-5-4-and-debian-10-9-as-workstation-network-issues/11441
+* https://www.whonix.org/w/index.php?title=Other_Operating_Systems&type=revision&diff=64470&oldid=64306
+* Disable Predictable Network Interface Names
+
+{{CodeSelect|code=
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface, leave as it is
+auto lo
+iface lo inet loopback
+
+auto eth0
+#iface eth0 inet dhcp
+iface eth0 inet static
+# increment last octet of IP address on additional workstations
+       address 10.152.152.12
+       netmask 255.255.192.0
+       #network 10.152.152.0
+       #broadcast 10.152.152.255
+       gateway 10.152.152.10
+}}
+
+In your Custom-Workstation. {{Open with root rights|
+filename=/etc/resolv.conf
+}}
+
+and delete everything, then add
+
+{{CodeSelect|code=
+nameserver 10.152.152.10
+}}
+</div>
+</div>
+
+'''Download operating system updates.'''
+
+For Debian based Linux, such as Ubuntu, see [[Operating_System_Software_and_Updates|Updates]].
+
+=== Configure Tor Browser Settings ===
+<div class="toccolours mw-collapsible mw-collapsed">
+<u>When using Tor Browser,</u> users should prevent [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]], click on Expand on the right.
+<div class="mw-collapsible-content">
+
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' These instructions are new and only for willing testers. Some connectivity issues may be experienced. Please [[contribute]] by testing these instructions.
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' These instructions prevent [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] for [[Tor Browser]] and system-tor. However, it is possible future updates to system-tor or the Tor Browser (TB) could break this custom configuration and fail to prevent Tor over Tor without the users knowledge. Therefore, users should use caution and thoroughly test prior to each use to ensure complete Tor over Tor prevention. See [https://forums.whonix.org/t/use-a-onion-address-from-a-whonix-workstation/6520/20 this forum thread for more].
+}}
+These instructions have been tested with Tor Browser v8.0.4. Connectivity might break in later Tor Browser versions, particularly if developers modify how Tor Browser networking is configured. <ref>
+Once Tor Browser moves to SocksSocket, these instructions will certainly no longer work. References:
+
+* https://gitlab.torproject.org/legacy/trac/-/issues/14270
+* https://phabricator.whonix.org/T192
+</ref>
+
+'''1.''' [[Tor_Browser/Manual_Download|Manually Download and Install Tor Browser]].
+
+'''2.''' Set multiple environment variables.
+
+{{Qubes_persistence_note}}
+
+{{Open with root rights|filename=
+/etc/environment
+}}
+
+Add.
+
+<pre>
+## Deactivate tor-launcher,
+## a Vidalia replacement as browser extension,
+## to prevent running Tor over Tor.
+## https://gitlab.torproject.org/legacy/trac/-/issues/6009
+## https://gitweb.torproject.org/tor-launcher.git
+TOR_SKIP_LAUNCH=1
+
+## Environment variable to disable the "TorButton" &rarr;
+## "Open Network Settings..." menu item. It is not useful and confusing to have
+## on a workstation, because this is forbidden for security reasons. Tor must be
+## configured on the gateway.
+TOR_NO_DISPLAY_NETWORK_SETTINGS=1
+
+## environment variable to skip TorButton control port verification
+## https://gitlab.torproject.org/legacy/trac/-/issues/13079
+TOR_SKIP_CONTROLPORTTEST=1
+</pre>
+
+'''3.''' Save and reboot.
+
+From this point, only the browser component of Tor Browser will be started.
+
+'''4.''' Verify environment variables.
+
+{{CodeSelect|code=
+env | grep -i tor
+}}
+
+The output should show.
+
+<pre>
+TOR_NO_DISPLAY_NETWORK_SETTINGS=1
+TOR_SKIP_CONTROLPORTTEST=1
+TOR_SKIP_LAUNCH=1
+</pre>
+
+'''5.''' Configure network settings. <ref>
+Learn more about the network settings.
+
+* Type: <code>SOCKSv5</code>.
+{{Gateway IP}}
+* Port: <code>9100</code>.
+* Do not change the <code>No Proxies for</code> setting.
+
+<pre>
+## The following TOR_SOCKS_HOST and TOR_SOCKS_PORT variables
+## do not work flawlessly, due to an upstream bug in Tor Button:
+##    "TOR_SOCKS_HOST, TOR_SOCKS_PORT regression"
+##    https://gitlab.torproject.org/legacy/trac/-/issues/8336
+TOR_SOCKS_HOST="10.152.152.10"
+TOR_SOCKS_PORT="9150"
+</pre>
+</ref>
+
+Now the file {{Code2|~/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/user.js}} must be created. This presupposes Tor Browser has been installed as per step 1 and that a folder {{Code2|~/.tb/tor-browser}} exists. If Tor Browser was installed to another folder, the the path must be adjusted.
+
+{{Open File|filename=
+~/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/user.js
+}}
+
+Add.
+
+<pre>
+user_pref("extensions.torbutton.use_privoxy", false);
+user_pref("extensions.torbutton.settings_method", "custom");
+user_pref("extensions.torbutton.socks_host", "10.152.152.10");
+user_pref("extensions.torbutton.socks_port", 9100);
+user_pref("network.proxy.socks", "10.152.152.10");
+user_pref("network.proxy.socks_port", 9100);
+user_pref("extensions.torbutton.custom.socks_host", "10.152.152.10");
+user_pref("extensions.torbutton.custom.socks_port", 9100);
+user_pref("extensions.torlauncher.control_host", "10.152.152.10");
+user_pref("extensions.torlauncher.control_port", 9052);
+</pre>
+
+Save.
+
+Tor is now disabled in Tor Browser.
+
+The process is now complete.
+</div>
+</div>
+
+=== Disable system-tor over Tor ===
+system-tor must also be disabled to prevent Tor over Tor.
+
+In the terminal, run.
+
+Stop Tor.
+
+{{CodeSelect|code=
+sudo systemctl stop tor
+}}
+
+Prevent Tor service from restarting after reboot.
+
+{{CodeSelect|code=
+sudo systemctl mask tor
+}}
+
+The process is now complete.
+</div>
+</div>
+
+=== Testing ===
+<div class="toccolours mw-collapsible mw-collapsed">
+User must verify that Tor in Tor Browser and system-tor are disabled, click on Expand on the right.
+<div class="mw-collapsible-content">
+
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px]]
+| text    = Note for Qubes users: Tor Browser should only be run the AppVM.
+}}
+
+'''1.''' To start Tor Browser two options exist.
+
+a) In the desktop file manager, move to the ~/.tb/tor-browser/Browser folder:  <code><i>Double-click: </i>start-tor-browser.desktop</code>
+
+<u>Or</u>
+
+b) In the terminal, move to the Tor Browser folder.
+
+{{CodeSelect|code=
+cd ~/.tb/tor-browser/Browser
+}}
+
+Next, start Tor Browser.
+
+{{CodeSelect|code=
+./start-tor-browser
+}}
+
+'''2.''' Once Tor Browser is started, verify system-tor is disabled.
+
+{{CodeSelect|code=
+sudo systemctl status tor@default
+}}
+
+The output should be similar the following showing tor@default service is inactive-(dead).
+<pre>
+tor@default.service - Anonymizing overlay network for TCP
+   Loaded: loaded (/lib/systemd/system/tor@default.service; static; vendor prese
+  Drop-In: /lib/systemd/system/tor@default.service.d
+           └─30_qubes.conf
+   Active: inactive (dead)
+</pre>
+
+'''3.''' Next, reconfirm both system-tor and Tor (in Tor Browser) are not running.
+
+'''Note:''' Output will show grep tor (command that was just run). This is of no concern. <ref> grep tor output: <pre>user 1053 0.0 0.0 12724 948 pts/1 S+ 20:22 0:00 grep tor</pre></ref>
+
+{{CodeSelect|code=
+sudo ps aux {{!}} grep tor
+}}
+
+Output similar to the following shows system-tor is running. This indicates <u>Tor over Tor prevention is '''Broken!'''</u> Users should immediately stop using Tor Browser and seek advise on the [https://forums.{{project_clearnet}}  {{project_name_long}} forums].
+
+<pre>
+debian-+   707  0.1  0.9  89320 36400 ?        Ss   21:15   0:01 /usr/bin/tor --defaults-torrc /usr/share/tor/tor-service-defaults-torrc -f /etc/tor/torrc --RunAsDaemon 0
+</pre>
+Done!
+</div>
+</div>
+
+----
+
+{{Anchor|{{project_name_short}}-Android-Workstation}}
+
+= {{project_name_long}}-Android-Workstation =
+{{Community_Support2}}
+== With Static IP ==
+'''Preferred!'''
+
+VM settings are the same: attach the network adapter to the internal network named <code>Whonix</code>.
+
+Configure Android x86 to use a static IP. On the Android VM run the following in the Terminal Emulator (tested on Nougat):
+
+{{CodeSelect|code=
+su
+}}
+
+{{CodeSelect|code=
+ifconfig eth0 10.152.152.12 netmask 255.255.192.0
+}}
+
+{{CodeSelect|code=
+ip rule add from all lookup main pref 0
+}}
+
+{{CodeSelect|code=
+busybox route add default gw 10.152.152.10
+}}
+
+{{CodeSelect|code=
+ndc resolver setnetdns 100 localdomain 10.152.152.10
+}}
+
+Static IP routing and DNS should now be working. Note that [[Tor#ICMP|ping uses ICMP and therefore is unsupported]], so open the browser to check your connection.
+
+== With DHCP ==
+<div class="toccolours mw-collapsible mw-collapsed">
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Android warning]]
+| text    =
+'''Warning''':
+
+The following instructions are user contributed, untested by {{project_name_long}} contributors, and require a DHCP server to be installed on {{project_name_gateway_long}}. [https://phabricator.whonix.org/T239 {{project_name_long}} contributors have not researched yet, if there is any feature in DHCP servers that would be problematic in the use case of anonymity distributions that use a two machine isolation approach. (Help welcome!)] Maybe there is such a feature, maybe not. If it exists, maybe it could be easily disabled, maybe not. What is the attack surface here: once an attacker has compromised {{project_name_workstation_long}}, an attempt to exploit the DHCP server on {{project_name_gateway_long}} could be tried. Worse, maybe DHCP has a feature such as "please tell me the IP address of your upstream router", and that would be your real external IP address and DHCP would answer. To find out if this is actually the case, one would have to read the whole [https://www.ietf.org/rfc/rfc2131.txt DHCP protocol]. [https://forums.whonix.org/t/dhcp-server-on-the-gateway Forum discussion]. If you are interested anyway, please click on expand on the right side.
+
+TODO development: Can't you use a static IP?
+
+* https://android.stackexchange.com/questions/123963/static-ip-address-in-android-x86-persistent-after-reboot/124121
+* https://groups.google.com/forum/#!topic/android-x86/GxLq1xbJIaM
+* https://forums.whonix.org/t/dhcp-on-seperate-workstation-for-android/6148/1
+}}
+<div class="mw-collapsible-content">
+VM settings are the same: attach the network adapter to the internal network named '''{{project_name_short}}'''
+
+== KVM ==
+
+It is possible to use [[KVM#DHCP|Libvirt's built-in DHCP functionality]] to safely configure DHCP without running into the traffic leaks privacy concerns discussed above.
+
+== Other Hypervisors ==
+
+Install a DHCP server package:
+
+{{Install_Package|package=
+isc-dhcp-server
+}}
+
+Note: It won't start, because it is not configured yet.
+
+{{Open with root rights|filename=
+/etc/dhcp/dhcpd.conf
+}}
+
+Replace its contents with the following.
+
+<pre>
+option domain-name "whonix";
+option domain-name-servers 10.152.152.10;
+subnet 10.152.128.0 netmask 255.255.192.0 {
+        range 10.152.152.12 10.152.152.15;
+        option subnet-mask 255.255.192.0;
+        option broadcast-address 10.152.191.255;
+        option routers 10.152.152.10;
+}
+default-lease-time 600;
+max-lease-time 7200;
+</pre>
+
+Save.
+
+Run.
+
+{{CodeSelect|code=
+sudo dpkg-reconfigure isc-dhcp-server
+}}
+
+and choose '''eth1''' as interface for the DHCP server to run on.
+
+After this the DHCP server on workstation starts properly and the {{project_name_long}} Gateway is ready to serve a dynamic IP to the Android x86 {{project_name_workstation_long}}.
+</div>
+</div>
+
+{{Anchor|more security}}
+
+----
+
+= More security =
+
+Recommendations:
+
+* Verify operating system installation CD, compare with sha256 hash or even better verify the gpg signature, if available.
+* Install while the Virtual Machine has no internet connection.
+* Set your username to ''user''.
+* Disable Internet Time Syncing.
+* Set your Time Zone to ''UTC''.
+* Set up a static IP.
+* In case you want to run more than one {{project_name_workstation_long}} at the same time, it is recommended reading the Introduction in the [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] article.
+* Read [[Documentation#Basic_Security_Guide| Basic Security Guide]], [[Documentation#Advanced_Security_Guide| Advanced Security Guide]], [[Documentation]] and [[Design]] (which is {{project_name_long}}-Example-Implementation-Workstation (based on Debian GNU/Linux) specific) and try to apply as much from it to Windows as possible.
+
+----
+= Even more security =
+== General ==
+Recommendations:
+
+* Prevent [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxyLeaks Transparent Proxy Leaks] by disabling {{project_name_gateway_long}} Transparent Proxy feature. Instead use your Windows {{project_name_workstation_long}} behind an [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IsolatingProxy Isolating Proxy]. See [[Stream Isolation]] for more information and instructions on how to [[Stream Isolation#Better Protection|disable the Transparent Proxy feature]].
+* Check your host clock out of band (use a watch or atomic clock).
+* Set your host and your Workstation clock to show seconds as well. After booting the {{project_name_long}}-Windows-Workstation, add a random skew to your clock, maybe +/- 1 to 30 seconds. Optimal values are still under investigation. For reference, see [[TimeSync|{{project_name_long}} Secure And Distributed Time Synchronization Mechanism]], it is {{project_name_long}}-Example-Implementation-Workstation (based on Debian GNU/Linux) specific, but most information also applies to Windows. Since we are not aware of a tails_htp alternative for Windows, you have to do it manually.
+
+== VM settings ==
+{{VM_Settings_Security_Common}}
+
+== {{project_name_long}} Packages ==
+[[Debian_Packages|{{project_name_long}} Debian Packages]] ([https://github.com/{{project_name_short}} overview]), such as for example [https://github.com/{{project_name_short}}/uwt uwt], are available for installation [[Dev/Build_Documentation|from source]] and [[Project-APT-Repository|{{project_name_long}} apt repository]] ([https://github.com/{{project_name_short}}/uwt#how-to-install-in-debian-using-apt-get example instructions]). Installation (of some) anonymity/security/privacy/usability related ones of them might be interesting for users of Debian and Debian derivatives.
+
+'''Note, that usage of these package outside of {{project_name_long}} is untested and there is no contributor that supports this use case.'''
+
+The current [[Contributors|{{project_name_long}} contributors]] can only maintain a limited amount of things, has limited resources and focuses on other priorities. If you have developer skills, would you be interested to [[contribute]] by [[Contribute#Contributor|co-maintaining]] one or another package for using them outside of {{project_name_long}}?
+
+= Most security =
+
+Use the default {{project_name_long}} VMs and build them yourself from source.
+
+= Ubuntu =
+* General: [[Ubuntu Tips|Ubuntu Tips]]
+* [[Ubuntu Tips#Guest_additions_for_Ubuntu]]
+
+= Debian =
+
+{{project_name_long}}-Default/Download-Version is already based on Debian Wheezy / Stable. You may be interested to read:
+
+* How to obtain Debian safely: [[Debian Tips|Debian ISO gpg verification]]
+
+= Security Comparison: {{project_name_long}}-Download-Workstation vs. {{project_name_customworkstation_long}} =
+
+== Introduction ==
+
+Read first: [[Comparison of different variants | Comparison of different {{project_name_long}} variants]]!
+
+Note: {{project_name_long}}-BuildYourselfFromSource-Workstation is of course the same as {{project_name_long}}-Download-Workstation.
+
+== Table ==
+
+<div class="scroll-table">
+{| class="wikitable" style="background-color: #fff; text-align: center"
+!
+! {{project_name_long}}-Download-Workstation
+! {{project_name_customworkstation_long}}
+|-
+
+| align="left" | Based on
+| Debian {{Stable_project_version_based_on_Debian_codename}} GNU/Linux
+| Any of your choice.
+|-
+
+| align="left" | Protection against root exploits (Malware with root rights) on the Workstation <ref name=same_footnote_as>Same footnote(s) as in [[Comparison_with_Others|Comparison of {{project_name_long}}, Tails, Tor Browser, Qubes OS TorVM and Corridor]] and [[Tor Browser]].</ref>
+| {{Yes}} <ref name=same_footnote_as />
+| {{Yes}} <ref name=same_footnote_as />
+|-
+
+| align="left" | IP/DNS protocol leak protection
+| style="background-color: {{Green}}"| Full <ref name=same_footnote_as />
+| style="background-color: {{Green}}"| Full <ref name=same_footnote_as />
+|-
+
+| align="left" | Takes advantage of Entry Guards
+| {{Yes}}
+| {{Yes}}
+|-
+
+| align="left" | Operating System Updates persist once updated
+| {{Yes}}
+| Depends if gets installed or is a Live CD.
+|-
+
+| align="left" | Hides hardware serials from malicious software
+| {{Yes}} <ref name=same_footnote_as />
+| {{Yes}} <ref name=same_footnote_as />
+|-
+
+| align="left" | Does not collect (virtual) hardware serials
+| {{Yes}}
+| Depends on the custom operating system
+|-
+
+| align="left" | Includes Tor Browser
+| {{Yes}}
+| {{Anchor|Your_Responsibility}}[[#Missing Documentation|Your responsibility]] to install Tor Browser.
+For help using Tor Browser without Tor over Tor (recommended), see:
+
+* Linux: [[Tor_Browser#{{project_name_long}}-Custom-Linux-Workstation_specific]]
+* Windows: [[Tor_Browser#Windows_specific]]
+</ref> <ref>
+For explanation of the about:tor "Something went wrong" error, please see this [https://forums.whonix.org/t/torbrowser-on-ubuntu-14-04-64-bit forum thread].
+</ref>
+|-
+
+| align="left" | Includes Firefox privacy patches <ref>https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/WebBrowsers</ref> and Tor Button (=Tor Browser)
+| {{Yes}}, because it uses Tor Browser (without Tor/Vidalia).
+| Your responsibility to install Tor Browser.
+|-
+
+| align="left" | Prevents [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] for Tor Browser
+| {{Yes}}
+|  Your responsibility to prevent Tor over Tor.
+|-
+
+| align="left" | Stream isolation to prevent identity correlation through circuit sharing
+| {{Yes}}
+| Your responsibility to use Stream Isolation.
+|-
+
+| align="left" | Stream isolation in Tor Browser
+| {{Yes}}
+| {{Yes}}
+|-
+
+| align="left" | Encryption
+| style="background-color: {{Yellow}}"| Should be applied on host.
+| style="background-color: {{Yellow}}"| Should be applied on host.
+|-
+
+| align="left" | Cold Boot Attack Protection <ref name=same_footnote_as />
+| {{No}}
+| {{No}}
+|-
+
+| align="left" | Secure Distributed Network Time Synchronization
+| {{Yes}}, using [[sdwdate]].
+| Your responsibility to install it.
+|-
+
+| align="left" | Hides your time zone (set to UTC)
+| {{Yes}}
+| Your responsibility to set clock to UTC.
+|-
+
+| align="left" | Hides your operating system account name
+| {{Yes}}, set to user.
+| Your responsibility to set username to user.
+|-
+
+| align="left" | Hides your MAC address from websites
+| {{BlueBackground}} Invalid <ref name=same_footnote_as />
+| {{BlueBackground}} Invalid <ref name=same_footnote_as />
+|-
+
+| align="left" | Secures your MAC address from local LAN (sometimes ISP) <ref name=same_footnote_as />
+| {{No}}, planned, see. <ref name=same_footnote_as />
+| Your responsibility. <ref name=same_footnote_as />
+|-
+
+| align="left" | Hides your hosts MAC address from applications
+| {{Yes}} <ref name=same_footnote_as />
+| {{Yes}} <ref name=same_footnote_as />
+|-
+
+| align="left" | Secure gpg.conf
+| {{Yes}}
+| Your responsibility to use a secure gpg.conf.
+|-
+
+| align="left" | Privacy enhanced IRC client configuration.
+| {{Yes}}
+| Your responsibility to configure the IRC client for enhanced privacy.
+|-
+
+| align="left" | Other [https://forums.whonix.org/t/whonix-virtualbox-15-0-0-8-9-point-release-vanguards-tcp-isn-leak-protection-extensive-hardening/8994 numerous security/privacy enhancements] which will not all be listed in this table such as defense against [[Keystroke Deanonymization]] or [https://forums.whonix.org/t/tcp-isn-cpu-information-leak-protection-tirdad/8552 TCP ISN CPU Information Leak Protection].
+| {{Yes}}
+| Your responsibility to configure these.
+|-
+
+|}
+</div>
+
+== Conclusion ==
+The {{project_name_long}}-Download-Workstation is already preconfigured with all {{project_name_long}} extra security features.
+
+A {{project_name_customworkstation_long}} ''can be made'' (Your responsibility!) as secure as a {{project_name_long}}-Download-Workstation. If you simply create <ref>Install or use a Live CD/DVD into {{project_name_workstation_long}}.</ref> a {{project_name_customworkstation_long}} it has still ''some'' security advantages, for example full IP/DNS protocol leak protection, but ''not all'', for example it lacks Secure Distributed Network Time Synchronization. The details are listed in the table above.
+
+= Missing Documentation =
+You might wonder what "[[#Your_Responsibility|your responsibility]]" means. Some users are wondering, where the documentation for these aspects can be found. No documentation has been written yet. There is a lack of resources to maintain such instructions. I.e. writing them, and more so, keeping them up to date, testing them, answering support requests, fixing bugs and implementing feature requests. Please [[contribute]]. For more detailed explanation, see also [[#{{project_name_long}} Packages|{{project_name_long}} Packages]].
+
+= References =
+{{#widget:Expand or Collapse All}}
+
+{{reflist}}
+
+{{Footer}}
+
+[[Category:Documentation]]

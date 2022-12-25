@@ -1,0 +1,219 @@
+{{Title|title=ZeroNet: Decentralized Censorship-resistant Network}}
+{{Header}}
+{{#seo:
+|description=Combining {{project_name_long}} with ZeroNet. ZeroNet over Tor. Connecting to Tor before ZeroNet (User &rarr; Tor &rarr; ZeroNet &rarr; Internet).
+|image=https://www.{{project_clearnet}}/w/images/c/c4/Zeronetlogo.png
+}}
+[[File:Zeronetlogo.png|200px||thumb|ZeroNet Logo]]
+{{Contributor|
+|status=unmaintained
+|about=About this {{Code2|{{PAGENAME}}}} Page
+|difficulty=unknown
+|contributor=none
+|support=none
+}}
+__FORCETOC__
+__TOC__
+----
+= Deprecated Wiki Page =
+The original developer of ZeroNet disappeared approximately February 2021. <ref>
+* https://github.com/HelloZeroNet/ZeroNet/issues/2749
+* https://github.com/HelloZeroNet
+</ref> There may or may not be a continuation of the ZeroNet project in form of a software fork. <ref>
+* https://www.reddit.com/r/Whonix/comments/ur4815/zeronet_wiki_page_is_outdated/
+* https://www.reddit.com/r/zeronet/comments/s27d34/0net_forks/
+</ref> These are [[Unsupported|undocumented]].
+
+= Introduction =
+The ZeroNet wiki describes the software design: <ref name=Zeronet_wiki>https://zeronet.readthedocs.io/en/latest/</ref>
+
+<blockquote>[https://zeronet.io/ ZeroNet] uses Bitcoin cryptography and BitTorrent technology to build a decentralized censorship-resistant network.
+
+Users can publish static or dynamic websites in ZeroNet and visitors can choose to also serve the website. Websites will remain online even if it is being served by only one peer.</blockquote>
+
+This means users are not identified or reachable by an IP address, since they are identified by a public key - specifically a public Bitcoin address. The private key owner can sign and publish changes, which are propagated through the network. Sites are accessed through an ordinary browser in combination with the Zeronet application. <ref>ZeroNet acts as a local web server for these pages.</ref> The BitTorrent technology refers to the use of trackers to negotiate peer connections. <ref>https://en.wikipedia.org/wiki/ZeroNet</ref> ZeroNet can be optionally configured to use Tor for anonymity. <ref>https://zeronet.io/docs/faq/#how-to-use-zeronet-with-tor</ref>
+
+The Zeronet wiki describes various features and benefits, including: <ref name=Zeronet_wiki />
+
+* Password-less authorization - the user account is protected by the same cryptography that applies to Bitcoin wallets.
+* Easy setup. <ref>Although the Chinese government has blocked the ZeroNet website and bittorrent tracker.</ref>
+* Immediate updating of sites in real time.
+* Works with any browser.
+* Full Tor network support, including onion services.
+* Content cannot be censored (removed) after publication.
+* It is impossible to shut down content, since content is served by any user who wishes to.
+* ZeroNet is fast and works offline.
+
+= Connecting to Tor before ZeroNet =
+
+These instructions lead to the following connection scheme in {{project_name_long}}:
+
+'''<code>User</code> &rarr; <code>Tor</code> &rarr; <code>ZeroNet</code> &rarr; <code>Internet</code>'''
+
+= Installation =
+
+{{onion-grater-warning}}
+
+== onion-grater Adjustments ==
+Complete the following steps in {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>).
+
+{{Control_Port_Filter_Python_Profile_Add
+|filename_new=40_zeronet
+}}
+
+== Modify Firewall Settings ==
+Modify the {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>) user firewall settings and reload them.
+{{Box|text=
+'''1.''' {{Firewall_Settings_Workstation}}
+
+'''2.''' Open required external ports.
+
+Add.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 15441 "
+EXTERNAL_OPEN_PORTS+=" 33750 "
+}}
+
+Save the file.
+
+'''3.''' {{Reload_Firewall_ws}}
+}}
+
+== Install Dependencies ==
+
+Run the following commands in {{project_name_workstation_long}} terminal ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>{{project_name_workstation_template}}</code> Template).
+
+{{Update}}
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install dependencies. <ref>
+Is python3-msgpack still reuqired?
+</ref>
+
+{{CodeSelect|code=
+sudo apt install git python3-pip python3-msgpack
+}}
+
+== Retrieve the Signing Key ==
+Run the following command in {{project_name_workstation_long}} terminal ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>{{project_name_workstation_vm}}</code> AppVM).
+
+Retrieve the ZeroNet signing key. <ref>
+* https://github.com/HelloZeroNet/ZeroNet/issues/759
+* ZeroNet feature request: [https://github.com/HelloZeroNet/ZeroNet/issues/2209 upload ZeroNet gpg signing key]
+</ref>
+
+{{gpg key
+|url=scurl-download https://zeronet.io/files/tamas@zeronet.io_pub.asc
+|source_filename=tamas@zeronet.io_pub.asc
+|gpg_fingerprint_output=Key fingerprint = 960F FF2D 6C14 5AA6 13E8  491B 5B63 BAE6 CB96 13AE<br />
+}}
+
+== Install ZeroNet ==
+Run the following commands in {{project_name_workstation_long}} terminal ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>{{project_name_workstation_vm}}</code> AppVM).
+
+ZeroNet is not yet packaged for Debian, so it must be manually installed. <ref>https://github.com/HelloZeroNet/ZeroNet/issues/241</ref> <ref>https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=850474</ref>
+
+Download ZeroNet.
+
+{{CodeSelect|code=
+git clone https://github.com/HelloZeroNet/ZeroNet.git
+}}
+
+Navigate to the ZeroNet folder.
+
+{{CodeSelect|code=
+cd ZeroNet
+}}
+
+Check the ZeroNet signature.
+
+{{CodeSelect|code=
+git log --show-signature
+}}
+
+Install dependencies of ZeroNet. There is currently no better way than using a third party repository and third party package manager <code>pip</code>. <ref>
+ZeroNet dependencies are not available in Debian.
+
+* https://github.com/HelloZeroNet/ZeroNet/issues/241#issuecomment-474427733
+* [https://github.com/HelloZeroNet/ZeroNet/issues/2326 please do not depend on python-pip3 - security risk - use dependencies available from distribution package repositories]
+</ref>
+
+{{Third_Party_Repository}}
+
+{{CodeSelect|code=
+sudo python3 -m pip install -r requirements.txt
+}}
+
+= Launch ZeroNet =
+{{Box|text=
+'''1.''' Launch the ZeroNet process.
+
+<u>[[{{q_project_name_short}}|{{q_project_name}}]]</u>:
+
+{{CodeSelect|code=
+./zeronet.py --tor always --fileserver_ip $(qubesdb-read /qubes-ip)
+}}
+
+<u>[[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>:
+
+{{CodeSelect|code=
+./zeronet.py --tor always --fileserver_ip 10.152.152.11
+}}
+
+'''2.''' Launch Tor Browser.
+
+{{Tor_Browser_Start}}
+
+'''3.''' Adjust Tor Browser's configuration.
+
+{{Template:TBB_localhost}}
+
+'''4.''' Navigate to the ZeroNet web interface.
+
+Paste <code>{{Archive_link|url=http://127.0.0.1:43110|text=http://127.0.0.1:43110}}</code> into Tor Browser's URL field and press <code>Enter</code>. For additional tips on visiting sites, see: [https://zeronet.readthedocs.io/en/latest/#how-does-it-work How does it work?]
+
+The process is now complete and ZeroNet should be fully functional in {{project_name_long}}. <ref>Functionality was last confirmed in mid-2020.</ref>
+}}
+
+'''Figure:''' ''ZeroNet Homepage in {{project_name_long}}''
+
+[[Image:Zeronethomepage.png|border]]
+
+= Popular ZeroNet Sites =
+
+Some popular ZeroNet sites include: <ref>https://zeronet.readthedocs.io/en/latest/using_zeronet/sample_sites/</ref>
+
+'''ZeroHello:''' http://127.0.0.1:43110/1HeLLo4uzjaLetFx6NH3PMwFP3qbRbTf3D
+
+<blockquote>The homepage of ZeroNet.</blockquote>
+-----
+'''ZeroMail:''' http://127.0.0.1:43110/1MaiL5gfBM1cyb4a8e3iiL8L5gXmoAJu27
+
+<blockquote>End-to-end encrypted, distributed, P2P messaging site. To improve privacy it uses a BitMessage-like solution and will not expose the message recipient.</blockquote>
+-----
+'''ZeroBlog:''' http://127.0.0.1:43110/1BLogC9LN4oPDcruNz3qo1ysa133E9AGg8
+
+<blockquote>Self publishing blog demo.</blockquote>
+-----
+'''ZeroTalk:''' http://127.0.0.1:43110/1TaLkFrMwvbNsooF4ioKAY9EuxTBTjipT
+
+<blockquote>Decentralized, P2P forum demo.</blockquote>
+-----
+'''ZeroMe:''' http://127.0.0.1:43110/1MeFqFfFFGQfa1J3gJyYYUvb5Lksczq7nH
+
+<blockquote>Decentralized, Twitter-like P2P social network.</blockquote>
+-----
+'''ZeroChat:''' http://127.0.0.1:43110/1AvF5TpcaamRNtqvN1cnDEWzNmUtD47Npg
+
+<blockquote>The finished site for the tutorial of creating a server-less, SQL backed, real-time updated P2P chat application using ZeroNet in less than 100 lines of code.</blockquote>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

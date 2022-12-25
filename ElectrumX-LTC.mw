@@ -1,0 +1,508 @@
+{{Title|
+title=Litecoin How-to: Use ElectrumX Personal Server in {{project_name_long}}
+}}
+{{Header}}
+{{#seo:
+|description=Higher Security and Privacy through using a Self-Hosted, Fully Validating Litecoin Node (ElectrumX + Litecoin Core)
+}}
+
+= Introduction =
+Using Electrum-LTC with its default, public servers (which are hosted by third parties) has various security and privacy disadvantages mentioned in [[electrum]] chapter [[Electrum#Warnings|warnings]]. These issues can be resolved by using one's own, self-hosted, local Electrum-LTC server. ElectrumX is a electrum server, which is documented on this wiki page. Under the assumption of a non-compromised system, the advantages include:
+
+* No third party can correlate all of the user's Litecoin addresses to the same pseudonym simply by starting the Electrum-LTC wallet. However, this does not change recommendation regarding Coin Control. When spending Litecoin using multiple inputs, correlation will still happen on the blockchain level.
+* No third party can log how many times or the times when a user is viewing their Litecoin addresses, transactions in their Electrum-LTC wallet.
+* A self-hosted ElectrumX will always truthfully report unconfirmed and confirmed transactions. However, the usual recommendation to wait for a number of confirmations on the blockchain remains unchanged.
+* Confirmed transactions are fully verified, not only via SPV.
+* Litecoin network fee estimates are no longer dependent on third parties.
+
+These instructions should be compatible with {{Non_q_project_name}}, {{Q_project_name}} and {{Kicksecure}}.
+
+ElectrumX depends on [[Litecoin Core]] to download the Litecoin blockchain. In other words, Litecoin Core is a dependency of ElectrumX. If Litecoin Core could have been avoided in this setup, it would have been avoided for simplicity.
+
+By design:
+
+* Only Litecoin Core will be able to establish outgoing internet connections. Only Litecoin Core will be configured to be able to reach the Litecoin network over Tor.
+* The connection scheme is <code>Electrum-LTC</code> &rarr; <code>ElectrumX</code> &rarr; <code>Litecoin Core</code> &rarr; <code>Tor</code> &rarr; <code>Litecoin network</code>.
+* Both ElextrumX and Electrum-LTC will be unable to connect to the internet thanks to enabling {{project_name_long}} transparent proxying feature as documented below.
+* It should be expected that the proxy settings for Electrum-LTC remain unchanged. That is normal and as intended. (If Electrum-LTC was configured to use Tor that would actually disable the fail-safe and violate the goal of these instructions to have a fail-safe preventing Electrum-LTC from connecting to third-party servers and the connection chain being <code>Electrum-LTC</code> &rarr; <code>ElectrumX</code> &rarr; <code>Litecoin Core</code>.)
+* Electrum-LTC connects to ElextrumX on localhost (<code>127.0.0.1</code>).
+* ElextrumX connects to Litecoin Core on localhost (<code>127.0.0.1</code>).
+
+[[Root#Inappropriate_Use_of_Root_Rights|Inappropriate Use of Root Rights]] should be avoided. Instructions on this wiki page have been carefully crafted with when to use and when not to use <code>sudo</code> in mind. The user should not use <code>sudo</code> unless instructed in documentation. <ref>
+The <code>systemctl --user</code> must be run as normal, non-root user without <code>sudo</code> because these are <code>systemd</code> <u>user</u> units and <u>not</u> <code>systemd</code> <u>system</u> units.
+</ref>
+
+{{Testers-Only}}
+
+= Installation =
+== Isolating Proxy Setup ==
+Optional but recommended for better privacy.
+
+Make sure the Electrum-LTC is prohibited from accidentally connecting to Electrum-LTC public servers and effectively only permitted to connect to ElectrumX.
+
+'''1.''' Acquire prerequisite knowledge.
+
+* [[Stream Isolation#Transparent Proxy|Transparent Proxy]]
+* [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IsolatingProxy IsolatingProxy]
+* [[Stream Isolation]]
+
+'''2.''' Do <u>not</u> configure Electrum-LTC for use with stream isolation.
+
+As documented on the the [[Electrum-LTC]] wiki page since this would nullify, circumvent the advantage of disabling transparent proxying.
+
+'''3.''' Disable transparent proxying.
+
+'''Note:''' The following step should be applied in {{project_name_gateway_short}} ([[{{q_project_name_short}}|{{q_project_name}}]]: In App Qubes <code>{{project_name_gateway_vm}}</code>):<br />
+[[Stream Isolation#Disable Transparent Proxying|Disable Transparent Proxying]].
+
+== Electrum-LTC Safeguard ==
+Remove the default electrum start menu entry.
+
+Optional but highly recommended for better privacy.
+
+Make sure the electrum default start menu entry (which would result in using electrum public servers) gets deleted and stays deleted even after electrum package upgrades to make sure to not accidentally start the electrum using its default start menu entry.
+
+'''Note:''' The following command should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: In Template <code>{{project_name_workstation_template}}</code>).
+
+{{CodeSelect|code=
+sudo dpkg-divert --local --divert /usr/share/applications/electrum.desktop --rename --add /usr/share/electrum-invalid
+}}
+
+== Package Dependency Installation ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: In Template <code>{{project_name_workstation_template}}</code>).
+
+Install dependencies from the Debian repository. <ref>
+Installation of the [[Electrum-LTC]] Wallet is optional. In advanced setups, the Electrum-LTC wallet might be running on a different server or in a different VM.
+</ref>
+
+{{Install Package|
+package=git python3-rocksdb python3-aiohttp python3-plyvel
+}}
+
+== Software Dependency Installation ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Install the [[PyLRU|Install PyLRU]]. <ref>
+Not available from packages.debian.org at time of writing.
+
+https:/packages.debian.org/pylru
+</ref>
+
+'''2.''' Install [[Litecoin Core]].
+
+'''3.''' Install [[Electrum-LTC]].
+
+== Source Code Download and Digital Software Signature Verification ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' {{Open_a__product_ws_terminal}}
+
+'''2.''' Acquire the OpenPGP public key of ElectrumX developer SomberNight. <ref>
+* https://github.com/spesmilo/electrum/tree/master/pubkeys
+* https://github.com/spesmilo/electrum/blob/master/SECURITY.md
+</ref>
+
+{{gpg key
+|url=scurl-download https://raw.githubusercontent.com/spesmilo/electrum/master/pubkeys/sombernight.asc
+|source_filename=sombernight.asc
+|fingerprint=6D7A2116DA909E00AC21108BB33B5F232C6271E9
+|gpg_fingerprint_output=
+In late-2021, the output is identical to the following.
+
+      Key fingerprint = 4AD6 4339 DFA0 5E20 B3F6  AD51 E7B7 48CD AF5E 5ED9
+}}
+
+'''3.''' Download the ElectrumX server source code using <code>git</code>.
+
+{{CodeSelect|code=
+git clone https://github.com/spesmilo/electrumx.git
+}}
+
+'''4.''' Change directory.
+
+{{CodeSelect|code=
+cd electrumx
+}}
+
+'''5.''' Digital signature verification.
+
+<u>Note:</u> At the time of writing, <code>1.16.0</code> was the latest stable release. Before starting the ElectrumX source code download, browse to [https://github.com/spesmilo/electrumx/tags <code>github.com/spesmilo/electrumx/tags</code>] to verify the version number.
+
+{{CodeSelect|code=
+git tag --verify 1.16.0
+}}
+
+{{GnuPG-Success}}
+
+{{GnuPG-Warning}}
+
+'''6.''' Checkout the git tag.
+
+{{CodeSelect|code=
+git checkout --quiet 1.16.0
+}}
+
+'''7.''' Done.
+
+Download, digital software verification and git checkout --quiet of the ElectrumX server source code is complete.
+
+= Configuration =
+== Litecoin-Qt Configuration ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/.litecoin</code>.
+
+Note: It is OK Litecoin-Qt has been previously used and folder <code>~/.litecoin</code> already exists. Running the following command would be optional, OK and do nothing.
+
+{{CodeSelect|code=
+mkdir -p ~/.litecoin
+}}
+
+'''2.''' Create the Litecoin Core configuration file <code>~/.litecoin/litecoin.conf</code>.
+
+{{Open File|
+filename=~/.litecoin/litecoin.conf
+}}
+
+'''3.''' Paste the following text. <ref>
+* <code>prune=0</code> is the default for litecoind but the Litecoin-Qt GUI has a first start wizard which asks if pruning should be enabled. To avoid that first start wizard and to make sure pruning is disabled, explicitly disable pruning in configuration file.
+* Quote [https://electrumx-spesmilo.readthedocs.io/en/latest/HOWTO.html ElectrumX Upstream Documentation]: <blockquote>You must be running a non-pruning litecoin daemon with <code>txindex=1</code></blockquote>
+</ref>
+
+{{CodeSelect|code=
+server=1
+bind=127.0.0.1
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+txindex=1
+prune=0
+rpcuser=username
+rpcpassword=password
+proxy=10.152.152.10:9111
+}}
+
+'''4.''' Save.
+
+'''5.''' Start Litecoin-Qt.
+
+Litecoin-Qt can be started using any method (from command line or start menu entry). Starting normally. <ref>
+"normally" meaning without <code>-reindex</code>.
+</ref>
+
+{{CodeSelect|code=
+~/litecoin-*/bin/litecoin-qt
+}}
+
+'''6.''' Disable pruning in Litecoin-Qt.
+
+<code>Litecoin Core</code> &rarr; <code>Settings</code> &rarr; <code>Options</code> &rarr; <u>un</u>select <code>Prune block storage to</code> <ref name=config-vs-gui>
+Optional since Litecoin-Qt options menu says that configuration file overrides Litecoin-Qt GUI settings anyhow but better just in case to avoid any potential bugs.
+</ref>
+
+'''7.''' Disable incoming connections in Litecoin-Qt.
+
+Optional. <ref name=config-vs-gui /> <ref>
+Disable incoming connections in Litecoin-Qt for better security (?) (avoiding code paths handling unsolicited incoming connections). But incoming connections are not accidentally happening inside {{project_name_workstation_long}} anyhow. That would require setting up an [[Onion Services|onion service]] for Litecoin Core which is [[Undocumented]].
+
+On the other hand, unsolicited incoming connections through an onion service might be desirable for better connectivity, to support the Litecoin network?
+</ref>
+
+<code>Litecoin Core</code> &rarr; <code>Settings</code> &rarr; <code>Network</code> &rarr; <u>un</u>select <code>Allow incoming connections</code>
+
+'''8.''' Terminate Litecoin-Qt.
+
+Close terminate Litecoin-Qt. This is required for the following next step which requires that Litecoin-Qt is not running.
+
+'''9.''' Reindex the blockchain using Litecoin-Qt.
+
+Litecoin-Qt needs to be started at least once from the command line with the <code>-reindex</code> parameter. <ref>
+Using <code>-reindex</code> is required because Litecoin Core configuration has been changed, specifically [https://litecoin.stackexchange.com/questions/35707/what-are-pros-and-cons-of-txindex-option <code>txindex</code>] has been enabled. (<code>txindex=1</code>) <br />
+
+Quote [https://electrumx-spesmilo.readthedocs.io/en/latest/HOWTO.html ElectrumX Upstream Documentation]: <blockquote>You must be running a non-pruning litecoin daemon with <code>txindex=1</code>
+</ref>
+
+{{CodeSelect|code=
+~/litecoin-*/bin/litecoin-qt -reindex
+}}
+
+When Litecoin-Qt is started next time, there is no more need for <code>-reindex</code> and it probably should not be used since it takes more time.
+
+'''10.''' Wait for the blockchain to be synchronized.
+
+'''11.''' Optional for better usability: [[Litecoin_Core#Add_a_Litecoin-Qt_Start_Menu_Entry|Add Litecoin-Qt start menu entry]].
+
+'''12.''' Optional for better usability: [[Litecoin_Core#Autostart_Litecoin-Qt|Autostart Litecoin-Qt]].
+
+Autostarting Litecoin-Qt after reboot might be desirable so it can catch up downloading the blockchain as well as to serve ElectrumX.
+
+'''13.''' Done.
+
+Configuration of Litecoin-Qt is complete.
+
+== ElectrumX Configuration ==
+=== ElectrumX Server Configuration ===
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/.electrumx</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.electrumx
+}}
+
+'''2.''' {{Open File|
+filename=~/electrumx.conf
+}}
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+COIN=Litecoin
+DB_DIRECTORY=/home/user/.electrumx
+DAEMON_URL=username:password@127.0.0.1
+SERVICES=tcp://127.0.0.1:5000,rpc://127.0.0.1:2401
+PEER_DISCOVERY=self
+}}
+
+'''4.''' Save.
+
+'''5.''' Done.
+
+Server configuration of ElectrumX has been completed.
+
+=== ElectrumX User Systemd Unit Configuration ===
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/.config/systemd/user</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.config/systemd/user
+}}
+
+'''2.''' Create file <code>~/.config/systemd/user/electrumx.service</code>.
+
+{{Open File|
+filename=~/.config/systemd/user/electrumx.service
+}}
+
+<ref>
+Based on <code>~/electrumx/contrib/systemd/electrumx.service</code>.
+</ref>
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+[Unit]
+Description=ElectrumX
+After=network.target
+
+[Service]
+EnvironmentFile=/home/user/electrumx.conf
+ExecStart=/home/user/electrumx/electrumx_server
+LimitNOFILE=8192
+TimeoutStopSec=30min
+
+[Install]
+WantedBy=default.target
+}}
+
+'''4.''' Save.
+
+'''5.''' Reload systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user daemon-reload
+}}
+
+'''6.''' Optional: Enable autostart for the ElectrumX systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user enable electrumx
+}}
+
+'''7.''' Start ElectrumX systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user restart electrumx
+}}
+
+'''8.''' Done.
+
+Creation and configuration of ElectrumX systemd user unit has been completed.
+
+== Electrum-LTC Wallet Configuration ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+Connect only to one server (own server) instead of any third party servers.
+
+{{CodeSelect|code=
+~/bin/electrum-ltc --offline setconfig oneserver true
+}}
+
+Connect to own local server.
+
+{{CodeSelect|code=
+~/bin/electrum-ltc --offline setconfig server 127.0.0.1:5000:t
+}}
+
+Avoid auto connecting to third party servers (and avoid Electrum-LTC first start wizard asking to).
+
+{{CodeSelect|code=
+~/bin/electrum-ltc --offline setconfig auto_connect false
+}}
+
+== Add a Electrum-LTC using Local ElectrumX Start Menu Entry ==
+Creating a <code>Electrum-LTC</code> start menu entry which only connects to <code>ElectrumX</code>.
+
+This step is optional.
+
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+{{Box|text=
+Inside {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/.local/share/applications</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.local/share/applications
+}}
+
+'''2.''' {{Open File|filename=
+~/.local/share/applications/electrum-ltc-with-electrumx.desktop
+}}
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+[Desktop Entry]
+Name=Electrum-LTC with ElectrumX
+Comment=electrum-ltc-with-electrumx
+Exec=bash -c '~/bin/electrum-ltc -v --oneserver --server 127.0.0.1:5000:t'
+Terminal=false
+Type=Application
+Icon=money-manager-ex
+StartupWMClass=litecoin
+MimeType=x-scheme-handler/litecoin;
+Categories=Finance;
+}}
+
+'''4.''' Save.
+
+'''5.''' {{Q_project_name}}: perform platform-specific steps.
+
+In <code>dom0</code>, refresh Qubes' appmenu: <code>VM settings</code> &rarr; <code>Applications</code> &rarr; <code>Refresh Applications</code> &rarr; <code>Add desktop shortcut</code>.
+
+'''6.''' Done.
+
+The <code>Electrum-LTC with ElectrumX</code> start menu entry available should be available.
+}}
+
+== Autostart Electrum-LTC using Local ElectrumX ==
+Automatically starting <code>Electrum-LTC using local ElectrumX</code> which only connects to ElectrumX.
+
+This step is optional.
+
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+{{Box|text=
+Inside {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Apply instructions [[#Add a Electrum-LTC Start Menu Entry|Add a Electrum-LTC Start Menu Entry]] first.
+
+'''2.''' Create folder <code>~/.config/autostart</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.config/autostart
+}}
+
+'''3.''' Create a symlink from <code>~/.local/share/applications/electrum-ltc-with-electrumx.desktop</code> to <code>~/.config/autostart/electrum-ltc-with-electrumx.desktop</code>.
+
+{{CodeSelect|code=
+ln -s ~/.local/share/applications/electrum-ltc-with-electrumx.desktop ~/.config/autostart/electrum-ltc-with-electrumx.desktop
+}}
+
+'''4.''' Done.
+
+<code>Electrum-LTC with ElectrumX</code> will be automatically started the next time the VM is started.
+}}
+
+= Usage =
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Start Litecoin-Qt using any method (from start menu entry, autostart or manually from the command line).
+
+{{CodeSelect|code=
+~/litecoin-*/bin/litecoin-qt
+}}
+
+'''2.''' Check the the blockchain download in Litecoin-Qt is functional.
+
+'''3.''' Run the ElectrumX server using any method (autostart, or manually form the command line).
+
+{{CodeSelect|code=
+systemctl --user restart electrumx
+}}
+
+'''4.''' Check that ElectrumX blockchain processing is functional.
+
+See [[#Monitoring|monitoring]].
+
+'''5.''' Start the [[Electrum-LTC]] wallet using any method (autostart, or manually form the command line). <ref>
+<code>-v</code> for verbose mode is optional but recommended.
+</ref>
+
+{{CodeSelect|code=
+~/bin/electrum-ltc -v --oneserver --server 127.0.0.1:5000:t
+}}
+
+If Electrum-LTC shows "not connected" then that could be because Litecoin Core has not downloaded enough blockchain yet and/or ElectrumX has not caught up with the blockchain yet. In that case, the console output would include:
+
+<pre>
+I/i | interface.[127.0.0.1:5000] | connection established. version: ['ElectrumX 1.16.0', '1.4']
+I/i | interface.[127.0.0.1:5000] | disconnecting due to GracefulDisconnect('server tip below max checkpoint')
+</pre>
+
+Upstream bug reports:
+
+* [https://github.com/spesmilo/electrum/issues/7549 electrum unwanted disconnect from own ElectrumX server] <ref>
+https://github.com/spesmilo/electrum/issues/7548
+</ref>
+* [https://github.com/spesmilo/electrumx/issues/161 ElectrumX should accept local RDP connections even if it has not fully caught up with the litecoin daemon]
+
+= Monitoring =
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+Check the status of the ElectrumX systemd user service.
+
+{{CodeSelect|code=
+systemctl --no-pager --user status electrumx
+}}
+
+Follow the log of the ElectrumX systemd user service.
+
+{{CodeSelect|code=
+journalctl --boot --user -f -u electrumx
+}}
+
+If all is going well, it should be showing output similar to the following.
+
+<pre>
+electrumx_server[7426]: INFO:Prefetcher:new block height 144,270 hash 00000000000002606168ac016368896d79c591bff2b6580db2e398faef7ec093
+</pre>
+
+= See Also =
+* [[Money]]
+* [[Litecoin Core]]
+* [[Electrum-LTC]]
+* [[PyLRU]] (Dependency of ElectrumX.)
+* [https://github.com/spesmilo/electrumx ElectrumX Source Code Repository]
+* ElectrumX Upstream Documentation
+** [https://electrumx-spesmilo.readthedocs.io ElectrumX Documentation Index]
+** [https://electrumx-spesmilo.readthedocs.io/en/latest/HOWTO.html ElectrumX HOWTO]
+** [https://electrumx-spesmilo.readthedocs.io/en/latest/environment.htm ElectrumX Environment Variables]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

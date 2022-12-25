@@ -1,0 +1,561 @@
+<noinclude>{{Header}}</noinclude>{{Box|text=
+'''Introduction'''
+
+This configuration results in Tor Browser no longer using proxy settings. With no proxy set, Tor Browser uses the (VM) system's default networking. This is identical to any other application inside {{project_name_workstation_long}} that has not been explicitly configured to use Tor via socks proxy settings or a socksifier. This setting is also called transparent torification. <ref>
+This term was coined in context of a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxy Tor Transparent Proxy] ([http://eweiibe6tdjsdprb4px6rqrzzcsi22m4koia44kc5pcjr7nec2rlxyad.onion/legacy/trac/-/wikis/doc/TransparentProxy .onion]). It acts as a simple gateway that routes all connections through Tor, but does not provide [[Stream Isolation]].
+</ref> <ref>
+If these settings are changed, Tor Button would previously show a red sign and state "Tor Disabled" when a mouse was hovered over it.
+</ref>
+
+{{Tor_Browser_Change_Proxy_Settings_Why_Difficult}}
+
+{{Tor_Browser_Change_Proxy_Settings_Issues}}
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<u>Local socks proxy Method'''</u>
+
+This method works for removal of proxy settings but is rather lengthy and complicated. In case the user wants to have a look anyhow, please press on Expand on the right.
+<div class="mw-collapsible-content">
+Since other methods to configure Tor Browser to use system default networking are broken due to Tor Browser changes by upstream, this new local socks proxy method stops [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]] local port <code>9150</code> redirection to {{project name gateway long}} <code>9150</code> (where a Tor <code>SocksPort</code> is listening). As a replacement, a local socks proxy listens on {{project name workstation long}} local port <code>9150</code> which then forwards the traffic using system default networking. In result, if the user is using a VPN inside {{project name workstation long}} or in a VPN-Gateway wretched between {{project name gateway long}} and {{project name workstation long}}, Tor Browser would use the VPN.
+
+In this documentation, Dante is used as a local socks proxy. Development notes are kept on [[Dev/Dante]].
+
+'''1.''' Legacy notices.
+
+* <u>New users</u>, that did not apply instructions from this page again: No special notice.
+* <u>Existing users</u>: See below.
+
+A few settings need to be undone.
+
+* A) Previous changes to <code>/etc/environment</code> as documented previously for other methods need to be undone.
+* B) Tor Browser needs to be re-installed. This is because undoing the previous configuration is difficult and [[Unsupported|undocumented]].
+
+'''2.''' Stop default anon-ws-disable-stacked-tor service for port 9150.
+
+* Non-Qubes-Whonix: In {{project name workstation long}}.
+* Qubes-Whonix: In <code>{{project name workstation template}}</code> <u>Template</u>.
+
+{{CodeSelect|code=
+sudo systemctl stop anon-ws-disable-stacked-tor_autogen_port_9150.socket
+sudo systemctl stop anon-ws-disable-stacked-tor_autogen_port_9150.service
+sudo systemctl stop anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-stacked-tor_127.0.0.1_9150.sock.socket
+sudo systemctl stop anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-stacked-tor_127.0.0.1_9150.sock.service
+}}
+
+'''3.''' Prevent default anon-ws-disable-stacked-tor systemd unit from starting.
+
+* Non-Qubes-Whonix: In {{project name workstation long}}.
+* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+
+{{CodeSelect|code=
+sudo systemctl mask anon-ws-disable-stacked-tor_autogen_port_9150.socket
+sudo systemctl mask anon-ws-disable-stacked-tor_autogen_port_9150.service
+sudo systemctl mask anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-stacked-tor_127.0.0.1_9150.sock.socket
+sudo systemctl mask anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-stacked-tor_127.0.0.1_9150.sock.service
+}}
+
+'''4.''' Install the local socks proxy server.
+
+* Non-Qubes-Whonix: In {{project name workstation long}}.
+* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+
+{{box|text=
+'''A)''' Add Debian source repository.
+
+{{Open with root rights|filename=
+/etc/apt/sources.list.d/debian-src.list
+}}
+
+Paste.
+
+{{CodeSelect|code=
+deb-src https://deb.debian.org/debian bullseye main contrib non-free
+}}
+
+Save and exit.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''B)''' Install build dependencies.
+
+{{CodeSelect|code=
+sudo apt build-dep dante-server
+}}
+
+'''C)''' Get dante source code.
+
+{{CodeSelect|code=
+apt-get source dante-server
+}}
+
+'''D)''' Open the dante accesscheck.c source file.
+
+{{CodeSelect|code=
+mousepad ~/dante-1.4.2+dfsg/sockd/accesscheck.c
+}}
+
+Paste the contents.
+
+{{CodeSelect|code=
+/*
+ * Copyright (c) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008,
+ *               2009, 2010, 2011, 2012, 2013
+ *      Inferno Nettverk A/S, Norway.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. The above copyright notice, this list of conditions and the following
+ *    disclaimer must appear in all copies of the software, derivative works
+ *    or modified versions, and any portions thereof, aswell as in all
+ *    supporting documentation.
+ * 2. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *      This product includes software developed by
+ *      Inferno Nettverk A/S, Norway.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Inferno Nettverk A/S requests users of this software to return to
+ *
+ *  Software Distribution Coordinator  or  sdc@inet.no
+ *  Inferno Nettverk A/S
+ *  Oslo Research Park
+ *  Gaustadalléen 21
+ *  NO-0349 Oslo
+ *  Norway
+ *
+ * any improvements or extensions that they make and grant Inferno Nettverk A/S
+ * the rights to redistribute these changes.
+ *
+ */
+
+#include "common.h"
+
+static const char rcsid[] =
+"$Id: accesscheck.c,v 1.89 2013/10/27 15:24:42 karls Exp $";
+
+int
+usermatch(auth, userlist)
+   const authmethod_t *auth;
+   const linkedname_t *userlist;
+{
+/*   const char *function = "usermatch()"; */
+   const char *name;
+
+   if ((name = authname(auth)) == NULL)
+      return 0; /* no username, no match. */
+
+   do
+      if (strcmp(name, userlist->name) == 0)
+         break;
+   while ((userlist = userlist->next) != NULL);
+
+   if (userlist == NULL)
+      return 0; /* no match. */
+   return 1;
+}
+
+int
+groupmatch(auth, grouplist)
+   const authmethod_t *auth;
+   const linkedname_t *grouplist;
+{
+   const char *function = "groupmatch()";
+   const char *username;
+   struct passwd *pw;
+   struct group *groupent;
+
+   SASSERTX(grouplist != NULL);
+
+   if ((username = authname(auth)) == NULL)
+      return 0; /* no username, no match. */
+
+   /*
+    * First check the primary group of the user against grouplist.
+    * If the groupname given there matches, we don't need to go through
+    * all users in the list of group.
+    */
+   if ((pw = getpwnam(username))         != NULL
+   &&  (groupent = getgrgid(pw->pw_gid)) != NULL) {
+      const linkedname_t *listent = grouplist;
+
+      do
+         if (strcmp(groupent->gr_name, listent->name) == 0)
+            return 1;
+      while ((listent = listent->next) != NULL);
+   }
+   else {
+      if (pw == NULL)
+         slog(LOG_DEBUG, "%s: unknown username \"%s\"", function, username);
+      else if (groupent == NULL)
+         slog(LOG_DEBUG, "%s: unknown primary groupid %ld",
+              function, (long)pw->pw_gid);
+   }
+
+   /*
+    * Go through grouplist, matching username against each groupmember of
+    * all the groups in grouplist.
+    */
+   do {
+      char **groupname;
+
+      if ((groupent = getgrnam(grouplist->name)) == NULL) {
+         swarn("%s: unknown groupname \"%s\"", function, grouplist->name);
+         continue;
+      }
+
+      groupname = groupent->gr_mem;
+
+      while (*groupname != NULL) {
+         if (strcmp(username, *groupname) == 0)
+            return 1; /* match. */
+
+         ++groupname;
+      }
+   } while ((grouplist = grouplist->next) != NULL);
+
+   return 0;
+}
+
+#if HAVE_LDAP
+int
+ldapgroupmatch(auth, rule)
+   const authmethod_t *auth;
+   const rule_t *rule;
+{
+   const char *function = "ldapgroupmatch()";
+   const linkedname_t *grouplist;
+   const char *username;
+   char *userdomain, *groupdomain;
+   int retval;
+
+   if ((username = authname(auth)) == NULL)
+      return 0; /* no username, no match. */
+
+#if !HAVE_GSSAPI
+   if (!rule->state.ldap.ldapurl)
+      SERRX(rule->state.ldap.ldapurl != NULL);
+#endif /* !HAVE_GSSAPI */
+
+   if ((userdomain = strchr(username, '@')) != NULL)
+      ++userdomain;
+
+   if (userdomain == NULL && *rule->state.ldap.domain == NUL && rule->state.ldap.ldapurl == NULL) {
+      slog(LOG_DEBUG, "%s: cannot check ldap group membership for user %s: "
+                      "user has no domain postfix and no ldap url is defined",
+                      function, username);
+      return 0;
+   }
+
+   if ((retval = ldap_user_is_cached(username)) >= 0)
+      return retval;
+
+   /* go through grouplist, matching username against members of each group. */
+   grouplist = rule->ldapgroup;
+   do {
+      char groupname[MAXNAMELEN];
+
+      slog(LOG_DEBUG, "%s: checking if user %s is member of ldap group %s",
+                      function, username, grouplist->name);
+
+      STRCPY_ASSERTLEN(groupname, grouplist->name);
+
+      if ((groupdomain = strchr(groupname, '@')) != NULL) {
+         *groupdomain = NUL; /* separates groupname from groupdomain. */
+         ++groupdomain;
+      }
+
+      if (groupdomain != NULL && userdomain != NULL) {
+         if (strcmp(groupdomain, userdomain) != 0
+         &&  strcmp(groupdomain, "") != 0) {
+            slog(LOG_DEBUG, "%s: userdomain \"%s\" does not match groupdomain "
+                            "\"%s\" and groupdomain is not default domain.  "
+                            "Trying next entry",
+                            function, userdomain, groupdomain);
+            continue;
+         }
+      }
+
+      if (ldapgroupmatches(username, userdomain, groupname, groupdomain, rule)){
+         cache_ldap_user(username, 1);
+         return 1;
+      }
+   } while ((grouplist = grouplist->next) != NULL);
+
+   cache_ldap_user(username, 0);
+   return 0;
+}
+#endif /* HAVE_LDAP */
+
+int
+accesscheck(s, auth, src, dst, emsg, emsgsize)
+   int s;
+   authmethod_t *auth;
+   const struct sockaddr_storage *src, *dst;
+   char *emsg;
+   size_t emsgsize;
+{
+   int match, authresultisfixed;
+   match = 1;
+   
+   /*
+    * HACK-FORK-EDIT-OK
+    */
+
+   return match;
+}
+}}
+
+'''E)''' Change directory into the dante source code folder.
+
+{{CodeSelect|code=
+pushd dante-1.4.2+dfsg
+}}
+
+'''F)''' Build the Debian package.
+
+{{CodeSelect|code=
+dpkg-buildpackage -b --no-sign
+}}
+
+'''E)''' Change directory back to the home folder.
+
+{{CodeSelect|code=
+popd
+}}
+
+'''F)''' Install the modified dante package.
+
+{{CodeSelect|code=
+sudo dpkg -i dante-server_1.4.2+dfsg-7_amd64.deb
+}}
+
+}}
+
+'''5.''' {{Open with root rights|filename=
+/etc/danted.conf
+}}
+
+'''6.''' Local socks proxy configuration.
+
+* Non-Qubes-Whonix: In {{project name workstation long}}.
+* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+
+Delete all contents from the file and <u>replace</u> it with the following configuration.
+
+{{CodeSelect|code=
+debug: 1
+
+logoutput: stderr
+
+internal: 127.0.0.1 port = 9150
+external: eth0
+
+socksmethod: none username
+clientmethod: none
+
+user.privileged: root
+user.notprivileged: root
+user.libwrap: root
+
+client pass {
+        from: 0.0.0.0/0 port 1-65535 to: 0.0.0.0/0
+        log: connect disconnect error
+}
+socks pass {
+        from: 0.0.0.0/0 to: 0.0.0.0/0
+        command: bind connect udpassociate
+        log: error connect disconnect iooperation
+}
+}}
+
+'''7.''' Restart the local socks proxy.
+
+This is to apply the changed configuration and to test if the configuration is valid.
+
+* Non-Qubes-Whonix: In {{project name workstation long}}.
+* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+
+{{CodeSelect|code=
+sudo systemctl restart danted.service
+}}
+
+'''8.''' tb-starter Configuration
+
+* Non-Qubes-Whonix: In {{project name workstation long}}.
+* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+
+Stop Tor from using unix domain socket files for socks so it uses socks on IP 127.0.0.1 port 9150 instead.
+
+{{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+Paste.
+
+{{CodeSelect|code=
+unset TOR_SOCKS_IPC_PATH
+}}
+
+Save and exit.
+
+'''9.''' Platform specific notice:
+
+* Non-Qubes-Whonix: No special notice required.
+* Qubes-Whonix: Shutdown Template. Once done, restart App Qube.
+
+'''10.''' Start Tor Browser.
+
+* Non-Qubes-Whonix: In {{project name workstation long}}.
+* Qubes-Whonix: In <code>{{project name workstation long}}</code> <u>App Qube</u>.
+
+{{CodeSelect|code=
+torbrowser
+}}
+
+Tor Browser should now be using system default networking thanks to the local socks proxy.
+
+No additional configuration of Tor Browser is required.
+
+'''11.''' Done.
+</div>
+</div>
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<u>Older Methods:</u>
+
+For older methods, which might be broken due to Tor Browser changes by upstream, please press on Expand on the right.
+<div class="mw-collapsible-content">
+To enable transparent torification (no proxy setting), set the <code>TOR_TRANSPROXY=1</code> environment variable. There are several methods, but the simplest is the [[#/etc/environment Method|/etc/environment Method]].
+
+'''Note:''' <u>Choose only one method</u> to enable transparent torification.
+
+<u>'''<code>/etc/environment</code> Method'''</u>
+
+This will apply to the whole environment, including any possible custom locations of Tor Browser installation folders. <ref>
+Unless this environment variable is manually unset before starting Tor Browser.
+</ref>
+
+'''1.''' Platform specific notice.
+
+* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In Template. (<code>{{project name workstation template}}</code>)
+
+'''2.''' {{Open with root rights|filename=
+/etc/environment
+}}
+
+'''3.''' Add the following line.
+
+{{CodeSelect|code=
+TOR_TRANSPROXY=1
+## newline at the end
+}}
+
+'''4.''' Save and exit.
+
+'''5.''' Reboot.
+
+Reboot is required to make changes to configuration file <code>/etc/environment</code> take effect.
+
+'''6.''' Done.
+
+<code>/etc/environment</code> method configuration has been completed.
+
+'''Tor Browser Settings Changes'''
+
+This step is required since Tor Browser 10. <ref>
+* https://forums.whonix.org/t/tor-browser-10-without-tor/10313
+* https://forums.whonix.org/t/tor-browser-not-working-user-tor-vpn-internet/10385
+* https://forums.whonix.org/t/tor-browser-infinite-tab-opening-when-enabling-tor-transproxy-when-using-it-with-a-vpn/12791
+</ref>
+
+'''1.''' Platform specific notice.
+
+* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project name workstation vm}}</code>)
+
+'''2.''' Tor Browser &rarr; URL bar &rarr; Type: <code>about:config</code> &rarr; Press <code>Enter</code> key. &rarr; search for and modify
+
+'''3.''' <code>network.dns.disabled</code> &rarr; set to <code>false</code>
+
+'''4.''' <code>extensions.torbutton.launch_warning</code> &rarr; set to <code>false</code>
+
+'''Undo'''
+
+Reverting this change is [[Unsupported|undocumented]]. Simply unsetting that environment variable will not work due to Tor Browser limitations. The easiest way to undo this setting is to install a fresh instance of Tor Browser (please contribute to these instructions)!
+
+<u>'''Command Line Method'''</u>
+
+'''1.''' Platform specific notice:
+
+* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project name workstation vm}}</code>)
+
+'''2.''' Navigate to the Tor Browser folder.
+
+{{CodeSelect|code=
+cd ~/.tb/tor-browser
+}}
+
+'''3.''' Every time Tor Browser is started, run the following command to set the <code>TOR_TRANSPROXY=1</code> environment variable.
+
+{{CodeSelect|code=
+TOR_TRANSPROXY=1 ./start-tor-browser.desktop
+}}
+
+'''4.''' Done.
+
+{{Anchor|start-tor-browser Method}}
+<u>'''start-tor-browser Method'''</u>
+
+This only applies to a single instance of the Tor Browser folder that is configured. This method may not persist when Tor Browser is updated.
+
+'''1.''' Platform specific notice:
+
+* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project name workstation vm}}</code>)
+
+'''2.''' Find and open {{Code|start-tor-browser}} in the Tor Browser folder with an editor.
+
+This is most likely found in <code>~/.tb/tor-browser/Browser/start-tor-browser</code> <u>below</u> <code>#!/usr/bin/env bash</code>.
+
+'''3.''' Set.
+
+{{CodeSelect|code=
+export TOR_TRANSPROXY=1
+}}
+
+'''4.''' Done.
+
+{{Code|start-tor-browser}} Method configuration has been completed.
+</div>
+</div>
+
+{{Anchor|/etc/environment Method}}
+
+{{Anchor|Forget about Tor Button's Open Network Settings}}
+'''Ignore Tor Button's Open Network Settings'''
+
+{{project_name_long}} has disabled the <code>Open Network Settings...</code> menu option in Tor Button. Read the footnote for further information. <ref>The regular Tor Browser Bundle from The Tor Project (without {{project_name_long}}) allows networking settings to changed inside Tor via the <code>Open Network Settings</code> menu option. It has the same effect as editing Tor's config file torrc. In {{project_name_long}}, the environment variable <code>export TOR_NO_DISPLAY_NETWORK_SETTINGS=1</code> has been [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh set] to disable the <code>Tor Browser</code> &rarr; <code>Open Network Settings...</code> menu item. It is not useful and confusing to have in the {{project_name_workstation_long}} because:
+* In {{project_name_long}}, there is only limited access to Tor's control port (see [[Dev/onion-grater|onion-grater, a Tor Control Port Filter Proxy, design documentation]] for more information).
+* For security reasons, Tor must be manually configured in <i>/usr/local/etc/torrc.d/50_user.conf</i> on {{project_name_gateway_long}}, and not from {{project_name_workstation_long}} (see [[Features#Tunnel_Support|VPN/Tunnel support]] for more information).
+</ref>
+}}
+<noinclude>
+{{Footer}}
+</noinclude>

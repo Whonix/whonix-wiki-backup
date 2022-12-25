@@ -1,0 +1,141 @@
+{{Title|title=Why use Qubes over other Virtualizers?}}
+{{Header}}
+{{#seo:
+|description=Qubes Advantages Over VirtualBox and KVM
+|image=Whyquestionmark5483259640.jpg
+}}
+[[image:Whyquestionmark5483259640.jpg|thumb]]
+
+= Why use Qubes over other Virtualizers? =
+
+The Qubes project is focused on developing the Qubes OS desktop operating system, which is based upon the principle of "Security by Isolation". It is not a general purpose operating system where the ability to install a virtualizer is just another feature. Rather, it runs a bare-metal virtualizer (Xen) and isolates hardware controllers and multiple user domains (qubes) in separate VMs that are explicitly assigned different levels of trust.
+
+== Security ==
+
+=== Advanced Separation / Least Privilege ===
+
+* The Xen hypervisor and administrative domain (<code>dom0</code>) in Qubes OS actively discourages any activity other than running VMs.
+* The network stack and WiFi drivers are running in a dedicated, unprivileged network qube (NetVM), which substantially reduces the attack surface.
+* Future separation of the [https://github.com/QubesOS/qubes-issues/issues/833 GUI (graphical) domain] from <code>dom0</code> is partially implemented in Qubes <code>4.1</code>.
+
+=== Hardware and Protocol Protection ===
+
+* Enabling VT-d/IOMMU via BIOS provides DMA protection.
+* The USB stack can be isolated in a dedicated USB VM, protecting <code>dom0</code> from untrusted USB devices.
+* [https://www.qubes-os.org/doc/anti-evil-maid/ Anti Evil Maid (AEM)] protection is supported.
+* [https://www.qubes-os.org/doc/yubikey/ Yubikey] multi-factor user authentication is available to enhance the security of logins, mitigate the risk of password snooping, and improve USB keyboard security.
+* No [[Hardware_Threat_Minimization#Microphones|microphones]] are attached to VMs by default.
+
+=== Networking ===
+
+* An additional firewall VM is used to house the Linux kernel-based firewall, providing extra protection against a compromised NetVM; see [https://www.qubes-os.org/doc/networking/ Qubes networking].
+* By default, Qubes OS is firewalled and no incoming ports are open.
+* No networking is present in the administrative domain (<code>dom0</code>). Even <code>dom0</code> upgrades are done in a dedicated UpdateVM (currently set by default to <code>sys-firewall</code>), before those are verified and installed in <code>dom0</code>.
+* All Template and <code>dom0</code> updates can be easily fetched over Tor via the {{project_name_gateway_long}} ProxyVM (commonly called <code>{{project_name_gateway_vm}}</code>).
+* TCP timestamps are disabled by default. <ref>
+[[Disable_TCP_and_ICMP_Timestamps#Disable_TCP_Timestamps|Disable TCP Timestamps]].
+</ref>
+* ICMP timestamps are disabled by default. <ref>
+[[Disable_TCP_and_ICMP_Timestamps#Disable_ICMP_Timestamps|Disable ICMP Timestamps]].
+</ref>
+* Protection against unintentional leaks of critical user data is possible by setting an empty NetVM field for the corresponding qube.
+* Tor Traffic can be white-listed using [[Corridor|corridor]] as a filtering gateway, protecting against accidental clearnet leaks.
+* Availability of an [https://github.com/talex5/qubes-mirage-firewall experimental unikernel] firewall based on MirageOS for greater security, performance and a lower resource footprint.
+
+=== Other Benefits ===
+
+* [https://www.qubes-os.org/doc/how-to-use-disposables/ Disposables] are available to open untrusted applications, links, attachments and documents. <ref>
+From Qubes R4.0, disposable {{project_name_workstation_long}} VMs are now available, as well as multiple Disposables for other platforms.
+</ref>
+* Service qubes can be configured as a [https://www.qubes-os.org/doc/disposable-customization/#using-named-disposables-for-sys- static Disposables] to mitigate the threat from persistent malware across VM reboots. <ref>
+<code>sys-net</code>, <code>sys-firewall</code> and <code>sys-usb</code> can be configured as static Disposables. This option was first made available in Qubes R4.
+</ref>
+* Unforgeable, colored window borders allow easy identification of qubes with different security levels.
+* PDFs can be easily sanitized via a trusted PDF converter. <ref>
+<code>Right-click</code> &rarr; <code>Convert to Trusted PDF</code>
+</ref>
+* Greater security of email-centric work environments is possible by using split GPG to protect private keys and limiting network connections exclusively to the chosen email server.
+* {{software compartmentalization vs. physical separation}}
+
+== Usability ==
+
+* OS agnostic: qubes can be based upon Fedora, Debian, Ubuntu, {{project_name_long}}, Windows, Kali Linux, CentOS and Arch Linux templates, among others.
+** Lightweight [https://www.qubes-os.org/doc/templates/minimal/ minimal templates] are also available for use. <ref>
+<blockquote>The minimal templates are lightweight versions of their standard template counterparts. They have only the most vital packages installed, including a minimal X and xterm installation. When properly configured and used, minimal templates can be less resource-intensive, reduce attack surface, and support more fine-grained compartmentalization.</blockquote>
+</ref>
+* All isolated qubes are integrated into a single, usable system via a unified desktop.
+* Software installation and updates are centralized.
+* Creating new VMs and disposing of unwanted VMs is very easy and fast.
+* The VM start menu is integrated into the host's (<code>dom0</code>) start menu via Qubes VM Manager.
+* A secure and usable mechanism exists for [https://www.qubes-os.org/doc/how-to-copy-and-paste-text/ copying and pasting] clipboard contents and files between qubes.
+* An easier [https://www.qubes-os.org/doc/how-to-back-up-restore-and-migrate/ backup / restore mechanism for VMs].
+* The keyboard layout only needs to be configured once in <code>dom0</code>.
+* No duplicate task bars are present.
+* A default seamless mode is available for Windows (similar to VirtualBox’s Seamless Mode or VMware’s Unity Mode). <ref>https://www.howtogeek.com/171145/use-virtualboxs-seamless-mode-or-vmwares-unity-mode-to-seamlessly-run-programs-from-a-virtual-machine/</ref> It is easy to distinguish which window belongs to each VM. <ref>
+https://www.qubes-os.org/doc/GettingStarted/
+</ref>
+* See also: [https://badland.io/static/A_Usability_Evaluation_of_QUBES_OS.pdf A Usability Evaluation of Qubes OS].
+
+== Performance ==
+
+* VMs boot up much faster, because fewer services need to be started.
+* App Qubes therefore also use much less RAM.
+* App Qubes use far less disk space because they can share the root image of the Template in read-only mode. Separate disk storage is only used for the user's directory and per-VM settings (read more: [https://www.qubes-os.org/doc/template-implementation/ Template Implementation]).
+* [https://www.qubes-os.org/doc/standalones-and-hvms/ Standalones] can be created for the installation of software in only specific domains.
+
+= {{q_project_name}} Advantages over {{non_q_project_name_short}} =
+
+== Anonymity ==
+
+* It is easier to tunnel the whole system -- including host (<code>dom0</code>) updates -- through Tor (besides <code>sys-net</code> and <code>sys-firewall</code>).
+
+== Security ==
+
+* Multiple {{project_name_workstation_long}} App Qubes can easily use the same {{project_name_gateway_long}} ProxyVM without being able to make contact with one another. <ref>
+This issue for [[{{non_q_project_name_short}}|{{non_q_project_name}}]] is documented on the [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] wiki page.
+</ref>
+* Downloads of {{project_name_long}} Template images use cryptographic signatures of the <code>dom0</code> package manager (qubes-dom0-update / dnf). Without the user knowing it, this makes verification transparent.
+* It is simple to run Tor Browser in a {{project_name_workstation_long}} Disposable.
+* Various operations can be securely performed in {{q_project_name}} VMs which are not available in [[{{non_q_project_name_short}}|{{non_q_project_name}}]], like:
+** [https://www.qubes-os.org/doc/how-to-copy-and-paste-text/ Secure copy / paste operations] between VMs.
+** [https://www.qubes-os.org/doc/how-to-copy-and-move-files/ Secure copying and transfer of files] between VMs.
+** [https://github.com/QubesOS/qubes-app-linux-pdf-converter Sanitization of PDFs] and images. <ref>
+<blockquote>Qubes PDF Converter is a Qubes OS application that uses DisposableVMs and Qubes' flexible qrexec (inter-VM communication) infrastructure to securely convert untrusted PDF files into safe-to-view PDF files.
+
+This is done by using a DisposableVM to render each page of a PDF file into a very simple representation (RGB bitmap) that (presumably) leaves no room for malicious code. This representation is then sent back to the client qube which then constructs an entirely new PDF file out of the received bitmaps.</blockquote>
+</ref> <ref>
+[https://blog.invisiblethings.org/2013/02/21/converting-untrusted-pdfs-into-trusted.html Converting untrusted PDFs into trusted ones: The Qubes Way].
+</ref>
+
+== Usability ==
+
+* Easier installation.
+** As an option during Qubes installer.
+** Or later [[Qubes/Install|downloaded from the Qubes repository]].
+* [[Known_Issues#{{non_q_project_name_short}}|Issues specific to {{non_q_project_name_short}}]] do not apply.
+* No confusing [[Known_Issues#Network_Manager_Systray_Unmanaged_Devices|Network Manager Systray Unmanaged Devices]] error messages, since there is no duplicate taskbar.
+* No confusion is caused by the VM timezone being set to UTC (for anonymity reasons), <ref>[[Post_Install_Advice#Network_Time_Syncing|Network Time Syncing]].
+</ref> since there is no duplicate taskbar. <ref>
+https://phabricator.whonix.org/T71
+</ref>
+
+= Qubes Vulnerabilities =
+
+Qubes is not however a silver bullet - attacks are still possible against:
+
+* The virtualization technology (VT-x, VT-d).
+* The hypervisor (Xen). <ref>
+See: [https://xenbits.xen.org/xsa/ Xen Security Advisories].
+</ref>
+* Additional software used by any virtualized system, like qemu and DirectX emulation.
+
+Further, data leaks are possible via cooperative covert channels (malware working in concert across two or more VMs), and side channel attacks (malware in one VM trying to learn about processes executed in another VM).
+
+[https://forums.whonix.org/t/qubes-whonix-security-disadvantages-help-wanted/8581 Qubes-Whonix Security Disadvantages - Help Wanted!]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

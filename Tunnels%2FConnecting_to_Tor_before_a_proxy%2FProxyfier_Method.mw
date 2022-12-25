@@ -1,0 +1,246 @@
+{{Header}}
+{{Title|
+title=Connecting to Tor before a Proxy using Proxyfier Method
+}}
+{{#seo:
+|description=Instructions on how to connect to Tor before a proxy (User &rarr; Tor &rarr; Proxy &rarr; Internet) using Proxyfier Method
+}}
+{{proxy_methods}}
+= Configure Applications to use Proxyfier Method =
+After understanding {{project_name_long}} default stream isolation configuration, there is no difference from using a proxyfier in an ordinary way, other than that it is running inside {{project_name_workstation_long}}. There is a [[Stream_Isolation#List|list]] of applications that come pre-configured with {{project_name_long}} for [[Stream Isolation]]. If you plan on changing the proxy settings of any of those, you must read the notes below.
+
+If the proxifier is leak free or in worst case leaks through Tor alone (thanks to {{project_name_long}}), is another question and not in {{project_name_long}} power, see [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO TorifyHOWTO].
+
+{{Prevent_Bypassing_the_Tunnel-Link_Warning_Box}}
+
+= Important Application Specific Notes =
+
+== Tor Browser Notes ==
+{{Tor_Browser_Change_Proxy_Settings_Why_Difficult}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = [[Undocumented]]. Documentation is incomplete. There is currently no tested, known to work solution for using [[Tor Browser]] with the Proxyfier Method.
+
+This issue is [[unspecific|unspecific to {{project_name_long}}]]. This is not a {{project_name_long}} issue but rather an issue with proxyfier / socksifier software and Tor Browser. This would also happen if {{project_name_long}} was not involved. (For a basic architectural explanation, see [[Support#Free_Support_Principle|Free Support Principle]].) 
+
+Researching this is up to you. Please [[contribute|contribute]]. Without contributions, this situation should be expected to remain the same forever.
+
+Alternatively consider other methods which however might also have issue and might also be difficult. See the mini navigation at the very top of this wiki page.
+}}
+
+'''1.''' Check applicability of these instructions.
+
+Does the user need to follow these instructions? Only if the user intents to use Tor Browser with an extra tunnel-link. For example, if the user only intents to use a different application such as curl with an extra tunnel-link, then the instructions in this very wiki chapter can be skipped. In that case, see the other wiki chapters on this page.
+
+'''2.''' Remove default proxy settings by Tor Browser.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+For information on how to remove Tor Browser default proxy settings, please press Expand on the right.
+<div class="mw-collapsible-content">
+{{Tor_Browser_Remove_Proxy_Settings}}
+</div>
+</div>
+
+'''3.''' Use proxification software with Tor Browser.
+
+Options:
+
+* '''A)''' <u>uwt:</u> If using a socks proxy. Try with [[#uwt|uwt]] which is a proxifier or more specifically a socksifier. [[Undocumented|Untested!]] Please leave feedback if it worked for you! {{CodeSelect2|code=
+uwt -t 5 -i 10.152.152.10 -p 9153 ~/.tb/tor-browser/App/Firefox/firefox --profile ~/.tb/tor-browser/Data/profile
+}}
+* '''B)''' <u>proxychains:</u> Method using [[#proxychains|proxychains]] is currently broken and a contributor is required to fix it.
+* '''C)''' <u>Different proxifier:</u> Any other proficicaiton software could be used. This is [[unspecific|unspecific to {{project name long}}]] and [[Unsupported|undocumented]].
+
+'''4.''' Done.
+
+The process of configuring an extra tunnel-link for Tor Browser has been completed.
+
+== Misc Application Notes ==
+'''1.''' Check applicability of these instructions.
+
+Do the user need to follow these instructions? Only if the user intents to use any of the applications which are on the [[Stream_Isolation#By_Settings|list of stream isolated by proxy settings]] with an extra tunnel-link. For example, if the user only intents to use Tor Browser with an extra tunnel-link, then the instructions in this very wiki chapter can be skipped. In that case, see above chapter.
+
+'''2.''' Remove default proxy settings by {{project name long}}.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+For information on how to remove {{project name long}} default proxy settings, please press Expand on the right.
+<div class="mw-collapsible-content">
+{{Deactivate_Misc_Proxy_Settings}}
+</div>
+</div>
+
+'''3.''' Use proxification software with the miscellaneous application.
+
+This is [[unspecific|unspecific to {{project name long}}]] and [[Unsupported|undocumented]]. uwt, proxychains which are mentioned below on this wiki page or other proxification software found elsewhere to be researched by the user could be considered.
+
+'''4.''' Done.
+
+The process of configuring an extra tunnel-link for a miscellaneous application has been completed.
+
+== uwt wrapped application notes ==
+'''1.''' Check applicability of these instructions.
+
+Do the user need to follow these instructions? Only if the user intents to use any application in the [[Stream_Isolation#By_uwt_wrapper|list of uwt wrapped applications]] with an extra tunnel-link. For example, if the user only intents to use Tor Browser with an extra tunnel-link, then the instructions in this very wiki chapter can be skipped. In that case, see above chapter.
+
+'''2.''' Remove uwt wrapper by {{project name long}}.
+
+{{project_name_long}} ships a list of applications pre-configured for using uwt wrappers by default. If the application you want to tunnel through the extra tunnel-link is on that list, it would conflict with your custom proxy settings. In that case, you need to disable that uwt wrapper first.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+For information on how to disable {{project name long}} uwt wrappers, please press Expand on the right.
+<div class="mw-collapsible-content">
+{{Deactivate_uwt}}
+</div>
+</div>
+
+'''3.''' Use proxification software with the miscellaneous application.
+
+This is [[unspecific|unspecific to {{project name long}}]] and [[Unsupported|undocumented]]. uwt, proxychains which are mentioned below on this wiki page or other proxification software found elsewhere to be researched by the user could be considered.
+
+'''4.''' Done.
+
+The process of configuring an extra tunnel-link for a uwt wrapped application has been completed.
+
+= Example Proxyfier Software =
+== uwt ==
+=== Introduction ===
+uwt uses {{Code2|torsocks}}. While the name ''tor''socks implies it is Tor specific, it is not. You can point it to any socks proxy.
+
+'''Mandatory prerequisite knowledge: [[#Configure Applications to use Proxyfier Method|Configure Applications to use Proxyfier Method]]'''
+
+=== uwt wrapped application example ===
+{{CodeSelect2|code=
+uwt -t 5 -i 10.152.152.10 -p 9153 /usr/bin/wget.anondist-orig -c https://check.torproject.org
+}}
+
+=== regular application example ===
+Requires [[Stream_Isolation#Deactivate_uwt_Stream_Isolation_Wrapper|deactivated]] wget uwt wrapper!
+
+{{CodeSelect2|code=
+uwt -t 5 -i 10.152.152.10 -p 9156 /usr/bin/wget -c https://check.torproject.org
+}}
+
+<ref>Using .anondist-orig, i.e. /usr/bin/wget.anondist-orig will circumvent the wget uwt wrapper.</ref> <ref>
+
+For testing, you could compare the IP shown by the above command with the next one. If you didn't disable the wget uwt wrapper, the following command will most likely fetch another IP, because still using Stream Isolation.
+
+Using Tor's <code>TransPort</code>.<br />
+(/usr/bin/wget.anondist-orig original non-uwt-wrapped version)
+
+{{CodeSelect2|code=
+wget.anondist-orig https://check.torproject.org
+}}
+</ref> <ref>For further explanation only...
+
+If you [[Stream_Isolation#Deactivate_uwt_Stream_Isolation_Wrapper|disabled]] wget's uwt wrapper, to use Tor's <code>TransPort</code>, you could use the following command.
+
+{{CodeSelect2|code=
+wget https://check.torproject.org
+}}
+</ref>
+
+== proxychains ==
+=== Warnings ===
+
+* It is unknown how well proxychains works. For example <code>torsocks has a IPv6 leak bug</code><ref>https://gitlab.torproject.org/legacy/trac/-/wikis/doc/torsocks#WorkaroundforIPv6leakbug</ref>. It is unknown if proxychains forces everything through the proxies. No research / leak testing has been performed by anyone to the knowledge of the author of this wiki page. {{project_name_long}} only ensures, should their be leaks, they go only through Tor.
+* There are at least three different versions of proxychains. The old/original/unmaintained version on sourceforge.net and two forks on github. The project status of any of them is unknown. The two different proxychains authors have different opinions. However, any leaks not going through the proxy(chain) will go through Tor.
+* '''Mandatory prerequisite knowledge: [[#Configure Applications to use Proxyfier Method|Configure Applications to use Proxyfier Method]]'''
+
+=== Setup ===
+Install proxychains.
+
+{{CodeSelect2|code=
+sudo apt install proxychains
+}}
+
+Open proxychains configuration file.
+
+{{Open with root rights|filename=
+/etc/proxychains.conf
+}}
+
+Go to the bottom of the settings file. Comment out "{{Code2|socks4 127.0.0.1 9050}}" and add for example "{{Code2|socks5 10.152.152.10 9152}}" (for Tor stream isolation) or "{{Code2|socks5 ip port}}" with an IP and port of your choice to set the proxy settings.
+
+<pre>
+[ProxyList]
+## add proxy here ...
+## meanwhile
+## defaults set to "tor"
+#socks4 127.0.0.1 9050
+socks5 10.152.152.10 9152
+# socks5 x.x.x.x xxxx
+</pre>
+
+<ref>Advanced. Recommendation: Why not use Tor stream isolation for the proxychains connection?
+
+<pre>
+[ProxyList]
+## add proxy here ...
+## meanwhile
+## defaults set to "tor"
+#socks4 127.0.0.1 9050
+socks5 10.152.152.10 9152
+socks5 x.x.x.x xxxx
+</pre>
+</ref>
+
+Save the configuration file. Test afterwards.
+
+=== example uwt wrapped application ===
+{{CodeSelect2|code=
+proxychains /usr/bin/wget.anondist-orig https://check.torproject.org
+}}
+
+<ref>
+For testing, you could compare the IP shown by the above command with the next one. If you didn't disable the wget uwt wrapper, the following command will most likely fetch another IP, because still using Stream Isolation. Using Tor's <code>TransPort</code>.
+
+(/usr/bin/wget.anondist-orig original non-uwt-wrapped version)
+
+{{CodeSelect2|code=
+wget.anondist-orig https://check.torproject.org
+}}
+</ref>
+
+=== example regular application ===
+Requires [[Stream_Isolation#Deactivate_uwt_Stream_Isolation_Wrapper|deactivated]] wget uwt wrapper!
+
+{{CodeSelect2|code=
+proxychains /usr/bin/wget https://check.torproject.org
+}}
+
+=== Tor Browser example ===
+Broken: The combination of proxychains and Tor Browser '''does currently <u>not</u> work'''. This issue is caused by proxychains and [[unspecific|unspecific to {{project name long}}]].
+
+Someone needs to [[Contribute]] by figuring this out. Otherwise this will probably never be possible. [https://forums.whonix.org/t/proxychains-tor-help-needed See forum discussion].
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<u>Archived instructions.</u>
+
+NOTE: The following archived instructions are most likely currently broken due to changes by upstream, The Tor Project. To resolve this issue, the user would have to proceed as per [[Support#Free_Support_Principle|Free Support Principle]]. Please post in {{project name long}} forums to notify if this method is currently working, broken or if any solution has been found. To view the archived instructions, please press on Expand on the right.
+
+<div class="mw-collapsible-content">
+Complete the following steps inside {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Remove proxy settings.
+
+First, you must remove Tor Browser proxy settings before you can combine it with a proxifier. This is documented above.
+
+'''2.''' Run proxychains.
+
+Then try this command.
+
+{{CodeSelect2|code=
+proxychains ~/.tb/tor-browser/start-tor-browser
+}}
+
+'''3.''' Done.
+</div>
+</div>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

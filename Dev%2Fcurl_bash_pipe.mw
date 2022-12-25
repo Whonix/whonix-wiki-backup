@@ -1,0 +1,132 @@
+{{Header}}
+{{title|title=
+curl bash pipe - Security Discussion
+}}
+= Introduction =
+There are some questions as well as arguments related to curl bash pipes on the internet. A concern has been raised on the subject of a curl bash pipe being inherently less secure than downloading a shell script and executing it.
+
+= Script Security Audit =
+There are at least two user groups.
+
+<u>'''User Group 1)'''</u> '''Users <u>with</u> the ability to security audit shell scripts:'''
+
+Users with the ability to review shell scripts (such as an installer shell script), can and might review shell scripts. These type of users do not need to be told:
+
+<blockquote>
+# It's a curl bash pipe, for better security, you might want to, not run the curl bash pipe, but instead:
+# download the script, 
+# check if there is any {{kicksecure_wiki
+|wikipage=Unicode
+|text=Malicious Unicode
+}} in the script,
+# review the source code in a text editor,
+# make it executable if it looks sane
+# execute it.
+</blockquote>
+
+These group of users already know that because knowing that is a very much more trivial skill than knowing how to audit shell scripts. Even a curl bash pipe <code>curl somedomain.com/script.bsh | bash</code> is a type of shell script (though usually a rather short one) that people with review skills know how to review or rewrite.
+
+If someone with Linux scripting skills is seeing a curl bash pipe such as for example <code>curl somedomain.com/script.bsh | bash</code> then it is trivial to modify that curl bash pipe or in other words to extract the the direct link to the script <code>somedomain.com/script.bsh</code> and then to manually download that script using a web browser, curl or similar.
+
+And hopefully not falling victim too {{kicksecure_wiki
+|wikipage=Shell
+|text=Hidden Text Attacks
+}} while using copy and paste.
+
+<u>'''User Group 1)'''</u> '''Users <u>without</u> the ability to security audit shell scripts:'''
+
+If a user does not have the ability to review a shell script, then there is no difference security wise for the user anyhow. If either,
+
+* A) The user 1) downloads the script, 2) makes the script executable and 3) then executes the script, <u>or</u>
+* B) runs a curl bash pipe,
+
+has the same effect. In both cases, the user was running a script without performing a security audit first.
+
+= Security Comparison =
+Let's compare method A) with Method B).
+
+<div class="tab-content-controller" data-tcc-id="curl-bash-pipe-comparison"></div>
+<div class="info-box" data-tcc-id="curl-bash-pipe-comparison" data-tcc-title="Option A) curl bash pipe">
+'''1.''' Run the following command.
+
+{{CodeSelect|code=
+curl --tlsv1.3 https://www.example.com/installer {{!}} bash
+}}
+
+'''2.''' Done.
+</div>
+
+<div class="info-box" data-tcc-id="curl-bash-pipe-comparison" data-tcc-title="Option B) Manual Download">
+'''1.''' Download the installer.
+
+{{CodeSelect|code=
+curl --tlsv1.3 --remote-name https://www.example.com/installer
+}}
+
+'''2.''' Make the installer executable.
+
+{{CodeSelect|code=
+chmod +x installer
+}}
+
+'''3.''' Run the installer.
+
+{{CodeSelect|code=
+./installer
+}}
+
+'''4.''' Done.
+</div>
+
+Method B) is not more secure than method A) because in both cases the user has run a script without performing a security audit of the script before executing it.
+
+= Partial Content =
+Quote [https://0x46.net/thoughts/2019/04/27/piping-curl-to-shell/ Piping curl to s(hell)]:
+
+<blockquote>Partial content returned by the server
+
+When using curl to pipe the script directly into your shell it is teoretically possible for the connection to be interrupted in an unpredictable way. In this case curl or other program can only output a part of the script before failing. In this case we can imagine a scenario in which a script does something that it shouldn't do. For example the following command:
+
+$ rm -r /usr/share/program<br />
+Could become:
+
+$ rm -r /usr<br />
+This is of course a syntetic example but it is not hard to imagine a different scenario in which a command may fail in an equally devastating way.
+</blockquote>
+
+This issue can be mitigated by wrapping all script code into functions.
+
+= Transparency =
+When running a curl bash pipe, the user does not really know which commands will be executed.
+
+Quote [https://0x46.net/thoughts/2019/04/27/piping-curl-to-shell/ Piping curl to s(hell)]:
+
+<blockquote>When executing an unknown script we don't know what is going to happen - we will not be able to easily find out what files were installed.</blockquote>
+
+This is a fair criticism which could be mitigated by installers in two ways.
+
+# The installer could store a backup of itself in the installer download folder. In doubt, the user can go later investigate and have a look at the script which was executed at the time.
+# The installer could by default log in the installer download folder create a log which contains a complete recording of all commands which have been executed on the user's computer.
+
+= References =
+* https://medium.com/@ewindisch/curl-bash-a-victimless-crime-d6676eb607c9
+* https://www.arp242.net/curl-to-sh.html
+* https://security.stackexchange.com/questions/213401/is-curl-something-sudo-bash-a-reasonably-safe-installation-method
+* https://www.djm.org.uk/posts/protect-yourself-from-non-obvious-dangers-curl-url-pipe-sh/
+
+= Related =
+* https://forums.whonix.org/t/detecting-the-use-of-curl-bash-server-side/2361/3
+* {{kicksecure_wiki
+|wikipage=Unicode
+|text=Malicious Unicode
+}}
+* {{kicksecure_wiki
+|wikipage=Shell
+|text=Hidden Text Attacks
+}}
+* {{kicksecure_wiki
+|wikpage=Verifying_Software_Signatures
+|text=Verifying Software Signatures
+}}
+
+{{Footer}}

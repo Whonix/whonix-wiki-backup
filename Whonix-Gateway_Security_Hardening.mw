@@ -1,0 +1,148 @@
+{{Header}}
+{{#seo:
+|description={{project_name_gateway_long}} Security Hardening
+|image=Gatewayhardening.jpg
+}}
+[[image:Gatewayhardening.jpg|thumb]]
+= Introduction =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = '''Tip:''' Disabling [https://www.whonix.org/wiki/Dev/onion-grater Control Port Filter Proxy] (onion-grater) can improve security by decreasing the attack surface, while sacrificing usability.
+}}
+
+Note that if onion-grater is disabled, users will no longer receive helpful {{project_name_long}} notifications when Tor is not fully bootstrapped, since the whonixcheck and sdwdate tools rely upon it.
+
+= How-to: Disable Control Port Filter Proxy =
+
+== {{project_name_gateway_long}} ==
+
+=== Deactivate onion-grater in Firewall ===
+{{Box|text=
+'''1.''' {{Firewall_Settings}}
+
+'''2.''' Add the following content.
+
+{{CodeSelect|code=
+CONTROL_PORT_FILTER_PROXY_ENABLE=0
+}}
+
+'''3.''' Save the file.
+
+'''4.''' {{Reload_Firewall}}
+}}
+=== Deactivate onion-grater ===
+{{Box|text=
+'''1.''' Stop onion-grater.
+
+{{CodeSelect|code=
+sudo service onion-grater stop
+}}
+
+'''2.''' Disable autostart of onion-grater.
+
+{{CodeSelect|code=
+sudo systemctl mask onion-grater
+}}
+
+'''3.''' Reboot.
+
+'''4.''' Check if onion-grater is still running or disabled.
+
+{{CodeSelect|code=
+ps aux {{!}} grep onion-grater
+}}
+
+If output similar to the following appears, then disabling did not work.
+
+<pre>
+onion-g+   911  3.2  1.9  66444 20644 ?        Ss   12:21   0:00 /usr/bin/python3 -u /usr/lib/onion-grater --debug --listen-interface eth1
+</pre>
+}}
+=== Deactivate whonixcheck onion-grater Running Test ===
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/etc/systemcheck.d/50_user.conf
+}}
+
+'''2.''' Add the following content.
+
+{{CodeSelect|code=
+whonixcheck_skip_functions+=" check_control_port_filter_running "
+}}
+
+'''3.''' Save the file.
+}}
+== {{project_name_workstation_long}} ==
+
+=== Deactivate whonixcheck Tor Bootstrap Test ===
+
+Because it relies on onion-grater.
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/etc/systemcheck.d/50_user.conf
+}}
+
+'''2.''' Add the following content.
+
+{{CodeSelect|code=
+whonixcheck_skip_functions+=" check_tor_bootstrap "
+}}
+
+'''3.''' Save the file.
+}}
+=== Deactivate sdwdate Connectivity Test ===
+{{project_name_workstation_long}} only.
+
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/usr/lib/helper-scripts/te_pe_tb_check
+}}
+
+'''2.''' Replace the existing content with the following text.
+
+{{CodeSelect|code=
+#!/bin/bash
+exit 0
+}}
+
+'''3.''' Save the file.
+
+'''4.''' Restart sdwdate.
+
+{{CodeSelect|code=
+sudo systemctl restart sdwdate
+}}
+
+The procedure is complete.
+}}
+
+Be aware that this setting will not persist after any upgrade of sdwdate, nor is sdwdate currently configurable. <ref>Any {{project_name_long}} users interested in further development should create a relevant ticket on [https://forums.whonix.org/ Whonix Forums].</ref>
+
+=== Tor Browser Updater ===
+
+In order to update [[Tor Browser]] using [[Tor_Browser#Update_Tor_Browser|Tor Browser Updater by {{project_name_long}} developers]] while onion-grater is disabled, complete the following step. <ref>It is far simpler to update using [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser's internal updater]] instead.</ref>
+
+{{CodeSelect|code=
+update-torbrowser --no-tor-con-check
+}}
+
+Or create a file ''/etc/torbrowser.d/50_user.conf'' with the following content.
+
+{{CodeSelect|code=
+TB_NO_TOR_CON_CHECK="1"
+}}
+
+= Static VirtualBox IP =
+
+Instead of using DHCP to obtain the internal IP address for the {{project_name_workstation_long}} <code>eth0</code> NAT adapter, a static IP can be used instead. This might marginally improve security because the DHCP package can then be removed.
+
+Open ''/etc/network/interfaces.d/30_non-qubes-whonix'' [https://github.com/{{project_name_short}}/whonix-gw-network-conf/blob/master/etc/network/interfaces.d/30_non-qubes-whonix on GitHub] and read the comments. Then, comment out DHCP and comment in Static VirtualBox IP.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

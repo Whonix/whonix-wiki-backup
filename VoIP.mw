@@ -1,0 +1,555 @@
+{{Title|title=Voice over IP (VoIP)}}
+{{Header}}
+{{#seo:
+|description=Anonymous Voice over IP (VoIP). Encrypted, anonymous phone calls using the Tor Anonymity Network.
+|image=https://www.{{project_clearnet}}/w/images/f/f9/Sound-856771640.png
+}}
+[[image:Sound-856771640.png|thumb]]
+= Introduction =
+
+Voice over IP (VoIP) is: <ref>https://www.fcc.gov/general/voice-over-internet-protocol-voip</ref>
+
+<blockquote>...a technology that allows you to make voice calls using a broadband Internet connection instead of a regular (or analog) phone line. ... VoIP services convert your voice into a digital signal that travels over the Internet. If you are calling a regular phone number, the signal is converted to a regular telephone signal before it reaches the destination. VoIP can allow you to make a call directly from a computer, a special VoIP phone, or a traditional phone connected to a special adapter.</blockquote>
+
+VoIP software is complex and has a large attack surface. Several threat classes have been identified in the literature: social threats; eavesdropping, interception and modification of session contents; denial of service attacks; unauthorized access to VoIP equipment; and a sudden interruption of services. <ref>See: [https://www.cs.columbia.edu/~angelos/Papers/2009/cip.pdf Voice over IP: Risks, Threats and Vulnerabilities]</ref>
+
+Anonymizing VoIP is somewhat difficult, but still possible. It is easy to hide the IP address with {{project_name_long}}, but the voice recognition component and slow Tor network speed (latency) are definite obstacles. Depending on your threat model, pseudonymous use of VoIP might be appropriate; this involves hidden voice communications that take place with known contacts. Consider the factors in the table below <u>before</u> deciding to use VoIP in {{project_name_long}}.
+
+== Anonymity Factors ==
+
+'''Table:''' ''Factors affecting VoIP Anonymity''
+
+{| class="wikitable"
+|-
+! scope="col"| <b>VoIP Domain</b>
+! scope="col"| <b>Description</b>
+! scope="col"| <b>IP Anonymity</b>
+! scope="col"| <b>Full Anonymity</b> <ref>No information is available to uniquely identify the VoIP user.</ref>
+|-
+! scope="row"| Tor + VoIP + Known Participants
+|
+* If two or more people use a VoIP application in combination with Tor, it is possible to hide the act of communication from the ISP, government, Tor exit relays, man-in-the-middle attackers and so on.
+* While the communication and IP addresses of each party remain hidden, this arrangement is <u>not</u> anonymous because the participants know each other.
+| {{Yes}}
+| {{No}}
+|-
+! scope="row"| Tor + VoIP + Unknown Participants
+|
+* It is discouraged to use VoIP with anonymous parties in forums or other environments.
+** The anonymous recipient of communications is a 'known unknown' -- it is impossible to confirm who you are talking to.
+** The voiceprint might be correlated with your real identity later on, unless a voice scrambler or artificial voice is utilized (which is impractical in most circumstances).
+| {{Yes}}
+| {{No}}
+|-
+! scope="row"| Tor + VoIP + Artificial Voice
+|
+* It is possible to type and let an artificial voice speak instead of using natural speech.
+* This technique could work (similar to anonymous videos), but there are limited benefits compared to encrypted email, other than the real-time nature of the communication.
+| {{Yes}}
+| style="background-color: {{Yellow}}" | Maybe <ref>The language structure and syntax might be unique.</ref>
+|-
+! scope="row"| [https://en.wikipedia.org/wiki/Whistleblower Whistleblowing]: Tor + VoIP
+|
+* Whistleblowers cannot safely use their own voice if utilizing VoIP. Voice data is recorded and voice recognition works extremely well; see footnote. <ref>For more than a decade, government agencies have been recording private phone calls to identify individuals by their unique voiceprint, while also recording and transcribing personal conversations, see: [https://theintercept.com/2018/01/19/voice-recognition-technology-nsa/ Finding Your Voice] for a detailed description based on intelligence disclosures.</ref>
+* Almost everybody has had multiple non-anonymous phone calls in their lifetime, which provides a solid baseline for later correlation of 'anonymous' and non-anonymous identities.
+* While commercial digital voice scramblers are available on the market, their effectiveness is a whole new field of research which is outside of the scope of {{project_name_long}}.
+| {{Yes}}
+| style="background-color: {{Yellow}}" | With scrambler: Maybe
+|-
+|}
+
+== Voice Recognition ==
+It is safe to assume that everyone has had an unencrypted phone call during their lifetime and that one of them has been recorded. Voiceprints allow a person to be identified from the specific characteristics (acoustics) of their voice and it is a useful biometric marker. <ref>
+https://en.wikipedia.org/wiki/Speaker_recognition#Technology
+</ref> This means personal and unique voiceprints can be used to link non-anonymous and "anonymous" voice samples; a process called voice recognition. <ref>
+Writing styles are also personal and unique. Individuals can be identified with a similar method called [[Stylometry]], which is documented on the [[Surfing_Posting_Blogging|Surfing Posting Blogging]] wiki page.
+</ref>
+
+== Software and Configuration ==
+
+Some fully-functioned and reliable Libre VoIP software is already available, such as [https://packages.debian.org/{{Stable project version based on Debian codename}}/linphone Linphone] and [https://jitsi.org/downloads/ Jitsi]. <ref>See: [https://en.wikipedia.org/wiki/Comparison_of_VoIP_software Wikipedia: Comparison of VoIP Software] to research alternatives.</ref> Unfortunately it is not possible to communicate directly over Tor using a VoIP server, because all session initiation protocol (SIP)-based clients use UDP and Tor developers closed the related support ticket years ago. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/7830</ref> <ref>This does not mean it will not be supported in the future, but the wait could be lengthy.</ref>
+
+The best workaround for SIP clients at present is to [[Tunnel_UDP_over_Tor|Tunnel UDP over Tor]]. The main downside of this method is that phone calls over Tor are slower and less convenient compared to ordinary networks. The reason is even when UDP packets are tunneled over Tor, the restrictions of the underlying TCP protocol still apply. To account for delays, [https://en.wikipedia.org/wiki/Push-to-talk push-to-talk] is a reliable communication method in this configuration -- it has similarities to using a [https://en.wikipedia.org/wiki/Walkie-talkie walkie-talkie]. The [https://guardianproject.info/ Guardian Project] recommends that 'prowords' (procedure words) <ref>https://en.wikipedia.org/wiki/Procedure_word</ref> such as "Roger" are used to acknowledge the end of transmission (speech, sentence). <ref>Once your calling partner hears "Roger", it is understood that it is safe to answer and then also terminate the answer with "Roger" or "Out" when leaving the conversation.</ref>
+
+When configuring the chosen software, it is safer to delegate encryption to Tor by utilizing onion services for both the caller and receiver. If that is not possible, then only use VoIP clients which support end-to-end encryption protocols like [https://en.wikipedia.org/wiki/Secure_Real-time_Transport_Protocol SRTP] or [https://www.silentcircle.com/products-and-solutions/technology/zrtp/ ZRTP]. <ref>ZRTP has been implemented in Jitsi as GNU ZRTP4J, and in Linphone as oRTP.</ref> This recommendation comes with warnings:
+* Never use a [https://www.techopedia.com/definition/4759/variable-bit-rate-vbr Variable Bit Rate (VBR)] codec <u>because ZRTP cannot protect it</u>.
+** If this advice is ignored, pauses in conversation will produce fingerprints in the encrypted stream that allow adversaries to infer what words are being said. <ref>https://zfoneproject.com/faq.html#vbr</ref> <ref>Research has [https://www.technologyreview.com/s/410280/breaking-phone-call-encryption/ found]: <blockquote>... in encrypted phone calls using a certain combination of technologies, preselected phrases can be spotted up to 50 percent of the time on average, and up to 90 percent of the time under optimal conditions. ... Variable-bit-rate encoding, Wright says, adjusts the size of data packets being sent over the Internet based on how much information they actually contain. For example, when the person on one end of a VoIP call is listening rather than speaking, the packets sent from that person’s computer shrink significantly. Also, packets containing certain sounds, such as “s” or “f,” can take up less space than those containing more-complex sounds, such as vowels. <br /><br />
+
+Encrypting the packets after they’ve been compressed scrambles their contents, making them look like gibberish. But it doesn’t change their size, which is what would give away information to potential eavesdroppers.</blockquote></ref>
+* Authentication strings <u>must</u> be compared with the other party during the initial call. If the strings do not match then this signals an active man-in-the-middle attack is underway and the call should be terminated.
+
+== Servers and Privacy ==
+
+Even with end-to-end encryption, VoIP servers servers can log call signalling metadata. This is not a major threat if:
+# VoIP IDs are anonymously registered (no personal data is required for signing up).
+# All parties only and always connect over Tor and have never used (or will use) accounts over clearnet.
+# All calls are encrypted end-to-end.
+# No communications occur with anonymous strangers.
+
+In this case it is unlikely a malicious server could cause much harm from logging or other actions. <ref>Apart from trying to [https://en.wikipedia.org/wiki/Exploit_(computer_security) exploit] random Tor users.</ref>
+
+Other than the factors outlined in this introduction section, no additional anonymity or security problems have been identified for VoIP. That said, this configuration is less tested in {{project_name_long}} so the performance and voice quality could be quite variable. If this activity is necessary, then it is recommended to test the performance of VoIP software for yourself and to provide feedback about the experience.
+
+= Tox =
+
+Tox <ref>https://wiki.tox.chat/users/faq#what_is_tox</ref> <ref>https://tox.chat</ref> looks like a promising solution for secure, encrypted communications. The official client implementation is based on the [https://toktok.ltd/ TokTok] protocol library, which is very feature-rich and has a variety of functions besides [[VoIP]]. By default, Tox does not attempt to cloak your IP address from authorized contacts. However, Tox is the only Tor compatible VoIP solution we know of, allowing communication with others even if they are not anonymous. <ref>https://wiki.tox.chat/users/tox_over_tor_tot</ref> Desktop versions are available for every major OS, however mobile support is lacking. <ref>https://wiki.tox.chat/clients</ref>
+
+To learn more, refer to [[Chat#Tox|this entry]].
+
+= Signal =
+[[image:Signal.png|<code>Signal</code> Logo|thumb]]
+There is a user report of Signal working between one instance running over Tor and the other in the clear. <ref>
+In reply to Patrick Schleizer (Telegram)
+Did you test this? How is voice quality?
+Yea, I just started receiving calls out of blue on both my GrapheenOS phone with Orbot and always on vpn set and also on iPod touch connected to GLiNet Mudi w/ Tor firewall. So far I had about a 60% success rate with calls that connect on first attempt and consistent quality with no drop outs. Wire I have about 80%. Both these devices are heavily firewalled no side channel leaks occurring it is absolutely working not with ideal reliability on signal but it’s a start. Note all my calls have been from signal + Tor to signal only . I have not tested calls between two TOR signal parties.
+</ref>
+
+Notes:
+
+* Signal is not in packages.debian.org. Only third party (signal APT repository).
+* Signal Desktop requires a [[Phone Number Validation]]. "There are plans to give users more freedom by letting them use emails. Workarounds to register a phone no. anonymously may be possible, but not straight forward." - Source?
+
+See also: [[Signal]]
+
+= Mumble =
+
+[[Image:Mumblelogo.png|thumb|Mumble Logo|border]]
+
+== Introduction ==
+
+Mumble is: <ref>https://packages.debian.org/{{Stable project version based on Debian codename}}/mumble</ref>
+
+<blockquote>... a low-latency, high quality voice chat program for gaming. It features noise suppression, encrypted connections for both voice and instant messaging, automatic gain control and low latency audio with support for multiple audio standards. Mumble includes an in-game overlay compatible with most open-source and commercial 3D applications. Mumble is just a client and uses a non-standard protocol. You will need a dedicated server to talk to other users. Server functionality is provided by the package "mumble-server".</blockquote>
+
+Mumble has a number of advantages: <ref>https://sourceforge.net/projects/mumble/</ref> <ref>https://github.com/mumble-voip/mumble</ref> <ref>https://www.mumble.com/mumble-server-support.php</ref> <ref>https://wiki.mumble.info/wiki/FAQ/English</ref>
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* The software is open source and packaged in Debian, as well as for all major operating systems.
+* Client to server encryption is supported. <ref>[https://wiki.mumble.info/wiki/FAQ/English#Is_Mumble_encrypted.3F Is Mumble encrypted?]: <blockquote>Your whole communication to and from the server is always encrypted. This encryption is mandatory and cannot be disabled. The so-called control channel, which transports your chat messages and other non-time critical information, is encrypted with TLS using 256 bit AES-SHA. The voice channel carrying speech and positional audio is encrypted with OCB-AES 128 bit. You and the server authenticate to each other using digital certificates like they are used for secured connections in Web-browsers.</blockquote></ref>
+* The communication is high quality and low latency. <ref>Although some voices are reported to sound 'metallic' or 'robotic'.</ref>
+* It is possible to check nobody is wiretapping the connection (MITM) by verifying client/server certificates. <ref>
+[https://wiki.mumble.info/wiki/FAQ/English#How_can_I_verify_that_there_is_nobody_wiretapping_my_connection_.28MITM.29.3F How can I verify that there is nobody wiretapping my connection (MITM)?]
+</ref>
+* Push to talk is supported. <ref>https://www.mumble.com/support/mumble-server-push-to-talk.php</ref>
+* The interface is similar to [https://teamspeak.com/en/ Team Speak], but without its disadvantages.
+* It supports TCP mode <ref>https://ccm.net/faq/26187-mumble-force-tcp-mode</ref> which is necessary because the Tor network does not support UDP yet.
+</div>
+
+== Tips ==
+
+To use Mumble, one party must act as a server while everyone else can act as a client. If the server administrator runs the server on its local machine and also wants to connect to the server, then local (<code>127.0.0.1</code>) connections are recommended since it is faster than connecting to the onion service domain.
+
+Group chats pose a greater risk since there is no end-to-end encryption. This means if the server is compromised, all conversations are no longer private. However, if only two parties use Mumble for communications, then end-to-end encryption protects against this threat.
+
+When one of the two communicating parties hosts a mumble server as a Tor onion service and the other party connects over Tor, encryption is already provided by Tor. This means Mumble's own encryption is not required and so long as a server password is set (see below), this configuration should be secure. <ref>Alternatively, the interested reader can learn more about Mumble certificates for defense in depth, as well as using channel passwords instead of server passwords and so on.</ref>
+
+For detailed instructions on using and configuring Mumble, refer to:
+* [https://www.mumble.com/mumble-server-support.php Mumble Server Support]
+* [https://wiki.mumble.info/wiki/Main_Page Mumble Documentation Wiki]
+
+== Mumble Server Instructions ==
+
+Newcomers are recommended to first read the introduction to [[Onion_Services|Onion Services]] and to learn about security benefits compared to regular 'clearnet' connections. This wiki resource is also useful if configuring a hidden web server on the same <code>.onion</code> domain, since it helps users to grasp basic operations and test them.
+
+{{Box|text=
+'''1.''' Make necessary {{project_name_gateway_long}} adjustments.
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = If <code>Sandbox 1</code> was previously set in the Tor configuration file, it must be removed for Mumble functionality.
+}}
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add.
+
+{{Box|text=
+{{IP-of-q-ws-AppVM}}
+}}
+
+{{CodeSelect|code=
+HiddenServiceDir /var/lib/tor/mumble_service/
+HiddenServicePort 64738 10.152.152.11:64738
+HiddenServiceVersion 3
+}}
+
+Save.
+
+'''2.''' Reload Tor.
+
+{{Reload_Tor}}
+
+'''3.''' Retrieve the Tor onion service url.
+
+{{CodeSelect|code=
+sudo cat /var/lib/tor/mumble_service/hostname
+}}
+
+{{
+Backups_Tor_Onion_Service_private_key
+|private_key_file=/var/lib/tor/mumble_service/hs_ed25519_secret_key
+|file_name=hs_ed25519_secret_key
+}}
+
+'''4.''' Adjust {{project_name_workstation_long}} firewall settings.
+
+{{Firewall_Settings_Workstation}}
+
+Add.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 64738 "
+}}
+
+Save.
+
+'''5.''' Reload the firewall.
+
+{{Reload_Firewall_ws}}
+
+'''6.''' Update the package lists and install necessary software.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install the {{Code2|mumble-server}} package.
+
+{{CodeSelect|code=
+sudo apt install mumble-server
+}}
+
+'''7.''' Configure the server.
+
+{{CodeSelect|code=
+sudo dpkg-reconfigure mumble-server
+}}
+
+Follow the recommendations below:
+* Autostart is suggested, unless you want to run {{CodeSelect|code=sudo service mumble-server start}} (which failed in the past).
+* Higher priority? Select 'Yes'.
+* Password: choose a secure password.
+
+There is also an upstream [https://wiki.mumble.info/wiki/Murmurguide Mumble server guide], but it does not consider onion services which are already described here. For any additional questions regarding the server setup, refer to the upstream documentation.
+
+'''8.''' Set a server password in the relevant file.
+
+{{Open with root rights|filename=
+/etc/mumble-server.ini
+}}
+
+Search for "''serverpassword=''" and file in.
+
+<pre>
+serverpassword=use_a_long_and_secure_server_password
+</pre>
+
+'''9.''' Restart mumble-server.
+
+{{CodeSelect|code=
+sudo service mumble-server restart
+}}
+}}
+
+== Mumble Client ==
+
+=== Installation ===
+
+Update the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install mumble.
+
+{{CodeSelect|code=
+sudo apt install mumble
+}}
+
+=== Start ===
+
+Launch Mumble.
+
+<code>Start menu</code> &rarr; <code>Applications</code> &rarr; <code>Internet</code> &rarr; <code>Voice Chat</code>
+
+Or in a terminal, run.
+
+{{CodeSelect|code=
+mumble
+}}
+
+'''Figure:''' ''Mumble Client in {{project_name_long}}''
+
+[[Image:Mumbleclient.png|border]]
+
+=== Configure ===
+
+Configure Mumble to suit your preferences.
+
+Next, enable Force TCP mode.
+
+<code>Go to C<u>o</u>nfigure</code> &rarr; <code>Select "Settings"</code> &rarr; <code>Network</code> &rarr; <code>Check "Force TCP mode"</code> &rarr; <code>Ok</code>
+
+'''Figure:''' ''Mumble Network Setting''
+
+[[Image:Mumblenetworksetting.png|border]]
+
+=== Add Server ===
+
+Follow these steps to add a new server. <ref>https://wiki.mumble.info/wiki/Murmurguide#Connecting_to_Murmur_Server</ref>
+
+<code>Server</code> &rarr; <code>Connect</code> &rarr; <code>Add New...</code>
+
+# <u>Servername</u>: anything - this can be same as the .onion domain name
+# <u>Address</u>: enter your .onion domain name or if the mumble server is running in your own {{project_name_workstation_long}}, choose <code>127.0.0.1</code>
+# <u>Port</u>: 64738
+# <u>Username</u>: anything
+
+It is now possible to connect to the server.
+
+'''Figure:''' ''Mumble Server Information''
+
+[[Image:Mumbleserverinformation.png|border]]
+
+== Technical Notes ==
+
+Mumble (and mumble-server) connections pass through Tor's TransPort, but this should not have a negative anonymity impact. The reason is connections to and from onion services are stream-isolated. <ref>See [[Stream Isolation]] for further information on TransPort, SocksPort, stream isolation and related issues.</ref>
+
+Security-conscious, free software developers consider browsers as a poor and dangerous option for implementing privacy-critical software. Browsers have a large attack surface (numerous security holes) and lack adequate process isolation, which can lead to the theft of private encryption keys if malicious code is run.
+
+= Asterisk VoIP Server over OpenVPN in Tor Hidden Service =
+
+== Introduction ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This entry was contributed by [https://forums.whonix.org/u/Norbert_Szczybelski Norbert Szczybelski]. For questions and further information, refer to the forum discussion: [https://forums.whonix.org/t/how-to-setup-asterisk-voip-server-over-openvpn-in-tor-hidden-service/3410 How To setup Asterisk VoIP server over OpenVPN in Tor hidden service.]
+}}
+
+Asterisk is: <ref>https://en.wikipedia.org/wiki/Asterisk_%28PBX%29</ref>
+<blockquote>... a software implementation of a private branch exchange (PBX). In conjunction with suitable telephony hardware interfaces and network applications, Asterisk is used to establish and control telephone calls between telecommunication endpoints, such as customary telephone sets, destinations on the public switched telephone network (PSTN), and devices or services on voice over Internet Protocol (VoIP) networks.</blockquote>
+
+Since Asterisk is open source and supports several standard VoIP protocols, it can be configured in {{project_name_long}} to enable the PC to run as a server for a VoIP service.
+
+Official Asterisk wiki documentation can be found [https://wiki.asterisk.org/wiki/display/AST/Home here].
+
+== Configuration Overview ==
+
+Configuration files are outlined below for:
+* OpenVPN server
+* OpenVPN clients
+* Tor hidden service
+* Tor clients
+* Asterisk SIP protocol
+* Asterisk extensions
+
+Note: this is a chrooted configuration. If necessary, servers can also be isolated in virtual machines. Be sure to also update CPU microcode to protect against the Spectre and Meltdown vulnerabilities.
+
+As an illustration, simply set up:
+
+* 172.16.0.2/10.8.0.1 OpenVPN Server - bhyve VM on server.
+* 172.16.0.3/10.8.0.10 OpenVPN Client with Apache - bhyve VM on server.
+* 172.16.0.4/10.8.0.20 OpenVPN Client with Asterisk - bhyve VM on server.
+* 172.16.0.5/10.8.0.30 OpenVPN Client with UnrealIRCd - bhyve VM on server.
+...
+* 172.31.0.9/10.8.10.10 OpenVPN Client with Apache - bhyve VM on client.
+* 192.168.38.37/10.8.10.20 OpenVPN Client with UnrealIRCd - bhyve VM on client.
+
+And so on. Next, set up static IP addresses in ccd directory for OpenVPN Client servers. Finally, generate encryption keys with OpenSSL (modified OpenSSL can be utilized for quantum-resistant cryptography).
+
+== OpenVPN Server openvpn.conf Configuration File ==
+
+{{CodeSelect|code=
+mode server
+tls-server
+dev tun
+proto tcp-server
+port 1194
+
+server 10.8.0.0 255.255.0.0
+
+ca /vpn/ca.crt
+cert /vpn/server.crt
+key /vpn/server.key
+dh /vpn/dh2048.pem
+tls-crypt /vpn/ta.key
+
+cipher AES-256-CBC
+auth SHA3-512
+
+log /var/log/openvpn.log
+status /var/log/openvpn-status.log
+
+user nobody
+group nobody
+persist-key
+persist-tun
+chroot /usr/local/etc/openvpn/jail
+auth-nocache
+
+# If you want to allow clients to communicate between themselves e.g. start own services like UnrealIRCd Servers.
+client-to-client
+client-config-dir /ccd
+}}
+
+== OpenVPN Clients client.conf Configuration File ==
+
+{{CodeSelect|code=
+client
+remote-cert-tls server
+dev tun
+
+<connection>
+remote youroniondomain.onion 1194 tcp-client
+socks-proxy 127.0.0.1 9050
+</connection>
+
+cipher AES-256-CBC
+auth SHA3-512
+
+user nobody
+group nogroup
+persist-key
+persist-tun
+chroot /etc/openvpn/jail
+auth-nocache
+
+log /var/log/openvpn/openvpn.log
+status /var/log/openvpn/openvpn-status.log
+
+<ca>
+</ca>
+
+<cert>
+</cert>
+
+<key>
+</key>
+
+<tls-crypt>
+</tls-crypt>
+}}
+
+== Tor Hidden Service torrc Configuration File ==
+
+{{CodeSelect|code=
+HiddenServiceDir /usr/local/torhs/hiddenservice/
+HiddenServicePort 1194 127.0.0.1:1194
+}}
+
+== Tor clients torrc Configuration File ==
+
+{{CodeSelect|code=
+SOCKSPort 9050
+}}
+
+== Asterisk sip.conf Configuration File ==
+
+{{CodeSelect|code=
+[general]
+transport=udp
+port=5060
+bindaddr=10.8.0.1
+disallow=all
+allow=ulaw
+allow=alaw
+allow=gsm
+directmedia=no
+nat=yes
+localnet=10.8.0.0/255.255.255.0
+
+[friends_internal](!)
+type=friend
+host=dynamic
+context=from-internal
+disallow=all
+allow=ulaw
+allow=alaw
+allow=gsm
+
+[demo-alice](friends_internal)
+secret=password
+
+[demo-bob](friends_internal)
+secret=password
+}}
+
+== Asterisk extensions.conf Configuration File ==
+
+{{CodeSelect|code=
+[from-internal]
+exten=>6001,1,Dial(SIP/demo-alice,20)
+exten=>6002,1,Dial(SIP/demo-bob,20)
+}}
+
+== Quantum Resistant OpenVPN ==
+
+For greater security, a modified form of OpenSSL can be utilized:
+* [https://openquantumsafe.org/ OPEN QUANTUM SAFE - Software for prototyping quantum-resistant cryptography]
+* [https://github.com/open-quantum-safe/liboqs liboqs]
+* [https://github.com/open-quantum-safe/openssl OQS-OpenSSL]
+
+Use of the above software is at the user's own risk and security is not guaranteed; always conduct research beforehand to assess whether it is suitable in your circumstances.
+
+= Warnings =
+
+== Skype ==
+
+''Does this mean if I combine {{project_name_long}} with proprietary software like Skype, that my IP address and location will be safe?''
+
+Yes, the IP address and location remain hidden. Skype was tested to work in {{project_name_long}} several years ago, but it appears to have  stopped working around 2013/14. <ref>https://web.archive.org/web/20160612142118/https://community.skype.com/t5/Security-Privacy-Trust-and/Is-Skype-blocking-TOR-exit-nodes/td-p/1706941</ref> Developers have very little interest in testing or providing functional Skype instructions, because it is strongly recommended against. As [https://www.gnu.org/proprietary/malware-microsoft.html gnu.org] notes: ''"Skype contains [https://web.archive.org/web/20130928235637/http://www.forbes.com/sites/petercohan/2013/06/20/project-chess-how-u-s-snoops-on-your-skype/ spyware]. Microsoft changed Skype [https://www.theguardian.com/world/2013/jul/11/microsoft-nsa-collaboration-user-data specifically for spying]."''
+
+Any corporation that willingly changes flagship software to enable secretive surveillance of users (without notice) cannot redeem itself. In addition: <ref>https://www.wired.com/story/skype-end-to-end-encryption-voice-text/</ref> <ref>https://en.wikipedia.org/wiki/Skype_security</ref>
+
+* Microsoft has long delayed providing a secure end-to-end encrypted communication channel until the announcement of the non-default "Conversations" option in 2018. <ref>Increasing the ease with which the company and other parties could spy on the communications of hundreds of millions of people. Even with "Conversations" set, Microsoft still has access to a host of metadata.</ref>
+* After Microsoft purchased Skype in 2010 they changed the architecture, leading observers to note this would increase the ease of surveillance. Client-side encryption was replaced with server-side encryption, allowing unencrypted data to be disseminated when requested. <ref>Microsoft routinely releases data to law enforcement agencies upon request, including users' geographical locations.</ref>
+* Skype is closed source software and inherently distrusted based on Microsoft's behavior. For example it was revealed in 2013 that Skype had a program entitled "Project Chess", which was exploring legal and technical issues in making communications available to law enforcement and other agencies. <ref>https://www.schneier.com/blog/archives/2013/06/new_details_on.html</ref> <ref>Snowden leaks also confirm Skype became part of the [https://www.washingtonpost.com/news/wonk/wp/2013/06/12/heres-everything-we-know-about-prism-to-date/ PRISM] program on 6 February, 2011.</ref>
+* Company executives lied in 2012 when they denied giving government agency access to customer communications.
+* Skype has a long history of serious security flaws and conducting unannounced spying, such as reading BIOS data from the PC and accessing the Firefox profile folder during execution (where  passwords are stored). <ref>https://en.wikipedia.org/wiki/Skype_security#Flaws_and_potential_flaws</ref>
+
+None of these issues are related to {{project_name_long}} or Tor; the blame falls squarely on the company producing the software. At best, Skype usage can only be considered [[Tips_on_Remaining_Anonymous#Study:_Anonymity_and_Pseudonymity_are_not_the_same|pseudonymous rather than anonymous]], particularly since it acts like malware. It would be completely unsurprising if Skype linked all account names inside {{project_name_workstation_long}} to the same pseudonym.
+
+As well as the threat posed by Skype's design, behavior and parent company, there are additional risks to this [[Avoid nonfreedom software|non-freedom software]]:
+
+* <u>Accounts</u>: if you log into an account without Tor, even once, then it should be considered non-anonymous. It is virtually certain logs are retained that can link Tor and non-Tor use together.
+** Always follow the wiki recommendations to [[Tips_on_Remaining_Anonymous#Keep_Anonymity_Modes_separate|not mix anonymity modes]].
+* <u>Communication partner</u>: if the other party did not create their account over Tor, or has not exclusively paired the account with Tor, then it is easy to verify your identity.
+* <u>Encryption</u>: as noted above, the encryption architecture is weak by default and the Skype authority is unworthy of trust -- consider the encryption broken at the outset. Always remember you do not control the encryption keys and the closed source software is hostile to privacy by design.
+* <u>Voice recognition</u>: as noted in the introduction, today's sophisticated software can easily identify you, even if Skype encryption is not broken.
+
+In conclusion, Skype cannot be used for truly (pseudo-)anonymous activites, even though it does not leak the IP address/location. This means it is useful for circumvention only. Anybody capable and willing to communicate with partners who exclusively create and use accounts over Tor have far better options available.
+
+Refer to the technical footnotes if you are interested in why Skype works at all in {{project_name_long}} over Tor (since Tor only supports TCP). <ref>Quote [http://www.secdev.org/conf/skype_BHEU06.handout.pdf Silver Needle in the Skype]:
+<blockquote>
+Skype can’t work without a TCP connection <br />
+But Skype can work without UDP <br />
+Blocking UDP is not sufficient <br />
+</blockquote></ref> <ref>Refer to the "Skype over Tor" section here: [https://guardianproject.info/2012/12/10/voice-over-tor/ guardianproject.info: Voice over Tor?]
+</ref>
+
+== TORFone ==
+
+{{Anchor|SpeakFreely}} {{project_name_long}} has consistently advised against [https://github.com/gegel/torfone TORFone] -- a fork of [https://web.archive.org/web/20210813051928/http://www.speakfreely.org/ SpeakFreely] -- since the developer in 2013 recommended against using the software: <ref>https://lists.torproject.org/pipermail/tor-talk/2013-February/027215.html</ref> ''"I did not think this project as a finished product for practical use."'' At that time, the project received an overall poor review in the mailing list thread.
+
+It is unclear whether the situation has improved over the last several years, but the software is under active development based on the number of recent commits. Any reader who is interested in testing TORFone in {{project_name_long}} is encouraged to report their experience here.
+
+== USB Webcam Passthrough ==
+
+Avoid this course of action -- the firmware of USB devices could be flashed by malware and cross infect the host.
+
+= VoIP Software List =
+
+There is a [https://en.wikipedia.org/wiki/Comparison_of_VoIP_software Comparison of VoIP software] page on Wikipedia. Any client that is chosen should be open source and if onion services are not being used on both ends of the communication (where Tor handles the encryption), then it should also support voice encryption such as ZRTP.
+
+= Sources =
+
+* [https://guardianproject.info/2013/01/31/mumble-and-the-bandwidth-anonymous-cb-radio-with-mumble-and-tor/ guardianproject.info: Mumble and the Bandwidth  Anonymous CB radio with Mumble and Tor]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

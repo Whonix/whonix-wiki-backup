@@ -1,0 +1,82 @@
+<div class="toccolours mw-collapsible mw-collapsed">
+What are Tor Entry Guards? If this is an unfamiliar term, please press on Expand on the right.
+<div class="mw-collapsible-content">
+
+{{Box|text=
+<p>
+Current practical, low-latency, anonymity designs like Tor fail when the attacker can see both ends of the communication channel. For example, suppose the attacker controls or watches the Tor relay a user chooses to enter the network, and also controls or watches the website visited. In this case, the research community is unaware of any practical, low-latency design that can reliably prevent the attacker from correlating volume and timing information on both ends.
+</p>
+<p>
+Mitigating this threat requires consideration of the Tor network topology. Suppose the attacker controls, or can observe, <i>C</i> relays from a pool of <i>N</i> total relays. If a user selects a new entry and exit relay each time the Tor network is used, the attacker can correlate all traffic sent with a probability of <i>(c/n)<sup>2</sup></i>. For most users, profiling is as hazardous as being traced all the time. Simply put, users want to repeat activities without the attacker noticing, but being noticed once by the attacker is as detrimental as being noticed more frequently. [...]
+</p>
+<p>
+The solution to this problem is "entry guards". Each Tor client selects a few relays at random to use as entry points, and only uses those relays for the first hop. If those relays are not controlled or observed, the attacker can't use end-to-end techniques and the user is secure. If those relays <i>are</i> observed or controlled by the attacker, then they see a larger <i>fraction</i> of the user's traffic — but still the user is no more profiled than before. Thus, entry guards increase the user's chance of avoiding profiling (on the order of <i>(n-c)/n</i>), compared to the former case.
+</p>
+<p>
+You can read more at [https://www.freehaven.net/anonbib/#wright02 An Analysis of the Degradation of Anonymous Protocols], [https://www.freehaven.net/anonbib/#wright03 Defending Anonymous Communication Against Passive Logging Attacks], and especially [https://www.freehaven.net/anonbib/#hs-attack06 Locating Hidden Servers].
+</p>
+<p>
+Restricting entry nodes may also help to defend against attackers who want to run a few Tor nodes and easily enumerate all of the Tor user IP addresses. <ref>Even though the attacker can't discover the user's destinations in the network, they still might target a list of known Tor users.</ref> However, this feature won't become really useful until Tor moves to a "directory guard" design as well.
+</p>
+
+Source and License, see footnote: <ref>
+Source:<br />
+[https://support.torproject.org/#about_entry-guards torproject.org What are Entry Guards?]
+<br />
+[https://www.torproject.org/about/trademark/ license]:<br />
+Content on this site is Copyright The Tor Project, Inc.. Reproduction of content is permitted under a [https://creativecommons.org/licenses/by/3.0/us/ Creative Commons Attribution 3.0 United States License]. All use under such license must be accompanied by a clear and prominent attribution that identifies The Tor Project, Inc. as the owner and originator of such content. The Tor Project Inc. reserves the right to change licenses and permissions at any time in its sole discretion.
+</ref>
+}}
+</div>
+</div>
+
+Many well known enhanced anonymity designs such as Tor, {{project_name_long}} and the Tor Browser (TB) use persistent Tor guards. This decision is attributable to community-based research which demonstrates that persistent Tor entry guards benefit security and lower the probability of an adversary profiling a user. <ref>The risk of guard fingerprinting is less severe now that upstream (The Tor Project) has changed its guard parameters to decrease the de-anonymization risk.</ref>
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    ='''Note:''' Guard fingerprinting techniques are similar to methods that track users via MAC addresses. If this is a realistic threat, then MAC address randomization is also recommended.
+}}
+In general, users should not interfere with Tor guard persistence or the natural rotation of entry guards every few months. At the time of writing, the Tor client selects one guard node, but previously used a three-guard design. Guards have a primary lifetime of 120 days. <ref>Prop 291 indicates a 3.5 month guard rotation.</ref> <ref>The Tor Project is currently considering shifting to two guards per client for better anonymity, instead of having one primary guard in use.</ref> <ref>https://github.com/torproject/torspec/blob/master/proposals/291-two-guard-nodes.txt</ref>
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' In some situations it is safer to not use the usual guard relay!
+}}
+
+== Guard Fingerprinting ==
+
+While natural guard rotation is recommended, there are some corner cases in which an adversary could fingerprint the entry guards <ref>The [https://gitlab.torproject.org/legacy/trac/-/issues/9273#comment:3 entropy associated with one, two or three guards] is 9, 17 and 25 bits, respectively.</ref> and de-anonymize a user. For instance:
+
+* The same entry guards are used across various physical locations and access points.
+* The same entry guards are used after permanently moving to a different physical location.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+For details on how this is possible, press Expand on the right.
+<div class="mw-collapsible-content">
+Consider the following scenario. A user connects to Tor via a laptop at their home address. An advanced adversary has observed the client-to-guard-node network path to discover the user's entry point to the Tor network.
+
+Soon afterwards, the same user attends a prominent event or protest in a nearby city. At that location, the user decides to anonymously blog about what transpired using the same laptop. This is problematic for anonymity, as the Tor client is using the same entry guard normally correlated with the user’s home address.
+
+To understand the potential threat, consider the following:
+
+* There are only around 4,000 Tor guards in 2021. <ref>https://metrics.torproject.org/relayflags.html</ref>
+* By design, Tor is picking one primary guard and using it for a few months. Since the Tor user base is relatively small, it is possible that a guard might only be used by one person in an entire region.
+* As the IP address of Tor entry guards is static and Tor network traffic is easily distinguishable, this information becomes public knowledge.
+* It is feasible that if a user-guard relationship is unique in a city location, and that user moves, it is likely (but not certain) that there was a location change.
+* At the event, the user might be the only one using Tor (or among a handful).
+* If the user posts about the event ''and'' an adversary who is passively monitoring network traffic conducts the same successful observation of the client-to-guard network path, then it’s likely the "anonymous" posts will be linked with the same person who normally connects to that guard at home.
+
+The relative uncommonness of Tor usage simply exacerbates the potential for de-anonymization.
+</div>
+</div>
+
+There are several ways to mitigate the risk of guard fingerprinting across different physical locations. In most cases, the original entry guards can also be re-established after returning home:
+
+* [[Tor_Entry_Guards#Clone_Whonix-Gateway_™_(sys-whonix)_with_New_Entry_Guards|Clone {{project_name_gateway_long}} ({{project_name_gateway_vm}}) with New Entry Guards]].
+* [[Tor_Entry_Guards#Regenerate_the_Tor_State_After_Saving_the_Tor_State_Folder|Regenerate the Tor State File after Saving the Current Tor State]].
+* Configure Tor to use [[Tor_Entry_Guards#Alternating_Bridges|Alternating Bridges]].
+* If moving to a new location permanently, create [[Tor_Entry_Guards#Fresh_Tor_Entry_Guards_by_Regenerating_the_Tor_State_File|Fresh Tor Entry Guards by Regenerating the Tor State File]].
+
+Forum discussion:<br />
+https://forums.whonix.org/t/persistent-tor-entry-guard-relays-can-make-you-trackable-across-different-physical-locations/2090

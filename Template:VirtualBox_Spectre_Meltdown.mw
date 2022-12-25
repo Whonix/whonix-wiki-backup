@@ -1,0 +1,93 @@
+<div class="toccolours mw-collapsible mw-collapsed">
+Testers only! For more information please press on expand on the right.
+<div class="mw-collapsible-content">
+These [https://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages/5739/22 experimental] Spectre/Meltdown defenses are related to issues outlined in [[Firmware Security and Updates]]. Due to the huge performance penalty and unclear security benefits of applying these changes, it may not be worth the effort. The reason is VirtualBox is still likely vulnerable, even after:
+
+# A [[Firmware_Security_and_Updates#Processor_Microcode_Updates|host microcode upgrade]].
+# A host kernel upgrade.
+# A VM kernel upgrade.
+# A "not vulnerable" result from [[Firmware_Security_and_Updates#spectre-meltdown-checker|spectre-meltdown-checker]] run on the host.
+# Installation of the latest VirtualBox version. <ref>
+VirtualBox version <code>5.2.18</code> or above is required since only that version comes with Spectre/Meltdown defenses. See https://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages/5739/22.
+</ref>
+# All Spectre/Meltdown-related VirtualBox settings are tuned for better security as documented below.
+
+To learn more, see: [https://www.virtualbox.org/ticket/17987 VirtualBox 5.2.18 vulnerable to spectre/meltdown despite microcode being installed] and the associated [https://forums.virtualbox.org/viewtopic.php?f=7&t=89395 VirtualBox forum discussion]. <ref>Also see the following forum discussion: [https://forums.whonix.org/t/whonix-vulerable-due-to-missing-processor-microcode-packages-spectre-meltdown-retpoline-l1-terminal-fault-l1tf/5739 vulerable due to missing processor microcode packages? spectre / meltdown / retpoline / L1 Terminal Fault (L1TF)]</ref> Users must patiently wait for VirtualBox developers to fix this bug.
+
+On the host.  <ref>
+<blockquote>
+--ibpb-on-vm-[enter|exit] on|off: Enables flushing of the indirect branch prediction buffers on every VM enter or exit respectively. This could be enabled by users overly worried about possible spectre attacks by the VM. Please note that these options may have sever impact on performance.
+<br />
+https://www.virtualbox.org/manual/ch08.html
+</blockquote>
+
+There is a mistake in the VirtualBox manual stating <code>enter</code> which does not work. It is actually <code>entry</code>.
+</ref> <ref>
+https://www.virtualbox.org/manual/ch08.html
+<blockquote>
+--l1d-flush-on-vm-enter on|off: Enables flushing of the level 1 data cache on VM enter. See Section 13.4.1, “CVE-2018-3646”.
+</blockquote>
+</ref> <ref>
+<blockquote>
+--l1d-flush-on-sched on|off: Enables flushing of the level 1 data cache on scheduling EMT for guest execution. See Section 13.4.1, [https://www.virtualbox.org/manual/ch13.html#sec-rec-cve-2018-3646 “CVE-2018-3646”].
+<br />
+https://www.virtualbox.org/manual/ch08.html
+</blockquote>
+</ref> <ref>
+https://www.virtualbox.org/manual/ch13.html#sec-rec-cve-2018-3646
+<blockquote>
+For users not concerned by this security issue, the default mitigation can be disabled using<br />
+<br />
+{{CodeSelect|code=
+VBoxManage modifyvm name --l1d-flush-on-sched off
+}}
+</blockquote>
+Since we want to enable the security feature we set <code>--l1d-flush-on-sched on</code>.
+</ref> <ref>
+<blockquote>
+--spec-ctrl on|off: This setting enables/disables exposing speculation control interfaces to the guest, provided they are available on the host. Depending on the host CPU and workload, enabling speculation control may significantly reduce performance.
+<br />
+https://www.virtualbox.org/manual/ch08.html
+</blockquote>
+</ref> <ref>
+According to this [https://www.virtualbox.org/ticket/17987 VirtualBox ticket] <code>--spec-ctrl</code> should be set to <code>on</code>.
+</ref> <ref>
+<blockquote>
+--nestedpaging on|off: If hardware virtualization is enabled, this additional setting enables or disables the use of the nested paging feature in the processor of your host system; see Section 10.7, “Nested paging and VPIDs” and Section 13.4.1, “CVE-2018-3646”.
+</blockquote>
+</ref>
+
+<blockquote>
+VBoxManage modifyvm "{{project_name_gateway_short}}" --ibpb-on-vm-entry on
+VBoxManage modifyvm "{{project_name_gateway_short}}" --ibpb-on-vm-exit on
+VBoxManage modifyvm "{{project_name_gateway_short}}" --l1d-flush-on-vm-entry on
+VBoxManage modifyvm "{{project_name_gateway_short}}" --l1d-flush-on-sched on
+VBoxManage modifyvm "{{project_name_gateway_short}}" --spec-ctrl on
+VBoxManage modifyvm "{{project_name_gateway_short}}" --nestedpaging off
+VBoxManage modifyvm "{{project_name_gateway_short}}" --mds-clear-on-vm-entry on
+VBoxManage modifyvm "{{project_name_gateway_short}}" --mds-clear-on-sched on
+</blockquote>
+
+<blockquote>
+VBoxManage modifyvm "{{project_name_workstation_short}}" --ibpb-on-vm-entry on
+VBoxManage modifyvm "{{project_name_workstation_short}}" --ibpb-on-vm-exit on
+VBoxManage modifyvm "{{project_name_workstation_short}}" --l1d-flush-on-vm-entry on
+VBoxManage modifyvm "{{project_name_workstation_short}}" --l1d-flush-on-sched on
+VBoxManage modifyvm "{{project_name_workstation_short}}" --spec-ctrl on
+VBoxManage modifyvm "{{project_name_workstation_short}}" --nestedpaging off
+VBoxManage modifyvm "{{project_name_workstation_short}}" --mds-clear-on-vm-entry on
+VBoxManage modifyvm "{{project_name_workstation_short}}" --mds-clear-on-sched on
+</blockquote>
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = These steps must be repeated for every VirtualBox VM, including [[Multiple_{{project_name_workstation_short}}|multiple]] and [[Other_Operating_Systems|custom]] VMs.
+}}
+The above instructions only apply to the default VM names {{project_name_gateway_long}} and {{project_name_workstation_long}}. Therefore, if [[Multiple {{project_name_workstation_short}}|Multiple {{project_name_workstation_long}}s]] and/or [[Multiple_Whonix-Gateway|Multiple {{project_name_gateway_long}}s]] are configured, then repeat these instructions using the relevant name/s.
+</div>
+</div>
+<noinclude>
+= Footnotes =
+<references />
+</noinclude>

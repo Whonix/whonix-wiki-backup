@@ -1,0 +1,131 @@
+{{Header}}
+{{title|title=
+Anbox - Run Android Applications and Games
+}}
+{{#seo:
+|description=Anbox allows Android applications and mobile games to run inside {{project_name_long}}.
+|image=https://www.{{project_clearnet}}/w/images/1/1e/Anbox_apps_short.png
+}}
+<!--|image=https://www.{{project_clearnet}}/w/images/c/c9/Android23432.png-->
+[[File:anbox_apps_short.png|thumb|800px|center]]
+[[File:Androidosicon.png|Android OS Icon|250px|thumb]]
+
+= Introduction and Installation =
+{{Community_Support}}
+
+{{upstream_wiki}}
+
+Other notes for whonix specific can be found below.
+
+= Anbox Configuration =
+== Derivative Specific ==
+Disabling [[{{project_name_workstation_short}} Firewall|{{project_name_workstation_long}} Firewall]] is unfortunately required. Otherwise there would be no network access. <ref>
+This is because Anbox comes with its own bridged network. Whitelisting that interface in {{project_name_workstation_long}} firewall is [[Unsupported|undocumented]] and might require source code modifications. [[Reporting_Bugs#Patches_are_Welcome|Patches are Welcome]].
+</ref>
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Warning:
+
+* This reduces security! Especially when using [[Multiple_Whonix-Workstations|multiple {{project_name_workstation_long}}]] behind the same {{project_name_gateway_long}}.
+** Still no risk of clearnet IP leaks. <ref>
+* [[Dev/Technical_Introduction#Security_Overview|{{project name long}} Security Overview]]
+* [[Whonix-Workstation_Firewall#Purpose|purpose of Whonix-Workstation firewall]]
+* [[Dev/Technical_Introduction#With_more_technical_terms|technical details why firewall even without firewall {{project name long}} is still leak-proof]]
+* Forum discussion: [https://forums.whonix.org/t/when-i-turn-off-the-whonix-workstation-firewall-am-i-still-safe/13826 When I turn off the Whonix-Workstation™ Firewall, am I still safe?]
+</ref>
+}}
+
+{{Box|text=
+'''1.''' Inside {{project_name_workstation_long}}.
+
+({{Q_project_name}}: inside StandaloneVM (better!) or Template).
+
+{{CodeSelect|code=
+sudo systemctl mask {{project_name_short_lowercase}}-firewall
+}}
+
+'''2.''' Disable [https://www.kicksecure.com/wiki/Systemcheck systemcheck] in {{project_name_workstation_long}} Firewall.
+
+{{Box|text=
+{{Open with root rights|filename=
+/etc/systemcheck.d/50_user.conf
+}}
+
+Paste.
+
+{{CodeSelect|code=
+systemcheck_skip_functions+=" check_{{project_name_short_lowercase}}_firewall_systemd_status "
+}}
+
+Save.
+}}
+
+'''3.''' Reboot.
+
+This is required to unload {{project_name_workstation_long}} firewall rules and to have Anbox load its firewall rules.
+
+{{CodeSelect|code=
+sudo reboot
+}}
+}}
+
+= Android x86 as a Workstation =
+
+There are both distinct advantages and disadvantages of running Android applications in Android x86 Workstation. <ref>https://forums.whonix.org/t/integrate-anbox-into-whonix-workstation/9642</ref>
+
+
+'''Table:''' ''Android x86 Workstation Advantages and Disadvantages''
+
+{| class="wikitable"
+|-
+
+! scope="col"| '''Category'''
+! scope="col"| '''Notes'''
+|-
+
+! scope="row"| Bootloader / Ramdisk
+| It is possible to use Magisk to achieve root permissions and hide root from applications on Android x86. <ref>Some individuals have already achieved this.</ref>
+|-
+
+! scope="row"| Flexibility
+|
+* It is possible to use <code>adb</code> if Android x86 uses the same internal network as the Gateway and Workstation. <ref>Also, it may be possible to run ssh-server on {{project_name_workstation_long}} and connect the Android x86 through Termux or similar.</ref>
+* Root access - Android x86 has a pre-installed superuser binary and manager so root access works out of the box. Applications with root access will work without any additional setup.
+|-
+
+! scope="row"| Networking
+| Android x86 provides a virtual Wi-Fi interface (<code>wlan0</code>) so applications think that a real Wi-Fi connection is established (Anbox uses a bridge network interface).
+|-
+
+! scope="row"| Operating System
+| The full Android stack implemented as Android x86 is a full operating system which requires hardware virtualization.
+|-
+
+! scope="row"| Security
+| This configuration is less secure than utilizing a {{project_name_workstation_long}}. <ref>Although it may have more flexibility, as static IP connections on the Android x86 Workstation have been accomplished.</ref>
+|-
+
+! scope="row"| Software
+| Any version of Android from 4.x to 9.x can be installed.
+|-
+
+! scope="row"| Speed
+|  This configuration is slower than anbox installation as Android x86 VM does not provide any type of Guest Additions meaning no graphic card drivers are supported.
+|-
+
+|}
+
+To check running anbox within kicksecure (same applied for {{project_name_workstation_long}}) check [https://www.kicksecure.com/wiki/Anbox#Anbox_inside_Kicksecure_%E2%84%A2_Advantages_and_Disadvantages Anbox inside Kicksecure ™ Advantages and Disadvantages]
+
+= Forum Discussion =
+
+* [https://forums.whonix.org/t/running-android-apps-inside-whonix-workstation-proof-of-concept/7441/11 Running Android Apps inside Whonix-Workstation - Anbox - Proof of concept]
+* [https://forums.whonix.org/t/integrate-anbox-into-whonix-workstation/9642 Integrate Anbox into Whonix-Workstation]
+
+= Footnotes =
+<references />
+
+{{Footer}}
+
+[[Category: Design]]

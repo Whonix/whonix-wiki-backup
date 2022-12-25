@@ -1,0 +1,79 @@
+{{Header}}
+{{Title|title=
+Hide Tor use from the Internet Service Provider
+}}
+{{#seo:
+|description=Prevent the Internet Service Provider from discovering you are a Tor user.
+|image=Cat-1040815640.jpg
+}} {{Responsive_Thumbnails}}
+<div class="mininav">
+* [[Bridges|Configure (Private) (Obfuscated) Tor Bridges]]
+* [[Hide_Tor_from_your_Internet_Service_Provider|Hide Tor use from the {{isp}}]]
+</div>
+[[image:Cat-1040815640.jpg|thumb]]
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = It is impossible to Hide Tor use from the {{isp}}. It has been concluded this goal is difficult beyond practicality.
+}}
+See also [[Warning#Use_of_Tor_is_Obvious|Use of Tor Is Obvious]].
+
+This is a general issue. Anonymizing internet traffic is a hard problem that for example Tor and {{project name long}} are working on. However, reliably hiding the type of any traffic (such as voice over IP or Tor) from the ISP in a threat model that includes endless data retention with retroactive policing is an even harder problem which is solved nowhere. This issue is [[unspecific|unspecific to {{project name long}}]].
+
+The technical discussion which lead to this conclusion can be found [https://forums.whonix.org/t/hiding-tor-whonix-is-difficult-beyond-practicality/7408 here]. The former version of this wiki page documenting some of the challenges in hiding Tor use from the ISP is still available [https://www.whonix.org/w/index.php?title=Hide_Tor_and_Whonix_from_your_ISP&oldid=48618 here].
+
+As for hiding {{project_name_long}} from network observers, this is a different subject which is covered on the [[Fingerprint]] page.
+
+= Technical Reasons =
+
+Using private and obfuscated bridges alone does not provide strong guarantees of hiding Tor use from the ISP. As Jacob Appelbaum has noted: <ref>
+https://web.archive.org/web/20181125024630/https://mailman.boum.org/pipermail/tails-dev/2013-April/002950.html
+</ref>
+
+<blockquote>Some pluggable transports may seek to obfuscate traffic or to morph it. However, they do not claim to hide that you are using Tor ''in all cases'' but rather in very specific cases. An example threat model includes a DPI device with limited time to make a classification choice - so the hiding is very specific to functionality and generally does not take into account endless data retention with retroactive policing.</blockquote>
+
+It is impossible to safely use a proxy to hide Tor. The connection between the user and the proxy is unencrypted and this applies to all proxies: http, https, socks4, socks4a and socks5. <ref>[[Whonix_versus_Proxies|Comparison Of Tor with CGI Proxies, Proxy Chains, and VPN_Services]]</ref> This means the ISP can still clearly see that connections are made to the Tor network. This fact is only mentioned here because proxies are constantly (falsely) suggested as a solution whenever this topic comes up in public arenas.
+
+Using a VPN or SSH does not provide a strong guarantee of hiding Tor use from the ISP either. <ref>
+* [[Whonix_versus_VPNs|Whonix versus VPNs]]
+* [[Whonix_versus_Proxies|Tor vs. Proxies, Proxy Chains]]
+</ref> VPNs and SSHs are vulnerable to an attack called {{Code|website traffic fingerprinting}}. <ref>
+For a reference for {{Code|website traffic fingerprinting}}, see [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorPlusVPN#vpnssh-fingerprinting VPN/SSH Fingerprinting].
+</ref>
+
+As Yawning Angel, founder and maintainer of the traffic obfuscator <code>obfs4</code> pluggable noted: <ref>
+https://gitlab.com/yawning/obfs4/-/blob/master/internal/README.md#maintainers-rant
+</ref>
+
+<blockquote>Maintainer's rant
+
+Honestly, it is possible to create a better obfuscation protocol than
+obfs4, and it's shelf-life expired years ago.  No one should be using
+it for anything at this point, and no one should have been using it
+for anything for the past however many years since I first started
+telling people to stop using it.<br />
+People should also have listened when I told them repeatedly that there
+are massive issues in the protocol.
+
+Do not ask me questions about this.<br />
+Do not use it in other projects.<br />
+Do not use it in anything new.<br />
+Use a prime order group instead of this nonsense especially if you
+are doing something new.<br />
+All I want is to be left alone.</blockquote>
+
+At time of writing <code>obfs4</code> is the only obfuscation protocol listed on [https://bridges.torproject.org/options/ <code>bridges.torproject.org/options</code>] and there are no better alternatives available for traffic obfuscation, to hide the fact that a user is using Tor.
+
+There is [https://snowflake.torproject.org/ Snowflake] ([[Bridges#Snowflake|in {{project name long}} wiki]]) but snowflake is not obfuscated.
+
+Tor will make still certain network-related calls (like DNS lookups) even if DisableNetwork is set. Quote [https://manpages.debian.org/bullseye-backports/tor/tor.1.en.html Tor man page] (<u>underline</u> added):
+
+<blockquote>DisableNetwork 0|1
+
+When this option is set, we don’t listen for or accept any connections other than controller connections, and we close (and don’t reattempt) any outbound connections. Controllers sometimes use this option to avoid using the network until Tor is fully configured. <u>Tor will make still certain network-related calls (like DNS lookups)</u> as a part of its configuration process, <u>even if DisableNetwork is set.</u></blockquote>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

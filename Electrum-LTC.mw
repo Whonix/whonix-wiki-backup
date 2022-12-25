@@ -1,0 +1,143 @@
+{{header}}
+= Introduction =
+{{stub}}
+
+= Installation =
+== Download and Digital Software Verification ==
+Perform these steps inside {{project_name_workstation_long}} ({{Q_project_name}}: <code>{{project_name_workstation_vm}}</code> App Qube).
+
+{{Box|text=
+'''1.'''
+
+<ref>
+maybe try if below does not work:
+https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xcae1092ad3553ffd21c05de36fc4c9f7f1be8fea
+</ref>
+
+{{CodeSelect|code=
+gpg --keyserver keyserver.ubuntu.com --recv-keys 0xCAE1092AD3553FFD21C05DE36FC4C9F7F1BE8FEA
+}}
+
+'''2.'''
+
+{{CodeSelect|code=
+gpg --fingerprint 0xCAE1092AD3553FFD21C05DE36FC4C9F7F1BE8FEA
+}}
+
+'''3.'''
+
+{{CodeSelect|code=
+scurl-download --tlsv1.2 https://electrum-ltc.org/download/electrum-ltc-4.0.9.3-x86_64.AppImage.asc
+}}
+
+'''4.'''
+
+{{CodeSelect|code=
+scurl-download --tlsv1.2 https://electrum-ltc.org/download/electrum-ltc-4.0.9.3-x86_64.AppImage
+}}
+
+'''5.'''
+
+{{CodeSelect|code=
+gpg --verify electrum-ltc-4.0.9.3-x86_64.AppImage.asc
+}}
+
+{{GnuPG-Success}}
+
+{{GnuPG-Warning}}
+
+'''6.'''
+
+{{CodeSelect|code=
+chmod +x ~/electrum-ltc-4.0.9.3-x86_64.AppImage
+}}
+
+'''7.'''
+
+{{CodeSelect|code=
+mkdir --parents ~/bin
+}}
+
+'''8.'''
+
+{{CodeSelect|code=
+mv electrum-ltc-4.0.9.3-x86_64.AppImage ~/bin/electrum-ltc
+}}
+}}
+
+= Configure Electrum-LTC - Debian based Offline Computer =
+Should not be needed since offline computer but useful anyhow just in case.
+
+Connect only to one server (own server) instead of any third party servers.
+
+{{CodeSelect|code=
+~/bin/electrum-ltc --offline setconfig oneserver true
+}}
+
+Connect to own local server.
+
+{{CodeSelect|code=
+~/bin/electrum-ltc --offline setconfig server 127.0.0.1:5000:t
+}}
+
+Avoid auto connecting to third party servers (and avoid Electrum-LTC first start wizard asking to).
+
+{{CodeSelect|code=
+~/bin/electrum-ltc --offline setconfig auto_connect false
+}}
+
+= Add a Electrum-LTC Start Menu Entry - Debian based Offline Computer =
+Creating a <code>Electrum-LTC</code> start menu entry.
+
+This step is optional.
+
+{{Box|text=
+'''1.''' Create folder <code>~/.local/share/applications</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.local/share/applications
+}}
+
+'''2.''' {{Open File|filename=
+~/.local/share/applications/electrum-ltc.desktop
+}}
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+[Desktop Entry]
+Name=Electrum-LTC
+Comment=electrum-ltc
+Exec=bash -c '~/bin/electrum-ltc --oneserver --server 127.0.0.1:5000:t'
+Terminal=false
+Type=Application
+Icon=money-manager-ex
+StartupWMClass=litecoin
+MimeType=x-scheme-handler/litecoin;
+Categories=Finance;
+}}
+
+'''4.''' Save.
+
+'''5.''' Done.
+
+The <code>Electrum-LTC</code> start menu entry available should be available.
+}}
+
+= Start from Command Line =
+
+To start <code>Electrum-LTC</code> from the command line, run.
+
+{{CodeSelect|code=
+~/bin/electrum-ltc
+}}
+
+= See Also =
+* [[Litecoin Core]]
+* [[ElectrumX-LTC]]
+
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

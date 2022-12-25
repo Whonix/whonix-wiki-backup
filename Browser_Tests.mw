@@ -1,0 +1,245 @@
+{{Header}}
+{{#seo:
+|description=check.torproject.org says "Sorry. You are not using Tor."? On false positives. And browser fingerprinting. How unique are you? On Browser Tests and Browser Security. Notes on sites such as ip-check.info and whoer.net.
+|image=Testschecklist.png
+}}
+[[image:Testschecklist.png|thumb]]
+= Interpreting Test Results =
+
+Sites like <code>whoer.net</code> or <code>ip-check.info</code> are unable to adequately assess and demonstrate the threat of fingerprinting techniques with respect to [[Tor Browser]]. These sites generally check for various browser characteristics as well as enabled functionality to reveal specific identifiers. Many of these identifiers require JavaScript, but reports commonly include elements like HTTP headers and attributes, the User Agent, numerous JavaScript attributes, IP address, operating system indicators, browser plugins, cookies, cache, browser window dimensions, fonts and so on. If these elements are enabled/activated, then the browser test sites provide more fine-grained results -- although the [https://2019.www.torproject.org/projects/torbrowser/design/ Tor Browser design] has already taken many into account.
+
+Tor Browser developers have carefully considered [https://2019.www.torproject.org/projects/torbrowser/design/#identifier-linkability Cross-Origin Identifier Unlinkability] and [https://2019.www.torproject.org/projects/torbrowser/design/#fingerprinting-linkability Cross-Origin Fingerprinting Unlinkability] defenses in their anonymity design. Efforts are focused upon:
+* First party isolation of all browser identifier sources (such as cookies, cache etc.) by browser tab. These are deleted after closing the browser, but are saved temporarily while the browser is open so most sites are accessible.
+* Specific fingerprinting defenses such as disabling browser plugins, preventing HTML5 data extraction, preventing access to the local host and WebRTC API, resizing browser windows to specific dimensions, and many more.
+
+A fundamental principle adopted to improve Tor Browser anonymity is to make all users appear as uniform (similar) as possible, thereby greatly reducing the effectiveness of tracking efforts by various websites and network observers who rely on identifiers. To learn more about how The Tor Project is preparing to defend against future fingerprinting threats, refer to this recent (2019) blog post: [https://blog.torproject.org/browser-fingerprinting-introduction-and-challenges-ahead Browser Fingerprinting: An Introduction and the Challenges Ahead].
+
+= Making Browsers Safer =
+
+Browser fingerprinting defenses are imperfect and most probably always will be. {{Browser_Fingerprinting_Footnote}} However, steady improvements are being made over time despite the emergence of novel tracking threats identified by researchers and developers alike. There are certainly too few volunteers who are <u>seriously</u> focused on testing browsers and defeating browser fingerprinting methods.
+
+{{Should_I_be_concerned}}
+
+= Browser Test Sites =
+
+== AmIUnique ==
+
+* https://amiunique.org/ -- [https://github.com/DIVERSIFY-project/amiunique GitHub source code]. This is a general fingerprinting site relying on common identifiers.
+
+'''Figure:''' ''AmIUnique Test in {{project_name_long}}''
+
+[[Image:Amiunique.png|border]]
+
+== cpuid visualiser ==
+The cpuid visualiser is not a browser test. As its website [https://cpuid.apps.poly.nomial.co.uk/ <code>cpuid.apps.poly.nomial.co.uk</code>] is correctly stating, a CPUID visualizer. It does not claim that it can detect the CPUID from the user's computer. This is further evidenced by the website writing <code>sample cpuid data</code>. The functionality cpuid visualiser is for a user to voluntarily, locally gather its CPU binary register data and paste it the cpuid visualiser so it can be decoded and visualized.
+
+CPU model and capabilities cannot be remotely detected by a website even if the browser has JavaScript (JS) enabled. See [[Protocol-Leak-Protection_and_Fingerprinting-Protection#CPUID|CPUID]].
+
+If a user wants to verify this, the following footnote could be considered. <ref>
+<u>cpuid visualiser is a visualizer, not a CPUID detector</u>
+
+{{box|text=
+This is not required for most users. Only for users who wish to verify above statements.
+
+Please test on different computers with different CPUs and check if the detected CPU information by the website is different.
+
+'''1.''' Make sure JavaScript (JS) has not been disabled (NoScript users).
+
+'''2.''' If using Tor Browser, make sure Tor Browser security slider setting is not set to "safest".
+
+'''3.''' Go to https://cpuid.apps.poly.nomial.co.uk/ with one computer.
+
+'''4.''' Go to https://cpuid.apps.poly.nomial.co.uk/ with another computer that has a different CPU model.
+
+'''5.''' Compare the results.
+
+* <u>If it is the same,<u> then no differences in the CPUs were detected.
+* <u>If it would be different,</u> then the visualizer was updated to a detector but this is highly unlikely.
+
+'''6.''' Optional: Report the result in the forums. Note: Do not paste your actual CPU information. [https://forums.whonix.org/t/computer-hardware-leaking/14238/7 forum discussion]
+
+'''7.''' Done.
+}}
+</ref>
+
+== Doileak.com ==
+
+* https://www.doileak.com -- This is another site testing the most common leaks such as IP address, operating system, browser, connection type, timezone difference, WebGL support and so on. However, it includes some uncommon tests such as UDP and torrent leak tests.
+
+'''Figure:''' ''Doileak.com Test in {{project_name_long}}''
+
+[[Image:Doileak.png|border]]
+
+== Fingerprint Central ==
+
+[https://web.archive.org/web/20210920040850/https://fpcentral.tbb.torproject.org/ Fingerprint Central] is the successor to the https://web.archive.org/web/20170207112813/https://fpcentral.irisa.fr/ website which now appears defunct. The original code is still [https://github.com/plaperdr/fp-central found on GitHub] and can be run locally to help Tor Browser developers rapidly create prototype defenses. <ref>
+https://lists.torproject.org/pipermail/tor-dev/2016-July/011233.html
+</ref> The same researchers run Fingerprint Central and have designed the test to differ from Panopticlick so it is dedicated to testing discrepancies between Tor Browser instances only. This assists Tor Browser developers test before releases.
+
+'''Figure:''' ''Fingerprint Central Test in {{project_name_long}}''
+
+[[Image:Fpcentral.png|border]]
+
+{{Anchor|FingerprintJS}}
+== Fingerprint.com ==
+The [https://fingerprint.com/demo/ Fingerprint.com Demo] (formally FingerprintJS ([https://github.com/fingerprintjs/fingerprintjs/ on github]) is a specifically important test since [[The_World_Wide_Web_And_Your_Privacy#Fingerprint.com|"12% of the largest 500 websites use Fingerprint.com"]]. Through use of [[Data_Collection_Techniques#Browser_Fingerprinting|browser fingerprinting]], fingerprint.com attempts to assign a unique identifier to the user that is similar to an [[Data_Collection_Techniques#IP_Address|IP address]]. Fingerprint.com is referring to that unique identifier as <code>visitorID</code>.
+
+'''Table:''' ''Fingerprint.com Tracking Capabilities and Defenses in {{project name long}}''
+
+Note: The following table is being elaborated in writing below the table.
+
+<div class="scroll-table">
+{| class="wikitable"
+|-
+
+! scope="col"| '''Tracking Attack'''
+! scope="col"| '''Defend Tracking'''
+|-
+
+| cannot track [[Tor Browser]] after browser restart
+| {{Yes}}
+|-
+
+
+| cannot track Tor Browser after using its [[Tor_Browser#New_Identity_Function|new identity function]]
+| {{Yes}}
+|-
+
+| cannot track Tor Browser running in different {{project name long}} VMs on the same computer
+| {{Yes}}
+|-
+
+| cannot correlate multiple browser tabs in the same browser on the same top level domain
+| {{No}}
+|-
+
+| cannot correlate multiple browser tabs in the same browser on different top level domain
+| Unknown.
+|-
+
+|}
+</div>
+
+'''Figure:''' ''Fingerprint.com <code>visitorID</code> Demo in {{project name long}}''
+
+[[File:TBfingerprint1.png|600px|border]]
+
+When using [[Tor Browser]]'s [[Tor_Browser#New_Identity_Function|new identity function]] results in different browser fingerprint. Fingerprint.com will detect a different <code>visitorID</code>. The same is true after restarting Tor Browser.
+
+Fingerprint.com is fortunately unable to assign the same <code>visitorID</code> to different instances of [[Tor Browser]] running in different [[Whonix-Workstation|{{project name workstation long}}]]. In other words, when using multiple [[Multiple Whonix-Workstation|multiple {{project name workstation long}}]], fingerprint.com fails to correlate them to the same pseudonym. This is good for a user that does not wish to be tracked.
+
+'''Figure:''' ''Different Fingerprint.com <code>visitorID</code> after browser restart''
+
+[[File:TBfingerprint2.png|600px|border]]
+
+When opening the fingerprint.com demo in multiple browser tabs in the same browser, fingerprint.com detects the same <code>visitorID</code>. This is because Tor Browser only attempts to provide a different identity in different browser tags for different top level domain names.
+
+See also:
+
+* [[Tor_Browser#Unsafe_Tor_Browser_Habits|Unsafe Tor Browser Habits]] for mitigations.
+* Internet Corporations and Privacy Concerns: [[The_World_Wide_Web_And_Your_Privacy#Fingerprint.com|Fingerprint.com]]
+* Related, see also [[#schemeflood.com|schemeflood.com]].
+
+{{Anchor|coveryourtracks.eff.org}}
+
+{{Anchor|Panopticlick}}
+== Cover Your Tracks ==
+
+Cover Your Tracks (previously called Panopticlick) was first launched in 2010. It is designed to gather information about common identifiers such as operating system version, browser, plugins and so on and compare it against a central database of many other Internet users' configurations. In addition, it tests tracker blocker effectiveness including tools like AdBlock, Disconnect and Ghostery. <ref>
+https://coveryourtracks.eff.org/about
+</ref>
+
+To learn more about [https://coveryourtracks.eff.org/ EFF's Cover Your Tracks test] and what it signifies for Tor Browser, refer to the following blog post by The Tor Project: [https://blog.torproject.org/effs-panopticlick-and-torbutton EFF's <s>Panopticlick</s> Cover Your Tracks and Torbutton].
+
+'''Figure:''' ''Cover Your Tracks (previously Panopticlick) v3 Test in {{project_name_long}}''
+
+[[Image:Panopticlickv3.png|border]]
+
+== schemeflood.com ==
+{{stub}}
+
+The following identifier is a good identifier since shared [...]
+
+<pre>
+0FVVVV
+</pre>
+
+[https://web.archive.org/web/20210527065854/https://twitter.com/mfsylv/status/1397808321244110849 Quote] M. Sylvester, @mfsylv, creator of schemeflood.com:
+
+<blockquote>The same identifier OFVVVV being generated is immediately concerning until its uselessness is observed. This identifier is generated ~8.9% of the time, when none of the matching applications are detected.</blockquote>
+
+See [[Tor_Browser#Unsafe_Tor_Browser_Habits|Unsafe Tor Browser Habits]] for mitigations.
+
+Related, see also [[#Fingerprint.com|Fingerprint.com]] and [[VM Fingerprinting]].
+
+Forum discussion:
+https://forums.whonix.org/t/protocol-flooding-attack-scheme-flood-browser-fingerprinting/11729
+
+== The Tor Project ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Note</u>: For information concerning the <code>about:tor</code> message, refer to the following [https://forums.whonix.org/t/something-went-wrong forum] <ref name=about-tor-failure-message /> [https://forums.whonix.org/t/sorry-you-are-not-using-tor discussions].
+}}
+
+https://check.torproject.org
+
+User are requested not to post any "Sorry. You are not using Tor." questions in the {{project_name_long}} forums unless certain it is not a false positive. If this message appears, it is unnecessary to be concerned since:
+* {{project_name_long}} is designed to tunnel everything over Tor.
+* https://check.torproject.org (<code>check.tpo</code>) sometimes fails to detect Tor exit relays. This is a bug in <code>check.tpo</code>, which only The Tor Project can fix.
+* Previous reports were IP addresses unassociated with the user's real, external, clearnet IP address. To discover your clearnet (non-Whonix) IP address, visit one of the sites on this page from the host or a non-Tor virtual machine.
+* ExoneraTor can be accessed with Tor Browser on the host. {{ExoneraTor}}
+
+'''Figure:''' ''Successful Tor Network Check in {{project_name_long}}''
+
+[[Image:Checktorproject.png|border]]
+
+== WebCPU ==
+[https://github.com/darionco/WebCPU WebCPU]. See [https://darionco.github.io/WebCPU/ WebCPU (live demo)].
+
+Fingerprinting Tor Browser using WebCPU is probably not possible. The WebCPU test results are different in different browser tabs. Test results are different in Tor Browser and other browsers.
+
+== WhatIsMyBrowser.com ==
+
+* https://www.whatismybrowser.com/ -- This is a general fingerprinting site that tests for common leaks including web browser settings, screen resolution, IP address, use of the Tor network and so on.
+
+'''Figure:''' ''WhatIsMyBrowser.com Test in {{project_name_long}}''
+
+[[Image:Whatismybrowser.png|border]]
+
+== Whoer.net ==
+
+https://whoer.net/ -- This is another site relying on common fingerprinting methods, including browser attributes, IP address, language localization, time, WebRTC, plugins, cookies and so on.
+
+'''Figure:''' ''Whoer.net Test in {{project_name_long}}''
+
+[[Image:Whoernet.png|border]]
+
+= Benchmarks =
+* https://web.archive.org/web/20220512115604/https://www.matthew-x83.com/online/cpu-benchmark.php
+* https://silver.urih.com/
+
+= Other Services =
+
+Interested readers are encouraged to try the browser test sites below, as well as researching and adding further resources here:
+
+* [https://browserleaks.com/css Browserleaks.com CSS Media Queries Test] -- Screen resolution fingerprinting without the need for JavaScript. It utilizes the CSS feature to fetch information.
+* [https://audiofingerprint.openwpm.com/ AudioContext Fingerprint Test Page] -- Audio stack and Canvas API fingerprinting.
+* [https://www.cloudflare.com/ssl/encrypted-sni/ Cloudflare ESNI Checker] -- DNSSEC test.
+* [https://arkenfox.github.io/TZP/tzp.html TorZillaPrint] -- Tor Browser fingerprinting.
+* [https://stackoverflow.com/a/38950845/2605155 Get CPU/GPU/memory information]
+
+= Miscellaneous =
+* The Tor Project task: [https://gitlab.torproject.org/legacy/trac/-/issues/6119 Create our own instance of Panopticlick]
+
+= See Also =
+* [[Dev/Leak Tests|Leak Tests]]
+* [[Tor-ctrl-observer|tor-ctrl-observer - Tor Connection Destination Viewer]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

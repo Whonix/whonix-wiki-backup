@@ -1,0 +1,210 @@
+{{Header}}
+{{Title|
+title=How-to: Use Electrum Bitcoin Wallet in {{project_name_long}} - Manual Installation
+}}
+{{#seo:
+|description=How-to: Use Electrum Bitcoin Wallet in {{project_name_long}}
+|image=Electrum.png
+}}
+{{electrum_mininav}}
+[[image:Electrum.png|thumb|250px]]
+__FORCETOC__
+= Introduction =
+
+See [[Electrum]] wiki page for introduction and warnings!
+
+Primarily refer to the [[Electrum]] wiki page! Use this page only in case newer versions of [[Electrum]] are desired!
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Prerequisite knowledge</u>: refer to the [[Operating_System_Software_and_Updates#Frozen_Packages|Frozen Packages]] and [[Operating_System_Software_and_Updates#Application_Specific_Update_Indicators|Application Specific Update Indicators]] entries in the [[Operating_System_Software_and_Updates|Operating System Software and Updates]] chapter.
+}}
+
+{{Community_Support}}
+
+= Install Electrum =
+
+== Installation Steps ==
+
+{{Box|text=
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' {{Open_a__product_ws_terminal}}
+
+'''2.''' Import the gpg public key of Electrum developer Thomas Voegtlin. <ref>
+https://github.com/spesmilo/electrum/issues/4789
+</ref>
+
+{{gpg key
+|url=scurl-download https://raw.githubusercontent.com/spesmilo/electrum/master/pubkeys/ThomasV.asc
+|source_filename=ThomasV.asc
+|fingerprint=6694D8DE7BE8EE5631BED9502BD5824B7F9470E6
+|gpg_fingerprint_output=
+In early-2019, the output is identical to the following image.
+
+'''Figure:''' ''Fingerprint Verification''
+
+[[Image:electrum_verify_gpg_fingerprint.png]]
+
+      Key fingerprint = 6694 D8DE 7BE8 EE56 31BE  D950 2BD5 824B 7F94 70E6
+}}
+
+'''3.''' Download the Electrum AppImage.
+
+<u>Note:</u> At the time of writing, <code>electrum-4.2.1</code> was the latest stable release. Before starting the Electrum download, browse to [https://electrum.org/#download electrum.org/#download] to verify the correct file path. Then download the file with [[Secure_Downloads#Downloads_with_scurl_-_SSL_Command_Line_Downloader|scurl]]. <ref>To find the correct image download: <i><code>"Right-click"</code></i> <code>AppImage</code> &rarr; <i><code>"Select"</i> Copy Link Location</code> &rarr; <i><code>Append</i> to scurl command</code>.</ref>
+
+{{CodeSelect|code=
+scurl-download https://download.electrum.org/4.2.1/electrum-4.2.1-x86_64.AppImage
+}}
+
+'''5.''' Check the Electrum AppImage is not corrupted after download. <ref>
+Due to recent DDoS attacks.
+</ref>
+
+To check the Electrum AppImage, run.
+
+{{CodeSelect|code=
+file electrum*.AppImage
+}}
+
+The following output indicates a corrupted and/or non-existent AppImage file.
+
+<pre>
+electrum-4.2.1-x86_64.AppImage: HTML document, ASCII text, with very long lines
+</pre>
+
+In that case, delete the file and try downloading the AppImage again.
+
+'''6.''' Download the corresponding gpg signature.
+
+It is necessary to verify the integrity of the AppImage with the correct signature.
+
+<u>Note:</u> If users downloaded a later Electrum version at <i>step 4</i>, then modify the following command to match the corresponding signature file. <ref>To find the correct signature file download: <i><code>"Right-click"</i> signature</code> &rarr; <i><code>"Select"</i> Copy Link Location</code> &rarr; <i><code>"Append"</i> to scurl command</code></ref>
+
+{{CodeSelect|code=
+scurl-download https://download.electrum.org/4.2.1/electrum-4.2.1-x86_64.AppImage.ThomasV.asc
+}}
+
+'''7.''' Verify the integrity of the AppImage image.
+
+<u>Note:</u> This command must be run in the same directory as the downloaded AppImage and signature.
+
+{{CodeSelect|code=
+gpg --verify electrum-4.2.1-x86_64.AppImage.ThomasV.asc electrum-4.2.1-x86_64.AppImage
+}}
+
+{{GnuPG-Success}}
+
+'''Figure:''' ''Good Signature'' <ref>
+<pre>
+gpg: Signature made Mon 19 Jul 2021 02:22:33 PM EDT
+gpg:                using RSA key 6694D8DE7BE8EE5631BED9502BD5824B7F9470E6
+gpg: Good signature from "Thomas Voegtlin (https://electrum.org) <thomasv@electrum.org>" [unknown]
+gpg:                 aka "ThomasV <thomasv1@gmx.de>" [unknown]
+gpg:                 aka "Thomas Voegtlin <thomasv1@gmx.de>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 6694 D8DE 7BE8 EE56 31BE  D950 2BD5 824B 7F94 70E6
+</pre>
+</ref>
+
+[[Image:electrum_gpg_good_signature.png]]
+
+{{GnuPG-Warning}}
+
+If the following "gpg: BAD signature" message appears, the AppImage has been corrupted or altered during the download process.
+
+'''Figure:''' ''Bad Signature''
+
+[[Image:Electrum_bad_gpg_signature.png]]
+
+In this event, delete both the AppImage and signature and either wait 10-15 minutes for the Tor circuits to change, or open up the [[Tor_Controller#Nyx|Nyx Tor Controller]] in {{project_name_gateway_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>{{project_name_gateway_vm}}</code>) and type "n" to create new Tor circuits. Wait for a random period of time before repeating the steps to download the AppImage and signature.
+
+'''8.''' Change file permissions.
+
+Make the electrum AppImage executable.
+
+{{CodeSelect|code=
+chmod +x electrum-4.2.1-x86_64.AppImage
+}}
+}}
+
+= Start Electrum =
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Users should create a wallet with a [[Passwords#Generating_Unbreakable_Passwords|strong password]]!
+}}
+Please refer to the official Documentation at [https://electrum.readthedocs.io/en/latest/ docs.electrum.org] for comprehensive instructions, as well as more advanced topics like [https://electrum.readthedocs.io/en/latest/coldstorage.html Cold Storage] of private keys.
+
+To start Electrum on all platforms, run.
+
+{{CodeSelect|code=
+./electrum-4.2.1-x86_64.AppImage
+}}
+
+[[{{q_project_name_short}}|{{q_project_name}}]] users are recommended to configure a [https://github.com/Qubes-Community/Contents/blob/master/docs/security/split-bitcoin.md Split Bitcoin Wallet] to better protect their private keys. To protect against identity correlation through Tor circuit sharing, follow the instructions below (see [[Stream_Isolation|Stream Isolation]] for more information).
+
+= Electrum: First Run =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = These steps enable [[Stream Isolation]] for the Electrum application.
+}}
+
+{{Box|text=
+'''1.''' Configure a manual server connection.
+
+When Electrum is started for the first time, users are met with the prompt: <code>"How do you want to connect to a server?"</code>.
+
+Choose <code>Select server manually</code> and press <code>Next</code>.
+
+'''Figure:''' ''Server Setting''
+
+[[Image:Electrum_select_server_manually.png]]
+
+'''2.''' Change the proxy settings.
+
+The necessary settings are:
+
+* Proxy: <code>SOCKS5</code>
+* Host: <code>10.152.152.10</code>
+* Port: <code>9111</code>
+
+Press <code>Next</code> and the application should be fully functional.
+
+'''Figure:''' ''SOCKS5 Proxy Configuration''
+
+[[Image:Electrum_use_proxy_socks5_.png]]
+
+'''Note:''' If Electrum is already set up but stream isolation was not enabled, then navigate to <code>Tools</code> &rarr; <code>Network</code> in Electrum to bring up the server and proxy settings.
+}}
+
+= Add Application Launcher to Start Menu =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This step is optional.
+}}
+
+{{Launcher
+|name=electrum
+|path=/home/user/electrum-4.2.1-x86_64.AppImage
+|categories=Other
+}}
+
+= Donations =
+
+After installing Electrum, please consider making a [[Donate|donation]] to {{project_name_long}} to keep it running for years to come.
+
+{{Pay_Bitcoin_Specific}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

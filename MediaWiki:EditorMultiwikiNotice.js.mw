@@ -1,0 +1,62 @@
+/*
+EditorMultiwikiNotice Gadget - JS Initialisation, Setup, Events. The editor now shows if this is a multiwiki master / slave page
+See detailed documentation in Dev/mediawiki
+*/
+
+(function() {
+	
+	let masterWikiDomain = {
+		clearnet: 'www.kicksecure.com',
+		onion: 'www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion',
+	};
+	
+	let urlParts = {
+		protocol: { clearnet: 'https://', onion: 'http://', },
+		info: '/wiki/Dev/mediawiki#MultiWiki',
+		edit: '/w/index.php?action=edit&title=',
+	};
+	
+	// Only active if a page gets edited and if the page is MultiWiki
+	if( (new URLSearchParams( window.location.search )).get('action') != 'edit'
+		|| ! $('#wpTextbox1').val().match(/\[\[\s*Category\s*:\s*MultiWiki\s*\]\]/) )
+		return;
+	
+	let domain = (new URL( window.location.href )).hostname;
+	let domainType = domain.match(/\.onion$/) ? 'onion' : 'clearnet';
+
+	let multiWikiInfo = $( ''
+		+ '<ul class="editor-multi-wiki-notice icon-bullet-list minimal">'
+		+ ( domain == masterWikiDomain[domainType]
+			? '<li>'
+				+' <i class="fas fa-exclamation cs-yellow"></i>'
+				+ '<span><b>Beware, you are editing a MultiWiki master page!</b> Your edits will take effect on all slave wikis too.</span>'
+			+ ' </li>'
+			+ '<li>'
+				+ '<i class="fas fa-info cs-blue"></i>'
+				+ '<span>Read here <a class="multiwiki-info" target="_blank">how MultiWiki works</a>.</span>'
+			+ '</li>'
+			
+			: '<li><i class="fas fa-times cs-red"></i><span><b>Please do not edit!</b> This is a MultiWiki slave page.</span></li>'
+			+ '<li>'
+				+ '<i class="fas fa-info cs-blue"></i>'
+				+ '<span>Read here <a class="multiwiki-info" target="_blank">how and where you should edit</a> instead.</span>'
+			+ '</li>'
+			+  '<li>'
+				+ '<i class="fas fa-pen cs-green"></i>'
+				+ '<span>Or <a class="multiwiki-edit-master" target="_blank">edit the master page here</a>.</span>'
+			+ '</li>'
+		)
+		+ '</ul>'
+	);
+	
+	$('#mw-content-text').prepend( multiWikiInfo );
+	
+	multiWikiInfo.find('.multiwiki-info').attr( 'href', urlParts.protocol[domainType] + masterWikiDomain[domainType] + urlParts.info );
+	multiWikiInfo.find('.multiwiki-edit-master').attr( 'href', urlParts.protocol[domainType] + masterWikiDomain[domainType]
+		+ urlParts.edit + (new URLSearchParams( window.location.search )).get('title') );
+			
+})();
+
+/*
+[[Category:MultiWiki]]
+*/

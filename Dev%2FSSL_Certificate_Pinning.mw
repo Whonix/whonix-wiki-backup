@@ -1,0 +1,184 @@
+{{Header}}
+{{#seo:
+|description=Technical Design Documentation about SSL Certificate Pinning
+}}
+
+'''''DRAFT! UNFINISHED!'''''
+
+= Design =
+== Defaults Discussion ==
+Reasons for not enabling this feature by default:
+* The feature is not yet implemented.
+* Usefulness.
+** Not even Tor Browser does pin the Certificate yet. (The Tor Project ticket: [https://gitlab.torproject.org/legacy/trac/-/issues/3555 enhancement: Pin *.torproject.org's certs in TBB]) Mike also says "low priority", where Patrick disagrees. However, Tor Browser at least [https://gitlab.torproject.org/legacy/trac/-/issues/6098#comment:4 enforces HSTS for *.torproject.org].
+* Implementation.
+** torbrowser-launcher is not installable from Debian stable at time of writing. TODO: expand
+** {{project_name_long}} is still installing [https://github.com/Kicksecure/tb-updater tb-updater] rather than [https://github.com/micahflee/torbrowser-launcher/ torbrowser-launcher] by default because, see [https://phabricator.whonix.org/T18 ticket]. So the certificate file {{Code2|/usr/share/torbrowser-launcher/torproject.pem}} is not installed by default.
+** It might be a Debian packaging bug to have whonixcheck depend on torbrowser-launcher for this purpose? Ignorable point, because whonixcheck is too specific to be included into Debian official repository anyhow.
+** We would also have to install torbrowser-launcher on {{project_name_gateway_long}}, so the certificate file {{Code2|/usr/share/torbrowser-launcher/torproject.pem}} gets installed by default. But since by {{project_name_long}} design, users must not use Tor Browser in {{project_name_gateway_long}}, we would have to hide (config-package-dev displace) torbrowser-launcher's start menu entries as well as build a wrapper around its binaries to warn against this. This is doable, but no one has implemented that yet.
+** We are unaware of any other package or even project that does provide SSL certificates for direct pinning (do not confuse this with SSL CA pinning), that we could rely on. Apparently there is not even a list of certain domains and their SSL certificates (public key hashes) (do not confuse this with SSL CA pinning).
+* Maintenance burden.
+** [https://gitlab.torproject.org/legacy/trac/-/issues/5789 The Tor Project (TPO) refused to maintain an OpenPGP signed certificate]. (They are excused: maintenance burden. TODO: expand)
+** Relying on [https://github.com/micahflee/torbrowser-launcher/ torbrowser-launcher] to maintain The Tor Project's SSL certificate file {{Code2|/usr/share/torbrowser-launcher/torproject.pem}}.
+*** One time the maintainer of torbrowser-launcher was busy and needed ~1 month to upgrade TPO's SSL certificate file. ([https://github.com/micahflee/torbrowser-launcher/issues/84 reference]) He is excused, because he is a volunteer maintaining the software, under no obligations, probably earning no money with torbrowser-launcher, having other obligations. This is Freedom Software. Thank you for torbrowser-launcher!
+*** The plan of the maintainer of torbrowser-launcher is to wait until the certificate breaks before upgrading it. This is already the best the maintainer can do in the absence of better support from TPO for this use case. No blame here. Everyone is excused here, also TPO, since maintaining this adds up to the maintenance burden. ([https://github.com/micahflee/torbrowser-launcher/issues/45 reference])
+*** See also [https://github.com/micahflee/torbrowser-launcher/issues?q=pin torbrowser-launcher issues search "pin"] for eventual further issues with pinning.
+
+TODO: expand
+
+= Technical =
+== Introduction ==
+Please don't confuse SSL CA (Certificate Authority) pinning SSL direct pinning.
+
+See also: <br />
+https://github.com/{{project_name_short}}/{{project_name_short}}/issues/24
+
+== PIN Certificate Authority ==
+Weaker method (still better than no pinning at all), more easy to maintain.
+
+Install required software.
+
+<pre>
+sudo apt install ca-certificates curl
+</pre>
+
+Test, expected to work.
+
+{{CodeSelect|code=
+curl --verbose {{Curl_Secure}} --capath /invalid/ --cacert /usr/share/ca-certificates/mozilla/DigiCert_High_Assurance_EV_Root_CA.crt https://check.torproject.org
+}}
+
+Test, expected to fail.
+
+{{CodeSelect|code=
+curl --verbose {{Curl_Secure}} --capath /invalid/ --cacert /usr/share/ca-certificates/mozilla/AddTrust_External_Root.crt https://check.torproject.org
+}}
+
+== PIN Certificate Directly ==
+=== curl method ===
+==== Introduction ====
+Better method, more difficult to maintain.
+
+==== Get the Certificate ====
+===== Introduction =====
+Install required software:
+
+<pre>
+apt install ca-certificates curl
+</pre>
+
+Download the public SSL certificate.
+
+===== pem Format =====
+====== Method 1 ======
+Method 1 just getting the certificate.
+
+<pre>
+openssl s_client -connect torproject.org:443 >./x.cert </dev/null
+</pre>
+
+====== Method 2 ======
+Or better method 2, getting the certificate while pinning torproject.org's certificate authority.
+
+<pre>
+openssl s_client -connect torproject.org:443 -CAfile /usr/share/ca-certificates/mozilla/DigiCert_Assured_ID_Root_CA.crt >./x.cert </dev/null
+</pre>
+
+====== Method 3 ======
+Or even better method 3, getting the certificate while pinning torproject.org's certificate authority and automatically extracting the certificate.
+
+<pre>
+echo -n | openssl s_client -connect torproject.org:443 -CAfile /usr/share/ca-certificates/mozilla/DigiCert_Assured_ID_Root_CA.crt | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ./torproject.pem
+</pre>
+
+====== der Format ======
+'''Untested!'''
+
+[https://www.mail-archive.com/curl-library@cool.haxx.se/msg20506.html source]
+
+<pre>
+openssl s_client -connect torproject.org:443 2>&1 < /dev/null | sed -n '/-----BEGIN/,/-----END/p' | openssl x509 -noout -pubkey | openssl rsa -pubin -outform DER > torproject.org.der
+</pre>
+
+==== Verify the Certificate ====
+Get SHA-1 fingerprint:
+
+<pre>
+openssl x509 -noout -in torproject.pem -fingerprint -sha1
+</pre>
+
+Get SHA-256 fingerprint:
+
+<pre>
+openssl x509 -noout -in torproject.pem -fingerprint -sha256
+</pre>
+
+Manually compare SHA-1 and SHA-256 fingerprints with [https://www.torproject.org/docs/faq.html.en#SSLcertfingerprint torproject.org FAQ: SSL].
+
+<pre>
+.
+</pre>
+
+==== Usage ====
+'''Defunct!'''
+
+Optionally render the ca-certificates useless for testing purposes. <font size="-3">Using ''curl'' here, but ''wget'' has a [https://lists.gnu.org/archive/html/bug-wget/2012-07/msg00015.html bug] and uses the ca-files anyway.</font>
+
+<pre>
+sudo mv /usr/share/ca-certificates /usr/share/ca-certificates_
+</pre>
+
+Download with curl and the pinned certificate:
+
+'''Broken!'''
+
+This needs curl 7.39.0 or above, because older versions do not support --pinnedpubkey.
+
+{{CodeSelect|code=
+curl {{Curl_Secure}} --cacert ./torproject.pem https://check.torproject.org/ > check.html
+}}
+
+Eventually undo.
+
+<pre>
+sudo mv /usr/share/ca-certificates_ /usr/share/ca-certificates
+</pre>
+
+=== Alternate perl method ===
+[https://security.stackexchange.com/questions/20399/how-to-verify-the-ssl-fingerprint-by-command-line-wget-curl Source]. '''''Not reviewed!'''''
+
+<pre>#!/usr/bin/perl
+# https://security.stackexchange.com/questions/20399/how-to-verify-the-ssl-fingerprint-by-command-line-wget-curl
+# Code snippets taken from Net::SSLeay documentation and mildly modified.
+# Requires a newer version of SSLeay (tested with 1.48)
+# Needless to say, verify correct $host and $fingerprint before testing!!!
+
+use Net::SSLeay qw(get_https3);
+
+$host = "www.google.com";
+$port = 443;
+$fingerprint = "C1:95:6D:C8:A7:DF:B2:A5:A5:69:34:DA:09:77:8E:3A:11:02:33:58";
+
+($p, $resp, $hdrs, $server_cert) = get_https3($host, $port, '/');
+if (!defined($server_cert) || ($server_cert == 0)) {
+    warn "Subject Name: undefined, Issuer  Name: undefined";
+} elsif (Net::SSLeay::X509_get_fingerprint($server_cert, "sha1") ne $fingerprint) {
+    warn 'Invalid certificate fingerprint '
+        .  Net::SSLeay::X509_get_fingerprint($server_cert, "sha1")
+        . ' for ' . Net::SSLeay::X509_NAME_oneline(
+             Net::SSLeay::X509_get_subject_name($server_cert));
+} else {
+    print $p;
+}</pre>
+
+= Sources =
+
+<font size="-3"> Sources:
+
+* [https://sourceforge.net/tracker/?func=detail&aid=3569642&group_id=976&atid=350976 curl Feature Request: Pinning SSL certificates / check SSL fingerprints - ID: 3569642]
+* [https://stackoverflow.com/questions/7084482/how-to-save-the-ldap-ssl-certificate-from-openssl How to save the LDAP SSL Certificate from OpenSSL]
+* [https://www.madboa.com/geek/openssl/ OpenSSL Command-Line HOWTO] </font>
+
+{{Footer}}
+
+[[Category:Development]]

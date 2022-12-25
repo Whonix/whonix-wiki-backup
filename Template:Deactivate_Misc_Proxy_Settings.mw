@@ -1,0 +1,82 @@
+{{Box|text=
+On the [[Stream Isolation]] page, there is a list of applications that are pre-configured to use [[Stream_Isolation#By_Settings|socks proxy settings]] via application configuration files. To disable this the {{project_name_long}} system default must be removed from the application's settings.
+
+TODO: document and expand.
+
+{{Box|text=
+Remove proxy settings for APT repository files.
+
+'''1.''' Platform specific notice:
+
+* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In Template. (<code>{{project name workstation template}}</code>)
+
+'''2.''' If you previously onionized any repositories, that has to be undone; see [[Onionizing Repositories]].
+
+'''3.''' Remove any mention of <code>tor+</code> in file <code>/etc/apt/sources.list</code> (if it was previously configured; that file is empty by default in {{project_name_long}} / Kicksecure) or any file in folder <code>/etc/apt/sources.list.d</code>.
+
+'''4.''' {{Open with root rights|filename=
+/etc/apt/sources.list /etc/apt/sources.list.d/*
+}}
+
+'''5.''' Remove any mention of <code>tor+</code>.
+
+'''6.''' Done.
+
+The process of removing proxy settings from APT repository files is now complete.
+}}
+
+{{Box|text=
+Remove proxy settings for [[Tor_Browser#Tor_Browser_Downloader_by_{{project_name_long}}|Tor Browser Downloader by {{project_name_long}}]].
+
+'''1.''' Platform specific notice:
+
+* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In Template. (<code>{{project name workstation template}}</code>) <ref name=usr-local-etc-torbrowser-dot-d>
+{{q_project_name}} users note: In App Qube (<code>{{project name workstation template}}</code>) could also use file <code>/usr/local/etc/torbrowser.d/50_user.conf</code> instead.
+
+{{Box|text=
+'''1.''' Create folder <code>/usr/local/etc/torbrowser.d</code>.
+
+{{CodeSelect|code=
+mkdir -p /usr/local/etc/torbrowser.d
+}}
+
+'''2.''' {{Open with root rights|filename=
+/usr/local/etc/torbrowser.d/50_user.conf
+}}
+}}
+</ref>
+
+'''2.''' {{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''3.''' Paste. <ref>
+<code>TB_NO_TOR_CON_CHECK=1</code> needs to be set because there is no filtered Tor ControlPort access when {{project_name_long}} tunnel firewall is enabled, which would break tb-updater's Tor connectivity check.
+</ref> <ref>
+By tb-updater default, if unset, variable <code>CURL_PROXY</code> will be dynamically set to a Tor SocksPort on {{project_name_gateway_long}}. For example to <code>CURL_PROXY="--proxy socks5h://user:password@10.137.6.1:9115"</code>.
+<br />
+By utilizing a curl parameter we are using anyhow -- <code>CURL_PROXY="--fail"</code> -- the environment variable can be disabled even if it is technically still set. This will result in downloading via the system's default networking.
+</ref>
+
+{{CodeSelect|code=
+TB_NO_TOR_CON_CHECK=1
+CURL_PROXY="--fail"
+}}
+
+'''4.''' Save and exit.
+
+'''5.''' Done.
+
+Proxy settings have been removed from Tor Browser Downloader by {{project_name_long}}.
+}}
+
+For some applications, this is impossible:
+
+* [[sdwdate]]
+* [[OnionShare|OnionShare]]
+* [[Chat#Ricochet_IM|Ricochet IM]]
+
+These applications can only talk to Tor [[Onion Services]] directly and cannot be configured to use the system default. Therefore you can only deactivate sdwdate and/or not use applications like OnionShare and Ricochet IM.
+}}

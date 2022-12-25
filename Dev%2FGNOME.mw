@@ -1,0 +1,39 @@
+{{Header}}
+{{#seo:
+|description=Development Notes about GNOME
+}}
+
+<u>'''Development''' notes about GNOME</u>
+
+'''For user documentation, see [[Other Desktop Environments]] instead!'''
+
+Users, non-developers, should ignore this page.
+
+= Proxy Settings =
+
+Setting GNOME 3 application wide proxy for improved [[Stream Isolation]] so far failed. Some notes.
+
+<pre>
+## install tools
+apt install gconf2
+
+## sources:
+## https://developer.gnome.org/ProxyConfiguration/
+
+## gsettings as root
+## thanks to https://stackoverflow.com/questions/10374520/gsettings-with-cron
+## not sure if using gsettings as root means system wide here
+sessionfile=`find "${HOME}/.dbus/session-bus/" -type f`
+export `grep "DBUS_SESSION_BUS_ADDRESS" "${sessionfile}" | sed '/^#/d'`
+
+## list proxy settings
+gsettings list-recursively org.gnome.system.proxy
+
+## set socks proxy settings
+gsettings set org.gnome.system.proxy.socks host "10.152.152.10"
+gsettings set org.gnome.system.proxy.socks port "9159"
+</pre>
+
+{{Footer}}
+
+[[Category:Development]]

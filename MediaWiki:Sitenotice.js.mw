@@ -1,0 +1,37 @@
+/*
+JS enhancements, events etc for Widget:Sitenotice
+See detailed documentation in Dev/mediawiki
+*/
+
+(function () {
+
+	// Setup
+
+	let closeWrapper = $('#siteNotice .mw-dismissable-notice-close');
+	let close = closeWrapper.children('a');
+
+	// Add title
+	close.attr('title','Hide this notice for me');
+
+	// Replace with Icon
+	close.html('<i class="fas fa-times"></i>');
+
+	// remove brackets []
+	closeWrapper.contents().filter(function() {
+		return this.nodeType == 3; //Node.TEXT_NODE
+	}).remove();
+
+	// show closeWrapper
+	closeWrapper.css('display','block');
+	// Fixes Extension:DismissableSitenotice (see Dev/mediawiki)
+	if( $.cookie( 'dismissSiteNotice' ) !== mw.config.get( 'wgSiteNoticeId' ) ) {
+		$('#siteNotice').addClass('show-notice');
+	} else {
+		$('#siteNotice').addClass('hide-notice');
+	}
+	
+})();
+
+/*
+[[Category:MultiWiki]]
+*/

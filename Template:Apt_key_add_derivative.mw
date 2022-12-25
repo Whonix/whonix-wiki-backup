@@ -1,0 +1,55 @@
+{{Box|text=
+[[Secure_Downloads|Securely download]] the key.
+
+{{Box|text=
+<u>'''If''' you are using {{project_name_workstation_long}}</u> (<code>{{project_name_workstation_vm}}</code>), run.
+
+{{CodeSelect|code=
+{{{download_command}}}
+}}
+
+<u>'''If''' you are using a Qubes Template</u> (<code>{{project_name_workstation_template}}</code>), run. <ref>
+Using Qubes UpdatesProxy (<code>--proxy http://127.0.0.1:8082/</code>) because Qubes Templates are non-networked by Qubes default and therefore require UpdatesProxy for connectivity. (APT in Qubes Templates is configured to use UpdatesProxy by Qubes default.)
+</ref> <ref>
+Even more secure would be to download the key [[Qubes/Disposables|Disposable]] and then [https://www.qubes-os.org/doc/how-to-copy-and-move-files/ <code>qvm-copy</code>] it to the Qubes Template because this would avoid <code>curl</code>'s attack surface but this would also result in even more complicated instructions.
+</ref>
+
+{{CodeSelect|code=
+{{{download_command_qubes_templatevm}}}
+}}
+}}
+
+Display the key's fingerprint. <ref>
+Even more secure would be to display the key in another Disposable because this would protect the Template from <code>curl</code>'s and <code>gpg</code>'s attack surface but this would also result in even more complicated instructions.
+</ref>
+
+{{CodeSelect|code=
+gpg --keyid-format long --import --import-options show-only --with-fingerprint {{{source_filename}}}
+}}
+
+Verify the output.
+
+{{always verify signatures reminder}}
+
+The most important check is confirming the key fingerprint <u>exactly</u> matches the output below. <ref>
+Minor changes in the output such as new uids (email addresses) or newer expiration dates are inconsequential.
+</ref>
+
+<blockquote>{{{gpg_fingerprint}}}</blockquote>
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:'''
+
+Do not continue if the fingerprint does not match -- this risks using infected or erroneous files! The whole point of verification is to confirm file integrity.
+}}
+
+Copy the signing key to the APT keyring folder. <ref>
+https://forums.whonix.org/t/apt-repository-signing-keys-per-apt-sources-list-signed-by/12302
+</ref>
+
+{{CodeSelect|code=
+sudo cp {{{source_filename}}} {{{target_filename}}}
+}}
+}}

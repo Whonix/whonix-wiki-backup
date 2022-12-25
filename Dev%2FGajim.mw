@@ -1,0 +1,63 @@
+{{Header}}
+{{#seo:
+|description=Gajim - TODO for installing Gajim by default in {{project_name_long}}
+}}
+
+= TODO =
+
+* Gajim might intelligently set a Tor socks user name per account already. Do we still manually specify a user/password?
+** Gajim developers said they don't intelligently set a Tor socks user name per account. https://dev.gajim.org/gajim/gajim/issues/9213
+
+* security
+** (3) TODO: create an AppArmor profile
+* does it have any [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#protocol-leaks protocol leaks]?
+** (4) TODO: check Gajim's built-in XML console
+* how to pre-configure Gajim with all these settings by default as a linux distribution?
+** (5) TODO: feature request for .d config folder support - https://dev.gajim.org/gajim/gajim/issues/9214
+
+* feature request: Forcing OMEMO out of the box
+** https://dev.gajim.org/gajim/gajim/issues/9215
+
+= Resolved =
+
+Was a blocker:
+
+* Despite the proxy setting, it routes DNS requests use system default networking, thus end up in Tor's {{Code2|TransPort}}, thereby DNS is not [[Stream Isolation|stream isolated]].
+** Won't be fixed. Python limitation.
+** https://dev.gajim.org/gajim/gajim/issues/8538
+** Violates [[Dev/Default_Application_Policy|{{project_name_long}} Default Application Policy]].
+*** https://forums.whonix.org/t/gajim-messenger/708/7
+*** https://forums.whonix.org/t/should-strict-stream-isolation-by-a-requirement-in-whonixs-default-appliation-policy
+* --> Strict stream isolation removed from {{project_name_long}} Default Application Policy.
+
+= Done =
+
+* Are uploads by gajim-httpupload encrypted using gajim-omemo?
+** Developer responded: "yes if you have activated OMEMO, httpupload will always encrypt the file, in fact you can not send a unencrypted file with OMEMO activated even if you wanted."
+
+* Plugin installer is only using https for verification which is weaker than gpg which is used by APT which is usually used to install software. <ref>
+https://tails.boum.org/blueprint/replace_Pidgin/
+</ref>  <ref>
+https://gitlab.tails.boum.org/tails/tails/-/issues/7868
+</ref>
+** We can nuke the plugin installer. [https://github.com/{{project_name_short}}/anon-apps-config anon-apps-config] which is installed by default will [https://github.com/{{project_name_short}}/anon-apps-config/blob/master/debian/anon-apps-config.hide deactivate gajim plugin installer / updater] because it's not secure. Using <code>config-package-dev</code> <code>displace</code>.
+** (2) Debian feature request to ship the gajim plugin-installer plugin in a separate Debian package. <ref>https://bugs.debian.org/902237</ref>
+
+= Discussion =
+
+* some answers here: https://dev.gajim.org/gajim/gajim/issues/8651
+
+* gajim {{project_name_long}} integration development discussion: https://forums.whonix.org/t/gajim-messenger
+
+* it would take a lot patches to ensure that OMEMO encryption is always used, but on the other hand, because it is written in Python, Gajim is very easy to patch.
+
+* Gajim can keep its account username and passwords in
+[https://www.kicksecure.com/wiki/Keepassxc KeepassXc]
+using LibSecret integration. If we look at end-to-end security, and worry about the weakest links, then integration of IM with a password-manager should be a high priority.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Development]]

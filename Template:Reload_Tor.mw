@@ -1,0 +1,53 @@
+Reload Tor.
+
+{{Box|text=
+After changing Tor configuration, Tor must be reloaded for changes to take effect.
+
+'''Note:''' If Tor does not connect after completing all these steps, then a user mistake is the most likely explanation. Recheck <code>/usr/local/etc/torrc.d/50_user.conf</code> and repeat the steps outlined in the sections above. If Tor then connects successfully, all the necessary changes have been made.
+
+<u>If you are using [[Qubes|{{q_project_name}}]]</u>, complete the following steps.
+
+<code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>{{project_name_gateway_long}} ProxyVM (commonly named '{{project_name_gateway_vm}}')</code> &rarr; <code>Reload Tor</code>
+
+<u>If you are using a graphical {{project_name_gateway_long}}</u>, complete the following steps.
+
+<code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>Settings</code> &rarr; <code>Reload Tor
+</code>
+
+<u>If you are using a terminal-only {{project_name_gateway_long}}</u>, click
+<span class="mw-customtoggle-myDivision"><code><u>HERE</u></code></span> for instructions.
+<div id="mw-customcollapsible-myDivision" class="mw-collapsible mw-collapsed">
+Complete the following steps.
+
+Reload Tor.
+
+{{CodeSelect|code=
+sudo service tor@default reload
+}}
+
+Check Tor's daemon status.
+
+{{CodeSelect|code=
+sudo service tor@default status
+}}
+
+It should include a a message saying.
+
+<pre>
+Active: active (running) since ...
+</pre>
+
+In case of issues, try the following debugging steps.
+
+Check Tor's config.
+
+{{CodeSelect|code=
+sudo -u debian-tor tor --verify-config
+}}
+
+The output should be similar to the following.
+
+<pre>Sep 17 17:40:41.416 [notice] Read configuration file "/usr/local/etc/torrc.d/50_user.conf".
+Configuration was valid</pre>
+</div>
+}}

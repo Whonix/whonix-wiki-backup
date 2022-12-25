@@ -1,0 +1,143 @@
+{{Header}}
+{{#seo:
+|description=Using Vidalia with {{project_name_long}}
+}}
+
+= Introduction =
+
+'''Not recommended.'''<ref>Why? See [[Tor_Controller#Vidalia_recommended_against|here]].</ref> <br />
+'''Advanced users only!''' <br />
+Better use Arm. See [[Tor Controller]].
+
+You have two possibility to get Vidalia. <br />
+1) Vidalia on the {{project_name_gateway_long}}. <br />
+2) Vidalia on the Host. <br />
+Each option's pros and cons are documented below.
+
+= 1. Vidalia on the {{project_name_gateway_long}} =
+You need to boot into a graphical user environment, see also [[Desktop#RAM_Adjusted_Desktop_Starter|RAM Adjusted Desktop Starter]]. Essentially, you need to assign at least 512 MB RAM to {{project_name_gateway_long}}, 768 MB RAM for better performance. The latter is the default setting.
+
+Install Vidalia.
+
+<pre>
+sudo apt update
+sudo apt install vidalia
+</pre>
+
+You'll be asked to add user {{Code2|clearnet}} to the debian-tor group, don't do this, as it is unnecessary. To get out of the debconf dialog, just press Tab followed by Enter. Probably no harm done if you mess(ed) that up and added the {{Code2|clearnet}} user.
+
+You can then start Vidalia from the start menu, {{Code2|Start Menu &rarr; Applications Internet &rarr; Tor GUI}} or from Terminal (Konsole) by starting {{Code|vidalia}}.
+
+= 2. Vidalia on the Host =
+'''Untested since {{project_name_long}} 6 and above!'''
+
+Ok, this is an ugly hack, but it works. Vidalia can be installed on the host, in this example on a Windows host but you can most likely do it also on a Linux host. We have to "trick" Vidalia because Vidalia insists on starting Tor itself, which is already running on {{project_name_workstation_long}}.
+
+You will be able to stop Tor using Vidalia, but not be able to start it again. Restarting Tor has to be done manually in {{project_name_gateway_long}} (or by ssh). "Start proxy application when Tor starts" will probably work (untested) but it will start it on the host and not on the {{project_name_gateway_long}}. What also won't work are all settings which modify torrc, because our torrc will be just a dummy one and the real torrc is inside the {{project_name_gateway_long}}. All settings in the settings, network tab won't work. Neither the "Sharing/Setup Relaying" tab will work (there will be instructions how to do it manually in torrc for the {{project_name_gateway_long}}). Services tab will also not work, this is covered above under [[Onion Services]]. The "Start Tor" button will actually not start Tor, but connect to the Control Port inside the {{project_name_gateway_long}}. "View the network", "Use a New Identity" and "Message Log" should be functional.
+
+(0) You need to ensure yourself, that port 9051 is firewalled on your host. It must not be accessible from the internet.
+
+(1) Create a folder Vidalia somewhere you like it. Ensure that your current user account has the necessary rights read, create, modify.
+
+(2) Grab some dummy exe, for example cmd.exe from C:\Windows\System32\cmd.exe and copy it to your new Vidalia folder.
+
+(3) Login as root sudo su. Go to your {{project_name_gateway_long}} and type in console.
+
+<pre>
+tor --hash-password password
+</pre>
+
+This will result in something like
+
+<pre>
+16:E61CFDC2FF3FDCDE605D8EDC3631F268B554612B0721E99F95588282B5
+
+## copy it into the clipboard.
+</pre>
+
+(4) Open your {{Code2|/usr/local/etc/torrc.d/50_user.conf}}.
+
+<pre>
+sudoedit /usr/local/etc/torrc.d/50_user.conf
+</pre>
+
+And add.
+
+<pre>
+ControlPort 9051
+ControlListenAddress 10.0.2.15:9051
+HashedControlPassword 16:E61CFDC2FF3FDCDE605D8EDC3631F268B554612B0721E99F95588282B5
+</pre>
+
+(5) nano {{W_Firewall}} and look out for the following
+
+<pre>
+## Allow incoming SSH connections on the external interface
+iptables -A INPUT -i $EXT_IF -p tcp --dport 22 -j ACCEPT
+</pre>
+
+and add additionally the following below
+
+<pre>
+## Allow incomming Tor ControlPort connections on the external interface
+iptables -A INPUT -i $EXT_IF -p tcp --dport 9051 -j ACCEPT
+</pre>
+
+(6) Then go to your host and create a file named control_auth_cookie inside your Vidalia folder. Insert the password only, this example we used "password". Choose your secure password. control_auth_cookie has no file extension, be sure that Windows will normally show you file extensions (like .exe, .pdf...), otherwise you will be probably unable to create a file without extension.
+
+(7) We need a start file, otherwise Vidalia will use the default documents and settings folder. Call it vidalia.bat and create it inside your Vidalia folder. The content of vidalia.bat must be
+
+<pre>
+start do_not_start.exe --datadir .\\
+</pre>
+
+(8) And of course you will be needing the Vidalia binaries. Download the Tor Browser Bundle for your platform. Go to *\Tor Browser\App* and copy the following files into your Vidalia directory.
+
+<pre>
+libeay32.dll
+libgcc_s_dw2-1.dll
+libgnurx-0.dll
+mingwm10.dll
+QtCore4.dll
+QtGui4.dll
+QtNetwork4.dll
+QtXml4.dll
+ssleay32.dll
+vidalia.exe
+</pre>
+
+tor.exe and tor-resolv.exe will not be needed (we have our own dummy tor.exe).
+
+(9) Rename vidalia.exe to do_not_start.exe.
+
+(10) Create a file called vidalia.conf inside your Vidalia directory. The content must be
+
+<pre>
+[Tor]
+TorExecutable=.\\tor.exe
+Torrc=.\\torrc
+DataDirectory=.\\
+UseRandomPassword=false
+ControlPassword=password
+Changed=true
+ControlPort=9052
+ControlAddr=127.0.0.1
+</pre>
+
+(11) Create a file torrc inside your Vidalia directory, leave it empty, it is just another dummy file for Vidalia's fate.
+
+(12) In the {{project_name_gateway_long}} VM network settings. Set up Port Forwarding: within the "Adapter 1" tab click "Advanced", then Port Forwarding. Insert a new rule as follows: Name: Vidalia; Protocol: TCP; Host IP: 127.0.0.1; Host Port: 9052; Guest IP: leave blank; Guest Port: 9051
+
+(13) That's it. From now you can vidalia.bat. For your convinience create a shortcut of vidalia.bat on your desktop.
+
+Optional, for debugging if you have problems.
+
+* We test if the IP/Port is reachable from the host. <code>telnet 10.152.152.10 9051</code>, press enter should say "514 Authentication required."
+* [https://trac-vidalia.torproject.org/projects/vidalia/wiki/FAQ Vidalia FAQ]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

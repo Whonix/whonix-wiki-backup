@@ -1,0 +1,404 @@
+{{Header}}
+{{Title|title=
+Outdated, Deprecated, Archived {{project_name_long}} Documentation.
+}}
+{{#seo:
+|description=Most users can safely ignore this page.
+|image=Deprec.jpg
+}}
+[[image:Deprec.jpg|thumb]]
+__NOINDEX__
+= ip-check.info =
+Update: The original https://ip-check.info has a new owner and much less anonymity test functionality since JonDonym is shutting down.
+
+https://ip-check.info -- This site is associated with the [[JonDonym]] anonymizing software and includes common fingerprinting vectors such as IP address, cookies, user agent, browser window dimensions, fonts and so on.
+
+In past forum discussions, users were confused by some false values that were reported by the test; see footnote. <ref>[https://web.archive.org/web/20210125110454/https://anonymous-proxy-servers.net/forum/viewtopic.php?f=10&t=7319 ip-check.info some false values and confuses TBB users]. ([https://archive.ph/aVliQ w])</ref> Complete faith cannot be placed in the browser test, since ip-check.info is not free/Libre/open source software ([https://anonymous-proxy-servers.net/forum/viewtopic.php?f=10&t=8191 source]), which means it is unlikely others can fix the test code. Further, since the test service is hosted by an alternative anonymizing network ([https://anonymous-proxy-servers.net JonDonym]) with an associated [https://anonymous-proxy-servers.net/en/jondofox.html JonDoFox] anonymous browser  -- a potential alternative to Tor / Tor Browser -- it is impossible to rule out biased results related to financial incentives (premium accounts).
+
+'''Figure:''' ''ip-check.info Test in {{project_name_long}}''
+
+[[Image:Ipcheckinfo.png|border]]
+
+= One VM {{project_name_long}} Configuration =
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' The one VM {{project_name_long}} configuration has been deprecated because there is no contributor. Use at your own risk!
+}}
+
+This platform was developed and tested successfully for {{project_name_long}} v0.1.3.
+
+Basically, it is possible to use one VM instead of two, with Tor running on the host OS and a single client VM routing activities via Tor. This configuration has several advantages and disadvantages relating to security and other matters. For further information, see [[OneVM]].
+
+= lightdm =
+<ref>
+Example debug log
+
+<pre>
+sudo journalctl -b -u lightdm -o cat
+Condition check resulted in Light Display Manager being skipped.
+Starting Light Display Manager...
+[+0.00s] DEBUG: Logging to /var/log/lightdm/lightdm.log
+[+0.00s] DEBUG: Starting Light Display Manager 1.26.0, UID=0 PID=933
+[+0.00s] DEBUG: Loading configuration dirs from /usr/share/lightdm/lightdm.conf.d
+[+0.00s] DEBUG: Loading configuration from /usr/share/lightdm/lightdm.conf.d/01_debian.conf
+[+0.00s] DEBUG: Loading configuration dirs from /usr/local/share/lightdm/lightdm.conf.d
+[+0.00s] DEBUG: Loading configuration dirs from /etc/xdg/lightdm/lightdm.conf.d
+[+0.00s] DEBUG: Loading configuration from /etc/lightdm/lightdm.conf.d/autologin.conf
+[+0.00s] DEBUG: Loading configuration from /etc/lightdm/lightdm.conf.d/whonix-autologin.conf
+[+0.00s] DEBUG:   [SeatDefaults] is now called [Seat:*], please update this configuration
+[+0.00s] DEBUG: Loading configuration from /etc/lightdm/lightdm.conf
+[+0.00s] DEBUG: Registered seat module local
+[+0.00s] DEBUG: Registered seat module xremote
+[+0.00s] DEBUG: Registered seat module unity
+[+0.00s] DEBUG: Using D-Bus name org.freedesktop.DisplayManager
+[+0.01s] DEBUG: Monitoring logind for seats
+[+0.01s] DEBUG: New seat added from logind: seat0
+[+0.01s] DEBUG: Seat seat0: Loading properties from config section Seat:*
+[+0.01s] DEBUG: Seat seat0: Starting
+[+0.01s] DEBUG: Seat seat0: Creating user session
+[+0.01s] WARNING: Error getting user list from org.freedesktop.Accounts: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.Accounts was not provided by any .ser
+[+0.01s] DEBUG: Loading user config from /etc/lightdm/users.conf
+[+0.01s] DEBUG: User user added
+[+0.01s] DEBUG: Seat seat0: Creating display server of type x
+[+0.01s] DEBUG: posix_spawn avoided (fd close requested)
+[+0.02s] DEBUG: Could not run plymouth --ping: Failed to execute child process ?plymouth? (No such file or directory)
+[+0.02s] DEBUG: Using VT 7
+[+0.02s] DEBUG: Seat seat0: Starting local X display on VT 7
+[+0.02s] DEBUG: XServer 0: Logging to /var/log/lightdm/x-0.log
+[+0.02s] DEBUG: XServer 0: Writing X server authority to /var/run/lightdm/root/:0
+[+0.02s] DEBUG: XServer 0: Launching X Server
+[+0.02s] DEBUG: Launching process 941: /usr/bin/X :0 -seat seat0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch
+[+0.02s] DEBUG: XServer 0: Waiting for ready signal from X server :0
+[+0.02s] DEBUG: Acquired bus name org.freedesktop.DisplayManager
+[+0.02s] DEBUG: Registering seat with bus path /org/freedesktop/DisplayManager/Seat0
+Started Light Display Manager.
+[+0.98s] DEBUG: Got signal 10 from process 941
+[+0.98s] DEBUG: XServer 0: Got signal from X server :0
+[+0.98s] DEBUG: XServer 0: Connecting to XServer :0
+[+0.99s] DEBUG: posix_spawn avoided (fd close requested) (child_setup specified)
+[+0.99s] DEBUG: Seat seat0: Display server ready, starting session authentication
+[+0.99s] DEBUG: Session pid=970: Started with service 'lightdm-autologin', username 'user'
+Error getting user list from org.freedesktop.Accounts: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.Accounts was not provided by any .service files
+[+1.01s] DEBUG: Session pid=970: Authentication complete with return value 0: Success
+[+1.01s] DEBUG: Seat seat0: Session authenticated, running command
+[+1.01s] DEBUG: Registering session with bus path /org/freedesktop/DisplayManager/Session0
+[+1.01s] DEBUG: posix_spawn avoided (fd close requested) (child_setup specified)
+[+1.02s] DEBUG: Session pid=970: Running command /etc/X11/Xsession startxfce4
+[+1.02s] DEBUG: Creating shared data directory /var/lib/lightdm/data/user
+[+1.02s] DEBUG: Session pid=970: Logging to .xsession-errors
+pam_unix(lightdm-autologin:session): session opened for user user by (uid=0)
+pam_exec(lightdm-autologin:session): Calling /usr/libexec/security-misc/permission-lockdown ...
+[+1.23s] DEBUG: Activating VT 7
+[+1.23s] DEBUG: Activating login1 session 1
+[+1.23s] DEBUG: Seat seat0 changes active session to 1
+[+1.23s] DEBUG: Session 1 is already active
+[+839.74s] DEBUG: Seat seat0 changes active session to
+[+842.35s] DEBUG: Seat seat0 changes active session to 3
+[+852.02s] DEBUG: Got signal 15 from process 1
+[+852.02s] DEBUG: Caught Terminated signal, shutting down
+[+852.02s] DEBUG: Stopping display manager
+[+852.02s] DEBUG: Seat seat0: Stopping
+[+852.02s] DEBUG: Seat seat0: Stopping display server
+[+852.02s] DEBUG: Sending signal 15 to process 941
+[+852.02s] DEBUG: Seat seat0: Stopping session
+[+852.02s] DEBUG: Terminating login1 session 1
+Stopping Light Display Manager...
+[+852.05s] DEBUG: Session pid=970: Sending SIGTERM
+[+852.05s] DEBUG: Session pid=970: Exited with return value 0
+[+852.05s] DEBUG: Seat seat0: Session stopped
+[+852.05s] DEBUG: Process 941 exited with return value 0
+[+852.05s] DEBUG: XServer 0: X server stopped
+[+852.05s] DEBUG: Releasing VT 7
+[+852.05s] DEBUG: XServer 0: Removing X server authority /var/run/lightdm/root/:0
+[+852.05s] DEBUG: Seat seat0: Display server stopped
+[+852.05s] DEBUG: Seat seat0: Stopped
+[+852.05s] DEBUG: Display manager stopped
+[+852.05s] DEBUG: Stopping daemon
+[+852.05s] DEBUG: Exiting with return value 0
+lightdm.service: Succeeded.
+Stopped Light Display Manager.
+</pre>
+</ref>
+
+=== Debugging lightdm ===
+==== Configure systemd to start lightdm in debug mode ====
+{{Box|text=
+'''1.''' Make sure folder <code>/lib/systemd/system/lightdm.service.d</code> exists.
+
+{{CodeSelect|code=
+sudo mkdir -p /lib/systemd/system/lightdm.service.d
+}}
+
+'''2.''' Create a file <code>/lib/systemd/system/lightdm.service.d/40_debug-misc.conf</code>. <ref>
+{{CodeSelect|code=
+echo "
+[Service]
+ExecStart=
+ExecStart=/usr/sbin/lightdm --debug
+" {{!}} sudo tee /lib/systemd/system/lightdm.service.d/40_debug-misc.conf
+}}
+</ref>
+
+'''3.''' {{Open with root rights|filename=
+/lib/systemd/system/lightdm.service.d/40_debug-misc.conf
+}}
+
+'''4.''' Paste the following contents. <ref>
+<code>ExecStart=</code> is required to clear the original <code>ExecStart=</code> so it can be overwritten by <code>ExecStart=/usr/sbin/lightdm --debug</code>.
+</ref>
+
+{{CodeSelect|code=
+[Service]
+ExecStart=
+ExecStart=/usr/sbin/lightdm --debug
+}}
+
+Save.
+}}
+==== Debug ====
+Use [[#lightdm restart method|lightdm restart method]] or [[#reboot method|reboot method]].
+
+===== lightdm restart method =====
+{{Box|text=
+'''1.''' Switch to another [[Desktop#Virtual_Consoles|virtual console]].
+
+'''2.''' Stop lightdm.
+
+{{CodeSelect|code=
+sudo systemctl stop lightdm
+}}
+
+'''3.''' Restart lightdm.
+
+{{CodeSelect|code=
+sudo systemctl restart lightdm
+}}
+
+'''4.''' Check lightdm log.
+
+[[#Check Systemd Journal Log of Current Boot|Check Systemd Journal Log of Current Boot]] for lightdm.
+
+For convenient reading of the log, it can be dumped to file. For example, the following command would write the log to file <code>~/lightdm-log</code>.
+
+{{CodeSelect|code=
+sudo journalctl -b -u lightdm > ~/lightdm-log
+}}
+}}
+
+===== reboot method =====
+
+Alternatively it is possible to reboot, but first you need to [[#Enable Persistent Systemd Journal Log|Enable Persistent Systemd Journal Log]].
+
+[[#Check Systemd Journal Log of Previous Boot|Check Systemd Journal Log of Previous Boot]]
+
+{{CodeSelect|code=
+sudo journalctl -b -1 -u lightdm
+}}
+
+= httpsdnsd by JonDos =
+==== Introduction ====
+Source: [https://anonymous-proxy-servers.net/en/help/transocks.html anonymous-proxy-servers.net] and also use it as a more verbose tutorial, but keep in mind that their tutorial is JonDonym specific, while this tutorial is Tor specific.
+
+These instructions have not been tested for years. There might be no reasons to use these instructions. Above DNSCrypt might do everything that is required.
+
+==== Installation ====
+Everything inside your {{project_name_workstation_long}}.
+
+Install dependencies.
+
+{{CodeSelect|code=
+sudo apt install libnet-ssleay-perl libnet-server-perl libnet-dns-perl libxml-simple-perl liblog-log4perl-perl
+}}
+
+Download httpsdnsd. (See source above in case download link changed.)
+
+{{scurl|
+https://anonymous-proxy-servers.net/downloads/httpsdnsd.tar.bz2
+}}
+
+Unpack.
+
+<pre>.    </pre>
+
+Go into the httpsdnsd folder.
+
+{{CodeSelect|code=
+cd httpsdnsd
+}}
+
+Install httpsdnsd. <ref>It contains also a uninstall.sh, if you want to uninstall it later.</ref>
+
+{{CodeSelect|code=
+sudo install.sh
+}}
+
+Add a new user for httpsdnsd.
+
+{{CodeSelect|code=
+sudo adduser --system --disabled-password --group httpsdns_daemon
+}}
+
+Editing /etc/resolv.conf is not required. (You still could out comment everything against DNS leaks.)
+
+Create a firewall script.
+
+{{CodeSelect|code=
+nano dns-fw.sh
+}}
+
+Insert these firewall rules.
+
+{{CodeSelect|code=
+# Flush old rules
+iptables -F
+iptables -t nat -F
+iptables -X
+
+# Redirect DNS traffic to httpdnsd.
+iptables -t nat -A OUTPUT -p udp -m owner --uid-owner anonuser --dport 53 -j REDIRECT --to-ports 4053
+
+# Accept connections to the httpdnsd.
+iptables -t filter -A OUTPUT -p udp -m owner --uid-owner anonuser --dport 4053 -j ACCEPT
+
+# Reject all other traffic for anonuser.
+iptables -t filter -A OUTPUT ! -o lo -m owner --uid-owner anonuser -j REJECT
+}}
+
+Install Privoxy. <ref>[https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorBOX/OptionalConfigurations?version=95#httpsdnsdbyJonDos torproject.org Wiki Version 95] of this site contains a working example using Polipo. Changed later to Privoxy, because Privoxy can be useful for other tasks as well. (Incoming: TransPort, http proxy; forwarding: http and socks.)</ref>
+
+{{CodeSelect|code=
+sudo apt install privoxy
+}}
+
+Open the privoxy configuration file.
+
+{{CodeSelect|code=
+nano /etc/privoxy/config
+}}
+
+Add the following to your privoxy configuration file.
+
+{{CodeSelect|code=
+# Theoretically you can tunnel through any
+# http or socks proxy. Local or remote proxy.
+# Inside {{project_name_workstation_long}}, due to design,
+# everything will be tunneled through Tor first.
+
+# Using Tor's socks5 proxy, running on {{project_name_gateway_long}}.
+# Change the port, see above...
+forward-socks5 / 10.152.152.10:9112 .
+
+# Another example using a http proxy.
+# (In this case, JonDo running on localhost.)
+# forward / 127.0.0.1:4001
+}}
+
+Restart privoxy to enable the changes.
+
+{{CodeSelect|code=
+sudo /etc/init.d/privoxy restart
+}}
+
+Privoxy is now listening on 127.0.0.1:8118. <ref>For debugging you can enter this IP/port into Tor Browser as http proxy and try if you can still reach check.torproject.org. Deactivate after testing.</ref>
+
+==== Starting ====
+
+Run httpsdnsd. <ref>For debugging, kill httpsdnsd and drop the ''--runasdaemon''.</ref> <ref>Run ''httpsdnsd --help'' or ''man httpsdnsd'' for help.</ref> <ref>Httpsdnsd will by default listen on localhost port 4053 for DNS queries.</ref> <ref>''--https_proxy_port=8118'' will redirect traffic to port 8118, where Privoxy is listening. This is necessary because Tor offers a socks proxy and httpsdnsd requires a http proxy. Privoxy translates from http to socks.</ref>
+
+{{CodeSelect|code=
+sudo httpsdnsd --https_proxy_port=8118 --runasdaemon
+}}
+
+Activate the firewall. Shouldn't show any errors.
+
+{{CodeSelect|code=
+sudo ./dns-fw.sh
+}}
+
+==== Using ====
+
+Open a console and switch to anonuser.
+
+{{CodeSelect|code=
+su anonuser
+}}
+
+Resolve DNS.
+
+{{CodeSelect|code=
+nslookup check.torproject.org
+}}
+
+
+= History =
+Cleared this wiki page. Still available in wiki history:
+
+https://www.whonix.org/w/index.php?title=Deprecated&oldid=69089
+
+Reason:
+
+https://forums.whonix.org/t/long-wiki-edits-thread/3477/2158
+
+== <code>monero-wallet-ws</code> VM Setup ==
+'''Data vchan connection failed''' anon-ws-disable-stacked-tor socat-unix-sockets runs under user debian-tor but would need to run as root for this.
+
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>monero-wallet-ws</code>).
+
+'''1.''' Create folder <code>/usr/local/lib/systemd/system/</code>.
+
+{{CodeSelect|code=
+sudo mkdir -p /usr/local/etc/anon-ws-disable-stacked-tor.d/
+}}
+
+'''2.''' Create file <code>/usr/local/etc/anon-ws-disable-stacked-tor.d/50_user.conf</code>.
+
+{{Open File|
+filename=/usr/local/etc/anon-ws-disable-stacked-tor.d/50_user.conf
+}}
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+socat TCP-LISTEN:18081,fork,bind=127.0.0.1 EXEC:"qrexec-client-vm monerod-ws user.monerod" &
+}}
+
+'''4.''' Save.
+
+'''5.''' Restart <code>[[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]]</code> systemd system instance.
+
+{{CodeSelect|code=
+sudo systemctl restart anon-ws-disable-stacked-tor
+}}
+
+'''6.''' Done.
+
+Automatically starting the <code>socat</code> process has been completed.
+
+= Xfce Disable Autologin =
+For lightdm display manager.
+
+Not very useful inside VMs, see also [[Protection_Against_Physical_Attacks#Login_Screen|Login Screen]].
+
+<ref name=legacy>
+
+legacy
+</ref>
+{{CodeSelect|code=
+sudo rm -f /etc/lightdm/lightdm.conf.d/whonix.conf
+}}
+
+<ref name=legacy />
+
+{{CodeSelect|code=
+sudo rm -f /etc/lightdm/lightdm.conf.d/whonix-autologin.conf
+}}
+
+<ref>
+* [https://github.com/Kicksecure/vm-config-dist vm-config-dist]
+* https://github.com/Kicksecure/vm-config-dist/-/blob/master/etc/lightdm/lightdm.conf.d/30_autologin.conf
+</ref>
+
+{{CodeSelect|code=
+sudo rm -f /etc/lightdm/lightdm.conf.d/30_autologin.conf
+}}

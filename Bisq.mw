@@ -1,0 +1,212 @@
+{{Title|title=Bisq: The P2P Exchange Network}}
+{{Header}}
+{{#seo:
+|description=How to use Bisq - The P2P Exchange Network - in {{project_name_long}}
+|image=Bisq123123.jpg
+}}
+__FORCETOC__
+[[image:Bisqlogo.png|Bisq Logo|thumb]]
+
+= Introduction =
+
+Bisq is an open-source, peer-to-peer (P2P) application that went into production on 19 April, 2016. Bisq is designed to allow for a safe, private and decentralized method of exchanging national currencies for cryptocurrencies. Primary features include: <ref>https://github.com/bisq-network/bisq</ref> <ref>https://bisq.network/</ref> <ref>https://docs.bisq.network/exchange/whitepaper.html#introduction</ref>
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* no registration is required - identity theft is impossible
+* fully decentralized and censorship resistant design:
+** multi-signature escrow transactions without a third party
+** security deposits encourage safe, successful trades <ref>A current limit of at most 1 Bitcoin per transaction applies.</ref>
+** resolution of disputes with a decentralized arbitration system
+* protection of user privacy via a custom P2P network of users running Bisq over Tor
+* no data is stored regarding who trades with whom -- end-to-end data encryption ensures trade details are only readable by counterparties
+* no approval wait times
+* resistant against spam or flooding
+* a cross-platform desktop application is available for Linux, macOS and Windows
+* the project is funded directly by its users through trading fees and donations
+</div>
+Bisq holds a lot of promise, since it eliminates the risk associated with theft of funds from centralized exchanges, removes the threat of interference with trades from third parties, and separates users' personal information from associated transactions. To learn more, refer to:
+* the [https://docs.bisq.network/exchange/whitepaper.html original Bisq whitepaper]; and/or
+* [https://docs.bisq.network/dao/phase-zero.html Phase Zero: A plan for bootstrapping the Bisq DAO] for a comprehensive overview of the application.
+
+= Installation =
+
+{{onion-grater-warning}}
+
+== {{project_name_gateway_long}} Installation Steps ==
+=== onion-grater Profile ===
+'''On {{project_name_gateway_long}}.'''
+
+{{Control_Port_Filter_Python_Profile_Add
+|filename_new=40_bisq
+}}
+
+== {{project_name_workstation_long}} Installation Steps ==
+=== Firewall Settings ===
+Modify the {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>) user firewall settings and reload them.
+
+{{Firewall_Settings_Workstation}}
+
+Add. TODO: <code>EXTERNAL_OPEN_ALL=true</code> is non-ideal.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_ALL=true
+}}
+
+Save.
+
+{{Reload_Firewall_ws}}
+
+=== Get the Signing Key ===
+'''On {{project_name_workstation_long}}.'''
+
+{{gpg key
+|url=scurl-download https://github.com/bisq-network/bisq/releases/download/v1.7.4/29CDFD3B.asc
+|source_filename=29CDFD3B.asc
+|fingerprint=CB36D7D2EBB2E35D9B75500BCD5DC1C529CDFD3B
+|gpg_fingerprint_output=
+      Key fingerprint = CB36 D7D2 EBB2 E35D 9B75  500B CD5D C1C5 29CD FD3B
+}}
+
+=== Download ===
+
+'''On {{project_name_workstation_long}}.'''
+
+Check the latest version number and read the release notes [https://github.com/bisq-network/bisq/releases here].
+
+Download bisq.
+
+{{CodeSelect|code=
+scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.1/Bisq-64bit-1.9.1.deb
+}}
+
+Download OpenPGP signature.
+
+{{CodeSelect|code=
+scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.1/Bisq-64bit-1.9.1.deb.asc
+}}
+
+=== Verification ===
+'''On {{project_name_workstation_long}}.'''
+
+Verify OpenPGP signature.
+
+{{CodeSelect|code=
+gpg --verify Bisq*.asc
+}}
+
+{{GnuPG-Success}}
+
+{{GnuPG-Warning}}
+
+=== Tor over Tor Prevention ===
+'''On {{project_name_workstation_long}}.'''
+
+Follow these steps to avoid a Tor over Tor scenario.
+
+Create folder <code>/home/user/.local/share/Bisq/btc_mainnet/tor/</code>.
+
+{{CodeSelect|code=
+mkdir -p /home/user/.local/share/Bisq/btc_mainnet/tor/
+}}
+
+Create a dummy Tor binary <code>/home/user/.local/share/Bisq/btc_mainnet/tor/tor</code>.
+
+{{CodeSelect|code=
+sudo touch /home/user/.local/share/Bisq/btc_mainnet/tor/tor
+}}
+
+=== xdg-desktop-menu Bug Workaround ===
+'''On {{project_name_workstation_long}}.'''
+
+Use the following workaround to avoid a known bug in xdg which fails to find a writable system menu directory. <ref>
+https://github.com/bisq-network/bisq/issues/848
+</ref>
+
+{{CodeSelect|code=
+sudo mkdir -p /usr/share/desktop-directories
+}}
+
+=== Install ===
+
+For '''{{q_project_name}}''' you need create binding dirs in VM:
+
+{{CodeSelect|code=
+sudo mkdir -p /rw/bind-dirs/opt/bisq
+sudo mkdir -p /rw/bind-dirs/usr/share/desktop-directories
+sudo mkdir -p /rw/config/qubes-bind-dirs.d
+}}
+
+Then create the configuration file:
+
+{{CodeSelect|code=
+sudo nano /rw/config/qubes-bind-dirs.d/50_user.conf
+}}
+
+And specify which system folders are mapped to binding dirs — write there two lines and save:
+
+{{CodeSelect|code=
+binds+=( '/opt/bisq' )
+binds+=( '/usr/share/desktop-directories' )
+}}
+
+Restart the qube to apply the binding dir settings.
+
+'''On {{project_name_workstation_long}}.'''
+
+Install Bisq.
+
+{{CodeSelect|code=
+sudo dpkg -i Bisq*.deb
+}}
+
+= Usage =
+'''On {{project_name_workstation_long}}.'''
+
+Start Bisq.
+
+{{CodeSelect|code=
+/opt/bisq/bin/Bisq --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true --daoActivated=false
+}}
+
+'''Figure:''' ''Bisq Launch in {{project_name_long}}''
+
+[[Image:Bisq.png|border]]
+
+'''Figure:''' ''Bisq Client'' <ref>https://docs.bisq.network/getting-started.html</ref>
+
+[[Image:Bisqclient.png|border]]
+
+If you would like to use the [https://docs.bisq.network/user-dao-intro.html#what-is-a-dao DAO], you could drop <code>--daoActivated=false</code>. If you are unfamiliar with DAO, refer to the prior reference before deciding whether it is necessary in your circumstances. When DAO is activated, Bisq will consume a lot more resources, and you will probably need to increase VCPUs/RAM.
+
+If the fonts are too small, you could alternatively use the following command. <ref>
+It is the same as above but prepended with <code>GDK_SCALE=2</code>.
+
+https://github.com/bisq-network/bisq/issues/1425
+</ref>
+
+{{CodeSelect|code=
+GDK_SCALE=2 /opt/bisq/bin/Bisq --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true --daoActivated=false
+}}
+
+Refer to the [https://docs.bisq.network/ official Bisq documentation] to learn about trading essentials, including:
+
+* an introduction to Bisq
+* quick start guide to trading in minutes
+* wallet information and security
+* backup and recovery
+* how to stay private
+* trading rules and dispute resolution
+* fees and security deposits
+* payments methods
+
+= Forum Discussion =
+[https://forums.whonix.org/t/bisq-the-p2p-exchange-network/4953 Bisq - The P2P Exchange Network]
+
+= Donations =
+After installing Bisq, please consider making a [[Donate|donation]] to {{project_name_long}} to keep it running for years to come.
+
+{{Pay_Bitcoin_Specific}}
+
+= Footnotes =
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]

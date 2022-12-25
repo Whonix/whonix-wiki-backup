@@ -1,0 +1,1363 @@
+{{#seo:
+|description={{q_project_name}} development notes.
+}}
+{{Header}}
+
+= Issues =
+== Important Issues ==
+=== Important Networking Issues ===
+* [https://github.com/QubesOS/qubes-issues/issues/3994 change Qubes network policy, UpdatesProxy to network disabled by default for better leak-proofness #3994]
+* [https://github.com/QubesOS/qubes-issues/issues/7614 disallow setting netvm of whonix-ws to a non whonix-gw]
+* [https://github.com/QubesOS/qubes-issues/issues/6948 self-contained Qubes templates including meta scripts (salt) / improve Qubes-Whonix installation usability]
+* Absence of [https://github.com/QubesOS/qubes-issues/issues/3412 add UpdateVM setting to qubes-vm-settings] feature leads to user confusion which VM will be used as UpdateVM.
+* [https://forums.whonix.org/t/qubes-whonix-security-disadvantages-help-wanted/8581 Qubes-Whonix Security Disadvantages]
+* [https://github.com/QubesOS/qubes-issues/issues/1814 sys-net phones home to fedoraproject.org for captive portal detection #1814] - Qubes openQA test missing
+* [https://github.com/QubesOS/qubes-issues/issues/7586 document how to route all traffic over Tor / how to disable Qubes default clearnet traffic #7586]
+* [https://github.com/QubesOS/qubes-issues/issues/7801 Qubes should keep IP forwarding in VMs with the provides network (Net Qube) disabled by default #7801]
+
+=== Important General Issues ===
+* [[Qubes/Update#Warnings|Qubes Updater Issues]], [https://github.com/QubesOS/qubes-issues/labels/C%3A%20updates Qubes Updater Issues], most notably such as:
+** [https://github.com/QubesOS/qubes-issues/issues/7254 qubes-dom0-update shows <code>No updates available</code> in case of network is down / <code>qubes-dom0-update</code> fails to notice if repositories are unreachable / network is down],
+** [https://github.com/QubesOS/qubes-issues/issues/6585 Updating via Salt falsely claims to succeed when it actually fails] and
+** [https://github.com/QubesOS/qubes-issues/issues/6635 Replace built-in Qube Manager update functionality with the Qubes Update tool]
+** [https://github.com/QubesOS/qubes-issues/issues/4792 qubes-dom0-update - dom0 package updates are downloaded but not installed]
+* [https://github.com/QubesOS/qubes-issues/issues/1856 Tor Browser default screen resolution different between Qubes Debian & Whonix templates versus plain Debian]
+* [https://github.com/QubesOS/qubes-issues/issues/2209 Ensure Qubes firewall loads at the right time during VM boot]
+* [https://github.com/QubesOS/qubes-issues/issues/1762 RELATED,ESTABLISHED -> ESTABLISHED linux kernel hardening]
+* [https://github.com/QubesOS/qubes-issues/issues/6941 unprivilege the CPU's random number generator (RDRAND) / set kernel parameter "random.trust_cpu=off"]
+
+== Usability Issues ==
+* [https://github.com/QubesOS/qubes-issues/issues/7276 Switching qube to Whonix template fails to add anon-vm qvm-tag, resulting in sys-whonix: denied: denied by policy]
+* [https://github.com/QubesOS/qubes-issues/issues/7447 Kicksecure inside Debian Template sdwdate qrexec Denied message]
+
+== Practicality Issues ==
+* [https://github.com/QubesOS/qubes-issues/issues/2835 Installer parses and modifies pre-existing partitions even if given disk is not selected for installation #2835]
+* [https://github.com/QubesOS/qubes-issues/issues/7244 Qubes Initial Setup impossible to debug]
+* [https://github.com/QubesOS/qubes-issues/issues/4794 qvm-backup-restore fails with scrypt: Input is not valid scrypt-encrypted block]
+* [https://github.com/QubesOS/qubes-issues/issues/4479 Qubes R4 after upgrades boot process stuck at "Reached Target Basic System"]
+
+== More Issues ==
+* [https://github.com/QubesOS/qubes-issues/issues/5461 make Linux Kernel Runtime Guard (LKRG) easily available in Qubes]
+* [https://github.com/QubesOS/qubes-issues/issues/6566 avoid installation of unnecessary packages / clean up packages_ in Debian based templates]
+* [https://github.com/QubesOS/qubes-issues/issues/6500 fix Qubes source code copyright / licensing declaration, machine readable copyright, use SPDX License Identifier]
+* [https://github.com/QubesOS/qubes-issues/issues/5253 qrexec feature request: send this over qrexec to the NetVM I am connected to / sys-whonix hardcoded / sys-whonix unexpected autostart]
+
+== More Reported Issues ==
+* https://github.com/QubesOS/qubes-issues/issues/created_by/adrelanos?page=2&q=is%3Aopen+is%3Aissue+author%3Aadrelanos
+
+= Write Qubes ISO Installer Image to USB =
+When using an App Qube such as <code>iso-download</code>.
+
+Syntax:
+
+<pre>
+pv < /path/to/iso > /path/to/linux/device
+</pre>
+
+Example:
+
+{{CodeSelect|code=
+pv < Qubes-R4.1.0-x86_64.iso > /dev/xvdi
+}}
+
+= Qubes Initial Setup Debugging =
+What is the Qubes Initial Setup? See this:
+
+* https://www.qubes-os.org/attachment/doc/initial-setup-menu.png
+* https://www.qubes-os.org/attachment/doc/initial-setup-menu-configuration.png
+
+{{CodeSelect|code=
+/usr/libexec/initial-setup/initial-setup-graphical
+}}
+
+source: https://github.com/QubesOS/qubes-issues/issues/7244#issuecomment-1035516089
+
+= Qubes Persistence =
+{{Qubes_persistence}}
+
+= Debian Template =
+https://groups.google.com/forum/#!topic/qubes-devel/EBxvtMlwp5k
+
+= bind-dirs vs Tor =
+Does bind-dirs will be run before /lib/systemd/system/tor@default.service?
+
+Yes.
+
+qubes-mount-dirs.service has Before=local-fs.target, which it ordered before sysinit.target. After=sysinit.target in turns is included by default (unless DefaultDependencies=noDefaultDependencies=no).
+
+= Config Files Changes =
+[https://groups.google.com/d/msg/qubes-users/AqZV65yZLuU/RQlLPOn5yRsJ source]
+
+I don't know how rpm packaging works. However, the TorVM rpm packaging seems simpler to me and introduce less overhead than Debian packaging at first view. Is there something like config-package-dev for Fedora? config-package-dev is a package to overtake ownership of other
+> package's files. Such as, in Debian the Tor package owns /usr/share/tor/tor-service-defaults-torrc. {{project_name_long}} needs to modify that file and keep it updated. config-package-dev can be used to avoid getting the file being overwritten when upstream releases and upgrade. Is there something like this for Fedora or is this even required? That would make a port much simpler, because for many parts, it is just diverted config files.
+
+qubes-tor pacakages provides own config file (tor --defaults-torrc option used), so no need to override the one provided by tor package.
+
+But to answer your question - no, rpm do not have option to take ownership of files from other packages, but to workaround this (rather sensible) limitation you can modify the config in triggers (so the file will be modified after each original package update).
+
+= IPs =
+[https://groups.google.com/d/msg/qubes-devel/jxr89--oGs0/IcA4pia70-0J source]
+
+Qubes uses non-fixed LAN IPs? How do internal LAN IPs get assigned to TorVM / AppVMs?
+
+QubesVm IP address is generated based on its netvm ID (subnet number) and the said VM static ID, so unless user is switching netvm, the IP is pretty static. We've chosen 10.137.<subnet-id>.<vm-id> which is quite exotic so conflicts with real LAN are very rare (even if rather harmless in isolated network).
+
+= Tor Browser =
+
+[https://groups.google.com/d/msg/qubes-devel/Dd0MVbIam5I/9z6GblxYQHwJ source]
+
+In your Torless TBB launcher script for use with Qubes' transparent Tor proxy, TOR_SOCKS_HOST=10.137.3.1. Is this supposed to be the same for all Qubes machines regardless of how many ProxyVMs users have created (or other user settings)? Or is the user supposed to change this before using the script?
+
+Perhaps it is good idea to add some firewall rule in TorVM to redirect traffic to any 10.137.0.0/16 IP + port 9050/9049 to the tor running in TorVM. This way AnonVM can use any IP as a sock proxy address.
+
+= Run updates over Proxy/Tor =
+[https://groups.google.com/d/msg/qubes-devel/2vnGqsoM9p0/0YCltU-Qs-MJ source]
+
+Without wasting a lot space, having lots of standalone VMs... How could one persistently install software in QubesOS using package managers over Tor just for a specific VM? Routing all traffic over Tor is also an option, but not a ideal one either (having some clearnet traffic is better for various reasons).
+
+Set TorVM as netvm for the template. By default template updates are routed via "update proxy" (simple http proxy, which allow access only to
+yum-repository-like sites). This proxy is running in netvm, so after TorVM. Because of that its you need to disable 'yum-proxy-setup' service for this
+template and allow some traffic in the firewall settings. Or enable 'qubes-yum-proxy' service in TorVM and ensure that its traffic goes through tor.
+
+= Time Sync =
+== Introduction ==
+Discussion about insecurity of NTP: <br />
+https://groups.google.com/d/msg/qubes-devel/YHK_rAUm0s0/ARrBPHrf0fkJ
+
+[https://groups.google.com/d/msg/qubes-users/AqZV65yZLuU/Lh8T7ZL6tdIJ source]
+
+Can Qubes OS leave VM's clocks untouched and keep time sync to the VM or is there some forced-VM-timesync-with-dom-0 that can not be turned off? In that case, that would be a bad.
+
+Currently time synchronization is done in some silly way: qvm-sync-clock called each 6min from dom0 cron. That tool fetch the current time using
+ntpdate in netvm (VM set as clockvm in qubes-prefs), then pass the result to 'date -s' in each VM.
+
+You can disable this mechanism globally by unsetting(*) clockvm (qubes-prefs -s clockvm none).
+
+(*) Which apparently was broken, fix will be included in updates soon.
+
+== Instructions ==
+'''UNTESTED!'''
+
+Install a comfortable editor (optional!).
+
+<pre>
+sudo qubes-dom0-update kate
+</pre>
+
+Edit your VM settings. (Feel free to drop 'EDITOR=kate' and/or to use an editor of your choice.)
+
+<pre>
+sudo EDITOR=kate virsh edit whonix-ws
+</pre>
+
+Find the following block.
+
+<pre>
+<clock offset='utc' adjustment='reset'>
+   <timer name='tsc' mode='native'/>
+</clock>
+</pre>
+
+Replace it with the following.
+
+<pre>
+  <clock offset='utc'>
+    <timer name='rtc' tickpolicy='catchup' track='guest'/>
+    <timer name='xen' present='no'/>
+  </clock>
+</pre>
+
+= How big is Qubes OS's user base? =
+https://groups.google.com/d/msg/qubes-users/AqZV65yZLuU/Kib1jFLZanUJ
+
+= IP Spoofing Protection =
+[https://groups.google.com/d/msg/qubes-devel/le7-Rrq6yxY/nhhpXX1QNRsJ source]
+
+AppVMs can't spoof each other in Qubes' network.
+
+Corollary: stream isolation cannot be circumvented.
+
+= Inter-VM Networking =
+<s>Current Qubes + {{project_name_long}} implementation has both the {{project_name_gateway_long}} and {{project_name_workstation_long}} connected to the same backend FirewallVM and iptables forwarding is manually established between the {{project_name_long}} IP addresses. This current method is really just an efficient hack for our initial Qubes + {{project_name_long}} implementation. The native/proper way to network VMs in Qubes is via chaining their networking "backend" together, which is part of Xen networking structure. This is how other VMs in Qubes are networked, including TorVM. According to Qubes devs, these Xen backends provide simple point-to-point networking between VMs. So this would be advantageous for further isolation of inter-VM {{project_name_long}} traffic, since, currently, all inter-VM traffic is routed through the internet-facing FirewallVM, which can also be shared by other VMs. This current implementation with a shared FirewallVM could be somewhat of a security concern for inter-VM traffic, and a reason to move to native/proper isolated point-to-point "backend" networking. Also, in the future, it is desirable to leverage full ProxyVM/ServiceVM networking between {{project_name_gateway_long}} and {{project_name_workstation_long}}, as the TorVM does. ProxyVM utilizes Xen "backend" networking but automates it with transparent Qubes GUI networking, making use of dynamically created virtual networking interfaces. {{project_name_long}} may need to add onto or adjust its internal networking setup to be compatible with such native Qubes networking.</s>
+
+Older, perhaps outdated discussions related to this topic:
+
+* https://groups.google.com/d/topic/qubes-users/RFXoZ3zt-PE
+* https://groups.google.com/d/msg/qubes-users/GhgWH5mHf2E/0LU35M6GPecJ
+* https://groups.google.com/d/msg/qubes-users/GhgWH5mHf2E/96odaNoBVRwJ
+
+Newer discussion:
+
+* https://forums.whonix.org/t/multiple-whonix-workstations-that-can-communicate-with-each-other
+* https://tor.stackexchange.com/questions/13522/how-to-configure-whonix-gateway-for-communication-between-two-local-workstations/13546#13546
+
+= Forum Discussion =
+[https://forums.whonix.org/t/qubes-whonix/374 Qubes + {{project_name_long}}]
+
+= IP =
+== grep -r 10.152.152.10 * ==
+<pre>
+packages/anon-ws-leaktest/usr/lib/leaktest-workstation/simple_ping.py:target = "10.152.152.10"
+</pre>
+Let's make a patch adding command line support implementing either --qubes or --ip?
+
+<pre>
+packages/systemcheck/usr/libexec/systemcheck/preparation:      GATEWAY_IP="10.152.152.10"
+packages/systemcheck/usr/libexec/systemcheck/preparation:      GATEWAY_IP="10.152.152.10"
+</pre>
+Overruleable. These variables get only set there if they are not yet set. So they can be manipulated by using environment variables, or better by dropping a config snippet to {{Code|/etc/systemcheck.d/40_qubes}}, {{Code|/etc/systemcheck.d/40_qubes}} that contains: export GATEWAY_IP="<qubes-ip>" <br /> (Make that {{Code|40_qubes_autogenerated}} if the file gets autogenerated.)
+
+<pre>
+packages/anon-kde-streamiso/usr/share/anon-kde-streamiso/share/config/kioslaverc:socksProxy=http://10.152.152.10 9122
+</pre>
+We could implement a package anon-kde-streamiso-qubes, that overrules anon-kde-streamiso and that gets only installed when using --qubes. ([https://marc.info/?l=kde&m=141130406809446&w=2 KDE config files are stackable although debuging is a bit cumbersome].) We'd just have to make sure the path to anon-kde-streamiso-qubes comes (before or after?) anon-kde-streamiso's path in the KDEDIRS envrionment variable.
+
+Or we could install either anon-kde-streamiso or anon-kde-streamiso-qubes (--qubes) depending on which build switch is being used.
+
+<pre>
+packages/anon-kde-streamiso/debian/control: settings are set, for KDE applications to socks 10.152.152.10:9122.
+packages/anon-kde-streamiso/README.md:settings are set, for KDE applications to socks 10.152.152.10:9122.
+</pre>
+Just a package description strings doing nothing. Either nevermind or rewrite the comment.
+
+<pre>
+packages/whonix-base-files/etc/apt/apt.conf.d/90whonix:## running on 127.0.0.1:9104 forwarding to 10.152.152.10:9104.
+packages/whonix-base-files/etc/apt/apt.conf.d/90whonix:## running on 127.0.0.1:9104 forwarding to 10.152.152.10:9104.
+packages/whonix-base-files/etc/apt/apt.conf.d/90whonix:## running on 127.0.0.1:9104 forwarding to 10.152.152.10:9104.
+packages/whonix-base-files/etc/apt/apt.conf.d/90whonix:#Acquire::socks::proxy "socks://10.152.152.10:9104/";
+</pre>
+These are just comments doing nothing. We can either nevermind or rewrite the comments.
+
+<pre>
+packages/whonix-ws-firewall/usr/bin/whonix_firewall:[ -n "$GATEWAY_IP" ] || GATEWAY_IP="10.152.152.10"
+packages/whonix-ws-firewall/etc/whonix_firewall.d/30_default.conf:GATEWAY_IP="10.152.152.10"
+</pre>
+Overrulable. <br />
+File: /etc/whonix_firewall.d/40_qubes <br />
+Content: GATEWAY_IP="<qubes-ip>" <br />
+Note: Keep a possible race condiation in mind. Depending on how that config snippnett is created and when whonix_firewall starts. Should the config change after whonix_firewall was already loaded, reload {{project_name_long}} firewall ("sudo whonix_firewall").
+
+<pre>
+packages/helper-scripts/usr/lib/helper-scripts/tor_bootstrap_check.bsh:            TOR_CONTROL_HOST="10.152.152.10"
+packages/helper-scripts/usr/lib/helper-scripts/tor_bootstrap_check.bsh:            TOR_CONTROL_HOST="10.152.152.10"
+</pre>
+Overruleable. These variables get only set there if they are not yet set. So they can be manipulated by using environment variables, or better by dropping a config snippet to {{Code|/etc/systemcheck.d/40_qubes}}, {{Code|/etc/systemcheck.d/40_qubes}} and {{Code|/etc/torbrowser.d/40_qubes}} that contains: export TOR_CONTROL_HOST="<qubes-ip>" <br />
+(Make that {{Code|40_qubes_autogenerated}} if the file gets autogenerated.)
+
+<pre>
+packages/uwt/usr/bin/uwt:        echo "         sudo $NAME -i 10.152.152.10 -p 9104 /usr/bin/apt --yes full-upgrade"
+</pre>
+Just an output string when using "uwt -h". Not overrulable at the moment. We can either put both IPs in there. Or would it be worth sourcing the /etc/uwt.d folder to make that IP configurable? (It is also a performance question.)
+
+<pre>
+packages/uwt/etc/uwt.d/30_uwt_default:      uwtwrapper_gateway_ip="10.152.152.10"
+</pre>
+Overrulable. Create a file /etc/uwt.d/40_qubes with content: uwtwrapper_gateway_ip="<qubes-ip>".
+
+<pre>
+packages/uwt/man/uwt.1.ronn:`sudo uwt -t 5 -i 10.152.152.10 -p 9104 /usr/bin/apt-get.anondist-orig --yes full-upgrade`
+packages/uwt/man/uwt.1.ronn:    uwt -t 5 -i 10.152.152.10 -p 9109 /usr/bin/wget ${1+"$@"}
+</pre>
+Just a man page documentation string. We could modify the man page to cover both use cases.
+
+<pre>
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:TransPort 10.152.152.10:9040
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:DnsPort 10.152.152.10:53 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9050
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9100
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:#SocksPort 10.152.152.10:9100 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9101 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9102 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9103 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9104
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9105 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9106 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9107 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9108 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9109 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9110 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9111
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9112
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9113
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9114 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9115 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9116 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9117 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9118 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9119
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9120 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9121 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9122
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9123
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9124
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:##  127.0.0.1:9150 to 10.152.152.10:9150 [as part of the
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9150
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9152
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9153
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9154
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9155
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9156
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9157
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9158
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9159
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9160 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9161 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9162 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9163 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9164 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9165 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9166 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9167 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9168 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9169 IsolateDestAddr
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9170 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9171 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9172 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9173 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9174 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9175 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9176 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9177 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9178 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9179 IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9180 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9181 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9182 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9183 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9184 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9185 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9186 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9187 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9188 IsolateDestAddr IsolateDestPort
+packages/anon-gw-anonymizer-config/usr/share/tor/tor-service-defaults-torrc.anondist:SocksPort 10.152.152.10:9189 IsolateDestAddr IsolateDestPort
+</pre>
+Not overrulable. Unfortunatly Tor does not support variables in config files. Should I (Patrick) make a feature request against Tor?
+
+If you could use static IPs, we could fall back to use Debian packaging's patching mechanism. But that would be burdensome maintenance wise. Because there would be need for a separate qubes repository, that always has the patch applied. Or users would always have to upgrade from source code, which seems inconvenient. Or can we think of something else?
+
+<pre>
+packages/tb-updater/usr/bin/update-torbrowser:      [ -n "$GATEWAY_IP" ] || GATEWAY_IP="10.152.152.10"
+</pre>
+Overrulable. Create a file {{Code|/etc/torbrowser.d/40_qubes}} with content: GATEWAY_IP="<qubes-ip>".
+
+<pre>
+packages/whonix-legacy/debian/whonix-legacy.preinst:         sed -i 's/192.168.0.10/10.152.152.10/g' "/home/user/.torchat/torchat.ini" || true
+packages/whonix-legacy/debian/whonix-legacy.preinst:         sed -i 's/192.168.0.10/10.152.152.10/g' "/home/user/.xchat2/xchat.conf" || true
+</pre>
+No change required here. Only applies to {{project_name_long}} 8.3.
+
+<pre>
+packages/{{project_name_gateway_template}}-network-conf/etc/network/interfaces.whonix:       address 10.152.152.10
+</pre>
+TODO research: Does ifupdown support variables? If not... We have to think of something.
+
+<pre>
+packages/anon-ws-dns-conf/etc/resolv.conf.anondist:nameserver 10.152.152.10
+</pre>
+TODO research: Does /etc/resolv.conf support variables? If not... We have to think of something.
+
+<pre>
+packages/anon-ws-dns-conf/debian/control: 10.152.152.10, where an Anon-Gateway is supposed to provide a DnsPort on port
+packages/anon-ws-dns-conf/README.md:10.152.152.10, where an Anon-Gateway is supposed to provide a DnsPort on port
+</pre>
+Just documentation strings. Either nevermind or patch documentation.
+
+<pre>
+packages/sdwdate-plugin-anon-shared-streamiso/etc/sdwdate.d/31_anon_dist_stream_isolation_plugin:PROXY="10.152.152.10:9108"
+</pre>
+Overrulable. Create a file /etc/sdwdate.d/40_qubes with content: PROXY="<qubes-ip>"
+
+<pre>
+packages/sdwdate-plugin-anon-shared-streamiso/debian/control: Sets sdwdate's proxy settings to socks 10.152.152.10:9108.
+packages/sdwdate-plugin-anon-shared-streamiso/README.md:Sets sdwdate's proxy settings to socks 10.152.152.10:9108.
+</pre>
+Just documentation strings. Either nevermind or patch documentation.
+
+<pre>
+packages/anon-ws-disable-stacked-tor/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh:##   127.0.0.1:9050 to {{project_name_gateway_long}} 10.152.152.10:9050 and
+packages/anon-ws-disable-stacked-tor/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh:##   127.0.0.1:9150 to {{project_name_gateway_long}} 10.152.152.10:9150.
+packages/anon-ws-disable-stacked-tor/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh:#export TOR_SOCKS_HOST="10.152.152.10"
+</pre>
+Just documentation strings. Either nevermind or patch documentation.
+
+<pre>
+packages/anon-ws-disable-stacked-tor/etc/rinetd.conf.anondist:127.0.0.1        9050      10.152.152.10    9050
+packages/anon-ws-disable-stacked-tor/etc/rinetd.conf.anondist:127.0.0.1        9150      10.152.152.10    9150
+packages/anon-ws-disable-stacked-tor/etc/rinetd.conf.anondist:127.0.0.1        11109     10.152.152.10    9119
+packages/anon-ws-disable-stacked-tor/etc/rinetd.conf.anondist:127.0.0.1        9051      10.152.152.10    9052
+packages/anon-ws-disable-stacked-tor/etc/rinetd.conf.anondist:127.0.0.1        9151      10.152.152.10    9052
+</pre>
+Maybe [https://github.com/{{project_name_short}}/{{project_name_short}}/issues/341 anon-ws-disable-stacked-tor: consider replacing rinetd with rlinetd] (probably not a great idea).
+
+TODO research: does /etc/rinetd.conf support variables? If not, we have to think of something.
+
+<pre>
+packages/whonix-ws-network-conf/etc/network/interfaces.whonix:       gateway 10.152.152.10
+</pre>
+Same comment as {{project_name_gateway_template}}-network-conf/etc/network/interfaces.whonix.
+
+<pre>
+packages/anon-torchat/usr/share/anon-torchat/.torchat/torchat.ini:tor_server = 10.152.152.10
+packages/anon-torchat/usr/share/anon-torchat/.torchat/torchat.ini:tor_server = 10.152.152.10
+</pre>
+Probably requires a package anon-torchat-qubes that conflicts with anon-torchat that gets installed when using --qubes.
+
+<pre>
+packages/xchat-improved-privacy/usr/share/xchat-improved-privacy/.xchat2/xchat.conf:# /set net_proxy_host 10.152.152.10
+</pre>
+Just documentation strings. Either nevermind or patch documentation.
+
+<pre>
+packages/xchat-improved-privacy/usr/share/xchat-improved-privacy/.xchat2/xchat.conf:net_proxy_host = 10.152.152.10
+</pre>
+Just documentation strings. Either nevermind or patch documentation.
+
+== grep -r 10.152.152.11 * ==
+<pre>
+packages/whonix-ws-firewall/usr/bin/whonix_firewall:##     From 10.152.152.11 icmp_seq=1 Destination Port Unreachable
+</pre>
+These are just comments doing nothing. We can either nevermind or rewrite the comments.
+
+<pre>
+packages/anon-gw-anonymizer-config/usr/local/etc/torrc.d/50_user.conf.examples:HiddenServicePort 80 10.152.152.11:80
+packages/anon-gw-anonymizer-config/usr/local/etc/torrc.d/50_user.conf.examples:HiddenServicePort 11009 10.152.152.11:11009
+packages/anon-gw-anonymizer-config/usr/local/etc/torrc.d/50_user.conf.examples:HiddenServicePort 80 10.152.152.11:80
+</pre>
+These are just comments doing nothing. We can either nevermind or rewrite the comments.
+
+<pre>
+packages/whonix-legacy/debian/whonix-legacy.preinst:         sed -i 's/192.168.0.11/10.152.152.11/g' "/home/user/.torchat/torchat.ini" || true
+</pre>
+Same comment as for packages/whonix-legacy/debian/whonix-legacy.preinst.
+
+<pre>
+packages/whonix-ws-network-conf/etc/network/interfaces.whonix:       address 10.152.152.11
+</pre>
+Same comment as for packages/{{project_name_gateway_template}}-network-conf/etc/network/interfaces.whonix above.
+
+<pre>
+packages/anon-torchat/usr/share/anon-torchat/.torchat/torchat.ini:listen_interface = 10.152.152.11
+</pre>
+Same comment as for packages/anon-torchat/usr/share/anon-torchat/.torchat/torchat.ini above.
+
+= Misc =
+Random facts.
+
+* {{Code2|AdminVM}} is a synonym for {{Code2|dom0}} <ref>https://github.com/QubesOS/qubes-issues/issues/1015</ref>.
+* {{Code2|AdminVM}} is not based on Fedora Template VM. More like a standalone VM.
+* Qubes Q3 RC1 {{Code2|AdminVM}} is based on Fedora 20. <ref>
+https://groups.google.com/d/msg/qubes-users/zHdY6Oe58t0/qSFkLZdpng4J
+<blockquote>
+Actually you need rpmfusion-free-release-20.noarch.rpm, as Qubes dom0 is based on Fedora 20.
+</blockquote>
+</ref>
+* Qubes Q3 RC1 {{Code2|Fedora Template VM}} is based on Fedora 21.
+
+= Time =
+<pre>
+sudo mv /etc/qubes-rpc/qubes.SetDateTime /etc/qubes-rpc/qubes.SetDateTime.disabled
+</pre>
+
+= tb-updater vs Template =
+== prerequisite knowledge ==
+* TPO stands for The Tor Project
+* The /home folder of a Template is copied to a TemplateBasedVM at creation time of the TemplateBasedVM. From then, TemplateBasedVM's /home folder is left untouched. (Source: https://groups.google.com/forum/#!topic/qubes-users/WwVJhGA-Xnc)
+* Tor Browser installation path in {{project_name_long}} 12 will change to ~/.tb. (https://phabricator.whonix.org/T338)
+* Since {{q_project_name}} 11, Tor Browser gets installed by default for new images. (Not for in place upgrades.)
+* [[Tor_Browser#Tor_Browser_Updater_.28{{project_name_long}}.29|Tor Browser Updater ({{project_name_long}})]] (((https://github.com/Kicksecure/tb-updater))) vs
+* [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]]
+* Tor Browser Updater ({{project_name_long}}) is unable to keep user settings (modifications such as bookmarks). It renames the old folder. Adds ".old.$(date)". So nothing is lost. Then installs a fresh one. Something important to know. This limitation can probably not be lifted in tb-updater. Upgrading Tor Browser is hard. (TPO often changed the folder layout in past.) That's what Tor Browser's internal updater is for.
+* No one has demonstrated yet, that it is possible to install & run and/or update TBB to either /usr/*, /opt/* or anything of that sort. This is because within the TBB folder, by TPO default, binaries and user data is mixed. (It is a portable application. [Portable with a meaning similar to portableapps.com. Portable on USB drives or similar. Not platform, arm + anything portable.])
+* By TPO default, users are supposed to have TBB in their home folder.
+* It is very unlikely, that TBB will be available as regular deb package anytime soon. <ref>
+* [https://gitlab.torproject.org/legacy/trac/-/issues/3994 Get TorBrowser in Debian]
+* [https://gitlab.torproject.org/legacy/trac/-/issues/5236 Make a deb of the Torbrowser and add to repository]
+</ref>
+* A quick an dirty packaging of TBB would likely require too much maintenance effort. [Needs keeping up with upstream releases.]
+* Packaging TBB is further complicated, because TBB abuses Firefox's user settings mechanism for configuring anonymity related settings. (Firefox prefs) Therefore separation of binaries and user data is difficult.
+* Once TBB is in user's home folder...  [as TPO wants it] [and it does not work otherwise]... And once the user used it... And once the user stored settings there that the user cares about... [bookmarks, etc...] It gets very difficult for the Template and/or tb-updater to keep the TBB folder up to date. That's what Tor Browser Internal Updater is for.
+** Unfortunately, this means, if a user had for example 5 different Qubes-{{project_name_workstation_long}} based AppVMs where Tor Browser is in use, the user would have to update each of its 5 TBBs using Tor Browser Internal Updater.
+** This is an issue, because Qubes updates are already complicated. (Various templates and dom0 needs to be updated.) This adds another layer of complexity. Users also have to care about updating stuff from within their AppVMs, which is counter intuitive.
+** TBB stable has automatic updates enabled by default. <ref>
+https://blog.torproject.org/tor-browser-50-released
+<blockquote>Starting with this release, Tor Browser will now also download and apply upgrades in the background, to ensure that users upgrade quicker and with less interaction. This behavior is governed by the about:config pref app.update.auto, but we do not recommend disabling it unless you really know what you're doing.</blockquote>
+</ref>
+
+== Implementation as of {{q_project_name}} 11 ==
+* As of {{q_project_name}} 11 it is confusing. Running tb-updater in the Template and restarting AppVM won't result in up to date TBB's. [Since if the Template modifies /home, this will not propagate to AppVM's /home.]
+
+== Brainstorming ==
+=== Headless TBB Internal Updater Updates in AppVMs ===
+We could call a qrexec service that starts TBB in each individual AppVM heedlessly (without / with hidden gui, using xvfb or similar) so it will be fetching updates.
+
+=== up to date versions of Tor Browsers in newly created AppVMs inherited from updated Templates ===
+ship Tor Browser tarballs in Qubes Templates in /var/cache/tb-binary and extract in AppVMs at boot time to user's home folder:<br />
+https://phabricator.whonix.org/T417
+
+=== keep as is ===
+Newly created Qubes-{{project_name_workstation_long}} AppVMs inherit the TBB version that came pre-installed in the Qubes-{{project_name_workstation_long}} Template. From there, TBB's internal updater keeps care of updating it.
+
+== Forum Discussion ==
+* https://forums.whonix.org/t/what-should-tor-browser-updater-whonix-do-in-a-templatevm
+* https://forums.whonix.org/t/idea-for-aqrexec-service-to-install-new-versions-of-tor-browser-to-a-list-of-vms
+
+= UpdateVM =
+Moved to [[Next#Torified_dom0_Updates]].
+
+= Upgrade through Clearnet =
+== Qubes R3.2 ==
+Just a note about upgrading a {{project_name_gateway_long}} Template through Clearnet. Untorified! This is easily possible by setting the following environment variable.
+
+<pre>
+export UWT_DEV_PASSTHROUGH="1"
+</pre>
+== Qubes R4 ==
+Undocumented.
+
+= Build =
+== Build Single Qubes Package ==
+=== Debian dev ===
+Source: https://groups.google.com/forum/#!topic/qubes-devel/o6pn-kV7cU0
+
+<pre>
+BACKEND_VMM=xen dpkg-buildpackage -b
+</pre>
+
+=== Fedora rpm ===
+Source: https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/pull/15#issuecomment-408371583
+
+<blockquote>
+the easiest way is to use qubes-builder, you can build a single by `make mgmt-salt-dom0-virtual-machines`. Otherwise, you need to manually:
+
+* create tarball from the source dir
+* fill version in `.spec.in` (writing it into `.spec` file)
+* build it with `rpmbuild -bb <path-to-spec>`
+</blockquote>
+
+== Build {{q_project_name}} Templates ==
+
+<pre>
+git clone https://github.com/QubesOS/qubes-builder.git
+</pre>
+
+([https://github.com/QubesOS/qubes-issues/issues/3441#issuecomment-359447019 source of the following instructions])
+
+<pre>
+cd qubes-builder
+</pre>
+
+<code>~/qubes-builder/builder.conf</code>
+
+<pre style="white-space: pre-wrap;">
+GIT_BASEURL ?= https://github.com
+GIT_PREFIX ?= QubesOS/qubes-
+NO_SIGN ?= 1
+VERBOSE ?= 2
+BACKEND_VMM = xen
+DIST_DOM0 ?=
+DISTS_VM ?= whonix-gateway whonix-workstation
+USE_QUBES_REPO_VERSION ?= 4.0
+USE_QUBES_REPO_TESTING ?= 1
+BRANCH ?= master
+COMPONENTS ?= \
+              linux-template-builder \
+              builder \
+              builder-debian \
+              template-whonix
+
+BUILDER_PLUGINS ?= \
+                   builder-debian \
+                   template-whonix
+
+GIT_URL_template_whonix = https://github.com/Whonix/qubes-template-whonix
+
+
+import-whonix-keys:
+	if ! [ -d "$(KEYRING_DIR_GIT)" ]; then \
+		export GNUPGHOME="$(KEYRING_DIR_GIT)"; \
+		scripts/verify-git-tag; \
+		gpg --keyserver keys.openpgp.org --recv-key 916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA || exit 1; \
+		echo '916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA:6:' | gpg --import-ownertrust; \
+	fi
+
+get-sources: import-whonix-keys
+</pre>
+
+<pre>
+make get-sources
+</pre>
+
+<pre>
+make template
+</pre>
+
+== Official Builds ==
+
+<code>builder.conf</code>:
+
+<pre>
+SIGN_KEY = 916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA
+GITHUB_BUILD_TARGET = /repos/QubesOS/updates-status/issues/566/comments
+# https://github.com/settings/tokens
+GITHUB_API_KEY = replace-this
+# And if you use splig-gpg:
+GNUPG = qubes-gpg-client
+</pre>
+
+* <ref>
+* [https://github.com/QubesOS/qubes-issues/issues/3935 Qubes issue ticket: Mechanism for triggering template build]
+* [https://github.com/QubesOS/qubes-issues/issues/6737 qubes-builder make template-github curl broken - wrong environment variable handling]
+* https://github.com/{{project_name_short}}/developer-meta-files/blob/master/release/qubes-templates-official-build-commands
+* https://github.com/QubesOS/qubes-issues/issues/4536
+* https://github.com/QubesOS/qubes-issues/issues/6737
+</ref>
+* [https://github.com/qubesos/qubes-builder-github#build-template-command build command format]
+* [https://github.com/QubesOS/updates-status/issues/566  Place for build template commands]
+* https://github.com/QubesOS/updates-status/issues
+* https://github.com/QubesOS/build-issues/issues
+* https://github.com/QubesOS/qubes-template-configs/blob/master/R4.0/templates-community/whonix-16.conf
+* Run from <code>qubes-builder</code> source folder:
+
+Whonix '''16''':
+
+{{CodeSelect|code=
+RELEASE=4.0 REPO_PROXY="" make DISTS_VM="whonix-gateway-16 whonix-workstation-16" template-github
+}}
+
+{{CodeSelect|code=
+RELEASE=4.1 REPO_PROXY="" make DISTS_VM="whonix-gateway-16 whonix-workstation-16" template-github
+}}
+
+= Test =
+* works as UpdateVM
+* can be used as ProxyVM for Fedora and Debian templates
+* [https://www.kicksecure.com/wiki/Systemcheck systemcheck] (<code>--verbose</code>) in {{project_name_gateway_vm}}, whonix, {{project_name_gateway_template}}, whonix-ws
+* Does qubes {{project_name_long}} network / firewall service run after qubes-sysinit.service? Check full systemd dependency resolution.
+
+= Qubes VM Manger Firewall Tab Settings =
+([https://www.qubes-os.org/attachment/wiki/QubesFirewall/r2b1-manager-firewall.png screenshot])
+
+Short:<br />
+Have no effect for {{q_project_name}} VMs. Can be ignored.
+
+Long <ref>https://groups.google.com/d/msg/qubes-devel/uzgN42uEJpE/hymUCMxoCwAJ</ref>:<br />
+All that settings are in separate file in the VM directory - dom0 /var/lib/qubes/appvms/whonix/firewall.xml. If the VM is running, those settings are converted to iptables syntax and loaded into QubesDB of directly connected ProxyVM. The qubes-firewall service in the ProxyVM watch for such changes and applies the rules.
+
+I.e. in case of {{project_name_long}}, the connected ProxyVM is {{project_name_gateway_vm}}. Since in {{project_name_long}} qubes-firewall service is disabled ({{project_name_long}} 12 <ref>https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf</ref>), these settings do not affect {{project_name_long}}. ([https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-whonix-firewall.service qubes-whonix-firewall.service] is what {{project_name_long}} uses.)
+
+= Qubes Upstream Bugs =
+Usability:
+
+* [https://github.com/QubesOS/qubes-issues/issues/889 Centralized Tray Notifications]
+
+= stable vs testing =
+Building R3 vs R3.1. Comments on which branch / config to build.
+
+https://github.com/QubesOS/qubes-issues/issues/1318#issuecomment-147133115
+
+= Handling of file system in Templates vs TemplateBasedVMs =
+== Qubes R3 ==
+{| class="wikitable" style="background-color: #fff;text-align: center"
+
+|
+| root
+| home
+
+|-
+| create new AppVM
+| {{Yes}}
+| {{Yes}}
+
+|-
+| modifications in TemmplateVMs for existing AppVMs
+| {{Yes}}
+| {{No}}
+
+|}
+
+* when you create a new AppVM, it inherits the Templates root and home folder
+* when you make changes in your Template root such as installing new packages, those will be available to existing AppVMs after Template shutdown + AppVM (re)start
+* when you make changes in your Template home, those will be not be available to existing AppVMs
+
+== Qubes Proposal ==
+{| class="wikitable" style="background-color: #fff;text-align: center"
+
+|
+| root
+| home
+
+|-
+| create new AppVM
+| {{Yes}}
+| {{No}}
+
+|-
+| modifications in TemmplateVMs for existing AppVMs
+| {{Yes}}
+| {{No}}
+
+|}
+
+= Split GPG =
+See [[Dev/Split_GPG]].
+
+= {{project_name_gateway_vm}} as Qubes FirewallVM =
+Goals:<br/>
+
+* any Template behind {{project_name_gateway_vm}} should be restricted to torified updates proxy only
+* {{project_name_long}} Templates behind {{project_name_gateway_vm}} should be restricted to torified updates proxy only
+* {{project_name_long}} Templates connected to a ProxyVM other than {{project_name_gateway_vm}} should refuse to connect and show a warning [done]
+
+Qubes tickets:<br/>
+
+* [https://github.com/QubesOS/qubes-issues/issues/1815 Implement new firewall dom0&rarr;VM interface]
+* [https://github.com/QubesOS/qubes-issues/issues/1323 mechanism to hide Qubes VM Manager 'Firewall rules' tab]
+* [https://github.com/QubesOS/qubes-issues/issues/1637 Template policy, services&rarr;features, core plugins]
+
+Tickets:<br/>
+
+* [https://phabricator.whonix.org/T372 {{q_project_name}} {{project_name_workstation_long}} Templates block access to (torified) open internet]
+
+= Connection Issues =
+* icmp mtu connection issues?
+
+= Matrix of Qubes VM Types =
+ProxyVM
+NetVM
+AppVM
+
+StandaloneVM
+TemplateBasedVM
+DisposableVM
+
+HVM
+HVM Template
+
+= Network in Templates =
+As default setting, any Template (including {{project_name_long}}) in Qubes R4.0 and above have their NetVM set to <code>none</code>.
+
+Networking and [[update]] of Templates is possible through Qubes Updates Proxy.
+
+= Torified Updates Proxy =
+== {{project_name_gateway_vm}} ==
+File /usr/share/tinyproxy/default.html gets [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/init/qubes-whonix-sysinit modified]. The following is the original.
+
+<pre>
+<head>
+<title>{errno} {cause}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+</pre>
+
+Modified to the following.
+
+<pre>
+<head>
+<title>{errno} {cause}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="application-name" content="tor proxy"/>
+</head>
+</pre>
+
+== {{project_name_long}} Templates ==
+Inside {{project_name_long}} Templates, [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/utility_functions.sh the following command is run will be run].
+
+=== Qubes R3.2 ===
+<pre>
+curl_output="$(UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "${PROXY_SERVER}")" || true
+</pre>
+
+After the variables are substituted, the command actually run will be the following.
+
+<pre>
+curl_output="$(UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://10.137.255.254:8082/" || true
+</pre>
+
+To simulate (test) this, run the following command.
+
+<pre>
+UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://10.137.255.254:8082/" ; echo $?
+</pre>
+
+Should output the following.
+
+<pre>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "https://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en">
+
+<head>
+<title>403 Filtered</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="application-name" content="tor proxy"/>
+</head>
+
+<body>
+
+<h1>Filtered</h1>
+
+<p>The request you made has been filtered</p>
+
+<hr />
+
+<p><em>Generated by <a href="https://banu.com/tinyproxy/">tinyproxy</a> version 1.8.3.</em></p>
+
+</body>
+
+</html>
+0
+</pre>
+
+That output gets `grep`ed for PROXY_META, i.e. for.
+
+<pre>
+<meta name="application-name" content="tor proxy"/>
+</pre>
+
+If that matches, the <code>whonix-secure-proxy</code> Qubes service is activated. In other words, the <code>/var/run/qubes-service/whonix-secure-proxy</code> status file is being created.
+
+=== Qubes R4 ===
+TODO
+
+<pre>
+UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://127.0.0.1:8082/"
+</pre>
+
+== Related ==
+
+* [https://github.com/QubesOS/qubes-issues/issues/1957 Cache updates #1957, qubes-updates-cache, qubes-updates-proxy]
+* design decision: [https://github.com/QubesOS/qubes-issues/issues/1880 Difficulty to upgrade {{project_name_long}} Templates over clearnet considered a bug or feature?]
+* bug: [https://forums.whonix.org/t/templates-incorrectly-think-theyre-not-connected-to-a-whonix-gateway Templates incorrectly think they're not connected to a {{project_name_long}} gateway.]
+
+= Updates Proxy Debugging =
+
+* qubes-updates-proxy (and its deprecated name: qubes-yum-proxy) - a service providing a proxy for templates - by default enabled in NetVMs (especially: sys-net)
+* updates-proxy-setup (and its deprecated name: yum-proxy-setup) - use a proxy provided by another VM (instead of downloading updates directly), enabled by default in all templates
+
+= Troubleshooting =
+See [[Troubleshooting#Qubes_specific]].
+
+== Connectivity Issues ==
+See [[Troubleshooting#Qubes_specific]].
+
+= bind-dirs flow chart =
+qubes-mount-dirs.service &rarr; /usr/lib/qubes/init/mount-dirs.sh &rarr; /usr/lib/qubes/bind-dirs.sh
+
+= qubes-whonix-postinit.service flow chart =
+qubes-whonix-postinit.service &rarr; /usr/lib/qubes-whonix/init/qubes-whonix-postinit &rarr;
+
+* /usr/lib/qubes-whonix/bind-directories
+* /usr/lib/qubes-whonix/replace-ips
+* enable / disable Tor through qvm-service
+
+= {{q_project_name}} 14 release testing =
+* make sure /etc/systemd/system/multi-user.target.wants/qubes-whonix-firewall.service is gone
+* sudo service qubes-whonix-firewall status
+* sudo service whonix-firewall status
+* [[Onion Services]]
+
+= lightdm autologin =
+
+<pre>
+sudo kate /etc/lightdm/lightdm.conf.d/user.conf
+</pre>
+
+<pre>
+[SeatDefaults]
+user-session=xfce
+autologin-user=user
+</pre>
+
+<pre>
+sudo systemctl enable lightdm
+</pre>
+
+= ssh into Qubes dom0 =
+Moved to [[Dev/Qubes_Remote_Support#ssh_into_Qubes_dom0]].
+
+= releasever =
+Where/how does one set <code>$relesever</code>?
+
+It is a yum/dnf magic variable - version of package providing system-release.
+
+= R3.1 template package in dom0 R3.2 =
+In UpdateVM.
+<pre>
+sudo rm -r /var/lib/qubes/dom0-updates/*
+</pre>
+
+dom0.
+
+<pre>
+sudo dnf remove qubes-template-whonix-ws
+</pre>
+
+dom0.
+
+<pre>
+sudo qubes-dom0-update --clean qubes-template-whonix-ws-3.0.6-201612190633
+</pre>
+
+R3.2: *0628
+R3.1: *0633
+
+= UEFI =
+* https://www.qubes-os.org/doc/uefi-troubleshooting/
+* https://groups.google.com/forum/#!topic/qubes-users/Er10fhAR1Ro
+
+= yubikey =
+yubico tested with Qubes R4 RC1.
+
+1. Install dependencies.
+
+In <code>debian-8</code> / <code>debian-stretch</code> / <code>whonix-ws</code> Templates:
+
+{{CodeSelect|code=
+sudo apt install qubes-usb-proxy libu2f-host0
+}}
+
+<code>Fedora</code> Template:
+
+{{CodeSelect|code=
+sudo dnf install qubes-usb-proxy libu2f-host
+}}
+
+2. Shut down Templates.
+
+3. Reboot TemplateBasedVMs that shall use the yubico.
+
+4. Attach yubikey.
+
+It should show up in Qubes USB systray widget. Use that to assign it to a VM that shall use the yubikey.
+
+Otherwise run on dom0 to see if Qubes knows about it.
+
+{{CodeSelect|code=
+qvm-usb
+}}
+
+Attach. Read command usage help and use from command line.
+
+{{CodeSelect|code=
+qvm-usb attach
+}}
+
+5. Browser support.
+
+* For Firefox: An add-on would be required. (Untested)
+* Chromium (<code>debian-stretch</code> TemplateBased AppVM): out of the box. (Tested.)
+
+6. Testing:
+
+https://demo.yubico.com/u2f
+
+7. Tested services:
+
+* Googlemail (multiple yubikey's can be added as backups)
+
+= Qubes VM debug mode =
+Quote Marek https://forums.whonix.org/t/whonix-live-mode/3894/36
+<blockquote>
+Works only with HVM (on PVH or PV you don’t have emulated VGA). Also it enables more verbose logging - shouldn’t affect performance, but syslog in the VM may be hard to read in some cases. No other disadvantages.
+</blockquote>
+
+See table at the bottom of https://www.qubes-os.org/news/2018/01/24/qsb-37-update/
+
+<pre>
+VM type \ Qubes OS version         | 3.2 | 4.0-rc1-3 | 4.0-rc4 |
+---------------------------------- | --- | --------- | ------- |
+Default VMs without PCI devices    | PV  |    HVM    |   PVH   |
+</pre>
+
+Conclusion: Qubes VM debug mode is not the way to go since in Qubes R4 the default for most VMs (that is VMs without PCI devices) (which includes {{project_name_long}}) is PHV, since these don't have emulated VGA.
+
+= salt =
+[https://www.qubes-os.org/doc/salt/ Qubes <code>salt</code> management stack <code>qubesctl</code>]
+
+Qubes R4
+
+This is what <code>sudo qubesctl state.sls qvm.{{project_name_workstation_vm}}</code> does in effect. <ref>
+https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/blob/master/qvm/
+</ref> It does not only do what [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/blob/master/qvm/{{project_name_workstation_vm}}.sls <code>qvm.{{project_name_workstation_vm}}</code>] does, since salt resolves [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/tree/master/qvm dependencies]. In other words, <code>qvm.{{project_name_workstation_vm}}</code> starts a chain reaction that includes all of the following.
+
+* install packages from <code>qubes-templates-community</code>
+** install <code>qubes-template-{{project_name_gateway_template}}</code>
+** install  <code>qubes-template-{{project_name_workstation_template}}</code>
+
+* create VM called  <code>{{project_name_gateway_vm}}</code>
+** with label:  <code>black</code>
+** with  <code>500</code> MB memory
+** with <code>provides_network</code>
+** enables autostart
+
+* create a VM called  <code>{{project_name_workstation_vm}}</code>
+** with label:  <code>red</code>
+** with netvm:  <code>{{project_name_gateway_vm}}</code>
+** default-dispvm:  <code>whonix-ws-dvm</code>
+** add tag <code>anon-vm</code>
+
+* create a VM called <code> whonix-ws-dvm</code>
+**as DispVM Template <ref><code>template-for-dispvms: true</code></ref>
+** with label:  <code>red</code>
+** with netvm:  <code>{{project_name_gateway_vm}}</code>
+** default-dispvm:  <code>whonix-ws-dvm</code>
+** add tag <code>anon-vm</code>
+
+* dom0 config changes
+** prepend <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> with the following text
+
+{{CodeSelect|code=
+$tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
+$tag:whonix-updatevm $anyvm deny
+}}
+
+** prepend <code>/etc/qubes-rpc/policy/qubes.GetDate</code> with
+
+{{CodeSelect|code=
+$tag:anon-vm $anyvm deny
+}}
+
+=== Version Number ===
+{{CodeSelect|code=
+sudo cat /srv/formulas/base/virtual-machines-formula/qvm/whonix.jinja
+}}
+
+{{Anchor|anon-vm tag}}
+
+= qvm-tags =
+== Introduction ==
+Qubes R4.0 and above only.
+
+Qubes dom0 package [https://github.com/QubesOS/qubes-core-admin-addon-whonix <code>qubes-core-admin-addon-whonix</code>] ([https://github.com/marmarek/qubes-core-admin-addon-whonix/blob/master/qubeswhonix/__init__.py <code>__init__.py</code>]) ([https://forums.whonix.org/t/qubes-core-admin-addon-whonix-for-qubes-r4-testers-wanted forum discussion]) is responsible for:
+
+* set NetVM to <code>{{project_name_gateway_vm}}</code> [...]
+* set default DispVM set to <code>whonix-ws-dvm</code> [...]
+* set tag <code>anon-vm</code>
+* set tag <code>anon-gateway</code>
+
+Qubes dom0 package [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines <code>qubes-mgmt-salt-dom0-virtual-machines</code>] [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/pull/9 will] depend on <code>qubes-core-admin-addon-whonix</code>, therefore ensuring it will be installed. ([https://phabricator.whonix.org/T792 T792]) ([https://github.com/QubesOS/qubes-issues/issues/3881 #3881])
+
+The template package [https://github.com/{{project_name_short}}/qubes-whonix <code>qubes-whonix</code>] ships script [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/etc/qubes/post-install.d/30-whonix-ws.sh<code>/etc/qubes/post-install.d/30-whonix-ws.sh</code>], which contains <code>qvm-features-request whonix-ws=1</code>, which is parsed by dom0 package [https://github.com/QubesOS/qubes-core-agent-linux <code>qubes-core-agent-linux</code>] [https://github.com/QubesOS/qubes-core-agent-linux/blob/master/qubes-rpc/qubes.PostInstall qubes RPC <code>qubes.PostInstall</code>].
+
+As per Marek, <code>qvm-features-request whonix-ws=1</code> should [https://github.com/QubesOS/qubes-issues/issues/3765#issuecomment-386805491 not be set by salt].
+
+Missing {{project_name_long}} tags anon-vm / anon-gateway [https://github.com/QubesOS/qubes-core-admin-addon-whonix/pull/6 will be added].
+
+bug: [https://github.com/QubesOS/qubes-issues/issues/4167 qvm-tags not included in Qubes backups and not re-applied when restoring #4167]
+
+== anon-vm tag ==
+<code>anon-vm</code> gets prepended to [https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.GetDate.policy <code>/etc/qubes-rpc/policy/qubes.GetDate</code>] by [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/blob/master/qvm/template-whonix-ws.sls#L43 salt template-whonix-ws.sls]. Or [https://github.com/QubesOS/qubes-core-admin/pull/221 maybe in future simpler by just adding it.]
+
+Tags are not reliably set yet. TODO: https://github.com/QubesOS/qubes-issues/issues/4155 - That is something doable. But it's not a big deal for now since Qubes VMs have many ways to ask dom0 for the non-randomized time.
+
+* [https://phabricator.whonix.org/T389 make sure {{q_project_name}} has no access to clocksource=xen] (unlikely to be fixed anytime soon without external help) (It matters in context of [[Dev/TimeSync#Clock_Correlation_Attack|Clock Correlation Attack]].
+* [https://phabricator.whonix.org/T440 set random clock offset for {{q_project_name}} VMs using mgmt to prevent clock correlation attacks]
+* [https://phabricator.whonix.org/T397 prevent dom0 telling {{q_project_name}} VMs the time by using the mgmt stack for that / disable Qubes dom0 /etc/qubes-rpc/qubes.SetDateTime]
+
+[https://github.com/QubesOS/qubes-core-admin-addon-whonix/tree/master/qubes-rpc-policy Tags will be more important in future] for [https://phabricator.whonix.org/T534 sdwdate-gui-qubes] but that is more usability, not security.
+
+== anon-gateway tag ==
+<code>anon-gateway</code> tag will be used in future by sdwdate-gui-qubes.
+
+== whonix-updatevm tag ==
+<code>whonix-updatevm</code> tag gets set by [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/blob/master/qvm/template-whonix-ws.sls#L33 salt template-whonix-ws.sls] as well as by [https://github.com/QubesOS/qubes-core-admin-addon-whonix/blob/master/qubeswhonix/__init__.py qubes-core-admin-addon-whonix __init__.py]. TODO: <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code>
+
+{{CodeSelect|code=
+      - $tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
+      - $tag:whonix-updatevm $anyvm deny
+}}
+
+== view tags ==
+See also Qubes [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-tags.html <code>qvm-tags</code> man page].
+
+To view tags.
+
+{{CodeSelect|code=
+qvm-tags {{project_name_gateway_template}}
+}}
+
+{{CodeSelect|code=
+qvm-tags {{project_name_workstation_template}}
+}}
+
+{{CodeSelect|code=
+qvm-tags {{project_name_workstation_vm}} list
+}}
+
+{{CodeSelect|code=
+qvm-tags {{project_name_gateway_vm}} list
+}}
+
+= tags inheritance =
+<blockquote>
+Tags are not inherited. Generally settings are not inherited from Template by TemplateBasedVM. Where needed, core-admin-addon can be made to copy selected settings from Template to TemplateBasedVM.
+</blockquote>
+<ref>
+https://github.com/QubesOS/qubes-core-admin/pull/214#issuecomment-399698122
+</ref>
+
+= qvm-features =
+To view VM features.
+
+{{CodeSelect|code=
+qvm-features {{{{project_name_gateway_template}}}}
+}}
+
+Should include <code>{{project_name_gateway_template}} 1</code>.
+
+{{CodeSelect|code=
+qvm-features {{project_name_workstation_template}}
+}}
+
+Should include <code>whonix-ws 1</code>.
+
+= Connection through Qubes Updates Proxy =
+In Qubes Template.
+
+{{CodeSelect|code=
+curl.anondist-orig --proxy https://127.0.0.1:8082 https://check.torproject.org
+}}
+
+= Testing Automated =
+* https://github.com/marmarek/openqa-tests-qubesos/blob/master/tests/whonix_firstrun.pm
+* https://github.com/marmarek/openqa-tests-qubesos/blob/master/tests/whonixcheck.pm
+
+= Major Version Bump =
+
+Port Whonix 14 to Whonix 15
+
+* https://github.com/QubesOS/qubes-builder/pull/81
+* https://github.com/QubesOS/qubes-builder/pull/82
+* https://github.com/QubesOS/qubes-template-configs/pull/6
+
+= DD Backup Mount =
+<ref>
+To avovid this error:
+
+<pre>
+/usr/sbin/thin_check: execvp failed: No such file or directory
+</pre>
+</ref>
+<pre>
+sudo apt install thin-provisioning-tools
+</pre>
+
+<pre>
+sudo cryptsetup luksOpen /dev/xvdi2 disk
+</pre>
+
+<pre>
+sudo vgchange -aay
+</pre>
+
+Find out /dev/dm-*
+
+<pre>
+sudo lvscan
+</pre>
+
+<pre>
+sudo mkdir /mnt/disk2
+</pre>
+
+<pre>
+sudo mount /dev/dm-153 /mnt/disk2
+</pre>
+
+all data can be found here:
+
+<pre>
+ls -la /mnt/disk2/home/user/
+</pre>
+
+= Qubes VM Kernel =
+Required.
+
+{{CodeSelect|code=
+sudo mkdir -p /boot/grub
+}}
+
+Required. <ref>
+* https://github.com/QubesOS/qubes-issues/issues/5490
+* https://github.com/QubesOS/qubes-doc/pull/905
+* https://github.com/marmarek/qubes-linux-utils/commit/4b55194a1b99618e55b9da48c403973fb1ade90a
+</ref>
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends linux-image-amd64 linux-headers-amd64 grub2-common qubes-kernel-vm-support initramfs-tools busybox
+}}
+
+Required.
+
+{{CodeSelect|code=
+sudo update-grub
+}}
+
+<ref>
+DKMS and update-initramfs not required. Already happening before.
+
+Replace this <code>kernel-version</code> with actual kernel version.
+
+{{CodeSelect|code=
+sudo dkms autoinstall -k <kernel-version>
+}}
+
+For example.
+
+{{CodeSelect|code=
+sudo dkms autoinstall -k 4.19.0-6-amd64
+}}<
+
+Not required. Already happening during apt installation step.
+
+{{CodeSelect|code=
+sudo update-initramfs -u
+}}
+</ref>
+
+= Debian Minimal Template =
+{{CodeSelect|code=
+sudo apt install qubes-core-agent-networking
+}}
+
+= Debug initramfs =
+[https://github.com/QubesOS/qubes-issues/issues/5490#issuecomment-562263712 Quote Marek]:
+
+<blockquote>
+Adding `debug=vc` to the kernel command line should make initramfs produce debug messages. Apparently it is also necessary to remove `console=tty0`, or at least make `console=hvc0` the last one. Otherwise the messages will end up on VGA, which isn't really present in PVH VM.
+</blockquote>
+
+= Mount Qubes Disk from Debian =
+This supposed that you either:
+
+* made a backup of a drive that contains Qubes, OR
+* that you unplugged a Qubes disk and attached it to another machine using Debian, OR
+* that you booted from Debian using an external disk
+
+Since Qubes uses LVM the process is a bit cumbersome.
+
+Install dependencies.
+
+{{CodeSelect|code=
+sudo apt --yes install thin-provisioning-tools
+}}
+
+Install a diff viewer of your choice such as meld.
+
+{{CodeSelect|code=
+sudo apt --yes install meld
+}}
+
+Detach any disk containing Qubes.
+
+Note what fdisk knows to file <code>before</code>.
+
+{{CodeSelect|code=
+sudo fdisk -l > before
+}}
+
+Attach the disk containing Qubes.
+
+Note what fdisk knows to file <code>after</code>.
+
+{{CodeSelect|code=
+sudo fdisk -l > after
+}}
+
+Compare the two files with your favorite diff viewer. Example using meld:
+
+{{CodeSelect|code=
+meld before after
+}}
+
+cryptsetup mount the disk. Example using <code>/dev/sbc2</code>.
+
+{{CodeSelect|code=
+sudo cryptsetup luksOpen /dev/sdc2 disk
+}}
+
+cryptsetup mount the disk. Example using <code>/dev/sdc2</code>.
+
+{{CodeSelect|code=
+sudo cryptsetup luksOpen /dev/sdc2 disk
+}}
+
+Run.
+
+{{CodeSelect|code=
+sudo vgchange -aay
+}}
+
+Run.
+
+{{CodeSelect|code=
+sudo lvscan
+}}
+
+Run.
+
+{{CodeSelect|code=
+sudo mkdir /mnt/disk
+}}
+
+Mount LVM. Syntax: (replace <code>vm-name</code> with the actual name of the VM.
+
+{{CodeSelect|code=
+sudo mount /dev/qubes_dom0/vm-name-vm /mnt/disk
+}}
+
+For example:
+
+{{CodeSelect|code=
+sudo mount /dev/qubes_dom0/vm-work /mnt/disk
+}}
+
+All data can be found here:
+
+{{CodeSelect|code=
+ls -la /mnt/disk2/home/user/
+}}
+
+= Revert Qubes Template =
+An ultra fast way to revert Qubes Template to previous revision.
+
+based on https://www.qubes-os.org/doc/volume-backup-revert/
+
+In dom0.
+
+Note: replace <code>vmname</code> with the actual name of the Template.
+
+{{CodeSelect|code=
+qvm-volume set vmname:root revisions_to_keep 2
+}}
+
+{{CodeSelect|code=
+qvm-volume revert vmname:root $(qvm-volume infovmname:root {{!}} tail -1)
+}}
+
+Bash history and home folder in the template will remain. Perhaps confusing but can be an advantage.
+
+Just template root being reverted. Private image not reverted. But could be done with qvm-volume revert too. Refer to upstream documentation.
+
+See also:
+
+{{CodeSelect|code=
+qvm-volume info vmname:root
+}}
+
+{{CodeSelect|code=
+qvm-volume info vmname:root {{!}} tail -1
+}}
+
+= See Also =
+* [[Dev/Test|Dev/Test - How to "UnWhonix" - Instructions on how to remove {{project_name_long}} Tor default networking for {{project_name_gateway_long}}. After applying these instructions, {{project_name_gateway_long}} will connect to clearnet.]]
+* [https://forums.whonix.org/t/how-to-add-a-proxyvm-between-{{project_name_workstation_vm}}-and-{{project_name_gateway_vm}}-whonix-ws-email-sys-fw-whonix-{{project_name_gateway_template}}-sys-firewall-sys-net How to add a ProxyVM between {{project_name_workstation_vm}} and {{project_name_gateway_vm}}? (whonix-ws-email &rarr; sys-fw-whonix &rarr; {{project_name_gateway_template}} &rarr; sys-firewall &rarr; sys-net)]
+* [[Dev/Qubes Remote Support]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Design]]

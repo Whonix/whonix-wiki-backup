@@ -1,0 +1,1162 @@
+{{Title|title=Build Documentation: Physical Isolation}}
+{{Header}}
+{{#seo:
+|description=Security by Isolation. Using {{project_name_long}} with Physical Isolation on Bare Metal for Better Security.
+|image=Digital-art-191226640.jpg
+}}
+[[image:Digital-art-191226640.jpg|thumb]]
+{{forkme}}
+= Introduction =
+
+'''{{free}}'''
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' It is essential to read the [[#Security and Support Status|Security and Support Status]], [[#Warnings|Warnings]] and [[#First Time Users|First Time Users]] entries in this chapter.
+}}
+
+== Overview ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <br />
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]] instructions only.
+* [[{{q_project_name_short}}|{{q_project_name}}]] see: [https://forums.whonix.org/t/physical-isolation-is-back-qubes-whonix-style Physical Isolation is back! Qubes-Whonix style]
+}}
+
+Physical isolation requires:
+
+* {{Other_Platforms}}
+* Also refer to Physical Isolation [[#Security and Support Status|Security and Support Status]].
+
+==  First Time Users ==
+
+{{Default_Passwords}}
+{{First_Time_User}}
+
+== Technical Introduction ==
+
+The default {{project_name_long}} configuration consists of two virtual machines (VMs) running on the same physical host. This means any exploits targeting the VM implementation or the host can still break out of the torified client VM and expose the IP address of a user. Further, any malware running on the host has full control over all VMs. To protect against these attacks a different approach is required -- physical isolation. In this configuration the gateway system is installed on separate hardware, which drastically reduces the [https://en.wikipedia.org/wiki/Trusted_computing_base trusted computing base (TCB)] by more than half.
+
+The following instructions describe how to install and configure two computers and set up an isolated point to point network between them. <ref>Alternatively an ordinary, completely isolated, LAN behind the {{project_name_gateway_long}} can be set up.</ref> This way one computer acts as the client ({{project_name_workstation_long}}), while the other is the proxy ({{project_name_gateway_long}}) which transparently routes all the {{project_name_workstation_long}} traffic via Tor.
+
+The {{project_name_gateway_long}} on its own physical device can be run either directly on hardware or inside a VM. Both options have distinct advantages and disadvantages, but using an additional VM for the {{project_name_gateway_long}} is <u>unrecommended</u>. In contrast, the {{project_name_workstation_long}} should <u>always</u> be installed in a VM because this will hide hardware serial numbers. Also read the wiki entry recommending [[Whonix-Workstation_Security#VM_Snapshots|use of multiple VM Snapshots]] for better security.
+
+In this configuration the host operating system(s) should only be used for downloading operating system updates, hosting {{project_name_gateway_long}} or {{project_name_workstation_long}} and nothing else. The configuration is also more secure if the physical systems are exclusively used for hosting {{project_name_long}}, or if storage devices are separated for {{project_name_long}} and non-{{project_name_long}} use cases. The reason is this avoids any potential infection of the {{project_name_long}} hard drive by another operating system.
+
+= Warnings =
+
+Please note the following warnings about physical isolation:
+
+* This configuration is less tested than VM builds. More rigorous testing by the {{project_name_long}} community is required.
+* These instructions are difficult to comprehend for non-technical Linux users.
+* [[Dev/Build Anonymity|Build Anonymity]] has not been considered for this wiki chapter. <ref>This refers to staying anonymous while building {{project_name_long}} from source code. Since building {{project_name_long}} requires a unique selection of software to be downloaded, the ISP can likely guess that a user is building {{project_name_long}}.</ref>
+* It is essential to read the [[Dev/Build_Documentation/VM|warnings]] in the [[Dev/Build Documentation‏‎|latest build instructions for VM images]]. Some of these apply to physical isolation such as {{Code2|Don't add private files to {{project_name_long}} source code folder!}} and {{Code2|Check if the OpenPGP public keys are still up to date}}.
+* This chapter currently lacks detail concerning {{project_name_gateway_long}} and {{project_name_workstation_long}} MAC addresses, see:
+** [[Protocol-Leak-Protection and Fingerprinting-Protection|Protocol Leak and Fingerprinting Protection‎]]
+** [[MAC_Address#Using_Personal_Computers_in_a_Public_Network|{{project_name_long}} in public networks / MAC Address]]<br />
+* {{software compartmentalization vs. physical separation}} (See also: [[Qubes|{{q_project_name}}]].)
+
+= Configuration =
+
+== Physical Isolation Configuration ==
+
+'''Table:''' ''Physical Isolation Configuration Comparison''
+
+{|   class="wikitable"
+
+!| '''Configuration'''
+!| '''Advantages'''
+!| '''Disadvantages'''
+|-
+
+| Spare Hardware and VM
+|
+* A graphical host can be installed.
+* The {{project_name_long}} download version is used.
+* The graphical network manager on the host can be used, for example to connect to WiFi.
+* A VPN can be easily set up on the host. Tor will then be tunneled through the VPN.
+|
+* This has a higher attack surface because VM code is involved.
+|-
+
+| Spare Hardware without VM
+|
+* This is more secure because less code is involved.
+|
+* The setup is slightly more complicated.
+* It is more difficult to set up a VPN.
+* It is more difficult to set up 3G/4G/5G networking compared to using a Windows host.
+|-
+
+|}
+
+== Hardware Configuration ==
+
+It is recommended that two dedicated computers are utilized for {{project_name_long}} that are never used for activities that could reveal your identity. Alternatively, an existing computer that is already in use can be utilized for {{project_name_gateway_long}}. To offer some isolation, all internal and external drives should be disconnected, with boots occuring from an eSATA, USB or another internal drive into a clean environment.
+
+For non-anonymous use, the physical arrangement can be used as is without any modification. This includes the use of a non-anonymous home (dial-up) Internet router, without any changes. In contrast anonymous use requires:
+# {{project_name_gateway_long}}
+# an anonymous 3G/4G/5G modem or an anonymous WiFi adapter (see below)
+# {{project_name_workstation_long}}
+
+In terms of the specific hardware used for {{project_name_gateway_long}}, various devices are feasible and it does not have to be a big desktop computer or ordinary server. Alternatives include:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* smartphone <ref name=one>Due to the lack of an ethernet interface this is a difficult configuration and beyond the scope of the {{project_name_long}} documentation. However, as a tip some (after market) firmwares support USB-host. This makes it possible to plug USB devices into your phone, such as an USB ethernet card. For example, some rooted Android smartphones can [https://web.archive.org/web/20210622003453/http://android.galoula.com/en/LinuxInstall/ install] Debian Linux.</ref>
+* [https://en.wikipedia.org/wiki/Ultra-mobile_PC ultra-mobile personal computer (UMPC)]
+* pad or tablet
+* notebook or netbook
+* formerly a [https://en.wikipedia.org/wiki/Raspberry_Pi Raspberry Pi] <ref>A contributor or maintainer is required, see: [https://forums.whonix.org/t/whonix-raspberry-pi/723 Whonix - Raspberry Pi] development thread.</ref>
+* router <ref>For example, something like [https://openwrt.org/ OpenWRT].</ref>
+* [https://en.wikipedia.org/wiki/Set-top_box set-top box]
+* and other suitable devices
+</div>
+How to utilize devices like a Linux server is beyond the scope of this chapter and better resources already exist on the Internet. Similarly for {{project_name_workstation_long}}, a device that is suitable should be chosen.
+
+= Pre-installation Prerequisites =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = {{Pre_Install_Advice}}
+}}
+
+== Prerequisites ==
+
+Physical isolation has several prerequisites:
+
+# <u>System requirements</u>: Available hardware must meet the [[System Requirements|minimum specifications]].
+# <u>{{project_name_gateway_long}}</u>: A device with at least two network adapters -- at least one of them ethernet <ref>The other one may be either an [[Essential_Host_Security#Anonymous_Mobile_Modems|Anonymous Mobile Modem]], an [[Essential_Host_Security#Anonymous_WiFi_Adapters|Anonymous WiFi Adapter]], or another ethernet or WiFi device connected to the modem/router.</ref> -- capable of running Linux. The {{project_name_gateway_long}} will run Debian. <ref>Theoretically any operating system that supports iptables or pf (packet filter) could be used. Advanced users who do not want to utilize Debian need to edit the source code. This is easy for Debian derivatives, but much more difficult for other distributions such as *BSD. In any case, the operating system choice does not really matter because this system is only used for running Tor. A cheap plug computer like the Raspberry Pi, or the hardware used by Torouter would be sufficient.</ref>
+# <u>{{project_name_workstation_long}}</u>: A device connected via ethernet to the {{project_name_gateway_long}}. It must only have this one NIC and no other network connectivity! It must also be connected by wire. <ref>If wire connections are not configured, isolation and security is significantly weakened. If the {{project_name_workstation_long}} were infected, it could jump onto another network and start leaking information.</ref> This will be the torified client system or {{project_name_workstation_long}} and it must be capable of running Debian. <ref>Any operating system can be used, but this is not recommended! If this advice is ignored, read the following [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxyLeaks Transparent Proxy Leaks] warning, especially for Windows.</ref>
+# <u>VM client</u>: It is recommended to use a VM as the client, namely the same {{project_name_workstation_long}} that most "normal" (non-physical isolation) {{project_name_long}} users rely upon. <ref>Either [[Download]] the image or build it from source code.</ref> <ref>A generic VM image cannot leak identifying hardware serial numbers or unique software fingerprints via software updates.</ref> <ref>This ensures the VM client has the latest security features and most secure configurations, for example stream isolation to protect against identity correlation through circuit sharing, HexChat IRC hardening, {{project_name_long}} protocol leak protection and fingerprinting protection, and so on.</ref>
+# <u>Host build environment</u>: The build environment must have a working Internet connection to Debian mirrors.
+# <u>Virtual console</u>: Although optional, it is also useful to know how to open a second [[Desktop#Virtual_Consoles|virtual console]].
+
+== Host Preparation ==
+
+<!--
+EDITORS NOTE: The following host preparation text is duplicated on 3 pages.
+(1) [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]]
+(2) [[Dev/Build Documentation]] for VM images
+(3) {{project_name_long}} Debian packages.
+When making changes here, please consider also making changes there.
+-->
+
+{{Box|text=
+'''1.''' Prepare to build on Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code>.
+
+To obtain Debian safely, see: [[Debian_Tips#Download_and_Verification|Debian ISO OpenPGP verification]]. Around 15 GB of free space is required. <ref>The build scripts can be adapted to run on other {{Code2|*NIX}} systems, but they currently assume <code>apt</code> and <code>grml-debootstrap</code> are available.</ref>
+
+'''2.''' Adjust terminal settings.
+
+It is recommended to set the terminal (such as Konsole) to unlimited scrollback, so it is possible to watch the full build log.
+
+'''3.''' Install build dependencies.
+
+{{Build_Dependencies}}
+}}
+
+== System Preparation ==
+
+{{kicksecure_Prerequisites}}
+
+= How-to: Install {{project_name_gateway_long}} =
+
+== Recommended: On Hardware ==
+
+=== Get Debian ===
+
+Download a [https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/ Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> 64-bit installation ISO]. Detailed instructions for this procedure are not part of this chapter, but the [[Debian_Tips#Download_and_Verification|Debian Host Operating System Tips]] chapter provides some steps.
+
+It is possible to choose an ISO for any desktop environment (KDE, LXDE, Xfce, ...). However, because the command line is extensively used the Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> network install (netinst) version is recommended (it is the most minimal).
+
+=== Install Debian ===
+In the installer boot menu of Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code>, press "Install" and choose the following settings:
+
+<pre>
+Select a language: English
+Select your location: United States
+Configure the keyboard: (select yours)
+Hostname: host
+Domain name: (empty)
+Root password: (set up a strong password)
+Full name for the new user: user
+Username for your account: user
+Password for the new user: (choose a good password, different from root password)
+Partitioning method: Guided - use entire disk (it is a good idea to set up cryptsetup encrypted LVM at this point)
+Partitioning scheme: All files in one partition (select the listed device in the next step)
+Partition disks/overview: Finish partitioning
+Write changes to disk: Yes
+
+Debian archive mirror country: Go back
+Continue without a network mirror: Yes
+
+Use a network mirror: No
+Participate in the package usage survey: No
+Software selection: None; deselect all options (using Space)
+Install the GRUB boot loader: Yes (select the listed device in the next step)
+Finish the installation: Continue
+</pre>
+
+<div class="toccolours mw-collapsible mw-collapsed">
+
+=== Installation Screenshots ===
+
+For a visual walk-through of the minimal Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> installation, click on Expand on the right. For up-to-date screenshots of this process, refer to the [https://debian-handbook.info/browse/stable/sect.installation-steps.html The Debian Administrator's Handbook: 4.2. Installing, Step by Step]. If utilizing this guide, remember to set:
+<div style="column-count:3;-moz-column-count:3;-webkit-column-count:3">
+* the English language
+* the United States location
+* hostname to "host"
+* an empty domain name
+* a strong root password
+* full name to "user"
+* username to "user"
+* a strong user password
+* full disk encryption (recommended)
+* installation without a mirror
+* refuse survey participation
+</div>
+
+<div class="mw-collapsible-content">
+'''Figure:''' ''Select "Install"''
+
+[[Image:20.png|600px]]
+
+
+'''Figure:''' ''Set English Language''
+
+[[File:21.png|600px]]
+
+
+'''Figure:''' ''Set United States Location''
+
+[[File:22a.png|600px]]
+
+
+'''Figure:''' ''Keyboard Selection''
+
+[[File:23.png|600px]]
+
+
+'''Figure:''' ''Additional Content Installation''
+
+[[File:53.png|600px]]
+
+
+'''Figure:''' ''Network Auto-configuration'' <ref>This should occur by default.</ref>
+
+[[File:24.png|600px]]
+
+
+'''Figure:''' ''Set Hostname to "host"''
+
+[[File:25.png|600px]]
+
+
+'''Figure:''' ''Set Empty Domain Name''
+
+[[File:26.png|600px]]
+
+
+'''Figure:''' ''Enter a Strong Root Password''
+
+[[File:27.png|600px]]
+
+
+'''Figure:''' ''Re-enter the Password''
+
+[[File:28.png|600px]]
+
+
+'''Figure:''' ''Set Full Name to "user"''
+
+[[File:29.png|600px]]
+
+
+'''Figure:''' ''Set Username to "user"''
+
+[[File:30.png|600px]]
+
+
+'''Figure:''' ''Enter a Strong user Password''
+
+[[File:31.png|600px]]
+
+
+'''Figure:''' ''Re-enter the Password''
+
+[[File:32.png|600px]]
+
+
+'''Figure:''' ''Network Time Procedure''
+
+[[File:33.png|600px]]
+
+
+'''Figure:''' ''Use a Guided Partitioning Method with the Whole Disk'' <ref>Full disk encryption (FDE) is recommended if planning to use physical isolation or the installation as the main system.</ref>
+
+[[File:34.png|600px]]
+
+
+'''Figure:''' ''Select the Suggested Disk''
+
+[[File:35.png|600px]]
+
+
+'''Figure:''' ''Partition all Files in One Partition''
+
+[[File:36.png|600px]]
+
+
+'''Figure:''' ''Finish Partitioning''
+
+[[File:37.png|600px]]
+
+
+'''Figure:''' ''Confirm Changes''
+
+[[File:38.png|600px]]
+
+
+'''Figure:''' ''Wait for Base System Installation'' <ref>It takes a few minutes for the base system installation to finish.</ref>
+
+[[File:39.png|600px]]
+[[File:40.png|600px]]
+
+
+'''Figure:''' ''Do not Select a Mirror'' <ref>Extra packages are not required, so do not select a mirror; "Go back".</ref>
+
+[[File:41.png|600px]]
+
+
+'''Figure:''' ''Confirm Continuation without a Mirror''
+
+[[File:42.png|600px]]
+
+
+'''Figure:''' ''APT Configuration''
+
+[[File:43.png|600px]]
+
+
+'''Figure:''' ''Refuse Survey Participation'' <ref>Select "No thanks".</ref>
+
+[[File:44.png|600px]]
+
+
+'''Figure:''' ''Deselect (no star) the Given Option'' <ref>Using the space bar.</ref>
+
+[[File:45.png|600px]]
+[[File:46.png|600px]]
+
+
+'''Figure:''' ''Install GRUB''
+
+[[File:47.png|600px]]
+
+
+'''Figure:''' ''Select the Disk''
+
+[[File:48.png|600px]]
+
+
+'''Figure:''' ''Finish Installation''
+
+[[File:49.png|600px]]
+
+
+'''Figure:''' ''Automatic System Reboot''
+
+[[File:50.png|600px]]
+
+
+'''Figure:''' ''Operating System Screen''
+
+[[File:51.png|600px]]
+
+
+'''Figure:''' ''Login Screen''
+
+[[File:52a.png|600px]]
+</div>
+</div>
+
+<div class="toccolours mw-collapsible mw-collapsed">
+
+=== Optional: Customizing Full Disk Encryption ===
+
+If you wish to configure a custom encryption algorithm to enhance security during the minimal Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> installation, click on Expand on the right.
+
+<div class="mw-collapsible-content">
+{{Box|text=
+'''1.''' Under "Partitioning method", select Manual.
+
+'''2.''' Select the installation disk.
+
+* <code>Highlight the installation disk and press "Enter"</code> &rarr; <code>Select <Yes> to create a new empty partition table</code>
+
+'''3.''' Create a new partition.
+
+* <code>Select the "FREE SPACE" of the destination drive you are installing to</code> &rarr; <code>Press "Enter"</code> &rarr; <code>"Create a new partition" should already be selected</code> &rarr; <code>Press "Enter" again</code>
+
+'''4.''' Create a boot partition.
+
+This is the unencrypted partition the system boots from; the standard size is 254.8 MB.
+
+* <code>Type "254.8 MB" (without the quotes)</code> &rarr; <code>Press "Enter"</code>
+
+'''5.''' Select partition type and location.
+
+* <code>Check "Type for the new partition:" -- "Primary" should already be selected</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Under "Location for the new partition:" -- "Beginning" should already be selected</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Navigate to the Partition settings screen</code>
+
+Use the following settings for the boot partition:
+
+<pre>
+Use as:         Ext4 file system
+
+Mount point:       /boot
+Mount options:    noatime
+Label:                 none
+Reserved blocks:  5%
+Typical Usage:     standard
+Bootable flag:      on
+</pre>
+
+Next, select "Done setting up the partition" and press Enter. You will be brought back to the main partitioning menu.
+
+'''6.''' Select encrypted volumes option.
+
+* <code>Choose "Configure encrypted volumes"</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Select <Yes> when asked to write the changes to disk and configure encrypted volumes</code>
+
+'''7.''' Configure the encrypted partition.
+
+* <code>Ensure "Create encrypted volumes" is already selected</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Select the free space of the installation drive by pressing the spacebar</code> &rarr; <code>Select <Continue> and press "Enter" again</code>
+
+After additional components load, a configuration page for the encrypted partition will appear. At this stage it is possible to customize the encryption settings.
+
+<pre>
+Use as:      physical volume for encryption
+Encryption method:   Device-mapper (dm-crypt)
+
+Encryption: twofish
+[Recommend "twofish" and "serpent" as alternatives. "Serpent" is the slowest and only recommended if you have a fast system (and a fast drive), as it creates a lot of system overhead. "Twofish" is an algorithm created by Bruce Schneier, and is a lot faster, computationally-speaking. For most use-cases, "twofish" should be sufficient as an alternative algorithm]
+Key size:     256 (leave as-is)
+IV algorithm:  xts-plain64
+[for most use-cases, xts-plain64 should be sufficient. Do not change this unless you know what you are doing. You could inadvertently create a security hole]
+Encryption key: Passphrase (leave as-is)
+Erase data: yes (this will wipe the partition)
+Bootable flag: off
+</pre>
+
+'''8.''' Write the changes to disk.
+
+After completing the configuration step:
+* <code>Select "Done setting up this partition"</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Select <Yes> and press Enter to write the changes to disk</code> &rarr; <code>On the next screen select "Finish" and press "Enter"</code>
+
+'''9.''' ''Optional:'' Erase the partition.
+
+It is strongly recommended to erase the partition before continuing. Please note this may take a while for large drives. If the device was securely wiped before starting this installation, this step can be skipped. To erase the partition, select <Yes> and press Enter.
+
+'''10.''' Choose a strong password.
+
+Refer to [[Passwords#Generating_Unbreakable_Passwords|this entry]] for advice on generating strong passwords with sufficient entropy; at least a 7-word diceware passphrase is recommended. <ref>This yields ~90 bits of entropy against classical computing attacks. To protect against hypothetical quantum computer attacks that halve the key search space, utilize a 14-word diceware passphrase.</ref> <ref>This section previously recommended a passphrase of at least 26 characters, including symbols.</ref> Remember: the stronger the passphrase, the stronger your encryption (and vice-versa). After entering the passphrase and confirming it, you will be brought back to the main partitioning menu.
+
+'''11.''' Configure the physical volume.
+
+* <code>Inspect the new "Encrypted volume" (which should be at the top of the list)</code> &rarr; <code>Highlight the partition that was just created under it (it should say ext4)</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Under "Use as:" -- change this to "physical volume for LVM"</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Select "Done setting up the partition"</code> &rarr; <code>Press "Enter" again to be brought back to the main partitioning menu</code>
+
+'''12.''' Select "Configure the Logical Volume Manager" and press Enter.
+
+'''13.''' Configure the volume group.
+
+* <code>Highlight "Create volume group" and press "Enter"</code> &rarr; <code>Under "Volume group name:" -- enter HOST_VG and press "Enter</code>
+
+'''14.''' Use the spacebar to select the encrypted partition, then select <Continue> and press Enter.
+
+<pre>
+(Optional) SWAP USERS:
+
+O1. Now create your swap partition. Highlight "Create logical volume" and press Enter, then select HOST_VG and press Enter again. Type SWAP, press Enter.
+
+O2. Enter your volume size (2.5 GB is usually a good standard size for most systems) then select <Continue> and press Enter.
+</pre>
+
+'''15.''' Create the logical volume.
+
+<code>Highlight "Create logical volume"</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Select HOST_VG</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Type ROOT</code> &rarr; <code>Press "Enter"</code>
+
+'''16.''' Under the "Logical volume size:", the entire volume should already be displayed. Press Enter again.
+
+'''17.''' Highlight "Finish", then press Enter to be brought back to the main partitioning menu.
+
+'''18.''' The new partition for ROOT should be displayed on this screen [LVM VG HOST_VG, LV ROOT - xxx.x GB Linux device-mapper (linear)]. Select the partition underneath the heading and press Enter.
+
+'''19.''' Select the preferred filing system.
+
+Change "do not use" to the filing system of your choice; ext4 is good for most installations, while XFS is more suitable for filesystems on top of encryption and is more robust with better performance. For the purpose of this chapter, the following configuration is provided:
+
+<pre>
+Use as:             XFS journaling file system
+
+Mount point:     /
+Mount options: defaults
+Label:               none
+</pre>
+
+'''20.''' When the preceding configuration is finished, select "Done setting up this partition" and press Enter to return to the main partitioning menu.
+
+<pre>
+(Optional) SWAP USERS:
+
+O1. You should see your new partition for SWAP displayed on this screen [LVM VG HOST_VG, LV SWAP - 2.5 GB Linux device-mapper (linear)]. Select the partition underneath the heading and press Enter.
+
+O2. Change "do not use" to "swap area", and press Enter. Then select "Done setting up the partition" to return to the main partitioning menu.
+
+</pre>
+
+'''21.''' Finalize the partitioning.
+
+* <code>Highlight "Finish partitioning and write changes to disk"</code> &rarr; <code>Press "Enter"</code> &rarr; <code>Select <Yes> when asked to confirm the changes</code>
+
+The installation will continue automatically.
+}}
+</div>
+</div>
+
+=== Network Configuration ===
+
+The external interface (usually <code>eth0</code>) may need to be configured according to the requirements of your local network, for example static or simply left to use DHCP if the gateway is connected to a DHCP-capable router. For <code>wlan</code>, refer to upstream wiki documentation:
+* [https://wiki.debian.org/WiFi Debian: WiFi]
+* [https://help.ubuntu.com/community/WifiDocs/WiFiHowTo Ubuntu: WifiDocs/WiFiHowTo].
+
+Check that the Internet is working.
+
+=== Log On and Upgrade Debian ===
+
+{{Box|text=
+'''1.''' Install security updates.
+
+Log on, install all security updates and reboot.
+
+'''2.''' Log in with "root".
+
+'''3.''' Add the <code>{{Stable_project_version_based_on_Debian_codename}}</code> main contrib non-free repository source.
+
+{{CodeSelect|code=
+echo "deb https://deb.debian.org/debian {{Stable_project_version_based_on_Debian_codename}} main contrib non-free" >> /etc/apt/sources.list
+}}
+
+'''4.''' Add the <code>{{Stable_project_version_based_on_Debian_codename}}</code> updates repository source. <ref>TODO: check whether this step is still required.</ref>
+
+{{CodeSelect|code=
+echo "deb https://security.debian.org/debian-security {{Stable_project_version_based_on_Debian_codename}}-security main" >> /etc/apt/sources.list
+}}
+
+'''5.''' Refresh package lists and upgrade.
+
+{{CodeSelect|code=
+apt update && apt full-upgrade -y
+}}
+}}
+
+=== Firmware Updating and Security Problems ===
+
+Processor microcode updates are recommended to address speculative execution flaws; see [[Firmware_Security_and_Updates#Firmware_Updating_and_Security_Problems|Firmware Updating and Security Problems]] for further information.
+
+{{Update}}
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+For Intel.
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends iucode-tool intel-microcode
+}}
+
+For AMD.
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends amd64-microcode
+}}
+
+=== Preparation ===
+
+{{Box|text=
+'''1.''' Install <code>sudo</code> and <code>git</code>. <ref><code>git</code> is needed to obtain the source code. Alternatively, a git tag can be downloaded as an archive using a (torified) browser: https://github.com/{{project_name_short}}/derivative-maker/tags</ref>
+
+<pre>
+## Install "sudo" and git.
+apt install sudo git -y
+</pre>
+
+'''2.''' Prepare the system for the {{project_name_long}} build.
+
+You must build as user "user" and that user must be a member of the "sudo" group. Rebooting applies the changes.
+
+<pre>
+## Add "user" to "sudo" group
+addgroup user sudo
+
+## Reboot the system
+shutdown -r now
+
+## (host) login with "user"
+user
+</pre>
+
+'''3.''' ''Optional'': Consider taking an image of the installation in case the build script fails partway through.
+}}
+
+=== Get the Source Code ===
+
+==== Get the Signing Key ====
+
+{{Get_Signing_Key}}
+
+==== Get the Source Code ====
+
+{{Build_Documentation_Get_Source}}
+
+==== OpenPGP Verify the Source Code ====
+
+{{OpenPGP Verify the Source Code}}
+
+==== Choose Version ====
+
+{{
+Build Documentation Choose Version
+|version={{VersionNew}}-stable
+|extra=--recurse-submodules
+}}
+
+==== Check Git ====
+
+{{Build Documentation Check Git
+|version={{VersionNew}}-stable
+}}
+
+=== Optional Build Configuration ===
+
+Refer to [[Build_Configuration|Optional Build Configuration]] for additional configuration options like:
+<div style="column-count:3;-moz-column-count:3;-webkit-column-count:3">
+* 32-bit vs 64-bit builds
+* {{project_name_long}} APT repository
+* APT onion build sources
+* torified or host APT cache
+* build variables changes
+* skipping steps
+* source code changes
+</div>
+
+=== Network Verification ===
+
+Before running the {{Code2|derivative-maker}} script make sure <code>eth0</code> and <code>eth1</code> refer to the correct interfaces.
+
+<pre>
+## May be helpful.
+dmesg | grep eth
+</pre>
+
+<div class="toccolours mw-collapsible mw-collapsed">
+If non-default network interface names are in use, please click on Expand on the right.
+<div class="mw-collapsible-content">
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = The following procedure should also be possible with non-default network interface names, but that is more difficult. Note this procedure is untested and not fully documented.
+}}
+
+One method is figuring out how to change a network interface name such as <code>wlan0</code> to <code>eth0</code>.
+
+Another method is to consider changing the network interface names in the configuration files. To discover components that require configuration changes in the {{project_name_long}} source folder, the following commands may be helpful. Note that only a few files should require modification and the variables <code>eth0</code> and <code>eth1</code> have been used wherever possible.
+
+<pre>
+exclude="--exclude=README.md --exclude=control --exclude=changelog.upstream --exclude-dir=.git --exclude-dir=developer-meta-files --exclude-dir=build-steps.d --exclude-dir=qubes-whonix"
+</pre>
+
+<pre>
+grep $exclude -r eth0 ~/derivative-maker
+grep $exclude -r eth1 ~/derivative-maker
+</pre>
+
+<pre>
+grep -l $exclude -r eth0 ~/derivative-maker
+grep -l $exclude -r eth1 ~/derivative-maker
+</pre>
+
+If you decide to edit these files in {{project_name_long}} source folder, remember to apply the build parameters from the Source Code Changes section [[Build_Configuration|here]].
+
+The final and perhaps best method is changing the network interface names after the {{project_name_long}} build script has finished; see below.
+
+{{Box|text=
+'''1.''' Note the location for network interfaces.
+
+For example <code>/home/user/{{project_name_short}}/packages/whonix-ws-network-conf/etc/network/interfaces.d/30_non-qubes-whonix</code> becomes <code>/etc/network/interfaces.d/30_non-qubes-whonix</code>.
+
+'''2.''' Create a firewall drop-in configuration snippet.
+
+* Do not edit <code>/usr/bin/whonix_firewall</code>.
+* Instead, create a drop-in config snippet here: <code>/etc/whonix_firewall.d/30_default.conf</code>.
+
+{{Open with root rights|
+filename=/etc/whonix_firewall.d/50_user.conf
+}}
+
+'''3.''' Add the external and internal network interface names.
+
+In the example below, replace <code>eth0</code> and <code>eth1</code> with the respective (actual) external and internal network interface names.
+
+<pre>
+EXT_IF="eth0"
+INT_IF="eth1"
+</pre>
+
+Save the file.
+
+'''4.''' Edit the network interfaces file.
+
+* Manually edit <code>/etc/network/interfaces.d/30_non-qubes-whonix</code>.
+
+{{Open with root rights|
+filename=/etc/network/interfaces.d/30_non-qubes-whonix
+}}
+
+Replace the interface names and save the file.
+
+'''5.''' Create a uwtwrapper drop-in configuration snippet. <ref>This is required for {{project_name_workstation_long}} in {{project_name_long}} 14 and above.</ref>
+
+* Do not edit <code>/uwt/usr/lib/uwtwrapper</code>.
+* Instead, create a drop-in config snippet here: <code>/etc/uwt.d/50_user.conf</code>.
+
+{{Open with root rights|
+filename=/etc/uwt.d/50_user.conf
+}}
+
+'''6.''' Add the external and internal network interface names.
+
+In the example below, replace the <code>eth0</code> interface name.
+
+<pre>
+bindp_interface="eth0"
+</pre>
+
+Save the file.
+
+'''7.''' ''Optional'': Edit the leaktest file.
+
+This step is not important, but <code>/usr/bin/leaktest</code> can be manually edited as per previous steps.
+
+{{Open with root rights|
+filename=/usr/bin/leaktest
+}}
+
+Make necessary changes and save the file.
+
+'''8.''' Edit the <code>systemcheck</code> network interfaces file.
+
+* Manually edit <code>/usr/lib/systemcheck/check_network_interfaces.bsh</code>.
+* This will break when systemcheck is upgraded, meaning it needs to be edited again. This is configurable in {{project_name_long}} 14 and above so the setting survives systemcheck upgrades.
+
+{{Open with root rights|
+filename=/usr/lib/systemcheck/check_network_interfaces.bsh
+}}
+
+Make necessary changes and save the file.
+
+'''9.''' Create a sudoers drop-in configuration snippet.
+
+* Do not edit <code>/etc/sudoers.d/systemcheck</code>.
+* Instead, create a drop-in config snippet here: <code>/etc/sudoers.d/systemcheck-user</code>.
+
+Use any preferred editor.
+
+<pre>
+sudo EDITOR=nano visudo -f /etc/sudoers.d/systemcheck-user
+</pre>
+
+'''10.''' Add the external and internal network interface names.
+
+In the example below, replace the <code>eth0</code> and <code>eth1</code> interface names.
+
+<pre>
+systemcheck ALL=NOPASSWD: /sbin/ifconfig eth0
+systemcheck ALL=NOPASSWD: /sbin/ifconfig eth1
+</pre>
+
+Save the file.
+
+'''11.''' Edit the <code>onion-grater</code> configuration file.
+
+* Manually edit <code>/usr/lib/systemd/system/onion-grater.service.d/30_cpfpy.conf</code>.
+* Systemd may fail to start <code>onion-grater</code> if this file is not configured properly.
+* As per previous steps, replace any interface names with your corresponding interface names and save the file.
+
+TODO: it is better to use a drop-in <code>/usr/lib/systemd/system/onion-grater.service.d/50_user.conf</code> file; see [[Configuration Files]].
+
+'''12.''' Restart <code>onion-grater.service</code> and confirm active status.
+
+<pre>
+systemctl restart onion-grater.service
+systemctl status onion-grater.service
+</pre>
+}}
+</div>
+</div>
+
+=== Minor Issues ===
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = It is currently recommended to skip this step. It is simpler to change these files later on after building {{project_name_long}}.
+}}
+
+Most configuration files work well inside VMs and on hardware. Minor issues such as deactivating powersaving, passwordless reboot, shutdown and so on are only recommended for VMs. They can be easily commented out by putting a hash # in front of them. Since they are marked, use grep to locate them.
+
+<pre>
+grep -r VMONLY* *
+</pre>
+
+=== Run Build Script ===
+
+It is recommended to create a log of the build process by redirecting all the output to a log file. Be aware that by doing so no build progress will appear on the screen -- instead a text log file will be created in the home folder.
+
+<pre>
+./derivative-maker --flavor whonix-gateway-xfce --target root --build >> ~/log-phyiso 2>&1
+</pre>
+
+To optionally watch the progress, open a second [[Desktop#Virtual_Consoles|virtual console]] and type.
+
+<pre>
+tail -f ~/log-phyiso
+</pre>
+
+Use the following command to avoid creating a log of the build process; the build progress will then appear on screen. Note this is <u>unrecommended</u> because if anything goes wrong during the build, it is harder to pinpoint the exact error without a log file.
+
+<pre>
+./derivative-maker --flavor whonix-gateway --target root --build
+</pre>
+
+=== Final Steps ===
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This is untested since [https://phabricator.whonix.org/T347 use /etc/network/interfaces.d instead of /etc/network/interfaces] was implemented; see footnote. <ref>[https://github.com/{{project_name_short}}/whonix-gw-network-conf whonix-gw-network-conf] ships a file [https://github.com/{{project_name_short}}/whonix-gw-network-conf/blob/master/etc/network/interfaces.d/30_non-qubes-whonix <code>/etc/network/interfaces.d/30_non-qubes-whonix</code>]. Normally it should not conflict with <code>/etc/network/interfaces</code>. If it does, consider:
+* removing source-directory <code>/etc/network/interfaces.d</code> from <code>/etc/network/interfaces</code> (if there are no other files in the <code>/etc/network/interfaces.d</code> folder); or
+* moving <code>/etc/network/interfaces.d/30_non-qubes-whonix</code> out of the way. ({{Code2|sudo mv /etc/network/interfaces.d/30_non-qubes-whonix ~/}})</ref> Please test and leave feedback.
+}}
+
+Reboot.
+
+<pre>
+sudo reboot
+</pre>
+
+Login as new user <code>user</code>. (If you didn't install as user <code>user</code>, the old user and home folder will still exist.)
+
+Done.
+
+=== Cleanup ===
+
+{{Build_Documentation_Cleanup}}
+
+== Experimental: On the Raspberry Pi 3 B (RPI3) ==
+
+[[image:Piraspberryicon.png|Raspberry Pi Logo|200px|thumb]]
+
+=== Introduction ===
+
+* Contributor of <code>Experimental: On the Raspberry Pi 3 B (RPI3)</code>: [https://forums.whonix.org/u/Algernon Algernon]
+* Forum discussion: [https://forums.whonix.org/t/whonix-for-arm64-raspberry-pi-rpi/1788 {{project_name_long}} for arm64 / Raspberry Pi (RPi)]
+* <u>Broken!</u> [https://forums.whonix.org/t/whonix-for-arm64-raspberry-pi-rpi/1788/181 Cannot be used at this time] due to lack of maintainer.
+
+=== Procedure ===
+
+{{Box|text=
+'''1.''' [[#Get_the_Source_Code|Get the source code]].
+
+'''2.''' Build {{project_name_gateway_long}}.
+
+Run this command inside the {{project_name_long}} source folder.
+
+{{CodeSelect|code=
+sudo ./derivative-maker --target raw --flavor whonix-gateway-rpi --build --arch arm64 --kernel linux-image-arm64 --headers linux-headers-arm64
+}}
+
+'''3.''' Burn the image to a micro SD card.
+
+After a successful build, burn the <code>whonix_gw_rpi.img</code> image to a micro SD card using <code>gnome-disk-utility</code>.
+# Within gnome-disk-utility select the SD card.
+# At the top panel select "options" (next to the poweroff button).
+# Click "restore disk image" and choose the respective file.
+# Click "start restoring" and wait until it is finished.
+# Put the SD card into the RPI3, attach an HDMI monitor, an USB-ethernet adapter as well as a keyboard and boot it.
+
+'''4.''' Configure interfaces.
+
+After login, run.
+
+{{CodeSelect|code=
+sudoedit /etc/network/interfaces.d/30_non-qubes-whonix
+}}
+
+Change the address and the gateway of <code>eth0</code> corresponding to the local network / upstream router. As an example, our ISP router uses <code>192.168.0.1/24</code> for the internal network. In this case the <code>eth0</code> settings would look like the following:
+
+{{CodeSelect|code=
+auto eth0
+iface eth0 inet static
+    address 192.168.0.11
+    netmask 255.255.255.0
+    gateway 192.168.0.1
+}}
+
+'''5.''' Set up network cables.
+
+By default <code>eth0</code> is the native ethernet connection of the RPI3. Hence, connect a network cable from there to the router. <code>eth1</code> is the USB-ethernet adapter which should also be connected via cable to the computer running {{project_name_workstation_long}}.
+
+'''6.''' Manually set the time.
+
+The RPI3 lacks a real time clock, so it is necessary to manually set the current UTC date and time. Example:
+
+{{CodeSelect|code=
+sudo date -s "10 JUL 2021 17:00:00"
+}}
+
+'''7.''' Connect to the Tor network.
+
+Restart the networking service.
+
+{{CodeSelect|code=
+sudo service networking restart
+}}
+
+Restart the Tor service.
+
+{{CodeSelect|code=
+sudo service tor restart
+}}
+
+<u>Note</u>: Depending on the hypervisor it is necessary to change network settings on {{project_name_workstation_long}} in order to connect it to {{project_name_gateway_long}} (see next section).
+}}
+
+== Unrecommended: In a VM ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = This configuration is entirely untested.
+}}
+
+{{Box|text=
+'''1.''' Install a new operating system.
+
+* It is advisable to install a new operating system just for hosting the {{project_name_gateway_long}} VM.
+* Any operating system that can run VirtualBox works, but an open source system is preferable.
+
+'''2.''' [[Download]] the {{project_name_gateway_long}} image. <ref>Or [[Dev/Build Documentation|build it]] from source code.</ref>
+
+'''3.''' Configure networking.
+
+* Adapter 1 can be set up as a NAT network.
+* Adapter 2 must either:
+** Be set to NAT as well -- but ports must be forwarded from the host to the guest; or
+** It is much simpler to use bridged networking and set it to the second physical interface (the one that goes into the isolated network/point to point ethernet); see [[#NAT_vs_Bridging|NAT vs Bridging]] below.
+
+'''4.''' Note the following warnings.
+
+* This configuration is not recommended unless Tor must be run through an unsupported 3G/4G/5G modem and a third physical device is unaffordable.
+* Using NAT for a virtualized {{project_name_gateway_long}} requires setting up port forwarding in VirtualBox. Using a bridged network may be easier, but then the router may see the gateway MAC address which identifies as {{project_name_gateway_long}}. <ref>This is not a concern in home networks, but is a risk in untrusted networks or when using a modem to connect.</ref>
+}}
+
+= How-to: Install {{project_name_workstation_long}} =
+
+== Recommended: In a VM ==
+
+=== First Steps ===
+
+# Install and update the host operating system. It can be any operating system that is capable of running VirtualBox, but be aware of [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxyLeaks Transparent Proxy Leaks]. Windows or other commercial proprietary systems are <u>not</u> recommended.
+# [[Download]] the {{project_name_workstation_long}} image. <ref>Or [[Dev/Build Documentation|build it]] from source code.</ref>
+# If the physical network between {{project_name_gateway_long}} and a router uses 10.152.152.* then review and edit all shell scripts and switch the internal network to something else! <ref>TODO: check whether this step is still required.</ref>
+
+=== Host Network Adapter ===
+
+Configure the host to use a static IP configuration.
+
+<pre>
+## {{project_name_workstation_long}}
+## /etc/network/interfaces for the host,
+## when using Physical Isolation,
+## with {{project_name_workstation_long}} in a VM.
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+   ## Increment last octet of address
+   ## on optional additional hosts.
+   address 10.152.152.11
+   netmask 255.255.192.0
+   gateway 10.152.152.10
+   #pre-up /usr/bin/whonix_firewall
+
+   ## Out commented.
+   ## For what do we require the network and broadcast
+   ## instances anyway?
+   #network 10.152.152.0
+   #broadcast 10.152.152.255
+
+#auto eth0
+#iface eth0 inet dhcp
+
+## end of /etc/network/interfaces
+</pre>
+
+If the physical network between {{project_name_gateway_long}} and a router uses 10.152.152.*, then review and edit all <code>/etc/network/interfaces</code>.
+
+=== NAT vs Bridging ===
+
+In the default {{project_name_long}} VirtualBox image, the network adapter setting for Adapter 1 (<code>eth0</code>) is set to internal network and will therefore not work out of the box. There are two ways to fix this: NAT (recommended) or using a bridged network (unrecommended).
+
+==== Recommended: NAT ====
+
+To use NAT, edit <code>/etc/network/interfaces</code> in {{project_name_workstation_long}} to utilize either DHCP (easier, shown in the example below) or a static IP for VirtualBox NAT.
+
+<pre>
+sudoedit /etc/network/interfaces
+</pre>
+
+Replace it with.
+
+<pre>
+## {{project_name_workstation_long}}
+## /etc/network/interfaces in a VM
+## when using Physical Isolation.
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+## end of /etc/network/interfaces
+</pre>
+
+==== Unrecommended: Bridged Network ====
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = This is untested.
+}}
+
+If bridged networking is configured, then everything should work by default. <ref>At least it should work, although it is untested by developers.</ref> The reason is {{project_name_workstation_long}} can see the MAC address of whatever network adapter it is connected to.
+
+For this reason it is recommended to change the MAC address for both the Workstation host and the {{project_name_gateway_long}}; see [[MAC_Address#Changing_MAC_Addresses|Changing MAC Addresses]].
+
+==== Macvtap on KVM ====
+
+Change the network source of the ethernet nic to "macvtap" and the source mode to "passthrough". Be aware that you cannot use networking on the host anymore.
+
+==== Attach a USB-ethernet Adapter to the VM ====
+
+Remove the network adapter from the VM and instead attach a USB-ethernet adapter to the host and redirect it to the VM.
+
+== Unrecommended: On Hardware ==
+
+Installing {{project_name_workstation_long}} on hardware without using a VM is <u>recommended against</u>, because hardware serials are visible to {{project_name_workstation_long}}.
+
+The instructions are very similar, if not identical, to those in the How-to: Install {{project_name_gateway_long}} - [[#Recommended:_On_Hardware|Recommended: On Hardware]] section. The only difference is replacing <code>--flavor whonix-gateway</code> with <code>--flavor whonix-workstation</code> in relevant steps.
+
+= Expected Build Warnings =
+{{Expected_Build_Warnings}}
+
+= Post-installation Advice =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = It is recommended to consult the {{project_name_long}} [[Documentation]] in further depth. The [[Essential_Host_Security|Essential Host Security]] and [[Post_Install_Advice|Post-installation Security Advice]] chapters apply to both computers!
+}}
+
+== Stay Tuned ==
+
+It is absolutely crucial to subscribe to and read the latest {{project_name_long}} news category 'important-news' to stay in touch with ongoing developments. This way users benefit from notifications concerning important security advisories, potential upgrade issues and improved releases which address identified issues, like those affecting the updater or other core elements.
+
+See [[Stay Tuned]] for further information.
+
+== Extra Packages for Better Hardware Support ==
+
+Some packages for bare metal could be missing. Below is an incomplete list of packages, which may or may not be useful for better hardware support. <ref>These are suggestions only and individual users may need to undertake further research in their personal circumstances.</ref>
+
+<pre>
+xorg
+xserver-xorg-input-all
+xserver-xorg-input-wacom
+xserver-xorg-input-geode
+xserver-xorg-input-vmmouse
+xserver-xephyr
+
+xserver-xorg-input-*
+xserver-xorg-*
+
+acpi-support-base
+acpid
+acpi
+
+discover
+discover-modprobe
+discover-data
+
+hwdata
+
+mdetect
+
+apt-cache show task-desktop
+apt-cache show task-kde-desktop
+apt-cache show task-laptop
+</pre>
+
+If you have EFI bios.
+
+<pre>
+grub-efi-amd64
+</pre>
+
+To compile a more complete list, install Debian (with Xfce) on bare metal using the regular Debian installer medium. Then compare the package list against those installed in {{project_name_long}}.
+
+* diff "dpkg -l" with Whonix
+* diff "sudo lsmod" with Whonix
+* contribute the findings
+
+* See also: [https://wiki.debian.org/HardwareAutodetection Debian: HardwareAutodetection]
+
+== Troubleshooting ==
+
+* <u>Slow network speed</u>: see [https://forums.whonix.org/t/solved-network-speed-stability-7-7-8-9-gw-physically-isolated/82 (SOLVED) network speed/stability (7.7.8.9 GW, physically isolated)] in the forum. In this case the WiFi driver was implicated.
+* <u>No connection between {{project_name_gateway_long}} and {{project_name_workstation_long}}</u>: see [https://forums.whonix.org/t/testers-wanted-whonix-8-release-candidate-1-whonix-7-7-8-6/67 Testers-wanted! Whonix 8 Release candidate #1 Whonix 7.7.8.6] in the forum. It may relate to [https://en.wikipedia.org/wiki/Medium-dependent_interface Auto-MDIX].
+
+== Known Bugs ==
+
+To learn about known bugs affecting all platforms, see [[Known_Issues|here]]. Refer to the [[Reporting_Bugs#Issue_Tracker|issue tracker]] for a list of all all open issues affecting {{project_name_long}}.
+
+= Security and Support Status =
+
+Currently there is no dedicated [[Contribute#Contributor|contributor]] for {{project_name_long}} physical isolation.  This configuration is a remnant from earlier times when no other [[Download|supported platforms]] were available. Despite this reality, the setup and instructions are still functional and a small percentage of the {{project_name_long}} user population relies upon it.
+
+Lead {{project_name_long}} developer, Patrick Schleizer, has shifted his focus to [[Qubes|{{q_project_name}}]], but grave security issues are unlikely due to the {{project_name_long}} design. Unfortunately there are no [[Contributors|{{project_name_long}} contributors]] testing {{project_name_long}} physical isolation. As a consequence, no progress on the [https://phabricator.whonix.org/maniphest/?statuses=open%28%29&projects=PHID-PROJ-f6ufodh4cac5ursi7kcq#R {{project_name_long}} Physical Isolation development task list] should be expected. Until this situation changes the [[Download|supported platforms table]] will continue to list physical isolation's security status as "experimental".
+
+= Help Wanted =
+
+* Work on the [https://phabricator.whonix.org/maniphest/?statuses=open%28%29&projects=PHID-PROJ-f6ufodh4cac5ursi7kcq#R {{project_name_long}} Physical Isolation development task list] (this is an incomplete list).
+* Become a {{project_name_long}} Physical Isolation [[Contribute#Contributor|contributor]] so the [[#Security and Support Status|Security and Support Status]] can be improved.
+
+= Footnotes / References =
+
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

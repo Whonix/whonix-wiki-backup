@@ -1,0 +1,528 @@
+{{Title|title=Nym Servers and Pseudonymous Emails}}
+{{Header}}
+{{#seo:
+|description=How to use Nym Servers
+|image=Nymservers-6010640.jpg
+}}
+
+{{Contributor|
+|status=stable
+|about=About this {{Code2|{{PAGENAME}}}} Page
+|difficulty=medium
+|contributor=[https://forums.whonix.org/users/hulahoop HulaHoop]
+|support=[[Support]]
+}}
+[[image:Nymservers-6010640.jpg|250px|thumb]]
+= Introduction =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = These instructions are mostly defunct since [[Mixmaster]] is dead upstream; see [https://forums.whonix.org/t/long-wiki-edits-thread/3477/1542 here] for more information.
+}}
+
+A nym server is: <ref name=nym>https://www.techopedia.com/definition/1696/nym-server</ref>
+
+<blockquote>... a pseudonym server that furnishes an untraceable email address. The purpose of this server is to allow users to have usernames (pseudonyms) and send and receive messages without revealing their true identities.
+
+Even the nym server operators cannot trace a user's email address.</blockquote>
+
+This arrangement means nym servers (and a network of anonymous remailers) send pseudonymous emails and forward the replies to the user's real email address. In order to use nym servers: <ref name=nym />
+
+* Registration is required with an available server located on the internet.
+* A PGP key pair must be created and sent to the nym server, as well as the reply block for anonymous remailers in order to send a message to the creator's real email address for replies.
+
+= Rationale =
+
+Properly created nym server systems are considered relatively anonymous -- it is difficult to trace the nym server or identify the real email sender. <ref>Explaining why they are sometimes use by parties for malicious purposes.</ref> In addition, this configuration provides an uncensorable inbox that does not rely on a single service provider; this is beneficial in today's climate where a number of email services have abruptly shut down due to coercion or service restrictions (see [https://en.wikipedia.org/wiki/Lavabit Lavabit] for a recent example). Further, it is unnecessary to risk browser-based logins in a webmail interface, thereby reducing the chance of connections being intercepted or poised by adversaries relying on specific selectors.
+
+The following guide utilizes [https://github.com/crooks/nymserv Zax-type nym servers] <ref>Zax (aka Steve Crook) is the author of this newer type of nym server.</ref> as they are infinitely more usable than the original GHIO-type servers which should be avoided at all costs (unless you enjoy [https://www.iusmentis.com/technology/remailers/nym.html hand-crafting reply-blocks]). Readers who are unfamiliar with the term 'reply-block' should not be concerned because no manual configuration is necessary in these instructions.
+
+To manage your nym, messages can be sent to the nym server via a SMTP server or even a personal email address (unrecommended, but still functional). Previously {{project_name_long}} strongly recommended the use of [[Mixmaster]] to communicate with nym servers, since they are commonly used together but are totally independent. Unfortunately this is no longer possible, as Mixmaster is dead upstream and has been [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=880101 permanently removed from Debian].
+
+= Message Path =
+
+'''Table:''' ''Message Path Factors''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Factor'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Nym Server Connections
+|
+* Remember that every message sent by your nym must be delivered to the nym server:
+<code>{{project_name_long}}</code> &rarr; <code>Tor circuit</code> &rarr; <code>Mixmaster network</code> &rarr; <code>Nym server</code>
+|-
+! scope="row"| Newsgroup Replies
+|
+* When the nym server receives a message from your nym (configuration or regular message), a reply is posted to the Newsgroup for the nym to confirm it was received. It can be retrieved later by downloading it from the Newsgroup:
+<code>Nym server</code> &rarr; <code>Newsgroup</code> &rarr; <code>Tor circuit</code> &rarr; <code>Whonix</code>
+|-
+! scope="row"| Other Nyms
+|
+* If your message was sent to another nym from the same server, it will follow the same path as above. If it wasn't, it will be delivered to the respective recipient:
+<code>Nym server</code> &rarr; <code>Recipient</code>
+|-
+! scope="row"| Received Messages
+|
+* When messages are sent to your nym they are delivered to the nym server and processed, before finally being posted to the Newsgroup in a similar fashion to the earlier "Newsgroup Replies" section:
+<code>Sender</code> &rarr; <code>Nym server</code> &rarr; <code>Newsgroup</code> &rarr; <code>Tor circuit</code> &rarr; <code>Whonix</code>
+|}
+
+= Instructions =
+
+This guide uses '''mixnym.net''', but the same steps equally apply to any other Zax-type nym server. For a selection of nym servers, see: [[#Zax-type Nym Server List|Zax-type Nym Server List]].
+
+The examples below use the nym '''nym@mixnym.net''' -- adjust this text to match your nym choice and the domain name of the nym server.
+
+== Conventions ==
+
+It is important to know which address should be used when sending messages to the nym server:
+* <u>config@mixnym.net</u>: creation or configuration requests, to create and manage your nym
+* <u>send@mixnym.net</u>: send requests, to send messages from your nym to other people
+* <u>url@mixnym.net</u>: url requests, to retrieve an HTML page
+
+For an overview of the process, seven primary steps apply:
+
+# Import the Nym Server Key
+# Prepare the Nym Request
+# Send Request to the Nym Server
+# Retrieve Messages from the Newsgroup
+# Decrypt Messages
+# Send Mail with Registered Nym
+# Reconfigure Nym
+
+== Import the Nym Server Key ==
+
+A nym server's key is usually on their homepage. Follow these steps to import the key.
+{{Box|text=
+'''1.''' Download the '''mixnym.net''' nym server key with curl to the home folder.
+
+{{CodeSelect|code=
+curl -o key.asc http://is-not-my.name/key.asc
+}}
+
+'''2.''' Check fingerprints/owners without importing anything.
+
+{{CodeSelect|code=
+gpg --keyid-format long --with-fingerprint key.asc
+}}
+
+Always check the fingerprint for yourself. The output at the moment is:
+
+<pre>
+pub  4096R/0xFF4DB66014D0C447 2010-05-05 URL is-not-my.name (URL Retrieval address for Is-Not-My Nymserver) <url@is-not-my.name>
+      Key fingerprint = 94F2 04C2 8BF0 0937 EFC8  5D1A FF4D B660 14D0 C447
+</pre>
+
+'''3.''' If the fingerprint is correct, import it with GPG.
+
+{{CodeSelect|code=
+gpg --import key.asc
+}}
+
+Sometimes it may only be available from PGP keyservers. In that instance, download it from a keyserver such as <code>keys.openpgp.org</code> (<code>zkaan2xfbuxia2wpf7ofnkbz6r5zdbbvxbunvp5g2iebopbfc4iqmbad.onion</code>) by providing the fingerprint.
+
+{{gpg_key_download}}
+
+{{CodeSelect|code=
+gpg --keyserver keys.openpgp.org --recv-keys 94F204C28BF00937EFC85D1AFF4DB66014D0C447
+}}
+
+If the fingerprint is unknown, try and search for it.
+
+{{CodeSelect|code=
+gpg --keyserver keys.openpgp.org --search-keys config@mixnym.net
+}}
+
+Do not forget to check the fingerprint before importing the key.
+}}
+
+== Prepare the Nym Request ==
+
+=== Create a Key Pair ===
+
+Create a new key pair for '''nym@mixnym.net'''.
+
+{{CodeSelect|code=
+gpg --gen-key
+}}
+
+<pre>
+    Please select what kind of key you want:
+       (1) RSA and RSA (default)
+       (2) DSA and Elgamal
+       (3) DSA (sign only)
+       (4) RSA (sign only)
+    Your selection? 1
+
+    What keysize do you want? (2048) 4096
+
+    Please specify how long the key should be valid.
+             0 = key does not expire
+          <n>  = key expires in n days
+          <n>w = key expires in n weeks
+          <n>m = key expires in n months
+          <n>y = key expires in n years
+    Key is valid for? (0) 6m
+
+    Real name: John Doe
+    Email address: nym@mixnym.net
+    You selected this USER-ID:
+        "nym@mixnym.net <nym@mixnym.net>"
+
+    You need a Passphrase to protect your secret key.
+
+    public and secret key created and signed.
+</pre>
+
+Make sure to provide different information from the example above. Also note the nym expires when the key expires.
+
+=== Export Public Key ===
+
+To create a nym, its public key must be exported and sent to the nym server. In the following example, it will be copied to <code>pubkey.txt</code>.
+
+{{CodeSelect|code=
+gpg --armor --export nym@mixnym.net > pubkey.txt
+}}
+
+=== Configure Additional Options ===
+
+This step is only necessary if choosing to configure additional nym options, such as Subject Identification or Symmetric Encryption. For each option, prepend a line to the <code>pubkey.txt</code> file using the following format.
+
+{{CodeSelect|code=
+option: setting
+}}
+
+Caps are unimportant in the option name, but are sensitive in the setting.
+
+The nym server parameters specified here are optional. <ref>https://groups.google.com/g/alt.privacy.anon-server/c/f3H4Xw5j2LI</ref> They can be set immediately or changed in the future as detailed in the [[#Reconfigure Nym|Reconfigure Nym]] section.
+
+'''Table:''' ''Optional Nym Server Parameters''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Parameter'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Fixed (Plaintext) Subject
+| Choose a unique keyword as a '''Subject''' to be able identify the nym server reply on the newsgroup with the <code>subject</code> option. Using a fixed subject is convenient, but anyone can link all the messages to the same nym since they all have the same subject.
+|-
+! scope="row"| Hashed Subject
+| A better alternative to the <code>subject</code> option is to use hashed subjects (hSubs), by providing an hSub passphrase with the <code>hsub</code> option.
+
+A hSub is made of two parts: the first is a random number and the second part is the hash of that same random number and a passphrase. As the hashing is a one-way function, it is impossible to identify the owner of the message. However, as you know your nym's hSub passphrase, it can be hashed with the random number of every message, and if the result collides with the second part of the hSub, that message was sent to your nym.
+<ref>http://is-not-my.name/hsub.html</ref>
+
+Alternative options for setting a hSub include: <code>hash-key</code>, <code>hash-subject</code> and
+<code>subject-password</code>. All of these are equivalent to <code>hsub</code>.
+|-
+! scope="row"| Symmetric Encryption
+| A symmetric encryption layer can be added by specifying a key with the <code>symmetric</code> option.
+|-
+! scope="row"| Deletion
+| To delete your nym, the following option and setting can be sent: <code>delete: yes</code>.
+|}
+
+For a concrete example, to add the hSub passphrase <code>panda</code>, <code>pubkey.txt</code> should be edited as follows:
+
+<pre>
+    hsub: panda
+
+    -----BEGIN PGP PUBLIC KEY BLOCK-----
+    <snipped>
+    -----END PGP PUBLIC KEY BLOCK-----
+</pre>
+
+More than one option line can be added to the request, but be aware that some options might create conflicts. For example, <code>subject</code> and <code>hsub</code> work differently, but are used for the same purpose -- only one of these options should be used at the same time.
+
+=== Encrypt the Request ===
+
+It is necessary to wrap <code>pubkey.txt</code> -- the message containing additional options and the public key -- to the nym server. The <code>pubkey.txt</code> file is the input for the following example and the encrypted file will be created as <code>pubkey.txt.asc</code>:
+
+{{CodeSelect|code=
+gpg --armor --encrypt --recipient config@mixnym.net pubkey.txt
+}}
+
+It is safe to ignore the warning about encrypting to an "untrusted" key and just select <code>y</code> for yes.
+
+== Send Request to the Nym Server ==
+
+Before sending the request, update the remailer keys first. It is enough to complete this procedure on a daily basis: <ref>https://www.youtube.com/watch?v=Oaft_WNMUIg Steven Murdoch</ref> <ref>https://web.archive.org/web/20190915082414/https://www.youtube.com/watch?v=dzbrFPO4604&gl=US&hl=en LinuxJournal</ref>
+
+<pre>
+    mixmaster
+
+    u)pdate stats
+
+    *
+
+    pick remailer letter (optional)
+
+    <space>
+
+    q)uit
+</pre>
+
+Send the encrypted file to the nym server with Mixmaster:
+
+{{CodeSelect|code=
+mixmaster --mail -l *,*,* -c 2 config@mixnym.net pubkey.txt.asc
+}}
+
+Where:
+
+* <code>-l</code> customizes the remailer chain length. The shorter the chain the faster the mail will be sent, thereby improving the chances of success. In this example, three random mixes are in use: <code>*,*,*</code>.
+* <code>-c</code> sends copies of the message. In this example, <code>2</code> copies are sent.
+
+If necessary, run Mixmaster from the command line and check the remailer chain list to see node availability and reliability statistics, then choose accordingly.
+
+If all steps were followed correctly, the nym server will decrypt the message, extract your nym's email address from the supplied public key, then process it. Provided the nym is not reserved or already taken, a confirmation message will be received from the nym server, encrypted to your nym's key.
+
+Note that the protection provided by Mixmaster is of little importance here because everything is done behind Tor. <ref>https://www.mail-archive.com/liberationtech@lists.stanford.edu/msg00022.html</ref>
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Important</u>: Take note that this is the only message where the public key is attached, as well as the only one the server will ever accept that is not signed by that key. From now on, the nym's digital signature will prove your ownership of it. Examples on signing can be found in [[#Send Mail with Registered Nym|Send Mail with Registered Nym]] and [[#Reconfigure Nym|Reconfigure Nym]].
+}}
+
+== Retrieve Messages from the Newsgroup ==
+
+Zax-type nym servers deliver messages to nyms via the <code>alt.anonymous.messages</code> Usenet group (a.a.m). Anyone can access these messages, but only the nyms can decrypt them by using their private keys.
+
+As explained earlier, messages can be configured to be identified by subject. If a form of subject identification was set up from the previous section, then refer to the [[#Use aam2mail to Fetch Replies|Use aam2mail to Fetch Replies]] section.
+
+If subject identification was not configured but is desirable, then a configuration message must be sent to stipulate a method of subject identification. An example can be found in the [[#Reconfigure Nym|Reconfigure Nym]] section.
+
+If no form of subject identification is desired, then the default method is to download and attempt to decrypt every message posted on the Newsgroup. If it works, then the message was sent to your nym.
+
+=== Use aam2mail to Fetch Replies ===
+{{anchor|Use aam2mail to Fetch Replies}}
+{{Box|text=
+'''1.''' Install git and clone aam2mail source.
+
+aam2mail does not have any extra dependencies.
+
+{{CodeSelect|code=
+sudo apt install git
+}}
+{{CodeSelect|code=
+git clone https://github.com/crooks/aam2mail
+}}
+{{CodeSelect|code=
+cd aam2mail
+}}
+{{CodeSelect|code=
+sudo python setup.py install
+}}
+
+'''2.''' Configure aam2mail settings.
+
+Utilize the hsub that was chosen.
+
+{{CodeSelect|code=
+mkdir ~/aam2mail/etc
+}}
+{{CodeSelect|code=
+echo 'panda' >> aam2mail/etc/subject_hsub
+}}
+{{CodeSelect|code=
+echo 'nntp.aioe.org' >> aam2mail/etc/servers
+}}
+
+'''3.''' Run aam2mail periodically to check for messages.
+
+There is an expected delay of a few hours before receiving replies.
+
+{{CodeSelect|code=
+aam2mail --start
+}}
+
+or
+
+{{CodeSelect|code=
+aam2mail --restart
+}}
+
+'''4.''' Check for replies downloaded by aam2mail.
+
+The default path is <code>/home/user/Maildir/new</code>. aam2mail will only retrieve messages and not decrypt them.
+
+Be sure to check for new messages regularly; messages on Usenet accumulate beyond the fetch-limit and can easily be missed.
+}}
+
+== Decrypt Messages ==
+
+With the message saved to a file, decrypt it as follows.
+
+{{CodeSelect|code=
+gpg --decrypt file
+}}
+
+If successful, the plaintext of the message your nym received should be visible.
+
+Congratulations on registering your first nym! Now it can be used for sending messages.
+
+== Send Mail with Registered Nym ==
+{{anchor|Send Mail with Registered Nym}}
+To send messages to other people, the steps are very similar to those used previously for creation and configuration.
+
+{{Box|text=
+'''1.''' Use a text editor to compose the <code>message.txt</code> file.
+
+{{CodeSelect|code=
+To: recipient@domain
+Subject: Example
+
+This is an example
+}}
+
+'''2.''' Encrypt and sign to the server.
+
+{{CodeSelect|code=
+gpg --armor --encrypt --sign --recipient send@mixnym.net message.txt
+}}
+
+'''3.''' Send the file with Mixmaster.
+
+This time the message is sent to '''send@mixnym.net'''.
+
+{{CodeSelect|code=
+mixmaster --mail -l *,*,* send@mixnym.net message.txt
+}}
+
+The recipient will receive a message from '''nym@mixnym.net''' and they can send a reply to the same address.
+}}
+
+Take note that copies of the message were not sent on this occasion. This was advisable for the creation step, because after receiving the first one the server would ignore the others. In this case of sending mail, if copies are sent the server will send all of them to the recipient.
+
+== Reconfigure Nym ==
+{{anchor|Reconfigure Nym}}
+{{Box|text=
+'''1.''' To add (or change) an option, another message must be sent to '''config@mixnym.net'''.
+
+This message must state <code>option.txt</code> and the additional option(s) that should be added.
+
+{{CodeSelect|code=
+    hsub: passphrase
+}}
+
+The message does not require a body, just headers.
+
+'''2.''' Remember to sign and encrypt the message.
+
+{{CodeSelect|code=
+gpg --armor --encrypt --sign --recipient config@mixnym.net option.txt
+}}
+
+'''3.''' Send the message.
+
+As you are configuring the nym, it should be sent to '''config@mixnym.net'''.
+
+{{CodeSelect|code=
+mixmaster --mail -l *,*,* config@mixnym.net option.txt.asc
+}}
+}}
+
+= Important Notes =
+
+== End-to-End Encryption ==
+
+The encryption layers discussed in this wiki entry will only protect data between the nym and the server. It is recommended that another form of end-to-end encryption (another layer) is added between you and the recipient, for example by encrypting the body of the message first, and then encrypting to the server's key.
+
+Bear in mind the headers cannot be encrypted, so an end-to-end encrypted message would appear similar to the example below.
+
+<pre>
+    To: recipient@domain
+    Subject: Subject
+
+    -----BEGIN PGP MESSAGE-----
+    <snipped>
+    -----END PGP MESSAGE-----
+</pre>
+
+After this step, users would then encrypt to the nym server so it would appear like the example below.
+
+<pre>
+    To: send@server
+
+    -----BEGIN PGP MESSAGE-----
+    <snipped>
+    -----END PGP MESSAGE-----
+</pre>
+
+== Message Ordering ==
+
+Due to Mixmaster's latency, it is possible for messages to arrive out of order. For instance, later messages might arrive earlier than the creation message. If no responses are received, it is necessary to send them again once the nym is created.
+
+== Multiple Nyms ==
+
+If more than one nym is used, you must remember to choose which nym will sign the message, or always use the same nym to send the messages, and consequently only these messages will be accepted. As noted earlier, the only message accepted without a signature is the creation message.
+
+To specify the nym that will sign the message, use the <code>--local-user</code> flag.
+
+{{CodeSelect|code=
+gpg --armor --encrypt --sign --recipient send@server --local-user nym@server message.txt
+}}
+
+== Public Mailbox ==
+
+When someone sends a message to your nym, the server will receive it, encrypt to the nym and post it on a.a.m so it can be retrieved. The Newsgroup acts as a public mailbox -- everybody can see and download the messages but only the intended recipient (your nym) can decrypt it.
+
+= Zax-type Nym Server List =
+
+Although the reference is dated, active Zax-type nym servers in 2019 include: <ref>https://alt.privacy.anon-server.narkive.com/Zd27lR8z/how-to-get-nymserver-help-key</ref>
+* nymphet.paranoici.org
+* [https://web.archive.org/web/20220727093503/http://mixnym.net/ mixnym.net]
+* https://www.cotse.net/
+
+= Public/Open News Servers =
+
+* https://news.dizum.net/ <ref>A open (read-only) (text) usenet server. Both nntp and nntps are supported. https://dizum.com/</ref>
+* https://news.aioe.org/ <ref name=QSA>Used by QSA: https://web.archive.org/web/20221007035558/https://sec3.net/www.quicksilvermail.net/</ref>
+* http://news.mixmin.net/ <ref name=QSA />
+
+= Other Useful Topics =
+
+* The default Mixmaster editor can be changed to something more usable than vi with the following steps. <ref>https://alt.privacy.anon-server.narkive.com/5dbZVYpQ/choice-of-editor-with-mixmaster</ref>
+
+{{project_name_long}} KDE:
+
+{{CodeSelect|code=
+sudo echo 'export EDITOR=kwrite' >> ~/.bashrc
+}}
+
+{{project_name_long}} XFCE:
+
+{{CodeSelect|code=
+sudo echo 'export EDITOR=mousepad' >> ~/.bashrc
+}}
+
+Logout and then log back in again for changes to take effect.
+
+* What happens if you register a nym that is already taken?
+
+A message will be received in a.a.m that it is already taken. <ref>https://alt.privacy.anon-server.narkive.com/Zd27lR8z/how-to-get-nymserver-help-key</ref>
+
+= Development Notes =
+
+* Explore whether aam2mail <ref>The latter is also written by Steve Crook, see: https://github.com/crooks/aam2mail</ref> can be shipped as a stand-alone python utility for hsub management.
+* Further reading: the Mixnym.net key expired but Zax fixed the problem. <ref>https://groups.google.com/g/alt.privacy.anon-server/c/A6ltHhItGrw</ref>
+
+= See Also =
+
+* [[E-Mail]]
+* [[Remailer]]
+
+= Sources =
+
+This wiki entry is based on Zax's [http://is-not-my.name help] [http://www.is-not-my.name/send_howto.html guides] on Mixnym.net, which is also [https://archive.ph/uIO5I archived] [https://archive.ph/Qss3y here]. Appreciation is also expressed to the [https://github.com/AnemoneLabs/nymphemeral Nymphemeral] developer, <ref>[https://pypi.org/project/nymphemeral/ pypi.org]: <blockquote>It is a GUI client that relies on a pseudonym remailer that communicates to its users by posting messages to a shared mailbox, a Zax-type nym server. Both the server and the client apply an ephemeral encryption layer on their messages based on the Axolotl Ratchet protocol, providing forward and future secrecy to the conversation.</blockquote></ref> Felipe Dau, for helping with these instructions.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

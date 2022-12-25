@@ -1,0 +1,82 @@
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Tor blocks by destination servers can usually be bypassed using simple [[Tor_Browser#Bypass_Tor_Censorship|proxies]], rather than adding an additional tunnel to Tor.
+
+In order to circumvent state-level censorship of the Tor network, [[Bridges]] or other [[Lantern|alternative]] [[Anon_Connection_Wizard|circumvention]] [[Censorship_Circumvention_Tools|tools]] will probably be required. <ref>Users in China are [https://web.archive.org/web/20171218203107/https://www.cs.uml.edu/~xinwenfu/paper/Bridge.pdf unlikely to circumvent government censorship] with vanilla bridges, as they are uniformly blocked. That said, anon-connection-wizard configured with the meek-amazon or meek-azure pluggable transport is reported to bypass Chinese censorship in late 2017.</ref>
+}}
+
+=== Trusting Service Providers ===
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Warning]]
+| text    =
+ A tunnel service provider that knows your identity and/or location may be more willing and able to compromise your privacy than your ISP.
+}}
+----
+=== Failed Closed Configurations ===
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Warning]]
+| text    =
+If your software configuration doesn’t block all traffic when your tunnel-link connection suddenly disconnects, your encrypted Tor traffic will go through your ISP without warning. This is the default nature of most tunnel configurations and not an issue specific to {{project_name_long}}. <ref>For example, VPNs require a failed closed configuration to prevent DNS leaks.</ref>
+}}
+----
+=== Tunnel-links can Affect Anonymity ===
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Warning]]
+| text    =
+Using any extra tunnel, for example a VPN, proxy or SSH can can negatively affect anonymity under some circumstances. <ref>
+https://lists.torproject.org/pipermail/tor-talk/2016-July/041757.html
+</ref>  <ref>
+[https://phabricator.whonix.org/T492 research / document impact for tunnel users if Tor relays hosted at the same tunnel provider]
+</ref>
+
+To explain why that is, some background information is required so you can draw conclusions and take actions to avoid this risk. See below.
+}}
+
+----
+=== Using the same Tunnel Provider in  Multiple VMs at the same Time ===
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Warning]]
+| text    =
+Don't use the same tunnel provider / configuration in more than one place at the same time.<br />
+<br />
+For example, do not use the same tunnel setup inside {{project_name_gateway_long}} as well as inside {{project_name_workstation_long}}. Also do not use the same tunnel setup on the host and inside a {{project_name_gateway_long}} or {{project_name_workstation_long}} at the same time.
+}}
+
+----
+=== Reusing Tunnel-links ===
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Warning]]
+| text    =
+Individual tunnel-links should only be used for a single configuration and never reused in any other tunnel-link chains. Doing so could tie any anonymous identities associated with the tunnel-link to the user's ISP assigned IP address.
+
+
+Example:
+
+In tunnel-chain 1, the ISP assigned IP address is permanently linked to the tunnel-link. In tunnel-chain 2, the same tunnel-link was reused. Since the users ISP assigned IP address was previously linked to that same tunnel-link, that anonymous identity can now be linked to the user actual IP address.
+
+* Tunnel-chain 1: (<code>User</code> &rarr; <code>Tunnel-link</code>[users IP address is linked] &rarr; <code>Tor</code> &rarr; <code>Internet</code>)
+
+* Tunnel-chain 2: (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Tunnel-link</code>[anonymous activities linked] &rarr; <code>Internet</code>)
+
+The previous example also holds true if the tunnel-link is first used with tunnel-chain 2 and then reused in tunnel-chain 1. If this were done, all anonymous activities conducted with tunnel-chain 2 would then be link with the users ISP assigned IP address.
+}}
+
+----
+=== {{q_project_name}} Templates ===
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Warning]]
+| text    = [[Qubes|{{q_project_name}}]] users note:<br />
+You probably do not want to run the tunnel software from within a Template. This is because the <code>\{\{project_name_gateway_template\}\}</code> Template "is more like a workstation". It is behind <code>{{project_name_gateway_vm}}</code>. It is not <code>{{project_name_gateway_vm}}</code> itself.<br />
+<br />
+(If you are using <code>openvpn</code> inside {{project_name_gateway_long}} (commonly called <code>{{project_name_gateway_vm}}</code>) or {{project_name_workstation_long}} (commonly called <code>{{project_name_workstation_vm}}</code>) while following {{project_name_long}} documentation, <code>openvpn</code> will not start inside the <code>\{\{project_name_gateway_template\}\}</code> or <code>{{project_name_workstation_template}}</code> Template.) <ref>
+This is because file [https://github.com/{{project_name_short}}/usability-misc/blob/master/lib/systemd/system/openvpn%40openvpn.service.d/50_unpriv.conf /lib/systemd/system/openvpn@openvpn.service.d/50_unpriv.conf] checks the following condition
+<pre>
+ConditionPathExists=!/var/run/qubes-service/whonix-template
+</pre>
+Which means, if file <code>/var/run/qubes-service/whonix-template</code> exists, which is the case in {{project_name_long}} templateVMs, the {{Code2|openvpn@openvpn}} service will not be started.
+</ref>
+<br />
+In Qubes R4 and above, the [https://github.com/QubesOS/qubes-issues/issues/1858 Templates's NetVM is purposely set to <code>none</code> by Qubes default]. (They are upgraded through the qrexec based updates proxy that will be running on <code>{{project_name_gateway_vm}}</code>.)
+}}

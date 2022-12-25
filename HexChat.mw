@@ -1,0 +1,119 @@
+{{Title|title=HexChat: IRC Client}}
+{{Header}}
+{{#seo:
+|description=Anonymous IRC Chat. HexChat (previously called XChat) over the Tor Anonymity Network.
+|image=https://www.{{project_clearnet}}/w/images/7/7b/Hexchaticon.png
+}}
+[[image:Hexchaticon.png|HexChat Logo|thumb]]
+= Introduction =
+
+[https://hexchat.github.io/ HexChat] is an open source IRC client based on XChat. It includes basic functionality found in IRC clients, like secure connections, multiple server connections, nick completion, a client-to-client protocol, direct client-to-client file transfer and chat, and a plugin system which allows extension of features and further customization. <ref>https://en.wikipedia.org/wiki/HexChat</ref> <ref>https://hexchat.github.io/</ref>
+
+HexChat in {{project_name_long}} has been hardened according to The Tor Project's Torrifying HexChat guide. <ref>https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/HexChat</ref> All servers, besides the secure (SSL) version of the [https://en.wikipedia.org/wiki/Open_and_Free_Technology_Community Open and Free Technology Community (OFTC)] have been removed. <ref>This is an IRC network which provides collaboration services for members of the free software community, anywhere in the world.</ref> It is recommended to add the securely encrypted version of the IRC server, preferably an onion service which uses SSL as a fallback or at best, both. Also see: [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/HexChat Torifying HexChat].
+
+Note that the official #Tor channel is on OFTC, but no {{project_name_long}} developers are active there! Upstream Tor developers do not support {{project_name_long}}. For help with {{project_name_long}}-related issues, see [[Support|Support]].
+
+= HexChat Operations =
+== Start HexChat ==
+{{Box|text=
+<u>If you are using [[Qubes|{{q_project_name}}]]</u>, complete the following steps.
+
+<code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>{{project_name_workstation_long}} AppVM (commonly named {{project_name_workstation_vm}})</code> &rarr; <code>HexChat IRC</code>
+
+<u>If you are using a graphical {{project_name_workstation_long}}</u>, complete the following steps.
+
+<code>Start menu</code> &rarr; <code>Applications</code> &rarr; <code>Internet</code> &rarr; <code>HexChat IRC</code>
+}}
+
+== Reset the HexChat Identity ==
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' This will kill HexChat, delete all settings, scripts and logs and finally create a fresh HexChat identity.
+}}
+{{Open_a__product_ws_terminal}}
+
+Run.
+
+{{CodeSelect|code=
+hexchat-reset
+}}
+
+Done.
+
+== SASL ==
+Some networks and hidden IRC servers (like freenode) require [https://en.wikipedia.org/wiki/Simple_Authentication_and_Security_Layer Simple Authentication and Security Layer (SASL)] to connect to them.
+
+Setting up SASL is outside the scope of this entry; refer to The Tor Project [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/HexChat SASL Authentication] instructions.
+
+== Privacy Check ==
+Before joining any channels, run the whois function from the status window.
+
+{{CodeSelect|code=
+/whois your-user-name your-user-name
+}}
+
+The following example Chat (IRC client) screenshot shows the /whois output for user TNTBOMBOM ({{Code|/whois TNTBOMBOM TNTBOMBOM}}).
+
+'''Figure:''' ''IRC /whois Output''
+
+[[File:chaos22.png|800px|HexChat (IRC Client), showing /whois of oneself.]]
+
+== Disabling Hardening and File Transfers ==
+
+Refer to this forum thread: [https://forums.whonix.org/t/hexchat-downloads/9790 Hexchat downloads?]
+
+= IRC General =
+
+The Ident Protocol <ref>https://en.wikipedia.org/wiki/Ident_protocol</ref> is automatically blocked because {{project_name_workstation_long}} is firewalled. <ref>The Tor Project [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IRC notes]: <blockquote>In both UNIX and Windows systems, the logged in username becomes the default ident. The ident is seen by most clients during channel join and when performing the /​whois command. It is therefore recommended to fake your ident before you connect to any IRC servers.</blockquote></ref>
+
+The Tor Project [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IRC Internet Relay Chat] page contains general IRC safety techniques and other tips. Another useful resource is the [https://www.irchelp.org/security/ IRC Security] page. Key information and advice is provided on:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* The importance of (additional) encrypted connections:
+** If an onion service is available, then use it. It is also safer to combine additional layers of encryption like SSL, TLS or GPG if possible.
+** If an IRC server uses a self-signed certificate, then explicitly check the SSL/TLS certificate is correct to prevent [https://en.wikipedia.org/wiki/Man-in-the-middle_attack man-in-the-middle attacks].
+* Avoiding [https://en.wikipedia.org/wiki/Trojan_horse_%28computing%29 Trojan Horse attacks] via malicious, downloaded files.
+* Defense against [https://en.wikipedia.org/wiki/Denial-of-service_attack Denial of Service attacks]. <ref>Which otherwise can make networked computers disconnect or crash.</ref>
+* Dangers associated with downloaded files.
+* Firewall considerations.
+* The impact of potential back-doors in IRC clients.
+* Circumvention of Tor censorship.
+* End-to-end encryption using OTR and other plugins.
+* Social safety measures to prevent de-anonymization.
+* Other miscellaneous security advice.
+</div>
+
+= Connection Issues =
+If a message similar to the following appears.
+
+<pre>
+* Closing Link: 93.115.95.205 (No more connections permitted from your host)
+* Disconnected (Remote host closed socket)
+</pre>
+
+This most likely means the connection to the IRC server is working, but the server disconnects because they are not accepting Tor network connections. This is a general Tor censorship problem and unrelated to Whonix; see [https://trac.torproject.org/projects/tor/wiki/org/doc/ListOfServicesBlockingTor List Of Services Blocking Tor].
+
+Unfortunately there is no easy solution and each available workaround has pros and cons:
+
+* Use an IRC alternative if this is feasible; see [[Chat]] for options.
+* If possible, use another Tor-friendly IRC network: [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/BlockingIrc List of IRC/chat networks that block or support Tor]. <ref>Or conduct an Internet search for "Tor-friendly IRC server".</ref>
+* Check if the IRC network provides a solution for Tor users. For example, [https://www.oftc.net/Tor/ OFTC and Tor].
+* Combine Tor with an [[Tunnels/Introduction|additional tunnel]] link to circumvent blocks. <ref>This is a time-consuming and steep learning curve just to solve this issue.</ref> A connection to Tor must be made before the tunnel-link (proxy / VPN / SSH): <code>User</code> &rarr; <code>Tor</code> &rarr; <code>proxy / VPN / SSH</code> &rarr; <code>Internet</code>.
+* Use an IRC bouncer; see [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IRC Internet Relay Chat]. In the past, there were no trustworthy and free IRC bouncer services, but this situation may have changed in 2018. IRC bouncers are very affordable, but it is difficult to register and pay anonymously, see: [[Money]].
+
+To follow the associated {{project_name_long}} development ticket, see: [https://phabricator.whonix.org/T361 Migrating from IRC OFTC to Tor friendly IRC network].
+
+= Screenshots =
+
+'''Figure:''' ''HexChat IRC Client Chat Window''
+[[File:hexchat.png|800px]]
+
+= See Also =
+* [[Chat]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

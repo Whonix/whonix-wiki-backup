@@ -1,0 +1,115 @@
+{{Header}}
+{{#seo:
+|description=This page is targeted at users who wish to improve the security of their {{project_name_gateway_short}} to become even more secure.
+|image=https://www.{{project_clearnet}}/w/images/c/c7/{{project_name_short}}gatewaysecur23234234.jpg
+}}
+[[image:{{project_name_short}}gatewaysecur23234234.jpg|thumb]]
+
+= Introduction =
+
+{{security_intro}}
+
+This page is targeted at users who wish to improve the security of their {{project_name_gateway_short}} to become even more secure.
+
+= AppArmor =
+
+According to debian.org: <ref>https://wiki.debian.org/AppArmor</ref>
+
+<blockquote>AppArmor is a Mandatory Access Control framework. When enabled, AppArmor confines programs according to a set of rules that specify what files a given program can access. This proactive approach helps protect the system against both known and unknown vulnerabilities.</blockquote>
+
+AppArmor provides a number of advantages: <ref>https://gitlab.com/apparmor/apparmor/-/wikis/home</ref>
+
+* It protects the operating system and applications from external or internal threats, including zero-day attacks.
+* "Good behavior" is enforced and it mitigates exploits via unknown application flaws.
+* AppArmor security policies define the system resources that individual applications can access, and with what privileges. For instance:
+** Network access.
+** Raw socket access.
+** Read, write or execute file permissions on specific paths.
+
+It is recommended to use the [[AppArmor|{{project_name_long}} AppArmor profiles]] which are available for various programs that run in both {{project_name_gateway_long}} and {{project_name_workstation_long}}, such as Tor, Tor Browser, Thunderbird and more. The profiles are easy to apply and provide a considerable security benefit.
+
+= General Advice =
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' Only use {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) for running Tor!
+}}
+
+If {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) is ever compromised, the attacker can discover:
+
+* The user's identity (public IP address).
+* All destinations visited.
+* The entirety of clear-text and onion service communication over Tor.
+
+Before installing any extra packages in {{project_name_gateway_long}}, first consult the developers to check whether that is  necessary and wise. As a rule of thumb, no additional programs should be run in {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>).
+
+= Seccomp =
+
+According to Mozilla: <ref>https://wiki.mozilla.org/Security/Sandbox/Seccomp</ref>
+
+<blockquote>
+Seccomp stands for secure computing mode. It is a simple sandboxing tool in the Linux kernel, available since Linux version 2.6.12. When enabling seccomp, the process enters a "secure mode" where a very small number of system calls are available (exit(), read(), write(), sigreturn()). Writing code to work in this environment is difficult; for example, dynamic memory allocation (using brk() or mmap(), either directly or to implement malloc()) is not possible.
+</blockquote>
+
+It is recommended to enable seccomp on {{project_name_gateway_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>{{project_name_gateway_vm}}</code>), since it is easily applied and provides additional sandboxing protection for the Tor process. Be aware that [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/PluggableTransports/list pluggable transports] like obfs4, meek-lite and Snowflake are incompatible with seccomp. <ref>
+See the following [https://forums.whonix.org/t/seccomp-not-working/5398 forum discussion] for further consideration of this issue.
+</ref>
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Note</u>: Enabling seccomp on {{project_name_gateway_long}} currently prevents Tor from connecting. Help is most welcome, see: [https://forums.whonix.org/t/cannot-use-seccomp-in-{{project_name_gateway_vm}}-after-update/10267 Cannot use Seccomp in {{project_name_gateway_vm}} after update]. <ref>This might relate to a [https://lists.torproject.org/pipermail/tor-dev/2021-March/014532.html bug] in Tor code.</ref>
+}}
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add.
+
+<pre>
+Sandbox 1
+</pre>
+
+Save and exit.
+
+= Tor Connection Padding =
+
+From Tor <code>3.1.7</code> onward, connection padding is available for the Tor process. This setting helps to resist traffic analysis, as The Tor Project explains (emphasis added): <ref>
+https://blog.torproject.org/tor-0317-now-released
+</ref>
+
+<blockquote>
+Connections between clients and relays now send a padding cell in each direction every 1.5 to 9.5 seconds (tunable via consensus parameters). This padding will not resist specialized eavesdroppers, but it should be enough to make many ISPs’ routine network flow logging less useful in traffic analysis against Tor users.
+
+Padding is negotiated using Tor’s link protocol, so both relays and clients must upgrade for this to take effect. '''Clients may still send padding despite the relay’s version by setting ConnectionPadding 1 in torrc''', and may disable padding by setting ConnectionPadding 0 in torrc.</blockquote>
+
+Follow these steps to enable connection padding.
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add.
+
+<pre>
+ConnectionPadding 1
+</pre>
+
+Save and exit.
+
+Forum discussion: <br />
+[https://forums.whonix.org/t/tor-connection-padding/7477 Tor Connection Padding]
+
+= Warning: Bridged Networking =
+
+Do not change {{project_name_gateway_long}}'s first or second network interface to a bridged network. This is [[unsupported|unsupported]], untested and should not be necessary. Users who feel it is necessary in their circumstances should get in [[contact]] for the purpose of [[Reporting_Bugs#Community_Feedback|community feedback]].
+
+For further interest, here is a [https://web.archive.org/web/20211023133804/https://sourceforge.net/p/whonix/discussion/general/thread/1e6a8675/ discussion thread], and [https://web.archive.org/web/20211028042010/https://sourceforge.net/p/whonix/discussion/general/thread/3a0b673a/ another one], debating whether NAT or a bridged network is more secure. <ref>
+https://www.virtualbox.org/manual/ch06.html#network_bridged
+</ref> <ref>
+https://forums.whonix.org/t/bridged-adapter-required/11770
+</ref>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

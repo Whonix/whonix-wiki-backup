@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<textarea class="codeBoxAreaNew" rows="1" onfocus="this.select()" readonly="readonly">t1</textarea>
+[<a href="#" onclick="document.copyText(this);">copy</a>]
+
+<textarea class="codeBoxAreaNew" rows="1" onfocus="this.select()" readonly="readonly">t2</textarea>
+[<a href="#" onclick="document.copyText(this);">copy</a>]
+
+<textarea class="codeBoxAreaNew" rows="1" onfocus="this.select()" readonly="readonly">t3</textarea>
+[<a href="#" onclick="document.copyText(this);">copy</a>]
+
+
+<script>
+let searchAndCheck = ctx => {
+    let found = Array.from(ctx.parentElement.children).filter(e => ( (e.readOnly && e.className == "codeBoxAreaNew") || e == ctx));
+    return found[found.indexOf(ctx) - 1];
+};
+
+let mT = 10; //maximum tags to check
+document.copyText = ctx => {
+    if (navigator.clipboard) {
+      let cT = 0, cctx = ctx;
+      while (cT < mT) {
+          if (cT > 0) {
+              for (let k = 0; k < cT; k++) cctx = cctx.parentElement;
+          };
+          let r = searchAndCheck(cctx);
+          if (r) {
+              if (r.length > 1) {
+                  layer = Array.from(cctx.parentElement.children);
+                  layer = layer.filter(e => (e));
+              };
+              navigator.clipboard.write && (navigator.clipboard.write(r.innerHTML));
+              navigator.clipboard.writeText && (navigator.clipboard.writeText(r.innerHTML));
+              break;
+          };
+          cT++; cctx = ctx;
+      };
+    } else {
+        return false;
+    };
+};
+</script>
+
+</body>
+
+</html>

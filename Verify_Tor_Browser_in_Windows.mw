@@ -1,0 +1,163 @@
+{{Header}}
+{{#seo:
+|description=Verify Tor Browser in Microsoft Windows.
+|image=Verifywindows.jpg
+}}
+{{Title|title=
+Verify Tor Browser in Microsoft Windows
+}}
+{{Community_Support}}
+[[image:Verifywindows.jpg|thumb|400px]]
+
+= Introduction =
+[https://gnupg.org/ GnuPG] is a complete and free implementation of [[OpenPGP]] that allows users to encrypt and sign data and communications. [https://www.gpg4win.org/ Gpg4win] is a graphical front end for GnuPG that is used for file and email encryption in Windows. The verification process for Tor Browser installer begins with securely downloading and verifying the <code>gpg4win</code> package. Once completed users can use GPG from the command-line to verify the Tor Browser installer.
+
+The following guide provides steps to:
+
+# Import the Intevation CA certificate.
+# Install SignTool.
+# Download and verify GPG4win.
+# Download Tor Browser Installer for Windows
+# Verify Tor Browser Installer
+# Install Tor Browser
+
+= Install GPG4win =
+{{Download_and_Verify_GPG4win_in_Windows}}
+
+== Download Tor Browser Installer for Windows ==
+{{Box|text=
+Tor Browser Installer for Windows package will be downloaded and used to install Tor Browser.
+
+'''1.''' Browse to https://www.torproject.org/download/
+
+'''2.''' Download Tor Browser installer for Windows: <code>Left "click" Windows icon</code> &rarr; <code>"click" Save file</code>.
+
+'''3.''' Download the Tor Browser Installer GPG signature file: <code>Right "click" Sig (signature file) </code> &rarr; <code>"click" Save Lin<u>k</u> As..</code><ref>Note: The file extension ".asc" may not be visible when first downloading the signature file</ref>
+}}
+
+== Verify Tor Browser Installer  ==
+{{Box|text=
+<u>Note:</u> At the time of writing (Aug 10 2019) <code>torbrowser-install-win64-8.5.4_en-US.exe</code> was the current stable release. When verifying the Tor Browser Installer package, users must modify the package version in the steps below to correspond to the Tor Browser Installer package version downloaded from https://www.torproject.org/download/
+
+'''1.''' In the Windows start menu, open a command prompt.
+
+{{CodeSelect|code=
+cmd.exe
+}}
+
+'''2.''' In the command prompt, change to the directory the Tor Browser Installer package and signature file was downloaded. In ''most'' cases this is the "Downloads" directory.
+
+{{CodeSelect|code=
+cd Downloads
+}}
+
+'''3.''' Download the Tor Browser developers signing key.
+
+From the Windows command prompt, run.
+
+{{CodeSelect|code=
+gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
+}}
+
+Command out put should show the Tor Browser Developers GPG key has been imported.
+
+<pre>
+gpg: key 4E2C6E8793298290: public key "Tor Browser Developers (signing key) <torbrowser@torproject.org>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+pub   rsa4096 2014-12-15 [C] [expires: 2020-08-24]
+      EF6E286DDA85EA2A4BA7DE684E2C6E8793298290
+uid           [ unknown] Tor Browser Developers (signing key) <torbrowser@torproject.org>
+sub   rsa4096 2018-05-26 [S] [expires: 2020-09-12]
+</pre>
+
+'''4.''' Verify the Tor Browser installer for Windows.
+Note: Remember to alter the below Tor Browser version number to match the package and signature file you downloaded.
+
+In the Windows command prompt, run.
+
+{{CodeSelect|code=
+gpg --verify torbrowser-install-win64-8.5.4_en-US.exe.asc torbrowser-install-win64-8.5.4_en-US.exe
+}}
+
+If the Tor Browser installer package is correct the output will tell you that the signature is good.
+
+<pre>
+gpg: Signature made 07/08/19 07:03:49 Eastern Daylight Time
+gpg:                using RSA key EB774491D9FF06E2
+gpg: Good signature from "Tor Browser Developers (signing key) <torbrowser@torproject.org>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: EF6E 286D DA85 EA2A 4BA7  DE68 4E2C 6E87 9329 8290
+     Subkey fingerprint: 1107 75B5 D101 FB36 BC6C  911B EB77 4491 D9FF 06E2
+</pre>
+
+<u>Bad signature warning.</u>
+
+If the command output shows a  "Bad signature" warning. Users should immediately delete ''both'' the Tor Browser installer package and signature file.  Then repeat the Tor Browser Installer sourcing and verification steps.
+
+<u>Key not certified warning.</u>
+
+<pre>
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+</pre>
+
+The above message can be ignored as it does not alter the validity of the signature related to the downloaded key. Rather, this warning refers to the level of trust placed in the Tor Browser developer's signing key and the [[OpenPGP#The_OpenPGP_Web_of_Trust|web of trust]]. To remove this warning, the Tor Browser developer's signing key must be personally signed with your own key.
+}}
+
+== Install Tor Browser  ==
+{{Box|text=
+Tor Browser installation is a simple process with Tor Browser Installer for Windows.
+
+'''1.''' Choose the Tor Browser installation Path and language.
+
+Navigate to the folder <code>torbrowser-install-win64-8.5.4_en-US</code> was downloaded:
+* <code>Double "click" tor-browser-install-win64-8.5.4_en-US</code> &rarr; <code>Select language</code> &rarr; <code>"click" OK</code> &rarr; <code>Choose Install Location</code> &rarr; <code>"click" OK</code> &rarr; <code>Choose Install Location</code> &rarr; <code>"click" Install</code>.
+
+'''Figure:''' ''Start Tor Browser Installer for Windows''
+
+[[Image:start_Tor_Browser_windows_installer.png]]
+
+'''Figure:''' ''Select Language''
+
+[[Image:Tor_Browser_select_language.png]]
+
+'''Figure:''' ''Choose Installation Location''
+
+[[Image:choose_Tor_Browser_install_location.png]]
+
+'''Figure:''' ''Tor Browser Installing''
+
+[[Image:Tor_Browser_installing.png]]
+
+
+'''2.''' Complete Tor Browser setup.
+
+Once Tor Browser has been installed a popup window will ask if a Start Menu and Desktop Shortcut should be added and if Tor Browser should be started once complete. Check ☑ both boxes and "click" Finish.
+
+'''Figure:''' ''Tor Browser Installation Complete''
+
+[[Image:complete_TorBrowser_setup.png]]
+
+'''3.''' Network Connections
+
+When Tor Browser starts for the first time it asks for "Tor Network Settings" to be set. Click <code>Connect</code>, then wait while the connection to Tor is completed. When Tor has successfully connected, Tor Browser will open and it is ready for use.
+
+'''Figure:''' ''Configure Network Connection''
+
+[[Image:Tor_Browser_connect_to_tor.png]]
+
+'''Figure:''' ''Connecting to Tor Network''
+
+[[Image:Tor_Browser_connecting_Tor_network.png]]
+
+'''&rarr; Done!'''
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

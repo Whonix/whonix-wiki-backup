@@ -1,0 +1,409 @@
+{{Title|
+title=Common {{project_name_long}} CLI Commands
+}}
+{{Header}}
+{{#seo:
+|description=Common {{project_name_long}} CLI Commands
+|image=https://www.{{project_clearnet}}/w/images/a/a6/Cli1242345.png
+}}
+[[image:Cli1242345.png|thumb]]
+= Introduction =
+
+There are a number of common command line operations that are performed by users of all skill levels in the {{project_name_long}} environment. This wiki page is intended to serve as a quick and handy reference guide for locating these, but it is not a substitute for reading relevant wiki entries that provide detailed instructions for various activities. <ref>This entry has been inspired by the relatively unknown <code>
+{{project_name_short_lowercase}}</code> command, which already lists common {{project_name_long}} command line operations.
+</ref> Additional, useful commands will be added here over time.
+
+= {{project_name_gateway_long}} =
+
+'''Table:''' ''{{project_name_gateway_long}} Common Commands''
+
+{| class="wikitable"
+|-
+
+! scope="col"| '''Category'''
+! scope="col"| '''Commands'''
+|-
+
+! scope="row"| Change Keyboard Layout
+|
+* To change the keyboard layout:
+** {{CodeSelect|code=
+sudo dpkg-reconfigure keyboard-configuration
+}}
+** {{CodeSelect|code=
+sudo dpkg-reconfigure console-data
+}}
+* Make the reconfigured keyboard-configuration change take effect:
+** {{CodeSelect|code=
+sudo setupcon
+}}
+|-
+
+! scope="row"| Circumvent uwt Wrapper Use <ref name=experts_only>Experts / debugging only!</ref>
+|
+* /usr/bin/apt-get.anondist-orig
+* /usr/bin/wget.anondist-orig
+* /usr/bin/curl.anondist-orig
+* /usr/bin/gpg.anondist-orig
+* /usr/bin/ssh.anondist-orig
+|-
+
+! scope="row"| Connection Wizard (Enable/Disable Tor)
+|
+* {{CodeSelect|code=
+lxsudo anon-connection-wizard
+}}
+* {{CodeSelect|code=
+sudo setup-wizard-dist
+}}
+|-
+
+! scope="row"| Default Username and Password <ref name=both_VMs>For both {{project_name_gateway_long}} and {{project_name_workstation_long}}.</ref>
+|
+* Default username: <code>user</code>
+* Default password: <code>changeme</code>
+|-
+
+! scope="row"| Important Configuration Files / Folders
+|
+* Important configuration files:
+** {{CodeSelect|code=
+sudoedit /usr/local/etc/torrc.d/50_user.conf
+}}
+** {{CodeSelect|code=
+sudoedit /etc/{{project_name_short_lowercase}}_firewall.d/50_user.conf
+}}
+* Important configuration folders:
+** /etc/{{project_name_short_lowercase}}_firewall.d/
+|-
+
+! scope="row"| Important Logs
+|
+* {{CodeSelect|code=
+sudo tail -f /var/log/syslog
+}}
+* {{CodeSelect|code=
+sdwdate-log-viewer
+}}
+* {{CodeSelect|code=
+sudo tail -f /var/run/tor/log
+}}
+|-
+
+! scope="row"| Nyx: Tor Command Line Monitor <ref>This is a Tor Controller which runs as a console application.</ref>
+|
+* Launch Nyx:
+{{CodeSelect|code=
+nyx
+}}
+|-
+
+! scope="row"| OS Updates
+|
+* {{CodeSelect|code=
+upgrade-nonroot
+}} or
+* {{CodeSelect|code=
+sudo apt update && sudo apt full-upgrade
+}}
+|-
+
+! scope="row"| Switch to Clearnet User <ref>The <code>{{project_name_short_lowercase}}</code> DNS notes state: <blockquote>Check if DNS resolution is functional:
+* Experts only!
+* This is only a summary.
+* You normally do not need to manually resolve DNS on Whonix-Gateway.
+* {{project_name_long}} has by default a feature to hide the fact, that you are a {{project_name_long}} user.
+- This will NOT hide the fact that you are a Tor user from your ISP!
+-- Hiding the fact, that you are a Tor user, is available as an optional configuration.
+* Whonix-Workstations traffic goes through Tors Socks-, Dns- or TransPorts.
+- Whonix-Gateway can only send traffic through Tor as well.<br />
+-- Whonix-Gateway has no longer a Trans- or DnsPort.<br />
+-- For example, APT will actually call the uwt wrapper /usr/bin/apt-get.<br />
+-- The APT uwt wrapper will with help of uwt and torsocks force also Whonix-Gateways traffic through Tor.<br />
+-- Thus hiding the fact, that you are a {{project_name_long}} user.<br />
+* Only as either,
+- as clearnet user or<br />
+- after activation of transparent proxying for Whonix-Gateway<br />
+- in /etc/whonix_firewall.d/ or<br />
+- after allowing Whonix-Gateways root sending non-Tor traffic in /etc/whonix_firewall.d/<br />
+* nslookup check.torproject.org</blockquote></ref>
+|
+* {{CodeSelect|code=
+sudo su clearnet
+}}
+|-
+
+! scope="row"| systemcheck
+|
+* Network Time Synchronization and Tor Connection Check:
+{{CodeSelect|code=
+systemcheck
+}}
+|-
+
+! scope="row"| Time
+|
+* Report the date in UTC:
+{{CodeSelect|code=
+date -u
+}}
+* Manually set the system clock:
+{{CodeSelect|code=
+sudo date -s "17 FEB 2019 24:00:00" && sudo hwclock -w
+}}
+* Randomize the time: <ref>A non-zero exit codes signifies an error, while <code>0</code> means it succeeded.</ref> <ref>Also see:
+{{CodeSelect|code=
+man clock-random-manual-gui
+}}
+
+{{CodeSelect|code=
+man clock-random-manual-cli
+}}
+</ref>
+** <code>clock-random-manual-gui</code>: a randomized clock setting (in UTC) is entered via a GUI.
+** <code>clock-random-manual-cli</code>: a randomized clock setting (in UTC) is entered on the command line. For example: {{CodeSelect|code=
+echo "Wed Dec 04 06:20:13 UTC 2019" {{!}} /usr/bin/clock-random-manual-cli
+}}
+|-
+
+! scope="row"| Tor
+|
+* Restart Network:
+{{CodeSelect|code=
+sudo service networking restart
+}}
+* Restart Tor:
+{{CodeSelect|code=
+sudo service tor restart
+}}
+* Stop Tor:
+{{CodeSelect|code=
+sudo systemctl stop tor@default
+}}
+* Check the Tor version:
+{{CodeSelect|code=
+anon-info
+}}
+* Check the Tor configuration:
+{{CodeSelect|code=
+anon-verify
+}}
+{{CodeSelect|code=
+sudo -u debian-tor tor --verify-config
+}}
+|-
+
+! scope="row"| Virtual Consoles
+|
+* Text console: Press <code>Alt + Crtl + F1</code>
+** Additional text consoles: Press <code>Alt + Crtl + F2</code> or <code>F3</code> and so on.
+* Graphical console: Press <code>Alt + Crtl + F7</code>
+|-
+
+! scope="row"| VM Operations
+|
+* Reboot:
+{{CodeSelect|code=
+sudo reboot
+}}
+* Power off:
+{{CodeSelect|code=
+sudo poweroff
+}}
+|-
+
+! scope="row"| {{project_name_long}} Version
+|
+* {{project_name_long}} version:
+{{CodeSelect|code=
+cat /etc/{{project_name_short_lowercase}}_version
+}}
+|-
+
+|}
+
+= {{project_name_workstation_long}} =
+
+'''Table:''' ''{{project_name_workstation_long}} Common Commands''
+
+{| class="wikitable"
+|-
+
+! scope="col"| '''Category'''
+! scope="col"| '''Commands'''
+|-
+
+! scope="row"| Change Keyboard Layout
+|
+* {{CodeSelect|code=
+sudo dpkg-reconfigure keyboard-configuration
+}}
+* {{CodeSelect|code=
+sudo dpkg-reconfigure console-data
+}}
+|-
+
+! scope="row"| Circumvent uwt Wrapper Use <ref name=experts_only />
+|
+* /usr/bin/apt-get.anondist-orig
+* /usr/bin/wget.anondist-orig
+* /usr/bin/curl.anondist-orig
+* /usr/bin/gpg.anondist-orig
+* /usr/bin/git.anondist-orig
+* /usr/bin/ssh.anondist-orig
+|-
+
+! scope="row"| Default Username and Password <ref name=both_VMs />
+|
+* Default username: <code>user</code>
+* Default password: <code>changeme</code>
+|-
+
+! scope="row"| DNS Resolution Functionality Test
+|
+* {{CodeSelect|code=
+nslookup check.torproject.org
+}}
+|-
+
+! scope="row"| GnuPG (OpenPGP)
+|
+* Retrieve keys (example):
+* Display key fingerprint (example):
+{{CodeSelect|code=
+sudo apt-key adv --fingerprint A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+}}
+* Check file signatures (example):
+{{CodeSelect|code=
+gpg --verify tor-browser-linux64-8.5_en-US.tar.xz.asc tor-browser-linux64-8.5_en-US.tar.xz
+}}
+|-
+
+! scope="row"| HexChat
+|
+* Reset HexChat identity:
+{{CodeSelect|code=
+hexchat-reset
+}}
+|-
+
+! scope="row"| Important Configuration Folders and Logs
+|
+* Important configuration folders:
+** /etc/{{project_name_short_lowercase}}_firewall.d/
+* Important logs:
+** {{CodeSelect|code=
+sudo tail -f /var/log/syslog
+}}
+** {{CodeSelect|code=
+sdwdate-log-viewer
+}}
+|-
+
+! scope="row"| Leak Test <ref>See: [[Dev/Leak_Tests|Leak Tests]]</ref>
+|
+* {{CodeSelect|code=
+leaktest
+}}
+|-
+
+! scope="row"| Network Restart
+|
+* {{CodeSelect|code=
+sudo service networking restart
+}}
+|-
+
+! scope="row"| OS Updates / Software Installation
+|
+* {{CodeSelect|code=
+upgrade-nonroot
+}} or
+* {{CodeSelect|code=
+sudo apt update && sudo apt full-upgrade
+}}
+* Install the <code>package-name</code> package.
+{{CodeSelect|code=
+sudo apt install package-name
+}}
+* Install the <code>package-name</code> package from Debian backports. Requires enabling [[Install_Software#Backports|backports]] repository.
+{{CodeSelect|code=
+sudo apt -t {{Stable_project_version_based_on_Debian_codename}}-backports install package-name
+}}
+|-
+
+! scope="row"| systemcheck
+|
+* Network Time Synchronization and Tor Connection Check: <ref>Additionallly in {{project_name_workstation_long}}, notifications are made regarding OS updates, the {{project_name_long}} version and news.</ref>
+{{CodeSelect|code=
+systemcheck
+}}
+|-
+
+! scope="row"| Time
+|
+* Manually set the system clock:
+{{CodeSelect|code=
+sudo date -s "17 FEB 2019 24:00:00" && sudo hwclock -w
+}}
+|-
+
+! scope="row"| Tor Browser
+|
+Note: Tor Browser can only be started when a graphical desktop environment (DE) such as XFCE is running ({{project_name_long}} XFCE). At time of writing Tor Browser cannot be run without a running DE ({{project_name_long}} CLI without a custom installed DE). However, graphical applications such as Tor Browser can be started from command line when a DE is running. <ref>
+https://forums.whonix.org/t/tor-browser-on-whonix-workstation-cli/10020/8
+</ref>
+
+* Important folders:
+** <code>~/.tb/tor-browser</code>
+** <code>~/.tb/tor-browser/Browser/TorBrowser/Data/Browser</code>
+* Tor Browser Launcher:
+
+{{CodeSelect|code=
+torbrowser
+}}
+* Tor Browser in debugging mode:
+{{CodeSelect|code=
+~/.tb/tor-browser/Browser/start-tor-browser --debug
+}}
+* [[Tor_Browser#Tor_Browser_Downloader_by_Whonix_.E2.84.A2|Tor Browser Downloader by {{project_name_long}} developers]]:
+{{CodeSelect|code=
+update-torbrowser
+}}
+|-
+
+! scope="row"| Virtual Consoles
+|
+* Text console: Press <code>Alt + Crtl + F1</code>
+** Additional text consoles: Press <code>Alt + Crtl + F2</code> or <code>F3</code> and so on.
+* Graphical console: Press <code>Alt + Crtl + F7</code>
+|-
+
+! scope="row"| VM Operations
+|
+* Reboot:
+{{CodeSelect|code=
+sudo reboot
+}}
+* Power off:
+{{CodeSelect|code=
+sudo poweroff
+}}
+|-
+
+! scope="row"| {{project_name_long}} Version
+|
+* {{project_name_long}} version:
+{{CodeSelect|code=
+cat /etc/{{project_name_short_lowercase}}_version
+}}
+|-
+
+|}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

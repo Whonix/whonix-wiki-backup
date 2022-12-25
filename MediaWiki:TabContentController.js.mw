@@ -1,0 +1,69 @@
+/*
+TabContentController Gadget - JS Initialisation, Setup, Events
+See detailed documentation in Dev/mediawiki
+*/
+
+/* See Dev/mediawiki for documentation */
+
+(function() {
+	
+	// as jQuery extension
+	
+	$.fn.tabContentController = function(action) {
+		
+		// Only allow 'init' at the moment (extendable later)
+		if( action != 'init' ) return;
+		
+		$(this).each( function() {
+			// Prevent double initialization
+			if( $(this).hasClass('js-fully-loaded') ) return;
+			
+			// Only elements with this attribute and class are accepted, but not the controller wrapper itself
+			if( ! $(this).attr('data-tcc-id') || ! $(this).hasClass('tab-content-controller') ) return;
+			
+			// Setup
+
+			let tc = $(this);
+			tc.append( '<div class="mininav"><ul></ul></div><div class="content"></div>' );
+			
+			tc.children('.content').append( $('[data-tcc-id=' + tc.attr('data-tcc-id') + ']:not(.tab-content-controller') );
+			
+			let tablist = tc.find('.mininav > ul');
+			
+			function chooseTab( tab, content ) {
+				tablist.find('li > *').removeClass('active');
+				tab.children().addClass('active');
+				tc.children('.content').children().removeClass('active');
+				content.addClass('active');
+			}
+			
+			// If no element is active make the first one active
+			if( ! tc.children('.content').children().hasClass('active') ) chooseTab( tablist.find('li > *').eq(0), tc.children('.content').children().eq(0) );
+			
+			tc.children('.content').children().each( function() {
+				let content = $(this);
+				let tab = $('<li><span></span></li>');
+				tablist.append( tab );
+				tab.children().eq(0).text( content.attr('data-tcc-title') );
+				if( content.hasClass('active') ) tab.children().addClass('active');
+				if( content.attr('data-tcc-image') ) tab.children().prepend( '<img class="pos-1px-up" src="' + content.attr('data-tcc-image') + '">');
+				
+				tab.click( function() { chooseTab( $(this), content ); });
+			});
+			
+			tc.addClass('js-fully-loaded');
+		});
+		
+	};
+	
+	// Automatic initialization
+	
+	$('.tab-content-controller[data-tcc-id]').tabContentController('init');
+	
+})();
+
+
+
+/*
+[[Category:MultiWiki]]
+*/

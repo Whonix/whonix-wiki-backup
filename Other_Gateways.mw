@@ -1,0 +1,103 @@
+{{Header}}
+{{#seo:
+|description=Using {{project_name_workstation_long}} with a Gateway Other Than {{project_name_gateway_long}}
+|image=Gatewayother2532158640.jpg
+}}
+[[image:Gatewayother2532158640.jpg|thumb]]
+
+{{stub}}
+
+= Potential Issues When using A Custom Gateway =
+TODO: document
+
+* Gateway IP Change required? See chapter below.
+* Tor Control Protocol Access. See chapter below.
+* Custom gateway might not provide all the Tor <code>SocksPort</code>s that {{project_name_gateway_short}} provides. Fixable by adjusting Tor configuration of the custom gateway.
+* Custom gateway might not provide [[Stream_Isolation#Transparent_Proxy|transparent proxying]]. This might be intended if the user prefers an [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IsolatingProxy IsolatingProxy] setup.
+
+= Gateway IP Change =
+
+[[Dev/git#grep_{{project_name_long}}_source_code|<code>grep</code> the {{project_name_long}} source code]] for the following search term.
+
+{{CodeSelect|code=
+IP HARDCODED
+}}
+
+For example. (Creation of the <code>mygrep</code> script is documented in above link.)
+
+{{CodeSelect|code=
+mygrep -r "IP HARDCODED"
+}}
+
+Perhaps IP change can be avoided with some iptables trick?
+
+Forum discussion:
+
+https://forums.whonix.org/t/network-changing-the-complete-16/10586
+
+= Tor Control Protocol Access =
+Two options. Either:
+
+* Allow filtered Tor control protocol access through onion-grater.
+* unfiltered Tor control protocol access. A compromised workstation with unfiltered Tor control protocol access can acquire the real external cleranet IP. <ref>
+Tor control protocol command <code>GETINFO address</code>
+</ref>
+* No Tor control protocol access. This would break some functionality.
+
+Which applications require Tor control protocol access?
+
+* Tor Browser new identity feature
+* A list of applications which are currently require Tor control protocol access can be found here: [[Special:WhatLinksHere/Template:Control_Port_Filter_Python_Profile_Add]]
+* [https://github.com/Whonix/onion-grater/tree/master/usr/share/doc/onion-grater-merger/example onion-grater example profiles]
+* [[sdwdate]] <ref name=whonix-defaults>
+https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/onion-grater-merger.d/30_whonix-default.yml
+</ref>
+* [https://www.kicksecure.com/wiki/Systemcheck systemcheck] <ref name=whonix-defaults />
+
+== Filtered Access using onion-grater ==
+[[Undocumented]].
+
+== Unfiltered Access not using onion-grater ==
+This setting comes from Debian system Tor upstream package default file <code>/usr/share/tor/tor-service-defaults-torrc</code>.
+
+{{CodeSelect|code=
+CookieAuthFile /run/tor/control.authcookie
+}}
+
+The file location for this file is non-ideal since it will change at every boot. By re-configuring Tor on the other gateway to use a different file location the contents of this file <u>might</u> be constant. Untested.
+
+On the {{project_name_workstation_long}} package anon-ws-disable-stacked-tor script <code>/usr/lib/anon-ws-disable-stacked-tor/state-files</code> copies at boot <code>/usr/share/anon-ws-disable-stacked-tor/control.authcookie</code> to the right places.
+
+By copying the <code>control.authcookie</code> file from the gateway to {{project_name_workstation_long}} <code>/usr/share/anon-ws-disable-stacked-tor/control.authcookie</code> one might be able to have Tor cookie authentication. Contents of <code>/usr/share/anon-ws-disable-stacked-tor/control.authcookie</code> will be overwritten when package anon-ws-disable-stacked-tor is upgraded.
+
+Therefore this exercise might be a bit pointless. A better solution might be to use Tor Browser control protocol authentication using a Tor control password rather than Tor control auth cookie.
+
+{{Open with root rights|filename=
+/etc/X11/Xsession.d/50user
+}}
+
+Paste the following contents.
+
+{{CodeSelect|code=
+## see also /usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh
+
+## See workstation file ~/.tb/tor-browser/Browser/start-tor-browser
+## or Tor Browser file Browser/start-tor-browser script for comment
+## why quoting looks weird.
+export TOR_CONTROL_PASSWD='"password"'
+
+## Overwrite what /usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh /
+## /etc/X11/Xsession.d/20torbrowser is doing.
+export TOR_CONTROL_IPC_PATH="/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock"
+}}
+
+Save.
+
+This would have to be combined with Tor setting <code>HashedControlPassword</code> on the other gateway. Untested.
+
+= References =
+{{reflist}}
+
+{{Footer}}
+
+[[Category:Documentation]]

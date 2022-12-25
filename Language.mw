@@ -1,0 +1,337 @@
+{{Title|title=Change the System or Tor Browser Language}}
+{{Header}}
+{{#seo:
+|description=How to change the User Interface Language for your Operating System and Tor Browser
+|image=https://www.{{project_clearnet}}/w/images/3/39/Language.png
+}}
+[[image:Language.png|thumb]]
+= Introduction =
+
+The system language used in {{project_name_long}} is easily changed. The technical steps are identical to the Debian method because {{project_name_long}} is based on Debian GNU/Linux and Xfce. Users can also refer to Debian or Xfce upstream documentation. It is also easy to change the language in Tor Browser (see further below). Native English speakers do not need to make any changes.
+
+= System =
+
+These instructions are sourced from the Debian wiki [https://wiki.debian.org/ChangeLanguage ChangeLanguage] and [https://wiki.debian.org/InputMethodBuster InputMethodBuster] entries. In Xfce, it is unnecessary to install additional language packs.
+
+== All Languages ==
+
+{{Box|text=
+'''1.''' Open a terminal in {{project_name_workstation_long}} ([[Qubes|{{q_project_name}}]]: in Template).
+
+<code>Start menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Terminal</code>
+
+'''2.''' Check the language environment variable.
+
+Run. <ref>The Debian wiki notes: <blockquote>First, you have to set EnvironmentVariables such as LANG, LANGUAGE, LC_CTYPE, LC_MESSAGES to your local language. Usually LANG (or LC_ALL) is sufficient.</blockquote></ref>
+
+{{CodeSelect|code=
+env {{!}} grep LANG
+}}
+
+The output should show.
+
+<pre>LANG=en_US.UTF-8</pre>
+
+'''3.''' Determine the code for your language and country.
+
+Before re-configuring the locale to your local language it is necessary to identify the two letter code for your language and country:
+
+* <u>Language</u>: the two-letter ISO 639-1 language code is found in the fourth column (639-1) [https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes here]. For example, Japanese is <code>ja</code>, Korean is <code>ko</code>, German is <code>de</code> and so on.
+* <u>Country</u>: [https://www.iso.org/obp/ui/#search this website] ("Country Codes") identifies country codes. For example, Japan is <code>JP</code>, Korea is <code>KR</code>, Germany is <code>DE</code> and so on.
+
+It is now possible to combine these codes to determine the language to export. For example, Japanese is <code>ja_JP.UTF-8</code>, Korean is <code>ko_KR.UTF-8</code>, German is <code>de_DE.UTF-8</code> and so on.
+
+'''4.''' Reconfigure locales.
+
+Reconfigure locales with the following command.
+
+{{CodeSelect|code=
+sudo dpkg-reconfigure locales
+}}
+
+A window will prompt for the preferred the locale(s) to be made available. Select the preferred option(s) with the space bar -- multiple locales can be chosen.
+
+'''5.''' Reboot {{project_name_workstation_long}}.
+
+This is required for the changes to take effect.
+
+'''Figure:''' ''Japanese Locale in {{project_name_long}}''
+[[image:Anonwhonixjapanese.png]]
+}}
+
+== Fonts ==
+
+Depending on the locale, it may be necessary to install [https://wiki.debian.org/Fonts additional fonts] in {{project_name_workstation_long}} so characters present correctly system-wide ([[Qubes|{{q_project_name}}]]: in Template):
+* [https://packages.debian.org/stable/fonts/ Debian stable fonts packages].
+* TrueType (TTF) and OpenType (OTF) fonts are generally recommended. These packages start with <code>fonts-</code>.
+* For Korean fonts, an anonymous [https://web.archive.org/web/20210114111944/https://sourceforge.net/p/whonix/discussion/general/thread/fff34595/ forums] contributor previously recommended the following additional packages: <code>fonts-unfonts-core</code> (Korean TrueType fonts) and <code>nabi</code> (Korean X input method). After restarting {{project_name_workstation_long}} and starting nabi, the Korean script should be available system-wide for writing and reading. <ref>
+{{CodeSelect|code=
+sudo apt install fonts-unfonts-core
+}}
+
+{{CodeSelect|code=
+sudo apt install nabi
+}}</ref>
+
+For example to install Japanese TrueType fonts:
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+{{CodeSelect|code=
+sudo apt install fonts-ipaexfont
+}}
+
+'''Figure:''' ''Japanese Font Installation in {{project_name_long}}''
+[[image:Anonwhonixjapanesefont.png]]
+
+== Input Method ==
+
+The <code>ibus</code> package is recommended for languages other than English. As of 2021, this should work by default for the following languages:
+<div style="column-count:4;-moz-column-count:4;-webkit-column-count:4">
+* English
+* Arabic
+* Bulgarian
+* Catalan; Valencian
+* Croatian
+* Czech
+* Danish
+* Dutch; Flemish
+* Estonian
+* Finnish
+* French
+* German
+* Greek, Modern
+* Hebrew
+* Hungarian
+* Italian
+* Japanese
+* Korean
+* Latvian
+* Lithuanian
+* Malay
+* Mongolian
+* Norwegian
+* Polish
+* Portuguese
+* Romanian; Moldavian; Moldovan
+* Russian
+* Serbian
+* Slovak
+* Slovenian
+* Spanish; Castilian
+* Swedish
+* Turkish
+* Ukrainian
+</div>
+
+{{Box|text=
+'''1.''' Open a terminal in {{project_name_workstation_long}} ([[Qubes|{{q_project_name}}]]: in Template).
+
+'''2.''' Install <code>ibus</code>.
+
+{{CodeSelect|code=
+sudo apt install ibus
+}}
+
+'''3.''' Launch <code>ibus-setup</code> ([[Qubes|{{q_project_name}}]]: in Template so changes are permanent).
+
+{{CodeSelect|code=
+ibus-setup
+}}
+
+'''4.''' Add the preferred input method(s).
+
+Multiple language input methods can be selected at this step.
+
+'''Figure:''' ''Input Method Option''
+
+[[image:Ibuslanguageselection.png]]
+
+'''5.''' Select the preferred keyboard shortcut to change the input method.
+
+'''Figure:''' ''Preferred Input Method Shortcut''
+
+[[image:Languageinputshortcut.png]]
+
+'''6.''' Reboot {{project_name_workstation_long}}.
+
+In [[Qubes|{{q_project_name}}]]: shut down the Template and create a new AppVM based on the modified template.
+
+'''7.''' Test the preferred input method(s) functionality.
+
+* Open a terminal in {{project_name_workstation_long}}.
+* Use either the language icon on the system tray or the keyboard shortcut to change the input method.
+* If the procedure was successful, languages other than English will present correctly.
+
+'''Figure:''' ''Non-English Input Method in {{project_name_long}}''
+
+[[image:Manylanguageexample.png]]
+
+'''8.''' ''Optional:'' Asian input method(s).
+
+Preliminary tests reveal additional Input Method Engine (IME) packages must be installed for Chinese and Korean functionality; refer to the Debian [https://wiki.debian.org/InputMethodBuster InputMethodBuster] entry for further information. After installation of IME packages, follow steps 3-7.
+
+'''Figure:''' ''Korean and Chinese Input Method in {{project_name_long}}''
+
+[[image:Asianlanguageexample.png]]
+
+Unfortunately, this method does not appear to work for Japanese and Thai. Additional libraries, IME packages or fonts are likely necessary; for instance [https://forums.whonix.org/t/adding-language-support/1757 one {{project_name_long}} user] has reported that [https://www.ubuntubuzz.com/2019/07/mozc-and-fcitx-for-japanese-writings-on-debian-10-buster.html installing <code>fcitx-mozc</code>] allows Japanese input. Readers who successfully configure functional Japanese and Thai input methods are encouraged to edit this wiki entry.
+}}
+
+= Tor Browser =
+
+Using <u>one</u> of the methods below is sufficient to change the language in [[Tor Browser]].
+
+== about:preferences Method ==
+
+# Type <code>about:preferences</code> in the URL bar.
+# Scroll down to the languages section and search for the preferred language: <code>Language</code> &rarr; <code>Search for more languages</code>
+# Add the preferred language.
+# Restart Tor Browser.
+
+'''Figure:''' ''Tor Browser Language Selection''
+[[image:Torbrowserlanguageselection.png]]
+
+'''Figure:''' ''Japanese Tor Browser in {{project_name_long}}''
+[[image:Japanesetorbrowser.png]]
+
+== Config File Method ==
+
+Complete these steps in {{project_name_workstation_long}}.
+
+Thirty-six language packs are available for Tor Browser as of 2022:
+<div style="column-count:3;-moz-column-count:3;-webkit-column-count:3">
+* English (en-US)
+* Arabic (ar)
+* Catalan (ca)
+* Czech (cs)
+* Danish (da)
+* German (de)
+* Greek (el)
+* Spanish (es-ES)
+* Spanish - Argentina (es-AR)
+* Persian/Farsi (fa)
+* French (fr)
+* Irish (ga-IE)
+* Hebrew (he)
+* Hungarian (hu)
+* Indonesian (id)
+* Icelandic (is)
+* Italian (it)
+* Japanese (ja)
+* Georgian (ka)
+* Korean (ko)
+* Lithuanian (lt)
+* Macedonian (mk)
+* Malay (ms)
+* Burmese (my)
+* Norwegian (nb-NO)
+* Dutch (nl)
+* Polish (pl)
+* Brazilian Portuguese (pt-BR)
+* Romanian (ro)
+* Russian (ru)
+* Swedish (sv-SE)
+* Turkish (tr)
+* Vietnamese (vi)
+* Chinese (zh-CN)
+* Traditional Chinese (zh-TW)
+</div>
+To check if further languages are supported in the future, visit: {{Archive_link
+|url=https://www.torproject.org/download/languages/ 
+|text=Download Tor Browser in your language
+|onion=http://2gzyxa5ihm7nsggfxnu52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion/download/languages/
+}}
+
+Binaries and supported language packs are listed by Tor Browser version. The nomenclature for language packs is classified according to [https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes ISO 639-1 codes].
+{{Box|text=
+'''1.''' Open the Tor Browser configuration file.
+
+{{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''2.''' Add the relevant language.
+
+For example, to add Vietnamese.
+
+{{CodeSelect|code=
+TB_LANG="vi"
+}}
+
+Replace <code>vi</code> with <code>zh-CN</code> for Chinese and so on.
+
+'''3.''' Save and download a new version.
+
+After changing this setting, use [[Tor_Browser#Tor_Browser_Downloader_by_{{project_name_long}}|Tor Browser Downloader by {{project_name_long}}]] to install a new version. Afterwards, Tor Browser will support the user's native language.
+}}
+
+== Mozilla Firefox Language Pack Method ==
+
+Complete these steps in {{project_name_workstation_long}}.
+{{Box|text=
+'''1.''' Start Tor Browser.
+
+'''2.''' Check Tor Browser's Firefox ESR version.
+
+<code>Tor Browser URL bar</code> &rarr; <code>about:support</code>
+
+The version output should be similar to: <code>91.13.0esr</code>
+
+'''3.''' Install a language pack.
+
+Visit https://download-origin.cdn.mozilla.net/pub/firefox/releases/91.13.0esr/linux-i686/xpi/ and install the required language pack.
+
+Note: <code>91.13.0</code> in the above URL needs to be changed to match the Firefox ESR version Tor Browser is based on.
+
+'''4.''' Restart Tor Browser.
+
+Tor Browser will now default to the user's native language.
+}}
+
+== Debian Firefox Language Pack Method ==
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Untested</u>. Please test and leave feedback.
+}}
+Complete these steps in {{project_name_workstation_long}}.
+{{Box|text=
+'''1.''' Update the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''2.''' Search for available language packs.
+
+{{CodeSelect|code=
+apt-cache search firefox-esr-l10n-
+}}
+
+'''3.''' Install a language pack.
+
+In the example below, replace <i>-de</i> with the preferred language.
+
+{{CodeSelect|code=
+sudo apt install firefox-esr-l10n-de
+}}
+
+'''4.''' Change the necessary Tor Browser setting. <ref>https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=864401</ref>
+
+{{CodeSelect|code=
+sudo find /usr/lib/firefox-esr/browser/extensions -maxdepth 1 -name 'langpack*.xpi' -exec ln -s '{}' /home/user/.tb/tor-browser/Data/profile/extensions/ ';'
+}}
+}}
+
+= See Also =
+* [[Keyboard Layout]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,141 @@
+{{Header}}
+{{Title|
+title=Connecting to a Proxy before Tor
+}}
+{{#seo:
+|description=Instructions on how to connect to a proxy before Tor (User &rarr; proxy &rarr; Tor &rarr; Internet)
+|image=Lightning-199651640.jpg
+}}
+[[image:Lightning-199651640.jpg|thumb|350px]]
+
+'''<code>User</code> &rarr; <code>Proxy</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>'''
+__FORCETOC__
+__TOC__
+
+= Introduction =
+
+{{Tunnels_Introduction}}
+
+= Proxy Warning =
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt={{project_name_long}} first time users warning]]
+| text    = '''<u>Warning!</u>'''
+Take careful note of the following issues when using standard, common http(s)/SOCKS4(a)/5 proxies -- anonymizers that only use http(s)/SOCKS4(a)/5 as an interface <ref>Like the Tor, [[JonDonym]] or [[I2P]] software.</ref> are exempt.
+* Most problems with these proxies are not caused by {{project_name_long}}.
+* Connections to proxies are unencrypted and therefore should not be used to hide Tor use. This is because proxies are a type of tunnel-link which are not VPNs or SSH. Despite being unsuitable for hiding Tor due to the lack of encryption, in certain circumstances proxies might still be useful for users to circumvent censorship.
+* If state-level censorship of the Tor network must be circumvented, then a better solution may be [[Bridges]] or other [[Lantern|alternative]] [[Anon_Connection_Wizard|circumvention]] [[Censorship_Circumvention_Tools|tools]]. <ref>Users in China are [https://web.archive.org/web/20171218203107/https://www.cs.uml.edu/~xinwenfu/paper/Bridge.pdf unlikely to circumvent government censorship] with vanilla bridges, as they are uniformly blocked. That said, Anon Connection Wizard configured with the <code>meek-amazon</code> or <code>meek-azure</code> pluggable transport was reported to bypass Chinese censorship in late 2017. Unfortunately the <code>meek-amazon</code> pluggable transport was [https://gitlab.torproject.org/legacy/trac/-/issues/26098 deprecated in 2018] after Amazon removed the domain fronting option.</ref>
+* Be especially careful with http(s) proxies. Some of them send the [[Whonix_versus_Proxies#Summary|<code>X-Forwarded-For</code>]] header which discloses the IP address. http(s) proxies that do not send this header are sometimes called "elite" or "anonymous" proxies.
+* When using <code>X-Forwarded-For</code> http(s) proxies, Tor entry guards and Tor [[Bridges|bridges]] can determine the IP address.
+* The unencrypted nature of proxies makes them unsuitable to hide Tor from destination websites. For simple IP logging / IP detection they might work unless they’re http(s) proxies and send the <code>X-Forwarded-For</code> header.
+
+For further detailed information on proxies, see: [[Whonix_versus_Proxies|Tor vs. Proxies, Proxy Chains]].
+}}
+
+= Proxy Configuration Prerequisites =
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = '''Tip:''' In order to configure a proxy, three things must be known in advance:
+
+# where the proxy is running;
+# the IP and port of the proxy; and
+# what type of proxy is being used.
+}}
+== Location of the Running Proxy ==
+The location of the running proxy is variable and depends on the user's system. Refer to the following resources for examples:
+
+* Proxy software might run on a remote computer, which is easier to set up.
+* Proxy software (such as [[lantern|Lantern]]) create a proxy tunnel on the local computer.
+** [[{{q_project_name_short}}|{{q_project_name}}]]: [[lantern|Lantern]] and [[JonDonym#Connecting_to_JonDonym_before_Tor|JonDonym]] examples.
+** [[{{non_q_project_name_short}}|{{non_q_project_name}}]]: This is not yet fully documented, please [[contribute]].
+*** The proxy software must run either:
+**** under the linux user account <code>tunnel</code> on {{project_name_gateway_long}}; <u>or</u>
+**** on the host; <u>or</u>
+**** in another virtual machine.
+*** All of this is [[Unsupported|undocumented]]. Also undocumented:
+**** how to autostart custom software after reboot (systemd etc.)
+**** custom proxy software setup example.
+
+== The Proxy IP and Port ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = If the proxy IP address and port is known, this section can be skipped.
+}}
+
+* If custom proxy software will be run on {{project_name_gateway_long}}, then this configuration is also called <code>localhost</code>. Usually the proxy IP address is <code>127.0.0.1</code>.
+* <u>Note</u>: It is necessary to use the IP address instead of the hostname (<code>proxy.example.com</code>). If the proxy IP address is unknown, then in a terminal on the host operating system, run (Linux) <code>nslookup proxy.example.com</code>; replace <code>proxy.example.com</code> with the hostname of your actual proxy. Using the IP address instead of hostname might cause subtle fingerprinting issues -- see the footnote <ref>https://web.archive.org/web/20201214130728/https://github.com/Whonix/Whonix/issues/94</ref> for more information.
+
+== Type of Proxy in Use ==
+It is necessary to know the proxy type from the following list:
+* <code>HTTPProxy</code>
+* <code>HTTPSProxy</code>
+* <code>Socks4Proxy</code>
+* <code>Socks5Proxy</code>
+
+Also check whether the proxy requires a username and/or password beforehand.
+
+= Configure {{project_name_gateway_long}} =
+<code>User</code> &rarr; <code>proxy</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>
+
+Tor natively supports proxy settings and only requires editing of the torrc file.
+
+== Option 1: Use {{Code2|Anon Connection Wizard}} ==
+A proxy can be configured easily using [[Anon_Connection_Wizard|Anon Connection Wizard]].
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<div class="mw-collapsible-content">
+=== Step 1: Start Anon Connection Wizard ===
+{{Start_Anon_Connection_Wizard}}
+
+=== Step 2: Use Proxy Configuration Page ===
+{{Anon_Connection_Wizard_Use_Proxy}}
+</div>
+</div>
+
+== Option 2: Manually Configure Proxy ==
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<div class="mw-collapsible-content">
+{{Box|text=
+'''1.''' {{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+'''2.''' Add necessary settings to <code>/usr/local/etc/torrc.d/50_user.conf</code>.
+
+Depending on your proxy configuration, add the necessary settings to the <code>/usr/local/etc/torrc.d/50_user.conf</code> file. For more information on these settings, refer to the [https://2019.www.torproject.org/docs/tor-manual.html.en Tor manual] ([http://jqyzxhjk6psc6ul5jnfwloamhtyh7si74b4743k2qgpskwwxrzhsxmad.onion/docs/tor-manual.html.en .onion]) and read the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorFAQ#my-internet-connection-requires-an-http-or-socks-proxy FAQ].
+
+<pre>
+HTTPProxy host[:port]
+HTTPProxyAuthenticator username:password
+HTTPSProxy host[:port]
+HTTPSProxyAuthenticator username:password
+
+Socks4Proxy host[:port]
+
+Socks5Proxy host[:port]
+Socks5ProxyUsername username
+Socks5ProxyPassword password
+
+FascistFirewall 0|1
+
+ReachableAddresses ADDR[/MASK][:PORT]…
+ReachableDirAddresses ADDR[/MASK][:PORT]…
+ReachableORAddresses ADDR[/MASK][:PORT]…
+</pre>
+
+'''3.''' {{Reload_Tor}}
+
+'''4.''' ''Optional:'' Test the configuration by running [[systemcheck|systemcheck]].
+
+The procedure is complete.
+}}
+</div>
+</div>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

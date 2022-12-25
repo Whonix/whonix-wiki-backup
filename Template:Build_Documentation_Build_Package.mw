@@ -1,0 +1,146 @@
+{{Header}}
+
+The build process of building any of the {{Archive_link
+|url=https://github.com/{{project_name_short}}
+|text=packages by {{project name long}}
+|archive=none
+}} developers is always very similar. This very wiki page explain how to build package <code>{{{package}}}</code>. By replacing the name of the package {{Archive_link
+|url=https://github.com/{{project_name_short}}/{{{package}}}
+|text={{{package}}}
+|archive=none
+}} with the name of any [[Packages for Debian Hosts|other]] package you might be interested in building, the other package would be build. You have two options.
+
+* '''A)''' <u>Instructions on '''this''' page</u> about '''how to build''' the {{Archive_link
+|url=https://github.com/{{project_name_short}}/{{{package}}}
+|text={{{package}}}
+|archive=none
+}} '''package from source code''' while [[Verifying Software Signatures|<u>verifying software signatures</u>]] for better security. '''<u>OR</u>'''
+* '''B)''' [[Dev/Build Documentation/{{{package}}}/easy|<u>Easier instructions</u> click here]].
+
+== Get Build Dependencies ==
+[[Security_Guide#Updates|Update]] your package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install from Debian repository.
+
+{{CodeSelect|code=
+sudo apt install build-essential devscripts git
+}}
+
+== Change Directory to Build Folder ==
+This chapter is recommended for better usability, but is not strictly required. <ref>
+When a package is build using <code>dpkg-buildpackage</code> the resulting packages will be created in the parent folder. It's better for usability if this is not the user's home folder since many other files may already reside there. Thereby making the build result files more difficult to find or delete. This is a missing Debian feature. See: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=657401 dpkg-buildpackage: support output directory other than ..]
+</ref>
+
+Create folder <code>~/{{{package}}}-build</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/{{{package}}}-build
+}}
+
+Change directory to folder <code>~/{{{package}}}-build</code>.
+
+{{CodeSelect|code=
+cd ~/{{{package}}}-build
+}}
+
+== Get the Source Code ==
+{{
+Build_Documentation_Get_SourceCode
+|package={{{package}}}
+}}
+
+== Get the Signing Key ==
+{{
+Build_Documentation_Get_Signing_Key
+|fullname={{{fullname}}}
+|shortname={{{shortname}}}
+|link={{{link}}}
+|longfingerprint={{{longfingerprint}}}
+|gpgfingerprintparam={{{gpgfingerprintparam}}}
+}}
+
+== Change Directory ==
+Get into the package's source code folder because later on package build commands using <code>make</code> are expected to be run from the root of the source folder.
+
+{{CodeSelect|code=
+cd {{{package}}}
+}}
+
+== OpenPGP Verify the Source Code ==
+{{
+Build_Documentation_OpenPGP_Verify_the_Source_Code
+|version={{{version}}}
+}}
+
+== Choose Version ==
+{{
+Build_Documentation_Choose_Version
+|version={{{version}}}
+|extra=
+}}
+
+== Build the Package  ==
+Install build dependencies.
+
+{{CodeSelect|code=
+sudo mk-build-deps --remove --install
+}}
+
+If that did not work, have a look in <code>debian/control</code> file and manually install all packages listed under <code>Build-Depends</code> and <code>Depends</code>.
+
+Build the package without signing it (not required for personal use) and install it.
+
+{{CodeSelect|code=
+dpkg-buildpackage -b
+}}
+
+== Build Result ==
+When a package is build using <code>dpkg-buildpackage</code> the resulting packages will be created in the parent folder. I.e. in this case in the <code>~/{{{package}}}-build</code> folder.
+
+{{CodeSelect|code=
+ls ../
+}}
+
+Should show something like this.
+
+<code>
+{{{package}}}  {{{package}}}{{{version}}}-1_amd64.buildinfo  {{{package}}}{{{version}}}-1_amd64.changes
+</code>
+
+== Install the Package ==
+The package can be found in the parent folder.
+
+{{CodeSelect|code=
+sudo dpkg -i ../{{{package}}}*.deb
+}}
+
+== Clean Up ==
+Delete temporary files debhelper files in package source folder as well as debhelper artifacts (.deb file etc.) in parent folder.
+
+1) Show extraneous (temporary files debhelper) files.
+
+{{CodeSelect|code=
+git clean -ndff
+}}
+
+2) <u>NOTE</u>: Read above output carefully if you added files of your own files to that folder.
+
+If that looks good, actually remove.
+
+{{CodeSelect|code=
+git clean -dff
+}}
+
+3) Delete debhelper artifacts (.deb file etc.) in parent folder.
+
+TODO: document
+
+== Footnotes ==
+{{reflist|close=1}}
+
+[[Category:Development]]
+{{Footer}}

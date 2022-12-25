@@ -1,0 +1,300 @@
+{{Anchor|backdoors_table}}
+'''Table:''' ''Finding Backdoors in Freedom Software vs Non-Freedom Software''
+
+<div class="scroll-table">
+{| class="wikitable" style="background-color: #fff;text-align: center"
+
+!
+! Non-Freedom Software (precompiled binaries)
+! Freedom Software (source-available)
+|-
+
+! Original source code is reviewable
+| {{No}}
+| {{Yes}}
+|-
+
+! Compiled binary file can be decompiled into disassembly
+| {{Yes}}
+| {{Yes}}
+|-
+
+! Regular pre-compiled binaries
+| style="background-color: {{Yellow}}"| Depends <ref>Some use binary obfuscators.</ref>
+| {{Yes}}
+|-
+
+! [https://en.wikipedia.org/wiki/Obfuscation_(software) Obfuscation] (anti-disassembly, anti-debugging, anti-VM) <ref>
+https://resources.infosecinstitute.com/topic/anti-disassembly-anti-debugging-and-anti-vm/
+</ref> is usually not used
+| style="background-color: {{Yellow}}"| Depends <ref>Some use obfuscation.</ref>
+| {{Yes}} <ref>
+An Open Source application binary could be obfuscated in theory. However, depending on the application and the context -- like not being an Open Source obfuscator -- that would be highly suspicious. An Open Source application using obfuscators would probably be criticized in public, get scrutinized, and lose user trust.
+</ref>
+|-
+
+! Price for security audit searching for backdoors
+| style="background-color: {{Red}}"| Very high <ref>
+This is because non-freedom software is usually only available as a pre-compiled, possibly obfuscated binary. Using an anti-decompiler:
+
+* Auditors can only look at the disassembly and cannot compare a pre-compiled version from the software vendor with a self-compiled version from source code.
+* There is no source code that is well-written, well-commented, and easily readable by design.
+</ref>
+| style="background-color: {{Green}}"| Lower
+|-
+
+! Difference between precompiled version and self-compiled version
+| style="background-color: {{Red}}"| Unavailable <ref>
+Since there is no source code, one cannot self-build one's own binary.
+</ref>
+| style="background-color: {{Green}}"| Small or none <ref>
+* small: for non-reproducible builds (or reproducible builds with bugs)
+* none: for reproducible builds
+</ref>
+|-
+
+! [https://en.wikipedia.org/wiki/Reverse_engineering Reverse-engineering] is not required
+| {{No}}
+| {{Yes}}
+|-
+
+! Assembler language skills required
+| style="background-color: {{Red}}"| Much more
+| style="background-color: {{Green}}"| Less
+|-
+
+! Always legal to decompile / reverse-engineer
+| {{No}} <ref>
+Decompilation is often expressly forbidden by license agreements of proprietary software.
+</ref> <ref name=skype-dmca>
+[https://www.phoronix.com/news/MTAwNzI Skype used DMCA (Digital Millenium Copyright Act) to shut down reverse engineering of Skype]
+</ref>
+| {{Yes}} <ref>
+Decompilation is always legal and permitted in the license agreements of Freedom Software.
+</ref>
+|-
+
+! Possibility of catching backdoors via observing incoming/outgoing Internet connections
+| style="background-color: {{Yellow}}"| Very difficult <ref name=internet-connections>
+This is very difficult because most outgoing connections are encrypted by default. At some point the content must be available to the computer in an unencrypted (plain text) format, but accessing that is not trivial. When running a suspected malicious application, local traffic analyzers like [https://www.wireshark.org/ Wireshark] cannot be trusted. The reason is the malicious application might have compromised the host operating system and be hiding that information from the traffic analyzer or through a backdoor. One possible option might be running the application inside a virtual machine, but many malicious applications actively attempt to detect this configuration. If a virtual machine is identified, they avoid performing malicious activities to avoid being detected. Ultimately this might be possible, but it is still very difficult.
+</ref>
+| style="background-color: {{Yellow}}"| Very difficult <ref name=internet-connections />
+|-
+
+! Convenience of spotting backdoors
+| style="background-color: {{Red}}"| Lowest convenience <ref>
+It is necessary to decompile the binary and read "gibberish", or try to catch malicious traffic originating from the software under review.
+
+As an example, consider how few people would have decompiled Microsoft Office and kept doing that for every upgrade.
+</ref>
+| style="background-color: {{Green}}"| Very high convenience <ref>
+It is possible to:
+# Audit the source code and confirm it is free of backdoors.
+# Compare the precompiled binary with a self-built binary and audit the difference. Ideally, and in future, there will be no difference (thanks to the Reproducible Builds project) or only a small difference (due to non-determinism introduced during compilation, such as timestamps).
+</ref>
+|-
+
+! Difficulty of spotting "direct" backdoors <ref>
+An example of a "direct" backdoor is a hardcoded username and password or login key only known by the software vendor. In this circumstance there is no plausible deniability for the software vendor.
+</ref> <ref>
+List of [https://en.wikipedia.org/wiki/Backdoor_(computing)#List_of_known_backdoors “direct” backdoors in wikipedia].
+</ref> <ref>
+One interesting “direct” backdoor was this bitcoin copay wallet backdoor:
+
+* <blockquote>If more than 100 BTC, steal it. Otherwise, don’t bother.</blockquote>
+* https://www.synopsys.com/blogs/software-security/malicious-dependency-supply-chain/
+* https://github.com/dominictarr/event-stream/issues/116
+* https://github.com/dominictarr/event-stream/issues/116#issuecomment-441759047
+</ref>
+| style="background-color: {{Red}}"| Much higher difficulty <ref>
+Requires strong disassembly auditing skills.
+</ref>
+| style="background-color: {{Green}}"| Much lower difficulty <ref>
+If for example hardcoded login credentials were in the published source code, that would be easy to spot. If the published source code is different from the actual source code used by the developer to compile the binary, that difference would stand out when comparing pre-compiled binaries from the software vendor with self-compiled binaries by an auditor.
+</ref>
+|-
+
+! Difficulty of spotting a "bugdoor" <ref>
+A "bugdoor" is a vulnerability that can be abused to gain unauthorized access. It also provides plausible deniability for the software vendor. See also: [https://en.wikipedia.org/wiki/International_Obfuscated_C_Code_Contest Obfuscated C Code Contest].
+</ref>
+| style="background-color: {{Red}}"| Much higher difficulty <ref>
+Such issues are hard to spot in the source code, but even harder to spot in the disassembly.
+</ref>
+| style="background-color: {{Green}}"| Lower difficulty
+|-
+
+! Third parties can legally release a [https://en.wikipedia.org/wiki/Fork_(software_development) software fork], a patched version without the backdoor
+| {{No}} <ref>
+This is forbidden in the license agreement. Due to lack of source code, no serious development is possible.
+</ref>
+| {{Yes}} <ref>
+Since source code is already available under a license that permits software forks and redistribution.
+</ref>
+|-
+
+! Third parties can potentially make (possibly illegal) modifications like disabling serial key checks <ref>
+This entry is to differentiate from the concept immediately above.
+
+Pre-compiled proprietary software is often modified by third parties for the purposes of privacy, game modifications, and exploitation.
+</ref>
+| {{Yes}}
+| {{Yes}}
+|-
+
+! Software is always modifiable
+| {{No}} <ref>
+For example, Intel ME could not be disabled in Intel CPUs yet. At the time of writing, a Freedom Software re-implementation of Intel microcode is unavailable.
+</ref>
+| {{Yes}}
+|-
+
+! Third parties can use static code analysis tools
+| {{No}}
+| {{Yes}}
+|-
+
+! Third parties can judge source code quality
+| {{No}}
+| {{Yes}}
+|-
+
+! Third parties can find logic bugs in the source code
+| {{No}}
+| {{Yes}}
+|-
+
+! Third parties can find logic bugs in the disassembly
+| {{Yes}}
+| {{Yes}}
+|-
+
+! Benefits from population-scale scrutiny
+| {{No}}
+| {{Yes}}
+|-
+
+! Third parties can benefit from [https://en.wikipedia.org/wiki/Debug_symbol debug symbols] during analysis
+| style="background-color: {{Yellow}}"| Depends <ref>Some may publish debug symbols.</ref>
+| {{Yes}}
+|-
+
+! Display source code intermixed with disassembly
+| {{No}}
+| {{Yes}} <ref>
+* [https://manpages.debian.org/objdump <code>objdump</code>] with parameter <code>-S</code> / <code>--source</code>
+* [https://stackoverflow.com/questions/2511018/how-does-objdump-manage-to-display-source-code-with-the-s-option How does objdump manage to display source code with the -S option?]
+</ref>
+|-
+
+! Effort to audit subsequent releases
+| style="background-color: {{Red}}"| Almost same <ref>
+It is possible to review the disassembly, but that effort is duplicated for subsequent releases. The disassembly is not optimized to change as little as possible or to be easily understood by humans. If the compiled version added new optimizations or compilation flags changed, that creates a much bigger [https://en.wikipedia.org/wiki/Diff diff] of the disassembly.
+</ref>
+| style="background-color: {{Green}}"| Usually lower <ref>
+After the initial audit of a source-available binary, it is possible to follow changes in the source code. To audit any newer releases, an auditor can compare the source code of the initially audited version with the new version. Unless there was a huge code refactoring or complete rewrite, the audit effort for subsequent versions is lower.
+</ref>
+|-
+
+!colspan="3"| [https://forums.whonix.org/t/finding-backdoors-in-freedom-software-vs-non-freedom-software/11335 Forum discussion: Finding Backdoors in Freedom Software vs Non-Freedom Software]
+|-
+
+|}
+</div>
+
+Spotting backdoors is already very difficult in Freedom Software where the full source code is available to the general public. Spotting backdoors in non-freedom software composed of obfuscated binaries is  exponentially more difficult. <ref>
+The consensus is the assembler [https://en.wikipedia.org/wiki/Low-level_programming_language low level] programming language is more difficult than other [https://en.wikipedia.org/wiki/High-level_programming_language higher level abstraction] programming languages. Example web search terms: <code>assembler easy</code>, <code>assembler easier</code>, <code>assembler difficult</code>.
+</ref> <ref>
+Source code written in higher level abstraction programming languages such as C and C++ are compiled to [https://en.wikipedia.org/wiki/Object_code object code] using a compiler. See [https://www.geeksforgeeks.org/difference-between-compiler-and-assembler/ this article] for an introduction and [https://media.geeksforgeeks.org/wp-content/uploads/20190823140215/compiler.png this image].
+
+Source code written in lower level abstraction programming language assembler is converted to object code using an assembler. See the same article above and [https://contribute.geeksforgeeks.org/wp-content/uploads/assem.png this image].
+
+Reverse engineering is very difficult for a reasonably complex program that is written in C or C++, where the source code is unavailable; that can be deduced from the high price for it. It is possible to decompile (meaning re-convert) the object code back to C with a decompiler like [https://boomerang.sourceforge.net Boomerang]. To put a price tag on it, consider this quote -- [https://boomerang.sourceforge.net/lostsource.php Boomerang: Help! I've lost my source code]:
+
+<blockquote>How much will it cost?
+
+You should expect to pay a significant amount of money for source recovery. The process is a long and intensive one. Depending on individual circumstances, the quality, quantity and size of artifacts, you can expect to pay upwards of US$15,000 per man-month.</blockquote>
+
+* [https://unix.stackexchange.com/questions/229802/convert-executable-back-to-c-source-code convert executable back to C source code]
+</ref> <ref>
+The following resources try to solve the question of how to disassemble a binary (byte code) into assembly source code and re-assemble (convert) to binary.
+
+* [https://gts3.org/2015/rasm.html Tricks to Reassemble Disassembly]
+* [https://stackoverflow.com/questions/6327862/ida-pro-asm-instructions-change IDA pro asm instructions change]
+* [https://reverseengineering.stackexchange.com/questions/3800/why-there-are-not-any-disassemblers-that-can-generate-re-assemblable-asm-code Why there are not any disassemblers that can generate re-assemblable asm code?]
+* [https://reverseengineering.stackexchange.com/questions/3203/recompile-the-asm-file-ida-pro-created Recompile the asm file IDA pro created]
+* [https://www.researchgate.net/publication/323249543_Superset_Disassembly_Statically_Rewriting_x86_Binaries_Without_Heuristics Superset Disassembly: Statically Rewriting x86 Binaries Without Heuristics]
+* [https://gist.github.com/jarun/ea47cc31f1b482d5586138472139d090 GitHub: Guide to disassemble - disassemble.md]
+* [https://stackoverflow.com/questions/5125896/how-to-disassemble-a-binary-executable-in-linux-to-get-the-assembly-code How to disassemble a binary executable in Linux to get the assembly code?]
+* [https://reverseengineering.stackexchange.com/questions/22223/use-gcc-and-objdump-to-disassemble-any-hex-to-assembly-code Use GCC and objdump to disassemble any hex to assembly code]
+{{Box|text=
+'''1.''' Take a hello world assembler source code.
+
+'''2.''' Assemble.
+
+{{CodeSelect|code=
+nasm -felf64 hello.asm
+}}
+
+'''3.''' Link.
+
+{{CodeSelect|code=
+ld hello.o -o hello
+}}
+
+'''4.''' objdump (optional).
+
+{{CodeSelect|code=
+objdump -d hello
+}}
+
+'''5.''' Exercise for the reader: disassemble <code>hello</code> and re-assemble.
+</ref> <ref>
+The [https://en.wikipedia.org/wiki/GNU_Hello GNU Hello] program source file [https://git.savannah.gnu.org/cgit/hello.git/tree/src/hello.c <code>hello.c</code>] at the time of writing contains <code>170</code> lines. The <code>objdump -d /usr/bin/hello</code> on Debian buster has <code>2757</code> lines.
+
+{{Install Package|package=
+hello
+}}
+
+{{CodeSelect|code=
+objdump -d /usr/bin/hello | wc -l
+}}
+
+<pre>
+2757
+</pre>
+}}
+</ref> <ref>
+For example, consider how difficult it was to reverse engineer Skype: [https://www.oklabs.net/skype-reverse-engineering-the-long-journey/ Skype Reverse Engineering : The (long) journey ;)..]
+</ref> <ref>
+* Consider all the Debian package maintainer scripts. Clearly these are easier to review as is, since most of them are written in <code>sh</code> or <code>bash</code>. Review would be difficult if these were converted to a program written in C, and were closed source and precompiled.
+* Similarly, it is far preferable for OnionShare to stay Open Source and written in python, rather than the project being turned into a precompiled binary.
+</ref> <ref>Salary comparison ($K):
+* <code>low</code> - <code>median</code> - <code>high</code>
+* [https://www.salary.com/research/salary/posting/python-developer-salary Python]: 77 - 92 - 108
+* [https://www.payscale.com/research/US/Job=Python_Developer/Salary Python]: 51 - 79 - 107
+* [https://www.salary.com/research/salary/posting/c-programmer-salary C]: 56 - 80 - 100
+* [https://www.payscale.com/research/US/Job=C_Developer/Salary C]: 49 - 80 - 112
+* [https://www.salary.com/research/salary/posting/malware-reverse-engineer-salary Malware reverse engineering]: 101 - 124 - 149
+* [https://www.payscale.com/research/US/Skill=Assembler_(Intel_x86%2FPentium)/Salary Assembler]: 81 - 104 - 131
+* [https://www.talent.com/salary?job=Malware+Analyst Malware Analyst]: 75 - 115 - 141
+</ref> <ref>
+It is obvious the cost of a security audit involving reverse engineering will be far greater than for source-available code.
+</ref>
+
+To further improve the situation in the future, the Freedom Software community is working on the [https://reproducible-builds.org/ Reproducible Builds] project. Quote:
+
+<blockquote>Reproducible builds are a set of software development practices that create an independently-verifiable path from source to binary code.</blockquote>
+
+<blockquote>Whilst anyone may inspect the source code of free and open source software for malicious flaws, most software is distributed pre-compiled with no method to confirm whether they correspond.
+
+This incentivises attacks on developers who release software, not only via traditional exploitation, but also in the forms of political influence, blackmail or even threats of violence.
+
+This is particularly a concern for developers collaborating on privacy or security software: attacking these typically result in compromising particularly politically-sensitive targets such as dissidents, journalists and whistleblowers, as well as anyone wishing to communicate securely under a repressive regime.
+
+Whilst individual developers are a natural target, it additionally encourages attacks on build infrastructure as an successful attack would provide access to a large number of downstream computer systems. By modifying the generated binaries here instead of modifying the upstream source code, illicit changes are essentially invisible to its original authors and users alike.
+
+The motivation behind the Reproducible Builds project is therefore to allow verification that no vulnerabilities or backdoors have been introduced during this compilation process. By promising identical results are always generated from a given source, this allows multiple third parties to come to a consensus on a “correct” result, highlighting any deviations as suspect and worthy of scrutiny.
+
+This ability to notice if a developer has been compromised then deters such threats or attacks occurring in the first place as any compromise would be quickly detected. This offers comfort to front-liners that they not only can be threatened, but they would not be coerced into exploiting or exposing their colleagues or end-users.
+
+[https://reproducible-builds.org/who/ Several free software projects] already, or will soon, provide reproducible builds.</blockquote>

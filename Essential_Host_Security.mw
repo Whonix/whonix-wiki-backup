@@ -1,0 +1,162 @@
+{{Header}}
+{{#seo:
+|description=Host Security Guide, Hardware Considerations and Risks. This page is targeted at advanced users who wish to improve the general security of their host operating system to become even more secure.
+|image=Hostsecurity23342.jpg
+}}
+{{title|title=
+Essential Host Security
+}}
+[[image:Hostsecurity23342.jpg|thumb]]
+{{security_intro}}
+
+This page is targeted at advanced users who wish to improve the general security of their host operating system to become even more secure.
+
+{{Upstream_wiki}}
+
+= Host Security Essentials =
+
+It is recommended to first read relevant Computer Security Education entries concerning host security, such as:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* [[Core_Dumps|Core Dumps]]
+* [[Firmware_Security_and_Updates|Firmware Security and Updates]]
+* [[Hardware_Threat_Minimization|Hardware Threat Minimization]]
+* [[Hostnames]]
+* [[Host_Firewall_Basics|Host Firewall Essentials]]
+* [[Host_Operating_System_Selection|Host Operating System Selection]]
+* [[MAC_Address|MAC Address]]
+* [[Malware_and_Firmware_Trojans|Malware and Firmware Trojans]]
+* [[Open-source_Hardware|Open-source Hardware]]
+* [[Out-of-band_Management_Technology|Out-of-band Management Technology]]
+* [[Router_and_Local_Area_Network_Security|Router and Local Area Network Security]]
+* [[System_Configuration_and_Access|System Configuration and Access]]
+* [[Disable_TCP_and_ICMP_Timestamps|TCP and ICMP Timestamps]]
+</div>
+
+= Anonymous Mobile Modems =
+
+== Introduction ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' The technique outlined in this section may be ineffective against advanced adversaries who can:
+
+* [https://theintercept.com/2014/12/04/nsa-auroragold-hack-cellphones/ Subvert cellular networks].
+* Conduct downgrade attacks on [https://www.schneier.com/blog/archives/2015/04/the_further_dem_1.html network functioning] from 4G to 3G, from 3G to 2G and so on.
+* [https://www.schneier.com/blog/archives/2014/12/nsa_hacking_of_.html Attack all ciphers] used in cellular networks, including A5/1, A5/2 and A5/3.
+}}
+
+"Mobile modems" refers to portable broadband modems which allow a computer to connect to the Internet via the cellular network. These devices support use of the 2G, 3G and 4G networks.
+
+For activities necessitating the best possible anonymity, it is theoretically safer to use an anonymous mobile modem far away from one's normal location, rather than use a local Internet connection. The reason is the dial-up or broadband provider normally knows your name, postal address and non-anonymous payment method. This is problematic if Tor or {{project_name_long}} is compromised, since an adversary could pressure the service provider and very easily confirm your identity. However, if a mobile modem user is successfully attacked, the IP address leaked will not immediately lead back to the postal address of the user.
+
+It is safest to assume that identification and location information can be discovered if specifically targeted, alongside potential eavesdropping of activities and communications. Always conduct a threat assessment of planned activities before following any course of action!
+
+== Warnings ==
+
+Many mobile modem devices are manufactured by a handful of companies like Huawei, Gemtek, Quanta and ZTE, with insecure software/firmware being the norm. Devices have often shown critical [https://www.helpnetsecurity.com/2015/12/03/3g4g-cellular-usb-modems-are-full-of-critical-security-flaws-many-0-days/ zero days]: <ref>https://web.archive.org/web/20160331090747/http://blog.ptsecurity.com/2015/12/critical-vulnerabilities-in-3g4g-modems.html</ref>
+
+<blockquote>The findings include Remote Code Execution (RCE) in web scripts, integrity attacks, Cross-Site Request Forgery (CSRF), and Cross-Site Scripting (XSS).<br />
+
+The research covers a full range of attacks against carrier customers using these types of modems — device identification, code injection, PC infection, SIM card cloning, data interception, determining subscriber location, getting access to user accounts on the operator's website, and APT attacks. <br />
+...
+All in all, we have a full infection cycle of devices and related PCs. Using the infected devices, we can determine location, intercept and send SMS messages and USSD requests, read HTTP and HTTPS traffic (by replacing SSL certificates), attack SIM cards via binary SMS messages, and intercept 2G traffic. Further infection can continue through the operator's networks, popular websites or equipment infected by worms (when connecting a new device).</blockquote>
+
+Key points from this research: <ref>For a detailed description of how these vulnerabilities are exploited, refer to the source document and additional reference.</ref> <ref>[https://www.computerworld.com/article/2495389/3g-and-4g-usb-modems-are-a-security-threat--researcher-says.html 3G and 4G USB modems are a security threat].</ref>
+
+* Virtually all the exploits could be conducted remotely.
+* 60% of the mobile modems studied were vulnerable to RCE.
+* Only a minority of mobile modems protected against arbitrary firmware modifications.
+* In some cases, CSRF attacks could be used to remotely upload modified firmware and perform arbitrary code injection.
+* XSS often allowed for everything from host infection to SMS interception, as well as modified firmware installation.
+
+The take-home message is always choose hardware carefully and conduct meticulous manufacturer research beforehand!
+
+== Safe Purchase of a Mobile Modem and SIM Card ==
+
+Recommendations:
+
+* Buy the mobile modem anonymously. This may be in a store, second-hand, or on the street. Be sure to leave no personal data during the purchase.
+* Be aware of cameras and potential witnesses to purchases.
+* Do not use the modem for any non-anonymous activity prior to using it for {{project_name_long}} purposes.
+* Telecommunication companies routinely log the serial numbers of phones (IMEI) and SIM cards, as well as the phone number for network logins. Therefore it is also necessary to:
+** Buy the SIM card anonymously (prepaid is better).
+** Buy cash codes in different stores anonymously.
+** Never use the anonymous SIM card with a non-anonymous phone or mobile modem beforehand.
+
+== Configuration ==
+
+'''Table:''' ''{{project_name_long}} Mobile Modem Configuration''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Whonix Platform'''
+! scope="col"| '''Recommendation'''
+|-
+! scope="row"| Default Configuration {{project_name_long}}
+|
+* Easy: Plug or integrate the mobile modem into the host operating system as its internet connection replacement.
+* Difficult: Plug the mobile modem into the {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) and only route {{project_name_gateway_long}} traffic through it, not the host traffic. <ref>This is undocumented and therefore unrecommended.</ref>
+|-
+! scope="row"| Physically-isolated {{project_name_long}}
+| It is necessary to use the second method outlined above. There is no host in the sense that the {{project_name_gateway_long}} is running bare-metal on a second computer.
+|}
+
+== Mobile Modem Operation ==
+
+When using cellular networks, it is common to receive a shared external IP address due to the scarcity of IPv4 IPs. This can lead to thousands of people sharing one IPv4 address at the same time. Also, some providers do not yet log the users' (NAT) ports; this means providers cannot pinpoint individuals when they are given an IP address and time stamp. This is a nice feature, but do not rely on it for strong anonymity!
+
+Some providers assign additional and unique IPv6 IP addresses to their users. This does not prohibit safe use of the Tor network, because IPv6 is not (yet) configured by default, see: [https://gitlab.torproject.org/legacy/trac/-/wikis/org/roadmaps/Tor/IPv6 The Tor IPv6 Roadmap]. For greater security, on-line activities should be conducted in locations that are new, distant, random, and non-circular.
+
+= Anonymous WiFi Adapters =
+
+Normally the dial-up or broadband provider knows your name, postal address and non-anonymous payment method. If Tor or {{project_name_long}} is compromised, then an adversary only needs to pressure the service provider to confirm your identity. This is not the case if using an anonymous WiFi adapter plugged or integrated into the {{project_name_gateway_long}}.
+
+For safer use, it is recommended to:
+
+* Buy the WiFi adapter anonymously in a store, second-hand or on the street.
+* Never provide personal data during a purchase.
+* Do not use the adapter for prior, non-anonymous activity. Some providers or hotspots log MAC addresses and the username (if paid).
+* If possible, only use free hotspots or pay for them anonymously. Otherwise abstain from paid hotspots.
+* For greater security, always use a new, distant, random, non-circular hotspot location.
+* Check for cameras and witnesses during online activities.
+
+= Hardening =
+
+{{project_name_long}} does not yet improve host security. It is recommended to use a secure host operating system like [https://www.qubes-os.org/downloads/ Qubes] or [[Host_Operating_System_Selection#Recommended_Host_Operating_Systems|Debian GNU/Linux]] and manually [[Operating_System_Hardening#Harden_Debian|harden]] it. Also follow relevant steps in the [[System_Hardening_Checklist|System Hardening Checklist]] for better security.
+
+= Hardware Component Risks =
+
+In the default configuration, {{project_name_long}} provides significant protection against [[Comparison_with_Others#Circumventing_Proxy_Obedience_Design|circumvention of the proxy obedience design]]. This includes:
+
+* Applications not honoring proxy settings (proxy bypass IP leaks).
+* Applications disclosing the user's real IP address (protocol IP leaks).
+* Remote code execution exploits with user-only rights (exploit + unsafe browser).
+* Remote code execution exploits with root rights (exploit + root exploit + unsafe browser).
+
+However, if a second exploit is used to break out of the VM, the default {{project_name_long}} installation is broken and the real IP address will be revealed. Only {{project_name_long}} run with [[Physical_Isolation|physical isolation]] will defeat this attack. This is because the {{project_name_workstation_long}} host does not know the real IP address, only the {{project_name_gateway_long}} which is running on another machine. This means deanonymization requires the attacker to either: exploit the physically isolated {{project_name_gateway_long}}, subvert the Tor process, or successfully attack the Tor network at large.
+
+Nevertheless, physically-isolated users should be aware that if an adversary manages to break out of the {{project_name_workstation_long}} VM using an exploit, then additional risks are posed by the hardware components that are built-in or have been additionally installed. This includes CPU and HDD / SSD temperature sensors, microphones and cameras.
+
+In the case of {{project_name_long}} with physical isolation:
+
+* The real IP address is still safe, but the temperature sensors can be used for anonymity set reduction.
+* Different CPU,  HDD and SSD models will report different sensor information, depending on climate and weather. If possible, it is advised to remove or to obfuscate the sensor results.
+* [[Hardware_Threat_Minimization#Webcams|Webcams]], [[Hardware_Threat_Minimization#Microphones|microphones]] and [[Hardware_Threat_Minimization#Speakers|speakers]] can be covertly activated by the adversary. Remove external hardware and/or disable them in BIOS if possible. At a minimum, cover them or ideally remove them.
+
+In the case of a default {{project_name_long}} installation, the same general recommendations apply, although it does not really matter since the user will have been deanonymized successfully.
+
+= Hostnames =
+
+The hostname given to a home computer or device can be leaked via a number of protocols, posing a privacy risk depending on the specificity of the naming convention. For further information, [[Hostnames|see here]].
+
+= See Also =
+* [[Host Operating System Selection]]
+* [[Advanced Host Security]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

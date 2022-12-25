@@ -1,0 +1,63 @@
+The iptables rules must be unloaded.
+
+If using Qubes, disable qubes-iptables and qubes-firewall systemd services. Non-Qubes users can skip this.
+
+<pre>
+sudo systemctl mask qubes-iptables
+sudo systemctl stop qubes-iptables
+sudo systemctl mask qubes-firewall
+sudo systemctl stop qubes-firewall
+</pre>
+
+{{Open File|filename=~/fw-unload}}
+
+Add.
+
+{{Firewall_Unload}}
+
+Save.
+
+Make ~/fw-unload executable.
+
+<pre>
+chmod +x ~/fw-unload
+</pre>
+
+Unload all iptables firewall rules.
+
+<pre>
+sudo ~/fw-unload
+</pre>
+
+After firewall unload, run the following command to see if all firewall rules are really unloaded.
+
+<pre>
+sudo iptables-save | sed -e 's/\[[0-9:]*\]/[0,0]/' -e '/^#/d'
+</pre>
+
+The output should show.
+
+<pre>
+*mangle
+:PREROUTING ACCEPT [0,0]
+:INPUT ACCEPT [0,0]
+:FORWARD ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+:POSTROUTING ACCEPT [0,0]
+COMMIT
+*raw
+:PREROUTING ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+COMMIT
+*nat
+:PREROUTING ACCEPT [0,0]
+:INPUT ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+:POSTROUTING ACCEPT [0,0]
+COMMIT
+*filter
+:INPUT ACCEPT [0,0]
+:FORWARD ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+COMMIT
+</pre>

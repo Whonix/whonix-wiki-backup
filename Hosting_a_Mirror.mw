@@ -1,0 +1,112 @@
+{{Header}}
+{{#seo:
+|description=Instructions on how to set up a {{project_name_long}} Download Mirror
+|image=Hosting-13348640.jpg
+}}
+{{title|title=
+Hosting a {{project_name_long}} Mirror
+}}
+{{Anchor|Landing}}
+
+__TOC__
+
+= rsync from {{project_clearnet}} =
+== Overview ==
+* Available over unencrypted clearnet port <code>873</code>. (Default port by unencrypted <code>rsync</code>.) [Planned deprecation.]
+* Available over encrypted clearnet port <code>874</code>. (Default port by <code>openssl-rsync</code>.)
+* Available over encrypted clearnet port <code>1874</code>. (Default port by Debian ftpsync package, <code>rsync-ssl-tunnel</code> script.)
+* Available over [[Onion_Services#Notes_about_End-to-end_Security_of_Onion_Services|encrypted]] onion, port <code>873</code>. (<code>rsync</code> default port.)
+
+Security advice:
+
+* Avoid unencrypted rsync.
+* Encrypted rsync is better.
+* rsync over onion is best.
+
+Commands below use for testing:
+
+* <code>--dry-run</code>
+
+Therefore:
+
+* Later for production you might wish to drop <code>--dry-run</code> and change the destination folder from <code>~/{{project_name_short_lowercase}}</code> to a folder of your choice such as <code>/var/www/{{project_name_short_lowercase}}</code>.
+
+== preparation ==
+
+{{CodeSelect|code=
+sudo apt install rsync
+}}
+
+== unencrypted rsync ==
+{{CodeSelect|code=
+rsync --dry-run --recursive --delete --times --perms rsync://{{project_clearnet}}/{{project_name_short_lowercase}} ~/{{project_name_short_lowercase}}
+}}
+
+== encrypted rsync over TLS ==
+
+{{CodeSelect|code=
+rsync-ssl --dry-run --recursive --delete --times --perms rsync://{{project_clearnet}}/{{project_name_short_lowercase}} ~/{{project_name_short_lowercase}}
+}}
+
+== encrypted rsync over onion ==
+Preparation.
+
+{{CodeSelect|code=
+sudo apt install torsocks rsync
+}}
+
+rsync over onion from {{project_name_long}} onion.
+
+{{CodeSelect|code=
+torsocks rsync --dry-run --recursive --delete --times --perms "rsync://{{project_onion}}/{{project_name_short_lowercase}}" ~/{{project_name_short_lowercase}}
+}}
+
+= Current Mirrors =
+* https://mirrors.dotsrc.org/whonix/ [Whonix permitted use exclusivity] [no traffic limit for now] [permitted to hotlink]
+* https://mirror.koljasagorski.de/whonix/ [Whonix permitted use exclusivity] [no traffic limit for now] [permitted to hotlink]
+* https://quantum-mirror.hu/mirrors/pub/whonix [Whonix permitted use exclusivity] [no traffic limit for now] [permitted to hotlink] <ref>
+https://quantum-mirror.hu/web/status_en.html
+
+quantum-mirror.hu (DNS round robin)
+
+super.quantum-mirror.hu 1000/350 Mb/s 78.131.56.189
+
+nova.quantum-mirror.hu 1000/350 Mb/s 195.38.126.147
+
+IPv4 only
+
+no FTP
+
+supports rsync
+</ref>
+* https://ftp.icm.edu.pl/pub/Linux/dist/whonix/ [only updated daily for now] [Whonix could ask to update more frequently] <ref>
+* ftp://ftp.icm.edu.pl/pub/Linux/dist/whonix/
+* rsync://ftp.icm.edu.pl/pub/Linux/dist/whonix/
+* gopher://ftp.icm.edu.pl/1/pub/Linux/dist/whonix/
+</ref>
+* https://mirrors.gigenet.com/whonix/
+
+= Mirror Speed Test =
+03 Mai 2020
+
+* dotsrc 103 MB/s in in 16s [acting as primary mirror since]
+
+21 April 2020
+
+* whonix.org 44 MB/s in 39s
+* dotsrc 138 MB/s in in 12s
+
+October 2022
+
+* dotsrc: Download speed 7-10 MByte/s (normal for that 50-100 Mbit connection). Took about 3 - 4.5 minutes.
+
+Forum discussion:
+
+* https://forums.whonix.org/t/whonix-vm-images-download-speed-issues-and-automated-download-speed-tests/15858/2
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Development]]

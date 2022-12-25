@@ -1,0 +1,125 @@
+{{Header}}
+{{#seo:
+|description=Known Issues in {{project_name_long}} |image=https://www.{{project_clearnet}}/w/images/a/ab/Question-mark-738813-640.png
+}}
+[[image:Question-mark-738813-640.png|200px|thumb]]
+= All Platforms =
+
+== "apt source package" will show "dpkg-source: warning: failed to verify signature" ==
+
+This is not a security issue, but only a warning. Read the entire thread [https://lists.debian.org/debian-derivatives/2013/08/msg00000.html here] for more information.
+
+This warning message can be removed with the following workaround below.
+
+{{Box|text=
+'''1.''' Modify <code>/etc/dpkg/origins/default</code>.
+
+{{CodeSelect|code=
+sudo unlink /etc/dpkg/origins/default
+}}
+{{CodeSelect|code=
+sudo ln -s /etc/dpkg/origins/debian /etc/dpkg/origins/default
+}}
+
+'''2.''' Download the source package.
+
+{{CodeSelect|code=
+apt source package
+}}
+
+'''3.''' Undo afterwards to prevent unexpected issues.
+
+{{CodeSelect|code=
+sudo unlink /etc/dpkg/origins/default
+}}
+{{CodeSelect|code=
+sudo ln -s /etc/dpkg/origins/whonix /etc/dpkg/origins/default
+}}
+}}
+
+== Proxychains Tor Browser Issue ==
+
+Using Tor Browser in conjunction with proxychains for the connection scheme: <code>User</code> &rarr; <code>Tor</code> &rarr; <code>Proxy</code> &rarr; <code>Internet</code> <br />
+does not currently work. For more information, see [[Tunnels/Connecting_to_Tor_before_a_proxy|here]].
+
+= VirtualBox =
+See also [[VirtualBox/Troubleshooting]]
+
+== ATA Freeze ==
+If you see the following error and freezing.
+
+<pre>
+433.348893] mptscsih: ioc0: attempting target reset! (sc=ffff81021b950940)
+433.348896] sd 0:0:0:0: [sda] CDB: ATA command pass through(16): 85 08
+0e 00 d5 00 01 00 09 00 4f 00 c2 00 b0 00
+433.605026] mptscsih: ioc0: target reset: SUCCESS (sc=ffff81021b950940
+</pre>
+
+It is a [https://web.archive.org/web/20210122015240/https://github.com/Whonix/Whonix/issues/274 known] issue and hardware-specific - VirtualBox upstream bug report: https://www.virtualbox.org/ticket/10031 <br />
+This cannot be fixed by the {{project_name_long}} team and patches are required.
+
+It has been [https://forums.whonix.org/t/kernel-panic-error-in-whonix-gateway-vbox/1487/3 reported] that running from an internal HDD/SSD works better than running from external devices.<br />
+One workaround might be avoiding high load on your host operating system. If this bug causes a lot of problems, then your only option is to switch to [[Download|another platform]].
+
+= {{non_q_project_name_short}} =
+
+{{non-q-project}}
+
+== Mounting (CD / DVD) Devices ==
+<!--T:241-->
+If the device auto mounter is broken, see if <code>Start menu</code> &rarr; <code>System Settings</code> &rarr; <code>Removable Media</code> helps.
+
+The following workaround can be used.
+
+{{CodeSelect|code=
+sudo mkdir /mnt/cdrom
+}}
+{{CodeSelect|code=
+sudo mount -o ro /dev/cdrom /mnt/cdrom/
+}}
+
+<!--T:242-->
+Using the <b>ro</b> flag will mount the CD / DVD in read-only mode. If a CD / DVD is not being mounted, then drop the "-o ro" parameter.
+
+Forum discussion:<br />
+https://forums.whonix.org/t/workstation11-doesnt-mount-hdds/1313
+
+<!--T:244-->
+Help fixing this bug is welcome! ([https://phabricator.whonix.org/T139 ticket])
+
+== Network Manager Systray Unmanaged Devices ==
+[[File:network_manger_question_mark.png|30px]]
+Short answer: Unmanaged devices are unrelated to {{project_name_long}} functioning and should not concern the user.<br />
+Long answer: <ref> {{project_name_long}} does not use network manager to manage either eth0 or eth1.
+
+* In [[{{non_q_project_name_short}}|{{non_q_project_name}}]], networking is managed by ifupdown.
+* [[Qubes|{{q_project_name}}]] uses a custom [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-whonix-network.service /lib/systemd/system/qubes-whonix-network.service] and is unaffected by this issue.
+
+It is unnecessary to port to network manager at this point, because there is no reason besides this issue. Ifupdown has functioned admirably in {{project_name_long}} for a long time and is well tested. It is unclear if network manager, specifically cli, is ready for the prime time yet. Network manager is simply reporting information that it does not manage these devices; this is not an error.
+<br />
+To reduce confusion, the ideal {{project_name_long}} default would either: prevent the systray item starting, hide the systray item, or suppress the information being presented. Network manager is installed so users can easily setup VPNs with its intuitive graphical user interface.<br />
+All attempts to fix this long-standing issue have failed. Help is welcome to fix it.<br />
+[https://forums.whonix.org/t/fix-unmanaged-devices-network-manager/507 Fix Unmanaged Devices Network Manager]<br />
+</ref>
+
+== Suspend / Hibernate Issues ==
+Short: Avoid suspending or hilbernating the computer or {{project_name_long}} VMs while {{project_name_long}} is running.
+
+Long: [[Post_Install_Advice#Network_Time_Syncing|Network Time Syncing]], [[Troubleshooting#Clock Fix|Clock Fix]]. <ref>
+https://github.com/QubesOS/qubes-issues/issues/1764
+</ref>
+
+== VLC / Video Player Crash ==
+The following workaround can be used; this is the default in recent builds (like {{project_name_long}} 14). <ref>
+* https://phabricator.whonix.org/T798
+* https://github.com/{{project_name_short}}/anon-apps-config/blob/master/etc/skel/.config/vlc/vlcrc
+</ref>
+
+<code>VLC</code> &rarr; <code>Tools</code> &rarr; <code>Preferences</code> &rarr; <code>Video</code> &rarr; <code>Output</code> &rarr; <code>X11</code> &rarr; <code>Save</code>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

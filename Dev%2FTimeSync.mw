@@ -1,0 +1,991 @@
+{{Header}} {{Title|title=
+TimeSync: {{project_name_long}} Time Synchronization Mechanism
+}}
+<!--
+Copyright:
+
+   {{project_name_long}} TimeSync wiki page Copyright (C) Amnesia <amnesia at boum dot org>
+   {{project_name_long}} TimeSync wiki page Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to:
+
+    Free Software Foundation, Inc.
+    51 Franklin St, Fifth Floor
+    Boston, MA 02110-1301, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License can be found in the /usr/share/common-licenses' directory.
+The complete text of the GNU General Public License can also be found online on gnu.org <https://www.gnu.org/licenses/gpl.html>, in {{project_name_long}} virtual machine images in /usr/share/common-licenses/GPL-3 file or on Github <https://github.com/{{project_name_short}}/derivative-maker/blob/master/GPLv3>.
+-->
+<!--
+This wiki page is a fork of the Tails Tor Bridge Mode page, from this exact source <https://git-tails.immerda.ch/tails/commit/wiki/src/contribute/design/Time_syncing.mdwn?id=b27209b3673a0ea2d31b54b163aefd3025c8b39c>.
+-->
+{{#seo:
+|description=Design Documentation of {{project_name_long}} Time Synchronization Mechanism
+}}
+
+= Basic Knowledge =
+== Introduction ==
+The Post Install Advice is part of this design, therefore read [[Post Install Advice#Network Time Syncing|Network Time Syncing]] first. Also read [[Network Time Synchronization|Network Time Synchronization]] as well.
+
+== Local Clock Leaks ==
+* TCP Sequence Numbers &rarr; [https://github.com/Kicksecure/tirdad <code>tirdad</code>] <ref>
+* [https://mailman.boum.org/pipermail/tails-dev/2014-September/007062.html Tails-dev - TCP Sequence Numbers leak System Clock]
+* [https://gitlab.torproject.org/legacy/trac/-/issues/16659 Linux TCP Initial Sequence Numbers may aid correlation]
+</ref>
+* ICMP timestamps &rarr; blocked by {{project_name_long}} firewall for {{project_name_long}} VMs. Host: [[Disable_TCP_and_ICMP_Timestamps#Disable_ICMP_Timestamps|Recommendation]] to disable on the host.
+* TCP timestamps &rarr; blocked in {{project_name_long}} VMs by [https://github.com/{{project_name_short}}/tcp-timestamps-disable tcp-timestamps-disable].; [[Computer_Security_Education#Disable_TCP_Timestamps|Recommendation]] to disable on the host.
+* NTP <ref name=ntp-rfc /> <ref name=ntp-se /> &rarr; Not installed by default in {{project_name_long}}. Host: TODO
+* Automatic updaters and other network using cron jobs that run at non-random, canned <ref>
+By distribution defaults.
+</ref> times.
+* Javascript. <ref>
+Was [https://gitlab.torproject.org/legacy/trac/-/issues/3059 fixed] in Tor Browser, but remains open for other applications such as browsers like Mozilla Firefox.</ref> <ref>
+See https://ip-check.info/ for demonstration.
+</ref>
+* E-mail clients such as Mozilla Thunderbird and others. <ref>
+As of June 2016, Iceweasel has been replaced by Firefox-ESR in Debian, see https://wiki.debian.org/Iceweasel
+</ref> <ref>
+[https://gitlab.torproject.org/legacy/trac/-/issues/6314 prevent leak via Date header field (local timestamp disclosure)]
+</ref> <ref>
+[https://gitlab.torproject.org/legacy/trac/-/issues/6315 prevent leak via Message-ID header field (local timestamp disclosure) ]
+</ref> <ref>
+[https://blog.torproject.org/torbirdy-013-our-fourth-beta-release Quote, on October 24th, 2014 sukhbir said]:<br />
+"The timestamp disclosures are via the date and the message-ID headers (relevant tickets: [https://gitlab.torproject.org/legacy/trac/-/issues/6314 #6314], [https://gitlab.torproject.org/legacy/trac/-/issues/6315 #6315]). We have submitted patches to Mozilla ([https://bugzilla.mozilla.org/show_bug.cgi?id=902573 902573], [https://bugzilla.mozilla.org/show_bug.cgi?id=902580 902580]) that have not yet been merged. The patches probably need more work and we are looking for volunteers to work on them and help us to get them merged. We will be doing a blog post about this soon and put out a call for help."
+</ref>
+* https / ssl, older <ref name=example-wheezy /> versions of openssl, TLS HELLO gmt_unix_time <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/8751
+</ref> What about other implementations of SSL / TLS, other than openssl?
+* older <ref name=example-wheezy>For example the one shipped by Debian wheezy.
+</ref> versions of Tor (NETINFO) <ref name=tlsleaktwo>
+See [https://gitlab.torproject.org/legacy/trac/-/issues/4852 torproject.org #4852: Clients send NETINFO with time]. The ticket says fixed. However, [https://packages.debian.org/de/wheezy/tor Debian wheezy (which {{project_name_long}} 10 was based on) was using Tor 0.2.3] but Nick's [https://gitlab.torproject.org/legacy/trac/-/issues/4852#comment:20 patch appeared first in 0.2.4]. It was solved in {{project_name_long}} 11, because it was based on Debian jessie, that contained [https://packages.debian.org/de/jessie/tor a more recent version of Tor].
+</ref>
+* web servers (time stamps from http headers (RFC 2616)) <ref>
+For demonstration, you could use.
+<pre>
+curl -silent --head torproject.org | grep -i date:
+</pre>
+</ref>
+
+== Virtualizers Time Synchronization Features ==
+=== VirtualBox Time Synchronization Features ===
+{{Anchor|VirtualBox's Time Synchronization Features}}
+For understanding {{project_name_long}} Time Synchronization Mechanism, it is required to know VirtualBox's time synchronization features:
+
+* VirtualBox uses the host's time if it needs to correct the time for guests.
+* (Some of VirtualBox's time synchronization features depend on guest additions.)
+* By default VirtualBox corrects Virtual Machine guests' virtual hardware system clock,
+** when they get powered on,
+** when they resume from suspension and
+** when their clock is more than X minutes off.
+
+=== KVM's Time Synchronization Features ===
+TODO: document
+
+=== Qubes Time Synchronization Features ===
+TODO: document
+
+Xen DomU’s get their initial time from Xen (Qubes dom0) at VM start.
+
+* qvm-sync-clock.service
+* qvm-sync-clock.timer
+
+qvm-sync-clock gets time from Qubes ClockVM.
+
+It is used because otherwise Xen DomU’s would start to clock drift more and more. This [https://forums.whonix.org/t/whonix-ws-16-fails-to-update-due-to-timing-issue/12739/10 this answer by marmarek].
+
+qvm-sync-clock is unwanted in {{project_name_gateway_vm}} and {{project_name_workstation_vm}} because sdwdate runs there.
+
+qvm-sync-clock is disabled in {{Q_project_name}} Templates until version {{Q_project_name}} <code>16.0.3.7</code>. To be re-considered for later versions. {{Q_project_name}} get their time from dom0 at VM startup, which is then randomized using [[Boot Clock Randomization]].
+
+Future: qvm-sync-clock should be equally safe to run inside {{Q_project_name}} Templates, if passed though <code>clock-random-manual-cli</code>.
+
+When is <code>/etc/qubes-rpc/qubes.SetDateTime</code> run?
+
+== sdwdate Time Sources Criteria ==
+See [[Sdwdate#sdwdate_Time_Sources_Criteria|sdwdate Time Sources Criteria]].
+
+== Facts ==
+People have been using:
+
+* Tor Browser and Mozilla Firefox in parallel
+* Tails inside VMs and Firefox on the host
+* Tor Browser inside {{project_name_workstation_long}} and Mozilla Firefox on the host
+
+== Other Facts ==
+* Almost no one and no operating system is using Secure Network Time Synchronization or External Clocks by default. Most systems synchronize the system clock using unauthenticated NTP. An adversary tampering with NTP replies or malicious NTP server makes things even worse. Even if there was authenticated NTP, there is a requirement for a distributed trust model.
+* A system not using NTP or using authenticated NTP stands out from most other users.
+* clock jumps are bad: [https://www.wired.com/2012/07/leap-second-glitch-explained/ wired: The Inside Story of the Extra Second That Crashed the Web]
+
+== Definitions ==
+* Time Sanity Check in context of Whonix: Is an init.d script, which checks if the system clock is between build timestamp and expiration date (17 MAY 2033 10:00:00).
+
+= Attacks =
+A correct system clock is crucial for many reasons (see footnotes for more):
+
+* '''Attack 1:''' Replay attacks <ref>Replay old Tor consensus, see [https://tails.boum.org/contribute/design/Time_syncing/ Tails: Time syncing] for detailed explanation.</ref>
+* '''Attack 2:''' Feeding old/outdated/known vulnerable updates and (https) certificates <ref>Cryptographic verification depends on system clock, i.e. a clock two years in past will accept certificates/updates, which have been expired/revoked for two years.</ref>
+* '''Attack 3:''' Deanonymizing <ref>[[#Local Clock Leaks]] are an issue. Imagine the user connects to an adversary controlled web-server with Mozilla Firefox and connects to another web-server controlled by the same adversary with Thunderbird. The adversary can link the anonymous and non-anonymous session, thus deanonymizing.</ref>
+* '''Attack 4:''' Linking all sessions to the same pseudonym <ref>If the clock is too much off, it is also easy for an adversary's web-server to detect "Oh, that's the Tor Browser user who's clock is X in past/future.", thus allowing the adversary to link all sessions to the same pseudonym. See Tor Browser upstream bug #3059: [https://gitlab.torproject.org/legacy/trac/-/issues/3059 Find some way to deal with time-based fingerprints].</ref>
+* '''Attack 5:''' Locating onion services. <ref>
+For onion services a correct clock is crucial, see:
+* [https://murdoch.is/papers/ccs06hotornot.pdf Hot or Not: Revealing Hidden Services by their Clock Skew]
+* [https://web.archive.org/web/20220324134410/https://caia.swin.edu.au/talks/CAIA-TALK-080728A.pdf An improved clock-skew measurement technique for revealing hidden services]
+* [https://web.archive.org/web/20120522143952/http://people.cs.umass.edu/~elisha/Papers/SkewMask%20-%20final%20version.pdf SkewMask: Frustrating Clock Skew Fingerprinting Attempts]
+* [https://catalog.caida.org/details/paper/2005_fingerprinting Remote physical device fingerprinting]
+</ref>
+
+= Goals =
+== Completely Isolated Virtual Time ==
+Quote https://www.kernel.org/doc/Documentation/virtual/kvm/timekeeping.txt
+
+<blockquote>
+4.8) Covert channels and leaks
+
+In addition to the above problems, time information will inevitably leak to the guest about the host in anything but a perfect implementation of virtualized time. This may allow the guest to infer the presence of a hypervisor (as in a red-pill type detection), and it may allow information to leak between guest
+by using CPU utilization itself as a signalling channel. Preventing such problems would require completely isolated virtual time which may not track real time any longer. This may be useful in certain security or QA contexts, but in general is not recommended for real-world deployment scenarios.
+</blockquote>
+
+Therefore we want a completely isolated virtual time.
+
+= {{project_name_long}} Time Synchronization Mechanism =
+== Overview ==
+* {{project_name_long}} leaves the host's system clock or time synchronization mechanism untouched.
+* {{project_name_gateway_long}} and {{project_name_workstation_long}} are commonly used inside virtualizers and therefore have their own virtual hardware system clocks.
+* Virtualizers time synchronization get disabled by {{project_name_long}}.
+** Most VirtualBox time synchronization features get disabled by {{project_name_long}}.
+*** Guest additions time synchronization gets disabled in by [https://github.com/{{project_name_short}}/vbox-disable-timesync vbox-disable-timesync] at run time. See VirtualBox bug report [https://www.virtualbox.org/ticket/10828 VBoxService --disable-timesync broken]. They say it is actually not a bug. It is a missing feature, that running instances of VBoxService can not be modified in their settings.
+*** built in time synchronization features get disabled by ''VBoxManage setextradata "$VMNAME" "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled" "1"'' at build time.
+** KVM: TODO document
+** Qubes: TODO
+*** https://phabricator.whonix.org/T389
+*** https://phabricator.whonix.org/T440
+*** https://phabricator.whonix.org/T389
+* VM Settings, Hardware Clock: set to UTC.
+* When get powered on, they still get their time from the host. The user is advised to modify the biossystemtimeoffset in Advanced Security Guide, chapter [[Advanced Security Guide#Network Time Synchronization|Network Time Synchronization]]. <ref>Developer information: If we needed or wanted to render the hardware clock unusable, we could set VirtualBox ''--biossystemtimeoffset'' several decades in past or future.</ref>
+* Time Sanity Check before [[sdwdate]] will be executed, this ensures, that the host clock is sane and not slow in 1980. User gets advised to fix its host clock in such cases.
+* After they are connected to the Tor network, they use sdwdate (inspired by [https://tails.boum.org/contribute/design/Time_syncing/ tails_htp]) to set the system clock. <ref>Stream isolation has been added, for {{project_name_long}} sdwdate implementation i.e. people using Tor Browser prevent notifying their exit relay, that they are sdwdate or {{project_name_long}} users.</ref>
+* Time Sanity Check after sdwdate was executed. This should catch eventual bigger bugs and attacks. User gets informed if it fails.
+* Using [https://github.com/{{project_name_short}}/bootclockrandomization Boot Clock Randomization], i.e. after boot, the clock is set randomly between 0 and 180 seconds into the past or future. This is useful to enforce the design goal, that the host clock and {{project_name_workstation_long}} clock should always slightly differ. It is also useful to obfuscate the clock when sdwdate itself is running, because naturally at this time, sdwdate hasn't finished.
+* sdwdate runs after booting.
+* {{project_name_gateway_long}}: Using sdwdate is better against Attack (1) when using a bridge.
+* Every hour, at a random time, sdwdate will set the clock again. This is useful for machines running for long time periods without reboot.
+* sdwdate runs at non-predictable times to prevent the ISP or Tor guard/bridge node to guess, that the user is running {{project_name_long}}.
+* sdwdate adds or subtracts a random amount of seconds in range of 0.000000001 and 0.999999999. <ref>
+Check.
+<pre>
+grep -i "Made up" /var/log/sdwdate.log
+</pre>
+</ref> This is supposed to prevent time servers tracking individual users.
+* That will reach the design goal, that all clocks, the host's, {{project_name_gateway_long}} and {{project_name_workstation_long}} slightly differ.
+
+== Block Networking until sdwdate Finishes ==
+TODO: expand
+
+'''This is not yet enabled by default.'''
+
+Network access will be limited to Tor and sdwdate until network time synchronization is done to prevent accidental traffic before that is done.
+
+{{project_name_long}} firewall runs in two different modes. After boot  it runs in <code>timesync-fail-closed mode</code>.
+
+<pre>
+OK: First run during current boot, therefore running in timesync-fail-closed mode.
+OK: (Only local Tor control port connections and torified sdwdate allowed.)
+</pre>
+
+Otherwise after sdwdate succeeded or after manually reloading {{project_name_long}} firewall it runs in <code>full mode</code>.
+
+<pre>
+OK: Consecutive run during current boot, therefore running in full mode.
+OK: (Full torified network access allowed.)
+</pre>
+
+Users are encouraged to test so we can enable it by default in the future.
+
+https://forums.whonix.org/t/testers-wanted-blocking-networking-until-sdwdate-finished-status-of-sdwdate-gui/5372/6
+
+Instructions:
+
+[[Network_Time_Synchronization#Block_Networking_until_sdwdate_Finishes]]
+
+== boot clock randomization ==
+{{Boot_Clock_Randomization}}
+
+== Conclusions ==
+* <span style="background-color: {{Red}}">'''Attack 1'''</span> is a general Tor problem. It is impossible to solve for {{project_name_long}}. It is unsolved in other projects as well.
+* <span style="background-color: {{Yellow}}">'''Attack 2'''</span> gets partially defeated.
+** {{project_name_gateway_long}} and {{project_name_workstation_long}} are immune.
+** This problem is unsolved in other projects as well.
+*** This is a general problem with all operating systems.
+*** The host is still at risk.
+*** [https://web.archive.org/web/20120905134544/http://brainstorm.ubuntu.com/idea/30050/ Ubuntu Brainstorm Idea #30050: Secure Network Time Synchronization]
+*** [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=%23687166 Debian Bug Report ntp: NTP security vulnerability because not using authentication by default]
+*** [https://bugs.launchpad.net/ubuntu/+source/ntp/+bug/1039420 Ubuntu Bug Report NTP security vulnerability because not using authentication by default]
+** Manual workaround: Check your clock manually and read [[Other Operating Systems#About_Ubuntu|About Ubuntu]] (stale mirror attack). ([https://bugs.launchpad.net/launchpad/+bug/716535 Bug #716535: Please support Valid-Until in release files for security.ubuntu.com])
+* <span style="background-color: {{Green}}">'''Attack 3'''</span> gets defeated, {{project_name_long}} adds additional security.
+* <span style="background-color: {{Green}}">'''Attack 4'''</span> gets defeated, {{project_name_long}} adds additional security.
+* <span style="background-color: {{Red}}">'''Attack 5'''</span> is a general Tor problem, which can not be solved by {{project_name_long}} and which is unsolved in other projects as well. Since host, {{project_name_gateway_long}} and {{project_name_workstation_long}} time all differ, at least this attack becomes harder against {{project_name_long}}.
+
+When the user powers on {{project_name_gateway_long}} and the host time is too much off, it will not be able to connect to the Tor network. It is advised, when powering on {{project_name_gateway_long}}, to check that the host time is no more than 1 hour in past or more than 3 hour in future, otherwise Tor will be unable to establish circuits. <ref>https://lists.torproject.org/pipermail/tor-talk/2012-February/023264.html</ref>
+
+An adversary tampering with the user's clock, while the user doesn't recognize that, can't do any more damage to {{project_name_long}} than he could do to Tor Browser. Worst case is a denial of service for Tor. On the other hand, an adversary capable of actively tampering with the traffic between the user and its entry guard or bridge poses much bigger risks to Tor in general. <ref>General Tor problems, Tor is known to be broken against many active attacks. This can not be solved by {{project_name_long}}. When an adversary is capable of running active attacks, tampering with the time leading into a denial of service is the least of the worries. The adversary could also disrupt the service easier. And as for active attacking in general, there are other attacks which are easier to deploy and which pose a greater danger. Not a {{project_name_long}} specific problem.</ref>
+
+The reason for running TimeSync on {{project_name_gateway_long}}, is that onion services can only be accessed if the clock is no more than 30 minutes slow or fast. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/3582#comment:3</ref> Running TimeSync ensures, that {{project_name_gateway_long}} clock is reasonably accurate.
+
+{{Anchor|sclockadj2}}
+
+= External Clock =
+This topic is still under research. Help is welcome.
+
+It might make sense to add an external clock, such as a GPS, or even better an atomic clock. (Can we get an atomic USB clock?) This clock should be added to the host and/or {{project_name_gateway_long}} and/or {{project_name_workstation_long}}?
+
+Open question: would the GPS/atomic clock be too accurate and would that make {{project_name_long}} more fingerprintable?
+
+= Discarded Options =
+== NTP ==
+{{Anchor|NTP authentication (autokey) is insecure}}
+* unauthenticated by default
+* NTP insecure
+** https://gist.github.com/CHEF-KOCH/12976cf15012d64b8fd2
+** https://blog.hboeck.de/archives/863-Dont-update-NTP-stop-using-it.html
+* NTP authentication (autokey):
+** info: https://tools.ietf.org/html/draft-ietf-ntp-network-time-security-00
+** insecure: http://www.innovationslab.net/~brian/NTP/autokey-analysis.pdf [down, contacted author]
+** insecure: https://web.archive.org/web/20210225205522/http://zero-entropy.de/autokey_analysis.pdf
+** Does not work behind NAT? <ref>https://web.archive.org/web/20210618153528/http://lists.ntp.org/pipermail/questions/2010-November/028033.html</ref> <ref>https://gitlab.tails.boum.org/tails/tails/-/issues/6113</ref>
+* NTP leaks the local time. <ref name=ntp-rfc>
+Source: [https://www.ietf.org/rfc/rfc5905.txt RFC5905]
+<blockquote>
+Origin Timestamp (org): Time at the client when the request departed
+for the server, in NTP timestamp format.
+</blockquote>
+</ref> <ref name=ntp-se>
+Credits: Thanks to [https://security.stackexchange.com/users/4564/dfc dfc] for [https://security.stackexchange.com/a/67142/54240 the answer on security.se].
+</ref>
+* does not work over Tor, because NTP uses UDP, while the Tor network does not support UDP
+* [https://www.ntp.org/ntpfaq/NTP-s-algo.htm Quote]: <blockquote>For example standard Linux adjusts the time with a rate of 0.5ms per second.</blockquote>
+** 500000 ns = 0.5 ms = 0.0005 s
+** 1 day = 86400 s <ref>60 s * 60 m * 24 h</ref>
+** NTP can adjust the clock 43.2 s per 1 day.
+** Or 1296 s (= 21.6 m) per 30 days.
+** Or 15768 s (= 262.8 m) (=4.38 h) per 365 days. (4.38 h per year)
+
+== tlsdate ==
+https://github.com/ioerror/tlsdate
+
+Pros:
+* uses seccomp
+* <s>written by Jacob Appelbaum (security researcher; The Tor Project staff member)</s> Due to the recent news now probably abandoned.
+
+Cons:
+* Only native SSL CA pinning support. No direct SSL certificate pinning support.
+* Does not distribute trust. <ref>As {{Code2|sdwdate}} does.</ref> <ref>https://github.com/ioerror/tlsdate/issues/112</ref> <ref>https://github.com/ioerror/tlsdate/issues/143#issuecomment-57053323</ref> The single time source can send by error or by malicious intent send wrong time replies.
+* Does not support hooks for user notifications about state of network time synchronization. &rarr; Users shouldn't use the internet in {{project_name_workstation_long}} before network time synchronization finished, and timesync is informing users about this. &rarr; Implementing notifications would be difficult or require patching tlsdate.
+* Produces clock jumps, which confuses various applications. Does not gradually adjust as {{Code2|sdwdate}} does with [https://github.com/{{project_name_short}}/{{project_name_short}}/issues/169 Slow Clock Adjuster]. <ref>[https://github.com/{{project_name_short}}/sdwdate/blob/master/usr/lib/sclockadj sclockadj]</ref>
+* Cannot connect to (most) Tor onion services, because most of those do not support SSL. <ref>Because in most cases, there is little need to combine Tor onion services with SSL. [[Onion_Services#Notes_about_End-to-end_security_of_Onion_Services|connections to Tor onion services are Tor-to-Tor encrypted by default ("not exactly end-to-end")]].</ref> <ref>https://github.com/ioerror/tlsdate/issues/157</ref>
+* Minor: {{Code2|command line parser doesn't fail closed on extraneous / unknown command line parameters}} <ref>https://github.com/ioerror/tlsdate/issues/158</ref> - not that important in the absence of bugs, butsafer behavior for {{Code2|tlsdate}} would be to fail closed on on extraneous / unknown command line parameters.
+* Likely denial of service issue: https://github.com/ioerror/tlsdate/issues/149
+
+== htpdate ==
+Original.
+
+* [https://www.vervest.org/htp/ htpdate] ([https://packages.debian.org/{{Stable_project_version_based_on_Debian_codename}}/htpdate debian package])
+* Detailed Package status in Debian: https://packages.qa.debian.org/h/htpdate.html
+* unresponsive upstream [tails-dev contact them because of their tails_htp fork - no reply] [no reply to Patrick in past]
+* htp=htpdate (same program as the one on rkeene.org)
+
+Tails htpdate fork
+
+* code in revision control: https://salsa.debian.org/debian/htpdate.git
+* Tails' reasons to fork htpdate:
+** they wanted to add features such as TLS Authentication of servers
+** and source pools model. <ref>https://tails.boum.org/contribute/design/Time_syncing/#index4h1</ref>
+* The htpdate implementation used by Tails is the perl one and not the C version.
+
+== Manual Time Setting ==
+Prompt are very difficult.
+
+* GUI users:
+** {{project_name_long}} users: Most laymen don't know what UTC is. Timezone/location should not be asked for privacy reasons too. Users would have to set the time in UTC. At probably a popup would say "use the clock widget and set clock in UTC" which is bad usability.
+** {{kicksecure}} users: Prompt could be in the timezone as defined by user during installer. Slightly less worse.
+* CLI users:
+** Servers: no prompt possible for a server that reboots (such as after forced server restart).
+
+= TODO =
+== Consideration no TimeSync on Host ==
+Would it be advisable to run no network time synching daemon on the host at all? There are open questions. See:<br />
+https://forums.whonix.org/t/ntp-possible-skew-per-day-month-year/487/5
+
+== Time Source of Time Servers ==
+Even if we could very securely obtain the time from a server with distributed trust and everything, the question is, how do these servers themselves set their own clock? If they just use unauthenticated NTP themselves, they might not be a big help.
+
+TODO: invent sdwdate-server
+
+== Tor Consensus Method ==
+===== Introduction =====
+'''Just an idea. Not implemented.'''
+
+Tails' [https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chroot_local-includes/etc/NetworkManager/dispatcher.d/20-time.sh {{Code2|tordate}}] ([https://tails.boum.org/contribute/design/Time_syncing/#index3h1 Guessing time based on Tor consensus]), renamed to {{Code2|[[anondate]]}} for trademark reasons and refactored to work outside of Tails provides useful bash functions to check system clock using Tor's consensus file and Tor's log.
+
+https://github.com/{{project_name_short}}/helper-scripts/blob/master/usr/sbin/anondate
+
+Tor connects to the network. The Tor consensus file contains rough time information. Since when and until when it is valid.
+
+{{Code2|tordate}} (now {{Code2|anondate}}) can provide us with a few machine readable infos we can then use for whatever we may need them.
+
+This is magic.
+<pre>
+valid-after=2014-07-31 21:00:00
+valid-until=2014-08-01 00:00:00
+</pre>
+
+This is simply {{Code2|/bin/date}}.
+<pre>
+Current time is 2014-07-31 22:44:02
+</pre>
+
+Less magic.
+<pre>
+Current time is in valid Tor range
+</pre>
+
+Less magic, but maybe useful.
+<pre>
+Current time is not in valid Tor range, setting to middle of this range: [2014-07-31 22:30:00]
+</pre>
+
+{{Code2|anondate}} can do this by parsing Tor's verified consensus file {{Code2|/var/lib/cached-microdesc-consensus}} or by parsing {{Code2|/var/lib/tor/unverified-microdesc-consensus}}.
+
+===== Tor Consensus Download and Verification Conditions =====
+Under which conditions Tor is not able to verify the Tor consensus file?
+
+1) If it has been tampered with by a man-in-the-middle.
+
+2) For clocks that are more than 30 days in the past or 2 days in the future, Tor will not even be able to download a consensus. In this case anondate can parse Tor's log and report the authority's cert's valid-after date. <ref>
+Source, source code comment in tordate: https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chroot_local-includes/etc/NetworkManager/dispatcher.d/20-time.sh
+<pre>
+	# Since Tor 0.2.3.x Tor doesn't download a consensus for
+	# clocks that are more than 30 days in the past or 2 days in
+	# the future.  For such clock skews we set the time to the
+	# authority's cert's valid-after date.
+</pre>
+</ref>
+
+<pre>
+anondate --tor-cert-valid-after
+</pre>
+
+<pre>
+Jun 16 00:00:00 2014 GMT
+</pre>
+
+===== Open Questions =====
+* Is the authority's cert's valid-after date signed/verified/built-into-Tor or can it be tampered with by a man-in-the-middle attack?
+* When clock is more than 1 hour in past or more than 3 hour in future, Tor will be unable to establish circuits? <ref>
+https://lists.torproject.org/pipermail/tor-talk/2012-February/023264.html
+</ref>
+
+===== Required Clock Accuracy for Onion Services Accessibility =====
+====== Gateway ======
+Generally, computer running Tor ({{project_name_gateway_short}}):
+
+<code>live consensus</code> definition, quote [https://github.com/torproject/torspec/blob/master/dir-spec.txt Tor Tor directory protocol]:
+
+<blockquote>A network-status document is "live" if the time in its valid-after field has passed, and the time in its valid-until field has not passed.</blockquote>
+
+<code>reasonably live consensus</code> definition, quote Tor Tor directory protocol:
+
+<blockquote>A reasonably live consensus is one that expired less than 24 hours ago.</blockquote>
+
+How accurate has the clock to be so onion services can be accessed? <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/3460
+</ref>
+
+Due to issue [https://forums.whonix.org/t/most-onions-down-due-to-a-denial-of-service-attack-on-the-tor-network/10979 Most Onions Down due to a Denial of Service Attack on the Tor Network] this question received attention.
+
+Previously a <code>live consensus</code> was required. From Tor <code>0.4.5.3</code> and above only a <code>reasonably live consensus</code> will be required.
+
+====== Workstation ======
+Generally, computer running applications (such as curl or sdwdate) connection to onions ({{project_name_workstation_long}}):
+
+Applications running on a separate computer/VM ({{project_name_workstation_long}}) can establish onion connections irrespective of ultra slow or ultra fast system clock on that computer. That is as Tor on a separate computer/VM is functional, which however requires a correct clock as described above.
+
+====== Summary ======
+* {{project_name_gateway_short}}: Clock need to be correct enough to be able to reach onions.
+* {{project_name_workstation_long}}: No clock correctness requirements for ability of reaching onions.
+
+===== Reasons for relying solely on anondate for time setting =====
+* Does not require [https://github.com/{{project_name_short}}/{{project_name_short}}/issues/24 ssl certificate pinning].
+* Does not rely on remote web servers.
+* Does not require a somewhat accurate clock as Remote Web Servers Method requires to get a rough time guess.
+
+===== anondate issues =====
+Originally posted in [https://phabricator.whonix.org/T151 sdwdate Tor Consensus Time Sanity Check]:
+
+* As per [https://forums.whonix.org/t/tor-dev-mailinglist-proposal/489/10 chat log with Roger] directory authorities can lie about time - so we need to use this with care.
+* Tor consensus isn't always downloaded from directly from directory authorities, sometimes Tor downloads the Tor consensus from directory mirrors. And the latter aren't trusted as much as directory authorities. Those are just like normal relays.
+* We should have the courtesy to not explicitly download from directory authorities, because... <blockquote>armadev: oh. i think that would be horrible. hundreds of thousands of users doing that could overwhelm the directory authorities.</blockquote>
+
+===== Reasons against relying solely on anondate for time setting =====
+* Provides only rough time.
+** [[Fingerprint#For_the_websites_that_you_are_visiting|web fingerprint]] would differ from most other Tor users.
+** Would cause lots of support requests complaining about skewed clocks.
+** Might trouble onion services (such as hidden web servers) that need to show time to clients?
+** Might trouble people attempting to [[I2P|tunnel I2P through Tor]]?
+** Might cause other (gpg) verification issues?
+*** Debian updater APT refuses to use sources which are not yet valid. I.e. source with a signed valid-until field later than the local system clock.
+* Fingerprinting issues at ISP level:
+** In situation, where the clock is that much off, that Tor cannot establish circuits, setting time using anondate required, restart of Tor required:
+*** As per [[Comparison with Others#Fingerprint]], quoted from the [https://tails.boum.org/contribute/design/Time_syncing/#index5h1 Tails Design about Time syncing]: "Our initial time guess based on the Tor consensus is probably easier to fingerprint, though: a fresh Tor is started, and restarted again right after the consensus has been downloaded."
+** Might not matter. See also [[Fingerprint#ISP_or_Local_Network_Administrators|Network Fingerprint]].
+*** Related: [[Comparison with Others#Network Time related]]
+* <s>Hidden services can only be accessed if the clock is no more than 30 minutes slow or fast. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/3582#comment:3</ref></s>
+* [https://gitlab.tails.boum.org/tails/tails/-/issues/5774 Tails ticket: Robust time syncing] Quote: <blockquote>Currently we use tordate to set the initial clock. It is very messy and error prone, so we desperately need a robust replacement.</blockquote>
+* Vulnerable to ISP level man-in-the-middle attacks:
+** [https://tails.boum.org/contribute/design/Time_syncing/ Tails Design: Time Syncing] Quote: <blockquote>First, replaying a consensus older than one week or so results in preventing access to the Tor network, and that's all, because onion keys will be wrong.</blockquote>
+*** In a situation where an adversary is replaying a more than ~7 days old consensus:
+**** anondate could report a clock that is more than ~7 days slow. With a system clock that is that slow, Tor would no longer be able to establish circuits. But there are multiple reasons why Tor may not be able to establish circuits. So anondate could only guess, that the clock reported in Tor consensus is more than ~7 days slow, but not know with certainty.
+*** In a situation where an adversary is replaying an up to ~7 days old consensus:
+**** anondate could report a clock that is up to ~7 days slow and Tor would still be able to create circuits.
+**** With Tor as is at the moment, anondate cannot even in principle provide a more accurate time guess than a clock that is up to ~7 days slow.
+**** Using an up to ~7 days old consensus, is most likely something we really should avoid?
+** Therefore vulnerable to Attack 3 as per [[#Attacks]].
+
+===== Conclusions =====
+* Relying solely on anondate for time setting is probably a bad idea.
+* Tor consensus time is used as a [[Sdwdate#Tor_Consensus_Time_Sanity_Check|sdwdate Tor Consensus Time Sanity Check]].
+* Rough time fix.
+** If clock is too much off so sdwdate cannot fix it, use anondate to get a rough time fix, then let sdwdate do the rest.
+
+===== Why not use tordate by Tails instead of reinventing the wheel with anondate? =====
+* Because Tails code is highly Tails specific.
+** Depending on non-persistent Tor data dir.
+** Entangled with Tails specific gui notifications.
+** Entangled into the Tails specific boot process with other scripts.
+** Not a clean abstraction of "tell me what Tor's log / Tor's consensus thinks about date/time".
+** Quote: "Currently we use tordate to set the initial clock. It is very messy and error prone, so we desperately need a robust replacement." <ref>https://gitlab.tails.boum.org/tails/tails/-/issues/5774</ref>
+
+===== Random Stuff =====
+* [https://mailman.boum.org/pipermail/tails-dev/2012-January/000822.html tails-dev mailing list: tordate: why is it safe to set time from unverified-consensus?]
+** String parsing a unverified consensus using anondate is more risky [hitting hypothetical vulnerabilities in grep] than string parsing a verified Tor consensus.
+* Tor consensus is in some cases downloaded from Tor directory authorities and in some cases from Tor directory mirrors. The latter should not be trusted as much as the former.
+* https://gitlab.torproject.org/tpo/core/torspec/-/blob/master/proposals/149-using-netinfo-data.txt
+
+{{Anchor|Status of this idea}}
+
+===== Tor Certificate Lifetime =====
+<code>certificate lifetime</code>
+
+<pre>
+Certificate not yet valid. Either their clock is set wrong, or your clock is wrong.
+(certificate lifetime runs from Aug 27 00:00:00 2020 GMT through Aug 27 00:00:00 2021 GMT. Your time is Jan 09 07:33:33 2000 UTC.)
+</pre>
+
+{{CodeSelect|code=
+sudo anondate --tor-cert-valid-after
+}}
+
+<pre>
+Aug 27 00:00:00 2020 GMT
+</pre>
+
+Might be related to the following. Quote [https://github.com/torproject/torspec/blob/master/dir-spec.txt Tor Tor directory protocol]:
+
+<blockquote>Every authority has a very-secret, long-term "Authority Identity Key". This is stored encrypted and/or offline, and is used to sign "key certificate" documents. Every key certificate contains a medium-term (3-12 months) "authority signing key", that is used by the authority to sign other directory information. (Note that the authority identity key is distinct from the router identity key that the authority uses in its role as an ordinary router.)</blockquote>
+
+While Authority Identity Key might be hardcoded in Tor, the certificate lifetime is likely not. Otherwise Debian (old)stable would have to ship yearly upgrades to upgrade the "Tor directory authority certificate start date" which never happens. Therefore <code>certificate lifetime</code> should not be trusted since it could be stale.
+
+Tor Certificate Lifetime likely has a digital software signature which gets verified by Tor. It's however not a trustworthy source of time. Vulnerable to replay attacks. Could be one year or older. That's because to verify its freshness, Tor requires a correct clock. For time synchronization purposes however the clock is assumed to be incorrect. What however could be trusted that at least that time has already come. It's not a far future date because then Tor directory authorities wouldn't have signed a Tor certificate with that lifetime yet.
+
+Related source code: https://src-ref.docs.torproject.org/tor/x509__openssl_8c.html#adcb9e22c87cb9ba135f6edf3e13386b4
+
+Related ticket: https://gitlab.torproject.org/legacy/trac/-/issues/4370
+
+===== Tor Consensus Issues =====
+[https://lists.torproject.org/pipermail/tor-talk/2011-January/008551.html Quote] Roger Dingledine:
+
+<blockquote>Whether this is a good idea depends on where you got the consensus. If you connect to a Tor directory mirror and it hands you a consensus from last month, and you set your clock based on it, then you've opened yourself up to exactly the attack that Tor is trying to defend against.</blockquote>
+
+Problem is, nowadays Tor in most cases doesn't download from Tor directory authorities anymore. And we ought to not download the Tor consensus exclusively from Tor directory authorities. Source: <ref>
+https://forums.whonix.org/t/tor-dev-mailinglist-proposal/489/10
+</ref> <blockquote><armadev> oh. i think that would be horrible. hundreds of thousands of users doing that could overwhelm the directory authorities.</blockquote>
+
+https://forums.whonix.org/t/tor-dev-mailinglist-proposal/489/print
+
+===== Fixing Time based on Tor Consensus =====
+Future Implementation consideration.
+
+This could be how time syncing is performed when {{project_name_long}} starts:
+
+Credits: This is a rewrite of [https://tails.boum.org/contribute/design/Time_syncing/ Tails Time Syncing Design]
+
+# Start Tor. If Tor is already working, skip to the following anondate steps.
+# Let Tor fetch the Tor consensus.
+# (anondate related step) If the time is too badly off, the Tor directory authority certificate may not be valid, so we set the system time to the Tor directory authority certificate start date. (<code>sudo anondate --tor-cert-valid-after</code>) For example, see above. Which will guarantee that the Tor directory authority certificate will be valid and the Tor consensus (which includes Tor <code>valid-until</code> date/time) can be downloaded.
+# (anondate related step) Wait until Tor can tell us the Tor <code>valid-until</code> date/time.
+# (anondate related step) Set system time to Tor consensus time <code>valid-until</code> - <code>1:30</code>. (In other words: minus <code>1</code> and <code>30</code> or minus <code>90</code> minutes.) (<code>sudo anondate --show-middle-range</code>) <ref>
+{{CodeSelect|code=
+anondate --show-valid-after
+}}
+
+<pre>
+2021-01-09 13:00:00
+</pre>
+
+{{CodeSelect|code=
+sudo anondate --show-valid-until
+}}
+
+<pre>
+2021-01-09 16:00:00
+</pre>
+
+{{CodeSelect|code=
+anondate --show-middle-range
+}}
+
+<pre>
+2021-01-09 14:30:00
+</pre>
+</ref>
+# Wait until the Tor bootstrap process has been completed.
+# Use sdwdate (which exclusively uses onions as time sources) though Tor to get a more correct system time.
+
+A notification in form of [[sdwdate-gui]] shown while the whole process is running.
+
+Non-issues:
+
+* Use of unverified Tor consensus is not required.
+* The hardware clock is not affected.
+
+Security discussion:
+
+sdwdate's approach essentially removes Tor's time skew check, which is used to prevent replay of consensus data. Let's discuss this class of attacks.
+
+First, replaying a consensus older than four weeks or so results in preventing access to the Tor network, and that's all, because onion keys will be wrong. An attacker who is in a position to replay a consensus to the user could anyway do this, unrelated to time, so the issue at hand boils down to replaying a consensus not older than four weeks or so.
+
+Second, the same type of attacker as above could also try to forge a completely new consensus, which would be unverifiable since the attacker doesn't have access to the authorities' keys. An attacker in that position could do denial-of-service attacks in many other ways, so this doesn't make the situation any worse.
+
+Third, things are different depending on if the user is using a bridge or not.
+
+If not using a bridge, first boot:
+
+* Tor starts without a cached consensus.
+* The Tor client starts by connecting directly to a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/FallbackDirectoryMirrors fallback directory mirror] to download the Tor consensus.
+* Feeding a stale consensus requires the attacker either to break SSL or to control the fallback directory mirror the user's Tor client connects to.
+* Under these conditions the adversary could feed an up to four weeks stale Tor consensus, which is used until sdwdate has fixed the time.
+* Not good, but probably a compromise we can make.
+
+If using a bridge, first boot:
+
+* Tor starts without a cached consensus.
+* Tor fetches Tor consensus from the bridge.
+* Feeding a stale consensus requires the attacker either to break SSL or to control the user's bridge.
+* Under these conditions the adversary could feed an up to four weeks stale Tor consensus, which is used until sdwdate has fixed the time.
+* Not good, but probably a compromise we can make.
+
+If your ISP, Tor entry guard or Tor bridge, can also:
+
+* A) set up an onion MitM attack against the sdwdate onion connections, and/or
+* B) controls onions used by sdwdate as time sources,
+
+it can trick you into keep using this old consensus for max. four weeks, which is much worse.
+
+A) should be extremely unlikely. A successful MitM against a Tor onion connection have never been reported. While Tor onions servers might be vulnerable to various de-anonymization attacks, this is a different topic, this affects only the anonymity of the onion server. The client, visitor (here user's machine using sdwdate) does not have to worry about this. Also does not affect the encryption/authentication of the connection. No reports of breaking onion encryption/authentication where known at time of writing. If this was possible, this would be catastrophic anyhow. This wouldn't make the situation any worse.
+
+B) should also be very unlikely. Onion servers targeting specific users seems very unlikely since users connect anonymously using Tor to an onion server. An attack against all users is also very unlikely since sdwdate is distributed (uses median of 3 onion time sources), randomly chosen from sdwdate time sources list and such an attack would be easy to notice, probably reported by users and in response developers would remove these sdwdate time sources.
+
+In any case it should be better than using unauthenticated NTP.
+
+===== Tor Consensus Time Setting Method Security Considerations =====
+User local system clock being much skewed is a big issue because:
+
+* <code>a)</code> Stands out in javascript snooping scripts (Even if Tor Browser fixed that, other applications could leak it.)
+* <code>b)</code> Prevents Tor consensus from being downloaded leading to broken Tor connectivity.
+* <code>c)</code> Other issues discussed on top of this page, [[Time Attacks]].
+
+It depends on the start conditions. Seems really complex. The user's clock is either:
+
+* <code>[C]</code>: correct
+* <code>[D]</code>: incorrect
+
+The Tor directory mirror (just normal relays) is either sending the user a Tor consensus that is:
+
+* <code>[E]</code>: fresh
+* <code>[D]</code>: legitimate (bug) stale
+* <code>[F]</code>: malicious (targeted attack) stale
+* <code>[G]</code>: invalid
+
+Now these are quite a few cases to combine and consider. <code>[G]</code> we can ignore. <code>[D]</code> and <code>[F]</code> can be regarded as approximately the same issue.
+
+user clock slow <code>[D]</code> + stale Tor consensus <code>[F]</code>: user would remain on fake Tor network
+
+user clock correct <code>[C]</code> + stale Tor consensus <code>[F]</code>: anondate would introduce a time skew. Not fix one. The user's system clock would be set to the past because the stale Tor consensus told anondate so. The worst could be prevented with a hardcoded minimum date as a safeguard but it's still a security compromise to make.
+
+user clock slow <code>[D]</code> + fresh Tor consensus <code>[E]</code>: In this case anondate would fix the connectivity/usability issue, fix a) and b).
+
+Then it also depends on how slow the user's clock is.
+
+* <code>[H]</code> Less than 24 hours slow clock or
+* <code>[I]</code> More than 24 hours slow clock.
+
+Therefore:
+
+* <code>[H]</code> + <code>a)</code>: issue
+* <code>[I]</code> + <code>a)</code>: no issue since no connection
+
+
+===== Issues =====
+The issue with looking at Tor consensus time is that after power off for a few hours (<code>>= ~3</code> hours) Tor starts necessarily with a stale Tor consensus. When querying Tor consensus time (using <code>anondate-get</code> or otherwise), from the perspective of <code>anondate-get</code> the clock is fast, because Tor consensus is stale because Tor hasn't downloaded a newer Tor consensus yet.
+
+This happened up to {{project_name_long}} 16.0.3.1 after the gateway VM was offline for a few hours:
+
+<pre>
+sudo anondate-get
+/usr/sbin/anondate-get: INFO: 100% Tor bootstrap, ok.
+/usr/sbin/anondate-get: INFO: tor_circuit_established_check.py, ok.
+/usr/sbin/anondate-get: INFO: Tor circuit already established, ok.
+/usr/sbin/anondate-get: WARNING: local system time is NOT with valid time range. (valid_after: 2021-05-25 11:00:00 | middle_range: 2021-05-25 12:30:00 | valid_until: 2021-05-25 14:00:00)
+/usr/sbin/anondate-get: INFO: middle_range: '2021-05-25 12:30:00'
+/usr/sbin/anondate-get: INFO: time_result later than minimum-unixtime-show, ok.
+2021-05-25 12:30:00
+/usr/sbin/anondate-get: END: Exiting with exit_code '0' indicating 'Showed Tor consensus time middle range.'.
+</pre>
+
+<pre>
+/usr/lib/helper-scripts/onion-time-pre-script: Start.
+Static Time Sanity Check: Within minimum time 'Sun Jan 17 00:00:00 UTC 2021' and expiration timestamp 'Tue May 17 10:00:00 UTC 2033', ok.
+Tor reports: NOTICE BOOTSTRAP PROGRESS=95 TAG=circuit_create SUMMARY="Establishing a Tor circuit"
+Tor circuit: not established.
+Tor Consensus Time Sanity Check: The clock might be too fast. Clock is faster than consensus/valid-until 2021-05-25 14:00:00.
+/usr/lib/helper-scripts/onion-time-pre-script: END: Exiting with exit_code '2' indicating 'wait, show busy icon and retry.'.
+</pre>
+
+<code>The clock might be too fast.</code> is because while the hardware clock was reasonable correct, Tor consensus time was still stale since Tor didn't download a new Tor consensus yet.
+
+After approximately two minutes after VM start (Tor finished downloading a newer Tor consensus):
+
+<pre>
+sudo anondate-get
+/usr/sbin/anondate-get: INFO: 100% Tor bootstrap, ok.
+/usr/sbin/anondate-get: INFO: tor_circuit_established_check.py, ok.
+/usr/sbin/anondate-get: INFO: Tor circuit already established, ok.
+/usr/sbin/anondate-get: INFO: local system time is already within valid range, ok. (valid_after: 2021-05-25 18:00:00 | middle_range: 2021-05-25 19:30:00 | valid_until: 2021-05-25 21:00:00)
+/usr/sbin/anondate-get: INFO: time_result later than minimum-unixtime-show, ok.
+/usr/sbin/anondate-get: INFO: Tor certificate lifetime valid, ok.
+/usr/sbin/anondate-get: END: Exiting with exit_code '4' indicating 'Setting time using anondate either not possible or not required.'.
+</pre>
+
+<pre>
+Static Time Sanity Check: Within minimum time 'Sun Jan 17 00:00:00 UTC 2021' and expiration timestamp 'Tue May 17 10:00:00 UTC 2033', ok.
+Tor reports: NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
+Tor circuit: established.
+Tor Consensus Time Sanity Check: Clock within consensus parameters consensus/valid-after 2021-05-25 18:00:00 and consensus/valid-until 2021-05-25 21:00:00.
+Tor already reports circuit established.
+/usr/lib/helper-scripts/onion-time-pre-script: END: Exiting with exit_code '0' indicating 'success'.
+</pre>
+
+Comparison:
+
+<pre>
+valid_after: 2021-05-25 11:00:00 | middle_range: 2021-05-25 12:30:00 | valid_until: 2021-05-25 14:00:00
+valid_after: 2021-05-25 18:00:00 | middle_range: 2021-05-25 19:30:00 | valid_until: 2021-05-25 21:00:00
+</pre>
+
+Actual time when this happened was:
+
+<pre>
+2021-05-25 18:40:00
+</pre>
+
+If sdwdate had set the time to <code>anondate-get</code>'s initial guess <code>2021-05-25 12:30:00</code> (using <code>anondate-set</code>), Tor connectivity would have been broken. (This issue was experienced indeed in past during experimentation using <code>anondate-set</code>.)
+
+Tor control protocol has no feature to query "attempting to download a newer Tor consensus done yet?"
+
+Idea:
+
+If hardware clock is faster than <code>valid_until</code>, delete Tor consensus before Tor starts.
+
+(Easily implemented thanks to systemd units.) Tor would re-download the Tor consensus anyhow. But this might be fingerprintable but then again, being a user of {{project_name_long}} might be fingerprintable anyhow ([https://github.com/Kicksecure/tirdad random ISN] / [[security-misc]] network hardening). Instead of Tor starting with a stale consensus, figuring out it's stale and re-downloading one, it would go straight ahead and download a new one which it has to do anyhow.
+
+Maybe using <code>anondate-set</code> to fix the clock on Whonix-Gateway only. That might mitigate introducing new fingerprinting issues inside
+Whonix-Workstation. And sdwdate in Whonix-Workstation should be functional anyhow as soon as Tor in Whonix-Gateway is functional.
+
+Maybe most issues with broken hardware clocks are these being too slow, and not too fast? Perhaps by only ever using <code>anondate-set</code> to move the clock into the future but never to the past most if not all security issues can be prevented.
+
+If Tor relays send us a too new Tor consensus, they are in position for denial of service anyhow. Too new is unlikely since for that Tor directory authorities would need to be malicious/compromised. Even if that happens, it would just DOS Tor. Any TLS certificate (debian APT) would be refused if clock is too far in future. Security issues with wrong system time seems to be only with too slow clocks but not with too fast clocks. The latter is at worst a DOS issue.
+
+= Clock Fixing =
+Since a few Whonix 16 point releases now.
+
+If Tor is running on the same machine / VM (such as Kicksecure or Whonix-Gateway):
+
+* very slow clocks can be fixed
+* very fast clocks cannot be fixed
+
+If Tor is running on another machine / VM (such as Whonix-Workstation):
+
+* very slow clocks can be fixed
+* very fast clocks can be fixed
+
+That is because Tor is not running on these machines. Once Tor is functional on Whonix-Gateway, it is easy for sdwdate in Whonix-Workstation to connect to onion time sources despite how far skews the time is.
+
+= Notes =
+
+= Adjusting time slowly using adjtimex/ntp_adjtime =
+
+Under [https://github.com/{{project_name_short}}/sdwdate/pull/4 consideration] is changing the time with <tt>sclockadj2</tt>. The initial drive for this was that calling <tt>clock_settime()</tt> in the original <tt>sclockadj</tt> can result in several thousand entries in <tt>systemd</tt>'s journal per invocation (can be seen with <tt>journalctrl -f</tt>) on Debian.
+
+<tt>sclockadj2</tt> uses <tt>adjtimex</tt> call in libc (als called <tt>ntp_adjtime</tt>) which translates to Linux' kernel system call 124. This is a modal interface that is used by `ntpd` to change the system clock. <tt>adjtimex</tt> supports a mode with "hard" changes to the time, but those generate entries in <tt>systemd</tt> journal, just like with <tt>clock_settime</tt>.
+
+The offset mode for <tt>adjtimex</tt> allows a change of 0.5 seconds per call (used to be ~130 milisec until the 2.6 kernel). The documentation of this call is incomplete, partly resulting from the limited number of clients (<tt>ntpd</tt>, <tt>chronyd</tt>) using this interface, but by tracing the kernel internals (<tt>linux/kernel/time/ntp.c</tt> and <tt>/linux/kernel/time/timekeeping.c</tt>) one can get a more complete picture, including that modern kernels support a NANO mode easier implementation of smaller adjustments than the older μsecond based interface, without the need to do clock tick adjustment calculations.
+
+Based on this interface and mode bit definitions taken from <tt>/usr/include/linux/timex.h</tt> (more complete than the counterparts you typically find online) to form a Python based interface via <tt>ctypes</tt>. Primarily first setting the kernel internals to handle nanoseconds specifications and run in PLL mode. Then using OFFSET  to adjust the time.
+With this call the kernel is instructed to change the time gradually. You can observe this change by making further calls to <tt>adjtimex</tt>, this time without setting any values (specified by 0 in the modes bitfield of the structure handed to <tt>adjtimex</tt>). To handle changes of more than the maximum allowed (±0.5 seconds), you need to invoke a 0.5 second change and observe if the offset has been reduced to 0, then invoke again. Writing a new offset using <tt>adjtimex</tt> will overwrite any running adjustment process, therefore you have to wait.
+
+By default the kernel uses a decreasing stepsize as the (remaining) offset to handle  approaches 0. This can be influenced by the TIMECONST to start with bigger steps, or even reset the stepsize on a regular basis while the kernel is changing the clock according to the remaining offset.
+
+The <tt>ntpd</tt> can use this offset changing possibility as is but also has a more sophisticated approach, by instructing the kernel about the drift compared to the internal clock.
+
+The <tt>sclockadj2</tt> directly uses a nanosecond offset (positive or negative) that instructs the kernel to adjust (looping multiple invocations if the absolute value of the offset > 0.5 seconds. The program has to be run as root in order to tell the kernel to make these changes (querying the status doesn't require this). At the start of this process a PID file is written, which is checked during loops (if running longer than 0.5 s) and will kill any previous invocation of the program. The syntax for the offset invocation is:
+
+      sclockadj2 offset [-h] [--constant CONSTANT] [--verbose] [--quiet][--wait]  nanoseconds
+for changes > 0.5s <tt>--wait</tt> has to be specified. Increased verbosity can be used to watch the progress of what the kernel is doing with the offset.
+
+This progress can also be seen by invoking the program with the <tt>status</tt> option. To do so has some instructional value for observing normal `ntpd` behaviour as well. The full options for status:
+    usage: sclockadj2 status [-h] [--follow] [--set] [--verbose] [--quiet]
+                             [--debug] [--wait]
+
+    adjtimex status (--quiet &rarr; only offset, --verbose &rarr; detail)
+
+    optional arguments:
+      -h, --help     show this help message and exit
+      --follow, -f   follow status indefinitely
+      --set          set status explicitly to PLL and NANO
+      --verbose, -v  increase verbosity level
+      --quiet, -q    decrease verbosity level
+      --debug, -D    Debug messages. Don't change date
+      --wait         wait for offset to return to 0
+
+Stopping a previous invocation of <tt>sclockadj2</tt> (which might be looping on values > 0.5s), including stopping the internal offset can easily be achieved by calling <tt>sclockadj2 offset 0</tt>
+
+== Blockchain Time ==
+* https://bitcoinmagazine.com/articles/bip-the-end-to-end-encryption-bitcoin-never-had-but-soon-will-1465401187
+* https://github.com/bitcoin/bips/blob/master/bip-0150.mediawiki
+* https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2019-March/016806.html
+* https://en.bitcoin.it/wiki/Block_timestamp
+* https://web.archive.org/web/20140213190023/http://james.lab6.com/2012/01/12/bitcoin-285-bytes-that-changed-the-world/
+* https://en.bitcoin.it/wiki/API_reference_(JSON-RPC)
+* https://twitter.com/_jonasschnelli_/status/1119137870592102400
+** <blockquote>A BIP158 based wallet rescans takes less then 5 minutes (back from genesis) on powerful consumer computer.</blockquote>
+
+* https://electrum.readthedocs.io/en/latest/faq.html#does-electrum-trust-servers
+* https://electrum.readthedocs.io/en/latest/faq.html#i-might-run-my-own-server-are-client-server-connections-authenticated
+
+* [https://ieeexplore.ieee.org/document/8482304 Blockchain-Based Secure Time Protection Scheme in IoT]
+* [https://hal.univ-grenoble-alpes.fr/hal-01865259/document Secure Time Synchronization Protocol]
+
+== NTS - Network Time Security - Secure NTP ==
+* https://fedoramagazine.org/secure-ntp-with-nts/
+* https://weberblog.net/network-time-security-strengths-weaknesses/
+* https://weberblog.net/setting-up-nts-secured-ntp-with-ntpsec/
+* https://weberblog.net/network-time-security-new-ntp-authentication-mechanism/
+** <blockquote>the time data is not encrypted by NTS – but authenticated.</blockquote>
+* https://chrony.tuxfamily.org/comparison.html
+* https://blog.apnic.net/2019/11/08/network-time-security-new-ntp-authentication-mechanism/
+* https://www.cloudflare.com/time/
+* https://blog.cloudflare.com/secure-time/
+* https://blog.cloudflare.com/nts-is-now-rfc/
+* https://blog.cloudflare.com/announcing-cfnts/
+
+== roughtime ==
+=== roughtime information ===
+* https://datatracker.ietf.org/doc/draft-ietf-ntp-roughtime/
+* https://datatracker.ietf.org/doc/draft-ietf-ntp-roughtime/?include_text=1
+* https://roughtime.googlesource.com/roughtime
+* https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=838416
+* https://salsa.debian.org/lamby/pkg-roughtime
+* UDP
+* independent of TLS CAs (hardcoded keys)
+* server list: https://github.com/cloudflare/roughtime/blob/master/ecosystem.json
+* https://int08h.com/post/to-catch-a-lying-timeserver/
+* https://int08h.com/post/roughtime-message-anatomy/
+* https://roughtime.googlesource.com/roughtime/+/HEAD/ECOSYSTEM.md
+* https://roughtime.googlesource.com/roughtime/+/HEAD/PROTOCOL.md
+
+=== roughtime client list ===
+* https://roughtime.googlesource.com/roughtime
+* https://github.com/cloudflare/roughtime
+* https://github.com/int08h/roughenough
+* https://github.com/int08h/roughenough-fuzz
+* https://github.com/ffledgling/python-roughtime
+* https://github.com/dansarie/pyroughtime
+** https://github.com/dansarie/pyroughtime/issues/3
+* https://github.com/Merovius/notary/tree/master/roughtime
+* https://github.com/nahojkap/craggy
+* https://github.com/tajchert/securetime
+* https://github.com/systemd/systemd/issues/12751
+* https://github.com/topics/roughtime
+* https://github.com/bnoordhuis/node-roughtime
+
+= Debugging =
+Useful to run in Qubes dom0.
+<pre>
+qvm-run --pass-io {{project_name_gateway_vm}} "date -u" ; date -u
+</pre>
+
+= See Also =
+== Other ==
+* [https://curl.se/docs/security.html List to keep track of curl advisories from the official website. Their descriptions are non-cryptic.]
+* [[Time Attacks]]
+* [[sdwdate|sdwdate - Secure Distribiuted Web Date - Homepage]]
+* [[Dev/sdwdate]]
+
+== Previous Discussion ==
+* [https://lists.torproject.org/pipermail/tor-talk/2011-January/008551.html System time in anonymity oriented LiveCDs]
+* [https://mailman.boum.org/pipermail/tails-dev/2014-August/006821.html Tails-dev mailing list - Tails htpdate - why use time information from neutral and foe pools?]
+* [https://mailman.boum.org/pipermail/tails-dev/2013-February/002635.html Tails-dev Endless Data Attack and Defense]
+
+== Other Projects ==
+* [https://tails.boum.org/contribute/design/Time_syncing/ Tails Design: Time syncing]
+* https://docs.google.com/a/chromium.org/document/d/1ylaCHabUIHoKRJQWhBxqQ5Vck270fX7XCWBdiJofHbU/edit
+
+== Comparison with Others ==
+[[Comparison with Others#Network Time related|Network Time related]]
+
+== Tickets ==
+=== Qubes ===
+==== high priority ====
+* [https://phabricator.whonix.org/T389 make sure {{q_project_name}} has no access to clocksource=xen]
+* [https://phabricator.whonix.org/T397 prevent dom0 telling {{q_project_name}} VMs the time]
+==== normal priority ====
+* document [[Advanced_Security_Guide#Spoof_the_Initial_Virtual_Hardware_Clock_Offset|Spoof the Initial Virtual Hardware Clock Offset]] for [[Advanced_Security_Guide#Qubes|Qubes]]
+* [https://phabricator.whonix.org/T387 {{q_project_name}} {{project_name_gateway_long}} as ClockVM]
+
+=== others ===
+* [https://gitlab.torproject.org/legacy/trac/-/issues/6894 torproject.org #6894 answer network time requests]
+* [https://tails.boum.org/todo/robust_time_syncing/ Tails Todo: robust time syncing]
+* https://tails.boum.org/blueprint/robust_time_syncing/
+* [https://tails.boum.org/todo/safer_tordate_parameters/ Tails Todo: safer tordate parameters (always use tordate)]
+* [https://tails.boum.org/todo/bridge_mode_vs_tordate_timeouts/ Tails Todo: bridge mode vs tordate timeouts]
+* [https://tails.boum.org/todo/when_htp_fails_the_user_should_be_prompted/ Tails Todo: when htp fails the user should be prompted]
+* [https://github.com/QubesOS/qubes-issues/issues/2342 Qubes: secure time synchronization]
+* [https://gitlab.torproject.org/legacy/trac/-/issues/16659 Linux TCP Initial Sequence Numbers may aid correlation]
+* [https://gitlab.torproject.org/legacy/trac/-/issues/8170 get independent from host clock time / insecure NTP]
+
+== Clock Correlation Attack ==
+=== Attack ===
+prerequisite knowledge:
+
+* {{project_name_gateway_long}} [Proxy]VMs and {{project_name_workstation_long}} [App]VM's system time cannot not be obtained by watching traffic at ISP level.
+* This chapter is not about tracking a single VM across its different Tor exit relays.
+* The context is anonymity. The significance is deanonymization.
+* In anonymity we don't just care about about correlations. Also about estimations. Anonymity set reduction. Partitioning users is already a success. Because it may be combined with other guesses. No direct proof is required. From some countries, there are just a few 100 users or less. If there is already a lead by country, then combined with these time related issues, things begin to really matter.
+* clocksource 'xen' / 'kvmclock' doesn't prevent {{project_name_long}} from using sdwdate.
+* clocksource 'xen' / 'kvmclock' doesn't prevent each VM having slightly different system time (used by all the applications), so no direct leaks here.
+* [host | dom0] host time and VM times a very, very similar. At most one second difference. Or less. In [host | dom0], see:
+<pre>
+date ; qvm-run --pass-io sys-net date
+</pre>
+
+Attack:
+
+* 1) requires a) compromise a {{project_name_workstation_long}} VM and b) observing the ISP network the user is using
+* 2) read [host | dom0] time using clocksource 'xen' / 'kvmclock' or possibly the wall clock interface
+* 3) [host | dom0] time will be very similar to NetVM's time (the system where external network connections are made)
+* 4) correlate {{project_name_workstation_long}} VM with NetVM's time
+* 5) anonymity set reduction done
+
+Notes:
+
+No need to compromise multiple VMs. Only one VM, a {{project_name_workstation_long}} VM needs to be compromised. NetVM does not have to be compromised, it leaks in most cases - hard to avoid all cases - any passive ISP level adversary watching traffic can read the clients local clock. It is leaked on many levels, see [[#Local Clock Leaks]].
+
+Threat Model:
+
+* {{project_name_workstation_long}} AppVM gets compromised up to local root code execution. Then the attacker uses the local exploit, reads clocksource 'xen' / 'kvmclock'.
+
+=== Defense ===
+We need to make sure that all of {{project_name_gateway_long}}, {{project_name_workstation_long}}, and NetVM uses slightly different time. Even if {{project_name_workstation_long}} would be compromised, and the attacker gets knowledge of the time of [host | dom0] and sniffs NetVM's time, it would hinder correlation.
+
+[host | dom0] and non-anonymous VM's clocks should be as synced, correct and secure as those can be.
+
+But those should differ from the clocks within {{project_name_long}} VMs.
+
+We need completely isolated virtual time within {{project_name_long}} VMs. <ref>
+https://security.stackexchange.com/questions/106406/how-to-get-a-completely-isolated-virtual-time-using-xen
+</ref> <ref>
+https://lists.xen.org/archives/html/xen-users/2015-11/msg00114.html
+</ref>
+
+=== wallclock ===
+> The other interface ("wallclock interface") would provide such time, though. And it is not configurable. But not sure if it is used anywhere in Linux by default (probably besides initial system time set).
+
+Yes. Must be so. Otherwise with "ticks" alone the VM had no chance to figure out the current time. And this is a roblem, because we don't want the VM to know [host | dom0]'s time.
+
+We might be able to solve the wallclock [not pvclock] issue by [[Advanced_Security_Guide#Spoof_the_Initial_Virtual_Hardware_Clock_Offset|Spoofing the Initial Virtual Hardware Clock Offset]].
+
+=== Development ===
+Rather than modifying [host | dom0]'s clock, we could perhaps spoof the initial virtual hardware clock offset. It is possible for KVM, as per: https://libvirt.org/formatdomain.html#elementsTime
+
+Something like this:
+<pre>
+<clock offset='variable' adjustment='123456' basis='utc'>
+</pre>
+
+Reading clocksource xen as a [root] user is not easily possible.
+source: https://lists.xen.org/archives/html/xen-users/2015-08/msg00020.html
+
+Would probably require writing a kernel module.
+
+* [https://phabricator.whonix.org/T440 set random clock offset for {{q_project_name}} VMs using mgmt to prevent clock correlation attacks]
+* [https://phabricator.whonix.org/T389 make sure {{q_project_name}} has no access to clocksource=xen]
+* https://groups.google.com/g/qubes-devel/c/aN3IOv6JmKw
+
+=== Sources ===
+* https://groups.google.com/g/qubes-devel/c/aN3IOv6JmKw
+* Document with general information on various clock interfaces.
+** Not very specific to kvm.
+** PIT, RTC, APIC, HPET, Offboard Timers, TSC
+** https://www.kernel.org/doc/Documentation/virtual/kvm/timekeeping.txt
+
+== TSC ==
+Needs more research.
+
+Why we should avoid leaking TSC from the host go the VM.
+
+Leaking anything related to time from the host into the VM [or from VM to VM] risks cryptographic side channel attacks and should therefore be avoided.
+
+Search term:<br />
+time stamp counter tsc side channel
+
+Leads to:<br />
+https://blog.cr0.org/2009/05/time-stamp-counter-disabling-oddities.html
+
+TSC leaks may be similar to TCP sequence numbers. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/16659#comment:10</ref>
+
+== clocksource xen ==
+https://github.com/QubesOS/qubes-issues/issues/1764#issuecomment-195619793
+
+== Resources ==
+* [https://software.intel.com/en-us/blogs/2013/06/20/eliminate-the-dreaded-clocksource-is-unstable-message-switch-to-tsc-for-a-stable General information on various clock sources such as tsc etc. by intel]
+
+== Footnotes ==
+{{reflist|close=1}}
+
+= License =
+{{License_Amnesia|{{FULLPAGENAME}}}}
+
+{{Footer}}
+
+[[Category:Design]]

@@ -1,0 +1,29 @@
+'''1.''' Open the Debian <code>sources.list</code> file using an editor with root rights.
+
+{{CodeSelect|code=
+sudo nano {{{filename}}}
+}}
+
+'''2.''' Reference the onionized Debian repositories.
+
+Cut and paste the following <i>.onion</i> mirrors and comment out (#) the corresponding https repositories.
+
+{{CodeSelect|code=
+#deb https://deb.debian.org/debian {{Stable project version based on Debian codename}} main contrib non-free
+deb tor+http://{{Debian_onion}}/debian {{Stable project version based on Debian codename}} main contrib non-free
+
+#deb https://deb.debian.org/debian-security {{Stable project version based on Debian codename}}-security main contrib non-free
+deb tor+http://{{security.debian.org_onion}} {{Stable project version based on Debian codename}}-security main contrib non-free
+
+#Optional Backports
+#deb https://deb.debian.org/debian {{Stable project version based on Debian codename}}-backports main contrib non-free
+deb tor+http://{{Debian_onion}}/debian {{Stable project version based on Debian codename}}-backports main contrib non-free
+}}
+
+Save and exit.
+
+'''3.''' Confirm the onionized repositories are functional.
+
+{{CodeSelect|code=
+sudo apt update && sudo apt full-upgrade
+}}

@@ -1,0 +1,194 @@
+{{Title|title=Post-installation Security Advice}}
+{{Header}}
+{{#seo:
+|description=This page provides security advice, steps that can be applied after installation of {{project_name_long}} for better security.
+|image=Ball-63527-640.jpg
+}}
+[[image:Ball-63527-640.jpg|thumb]]
+
+= Introduction =
+
+{{security_intro}}
+
+This page provides security advice, including steps that can be applied after installation of {{project_name_long}} for better security.
+
+= On {{project_name_gateway_long}} and {{project_name_workstation_long}} =
+== Increase Virtual Machine RAM ==
+{{mbox
+| image   = [[File:Ambox_notice.png|40px|alt={{project_name_long}} default password info box]]
+| text    = [[Qubes|{{q_project_name}}]] users can skip this section. <ref>
+Qubes has dynamic RAM assignment.
+</ref>
+}}
+
+* {{project_name_workstation_long}}: No changes are necessary for most users.
+* {{project_name_gateway_long}}: If enough host RAM is available, ideally the virtual RAM setting of {{project_name_gateway_long}} should be increased to <code>2048</code> MB RAM. <ref>
+This provides higher performance during upgrades and lowers the likelihood of [https://forums.whonix.org/t/swap-swap-file-whonix-gateway-freezing-during-apt-get-dist-upgrade-encrypted-swap-file-creator/8317 issues].
+</ref> If it is infeasible to increase the virtual RAM setting, {{project_name_gateway_long}} will still function properly. <ref>
+Although non-ideal, [https://github.com/Whonix/swap-file-creator swap-file-creator] will create an encrypted swap file and the [https://forums.whonix.org/t/vm-swappiness-1-set-swapiness-to-lowest-setting-still-useful-swappiness-lowest/9278 system is configured to swap as little as possible].
+</ref>
+
+If it is unknown how much RAM is available, follow these steps on the host: <ref>https://www.tenforums.com/tutorials/66809-determine-system-memory-size-speed-type-windows-10-a.html</ref> <ref>https://vitux.com/how-to-check-installed-ram-on-debian/</ref> <ref>https://support.apple.com/en-us/HT201191</ref>
+* <u>Windows 10</u>: <code>Task Manager in More details view</code> &rarr; <code>Click/tap on the Performance tab</code> &rarr; <code>Click/tap on Memory</code>; or <code>Open a command prompt</code> &rarr; <code><i>Run</i></code> <code>wmic MemoryChip get /format:list</code>
+* <u>macOS</u>: <code>Apple menu</code> &rarr; <code>About This Mac</code>
+* <u>Linux</u>: <code>Open a terminal</code> &rarr; <code><i>Run</i></code> <code>free -h</code> <ref>This command works in Red Hat, CentOS, Suse, Ubuntu, Fedora, Debian and other distributions. Alternative commands include: <code>cat /proc/meminfo |grep MemTotal</code>, <code>top</code>, and <code>vmstat -s</code>.</ref>
+
+Related:
+
+* [[Troubleshooting#Low_RAM_Issues|Low RAM Issues]]
+* [[RAM|Advice for Systems with Low RAM]]
+
+=== VirtualBox ===
+# To add RAM in VirtualBox the VM <u>must</u> first be powered down.
+# <code>Virtual machine</code> &rarr; <code>Menu</code> &rarr; <code>Settings</code> &rarr; <code><i>Adjust</i></code> <code>Memory slider</code> &rarr; <code><i>Hit:</i> OK</code>
+
+=== KVM ===
+{{KVM_RAM}}
+
+== Change Keyboard Layout ==
+{{mbox
+| image   = [[File:Ambox_notice.png|40px|alt={{project_name_long}}Change Keyboard Layout info box]]
+| text    = [[Qubes|{{q_project_name}}]] users can skip this section. <ref>
+By default, Qubes VMs use the same keyboard layout as Qubes <code>dom0</code>.
+</ref>
+}}
+
+If you are using a keyboard layout other than <code>qwerty</code> (US), consider changing the keyboard layout. Refer to the dedicated [[Keyboard Layout]] entry for further details.
+
+== Test Keyboard Layout ==
+{{mbox
+| image   = [[File:Ambox_notice.png|40px|alt={{project_name_long}}Test Keyboard Layout info box]]
+| text    = [[Qubes|{{q_project_name}}]] users can skip this section.
+}}
+
+* <code>Start menu</code> &rarr; <code>Accessories</code> &rarr; <code>Mousepad</code>; or
+* {{Open File
+|filename=~/testfile
+}}
+
+Try typing the words <code>user</code>, <code>changeme</code> and <code>qwerty</code>. Try typing further words to ensure the desired keyboard layout is functional.
+
+{{Anchor|Change Passwords}}
+== Change Password ==
+{{mbox
+| image   = [[File:Ambox_notice.png|40px|alt={{project_name_long}} default password info box]]
+| text    = [[Qubes|{{q_project_name}}]] users can skip this section. <ref>
+By default, Qubes does not require a password for superuser access.
+</ref> <ref>
+https://www.qubes-os.org/doc/vm-sudo/
+</ref>
+}}
+
+<div class>
+After {{project_name_long}} has finished installing, immediately change the password for the user <code>user</code> account in <u>both</u>, {{project name gateway long}} and {{project name workstation long}}. <ref>
+https://forums.whonix.org/t/whonix-default-password-changeme-impact/13115
+</ref>
+
+{{Box|text=
+'''1.''' To avoid possible issues, review the [[#Change Keyboard Layout|Change Keyboard Layout]] and [[#Test Keyboard Layout|Test Keyboard Layout]] entries before proceeding further.
+
+'''2.''' Open a terminal (such as Xfce Terminal Emulator).
+
+<code>Start menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Terminal</code>
+
+'''3.''' Run a test command as <code>root</code> by using <code>sudo</code>.
+
+Run. <ref name=pwd_change>
+Type the command in the terminal and press <code><Enter></code>.
+</ref>
+
+{{CodeSelect|code=
+sudo systemd-detect-virt
+}}
+
+'''4.''' Read the note below regarding the username and password.
+
+{{Default_Passwords}}
+
+'''5.''' Read the note below regarding the password change procedure.
+
+When typing the password it will <u>not</u> appear on the screen, nor will the asterisk sign (<code>*</code>) be visible. It is necessary to type blindly and trust the procedure.
+
+'''6.''' Change the user (and <code>sudo</code>) password.
+
+* To change the <code>user</code> ({{project_name_long}} default user account) password, run the following command. <ref name=pwd_change />
+* This will also be the password when running <code>sudo</code> from Linux user account <code>user</code>. <ref>
+Usual Debian / sudo default. [[Unspecific|Unspecific to {{project_name_long}}]],
+</ref>
+
+{{CodeSelect|code=
+sudo passwd user
+}}
+
+'''7.''' Root password.
+
+No changes required. Optional, for details, see [[Root#Root_Account|root account in {{project_name_long}}]].
+
+'''8.''' Done.
+
+The procedure of changing passwords is complete.
+}}
+</div>
+
+If issues appear when gaining root, consider using [[Root#dsudo_-_default_password_sudo|dsudo]].
+
+Another option is to [[Recovery#Recovery_Mode|boot into recovery mode]] and change passwords there.
+
+== Security Updates ==
+
+Regularly check for security updates and apply them in a timely fashion; see [[Operating_System_Software_and_Updates#Updates|Operating System Updates]].
+
+= Network Time Syncing =
+This is a short summary of the [[Network Time Synchronization]] wiki page which is recommended reading.
+
+{{Box|text=
+'''1.''' Timezone information.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' The system clock inside {{project_name_long}} is set to UTC to prevent against [[timezone]] leaks. This means it may be a few hours ahead or behind the user's host system clock. <u>It is strongly recommended not to change this setting.</u>
+}}
+
+'''2.''' Check the host clock is reasonably accurate.
+
+A reasonably accurate host clock is required for many general security properties because an inaccurate clock can lead to:
+
+* Broken internet connectivity; and
+* [[Time Attacks]].
+
+Therefore, at all times ensure the host clock has an accuracy of up to ± 30 minutes.
+
+'''3.''' Avoid pause / suspend / save / hibernate functions.
+
+In simple terms, most users should avoid the pause / suspend / save / hibernate features. Although discouraged, see [[Network Time Synchronization]] for further details on when this is possible.
+}}
+
+= Better Security =
+
+This chapter is aimed at newcomers and only provides a short and simple overview for basic protection. Anonymity and platform security can be improved by following recommendations outlined in the Security Guide and Advanced Security Guide sections, along with the [[Time Attacks]] and [[Network_Time_Synchronization|Network Time Synchronization]] page.
+
+= Appendix =
+
+== How do I Check the Current {{project_name_long}} Version? ==
+
+See <code>/etc/*_version</code>.
+
+{{Open_a__product_gw_terminal}}
+
+{{CodeSelect|code=
+cat /etc/*_version
+}}
+
+Should show.
+
+<code>{{Stable project version based on Debian version short}}.1<br />
+{{VersionShort}}</code>
+
+The first line shows the version of the major and minor version of Debian. The second line shows the version of the derivative ({{project name long}}).
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

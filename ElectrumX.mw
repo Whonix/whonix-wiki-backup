@@ -1,0 +1,649 @@
+{{Title|
+title=Bitcoin How-to: Use ElectrumX Personal Server in {{project_name_long}}
+}}
+{{Header}}
+{{#seo:
+|description=Higher Security and Privacy through using a Self-Hosted, Fully Validating Bitcoin Node (ElectrumX + Bitcoin Core)
+|image=Electrumx123123.jpg
+}}
+[[image:Electrumx123123.jpg|thumb]]
+[[File:Electrum-appimage.png|thumb|Electrum Logo]]
+[[File:BC Logo .png|thumb|Bitcoin Logo|128px]]
+[[File:Bitcoin-core.png|thumb|Bitcoin Core Logo]]
+
+= Introduction =
+Using electrum with its default, public servers (which are hosted by third parties) has various security and privacy disadvantages mentioned in [[electrum]] chapter [[Electrum#Warnings|warnings]]. These issues can be resolved by using one's own, self-hosted, local electrum server. ElectrumX is a electrum server, which is documented on this wiki page. Under the assumption of a non-compromised system, the advantages include:
+
+* No third party can correlate all of the user's Bitcoin addresses to the same pseudonym simply by starting the electrum Bitcoin wallet. However, this does not change recommendation regarding Coin Control. When spending Bitcoin using multiple inputs, correlation will still happen on the blockchain level.
+* No third party can log how many times or the times when a user is viewing their Bitcoin addresses, transactions in their electrum Bitcoin wallet.
+* A self-hosted ElectrumX will always truthfully report unconfirmed and confirmed transactions. However, the usual recommendation to wait for a number of confirmations on the blockchain remains unchanged.
+* Confirmed transactions are fully verified, not only via SPV.
+* Bitcoin network fee estimates are no longer dependent on third parties.
+
+[https://github.com/spesmilo/electrumx ElectrumX] is developed by the same developers as [https://github.com/spesmilo/electrum electrum]. Both are developed under the [https://github.com/spesmilo github organization <code>spesmilo</code>].
+
+These instructions should be compatible with {{Non_q_project_name}}, {{Q_project_name}} and {{Kicksecure}}.
+
+ElectrumX depends on [[Bitcoin Core]] to download the Bitcoin blockchain. In other words, Bitcoin Core is a dependency of ElectrumX. If Bitcoin Core could have been avoided in this setup, it would have been avoided for simplicity.
+
+By design:
+
+* Only Bitcoin Core will be able to establish outgoing internet connections. Only Bitcoin Core will be configured to be able to reach the Bitcoin network over Tor.
+* The connection scheme is <code>electrum</code> &rarr; <code>ElectrumX</code> &rarr; <code>Bitcoin Core</code> &rarr; <code>Tor</code> &rarr; <code>Bitcoin network</code>.
+* Both ElextrumX and electrum will be unable to connect to the internet thanks to enabling {{project_name_long}} transparent proxying feature as documented below.
+* It should be expected that the proxy settings for electrum remain unchanged. That is normal and as indented. (If electrum was configured to use Tor that would actually disable the fail-safe and violate the goal of these instructions to have a fail-safe preventing electrum from connecting to third-party servers and the connection chain being <code>electrum</code> &rarr; <code>ElectrumX</code> &rarr; <code>Bitcoin Core</code>.)
+* electrum connects to ElextrumX on localhost (<code>127.0.0.1</code>).
+* ElextrumX connects to Bitcoin Core on localhost (<code>127.0.0.1</code>).
+
+[[Root#Inappropriate_Use_of_Root_Rights|Inappropriate Use of Root Rights]] should be avoided. Instructions on this wiki page have been carefully crafted with when to use and when not to use <code>sudo</code> in mind. The user should not use <code>sudo</code> unless instructed in documentation. <ref>
+The <code>systemctl --user</code> must be run as normal, non-root user without <code>sudo</code> because these are <code>systemd</code> <u>user</u> units and <u>not</u> <code>systemd</code> <u>system</u> units.
+</ref>
+
+{{Testers-Only}}
+
+= Installation =
+== Isolating Proxy Setup ==
+Optional but recommended for better privacy.
+
+Make sure the electrum is prohibited from accidentally connecting to electrum public servers and effectively only permitted to connect to ElectrumX.
+
+'''1.''' Acquire prerequisite knowledge.
+
+* [[Stream Isolation#Transparent Proxy|Transparent Proxy]]
+* [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/IsolatingProxy IsolatingProxy]
+* [[Stream Isolation]]
+
+'''2.''' Do <u>not</u> configure electrum for use with stream isolation.
+
+As documented on the the [[electrum]] wiki page since this would nullify, circumvent the advantage of disabling transparent proxying.
+
+'''3.''' Disable transparent proxying.
+
+'''Note:''' The following step should be applied in {{project_name_gateway_short}} ([[{{q_project_name_short}}|{{q_project_name}}]]: In App Qubes <code>{{project_name_gateway_vm}}</code>):<br />
+[[Stream Isolation#Disable Transparent Proxying|Disable Transparent Proxying]].
+
+== electrum Safeguard ==
+Remove the default electrum start menu entry.
+
+Optional but highly recommended for better privacy.
+
+Make sure the electrum default start menu entry (which would result in using electrum public servers) gets deleted and stays deleted even after electrum package upgrades to make sure to not accidentally start the electrum using its default start menu entry.
+
+'''1.''' dpkg-divert legacy undo command (for existing users)
+
+'''Note:''' The following command should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: In Template <code>{{project_name_workstation_template}}</code>).
+
+{{CodeSelect|code=
+sudo dpkg-divert --remove /usr/share/electrum-invalid
+}}
+
+'''2.''' dpkg-divert
+
+'''Note:''' The following command should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: In Template <code>{{project_name_workstation_template}}</code>).
+
+{{CodeSelect|code=
+sudo dpkg-divert --local --divert /usr/bin/electrum-invalid --rename --add /usr/share/applications/electrum.desktop
+}}
+
+== Package Dependency Installation ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: In Template <code>{{project_name_workstation_template}}</code>).
+
+Install dependencies from the Debian repository. <ref>
+Installation of the [[electrum]] Bitcoin Wallet is optional. In advanced setups, the electrum wallet might be running on a different server or in a different VM.
+</ref>
+
+{{Install Package|
+package=git python3-rocksdb python3-aiohttp python3-plyvel electrum
+}}
+
+== Software Dependency Installation ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Install the [[PyLRU|Install PyLRU]]. <ref>
+Not available from packages.debian.org at time of writing.
+
+https:/packages.debian.org/pylru
+</ref>
+
+'''2.''' Install [[Bitcoin Core]].
+
+== Source Code Download and Digital Software Signature Verification ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' {{Open_a__product_ws_terminal}}
+
+'''2.''' Acquire the OpenPGP public key of ElectrumX developer SomberNight. <ref>
+* https://github.com/spesmilo/electrum/tree/master/pubkeys
+* https://github.com/spesmilo/electrum/blob/master/SECURITY.md
+</ref>
+
+{{gpg key
+|url=scurl-download https://raw.githubusercontent.com/spesmilo/electrum/master/pubkeys/sombernight.asc
+|source_filename=sombernight.asc
+|fingerprint=6D7A2116DA909E00AC21108BB33B5F232C6271E9
+|gpg_fingerprint_output=
+In late-2021, the output is identical to the following.
+
+      Key fingerprint = 4AD6 4339 DFA0 5E20 B3F6  AD51 E7B7 48CD AF5E 5ED9
+}}
+
+'''3.''' Download the ElectrumX server source code using <code>git</code>.
+
+{{CodeSelect|code=
+git clone https://github.com/spesmilo/electrumx.git
+}}
+
+'''4.''' Change directory.
+
+{{CodeSelect|code=
+cd electrumx
+}}
+
+'''5.''' Digital signature verification.
+
+<u>Note:</u> At the time of writing, <code>1.16.0</code> was the latest stable release. Before starting the ElectrumX source code download, browse to [https://github.com/spesmilo/electrumx/tags <code>github.com/spesmilo/electrumx/tags</code>] to verify the version number.
+
+{{CodeSelect|code=
+git tag --verify 1.16.0
+}}
+
+{{GnuPG-Success}}
+
+{{GnuPG-Warning}}
+
+'''6.''' Checkout the git tag.
+
+{{CodeSelect|code=
+git checkout --quiet 1.16.0
+}}
+
+'''7.''' Done.
+
+Download, digital software verification and git checkout of the ElectrumX server source code is complete.
+
+== electrumx-autostart-all Script Creation ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/bin</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/bin
+}}
+
+'''2.''' {{Open File|filename=
+~/bin/electrumx-autostart-all
+}}
+
+'''3.''' Paste the following contents.
+
+<pre>
+#!/bin/bash
+
+set -x
+set -e
+
+true "START: $0"
+
+if [ "$(id -u)" = "0" ]; then
+   echo "$0: ERROR: Must not be run as root! Run as user without root/sudo." >&2
+   exit 112
+fi
+
+if test -d ~/.bitcoin ; then
+   true "INFO: bitcoin detected."
+   coin=bitcoin
+   electrum_binary=electrum
+   coin_short=BTC
+elif test -d ~/.litecoin ; then
+   true "INFO: litecoin detected."
+   coin=litecoin
+   coin_short=LTC
+   electrum_binary=~/bin/electrum-ltc
+else
+   true "ERROR: neither bitcoin nor litecoin was detected! Does folder ~/.bitcoin or ~/.litecoin exist?"
+   exit 1
+fi
+
+true "INFO: Terminating possibly still running leftover processes $coin Core and $electrum_binary just in case."
+true "INFO: (Restarting ElectrumX later below.)"
+true "INFO: If none running, that is OK."
+killall $coin-qt || true
+killall $electrum_binary || true
+
+true "INFO: Starting $coin Core..."
+
+cmd=~/${coin}-*/bin/${coin}-qt
+terminal_emulator_window_title="$cmd" \
+    /usr/libexec/helper-scripts/terminal-wrapper \
+    $cmd
+#coin_qt_pid=$!
+
+true "INFO: Waiting for 20 seconds to give $coin Core time to startup."
+sleep 20
+
+true "INFO: Restarting ElectrumX..."
+systemctl --user restart electrumx
+true "INFO: Done, restarted ElectrumX."
+
+true "INFO: Waiting for 20 seconds to give ElectrumX time to startup."
+sleep 20
+
+true "INFO: Starting ElectrumX journalctl..."
+
+cmd="journalctl --boot --user -f -u electrumx"
+terminal_emulator_window_title="$cmd" \
+    /usr/libexec/helper-scripts/terminal-wrapper \
+    $cmd
+#journalctl_pid=$!
+
+true "INFO: Started ElectrumX journalctl."
+
+true "INFO: Starting Electrum $coin_short..."
+
+cmd="$electrum_binary -v --oneserver --server 127.0.0.1:5000:t"
+terminal_emulator_window_title="$cmd" \
+    /usr/libexec/helper-scripts/terminal-wrapper \
+    $cmd
+#electrum_pid=$!
+
+true "INFO: Started Electrum $coin_short."
+
+true "END: $0"
+</pre>
+
+'''4.''' Save and exit.
+
+'''5.''' Make <code>~/bin/electrumx-autostart-all</code> executable.
+
+{{CodeSelect|code=
+chmod +x ~/bin/electrumx-autostart-all
+}}
+
+'''6.''' Done.
+
+electrumx-autostart-all script creation is complete.
+
+= Configuration =
+== Bitcoin-Qt Configuration ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/.bitcoin</code>.
+
+Note: It is OK Bitcoin-Qt has been previously used and folder <code>~/.bitcoin</code> already exists. Running the following command would be optional, OK and do nothing.
+
+{{CodeSelect|code=
+mkdir -p ~/.bitcoin
+}}
+
+'''2.''' Create the Bitcoin Core configuration file <code>~/.bitcoin/bitcoin.conf</code>.
+
+{{Open File|
+filename=~/.bitcoin/bitcoin.conf
+}}
+
+'''3.''' Paste the following text. <ref>
+* <code>prune=0</code> is the default for bitcoind but the Bitcoin-Qt GUI has a first start wizard which asks if pruning should be enabled. To avoid that first start wizard and to make sure pruning is disabled, explicitly disable pruning in configuration file.
+* Quote [https://electrumx-spesmilo.readthedocs.io/en/latest/HOWTO.html ElectrumX Upstream Documentation]: <blockquote>You must be running a non-pruning bitcoin daemon with <code>txindex=1</code></blockquote>
+</ref>
+
+{{CodeSelect|code=
+server=1
+bind=127.0.0.1
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+txindex=1
+prune=0
+rpcuser=username
+rpcpassword=password
+proxy=10.152.152.10:9111
+}}
+
+'''4.''' Save.
+
+'''5.''' Start Bitcoin-Qt.
+
+Bitcoin-Qt can be started using any method (from command line or start menu entry). Starting normally. <ref>
+"normally" meaning without <code>-reindex</code>.
+</ref>
+
+{{CodeSelect|code=
+~/bitcoin-*/bin/bitcoin-qt
+}}
+
+'''6.''' Disable pruning in Bitcoin-Qt.
+
+<code>Bitcoin Core</code> &rarr; <code>Settings</code> &rarr; <code>Options</code> &rarr; <u>un</u>select <code>Prune block storage to</code> <ref name=config-vs-gui>
+Optional since bitcoin-qt options menu says that configuration file overrides bitcoin-qt GUI settings anyhow but better just in case to avoid any potential bugs.
+</ref>
+
+'''7.''' Disable incoming connections in Bitcoin-Qt.
+
+Optional. <ref name=config-vs-gui /> <ref>
+Disable incoming connections in Bitcoin-Qt for better security (?) (avoiding code paths handling unsolicited incoming connections). But incoming connections are not accidentally happening inside {{project_name_workstation_long}} anyhow. That would require setting up an [[Onion Services|onion service]] for Bitcoin Core which is [[Undocumented]].
+
+On the other hand, unsolicited incoming connections through an onion service might be desirable for better connectivity, to support the Bitcoin network?
+</ref>
+
+<code>Bitcoin Core</code> &rarr; <code>Settings</code> &rarr; <code>Network</code> &rarr; <u>un</u>select <code>Allow incoming connections</code>
+
+'''8.''' Proxy Settings
+
+<code>Bitcoin Core</code> &rarr; <code>Settings</code> &rarr; <code>Network</code> &rarr; <code>Connect through SOCKS5 proxy (default proxy):</code> <ref>
+This might not be required due to <code>~/.bitcoin/bitcoin.conf</code> already above configured with <code>proxy=10.152.152.10:9111</code> but shouldn't have bad effects anyhow. Not setting this causes user confusion.
+</ref>
+
+* Proxy IP: <code>10.152.152.10</code>
+* Port: <code>9111</code>
+
+'''9.''' Terminate Bitcoin-Qt.
+
+Close terminate Bitcoin-Qt. This is required for the following next step which requires that Bitcoin-Qt is not running.
+
+'''10.''' Reindex the blockchain using Bitcoin-Qt.
+
+Bitcoin-Qt needs to be started at least once from the command line with the <code>-reindex</code> parameter. <ref>
+Using <code>-reindex</code> is required because Bitcoin Core configuration has been changed, specifically [https://bitcoin.stackexchange.com/questions/35707/what-are-pros-and-cons-of-txindex-option <code>txindex</code>] has been enabled. (<code>txindex=1</code>) <br />
+
+Quote [https://electrumx-spesmilo.readthedocs.io/en/latest/HOWTO.html ElectrumX Upstream Documentation]: <blockquote>You must be running a non-pruning bitcoin daemon with <code>txindex=1</code>
+</ref>
+
+{{CodeSelect|code=
+~/bitcoin-*/bin/bitcoin-qt -reindex
+}}
+
+When Bitcoin-Qt is started next time, there is no more need for <code>-reindex</code> and it probably should not be used since it takes more time.
+
+'''11.''' Wait for the blockchain to be synchronized.
+
+'''12.''' Optional for better usability: [[Bitcoin_Core#Add_a_bitcoin-qt_Start_Menu_Entry|Add Bitcoin-Qt start menu entry]].
+
+'''13.''' Optional for better usability: [[Bitcoin_Core#Autostart_bitcoin-qt|Autostart bitcoin-qt]].
+
+Autostarting Bitcoin-Qt after reboot might be desirable so it can catch up downloading the blockchain as well as to serve ElectrumX.
+
+'''14.''' Done.
+
+Configuration of Bitcoin-Qt is complete.
+
+== ElectrumX Configuration ==
+=== ElectrumX Server Configuration ===
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/.electrumx</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.electrumx
+}}
+
+'''2.''' {{Open File|
+filename=~/electrumx.conf
+}}
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+COIN=Bitcoin
+DB_DIRECTORY=/home/user/.electrumx
+DAEMON_URL=username:password@127.0.0.1
+SERVICES=tcp://127.0.0.1:5000,rpc://127.0.0.1:2401
+PEER_DISCOVERY=self
+}}
+
+'''4.''' Save.
+
+'''5.''' Done.
+
+Server configuration of ElectrumX has been completed.
+
+=== ElectrumX User Systemd Unit Configuration ===
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/.config/systemd/user</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.config/systemd/user
+}}
+
+'''2.''' Create file <code>~/.config/systemd/user/electrumx.service</code>.
+
+{{Open File|
+filename=~/.config/systemd/user/electrumx.service
+}}
+
+<ref>
+Based on <code>~/electrumx/contrib/systemd/electrumx.service</code>.
+</ref>
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+[Unit]
+Description=ElectrumX
+After=network.target
+
+[Service]
+EnvironmentFile=/home/user/electrumx.conf
+ExecStart=/home/user/electrumx/electrumx_server
+LimitNOFILE=8192
+TimeoutStopSec=30min
+
+[Install]
+WantedBy=default.target
+}}
+
+'''4.''' Save.
+
+'''5.''' Reload systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user daemon-reload
+}}
+
+'''6.''' Optional: Enable autostart for the ElectrumX systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user enable electrumx
+}}
+
+'''7.''' Start ElectrumX systemd user instance.
+
+{{CodeSelect|code=
+systemctl --user restart electrumx
+}}
+
+'''8.''' Done.
+
+Creation and configuration of ElectrumX systemd user unit has been completed.
+
+== Electrum Bitcoin Wallet Configuration ==
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+Connect only to one server (own server) instead of any third party servers.
+
+{{CodeSelect|code=
+electrum --offline setconfig oneserver true
+}}
+
+Connect to own local server.
+
+{{CodeSelect|code=
+electrum --offline setconfig server 127.0.0.1:5000:t
+}}
+
+Avoid auto connecting to third party servers (and avoid electrum first start wizard asking to).
+
+{{CodeSelect|code=
+electrum --offline setconfig auto_connect false
+}}
+
+== Add an electrum Connecting to Local ElectrumX Start Menu Entry ==
+Creating a <code>electrum</code> start menu entry which only locally connects to <code>ElectrumX</code>.
+
+This step is optional.
+
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+{{Box|text=
+Inside {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Create folder <code>~/.local/share/applications</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.local/share/applications
+}}
+
+'''2.''' {{Open File|filename=
+~/.local/share/applications/electrum-connecting-to-local-electrumx.desktop
+}}
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+[Desktop Entry]
+Name=electrum connecting to local ElectrumX
+Comment=electrum connecting to local ElectrumX
+Exec=terminal_emulator_window_title="electrum Connecting to Local ElectrumX" /usr/libexec/helper-scripts/terminal-wrapper electrum -v --oneserver --server 127.0.0.1:5000:t
+Terminal=false
+Type=Application
+Icon=money-manager-ex
+StartupWMClass=bitcoin
+MimeType=x-scheme-handler/bitcoin;
+Categories=Finance;
+}}
+
+'''4.''' Save.
+
+'''5.''' {{Q_project_name}}: perform platform-specific steps.
+
+In <code>dom0</code>, refresh Qubes' appmenu: <code>VM settings</code> &rarr; <code>Applications</code> &rarr; <code>Refresh Applications</code> &rarr; <code>Add desktop shortcut</code>.
+
+'''6.''' Done.
+
+The <code>Electrum with ElectrumX</code> start menu entry available should be available.
+}}
+
+== Autostart electrum Connecting to Local ElectrumX ==
+Automatically starting <code>Electrum using local ElectrumX</code> which only connects to ElectrumX.
+
+This step is optional.
+
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+{{Box|text=
+Inside {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Apply instructions [[ElectrumX#Autostart_electrum_Connecting_to_Local_ElectrumX|Add a electrum Start Menu Entry]] first.
+
+'''2.''' Create folder <code>~/.config/autostart</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.config/autostart
+}}
+
+'''3.''' Create a symlink from <code>~/.local/share/applications/electrum-connecting-to-local-electrumx.desktop</code> to <code>~/.config/autostart/electrum-connecting-to-local-electrumx.desktop</code>.
+
+{{CodeSelect|code=
+ln -s ~/.local/share/applications/electrum-connecting-to-local-electrumx.desktop ~/.config/autostart/electrum-connecting-to-local-electrumx.desktop
+}}
+
+'''4.''' Done.
+
+<code>Electrum with ElectrumX</code> will be automatically started the next time the VM is started.
+}}
+
+= Usage =
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+'''1.''' Start Bitcoin-Qt using any method (from start menu entry, autostart or manually from the command line).
+
+{{CodeSelect|code=
+~/bitcoin-*/bin/bitcoin-qt
+}}
+
+'''2.''' Check the the blockchain download in Bitcoin-Qt is functional.
+
+'''3.''' Run the ElectrumX server using any method (autostart, or manually form the command line).
+
+{{CodeSelect|code=
+systemctl --user restart electrumx
+}}
+
+'''4.''' Check that ElectrumX blockchain processing is functional.
+
+See [[#Monitoring|monitoring]].
+
+'''5.''' Start the [[electrum]] Bitcoin wallet using any method (autostart, or manually form the command line). <ref>
+<code>-v</code> for verbose mode is optional but recommended.
+</ref>
+
+{{CodeSelect|code=
+electrum -v --oneserver --server 127.0.0.1:5000:t
+}}
+
+If electrum shows "not connected" then that could be because Bitcoin Core has not downloaded enough blockchain yet and/or ElectrumX has not caught up with the blockchain yet. In that case, the console output would include:
+
+<pre>
+I/i | interface.[127.0.0.1:5000] | connection established. version: ['ElectrumX 1.16.0', '1.4']
+I/i | interface.[127.0.0.1:5000] | disconnecting due to GracefulDisconnect('server tip below max checkpoint')
+</pre>
+
+Upstream bug reports:
+
+* [https://github.com/spesmilo/electrum/issues/7549 electrum unwanted disconnect from own ElectrumX server] <ref>
+https://github.com/spesmilo/electrum/issues/7548
+</ref>
+* [https://github.com/spesmilo/electrumx/issues/161 ElectrumX should accept local RDP connections even if it has not fully caught up with the bitcoin daemon]
+
+== electrumx-autostart-all usage ==
+{{CodeSelect|code=
+~/bin/electrumx-autostart-all
+}}
+
+= Monitoring =
+'''Note:''' The following instructions should be applied in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: App Qube <code>{{project_name_workstation_vm}}</code>).
+
+Check the status of the ElectrumX systemd user service.
+
+{{CodeSelect|code=
+systemctl --no-pager --user status electrumx
+}}
+
+Follow the log of the ElectrumX systemd user service.
+
+{{CodeSelect|code=
+journalctl --boot --user -f -u electrumx
+}}
+
+If all is going well, it should be showing output similar to the following.
+
+<pre>
+electrumx_server[7426]: INFO:Prefetcher:new block height 144,270 hash 00000000000002606168ac016368896d79c591bff2b6580db2e398faef7ec093
+</pre>
+
+= Store ElectrumX Log to File =
+{{CodeSelect|code=
+journalctl --boot --user -u electrumx > electrumx.log
+}}
+
+= See Also =
+* [[Money]]
+* [[Bitcoin]]
+* [[electrum]]
+* [[PyLRU]] (Dependency of ElectrumX.)
+* [https://github.com/spesmilo/electrumx ElectrumX Source Code Repository]
+* ElectrumX Upstream Documentation
+** [https://electrumx-spesmilo.readthedocs.io ElectrumX Documentation Index]
+** [https://electrumx-spesmilo.readthedocs.io/en/latest/HOWTO.html ElectrumX HOWTO]
+** [https://electrumx-spesmilo.readthedocs.io/en/latest/environment.html ElectrumX Environment Variables]
+
+= Donations =
+After installing the ElectrumX server, please consider making a donation to electrum Bitcoin Wallet / ElextrumX server and {{project_name_long}} project ([[Donate]]) to help keep it running for many years to come.
+
+{{Pay_Bitcoin_Specific}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

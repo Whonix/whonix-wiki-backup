@@ -1,0 +1,83 @@
+{{Header}}
+__TOC__
+
+= Curl Clearnet Connectivity Test from Whonix-Gateway =
+Warning: Not anonymous!
+
+At time of writing IP <code>{{Check.torproject.org IP}}</code> is <code>check.torproject.org</code>.
+
+Using IP (<code>{{Check.torproject.org IP}}</code>) rather than DNS (<code>check.torproject.org</code>) is requried since {{project_name_gateway_long}} does not have a global DNS resolver enabled by default for its own traffic (details on page [[Whonix-Gateway System DNS]]).
+
+{{CodeSelect|code=
+sudo -u clearnet {{Curl_Plain}} --silent {{Curl_Secure}} --header 'Host: check.torproject.org' --insecure https://{{Check.torproject.org IP}} | grep IP
+}}
+
+= How to Un{{project_name_long}} - {{project_name_long}} package removal =
+TODO: document
+
+= How to Un{{project_name_long}} - restore clearnet networking =
+Instructions on how to remove {{project_name_long}} Tor default networking for {{project_name_gateway_long}}. After applying these instructions, {{project_name_gateway_long}} will connect to clearnet.
+
+Warning: Not anonymous!
+
+Qubes specific!
+
+
+1) Inside <code>{{project_name_gateway_vm}}</code>: [[Dev/Firewall_Unload|Unload {{project_name_long}} Firewal]].
+
+2) Inside <code>{{project_name_gateway_vm}}</code>: Check.
+
+{{CodeSelect|code=
+sudo iptables --list
+}}
+
+Should show.
+
+<pre>
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+</pre>
+
+3) Inside any other VM, any non-Tor VM that has functional internet: Figure out its <code>/etc/resolv.conf</code> settings.
+
+{{CodeSelect|code=
+cat /etc/resolv.conf
+}}
+
+4) Inside <code>{{project_name_gateway_vm}}</code>: Delete <code>/etc/resolv.conf</code>.
+
+{{CodeSelect|code=
+sudo rm /etc/resolv.conf
+}}
+
+5) Inside <code>{{project_name_gateway_vm}}</code>: Use the same settings from the non-Tor VM.
+
+{{Open with root rights|
+filename=/etc/resolv.conf
+}}
+
+6) Inside <code>{{project_name_gateway_vm}}</code>: Deactivate all uwt wrappers globally.
+
+{{Uwt_wrappers_deactivate_all_permanently}}
+
+7) Inside <code>{{project_name_gateway_vm}}</code>: Download https://check.torproject.org
+
+{{scurl|https://check.torproject.org}}
+
+{{Open File|
+filename=index.html
+}}
+
+Should include.
+
+<pre>
+Sorry. You are not using Tor.
+</pre>
+
+{{Footer}}

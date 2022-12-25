@@ -1,0 +1,122 @@
+{{Header}}
+{{#seo:
+|description=deanonymization using user keystrokes, keystroke deanonymization, keystroke fingerprinting
+|image=https://www.{{project_clearnet}}/w/images/9/9c/Keystroke.png
+}}
+[[image:Keystroke.png|thumb]]
+
+== Keystroke Dynamics ==
+Keystroke biometric algorithms have advanced to the point where it is viable to fingerprint users based on soft biometric traits. This is a privacy risk because masking spatial information -- such as the IP address via Tor -- is insufficient to anonymize users. <ref>
+https://github.com/vmonaco/keystroke-obfuscation
+</ref>
+
+Users can be uniquely fingerprinted based on: <ref name=keystroke_dynamics>
+https://en.wikipedia.org/wiki/Keystroke_dynamics
+</ref>
+
+* Typing speed.
+* Exactly when each key is located and pressed (seek time), how long it is held down before release (hold time), and when the next key is pressed (flight time).
+* How long the breaks/pauses are in typing.
+* How many errors are made and the most common errors produced.
+* How errors are corrected during the drafting of material.
+* The type of local keyboard that is being used.
+* Whether they are likely right or left-handed.
+* Rapidity of letter sequencing indicating the user's likely native language.
+* [[Keyboard Layout]] as the placement of the keys on the keyboard leads to different key seek times and typing mistakes.
+
+A unique neural algorithm generates a primary pattern for future comparison. It is thought that most individuals produce keystrokes that are as unique as handwriting or signatures. This technique is imperfect; typing styles can vary during the day and between different days depending on the user's emotional state and energy level. <ref name=keystroke_dynamics />
+
+Unless protective steps are taken to obfuscate the time intervals between key press and release events, it is likely most users can be deanonymized based on their keystroke manner and rhythm biometrics. Adversaries are likely to have samples of clearnet keystroke fingerprinting which they can compare with "anonymous" Tor samples.
+
+Typing on the most popular keyboard layout which is probably en-US might help mitigation however a more effective way is the following. At a minimum users should not type into browsers with Javascript enabled, since this opens up this deanonymization vector. Text should be written in an offline text editor and then copied and pasted into the web interface when it is complete.
+
+In addition, users must also disguise their linguistic style to combat [[Surfing_Posting_Blogging#Stylometry|stylometric analysis]] and be aware of [[Surfing_Posting_Blogging#Mouse_Fingerprinting|mouse tracking techniques]] available to adversaries.
+
+== Defenses ==
+=== Kloak ===
+Kloak is a Keystroke Anonymization Tool.
+
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]] supported by default.
+* [[{{q_project_name_short}}|{{q_project_name}}]] Not installed by default. Might be possible. [[Community Support]] only. See [https://forum.qubes-os.org/t/tutorial-how-to-use-kloak-with-usb-keyboards/14134 this]. <ref>
+* https://github.com/QubesOS/qubes-issues/issues/2558
+* https://github.com/QubesOS/qubes-issues/issues/1850
+* Using <code>/dev/input/event0</code> in Qubes VMs [https://forums.whonix.org/t/current-state-of-kloak/5605/6 will not work since not a keyboard device].
+</ref>
+
+Kloak is installed in {{non_q_project_name}} {{project_name_workstation_long}} by default.
+
+We recommend [[Packages for Debian Hosts|installing kloak on the host]] too so it remains effective in event of a {{project_name_workstation_long}} VM compromise. If you need to access accounts (for example banking) that enforce keystroke biometrics, then it may be a good idea to just limit installation to {{project_name_long}} VMs.
+
+Kloak has the added benefit of foiling attacks that identify search queries in encrypted network traffic using information leaked through autocomplete suggestions of search engines. <ref>[https://vmonaco.com/papers/Feasibility%20of%20a%20Keystroke%20Timing%20Attack%20on%20Search%20Engines%20with%20Autocomplete.pdf Feasibility of a Keystroke Timing Attack on Search Engines with Autocomplete]
+</ref> <ref>
+https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slides_monaco.pdf
+</ref>
+
+=== Defense Testing ===
+You can test that kloak actually works by trying an [https://www.keytrac.net/en/tryout online keystroke biometrics demo]. For example, try these three different scenarios:
+
+* '''Train normal, test normal'''
+* '''Train normal, test kloak'''
+* '''Train kloak, test kloak'''
+
+Train normal means to train with normal typing behavior (without kloak running). At the enrollment page on the KeyTrac demo, enter a username and password without kloak running, and then on the authenticate page, try authenticating.
+
+Expected results and interpretation:
+{{Box|text=
+'''Train normal, test normal'''
+
+trial 1: 94% accuracy identified
+
+trial 2: 92% accuracy
+
+trial 3: 94% ..
+
+
+'''Train normal, test kloak'''
+
+trial 1: 18%
+
+trial 2: 15%
+
+trial 3: 19%
+
+
+'''Train kloak, test kloak'''
+
+trial 1: 40%
+
+trial 2: 42%
+
+trial 3 36%
+}}
+
+Without kloak users can be identified with very high certainty. The second set of tests show that kloak definitely obfuscates typing behavior, making it difficult to authenticate or identify a particular user. Third set: users running kloak may look "similar" to other users running kloak. That is, it might be possible to identify kloak users from non-kloak users. If this is the case, the anonymity set will increase as more users start running kloak.
+
+=== Future ===
+{{Anchor|mouse}}
+Planned future developments of kloak will focus on obfuscating unique mouse movement behavior to protect user anonymity.
+
+References:
+
+* [[Surfing_Posting_Blogging#Mouse_Fingerprinting|Mouse Fingerprinting]]
+* https://github.com/vmonaco/keystroke-obfuscation
+* https://github.com/vmonaco/keystroke-obfuscation/issues/1#issuecomment-268598887
+* https://github.com/vmonaco/kloak
+* https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507
+* https://twitter.com/{{project_name_short}}/status/1111053743905226752
+* https://t.co/QcKyLppZBr
+* https://forums.whonix.org/t/current-state-of-kloak/5605
+* https://phabricator.whonix.org/T583
+* https://forums.whonix.org/t/device-fingerprinting-with-peripheral-timestamps-mouse-fingerprinting/12114
+
+== See Also ==
+* [https://raw.githubusercontent.com/vmonaco/vmonaco.github.io/master/papers/Device%20Fingerprinting%20with%20Peripheral%20Timestamps.pdf Device Fingerprinting with Peripheral Timestamps]
+* [[stylometry|Stylometry]]
+* [[Surfing_Posting_Blogging|Surfing Posting Blogging]]
+
+== References ==
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

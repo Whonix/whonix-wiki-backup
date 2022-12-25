@@ -1,0 +1,68 @@
+'''{{free}}'''
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = <u>Note</u>: By proceeding, you acknowledge that you have read, understood and agreed to our [[Terms of Service|<span style="color:#FF1493;">Terms of Service</span>]] and [[License Agreement|<span style="color:#FF1493;">License Agreement</span>]]. [[File:Ambox_warning_pn.svg.png|40px]]
+}}
+
+Install git.
+
+{{CodeSelect|code=
+sudo apt update && sudo apt install git
+}}
+
+<!--
+Temporarily download using git isn't possible since Whonix source code is under a major restructuring. <ref>
+Kicksecure and Whonix source code is being split.
+</ref> Meanwhile the latest stable source code version can be downloaded as a tar xz file.
+
+Note: This downloads <code>{{VersionNew}}-stable</code>. Download link: {{Archive_link
+|url=https://download.{{project_clearnet}}/source/Whonix.tar.xz
+|onion=http://download.{{project_onion}}/source/Whonix.tar.xz
+|text=Whonix.tar.xz
+}}
+
+{{CodeSelect|code=
+mkdir ./Whonix-extract-temp
+}}
+
+{{CodeSelect|code=
+tar xv --directory ./Whonix-extract-temp -f ./Whonix.tar.xz
+}}
+
+{{CodeSelect|code=
+mv ./Whonix-extract-temp/Whonix ~/derivative-maker
+}}
+-->
+
+Get the source code including git submodules. <ref>
+Optional <code>git</code> parameters:
+
+* <code>--depth=1</code>: Used to speed up download.
+* <code>--branch {{VersionNew}}-stable</code> Usability. Used to speed up download.
+* <code>--jobs=4</code>: Used to speed up download.
+* <code>--recurse-submodules --shallow-submodules</code>: Usability.
+
+Knowledgeable <code>git</code> users are free to drop any of these optional parameters.
+</ref> <ref>
+Alternatively, this can be achieved with the following commands in several steps. This is useful if network issues arise.
+
+{{CodeSelect|code=
+git clone --depth=1 --branch {{VersionNew}}-stable https://github.com/{{project_name_short}}/derivative-maker.git
+}}
+
+{{CodeSelect|code=
+cd derivative-maker
+}}
+
+{{CodeSelect|code=
+git submodule update --init --recursive --progress --jobs=4
+}}
+</ref>
+
+Note: Replace <code>{{VersionNew}}-stable</code> with the actual tag you want to build.
+
+{{CodeSelect|code=
+git clone --depth=1 --branch {{VersionNew}}-stable --jobs=4 --recurse-submodules --shallow-submodules https://github.com/{{project_name_short}}/derivative-maker.git
+}}

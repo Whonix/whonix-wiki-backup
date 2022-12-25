@@ -1,0 +1,75 @@
+{{Box|text=
+'''1.''' Confirm prerequisites are met.
+
+* Debian <code>{{Stable project version based on Debian codename}}</code> is installed.
+* User account <code>user</code> exists.
+
+'''2.''' Become root. <ref>
+Parameter <code>-</code> is required to set the correct paths to <code>/usr/sbin</code>.
+
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=833256
+</ref> <ref>
+Other methods are possible.
+</ref>
+
+{{CodeSelect|code=
+su -
+}}
+
+'''3.''' Install <code>sudo</code> and <code>adduser</code> packages.
+<!-- WIKI EDITORS NOTE:
+Can use template Install_Package because that would use sudo which is not installed at this point.
+-->
+
+{{Box|text=
+'''1.''' Update the package lists.
+
+{{CodeSelect|code=
+apt update
+}}
+
+'''2.''' Upgrade the system.
+
+{{CodeSelect|code=
+apt full-upgrade
+}}
+
+'''3.''' Install <code>sudo</code> and <code>adduser</code> packages.
+
+{{CodeSelect|code=
+apt install --no-install-recommends sudo adduser
+}}
+}}
+
+'''4.''' Set user rights.
+
+The following commands must be run either by root or using <code>sudo</code>.
+
+Create group <code>console</code>.
+
+{{CodeSelect|code=
+addgroup --system console
+}}
+
+Add user <code>user</code> to group <code>console</code>.
+
+{{CodeSelect|code=
+adduser user console
+}}
+
+Add user <code>user</code> to group <code>sudo</code>.
+
+{{CodeSelect|code=
+adduser user sudo
+}}
+
+'''5.''' Reboot. <ref>
+Usability. Otherwise after installation is complete, user might not be able to login. Needs further testing if still required.
+
+Can be avoided for remote servers.
+</ref>
+
+{{CodeSelect|code=
+reboot
+}}
+}}

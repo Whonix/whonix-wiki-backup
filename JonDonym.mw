@@ -1,0 +1,462 @@
+{{Header}}
+{{#seo:
+|description=Combining {{project_name_long}} with JonDonym. JonDonym over Tor. Connecting to Tor before JonDonym (User &rarr; Tor &rarr; JonDonym &rarr; Internet ) OR Connecting to JonDonym before Tor (User &rarr; JonDonym &rarr; Tor &rarr; Internet ).
+|image=https://www.{{project_clearnet}}/w/images/c/c9/Logo.png
+}}
+{{title|title=
+Combining {{project_name_long}} with JonDonym
+}}
+[[image:Logo.png|JonDonym Logo|thumb]]
+
+= Introduction =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = As of June 2021, the [https://anonymous-proxy-servers.net/ JonDonym website] states: <blockquote>
+Unfortunately, we have to close our service until 2021-08-31. Until then, our operators will ensure you that you can consume your existing plans. Purchasing new plans is not possible any more.</blockquote>
+}}
+
+Similar to Tor, JonDonym has a design based on multiple layers of encryption: <ref>
+https://anonymous-proxy-servers.net/en/help/jondonym.html
+</ref>
+
+<blockquote>The JonDonym / AN.ON technology is based on the principle of multiple (layered) encryption, distribution and processing. This procedure does not only protect your Internet activities from being observed by third parties (against your access provider, WLAN hackers, advertising services and websites), but also against observation by the individual JonDonym providers themselves.
+...
+It consists of multiple user selectable mix cascades. A cascade consists of two or three separately encrypted mix servers. These mix servers are operated by independent and non interrelated organizations or private individuals who all publish their identity. The operators have to abide by strict provisions which prohibit saving connection data or exchanging such data with other operators.
+
+Every connection from a user is differently encrypted for every mix server within a cascade and transferred through the cascade to the target, e.g. a website. Thereby no mix operator alone can by himself expose the user. Eavesdroppers on the connections to JonDonym cascades get garbage data only, as the connection to every mix is separately encrypted. Also, since a lot of users surf the anonymization service simultaneously, and thus share the same IP address, all connections of every user are concealed amidst each other: a correlation is not possible any more.</blockquote>
+
+= JonDonym vs Tor Comparison =
+
+== JonDonym ==
+
+JonDonym is an alternative anonymity network which is briefly compared with [[Tor]]. <ref>
+This is an informal opinion by lead {{project_name_long}} developer Patrick Schleizer. Last updated in May, 2020.</ref> It is easy to tunnel JonDonym over Tor inside Whonix-Workstation (<code>{{project_name_workstation_vm}}</code>), which will be discussed further below. In theory, Tor on Whonix-Gateway <code>{{project_name_gateway_vm}}</code> could be replaced with JonDonym.
+
+The [https://anonymous-proxy-servers.net JonDonym network] is much smaller than the Tor network, but may be faster. In general, the JonDonym network receives far less attention from security researchers compared to Tor. In 2020, there are 4 premium cascades, 1 free cascade and 2 experimental services. <ref>
+https://web.archive.org/web/20160707165220/https://anonymous-proxy-servers.net/en/status/
+</ref> The size of the network has decreased since February 2012], when a random snapshot at that time revealed there were 5 two hop free mix cascades, 11 three hop premium mix cascades and 1 test/experimental, free one-hop service.
+
+Mix servers are operated by independent and unassociated organizations or private individuals who publish their identity. <ref>
+https://anonymous-proxy-servers.net/en/help/certificates.html
+</ref>. All JonDonym operators must abide by strict provisions which prohibit saving connection data or exchanging such data with other operators. Placing faith in JonDonym requires trusting in their policy and server administration skills. Neither the mix server administration nor the JonDo software can prevent a man-in-the-middle attack between the mix server and the destination server.
+
+The free two-hop mix cascade currently has a limit of 600 free users, while the premium three-hop mixes have an unlimited amount of users. <ref>
+In 2012, the random snapshot identified the two-hop free mix cascades had 1940 users with a maximum available capacity of 2750 users. 1367 users were using the test/experimental free one hop service which did not advertise a maximum user capacity. From 16 to 63 users used one of the 11 three-hop premium mix cascades and no maximum user restriction was advertised. There were 350 premium users in total.
+</ref> Free users also have other restrictions such as a maximum file size for up- and downloads (2 MB), no SOCKS5 support, and a maximum of two different countries in the path. <ref>
+https://anonymous-proxy-servers.net/en/premium.html
+</ref> A random snapshot of user data in 2020 showed: <ref>
+https://web.archive.org/web/20160707165220/https://anonymous-proxy-servers.net/en/status/
+</ref>
+
+* 30 premium users active.
+* 133 users relying on free cascades.
+* 185 users relaying on experimental cascades. <ref>
+With no advertised limit on the number of users.
+</ref>
+
+== Tor Network ==
+
+The JonDonym network is tiny in comparison to the Tor network. A snapshot of Tor metrics on the same day in 2020 reveals around 2.1 million users <ref>
+https://metrics.torproject.org/userstats-relay-country.html
+</ref>, nearly 7,000 relays and over 1,000 bridges. <ref>https://metrics.torproject.org/networksize.html
+</ref> <ref>
+A similarly large difference was evident in 2012: according to Tor metrics page ([ on that same day] the Tor network had on that day had around 3,000 relays (approximately 1,000 had the guard flag and around 900 had the entry guard flag). An estimated 500,000 users were using the Tor network at that time].
+</ref>
+
+The path (circuit) chosen by a Tor client is not predictable and changes every 10 minutes, unless a long-lived onion connection is established. In contrast, a JonDonym user relying on a free two-hop mix cascade will have a predictable entry and exit to the network until the user manually changes it; this similarly applies to all other mix cascades. If a network observer  knows the entry or exit, the whole path the client is using through the network is obvious.
+
+The Tor network is run by volunteers from many different countries. Anybody can run a Tor relay -- no formal process or verification of identity is necessary for administrators. The open source software can simply be downloaded, configured and a node volunteered to the network. Due to the open nature of the network, there are obviously both legitimate and malicious nodes. This stands in contrast to JonDonym's small network of known private operators and companies.
+
+A number of attacks have already been performed on the Tor network, such as [[Warning#Exit_Relays_can_Eavesdrop_on_Communications|sniffing of private usernames and passwords by Tor exit relays]] on unencrypted or SSL-stripped connections. Tor attracts significant interest from researchers, government agencies and adherents due to its popularity and proven track record. Far less attention is given to JonDonym due to the size of the network and user pool which are both serious weaknesses. <ref>
+For instance, it is likely trivial for advanced adversaries to conduct end-to-end correlation attacks.
+</ref>
+
+== Summary ==
+
+Although they are selling a product, the JonDonym developers seem to be honest about the capabilities and limitations of their network. They constructively participate in the Tor bug tracker, on JonDonym forums, <ref
+>For example, see: [https://web.archive.org/web/20210125110454/https://anonymous-proxy-servers.net/forum/viewtopic.php?f=10&t=7319 ip-check.info some false values and confuses TBB users].
+</ref> and have been amenable to {{project_name_long}} reusing their material under an Open Source license (with or without modification) to improve our own documentation.
+
+In some aspects JonDonym is more or less secure than Tor; this depends on the the threat model adopted by the user. Interested readers are suggested to review the [https://anonymous-proxy-servers.net/en/help/jondonym.html network comparison] and [https://anonymous-proxy-servers.net/en/law_enforcement.html law enforcement] entries to draw a conclusion for their own circumstances.
+
+Tunneling JonDonym over Tor (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>JonDonym</code> &rarr; <code>Internet</code>) makes sense in some cases and the JonDonym developers state it is safe; see footnotes. <ref>
+Quoted from the [https://anonymous-proxy-servers.net/en/help/jondonym.html JonDonym network comparison page]:
+<blockquote>[...] making surfing considerably slower but, in some individual cases, even more secure than with JonDonym alone.
+</blockquote></ref> <ref>
+According to the [https://anonymous-proxy-servers.net/en/help/services_tor.html Access to the Tor network with JonDo] page, JonDonym natively supports being tunneled over Tor. This also implies the developers do <u>not</u> argue that tunneling JonDo through Tor is less safe. This option is unneeded in {{project_name_long}}, since all traffic originating from {{project_name_workstation_long}} is tunneled through Tor in the first place. Enabling that JonDonym option inside {{project_name_workstation_long}} is discouraged, since it would lead to a [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] scenario.
+</ref> It is inadvisable to do this for a long period of time, because it adds a permanent exit server, see: [[Tunnels/Introduction|Combining Tunnels with Tor]] for background details.
+
+In conclusion, if it is necessary to download something which cannot be done over TLS (and if there are also no hash sums or signatures), the JonDonym exit might be more trustworthy than a random Tor exit in your personal threat model. However, an alternative is to try and use a specific Tor exit from someone that is trusted.
+
+= Surveillance Concerns =
+
+== Advanced Adversary Analysis ==
+
+Intelligence disclosures in recent years have revealed the assessment of JonDonym by government agencies. <ref>
+https://web.archive.org/web/20210617211029/https://search.edwardsnowden.com/docs/InternetAnonymity20112014-12-28nsadocs
+</ref>
+
+<blockquote>
+(S//REL) Open Source Multi-Hop Networks
+
+(S//REL) Jondo Anonymous Proxy (JAP)
+
+(S//REL) Championed by German University (Dresden)
+
+(S//REL) (Mostly?) Open source software - some Docs in German
+(S//REL) Uses a technology known as Cascades
+
+* (S//REL) Each cascade is set of 2 or 3 Mixes
+
+* (S//REL) All internal traffic encrypted
+
+* (S//REL) Free service AN.ON: 5 Cascades
+
+* (S//REL) Premium service JonDoNym: 10 Cascades
+
+(S//REL) Countries: BG, CA, CH, CZ, DE, DK, FR, GB, IT, LU, US,
+(S//REL) Less than 50 mixes total
+
+(S//REL) Open Source Multi-Hop Networks
+
+(S//REL) Jondo Anonymous Proxy (JAP)
+
+(S//REL) Comparison with Tor
+
+• (S//REL) Not nearly as well studied
+
+* (S//REL) Much smaller contained development community
+
+• (S//REL) More centralized structure (all mixes centrally approved)
+
+• (S//REL) Not as diverse geographically or scalable
+
+* (S//REL) Not as well used or publicized
+
+(S//REL) Not analyzed in great detail here at NSA (or FVEY?)
+(TS//SI//REL) Much better chance for Global Adversary (SIGINT :-))
+
+* (TS//SI//REL) Sessionization of DNI still would be a problem
+</blockquote>
+
+In summary, the tone of the IC disclosure suggests they have greater confidence in deanonymizing JonDonym users due to: less geographical divergence; the smaller network size; a relative lack of scrutiny from researchers; and the centralized structure.
+
+== Law Enforcement Assessment ==
+
+Quoted from the JonDonym Law enforcement page <ref>
+https://anonymous-proxy-servers.net/en/law_enforcement.html
+</ref>:
+
+<blockquote>JonDonym does not make it impossible to uncover individual users, as there is no such thing as a 100% security. However, such a disclosure is by magnitudes more difficult than for other VPN or proxy services, as this would require the cooperation of several states and organizations.
+
+JonDonym is no technology for preventing law enforcement on the internet. In very serious cases, it is possible to uncover the abuse of Mix services. User connections may be individually observed, if all operators of a Mix cascade get such an official order, valid in their respective country (in Germany accourding to §100a/b StPO). The official order has to provide an identification feature for individually observed connections (like the IP address used by the observed person or something else).
+
+However, the independence of JonDonym operators vastly lowers the danger of an illegitimate law enforcement done by non-democratic states or arbitrary individual public officers. Any disclosure basically needs the cooperation of all operators of a Mix cascade. This was never realized for premium mix cascades in the past.</blockquote>
+
+Each year, JonDonym publishes a report regarding any surveillance actions that have been taken and reported by mix operators. It shows that since 2006, five surveillance court orders have been received which affected a total of 6 years of operation (2006, 2009-12, 2014). It is believed that up until now, no JonDonym user has ever been de-anonymized.
+
+It should be noted the Tor network also suffers from legal attacks -- for instance there have been some raids of Tor exit servers -- but this also did not (and could not) lead to de-anonymization. It is suspected that both networks provide strong protections against compromise if they are correctly used. However, they will fail to protect users who deanonymize themselves by posting private information, failing to follow documentation, connecting without going through the anonymity network / without proxy bypass, being affected  by viruses and so on.
+
+= Connecting to Tor before JonDonym =
+
+== Introduction ==
+
+It is possible to run JonDonym inside {{project_name_workstation_long}}: <code>User</code> &rarr; <code>Tor</code> &rarr; <code>JonDonym</code> &rarr; <code>Internet</code>
+
+If this tunnel configuration is desired, it is suggested to first read the following two related wiki entries:
+
+* [[Tunnels/Introduction|Combining Tunnels with Tor]]
+* [[Tunnels/Connecting_to_Tor_before_a_proxy|Connecting to Tor before a Proxy]]
+
+By tunneling JonDonym over Tor, this might be useful in circumventing Tor bans. However, this configuration will also [[Tunnels/Introduction#Connecting_to_Tor_before_a_Tunnel-link_.28Proxy.2FVPN.2FSSH.29|add a permanent exit relay]], which is harmful to anonymity. <ref>
+See also: [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorPlusVPN Tor Plus VPN or Proxy]
+</ref> Other [[Tunnels/Introduction#Comparison_Table|negative impacts]] include the loss of stream isolation, a worsened browser fingerprint, and unavailability of Tor onion services connections.
+
+The instructions below install [https://anonymous-proxy-servers.net/en/software.html JonDo - the IP changer] software package (GUI version) manually by hand; a console version is also available. If installation from the JonDonym GNU/Linux repository is preferred, follow the relevant steps [https://anonymous-proxy-servers.net/en/help/firststeps2.html here]. At the time of writing, the JonDonym repository does not appear to support Debian buster which {{project_name_long}} is based on; also see footnote. <ref>
+In the section stating "The repository is signed with the OpenPGP key 0x2B3CAA3E", it is unrecommended to download the key from a keyserver with <code>apt-key</code>, using only the short key fingerprint. Instead, it is more secure -- equivalent to using the long key fingerprint -- to download the signing key over https with your browser: <br />
+1. Right-click on 0x2B3CAA3E and "Save Link As..." <br />
+2. Save the key in the home folder <br />
+3. Run <code>gpg --import 0x2B3CAA3E</code>
+</ref>
+
+== JonDo IP Changer Proxy Tool Installation ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Note</u>:
+* Non-Qubes-Whonix only.
+* If packages are installed by hand, it is not possible to update the software automatically. You will receive a notice later on if new software versions are ready for download. In this case, the new deb package must be downloaded and installed again manually.
+* Perform the following steps in {{project_name_workstation_long}} terminal. It is recommended to clone the {{project_name_workstation_long}} beforehand, as numerous dependencies are installed during this procedure.
+}}
+
+{{Box|text=
+'''1.''' Download the signing key. <ref>
+Alternatively use Tor Browser to download the signing key [https://anonymous-proxy-servers.net/en/jondo.html here].
+</ref>
+
+{{CodeSelect|code=
+scurl-download https://anonymous-proxy-servers.net/downloads/Software_JonDos_GmbH.asc
+}}
+
+Note: All PGP signature files were created with the OpenPGP key <code>0x2B3CAA3E</code>.
+
+'''2.''' Display the fingerprint without importing anything.
+
+{{CodeSelect|code=
+gpg --keyid-format long --import --import-options show-only --with-fingerprint Software_JonDos_GmbH.asc
+}}
+
+'''3.''' Verify the output.
+
+The output should be identical to the following.
+
+<pre>
+pub   rsa4096/2146D0CD2B3CAA3E 2014-10-20 [SC] [expires: 2024-10-17]
+      Key fingerprint = 6899 5C53 D2CE E11B 0E41  82F6 2146 D0CD 2B3C AA3E
+uid   JonDos GmbH (Software Signing Key) <software@jondos.de>
+sub   rsa4096/435B56FDF9115DBF 2014-10-20 [E] [expires: 2024-10-17]
+</pre>
+
+'''4.''' Import the key.
+
+{{CodeSelect|code=
+gpg --import Software_JonDos_GmbH.asc
+}}
+
+The output should confirm the key was imported.
+
+<pre>
+gpg: key 0x2146D0CD2B3CAA3E: public key "JonDos GmbH (Software Signing Key) <software@jondos.de>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+</pre>
+
+'''5.''' Download the JonDo Debian package (<code>jondo_all.deb</code>). <ref>
+Alternatively use Tor Browser to download the package from [https://anonymous-proxy-servers.net/en/jondo.html here].
+</ref>
+
+{{CodeSelect|code=
+scurl-download https://anonymous-proxy-servers.net/downloads/jondo_all.deb
+}}
+
+'''6.''' Download the package signature (<code>jondo_all.deb.asc</code>). <ref>
+Alternatively use Tor Browser to download the signature from [https://anonymous-proxy-servers.net/en/jondo.html here]. Right-click and select "Save Page As..." to save the signature.
+</ref>
+
+{{CodeSelect|code=
+scurl-download https://anonymous-proxy-servers.net/downloads/jondo_all.deb.asc
+}}
+
+'''7.''' Verify the JonDo Debian package.
+
+{{CodeSelect|code=
+gpg --verify jondo_all.deb.asc
+}}
+
+The output should show.
+
+<pre>
+gpg: Signature made Mon 06 Feb 2017 10:14:57 AM UTC
+gpg:                using RSA key 0x2146D0CD2B3CAA3E
+gpg: Good signature from "JonDos GmbH (Software Signing Key) <software@jondos.de>" [unknown]
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 6899 5C53 D2CE E11B 0E41  82F6 2146 D0CD 2B3C AA3E
+</pre>
+
+'''8.''' Install the JonDo deb package.
+
+{{CodeSelect|code=
+sudo dpkg -i jondo_all.deb
+}}
+
+'''9.''' Install all unmet dependencies.
+
+{{CodeSelect|code=
+sudo apt -f install
+}}
+}}
+
+== Launch JonDonym ==
+
+After installation a placeholder for JonDonym should appear in the application menu. If it does not appear, it can simply be launched from the terminal.
+
+{{CodeSelect|code=
+jondo
+}}
+
+== Free vs Premium Accounts ==
+
+Free accounts can connect only to ports <code>80</code> and <code>443</code>. Further, only a HTTPS proxy interface is provided, not a SOCKS proxy. <ref>
+https://anonymous-proxy-servers.net/en/help/otherApplications.html
+</ref> Premium accounts have unrestricted port options and support the SOCKS proxy. The full comparison can be found [https://anonymous-proxy-servers.net/en/premium.html here].
+
+=== JonDonym HTTPS Proxy Test ===
+
+This also works with JonDonym free accounts.
+
+{{CodeSelect|code=
+{{Curl_Plain}} {{Curl_Secure}} --proxytunnel --proxy 127.0.0.1:4001 https://check.torproject.org
+}}
+
+=== JonDonym SOCKS Proxy Test ===
+
+This requires a JonDonym premium (paid) account.
+
+Try this test command.
+{{CodeSelect|code=
+{{Curl_Plain}} {{Curl_Secure}} --socks5-hostname socks5h://127.0.0.1:4001 https://check.torproject.org
+}}
+
+If the following message appears, it indicates the local JonDo has not opened a listener. Check if JonDonym has been started or configured to use a non-default port.
+<pre>
+curl: (7) couldn't connect to host
+</pre>
+
+If the following message appears, you are likely only using a free account (therefore SOCKS is unavailable).
+<pre>
+curl: (7) Unable to receive initial SOCKS5 response.
+</pre>
+
+== JonDoFox vs Tor Browser ==
+
+Users must make an informed decision whether to prefer JonDoFox or Tor Browser.
+
+It may be more sensible to use JonDoFox in order to blend in better with other JonDonym users, but this is unclear. In this case, no special settings are required.
+
+If Tor Browser is preferred for browsing: user &rarr; Tor &rarr; JonDonym &rarr; destination server, then the proxy settings must be changed via TorButton. Start Tor Browser, open TorButton settings and choose custom proxy settings. HTTP should be set to <code>127.0.0.1</code>, with port set to <code>4001</code> and leave all other fields free except no proxy for <code>127.0.0.1</code>. Browse to https://ip-check.info/ to see if it correctly configured.
+
+== Future Integration ==
+
+See [[Dev/JonDo]] if you are interested in a development discussion about JonDo(Fox) being pre-installed in {{project_name_long}}.
+
+{{Anchor|Connecting_to_JonDo_before_Tor}}
+
+= Connecting to JonDonym before Tor =
+
+== Introduction ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Note</u>:
+* Testers only!
+* [[{{q_project_name_short}}|{{q_project_name}}]] only! [[{{non_q_project_name_short}}|{{non_q_project_name}}]] is [[Unsupported|unsupported]].
+}}
+
+It is possible to configure Tor to use JonDonym as a proxy to establish the following tunnel: <code>User</code> &rarr; <code>JonDonym</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>
+
+A JonDonym premium account is not required; this configuration is functional with JonDonym free. If this tunnel configuration is desired, it is recommended to first read the following two related wiki entries:
+
+* [[Tunnels/Introduction|Combining Tunnels with Tor]]
+* [[Tunnels/Connecting_to_a_proxy_before_Tor|Connecting to Proxy before Tor]]
+
+The anonymity effects are disputed when tunneling Tor over JonDonym; see [[Tunnels/Introduction#Comparison_Table|here]] for further information. The instructions below also have a number of current limitations: <ref>
+https://forums.whonix.org/t/connecting-to-jondonym-before-tor-user-jondonym-tor-internet
+</ref>
+
+* JonDonym is installed in a separate ProxyVM behind <code>{{project_name_gateway_vm}}</code>. <ref>
+The motivation behind this is better security. JonDonym is not installable from Debian, but instead is a package from the anonymous-proxy-servers.net website / Debian apt repository. In theory, Tor should not be compromised if JonDonym is compromised. Also, if JonDonym is compromised to begin with or more easily exploited than Tor, then it is desirable to run it in a separate ProxyVM for better isolation.
+</ref>
+* This configuration is very impractical. Since Qubes does not yet support static IP addresses, the Tor configuration setting <code>/etc/tor/torrc</code> 'HTTPSProxy 10.137.10.1:4001' is not stable. When the JonDonym ProxyVM has its IP changed, connectivity breaks and <code>/etc/tor/torrc</code> in <code>{{project_name_gateway_vm}}</code> needs a manual update.
+* It would be preferable to increased usability by documenting how to run JonDonym directly in <code>{{project_name_gateway_vm}}</code> -- under user tunnel with TUNNEL_FIREWALL=true etc. -- however, this would mean less isolation.
+* This configuration does not yet autostart JonDonym.
+
+== Installation and Configuration ==
+
+{{Box|text=
+'''1.''' Create a new standalone ProxyVM called <code>JonDo-Gateway</code>.
+
+'''2.''' Install JonDonym in the new <code>JonDo-Gateway</code> ProxyVM.
+
+Follow [https://anonymous-proxy-servers.net/en/help/firststeps2.html these instructions] to install JonDonym from JonDonymn's Debian APT repository. The {{Code2|Using the repository at command line}} chapter is recommended for installation.
+
+'''3.''' Test if JonDonym's https proxy is functional.
+
+{{CodeSelect|code=
+curl {{Curl_Secure}} --proxytunnel --proxy 127.0.0.1:4001 https://check.torproject.org
+}}
+
+<ref>
+Socks proxy test - premium accounts only.
+
+{{CodeSelect|code=
+curl {{Curl_Secure}} --socks5-hostname socks5h://127.0.0.1:4001 https://check.torproject.org
+}}
+</ref>
+
+'''4.''' Enable the extended view.
+
+<pre>
+Config &rarr; user interface &rarr; extended view.
+</pre>
+
+'''5.''' Configure JonDonymn to listen on all interfaces so it will be reachable from <code>{{project_name_gateway_vm}}</code>.
+
+Under network, <u>un</u>check:<br />
+<code>[ ] Allow access to JAP/JonDo from localhost only (recommended)</code>
+
+'''6.''' In <code>JonDo-Gateway</code> ProxyVM, {{Firewall_Unload_Home_Folder}}
+
+'''7.''' Disable IP Forwarding in the <code>JonDo-Gateway</code> ProxyVM.
+
+IP Forwarding could/should be disabled, since it is not required. TODO: document how.
+
+'''8.''' Shut down <code>{{project_name_gateway_vm}}</code>.
+
+* Next set the <code>{{project_name_gateway_vm}}</code> NetVM to <code>JonDo-Gateway</code>.
+* Restart <code>{{project_name_gateway_vm}}</code>.
+
+'''9.''' Add the IP address of <code>JonDo-Gateway</code>.
+
+In <code>{{project_name_gateway_vm}}</code>: {{Open_/usr/local/etc/torrc.d/50_user.conf}}
+
+Add the following.
+
+Note: <code>10.137.10.1</code> is just an example and needs to be replaced with the IP address of the <code>JonDo-Gateway</code> ProxyVM. To discover the IP address of the <code>JonDo-Gateway</code> ProxyVM, run the following command in <code>{{project_name_gateway_vm}}</code>:
+<code>qubesdb-read /qubes-gateway</code>
+
+<pre>
+HTTPSProxy 10.137.10.1:4001
+</pre>
+
+Save.
+
+'''10.''' {{Reload_Tor}}
+
+'''11.''' In <code>{{project_name_gateway_vm}}</code>, test if Tor is able to use the https proxy that JonDonym is providing.
+
+{{CodeSelect|code=
+{{Curl_Plain}} {{Curl_Secure}} --socks5-hostname socks5h://127.0.0.1:9050 https://check.torproject.org
+}}
+
+The procedure is complete and Tor will use JonDonym as a proxy.
+}}
+
+= JonDoBox: Substituting Tor with JonDonym =
+
+This was just a development idea with some limited progress. Interested readers can review the material [[Dev/Inspiration|here]].
+
+= Screenshots =
+
+'''Figure:''' ''Java Anon Proxy (JonDonym) Client Software in {{project_name_long}}''
+
+[[Image:JonDo.png]]
+
+'''Figure:''' ''JonDonym Client Software Settings''
+
+[[Image:JonDosettings.png]]
+
+= License =
+
+{{JonDos}} The "{{project_name_long}} JonDonym" wiki page contains content from the JonDonym documentation [https://anonymous-proxy-servers.net/en/help/jondonym.html Network] page.
+
+= Footnotes / References =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

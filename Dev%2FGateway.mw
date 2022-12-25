@@ -1,0 +1,71 @@
+{{Header}}
+{{#seo:
+|description={{project_name_gateway_long}} Detailed Design Documentation
+}}
+
+__FORCETOC__
+= {{project_name_gateway_long}} =
+
+{{project_name_gateway_long}} MUST NOT be ever used for anything other than running Tor on it.
+
+If this machine is compromised the identity (public IP), all destinations and all clear-text (and onion service) communication over Tor is available to the attacker.
+
+Our first goal in securing the {{project_name_gateway_long}} is minimizing its attack surface. By installing a "minimal system", the only attack surface to an remote attack is Tor itself, apt, [[Dev/onion-grater
+|onion-grater]] and [[sdwdate]]. You can verify this with netstat.
+
+Security features that do not prevent exploitation but only restrict what exploits can do, such as chrooting or sandboxing, do not make much sense: A compromise of Tor already results in a compromise of everything the user cares about.
+
+Compile time hardening (see [https://gitlab.torproject.org/legacy/trac/-/issues/5024 Bug #5024: compile time hardening of TBB (RELRO, canary, PIE)]) should be done by the Tor package contributor and is beyond the scope of {{project_name_long}}.
+
+Debian is a good compromise of security and usability. More secure and hardened Linux or BSD based options do exist but they require too much work and/or maintenance to be considered for {{project_name_long}}. The [[Dev/Operating System]] design page elaborates on that topic.
+
+Having said this, you are welcome to use your own distro. The {{project_name_long}} design is distro agnostic. You just won't be able to thoughtlessly copy and paste commands or to use the source without modifications.
+
+= Graphical {{project_name_gateway_long}} benefits over Headless {{project_name_gateway_long}} =
+In the [[VirtualBox/CLI|non-graphical version of {{project_name_gateway_long}}]], it is difficult for users who have never used Linux before to complete tasks like upgrading or configuring obfuscated bridges. Many activities are simpler and easily accessible in a [[VirtualBox/XFCE|graphical {{project_name_gateway_long}}]], such as:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* Setting up bridges.
+* Auditing logs.
+* Auditing iptables.
+* Auditing the system architecture in general.
+* Running [[Essential_Tests|Essential {{project_name_long}} Functionality Tests]].
+* Running [[Dev/Leak_Tests|Leak Tests]].
+* [[Tor#Edit_Tor_Configuration|Editing the Tor configuration]]
+* Editing the [[Whonix-Gateway_Firewall|{{project_name_gateway_short}} firewall settings]]
+* Reading status messages ([https://www.kicksecure.com/wiki/Systemcheck systemcheck] and [[sdwdate]]).
+* [[Nyx|Changing the Tor circuit]].
+* Copying and pasting (configuration) commands, (error) messages and logs.
+* Running tshark / wireshark.
+* [[Tunnels/Introduction|Tunneling only {{project_name_gateway_long}} traffic through a VPN]].
+</div>
+
+A black, text-only window (terminal) is intimidating for normal users. A graphical desktop environment is also a prerequisite for further planed improvements, such as the proposed [https://github.com/{{project_name_short}}/{{project_name_short}}/issues/132 graphical {{project_name_long}} Controller] which will provide buttons such as:
+
+* "Create hidden blog", which creates a pre-configured blog.
+* "Backup onion service keys".
+* A [https://phabricator.whonix.org/T89 Better Circumvention User Interface].
+* And more.
+* Also, terminal-only environments can be impractical for users with disabilities.
+
+= Headless / CLI (Terminal) {{project_name_gateway_long}} =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = {{non_q_project_name_short}} only.
+}}
+
+If a user believes the graphical {{project_name_gateway_long}} is using too much RAM, or if a terminal version of {{project_name_gateway_long}} is generally preferred, then '''headless''' {{project_name_long}} is available: see [[VirtualBox/CLI|{{project_name_long}} for VirtualBox with CLI]].
+
+Alternatively, [[VirtualBox/XFCE|{{project_name_long}} for VirtualBox with XFCE]] RAM can be reduced to 256 MB and [[RAM_Adjusted_Desktop_Starter|RAM Adjusted Desktop Starter]] will automatically boot into a terminal version of {{project_name_gateway_long}}.
+
+When building {{project_name_long}} images from source code, both {{project_name_long}} VirtualBox and {{project_name_long}} KVM support build script parameter <code>--flavor whonix-gateway-cli</code>. <ref>
+Equivalent for {{project_name_gateway_long}} <code>--flavor whonix-workstation-cli</code> also exists.
+</ref>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Design]]

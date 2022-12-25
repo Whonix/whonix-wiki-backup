@@ -1,0 +1,260 @@
+{{Header}}
+{{#seo:
+|description=Using OnionShare in {{project_name_long}}.
+|image=https://www.{{project_clearnet}}/w/images/0/0d/OnionShare_logo.png
+}}
+[[Image:OnionShare_logo.png|<code>OnionShare Logo</code>|thumb|128px]]
+
+= Introduction =
+
+== OnionShare Functionality ==
+
+OnionShare is an open source program that allows users to share/receive files, host a website or chat anonymously utilizing the Tor network. <ref>https://onionshare.org/</ref> The OnionShare wiki succinctly describes the design: <ref>https://docs.onionshare.org/</ref>
+
+<blockquote>Web servers are started locally on your computer and made accessible to other people as [https://community.torproject.org/onion-services/ Tor onion services].
+
+By default, OnionShare web addresses are protected with a random password. A typical OnionShare address might look something like this:
+
+<code>http://onionshare:constrict-purity@by4im3ir5nsvygprmjq74xwplrkdgt44qmeapxawwikxacmr3dqzyjad.onion</code>
+
+You’re responsible for securely sharing that URL using a communication channel of your choice like in an encrypted chat message, or using something less secure like unencrypted e-mail, depending on your [https://ssd.eff.org/module/your-security-plan threat model].
+
+The people you send the URL to then copy and paste it into their [https://www.torproject.org/ Tor Browser] to access the OnionShare service.</blockquote>
+
+As of OnionShare version <code>2.0</code> it is also possible to run the program in Receive mode. This means you can receive files via OnionShare after they are uploaded by Tor Browser users; this is a sort of 'SecureDrop Lite' or personal dropbox. Version <code>2.2</code> of OnionShare also permits the [https://micahflee.com/2019/10/new-version-of-onionshare-makes-it-easy-for-anyone-to-publish-anonymous-uncensorable-websites/ easy hosting of anonymous websites]:
+
+<blockquote>In addition to the “Share Files” and “Receive Files” tabs, OnionShare 2.2 introduces the “Publish Website” tab. You drag all of the files that make up your website into the OnionShare window and click “Start sharing.” It will start a web server to host your static website and give you a .onion URL. This website is only accessible from the Tor network, so people will need Tor Browser to visit it. People who visit your website will have no idea who you are – they won’t have access to your IP address, and they won’t know your identity or your location. And, so long as your website visitors are able to access the Tor network, the website can’t be censored.</blockquote>
+
+Version <code>2.3</code> of OnionShare allows users to share/receive files, host websites or chat anonymously at the same time using a tabs feature. The secure, ephemeral and anonymous chat feature is particularly useful since it does not require account creation, is encrypted end-to-end and reduces the risk of messages being stored locally: <ref>https://blog.torproject.org/new-release-onionshare-23</ref>
+
+<blockquote>Now when you open OnionShare you are presented with a blank tab that lets you choose between sharing files, receiving files, hosting a website, or chatting anonymous. You can have as many tabs open as you want at a time, and you can easily save tabs (that's what the purple thumbtack in the tab bar means) so that if you quit OnionShare and open it again later, these services can start back up with the same OnionShare addresses. ... Another major new feature is chat. You start a chat service, it gives you an OnionShare address, and then you send this address to everyone who is invited to the chat room (using an encrypted messaging app like Signal, for example). Then everyone loads this address in a Tor Browser, makes up a name to go by, and can have a completely private conversation.</blockquote>
+
+As OnionShare is an actively developed project, it is recommended to refer to [https://docs.onionshare.org/ official documentation] for the latest features and information before use. Advanced users should also consider [https://docs.onionshare.org/2.6/en/advanced.html additional features] like saving of tabs, turning off passwords, scheduled start/stop times, command line operations and legacy addresses.
+
+== Security Design ==
+
+'''Table:''' ''OnionShare Security Design'' <ref>https://docs.onionshare.org/2.4/en/security.html</ref>
+
+{| class="wikitable"
+|-
+! scope="col"| '''Protections'''
+! scope="col"| '''Description'''
+|-
+
+! scope="row"| Third party access
+| Third parties cannot access anything that happens in OnionShare because services are hosted directly on your computer. Filesharing does not utilise online servers, and chat rooms also use your computer as a server; trust in other computers is removed.
+|-
+
+! scope="row"| Network eavesdroppers
+| Eavesdroppers cannot spy on OnionShare activities in transit because connections between Tor onions services and Tor Browser are encrypted end-to-end. Even malicious Tor nodes used for connections will only see encrypted traffic using the onion service's private key.
+|-
+
+! scope="row"| Anonymity
+| OnionShare anonymity is protected by Tor. If OnionShare addresses are anonymously communicated with Tor Browser users, then eavesdroppers cannot learn the identity of the OnionShare user.
+|-
+
+! scope="row"| Onion service discovery
+| Malicious actors cannot access anything just by learning about the onion service; attackers also need to guess the private key used for client authentication (access). <ref>Unless the private key feature is [https://docs.onionshare.org/2.4/en/advanced.html#turn-off-private-key turned off].</ref>
+|-
+
+|}
+
+OnionShare cannot protect users if the OnionShare address and private key is not communicated securely. For example, do not share this information via email which can be potentially monitored by attackers. It is far safer to utilize encrypted text messages for this purpose (preferably with disappearing messages enabled), encrypted email, or in-person sharing of this information. This method is not anonymous unless a new email account or chat account is ''only'' created/accessed over Tor.
+
+= Installation =
+== {{project_name_gateway_long}} Installation Steps ==
+=== onion-grater Profile ===
+{{onion-grater-warning}}
+
+{{Control_Port_Filter_Python_Profile_Add
+|filename_new=40_onionshare
+}}
+
+== {{project_name_workstation_long}} Installation Steps ==
+=== Firewall Settings ===
+Modify the {{project_name_workstation_long}} (<code>anon-onionshare</code>) user firewall settings and reload them.
+
+{{box|text=
+{{Firewall_Settings_Workstation}}
+
+Add. <ref>
+As per https://gitlab.tails.boum.org/tails/tails/-/issues/7870#note-15 OnionShare uses ports 17600 to 17659.
+</ref>
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" $(seq 17600 17659) "
+}}
+
+Save.
+
+{{Reload_Firewall_ws}}
+}}
+
+=== Installation ===
+Before installing OnionShare:
+
+* A separate {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>anon-onionshare</code> App Qube) is also recommended; see footnote. <ref>To clone the existing <code>{{project_name_workstation_vm}}</code> in [[{{q_project_name_short}}|{{q_project_name}}]]:
+* <code>Qube Manager</code> &rarr; <code>Right-click on anon-vm</code> &rarr; <code>Select "<u>C</u>lone qube"</code> &rarr; <code>Rename to "anon-onionshare"</code></ref> The reason is the OnionShare installation will persist in this configuration and it is best practice to separate different, anonymous activities in distinct VMs (App Qubes).
+* Installation using [https://www.kicksecure.com/wiki/Install_Software#Flatpak flatpak] is discouraged because it leads to [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]].
+* Installation from Debian package sources as documented below is recommended.
+
+Inside {{project_name_workstation_long}}.
+
+{{Install_Package
+|package=onionshare
+}}
+
+= Using OnionShare =
+== Start OnionShare ==
+Inside {{project_name_workstation_long}}.
+
+If OnionShare was installed from Debian package sources, launch it in {{project_name_workstation_long}} by either running the command line interface (CLI) or graphical user interface (GUI) version.
+
+* CLI: {{CodeSelect|code=
+onionshare
+}}
+* GUI: {{CodeSelect|code=
+onionshare-gui
+}}
+* If the flatpak version was installed (discouraged because of [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]]), run. {{CodeSelect|code=
+flatpak run org.onionshare.OnionShare
+}}
+
+'''Figure:''' ''First Start of OnionShare v2.4 GUI''
+
+[[Image:Onionsharehomepage.png|border]]
+
+== OnionShare Configuration ==
+If OnionShare was installed from Debian package sources as documented on this wiki page, then no configuration changes specific to {{project_name_long}} in the OnionShare application are required. <ref>
+Under "How should OnionShare connect to Tor?" no changes are required. Even setting "Use the Tor version built into OnionShare" is OK in the very case of OnionShare and does not lead to [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] thanks to special support by [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]].
+
+https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/usr/bin/tor.anondist#L70
+</ref>
+
+== How-to: Use OnionShare ==
+
+Later OnionShare versions have significantly improved functionality:
+* Version <code>2.0</code> provides a feature called 'Receive Mode'. With this mode, you can start an onion service and allow other users to upload files to ''you'' via Tor Browser (rather than Share Mode, in which you share files from your OnionShare to others).
+* Version <code>2.2</code> allows the hosting of static HTML websites.
+* Version <code>2.3</code> allows users to set up a private, secure chat room that does not require an account and does not log activity.
+
+A complete user guide is available, including advanced topics, hardening options <ref>Such as setting a Shutdown Timer to self-destruct shares if they are not downloaded within an acceptable time window. These topics are beyond the scope of this documentation.</ref> and development documentation; refer to the [https://docs.onionshare.org/ official website].
+
+Do not change settings without fully understanding their function, otherwise onion addresses might be re-used, shares might be left open even after multiple downloads are performed, and so on.
+
+=== Share Files ===
+
+Once OnionShare has been installed correctly and the Tor check is successful, sharing files anonymously is easy: <ref>https://docs.onionshare.org/2.3.1/en/features.html</ref>
+
+<blockquote>You can use OnionShare to send files and folders to people securely and anonymously. Open a share tab, drag in the files and folders you wish to share, and click “Start sharing”.
+...
+When you’re ready to share, click the “Start sharing” button. You can always click “Stop sharing”, or quit OnionShare, immediately taking the website down. You can also click the “↑” icon in the top-right corner to show the history and progress of people downloading files from you. <br />
+
+Now that you have a OnionShare, copy the address and send it to the person you want to receive the files. If the files need to stay secure, or the person is otherwise exposed to danger, use an encrypted messaging app.
+
+That person then must load the address in Tor Browser. After logging in with the random password included in the web address, the files can be downloaded directly from your computer by clicking the “Download Files” link in the corner.</blockquote>
+
+'''Figure:''' ''Select File to Share''
+
+[[Image:Sharefileone.png|border]]
+
+'''Figure:''' ''Secret Onion URL for Downloaders''
+
+[[Image:Sharefiletwo.png|border]]
+
+'''Figure:''' ''OnionShare Download with Tor Browser'' <ref>https://micahflee.com/2018/02/onionshare-has-some-exciting-new-features/</ref>
+
+[[Image:OnionSharereceive.png|border]]
+
+=== Receive Files and Messages ===
+
+Receiving files or messages is also simple: <ref>https://docs.onionshare.org/2.4/en/features.html#receive-files-and-messages</ref>
+
+<blockquote>You can use OnionShare to let people anonymously submit files and messages directly to your computer, essentially turning it into an anonymous dropbox. Open a receive tab and choose the settings that you want.
+
+You can browse for a folder to save messages and files that get submitted.
+
+You can check “Disable submitting text” if want to only allow file uploads, and you can check “Disable uploading files” if you want to only allow submitting text messages, like for an anonymous contact form.</blockquote>
+
+'''Figure:''' ''Receive Files or Messages''
+
+[[Image:Onionsharereceivefiles.png|border]]
+
+=== Website Hosting ===
+
+Website hosting can be achieved in a few steps: <ref>https://docs.onionshare.org/2.4/en/features.html#host-a-website</ref>
+
+<blockquote>To host a static HTML website with OnionShare, open a website tab, drag the files and folders that make up the static content there, and click “Start sharing” when you are ready.
+
+If you add an index.html file, it will render when someone loads your website. You should also include any other HTML files, CSS files, JavaScript files, and images that make up the website. (Note that OnionShare only supports hosting static websites. It can’t host websites that execute code or use databases. So you can’t for example use WordPress.)</blockquote>
+
+This functionality means content can be shared temporarily to select individuals, or it can be run as a public service if desired.
+
+=== Anonymous Chat ===
+
+Finally, private and secure chat rooms (without logging) are possible by: <ref>https://docs.onionshare.org/2.4/en/features.html#chat-anonymously</ref>
+# Opening a chat tab and selecting "Start chat server".
+# Copy the onion address and private key and send them to the intended recipients. <ref>Preferably with an encrypted messaging application.</ref>
+# To join the chat room, participants cut and paste the OnionShare address into Tor Brower; JavaScript is required, so the security level must be set to "Standard" or "Safer".
+# After joining, participants are assigned a random name.
+
+The benefit of OnionShare anonymous chat is no copies of messages are left on devices or possibly on servers/databases, and account creation is unnecessary.
+
+=== Visit Authenticated OnionShare Services using Tor Browser in {{project name short}} ===
+This wiki chapter might be useful for users who intent to visit authenticated OnionShare Services using Tor Browser in {{project name long}}.
+
+When a provider of an OnionShare service is using onion authentication, then a {{project name long}} visitor of that OnionShare instance is required to setup Onion Service Client Authentication in {{project name long}} first.
+
+There are two options to setup Onion Service Client Authentication. Chose <u>either</u> option '''A)''' <u>or</u> '''B)'''.
+
+* '''A)''' [[Tor_Browser#Onion_Client_Authorization|Tor Browser Onion Client Authorization]], <u>or</u>
+* '''B)''' [[Onion_Services#Onion_Service_Authentication_Client_Setup|Onion Service Client Authentication setup on {{project name gateway long}}]].
+
+If this step is omitted, the following [https://github.com/onionshare/onionshare/issues/1511 symptom] might be shown.
+
+<pre>
+Command filtered
+</pre>
+
+== OnionShare AppArmor Profiles ==
+
+AppArmor profiles are available to better contain OnionShare, but they are outdated <ref>https://github.com/micahflee/onionshare/issues/686 open OnionShare AppArmor ticket</ref>.
+
+Advanced users are encouraged to help progress and complete this wiki section. Successes or failures can also be reported in the [http://forums.{{project_onion}}/c/apparmor {{project_name_long}} AppArmor forum].
+
+TODO: Test profiles and expand this section.
+
+= Troubleshooting =
+https://github.com/onionshare/onionshare/issues/1374
+
+<pre>
+Opening tab in existing OnionShare window (pid 2)
+</pre>
+
+{{CodeSelect|code=
+rm ~/.config/onionshare/lock
+}}
+
+= Newer OnionShare Versions =
+Prerequisite knowledge: {{kicksecure_wiki
+|wikipage=Operating_System_Software_and_Updates#Frozen_Packages
+|text=Frozen Packages
+}}
+
+Newer versions will only be supported once the next stable version of Debian gets released and once {{project name long}} has been ported to that version.
+
+Installing newer OnionShare versions is [[unsupported]] due to technical difficulties.
+
+Technical details:
+
+* Installation from source code is [[undocumented]].
+* flatpak installation method currently leads to Tor over Tor. Details here:
+** https://forums.whonix.org/t/can-i-use-onionshare-2-4-in-virtualbox-environment-whonix-xfce-16-0-3-1/12691/4
+** [[Dev/OnionShare]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

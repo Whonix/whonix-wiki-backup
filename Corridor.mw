@@ -1,0 +1,252 @@
+{{Header}}
+{{#seo:
+|description=Using corridor, a Tor traffic whitelisting gateway with Whonix
+|image=Corridor.jpg
+}}
+{{Title|
+title=Using corridor, a Tor traffic whitelisting gateway with {{project_name_long}}
+}}
+__forcetoc__
+[[image:Corridor.jpg|thumb]]
+= Introduction =
+[https://github.com/rustybird/corridor corridor] is a Tor traffic whitelisting gateway. It is a filtering gateway, not a proxying gateway and can also be configured as a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/BridgeFirewall BridgeFirewall].
+
+= Connecting to corridor before Tor =
+== Introduction ==
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = corridor configurations are only possible in [[{{q_project_name_short}}|{{q_project_name}}]]. [[{{non_q_project_name_short}}|{{non_q_project_name}}]] is [[unsupported]] at present. <ref>[https://phabricator.whonix.org/T524 Corridor for {{project_name_long}} KVM ticket].</ref> <ref>Without third party contributions to corridor, [[{{non_q_project_name_short}}|{{non_q_project_name}}]] is unlikely to be supported in the near future.</ref>
+}}
+
+It is possible to configure {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) to use corridor as a <u>local</u> proxy to establish the following tunnel:<br />
+<code>User</code> &rarr; <code>corridor</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>
+
+This is not necessarily more anonymous, but it does provide an additional fail-safe -- a Tor traffic whitelisting firewall that helps protect against accidental clearnet leaks (hypothetical clearnet leak bugs in {{project_name_long}}). As [https://github.com/rustybird/corridor corridor's project description] states: "... it cannot prevent malware on a client computer from finding out your clearnet IP address."
+
+corridor is mostly useful for developers and auditors of {{project_name_long}}, along with advanced users who would like to have an additional safety net. Note that it cannot protect from hypothetical bugs affecting Qubes' ProxyVM; a [https://github.com/rustybird/corridor physically-isolated, standalone corridor-Gateway] is necessary to cover that leak vector.
+
+corridor does not increase the tunnel length, meaning no more relays are added between a user and the destination. Users interested in this configuration should read [[Tunnels/Introduction]].
+
+== Warning ==
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+By default, the following instructions will result in:
+
+# The [https://packages.debian.org/{{Stable project version based on Debian codename}}/tor Debian tor package] being installed.
+# Thereby automatically connecting to the [https://www.torproject.org Tor] public network.
+# Downloading of corridor from [[Project-APT-Repository]].
+}}
+This behavior might be dangerous if users need / want to [[Hide Tor from your Internet Service Provider|hide Tor and {{project_name_long}} from the ISP]].
+
+If {{project_name_long}} is already in use, then configuring a second running instance of [[Tor]] will ensure that it is independent of the one running inside {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>). From the ISP's perspective, the user will have a different network [[Fingerprint]]. The anonymity impact should be no worse than running Tor Browser, or system-tor and {{project_name_long}} at the same time.
+
+== dom0 Setup ==
+Create a new standalone ProxyVM called {{Code2|sys-corridor}} based on the Debian <code>{{Stable project version based on Debian codename}}</code> template:
+
+<code>Qube Manager</code> &rarr; <code>Create new Qube</code> &rarr; <code>enable 'Standalone qube based on a template'</code> &rarr; <code>name: {{Code2|sys-corridor}}</code> &rarr; <code>template: debian</code> &rarr; <code>OK</code>
+
+Enable the {{Code2|corridor}} qvm service:
+
+<code>Qube Manager</code> &rarr; <code>left-click {{Code2|sys-corridor}}</code> &rarr; <code>right-click</code> &rarr; <code>Qube settings</code> &rarr; <code>services</code> &rarr; <code>type in the field</code> &rarr; <code>{{Code2|corridor}}</code> &rarr; <code>press {{Code2|+}}</code> &rarr; <code>press OK</code>
+
+== sys-corridor Setup ==
+
+If a BridgeFirewall is required, [[#Optional:_BridgeFirewall_corridor_Configuration|first configure Tor to use bridges]] before installing corridor. All the following steps should be applied in [https://www.qubes-os.org Qubes'] [https://www.qubes-os.org/doc/templates/debian/ Debian template].
+
+=== Install corridor ===
+
+Start <code>sys-corridor</code> and open a terminal using Qubes start menu.
+
+{{Box|text=
+{{W-APT-Repository-Key}}
+}}
+
+{{Project-APT-Repository-Add}}
+
+{{Box|text=
+Install <code>corridor</code>.
+
+{{Install Package|package=
+corridor
+}}
+}}
+
+=== Configuration ===
+=== Optional: BridgeFirewall corridor Configuration ===
+TODO: BridgeFirewall corridor configuration is currently [[unsupported|untested]].
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = "Bridges are less reliable and tend to have lower performance than other entry points. If you live in a uncensored area, they are not necessarily more secure than entry guards." <ref>[https://lists.torproject.org/pipermail/tor-talk/2012-May/024378.html bridge vs non-bridge users anonymity].</ref>
+}}
+
+In order to use corridor as a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/BridgeFirewall BridgeFirewall], configure Tor to use [https://support.torproject.org/#censorship_censorship-7 bridges] before installing corridor. <ref>The {{project_name_long}} [[Bridges]] page can help, but the steps do not apply one-to-one.</ref>
+{{Box|text=
+'''1.''' Start <code>sys-corridor</code> and open a terminal using Qubes start menu.<br />
+'''2.''' Create folder {{Code2|/etc/corridor.d}} and configuration file {{Code2|/etc/corridor.d/21-bridges-user.conf}} first. <ref>This skip is stepped if [https://support.torproject.org/#about_entry-guards Tor entry guards] are preferred.</ref> <br />
+'''3.''' Create a bridges configuration file.
+{{Open with root rights|filename=
+/etc/corridor.d/21-bridges-user.conf
+}}
+
+'''4.''' Review {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) [[Bridges|Tor bridge]] settings.
+
+Depending on how Tor bridges are configured on {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>):
+
+* if [[Anon Connection Wizard]] was used, see configuration file <code>/usr/local/etc/torrc.d/40_tor_control_panel.conf</code>.
+* if [[Tor#Manual_Bridge_Configuration|manual Tor bridge configuration]] was done, see file <code>/usr/local/etc/torrc.d/50_user.conf</code>.
+
+'''5.''' Add the following text. <ref>
+https://github.com/rustybird/corridor/issues/42
+</ref>
+
+Syntax is similar as Tor configuration as reviewed in previous step. Replace the IPs and ports <code>1.2.3.4:443</code>, <code>2.3.4.5:443</code> with the actual IPs and ports of the bridges in use. All Tor bridges from Tor configuration on {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) need to be added below too.
+
+{{CodeSelect|code=
+BRIDGES="\
+Bridge 1.2.3.4:443
+Bridge 2.3.4.5:443
+Bridge 3.4.5.6:443
+"
+}}
+
+Save.
+
+'''6.''' Done.
+
+BridgeFirewall corridor configuration is complete.
+}}
+
+== Daemon Status Test ==
+While these instructions remain experimental, it is advised to run the following systemctl commands to check everything is functioning correctly.
+
+{{CodeSelect|code=
+sudo systemctl --no-pager status corridor-data
+sudo systemctl --no-pager status corridor-init-forwarding
+sudo systemctl --no-pager status corridor-init-logged
+sudo systemctl --no-pager status corridor-init-snat
+}}
+
+== Restart corridor ==
+Reboot {{Code2|sys-corridor}}.
+
+Do another [[#Daemon Status Test|Daemon Status Test]].
+
+== Test corridor ==
+
+=== Test Preparation ===
+
+# Run the [[#Install_corridor|above systemctl commands]] again. <br />
+# Create or use an appropriate existing AppVM named <code>corridor-client</code> (or similar).<br />
+# Install / run either system-tor (from Debian or Fedora package sources) or Tor Browser.<br />
+# Set <code>Networking</code> of <code>corridor-client</code> to <code>sys-corridor</code>. Tor should be still able to connect.
+
+=== Testing Steps ===
+
+Run a [[Tor#Log_Analysis|Tor log analysis]].
+
+Then restart Tor.
+
+{{CodeSelect|code=
+sudo service tor restart
+}}
+
+Check if Tor is still able to connect.
+
+To test Tor Browser:
+
+# First check Tor Browser can make an initial connection to the Internet while <code>Networking</code> is still set to <code>sys-firewall</code>.
+# Next set <code>Networking</code> to <code>sys-corridor</code> and confirm it is still able to connect. If so, that is a positive sign.
+# Finally attempt an untorified connection by using an application like Chromium or Firefox browser. Untorified applications should fail to connect to the Internet.
+
+== Test Logging ==
+Whenever corridor blocks attempted actions (like the [[#Test_corridor|tests above]]), a message will appear in syslog. To inspect {{Code2|/var/log/syslog}}
+
+{{Open with root rights|filename=
+/var/log/syslog
+}}
+
+To check for blocks inside <code>sys-corridor</code>, run.
+
+{{CodeSelect|code=
+sudo tail -f /var/log/syslog
+}}
+
+If corridor blocks anything, the output will be similar to this.
+
+{{CodeSelect|code=
+Jul 19 00:58:27 localhost kernel: [  954.706833] corridor:
+}}
+
+== Interpreting the Results ==
+The safest configuration is only setting <code>{{project_name_gateway_vm}}</code> to use <code>sys-corridor</code> for <code>Networking</code>. The reason is the [https://github.com/marmarek/qubes-core-agent-linux/blob/master/vm-systemd/qubes-update-check.service qubes-update-check.service] will try to use the Internet without Tor, and [https://github.com/QubesOS/qubes-issues/issues/1814 other programs] may also try to use clearnet. Therefore, always shut down <code>corridor-client</code>.
+
+== Configure {{project_name_gateway_vm}} ==
+To set <code>Networking</code> of <code>{{project_name_gateway_vm}}</code> to <code>sys-corridor</code>:
+
+<code>Qube Manager</code> &rarr; <code>left-click {{project_name_gateway_vm}}</code> &rarr; <code>right-click</code> &rarr; <code>Qube settings</code> &rarr; <code>Networking</code> &rarr; <code>{{Code2|sys-corridor}}</code> &rarr; <code>OK</code>
+
+The procedure is now complete.
+
+= Debugging =
+If problems are encountered, this section provides tips on gathering useful information for debugging.
+
+It is also possible to ignore everything said on this website. Pretend it does not exist. Then [https://github.com/rustybird/corridor acquire corridor from its original upstream] and [https://github.com/rustybird/corridor/issues contact upstream for support].
+
+Check if the {{Code2|corridor_relays}} ipset gets populated.
+
+{{CodeSelect|code=
+sudo ipset list corridor_relays
+}}
+
+It is recommended to also install the {{Code2|usability-misc}} package from {{project_name_long}} repository, since it provides the {{Code2|iptables-save-deterministic}} command. Alternatively, retrieve the package from [[Dev/Firewall_Refactoring|elsewhere]].
+
+{{CodeSelect|code=
+sudo apt install usability-misc
+}}
+
+Run {{Code2|iptables-save-deterministic}}.
+
+{{CodeSelect|code=
+sudo iptables-save-deterministic
+}}
+
+In Qubes, the output should be similar to the following.
+
+<pre>
+*nat
+:PREROUTING ACCEPT [0,0]
+:INPUT ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+:POSTROUTING ACCEPT [0,0]
+:CORRIDOR_SNAT - [0,0]
+-A POSTROUTING -j CORRIDOR_SNAT
+-A CORRIDOR_SNAT -s 10.137.0.0/16 ! -d 10.137.0.0/16 -j MASQUERADE
+COMMIT
+*filter
+:INPUT ACCEPT [0,0]
+:FORWARD ACCEPT [0,0]
+:OUTPUT ACCEPT [0,0]
+:CORRIDOR_FILTER - [0,0]
+-A FORWARD -j CORRIDOR_FILTER
+-A CORRIDOR_FILTER -m conntrack --ctstate RELATED,ESTABLISHED -j RETURN
+-A CORRIDOR_FILTER -m set --match-set corridor_relays dst,dst -j RETURN
+-A CORRIDOR_FILTER -m set --match-set corridor_logged src -j LOG --log-prefix "corridor: reject " --log-macdecode
+-A CORRIDOR_FILTER -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+</pre>
+
+= Credits =
+
+The author of corridor is [https://github.com/rustybird rustybird]. [https://github.com/adrelanos Patrick Schleizer] is the author of the [https://github.com/adrelanos/corridor corridor for Debian] [https://en.wikipedia.org/wiki/Fork_%28software_development%29 fork] used in these {{project_name_long}} instructions.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

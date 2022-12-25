@@ -1,0 +1,65 @@
+{{Header}}
+
+'''This page is Obsolete since not needed. See [[Advanced_Deanonymization_Attacks]] for explanation.'''
+
+{{archived}}
+
+= Latency-Obfuscator =
+
+== Summary ==
+This package is supposed to implement the mitigation discussed in https://phabricator.whonix.org/T530 using tc netem. Package WIP at https://github.com/HulaHoop0/latency-obfuscator
+
+Packet latency (as observed by an adversary outside Tor) drops significantly when the CPU is stressed as can be observed in ICMP and TCP traffic. This is caused by c-state transitions. Non-solutions: Running a stress process with a high nice-level or disabling c-state because both solutions would heavily impact battery life and CPU temperature.
+
+The chosen solution is to add a random delay per packet to mask the this effect for best results.
+
+
+== Implementation Details ==
+
+* Use of /etc/NetworkManager/dispatcher.d hooks to run the tc command whenever any NIC goes up: https://askubuntu.com/questions/1111652/network-manager-script-when-interface-up
+
+* Interface names must be filtered to exclude <code>lo</code> <code>virbr*</code> devices or virtual environments and local daemons will incur a needless penalty.
+
+* No need to react to "down" events because tc remains running in cases where the NIC goes down then up again. It declares "Error: Exclusivity flag on, cannot modify." in that situation when the command is re-run again.
+
+* The limit parameter must be [https://stackoverflow.com/questions/18792347/what-does-option-limit-in-tc-netem-mean-and-do raised] from the default of 1000 or else packets get dropped as traffic demand increases. 12500 covers connection speeds of up to 1Gbps.
+
+* <code>sudo tc qdisc</code> indicates all the default queues setup for interfaces on Linux
+
+* Info on various qdisc filter properties: https://wiki.archlinux.org/title/advanced_traffic_control
+
+== Relevant Commands and Testing ==
+
+* Setup a VPN connection in {{project_name_long}} WS then run ping <foo>.com
+
+* Simulate CPU load  with stress <code>ctrl + c</code> to stop:
+{{CodeSelect|code=
+sudo apt install stress
+stress -c 4
+}}
+You will notice latency markedly dropping and staying there.
+
+* Run this command for mitigation. It will mask the latency patterns induced by the <code>stress</code> command:
+{{CodeSelect|code=
+sudo tc qdisc add dev eth0 root netem limit 12500 slot 75ms 200ms packets 1
+}}
+
+* To test with [https://serverfault.com/questions/14376/ping-alternative-for-tcp TCP ping]:
+{{CodeSelect|code=
+sudo apt install hping3
+sudo hping3 -S -p 80 www.sunet.se
+}}
+
+* For [https://serverfault.com/questions/794948/how-to-check-all-active-netem-rules checking] queue properties / [https://tldp.org/en/Traffic-Control-HOWTO/ar01s06.html details]:
+
+{{CodeSelect|code=
+sudo tc qdisc
+}}
+{{CodeSelect|code=
+sudo tc -s qdisc ls dev eth0
+}}
+
+* To detach tc from the interface
+{{CodeSelect|code=
+sudo tc qdisc delete dev eth0 root
+}}

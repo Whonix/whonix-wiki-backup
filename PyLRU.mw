@@ -1,0 +1,155 @@
+{{Title|
+title=How-to: Install PyLRU in {{project_name_long}}
+}}
+{{Header}}
+{{#seo:
+|description=PyLRU python library
+|image=https://www.{{project_clearnet}}/w/images/8/80/Py123123.png
+}}
+__FORCETOC__
+[[image:Py123123.png|thumb]]
+
+= Introduction =
+
+PyLRU is: <ref>https://pypi.org/project/pylru/</ref>
+<blockquote>...a true LRU cache along with several support classes. The cache is efficient and written in pure Python. It works with Python 2.6+ including the 3.x series. Basic operations (lookup, insert, delete) all run in a constant amount of time. Pylru provides a cache class with a simple dict interface. It also provides classes to wrap any object that has a dict interface with a cache. Both write-through and write-back semantics are supported. Pylru also provides classes to wrap functions in a similar way, including a function decorator.</blockquote>
+
+= PyLRU Setup =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Perform the following procedure in {{project_name_workstation_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>{{project_name_workstation_vm}}</code> App Qube).
+}}
+
+== Download ==
+
+Acquire the [https://github.com/jlhutch/pylru PyLRU] source code by Jay Hutchinson ([https://github.com/jlhutch <code>jlhutch</code> on GitHub]).
+
+{{CodeSelect|code=
+git clone https://github.com/jlhutch/pylru
+}}
+
+== Hash Sum Verification ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This section is optional, but provides better security.
+}}
+
+Use <code>sha512sum</code> to create a sha512 sum of <code>pylru.py</code>.
+
+{{always_verify_signatures_reminder}}
+
+Note:
+
+* [https://github.com/jlhutch/pylru/issues/30 No PyLRU developer provided OpenPGP digital signature available at time of writing.]
+* The hash sum changes if <code>pylru.py</code> is updated.
+
+{{CodeSelect|code=
+sha512sum ~/pylru/pylru.py
+}}
+
+The output should show. <ref>Confirmed by {{project_name_long}} developer Patrick Schleizer.</ref>
+
+<pre>
+c822aa8e23b9cd3e569a335c88a2929d4b3fe64cee397b7777842eb6ad3cba7fd191e801cf503f28bc461978e19fe97ea74df56bd134e8e41f11ec80b52887df  pylru.py
+</pre>
+
+== Digital Signature Verification ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This section is optional, but provides better security.
+}}
+
+{{Box|text=
+'''1.''' Import {{project_name_long}} developer Patrick Schleizer's signing key.
+
+{{CodeSelect|code=
+gpg --import /usr/share/keyrings/derivative.asc
+}}
+
+'''2.''' Create a file named <code>signed-hash.asc</code>.
+
+{{Open File|
+filename=signed-hash.asc
+}}
+
+'''3.''' Paste the following text.
+
+<pre>
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+c822aa8e23b9cd3e569a335c88a2929d4b3fe64cee397b7777842eb6ad3cba7fd191e801cf503f28bc461978e19fe97ea74df56bd134e8e41f11ec80b52887df  pylru.py
+-----BEGIN PGP SIGNATURE-----
+
+iQKTBAEBCgB9FiEEbpebKKbzfEO+MK+hy41Qu3e7PEgFAmF4SG9fFIAAAAAALgAo
+aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldDZF
+OTc5QjI4QTZGMzdDNDNCRTMwQUZBMUNCOEQ1MEJCNzdCQjNDNDgACgkQy41Qu3e7
+PEhtShAAm10bv4eUs38kfAeB50OGeSD/BMQf1aImKUk8YJfty5frhmdGcDqWDMYN
+ju5SpwPlb0uOXPaBUXC7tN04UrUxwmV5oNbT6pGPTqqq6DXRNA6iZPTKBwGQq9t0
+pelcPFCUs0KKycUYDxRJrdchAT807TyKD5Aj8wn+yLxm30jRrqE99vaJT6OeHIju
+lAUCFIhBQoYyCuHpi18JWBbsnzyI9r3CcRzGc+4sDQyaA1SAGCclNgGFlsrNv9xt
+MCSogBnPcJWna2gCtuxFRItxAKGS0R3KmC5J2s4fi93QpWzUKdDCB1eM8uXBGNqu
+jvsDpRqZO732JffwFrFTEW4otAZ7matHjAiUS4Qw5bZxf9Zl3gEk7S0LOpPzm4nC
+iYfAK4gir7Sw8Zt7AJBAvQOKiERl48CG3AORuoxI6iISK8W1rjJywfluM2qhnc+x
+h7kOHBWsf2Xd0Nn7VeZKYVsLA5MmJwIVEmFV1q/7Fpin0letdkWzaVXuCVmKFOJ+
+M7c6HvFKtZq3XhbS80r8R0SkCOsKJTsHTlZv9AVqFZXsdR17WoIuKMuQAs8Uny/9
+NIpWSEofl3hYdrPn5vFCGhoVUVbBhv1bWOTb6XDGWcimK7UfQnMiIHcQUBQLc2kD
+annsM0txxRIIuehwJlkjuhwrvMRL2PQP/aCyIHz/9FdRVw8bYF0=
+=D1X6
+-----END PGP SIGNATURE-----
+</pre>
+
+'''4.''' Save.
+
+'''5.''' Perform digital signature verification.
+
+{{CodeSelect|code=
+gpg --decrypt signed-hash.asc > signed-hash
+}}
+
+{{GnuPG-Success}}
+
+{{GnuPG-Warning}}
+
+'''6.''' View the verified hash sum.
+
+{{CodeSelect|code=
+cat signed-hash
+}}
+
+'''7.''' Verify that the hash sum in the file matches the hash sum shown earlier by the <code>sha512</code> utility.
+}}
+
+== Installation ==
+
+{{Box|text=
+'''1.''' Create folder <code>/usr/local/lib/python3.9/dist-packages/</code>.
+
+{{CodeSelect|code=
+sudo mkdir -p /usr/local/lib/python3.9/dist-packages/
+}}
+
+'''2.''' Install <code>pylru.py</code> in folder <code>/usr/local/lib/python3.9/dist-packages/</code>.
+
+{{CodeSelect|code=
+sudo cp ~/pylru/pylru.py /usr/local/lib/python3.9/dist-packages/
+}}
+
+'''3.''' Done.
+
+PyLRU installation is now complete.
+}}
+
+= Footnotes =
+
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

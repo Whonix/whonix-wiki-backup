@@ -1,0 +1,346 @@
+{{Header}}
+{{title|title=
+{{project name long}} Linux Installer - Design Documentation
+}}
+{{#seo:
+|description=Information about the {{project name long}} Linux Installer for Testers and Developers.
+}}
+<div class="mininav">
+* [[Dev/Windows Installer|Windows Installer]]
+* [[Dev/Linux Installer|Linux Installer]]
+</div>
+{{intro|
+Information about the {{project name long}} Linux Installer for Testers and Developers. User documentation for the Installer can be found on the [[Linux|{{project name long}} for Linux download page]].
+}}
+= Testers Wanted =
+Here are some ideas for testing.
+
+Do not use ''--no-show-errors'' and ''--allow-errors'' when debugging, unless you explicitly want that behavior.
+
+Use ''--testers'' to download testers version and ''--dev'' to download empty Whonix-XFCE for VirtualBox.
+
+If you want to try to find bugs, mix the options, miss some, add some, check the result, try other options not mentioned here.
+
+These are raw tests and you still should read the script logs.
+
+Common options and testing if option parsing is working:
+
+{{CodeSelect|code=
+installer-dist --non-interactive --no-boot --dry-run --guest kicksecure --hypervisor=kvm -i cli -u=16.0.9.0 --onion --socks-proxy 127.0.0.1:9050 -l info
+}}
+
+Check that the correct version is being printed and only it is being printed, nothing more:
+
+{{CodeSelect|code=
+installer-dist --version
+}}
+
+Download Kicksecure-CLI for KVM:
+{{CodeSelect|code=
+installer-dist -k -n -g kicksecure -i cli -m kvm --mirror 1
+}}
+
+Download whonix from specified mirror and do signature verification but do not import anything:
+
+{{CodeSelect|code=
+installer-dist -k -n -g whonix --mirror 1 --no-import
+}}
+
+Redownload whonix and import only the gateway (check if files were redownloaded/synced and if only gateway was imported):
+
+{{CodeSelect|code=
+installer-dist -k -n -g whonix --import-only gateway --redownload
+}}
+
+Reimport only the gateway (check that only the gateway was imported and it overwrote only the previous gateway):
+
+{{CodeSelect|code=
+installer-dist -k -n -g whonix --import-only gateway --reimport --destroy-existing-guest
+}}
+
+Import only the workstation (check that only the workstation was imported):
+
+{{CodeSelect|code=
+installer-dist -k -n -g whonix --import-only workstation
+}}
+
+= Developer Information =
+== How to add support for a different host operating system? ==
+
+This can only be done if you are a developer and is committed to test and report about the wanted operating system. This is because the {{project_name_long}} Team does not have all resources to test under all umbrellas.
+
+If you want to add support, please open an issue in the forum mentioning your interest.
+
+You will face the following challenges:
+* Add commands that your package manager uses to
+** test if packages were installed
+** install command
+** update command
+
+* Handle programs that changed the upstream name to another name, such as Debian's "signify-openbsd", should be called universally simply "signify".
+
+* Handle installing the hypervisor from the package manager itself, even if the package is not present in the main branch, but on Debian's "fasttrack" for example.
+
+= Notes =
+== Exit Codes ==
+
+Exit code 0 does not guarantee that the script did what was expected to be done, it just means it didn't find any errors along the way. Let's take import-only for example, it may not fail, but did it actually import only the specified VM? If combined with reimport, did it reimport only the specified VM?
+
+= Development Todo =
+
+== Soon ==
+=== apt-get update debugging ===
+In https://forums.whonix.org/t/can-i-report-a-bug-here/16142/2 a user reported a log containing:
+
+<pre>
+709 log_run “root_cmd ${pkg_mngr_update}”
+</pre>
+
+1) That is not verbose enough. Would be better if the log could be seen.
+
+2) Users having local issues (not caused by installer-dist) with their APT package management system could be quite common. (Duplicate sources, some broken repositories.) Therefore installer-dist should advice the user so the user doesn't have to ask in the forums.
+
+Advice could either be built into installer-dist or probably better, a link to a wiki page? If a wiki page, then Patrick could 
+
+=== apt-get install debugging ===
+Users having local issues (not caused by installer-dist) with their APT package management system could be quite common. (Such as when APT / dpkg was previously interrupted during a dist-upgrade or a package installation.) In these cases no packages can be installed. This includes the inability to install VirtualBox.
+
+To find out if that is happening, the installer could run a few commands as sanity test. Some pseudo code inspired by systemcheck:
+
+<pre>
+   ## If a package manager is running:
+   ## sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; echo $?
+   ## /var/lib/dpkg/lock:  15601
+   ## /var/cache/apt/archives/lock: 15601
+   ## 0
+   ##
+   ## If no package manager is running:
+   ## sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; echo $?
+   ## 1
+   if sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; then
+      echo "A package manager is already running. Cannot proceed. See: link to wiki"
+   fi
+</pre>
+
+<pre>
+   ## dpkg --audit does not exit with a non-zero exit code if something is wrong.
+   ## dpkg --audit does not return anything, if everything is fine.
+   ## Therefore we see if dpkg has to say something, and if yes, the system is
+   ## broken and we abort.
+   dpkg_audit_output="$(dpkg --audit 2>&1)" || true
+
+   if [ "$dpkg_audit_output" = "" ]; then
+      ## OK
+   else
+      ## issue. Show output of dpkg_audit_output and link to wiki.
+   fi
+</pre>
+
+=== misc ===
+
+* add support for Oracle Vbox repo. Currently there is no need, maybe in the future with outdated packages on the main distributions.
+** https://www.kicksecure.com/wiki/VirtualBox/Other_Versions#Install_from_VirtualBox.org_Repository
+*** use extrepo? or manual method? extrepo might not support tor+?
+**** problem with extrepo is as of current stable Debian 11 (Bullseye), extrepo-data is only available from backports and the problem with manual method is gpg.
+** virtualbox package name auto detection: detect version number virtualbox-6.1 versus virtualbox-7.0 or maybe in virtualbox-7.1. Probably virtualbox-(3 characters)
+** after adding the repository and after updating the package lists (apt-get update) maybe apt-cache can be used
+*** <code>apt-cache search --names-only --quiet virtualbox-</code>
+*** apt-cache supports regex (but could also use awk, grep)
+* header package name auto detection: try linux-headers-generic first, then fall back to linux-headers-amd64, then fall back to linux-headers-$(uname -r)
+** check availability using apt-cache?
+*** {{CodeSelect|code=apt-cache search --names-only --quiet linux-headers-generic\$}}
+*** {{CodeSelect|code=apt-cache search --names-only --quiet linux-headers-amd64\$}}
+*** {{CodeSelect|code=search_string="linux-headers-$(uname -r)" ; apt-cache search --names-only --quiet "$search_string\$"}}
+
+== Future ==
+
+* signed version numbers instead of querying API
+** no need to distrust the source if we are verifying its signature.
+** the API is for HTTP (curl) not for rsync.
+* graphical installer
+** examples?
+
+== Done ==
+
+* use apt sources list with <code>tor+</code> if user already indicated that torification is desired
+** does not depend on other flags
+** if using torsocks
+** when using --onion
+** when using --tor? (to be invented)
+** https://gitlab.torproject.org/tpo/applications/team/-/wikis/Tor-Friendly-Applications-Best-Practices
+
+* CI
+** abort CI run if a script other than installer-dist was modified to safe CI minutes?
+
+* os support
+** debian stable, other debian releases are not compatible with virtualbox.
+** supports debian derivatives such as kicksecure and ubuntu derivatives such as mint.
+
+* installer-dist could contain a fixed, magic string such as "##commit-hash-replace-me##", use str_replace to search for that string and replace with the commit hash.
+
+* --no-import
+* --testers
+** https://www.whonix.org/wiki/API#VirtualBox_Testers-Only_Version_Number
+
+* --mirror
+** indexed to make it easier to choose by number, not writing whole domain.
+
+* backup script and its logs to a folder in the target with the run timestamp.
+** mention in the logs where it is being saved to.
+** Troubles: not executing trap when exiting, mixing/joining stdout and stderr output, not printing to both stdout and the file correctly.
+** exit trap works but mixes stdout and stderr: <code>main 2>&1 | tee "${log_file}"</code>
+** leaves stdout and stderr separate but trap does not work: <code>exec > >(tee -a "${log_file}"); exec 2> >(tee -a "${log_file}" >&2); main</code>
+
+* --import-only gateway|workstation
+** didn't find a way to do this with vbox gui or cli. It seems that to import one virtual system, licenses of both virtual systems needs to be accepted and both will be imported.
+** if not accepting both licenses, this happens: VBoxManage: error: Cannot import until the license agreement listed above is accepted.
+** https://forums.virtualbox.org/viewtopic.php?f=1&t=107965
+** modify vmname and delete it later.
+
+* if vms were already imported, ask user if they want to start the vms.
+* log important commands.
+
+* change default download directory to $HOME/installer-dist-download.
+
+* set default license answer to agree.
+** can't do that on whiptail because of its limitations. When text is too long and scrolltext is needed, the yesno box does not display a default item. (note: --default-item is for items in the box to be selected as menu for example, not for buttons).
+
+* if vm was imported
+** start (default) (safe)
+** force-download (difficult to understand purpose for users)
+** factory-reset (can lead to data loss)
+
+* change curl to rsync
+** evaluate benefits, speed, reliability, resource usage, especially over onion.
+** https://www.whonix.org/wiki/Hosting_a_Mirror
+
+* man page
+* bash completion
+* zsh completion
+
+* The proper spelling is Xfce not XFCE. (Wiki / Whonix has some legacy using "XFCE".)
+** Xfce is printed correctly but currently the file name is XFCE: https://download.whonix.org/ova/16.0.8.2/
+
+* changing default features (download Whonix vs KS) depending on the name of the script
+
+* download from clearnet by default, support command line parameter to download from onion instead
+
+* check if fasttrack repo is already enabled clearnet/onion
+
+* wrap all into a function (guard bash pipe against server partial content transfer)
+
+* call specific functions only such as get_version for testing
+** dry-run mode was implemented instead because some functions depends on many others being called before.
+
+* check architecture - anything other than amd64 is unsupported by VirtualBox
+** check <code>uname --machine</code> is <code>x86_64</code>
+** this might be different later for KVM
+** check early
+** notify in textual output early
+** remind that this is a missing step at the end of the instillation process
+*** do not offer to start VirtualBox because of this
+
+* check if enough disk space is available
+* use [[API]] to get latest stable version number
+** command line switch to download testers version instead
+** command line switch or env var to select arbitrary version
+
+* Multi distribution support:
+** Debian bullseye
+** Ubuntu 22.04
+** Kicksecure 16
+* Debian:
+** install fasttrack signing key
+** add fasttrack repository
+* Ubuntu:
+** check it's Ubuntu 22.04 or above - warn/abort for earlier versions
+* Kicksecure:
+** Installation is simpler than on Debian. This is already documented on [[VirtualBox/XFCE]]
+
+* install what?
+** Whonix for [[VirtualBox]]
+*** [[VirtualBox/XFCE|VirtualBox Xfce]] by default
+**** command line option to download CLI version instead [[VirtualBox/CLI]]
+** potentially later to be extended to download Kicksecure
+*** therefore the download location URL needs to be a variable
+
+* download progress meter needed
+
+* source code design optimization
+** Split into separate functions or scripts that do checks versus those that perform tasks.
+*** What are tasks? For example, updating the package lists, install VirtualBox, download Whonix, import Whonix VMs.
+*** Maybe good if these scripts can be tested standalone to make these easier to maintain?
+*** Perhaps some shared command line parsing / variables are needed?
+
+* torify connections without changing user configuration
+** do not spawn a daemon, this bypass the main daemon bridges etc.
+** do not edit user configuration, this is very hard to do right and to do clean up later
+** give command line option to use a SOCKS proxy so user specify their own, if none specified, user tor variable TOR_SOCKS_HOST (default: 127.0.0.1) and TOR_SOCKS_PORT. If the TOR_SOCKS_PORT is not set at all, default to TBB 9150 and then system tor 9050.
+
+* Accept legal texts vs --no-interactive
+
+* privileged user
+** run as user and makes inform about having long timeouts for the user password, because logged in as root is not a good option and the script won't know to which user add to the group vboxusers.
+** demand to not run as root
+** choose sudo, doas, su.
+
+* abort if the VMs already exist?
+** the system updates with apt, the VM file name version could still be using a previous version. Abort and inform.
+** if the VM is deleted, user could lose user data.
+
+* idempotent - possible to re-run the installer multiple times without breaking things
+* <code>NO_COLOR</code> https://no-color.org/
+
+=== Logging ===
+* Needs to keep updating the user, inform approximately how long things will take. "This will take a moment." "This will take a while." This is needed to reassure the user that the installer isn't frozen, which then results to the user closing the installer which then results in the installer being run multiple times which shouldn't but could cause issues.
+** log function implemented to be verbose about the running commands.
+
+{{CodeSelect|code=
+installer-dist -l info
+}}
+
+<pre>
+installer-dist: [NOTICE]: Testing internet connection...
+verify depth is 4
+</pre>
+
+Please show the command that is used to test internet connection. (Since using debug level info.)
+
+<pre>
+installer-dist: [INFO]: Acquiring guest version from API.
+installer-dist: [INFO]: API host: https://www.whonix.org/w/index.php?title=Template:VersionNew&stable=0&action=raw
+</pre>
+
+Same as above.
+
+<pre>
+installer-dist: [NOTICE]: Downloading rsync://mirrors.dotsrc.org/whonix/ova/16.0.9.0/Whonix-XFCE-16.0.9.0.ova.
+opening connection using: /usr/bin/rsync-ssl --HELPER mirrors.dotsrc.org rsync --server --daemon .  (7 args)
+verify depth is 4
+sending daemon args: --server --sender -vvze.LsfxCIvu --timeout=600 . whonix/ova/16.0.9.0/Whonix-XFCE-16.0.9.0.ova  (6 args)
+delta-transmission enabled
+</pre>
+
+Same as above.
+
+=== Virtualization ===
+* check if virtualization is enabled in BIOS
+
+* check if Intel's VT-x (vmx) or AMD's AMD-V (svm) is enabled
+** read:
+*** https://www.thomas-krenn.com/en/wiki/Activating_the_Intel_VT_Virtualization_Feature
+*** https://security.stackexchange.com/questions/15555/can-a-hypervisor-rootkit-enable-hardware-assisted-virtualization-when-it-has-bee
+** /proc/cpuinfo: from my tests, if virtualization is not enabled in the BIOS, the flag won't appear.
+*** but on this [https://stackoverflow.com/questions/11116704/check-if-vt-x-is-activated-without-having-to-reboot-in-linux/51272679#comment14569958_11119205 comment], the person says that msr is better because it checks if it is enabled, but from my tests, if enabled, the flag will appear, else it will not.
+** dmesg: no, it gets cleaned on long running systems
+** msr/cpu-checker): no, blocked by security misc. Requires installation of msr-tools.
+*** https://bazaar.launchpad.net/~cpu-checker-dev/cpu-checker/trunk/view/head:/kvm-ok
+** systool: necessary, better to grep directly the CPU flags. Requires installation of sysfsutils.
+*** https://stackoverflow.com/a/51272679
+
+= Forum Discussion =
+[https://forums.whonix.org/t/whonix-linux-installer/15917 Forum discussion]
+
+= See Also =
+{{Footer}}
+[[Category:Design]]

@@ -1,0 +1,124 @@
+{{Header}}
+{{title|title=
+{{project_name_long}} friendly applications best practices
+}}
+{{#seo:
+|description=Best practices on writing applications compatible with {{project_name_long}}.
+}}
+= config.d support =
+Please parse a configuration directory to apply options to your application, such as parsing <code>/etc/<u>your-application</u><b>.d</b></code> configuration folder (and <code>/usr/local/etc/<u>your-application</u><b>.d</b></code> for better Qubes support) so Linux distributions such as Debian, {{Kicksecure}} and {{project_name_long}} can set defaults (such as proxy / stream isolation configuration). Users are of course free to overrule these defaults using the usual configuration files in the user's home folder.
+
+Please parse only configuration files with a defined file extension such as <code>.conf</code> to avoid parsing backup, swap and temporary files. Graphical editors such as <code>kate</code> create backup files such as <code>file-name<b>~</b></code>, vim create <code><b>.</b>file-name<b>.swp</b></code> or APT / dpkg creating files such as <code>file-name<b>.dpkg-old</b></code> which would lead to unexpected results, should be ignored by your parsing logic.
+
+The parsing rules should be consistent and documented, preferably on the manual page or the program's documentation. As of Tor version <b>4.7.10</b>, the manual page describes the parsing logic and could inspire the parsing design of your application:
+
+<pre>
+       Configuration options can be imported from files or folders using the %include option with
+       the value being a path. This path can have wildcards. Wildcards are expanded first, then
+       sorted using lexical order. Then, for each matching file or folder, the following rules
+       are followed: if the path is a file, the options from the file will be parsed as if they
+       were written where the %include option is. If the path is a folder, all files on that
+       folder will be parsed following lexical order. Files starting with a dot are ignored.
+       Files in subfolders are ignored. The %include option can be used recursively. New
+       configuration files or directories cannot be added to already running Tor instance if
+       Sandbox is enabled.
+</pre>
+
+It is important the parsing occurs has a defined order, such as the lexical.
+
+If it is lexical, the configuration shipped with your program named <code>00_default.conf</code> for example, has a lower precedence compared to an anonymity system configuration file that overrides the default options with a file parsed later <code>30_whonix.conf</code>. A user can then overwrite all configuration files by making it be last one to be parse, named <code>50_user.conf</code> as an example.
+
+It is also possible to combine the lexical order with overriding by last match, stopping on the first match. It is up to your team to design what is best for the development of the program, as long as it is documented clearly, you are taking the first step for your application to become Tor friendly.
+
+= Stream Isolation =
+
+Please set SOCKS user name for [https://www.whonix.org/wiki/Stream_Isolation Stream Isolation], this enables IsolateSOCKSAuth which is one of the default isolation flags for tor ports used by clients. This method enforces stream isolation on the application level independent of other applications using the same port, different SOCKS Authorizations will be stream isolated.
+
+= Ephemeral onion services =
+* Please use <code>ADD_ONION</code> Tor control protocol command / Tor ephemeral onion services.
+
+ephemeral: Means the onion service will be gone after the Tor control connection is closed. It's however possible to retrieve onion service private key and to restore it at next run. It is important for your application to retry <code>ADD_ONION</code> after the Tor control connection is closed so the user does not have to stop and start your application again to retrieve an onion service. If your application uses <code>Flags=Detach</code>, it is important for your program to issue the <code>DEL_ONION</code> controller command to avoid having an onion hanging when your application has already closed.
+
+Tor ephemeral onion services are a lot a lot better for {{project_name_long}} than preconfigued Tor hidden services because it does not require the user to configure onion services manually, therefore a better usability.
+
+[https://github.com/micahflee/onionshare OnionShare] by [https://github.com/micahflee @micahflee] has superb Tails and {{project_name_long}} support.
+
+= Listening Interface =
+
+The listening interface is that interface that your program will bind to listen for incoming connections.
+
+* Listen on all interfaces (0.0.0.0) rather than just 127.0.0.1. (This is required since the incoming onion service connection comes from the network, not from localhost.)
+
+<pre>
+    # In Whonix, listen on 0.0.0.0 instead of 127.0.0.1
+    if os.path.exists('/usr/share/anon-ws-base-files/workstation'):
+        host = '0.0.0.0'
+    else:
+        host = '127.0.0.1'
+</pre>
+
+Related: [https://github.com/{{project_name_short}}/proposals/blob/master/635-listen-port-convention.txt Listen Port Convention]
+
+= Listening Port =
+* Don't listen on a random local server port, instead listen on a specific local server port or port range. Using this method, it is easier to open only the necessary range of incoming ports on the firewall instead of all ports, as it would not be possible to automate the process of opening the firewall port when there is no range.
+* Tor <code>VIRTPROT</code> (remote virtual port on the onion service) does not matter.
+
+An application that applies that listening port methodology is Onionshare:
+
+* OnionShare uses <code>17600 - 17659</code>. That is handy, so we can match for it using <code>(176[0-5][0-9])</code> in the [https://github.com/{{project_name_short}}/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_onionshare.yml onionshare onion-grater whitelist config].
+* That way OnionShare (running inside a compromised Workstation) cannot open arbitrary ports on the workstation. For example, not to the real Tor <code>ControlPort</code> and circumvent the filtering. (We use Tor <code>ControlSocket</code> rather than <code>ControlPort</code> now for this reason.) There are no local ports open on {{project_name_gateway_long}} besides Tor <code>Socks</code>, <code>DNS</code> and <code>TransPort</code>, but if there was (let's say for example for [https://packages.debian.org/brltty brltty]), then we don't want connections to it.
+* That allows us to set a limit on how many Tor hidden services (a compromised) workstation can create.
+* It's also useful so users don't have to open all incoming ports in [[{{project_name_workstation_short}} Firewall]].
+
+= Tor Settings Autodetection =
+* Auto detect Tor settings through <code>TOR_*</code> environment variables.
+
+In Whonix:
+
+<pre>
+TOR_CONTROL_IPC_PATH=/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock
+</pre>
+
+<pre>
+TOR_SOCKS_IPC_PATH=/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock
+</pre>
+
+These are Unix domain socket files.
+
+Ports works fine for {{project_name_long}} as per design the Workstation is isolated and uses the Gateway as its only source of networking, but nowadays Unix domain socket files are much more advisable since these are less likely to leak for non-isolated systems.
+
+= Robustness =
+* The application should <b>not</b> crash if Tor <code>ControlPort</code> replies something unexpected such as <code>510 Command filtered</code>.
+
+If the application does crash, even though it can not get replies from the tor controller by receiving <code>510 Command filtered</code>, the user won't understand why your program is not working and won't try to use it again, that is not a good user experience. The application should have error handling for unexpected tor control replies.
+
+= Usability =
+* Show an error message if {{project_name_long}} is detected and <code>ControlPort</code> receiving <code>510 Command filtered</code> replies. Sample error message:
+** <blockquote>Error talking to the Tor controller, command sent: 'XXX', received reply: 'YYY'. If you're using {{project_name_long}}, check out https://www.whonix.org/wiki/ProgramName to make ProgramName work.</blockquote>
+* onionshare has a [https://cdn.ghacks.net/wp-content/uploads/2017/03/onionshare-password.png Tor settings dialog]. But not really needed in {{project_name_long}}.
+
+= Bonus =
+Connections to the controller are passed through a proxy called onion-grater, which only allows basic features by default. After the profile is built for your program, your application should work gracefully.
+
+* Bonus: Make a list of Tor control commands you are using so an onion-grater profile can be written. 
+* Bonus: Write an [https://github.com/{{project_name_short}}/onion-grater/tree/master/usr/share/doc/onion-grater-merger/examples onion-grater profile].
+
+= Programmatically Detecting {{project name long}} =
+Various marker files are available:
+
+* {{project name long}} generally: <code>/usr/share/whonix/marker</code>
+* {{project name gateway long}}: <code>/usr/share/anon-gw-base-files/gateway</code>
+* {{project name workstation long}}: <code>/usr/share/anon-ws-base-files/workstation</code>
+
+= See Also =
+* See also [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/Tor_friendly_applications_best_practices Tor friendly applications best practices on Tor Project Legacy Wiki].
+
+= Forum Discussion =
+https://forums.whonix.org/t/whonix-friendly-applications-best-practices
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Design]]

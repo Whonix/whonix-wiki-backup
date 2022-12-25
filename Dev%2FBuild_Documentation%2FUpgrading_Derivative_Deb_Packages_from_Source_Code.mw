@@ -1,0 +1,134 @@
+{{Header}}
+{{#seo:
+|description=HowTo: Upgrade {{project_name_long}} Deb Packages from Source Code
+}}
+{{forkme}}
+{{Title|title=
+Upgrading {{project_name_long}} Deb Packages from Source Code
+}}
+
+== Introduction ==
+This assumes you are updating {{project_name_long}} debian packages while you are using {{project_name_long}}.
+
+== Prerequisites ==
+Might be a good idea to create a backup and/or clone before trying to update.
+
+If you haven't done already, disable {{project_name_long}} APT repository. <ref>
+[[Project-APT-Repository#Disable_{{project_name_long}}_APT_Repository]]
+</ref>
+
+{{CodeSelect|code=
+sudo repository-dist --disable
+}}
+
+Upgrade from Debian packages.
+
+{{CodeSelect|code=
+sudo apt update && sudo apt --yes full-upgrade
+}}
+
+== Get the Source Code ==
+=== Get the Signing Key ===
+{{Get_Signing_Key}}
+
+=== Get the Source Code ===
+{{Build_Documentation_Get_Source}}
+
+=== Change Directory ===
+Get into the <code>{{project_name_short}}</code> source code folder because later on package build commands using <code>./derivative-maker</code> are expected to be run from the root of the source folder.
+
+{{CodeSelect|code=
+cd derivative-maker
+}}
+
+=== OpenPGP Verify the Source Code ===
+{{OpenPGP Verify the Source Code}}
+
+=== Choose Version ===
+{{
+Build Documentation Choose Version
+|version={{VersionNew}}-stable
+|extra=--recurse-submodules
+}}
+
+=== Check Git ===
+{{Build Documentation Check Git
+|version={{{version}}}
+}}
+
+== Build Dependencies ==
+Get all build dependencies.
+
+{{CodeSelect|code=
+sudo -E ./build-steps.d/1100_prepare-build-machine --internalrun --build --target root
+}}
+
+Why <code>--target root</code>? This is correct, if you want to know why, see footnote. <ref>Setting the <code>--target</code> parameter to <code>root</code> will result in installing fewer build dependencies. For example VirtualBox will not be installed. These are only required to build full images, but since we just want to create updated {{project_name_long}} Debian Packages, this is unnecessary. Not much harm done when forgetting to use <code>--target root</code>, because the user is free to remove any build dependencies later.</ref>
+
+== Create the Packages ==
+If you're not debugging, create the packages with:
+
+{{CodeSelect|code=
+sudo -E ./build-steps.d/1200_create-debian-packages --build --internalrun --target root
+}}
+
+If debugging, use the following command. Developers only! <ref>Packages are possibly not matching the quality for redistributable testes or stable builds. This is because the package will potentially built from git master, which has no proper debian/changelog release version, and no signed git tag. There may be another package of that version in the repository that is different. Distinguishing these packages is hard and would cause confusion. Therefore this is considered unclean and only developers may do this for debugging purposes.</ref> Potentially insecure unless the untagged / uncommited changes are by you or by a trusted developer with a git gpg signature that you verified.
+
+{{CodeSelect|code=
+sudo -E ./build-steps.d/1200_create-debian-packages --build --allow-untagged true --allow-uncommitted true --internalrun --target root
+}}
+
+== Upgrade {{project_name_long}} Debian Packages ==
+Upgrade {{project_name_long}} Debian Packages without contacting a {{project_name_long}} APT Repository, using your own locally created apt package repository.
+
+For {{project_name_gateway_long}}.
+
+{{CodeSelect|code=
+sudo ./packages/kicksecure/developer-meta-files/debug-steps/locally-upgrade-whonix-debian-packages --build --target root --flavor whonix-gateway
+}}
+
+<ref>Why use <code>--target root</code>"? Technical explanation: <code>--target root</code> in context of {{project_name_long}} source code means "do it on the system currently running, i.e. do it directly on the root folder "/[...]", don't do it inside "vm_image/[...]".</ref>
+
+For {{project_name_workstation_long}}.
+
+{{CodeSelect|code=
+sudo ./packages/kicksecure/developer-meta-files/debug-steps/locally-upgrade-whonix-debian-packages --build --target root --flavor whonix-workstation
+}}
+
+There will be a lot debug output. <ref>Unless you log in as root and run <code>export WHONIX_DEB_DEBUG=0</code>.</ref>
+
+If everything went well, you will see <ref>Or saying {{project_name_gateway_long}} respectively</ref> <ref>It won't, if you have <code>export WHONIX_DEB_DEBUG=0</code> set.</ref>
+
+<blockquote>
+<nowiki>########################################################################</nowiki></br>
+<nowiki>##</nowiki> INFO: Successfully configured (postinst script) {{project_name_workstation_long}}. <nowiki>#</nowiki></br>
+<nowiki>########################################################################</nowiki>
+</blockquote>
+
+The last few highlighted messages will be similar to:
+
+<blockquote>
++ true 'INFO: Skipping script, because --target root: /home/user/whonix_dot/{{project_name_short}}/help-steps/unmount-img'<br />
++ true 'INFO: End of: ./debug-steps/locally-upgrade-whonix-debian-packages | exit_code: 0 | error(s) detected: 0 | benchmark: 00:01:40'
+</blockquote>
+
+In case any error is caught, the script will loudly complain by echoing in a red colored error message:
+
+<blockquote>
+ERROR in ./debug-steps/locally-upgrade-whonix-debian-packages! Aborted.
+</blockquote>
+
+Lets hope it works well. Please get in [[Support|Contact]] should there be any issues. Leave feedback if you are using this, if it worked for you, which issues you may have had, so these instructions can be updated.
+
+== Cleanup ==
+{{Build_Documentation_Cleanup}}
+
+= See Also =
+* [[Dev/Build Documentation]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Development]]

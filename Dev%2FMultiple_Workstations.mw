@@ -1,0 +1,114 @@
+{{#seo:
+|description={{q_project_name}} development notes.
+}}
+{{Header}}
+
+= Single Tor-Gateway with Multiple Workstations =
+Pros:
+
+* Not subverting Tor guard selection and cycling.
+* Single Gateway VM uses less resources.
+
+Cons:
+
+* Some unforeseen way malicious VM "X" can link activities of or  influence traffic of VM "Y"
+* Maybe sending NEWNYM requests in a timed pattern that changes exit IPs of VM Y's traffic, revealing they are behind the same client?
+* <b>[XXX] perhaps some discovery attacks even with a control port filter can leak VM's guards and even entire circuits</b>
+* Maybe eavesdropping on HSes running on VM Y's behalf?
+* caching of DNS
+* caching of HS descriptors
+* preemptive circuits.
+* circuit cannibalization (cannot be isolated)
+* SSL state
+* guard state
+* consensus availability and content
+* descriptor availability and content
+* connectivity (or lack thereof)
+* uptime
+* ControlPort config information
+* ControlPort config changes
+* And many more.
+* <ref>
+https://lists.torproject.org/pipermail/tor-dev/2016-October/011591.html
+</ref> <ref>
+https://lists.torproject.org/pipermail/tor-dev/2016-November/011634.html
+</ref>
+* "We don't even recommend running a SOCKS client and an onion service on the same instance."
+* If the host or {{project_name_gateway_long}} internet connection goes down, all workstations will go offline at the same time which could aid to link them to the same pseudonym.
+
+[[Stream Isolation]] defends at the remote end. Not at the client end.
+
+= Multiple Tor-Gateways mapped 1:1 to Workstation VMs =
+
+Pros:
+
+* Conceptually simple. Uses a different Tor instance so no need to worry about all these questions.
+
+Cons:
+
+* Subverting Tor guard selection. (For better anonymity, Tor developers decided to reduce entry guards from 3 to 1.)
+* Subverting Tor guard cycling. (For better anonymity, Tor developers decided to cycle Tor guards less often.)
+* Uses a different entry guard which can increase chance of running into a malicious relay that can deanonymize some of the traffic.
+* Uses extra resources (though not much as a Tor Gateway can run with as little as 192MB RAM).
+* Links traffic at different guards to the same source IP address
+* <b>[XXX] Even VM-level isolation is not proof against some attacks</b>
+** covert and sidechannel attacks
+** [[Advanced Deanonymization Attacks]]
+** [[Dev/Advanced Deanonymization Attacks]]
+* Much worse usability.
+** More difficult to explain to and grasp by users.
+** More hassle setting up [[bridges]].
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]]:
+** Wastes lots of disk space.
+** Lots of more VMs to keep updated.
+* If the host internet connection goes down, all workstations will go offline at the same time which could aid to link them to the same pseudonym.
+
+= Multiple Tor instances on same Gateway =
+Idea:
+
+* Running multiple Tor instances on the same Gateway. [Tor's systemd service supports that. (Would use separate Tor data dirs, thereby Tor entry guards.)]
+* Ideas:
+** *Might* be simpler to make all instances of Tor use the same Tor entry guards.
+** There could be a Tor "master" instance. It would fetch consensus and set entry guard. All other Tor slave instances would use that, perhaps using symlinks or so. Might require features that Tor does not provide yet.
+
+Pros:
+
+* Just one gateway.
+
+Cons:
+
+* ...more from above
+* If the host or {{project_name_gateway_long}} internet connection goes down, all workstations will go offline at the same time which could aid to link them to the same pseudonym.
+
+= Tor Onion Services =
+== Compartmentalization ==
+<blockquote>
+We don't even recommend running a SOCKS client and an onion service on the same instance.
+</blockquote>
+
+Safe to recommend:
+
+* use one gateway / workstation[s] combination for simple client activities (browsing, mail, chat)
+* use another gateway / workstation[s] combination where add_onion is whitelisted, i.e. where using Tor ephemeral onion services is white listed
+
+Deanonymization is more at risk when using Tor onion services compared to just using Tor as client. This is because Tor onion services can be made to talk by connecting to them. A whole different class of attacks.
+
+So when one just users Tor as a client and that workstation gets compromised, it would be a safer if that VM did not have access to Tor creating ephemeral onion services, since that allows more deanonymization attacks.
+
+== Ephemeral Detached Tor Onion Services ==
+When using <u>detached</u> ephemeral onion services, VMs can read onion service keys and hostnames of other VM as well as shut them down.
+
+* Requires {{project_name_long}} 14 or above ({{project_name_long}} 13 control port filter does not support ephemeral onion services).
+* Only when white listening the command for listing ephemeral onion services in control port filter.
+** It is not clear that will be required since there are no ephemeral HS applications in the wild that would require that command.
+
+= See Also =
+* https://phabricator.whonix.org/T567
+* [[Advanced Deanonymization Attacks]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Design]]

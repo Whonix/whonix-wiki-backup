@@ -1,0 +1,285 @@
+{{Title|
+title=ProxyBOX
+}}
+{{Header}}
+{{#seo:
+|description=sys-proxy
+|image=Proxybox123.jpg
+}}
+[[File:Proxybox123.jpg|thumb]]
+Developed for and tested in Qubes Debian / {{kicksecure}} only.
+= Introduction =
+TODO: write introduction
+
+{{Tunnels_Introduction}}
+
+This is for advanced users only!
+
+Advantage: IP forwarding not required
+
+For background information, see also: [[Dev/Inspiration#Proxy]]
+
+= Setup =
+== Template ==
+{{Install Package|package=
+redsocks
+}}
+
+== VM Setup ==
+'''1.''' Create a VM <code>sys-proxy</code> with checked <code>provides network</code> based on Debian {{Stable project version based on Debian version short}} Template.
+
+'''2.''' Create a VM <code>anon-proxy</code> which uses <code>net qube</code>: <code>sys-proxy</code>.
+
+== sys-proxy Setup ==
+=== redsocks Configuration ===
+In <code>sys-proxy</code>.
+
+file: <code>~/redsocks.conf</code>
+
+<pre>
+base {
+	// debug: connection progress & client list on SIGUSR1
+	log_debug = off;
+
+	// info: start and end of client session
+	log_info = on;
+
+	/* possible `log' values are:
+	 *   stderr
+	 *   "file:/path/to/file"
+	 *   syslog:FACILITY  facility is any of "daemon", "local0"..."local7"
+	 */
+	log = "syslog:daemon";
+
+	// detach from console
+	daemon = on;
+
+	/* Change uid, gid and root directory, these options require root
+	 * privilegies on startup.
+	 * Note, your chroot may requre /etc/localtime if you write log to syslog.
+	 * Log is opened before chroot & uid changing.
+	 */
+	user = redsocks;
+	group = redsocks;
+	// chroot = "/var/chroot";
+
+	/* possible `redirector' values are:
+	 *   iptables   - for Linux
+	 *   ipf        - for FreeBSD
+	 *   pf         - for OpenBSD
+	 *   generic    - some generic redirector that MAY work
+	 */
+	redirector = iptables;
+}
+
+redsocks {
+	/* `local_ip' defaults to 127.0.0.1 for security reasons,
+	 * use 0.0.0.0 if you want to listen on every interface.
+	 * `local_*' are used as port to redirect to.
+	 */
+	// local_ip = 127.0.0.1;
+	local_ip = 0.0.0.0;
+	local_port = 12345;
+
+	// `ip' and `port' are IP and tcp-port of proxy-server
+	// You can also use hostname instead of IP, only one (random)
+	// address of multihomed host will be used.
+	ip = 127.0.0.1;
+	port = 9050;
+	// known types: socks4, socks5, http-connect, http-relay
+	type = socks5;
+	// login = "username";
+	// password = "password";
+}
+
+redudp {
+	// `local_ip' should not be 0.0.0.0 as it's also used for outgoing
+	// packets that are sent as replies - and it should be fixed
+	// if we want NAT to work properly.
+	// local_ip = 127.0.0.1;
+	local_ip = 0.0.0.0;
+	local_port = 10053;
+
+	// `ip' and `port' of socks5 proxy server.
+	ip = 127.0.0.1;
+	port = 9050;
+	// login = "username";
+	// password = "password";
+
+	// kernel does not give us this information, so we have to duplicate it
+	// in both iptables rules and configuration file.  By the way, you can
+	// set `local_ip' to 127.45.67.89 if you need more than 65535 ports to
+	// forward ;-)
+	// This limitation may be relaxed in future versions using contrack-tools.
+	dest_ip = 192.0.2.2;
+	dest_port = 53;
+
+	udp_timeout = 30;
+	udp_timeout_stream = 180;
+}
+
+dnstc {
+	// fake and really dumb DNS server that returns "truncated answer" to
+	// every query via UDP, RFC-compliant resolver should repeat same query
+	// via TCP in this case.
+	// local_ip = 127.0.0.1;
+	local_ip = 0.0.0.0;
+	local_port = 5300;
+}
+
+// you can add more `redsocks' and `redudp' sections if you need.
+</pre>
+
+=== Script ===
+In <code>sys-proxy</code>.
+
+file: <code>~/firewall</code>
+
+<pre>
+#!/bin/bash
+
+set -x
+set -e
+
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sysctl -w net.ipv4.conf.all.forwarding=0
+
+ls /home/user/redsocks.conf /etc/redsocks.conf
+cp /home/user/redsocks.conf /etc/redsocks.conf
+systemctl --no-pager restart redsocks
+systemctl --no-pager status redsocks
+
+echo "options use-vc
+nameserver 1.1.1.1" | tee /etc/resolv.conf
+
+[ -n "$iptables_cmd" ] || iptables_cmd="iptables --wait"
+[ -n "$ip6tables_cmd" ] || ip6tables_cmd="ip6tables --wait"
+
+$iptables_cmd -P INPUT DROP
+$iptables_cmd -P FORWARD DROP
+$iptables_cmd -P OUTPUT DROP
+
+## Flush old rules.
+$iptables_cmd -F
+$iptables_cmd -X
+$iptables_cmd -t nat -F
+$iptables_cmd -t nat -X
+$iptables_cmd -t mangle -F
+$iptables_cmd -t mangle -X
+
+## Allow unlimited traffic on the loopback interface.
+$iptables_cmd -A INPUT -i lo -j ACCEPT
+$iptables_cmd -A OUTPUT -o lo -j ACCEPT
+$iptables_cmd -A OUTPUT --dst 127.0.0.1 -j ACCEPT
+
+## Established incoming connections are accepted.
+$iptables_cmd -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+## Established outgoing connections are accepted.
+$iptables_cmd -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+#$iptables_cmd -A OUTPUT --dst 1.1.1.1 -p udp --dport 53 -j ACCEPT
+#$iptables_cmd -A OUTPUT --dst 1.1.1.1 -p tcp --dport 53 -j ACCEPT
+
+$iptables_cmd -t nat -A OUTPUT --dst 127.0.0.1 -p udp --dport 53 -j ACCEPT
+$iptables_cmd -t nat -A OUTPUT --dst 127.0.0.1 -p tcp --dport 53 -j ACCEPT
+
+## redsocks must be allowed to establish direct connections.
+$iptables_cmd -A OUTPUT -j ACCEPT -m owner --uid-owner redsocks
+$iptables_cmd -t nat -A OUTPUT -j ACCEPT -m owner --uid-owner redsocks
+
+## Used Tor in absence of a stable proxy for testing purposes.
+#$iptables_cmd -A OUTPUT -j ACCEPT -m owner --uid-owner debian-tor
+#$iptables_cmd -t nat -A OUTPUT -j ACCEPT -m owner --uid-owner debian-tor
+
+## redsocks dnstc
+$iptables_cmd -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-port 5300
+
+## redsocks redudp
+$iptables_cmd -t nat -A OUTPUT -p udp -j REDIRECT --to-port 10053
+
+## redsocks redsocks
+$iptables_cmd -t nat -A OUTPUT -p tcp -j REDIRECT --to-port 12345
+
+$iptables_cmd -A INPUT -i vif+ -j ACCEPT
+
+## Best not interering with DNS resolution from anon-proxy VM.
+## redsocks dnstc
+## This fixes "nslookup google.com" when the "proxy is Tor".
+#$iptables_cmd -t nat -A PREROUTING -i vif+ -p udp --dport 53 -j REDIRECT --to-ports 5300
+## redsocks redudp
+#$iptables_cmd -t nat -A PREROUTING -i vif+ -p udp -j REDIRECT --to-ports 10053
+## Would it make sense to set up a DNS server in sys-proxy?
+#$iptables_cmd -t nat -A PREROUTING -i vif+ -p tcp --dport 53 -j REDIRECT --to-ports 53
+
+## redsocks redsocks
+$iptables_cmd -t nat -A PREROUTING -i vif+ -p tcp --syn -j REDIRECT --to-ports 12345
+
+## Log blocked traffic for debugging.
+$iptables_cmd -A INPUT -j LOG --log-level 4 --log-prefix "iptables blocked input: "
+$iptables_cmd -A OUTPUT -j LOG --log-level 4 --log-prefix "iptables blocked output: "
+$iptables_cmd -A FORWARD -j LOG --log-level 4 --log-prefix "iptables blocked forward: "
+
+## Reject all other traffic.
+$iptables_cmd -A OUTPUT -j REJECT
+
+cat /etc/resolv.conf
+</pre>
+
+{{CodeSelect|code=
+chmod +x ~/firewall
+}}
+
+=== Start ===
+
+In <code>sys-proxy</code>.
+
+{{CodeSelect|code=
+sudo ~/firewall
+}}
+
+== anon-proxy VM setup ==
+In <code>anon-proxy</code> VM.
+
+{{Open with root rights|filename=
+/etc/resolv.conf
+}}
+
+Public DNS server. Warning: this example uses cloudflare.
+
+{{CodeSelect|code=
+options use-vc
+nameserver 1.1.1.1
+## alternative: Google
+#nameserver 8.8.8.8
+}}
+
+= Tests =
+
+TCP test:
+
+{{CodeSelect|code=
+curl -H 'Host: check.torproject.org' -k https://{{Check.torproject.org IP}}/api/ip
+}}
+
+TCP + DNS test:
+
+{{CodeSelect|code=
+curl https://check.torproject.org/api/ip
+}}
+
+DNS test:
+
+{{CodeSelect|code=
+nslookup check.torproject.org
+}}
+
+= Leak Testing =
+When running <code>sudo systemctl stop tor</code> in <code>sys-proxy</code>, TCP test, TCP + DNS test, as well as DNS test will be dysfuctional.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

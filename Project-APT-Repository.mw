@@ -1,0 +1,196 @@
+{{Title|title={{project_name_long}} APT Repository}}
+{{Header}}
+{{#seo:
+|description={{project_name_long}} stable / testers / developers APT Repository. How to change from one suite to another? How to disable {{project_name_long}} APT Repository?
+|image=Repository3243245.jpg
+}}
+
+[[File:Whonix_Repository_Wizard_install_updates.png|{{project_name_long}} Derivative Repository Tool|thumb]]
+= {{project_name_long}} APT Repository Overview =
+
+{{project_name_long}} currently provides four repository choices:
+
+* <u>{{project_name_long}} <code>stable</code> APT repository</u>: Recommended for most users. The production level packages focus on providing the most reliable {{project_name_long}} experience. <ref>
+If possible, users are requested to run a separate testers-only {{Qubes_VM}} that has the <code>testers</code> repository enabled. If too few people test {{project_name_long}}, undiscovered issues might migrate to the stable repository.
+</ref>
+* <u>{{project_name_long}} <code>stable-proposed-updates</code> APT repository</u>: After testing by a wider audience, these packages migrate to the stable repository. <ref name=rollback>Users are recommended to make a VM clone for this repository just in case it breaks. That way changes can be rolled back if necessary.</ref>
+* <u>{{project_name_long}} <code>testers</code> APT repository</u>: Recommended for testers, since it is only briefly tested by {{project_name_long}} developers. It could break APT during an upgrade, requiring terminal commands to rectify the problem. <ref name=rollback/>
+* <u>{{project_name_long}} <code>developers</code> APT repository</u>: As above, except it includes untested changes. These changes ''may'' eventually migrate to the testers repository there is reasonable certainty that these changes will not break the update system. It is not recommended, unless the user is in touch with the development team.
+
+Due to the {{project_name_long}} design, a user's security is unlikely to be materially affected by preferring the "beta" (<code>stable-proposed-updates</code>) or "alpha" (<code>testers</code>) repositories over the default stable one. <ref>
+The terms <code>alpha</code> and <code>beta</code> are avoided because they have generally lost their meaning in the software field; many applications remain in <code>alpha</code> or <code>beta</code> status for years, even though they work perfectly well.
+</ref>
+
+= Change {{project_name_long}} APT Repository =
+
+It is easy for users to switch between {{project_name_long}} repositories.
+
+== {{q_project_name}} ==
+
+<div class="toccolours mw-collapsible mw-collapsed">
+If you are using [[{{q_project_name_short}}|{{q_project_name}}]], please press Expand on the right.
+<div class="mw-collapsible-content">
+<code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>Template:</code> <code>{{project_name_short_lowercase}}</code> &rarr; <code>Repository</code>
+
+'''Figure:''' ''Wizard Repository Selection''
+
+[[File:Whonix_Repository_Wizard_select_repo.png|border]]
+
+'''Figure:''' ''Wizard Auto-update Configuration''
+
+[[File:Whonix_Repository_Wizard_install_updates.png|border]]
+</div>
+</div>
+
+== {{project_name_short}} ==
+
+<div class="toccolours mw-collapsible mw-collapsed">
+If you are using [[About|{{project_name_long}}]], please press Expand on the right.
+<div class="mw-collapsible-content">
+<code>Start Menu</code> &rarr; <code>System</code> &rarr; <code>Derivative Repository</code> &rarr; <code>choose either "stable", "stable-proposed-updates" , "Testers" or "Developers" repository</code>
+
+'''Figure:''' ''Start Menu''
+
+[[File:whonixrepoxfce1.png|600px]]
+
+'''Figure:''' ''super user password''
+
+[[File:whonixrepoxfce2.png|600px]]
+
+</div>
+</div>
+
+Afterwards, the following window will appear.
+
+'''Figure:''' ''Auto-update Configuration''
+
+[[File:whonixrepoxfce3.png|600px]]
+
+'''Figure:''' ''Repository Selection''
+
+[[File:whonixrepoxfce4.png|600px]]
+
+== Command Line Interface ==
+
+<div class="toccolours mw-collapsible mw-collapsed">
+If you are a terminal user, please press Expand on the right.
+<div class="mw-collapsible-content">
+
+In Terminal, run.
+
+{{CodeSelect|code=
+sudo repository-dist
+}}
+
+'''Figure:''' ''Launch Terminal''
+
+[[File:whonixrepocli.png|600px]]
+
+'''Figure:''' ''Run repository-dist''
+
+[[File:whonixrepocli2.png|600px]]
+
+Choose one of the following repositories based on personal preferences.
+
+{{CodeSelect|code=
+sudo repository-dist --enable --repository stable
+}}
+
+{{CodeSelect|code=
+sudo repository-dist --enable --repository stable-proposed-updates
+}}
+
+{{CodeSelect|code=
+sudo repository-dist--enable --repository testers
+}}
+
+{{CodeSelect|code=
+sudo repository-dist --enable --repository developers
+}}
+</div>
+</div>
+
+To use the repository, follow the [[Operating_System_Software_and_Updates|usual update instructions]].
+
+= Disable {{project_name_long}} APT Repository =
+
+For [[Trust]] reasons some users may prefer not to use {{project_name_long}} APT Repository. In that case, it is necessary to  [[Dev/Build Documentation|update Debian packages in {{project_name_long}} from source code]], which is inconvenient.
+
+All Default-Download-Version {{project_name_long}} variants have the {{project_name_long}} APT repository enabled. It can be disabled via the GUI or in a terminal with the Derivative Repository Tool.
+
+'''Table:''' ''{{project_name_long}} APT Repository Disabling''
+
+<div class="scroll-table">
+{| class="wikitable"
+|-
+
+! scope="col"| '''Platform / Method'''
+! scope="col"| '''Instructions'''
+|-
+
+! scope="row"| {{project_name_long}} Built from Source Code
+| If [[Dev/Build Documentation|{{project_name_long}} is built from source code]], {{project_name_long}} APT Repository is not added by default. The only exception is if users [[Build_Configuration|opt in using a build configuration]]. It is also possible to [[Project-APT-Repository#Verify_{{project_name_short}}_™_APT_Repository_is_Disabled|verify]]
+
+ that it is already disabled.
+|-
+
+! scope="row"| {{project_name_long}} Default-Download-Version: GUI
+|
+* {{q_project_name}}: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>Template:</code> <code>{{project_name_short_lowercase}}</code> &rarr; <code>Repository</code> &rarr; <code>"No, I will manually update from source code."</code> <br />
+* {{project_name_long}}: <code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>{{project_name_short}} Repository</code> &rarr; <code>"No, I will manually update from source code."</code>
+|-
+
+! scope="row"| {{project_name_long}} Default-Download-Version: Terminal
+| To disable it in a terminal, run. <br />
+{{CodeSelect|code=
+sudo repository-dist --disable
+}}
+|-
+
+|}
+</div>
+
+Users can [[Project-APT-Repository#Verify_{{project_name_short}}_™_APT_Repository_is_Disabled|optionally verify]] {{project_name_long}} APT repository is disabled after this procedure.
+
+== Verify {{project_name_long}} APT Repository is Disabled ==
+
+To check the {{project_name_long}} APT repository was successfully disabled, run the following tests.
+{{Box|text=
+'''1.''' Use {{Code2|apt-key}}.
+
+{{CodeSelect|code=
+sudo apt-key finger
+}}
+
+This test should not show any {{project_name_long}}-specific keys, such as [[Patrick Schleizer|Patrick Schleizer's OpenPGP key]].
+
+'''2.''' Check if file <code>/etc/apt/sources.list.d/derivative.list</code> exists.
+
+If it does not exist, the procedure was successful.
+
+'''3.''' ''Optional:'' conduct additional tests as a precaution.
+
+Examine the <code>/etc/apt/sources.list</code> file. It should not include the {{project_name_long}} APT Repository.
+
+{{CodeSelect|code=
+cat /etc/apt/sources.list
+}}
+
+Next examine the </code>/etc/apt/sources.list.d/</code> folder as well.
+
+{{CodeSelect|code=
+cat /etc/apt/sources.list.d/*
+}}
+}}
+
+= Further Reading =
+* [[Trust]]
+* [[Debian Packages|{{project_name_long}} Debian package - which ones are safe to remove?]]
+* [[Dev/Build Documentation‏‎|Building/upgrading {{project_name_long}} Debian packages from source code]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

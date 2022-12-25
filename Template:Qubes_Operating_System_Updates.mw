@@ -1,0 +1,176 @@
+'''1. Update the Package Lists'''
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+At the time of writing, it is [https://github.com/QubesOS/qubes-issues/issues/6635 <u>discouraged</u>] to update <code>{{project_name_gateway_template}}</code> and <code>{{project_name_workstation_template}}</code> Template packages lists using Qube Manager (<code>Qube Manager</code> &rarr; <code>left-click {{project_name_gateway_template}} or {{project_name_workstation_template}}</code> &rarr; <code>Update qube system (blue arrow)</code>). <ref>
+[https://github.com/QubesOS/qubes-issues/issues/6635 Quote] [https://github.com/andrewdavidwong Andrew David Wong, Community Manager, @QubesOS. CCO, Invisible Things Lab]:
+
+<blockquote>3. Selecting a VM in the Qube Manager and pressing the "Update" button.
+
+[...]. (3) is a weird in-between method that is inferior to (2). For example, historically, not all of the Salt fixes applied by (2) have been applied by (3), which is a security problem.</blockquote>
+</ref>
+}}
+
+For similar reasons, it is also [https://github.com/QubesOS/qubes-issues/issues/6635 <u>discouraged</u>] to open a terminal in the Template and run.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+The output should look similar to this.
+
+{{CodeSelect|code=
+Hit:1 https://deb.qubes-os.org/r4.0/vm {{Stable project version based on Debian codename}} InRelease
+Hit:2 tor+https://deb.debian.org/debian {{Stable project version based on Debian codename}} InRelease
+Hit:3 tor+https://deb.whonix.org bullseye {{Stable project version based on Debian codename}}
+Hit:4 tor+https://deb.debian.org/debian {{Stable project version based on Debian codename}}-updates InRelease
+Hit:5 tor+https://fasttrack.debian.net/debian {{Stable project version based on Debian codename}}-fasttrack InRelease
+Hit:6 tor+https://deb.debian.org/debian-security {{Stable project version based on Debian codename}}-security InRelease
+Hit:7 tor+https://deb.debian.org/debian {{Stable project version based on Debian codename}}-backports InRelease
+Reading package lists... Done
+}}
+
+If an error message like this appears. <ref>
+https://forums.whonix.org/t/cant-update-any-whonixvm-in-qubes-4-0-or-whonixcheck/6023
+</ref>
+
+{{CodeSelect|code=
+Hit:1 https://deb.qubes-os.org/r4.0/vm {{Stable project version based on Debian codename}} InRelease
+Ign:2 tor+https://deb.debian.org/debian {{Stable project version based on Debian codename}} InRelease
+...
+Err:12 tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/ {{Stable project version based on Debian codename}}/updates Release
+Connection failed
+Reading package lists... Done
+E: The repository 'tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/ {{Stable project version based on Debian codename}}/updates Release' does no longer have a Release file.
+N: Updating from such a repository can't be done securely, and is therefore disabled by default.
+N: See apt-secure(8) manpage for repository creation and user configuration details.
+Done.
+}}
+
+Or this.
+
+{{CodeSelect|code=
+500  Unable to connect
+}}
+
+Then something went wrong. It could be:
+# A temporary Tor exit relay or server failure that should resolve itself; or
+# One or more [[Operating_System_Software_and_Updates#Non-functional_Onion_Services|Onion Services might be non-functional]].
+
+In the first case, check if the network connection is functional by [[Tor_Controller#Arm|changing the Tor circuit]] and/or run [https://www.kicksecure.com/wiki/Systemcheck systemcheck] to try and diagnose the problem. In the second case, try setting clearnet repository links before attempting to update again.
+
+Sometimes a message like this will appear.
+
+{{CodeSelect|code=
+Could not resolve 'security.debian.org'
+}}
+
+It that case, it helps to run.
+
+{{CodeSelect|code=
+nslookup security.debian.org
+}}
+
+And then try again.
+
+'''2. Upgrade'''
+
+If using a terminal, run the following command to install the latest system package versions. <ref>Steps 1 and 2 can be combined with: <code>upgrade-nonroot</code>.</ref>
+
+{{CodeSelect|code=
+sudo apt full-upgrade
+}}
+
+Please note if the {{project_name_long}} APT Repository was disabled (see [[Project-APT-Repository#Disable_{{project_name_long}}_APT_Repository|Disable {{project_name_long}} APT Repository]]), then manual checks are required for new {{project_name_long}} releases along with [[Dev/Build_Documentation|manual installation from source code]].
+
+'''3. Never Install Unsigned Packages!'''
+
+If a message like this appears.
+
+{{CodeSelect|code=
+WARNING: The following packages cannot be authenticated!
+  thunderbird
+Install these packages without verification [y/N]?
+}}
+
+Then do not proceed! Press {{Code|N}} and {{Code|<enter>}}. Running {{Code|apt update}} again should fix the problem. If not, something is broken or it is a [[Warning#Man-in-the-middle_Attacks|Man-in-the-Middle Attack]], which is not that unlikely since updates are retrieved over Tor exit relays and some of them are malicious. [[Tor_Controller#Nyx_Usage|Changing the Tor circuit]] is recommended if this message appears.
+
+{{Anchor|signature verification errors}}
+{{Anchor|signature verification warnings}}
+
+'''4. Signature Verification Warnings'''
+
+There should be no signature verification warnings at present; if it occurs, it will look similar to this.
+
+{{CodeSelect|code=
+W: A error occurred during the signature verification. The repository is not updated and the previous index files will be used. GPG error: https://deb.torproject.org stable Release: The following signatures were invalid: KEYEXPIRED 1409325681 KEYEXPIRED 1409325681 KEYEXPIRED 1409325681 KEYEXPIRED 1409325681
+}}
+
+Caution is required in this case, even though <code>apt</code> will automatically ignore repositories with expired keys or signatures, and no upgrades will be received from that repository. Unless the issue is already known or documented, it should be reported for further investigation.
+
+There are two possible reasons why this could happen. Either there is an issue with the repository that the contributors have yet to fix or the user is the victim of a [[Warning#Man-in-the-middle_Attacks|Man-in-the-Middle Attack]]. <ref>Rollback or indefinite freeze attacks as defined by {{TUF}}.</ref> The latter is not a big issue, since no malicious packages are installed. Further, it may automatically resolve itself after a period of time when a different, non-malicious Tor exit relay is used, or following a [[Arm#Arm|manual change of the Tor circuit]].
+
+<div class="toccolours mw-collapsible mw-collapsed">
+In the past, various apt repositories were signed with an expired key. To inspect how the documentation appeared at that point, please click on Expand on the right.
+<div class="mw-collapsible-content">
+For instance, the [https://gitlab.torproject.org/legacy/trac/-/issues/12994 Tor Project's apt repository key had expired] and the following warning appeared.
+
+{{CodeSelect|code=
+W: A error occurred during the signature verification. The repository is not updated and the previous index files will be used. GPG error: https://deb.torproject.org stable Release: The following signatures were invalid: KEYEXPIRED 1409325681 KEYEXPIRED 1409325681 KEYEXPIRED 1409325681 KEYEXPIRED 1409325681
+
+W: Failed to fetch https://deb.torproject.org/torproject.org/dists/stable/Release
+
+W: Some index files failed to download. They have been ignored, or old ones used instead.
+}}
+
+This issue had already been [https://gitlab.torproject.org/legacy/trac/-/issues/12994 reported]. There was no immediate danger and it could have safely been ignored. Just make sure to never install unsigned packages as explained above.
+
+For another example, see the more recent [[Deprecated#KEYEXPIRED_Error|Whonix apt repository keyexpired error]].
+
+Although an unlikely outcome, please report any other signature verification errors if/when they appear.
+</div>
+</div>
+
+'''5. Changed Configuration Files'''
+
+Be careful if a message like this appears.
+
+{{CodeSelect|code=
+Setting up ifupdown ...
+Configuration file `/etc/network/interfaces'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package contributor's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : background this process to examine the situation
+ The default action is to keep your current version.
+*** interfaces (Y/I/N/O/D/Z) [default=N] ? N
+}}
+
+It is safest to press <code>y</code>, but any customized settings will be lost (these can be re-added afterwards). <ref>
+Or {{project_name_long}} changes can be delayed, inspected, and then backported if the effort is worth it.
+</ref> <ref>
+{{project_name_long}} uses package [https://packages.debian.org/{{Stable project version based on Debian codename}}/config-package-dev <code>config-package-dev</code>] which assumes ownership of configuration files coming from “other distributions” (mostly Debian, although third party repositories might be added by users). ([[Dev/About_Debian_Packaging#config-package-dev|{{project_name_long}} on <code>config-package-dev</code>]])
+</ref>
+
+See also:
+
+* [[Configuration_Files#Reset_Configuration_Files_to_Vendor_Default|Reset Configuration Files to Vendor Default]]
+* [[Configuration Files]]
+
+{{Anchor|Restart Services after Upgrading}}
+'''6. Shutdown the Template'''
+
+Shutdown the Template from Qube Manager: <code>Qube Manager</code> &rarr; <code>right-click on Template</code> &rarr; <code>Shutdown VM</code> or via the contextual menu.
+
+'''7. Restart/Update {{project_name_long}} VMs'''
+
+If new updates were available and installed, it is necessary to either:
+
+* Restart any running {{project_name_gateway_long}} ProxyVMs (<code>{{project_name_gateway_vm}}</code>) or {{project_name_workstation_long}} App Qube instances (<code>{{project_name_workstation_vm}}</code>) so they are updated; or
+* Apply the same update process in any running VMs if an immediate restart is inconvenient.
+
+Note: If any <code>dom0</code> packages were upgraded during Qubes system updates, reboot the computer to profit from any security updates.

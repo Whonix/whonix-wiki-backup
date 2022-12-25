@@ -1,0 +1,293 @@
+{{Title|title=How-to: Use Wickr Me in {{project_name_long}}}}
+{{Header}}
+{{#seo:
+|description=How-to: Use Wickr Me in {{project_name_long}}
+|image=https://www.{{project_clearnet}}/w/images/d/df/Wickr12312312.png
+}}
+[[image:Wickrlogo.png|Wickr Logo|thumb]]
+= Introduction =
+
+Wickr Me can be installed in Debian and provides various functionality in addition to end-to-end encrypted messaging: <ref name=wickrme>https://snapcraft.io/wickrme</ref>
+
+<blockquote>With Wickr Me, you can instantly connect with your friends 1:1 or in groups - now with fully encrypted voice calling, voice memos - new additions to the trusted end-to-end secure sharing of files, images, and videos. Take full control over who has access to your content and how long it remains accessible.</blockquote>
+
+The application touts various privacy and security benefits, including: <ref name=wickrme />
+
+* no access to messages or contact lists
+* users' address books remain private and not stored on Wickr servers
+* each message being encrypted with a new key
+* no phone number or email address registration required
+* nil storage of meta-data
+* communication in private groups of up to 10 users
+* partial open source code <ref>The encryption protocol <code>Wickr-Crypto-C</code> source code is available on [https://github.com/WickrInc/wickr-crypto-c GitHub].</ref>
+* an expiration time can be set on messaging content
+* incorporation of perfect forward and backward secrecy for user content
+
+To learn more, refer to the [https://wickr.com/ parent website].
+
+{{Community_Support}}
+
+= Warning =
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Wickr Me is considered a security risk and installation is discouraged as per [[Install Software|software installation best practices]]:
+* <u>Unsigned software</u>: It is not possible to follow the security advice of always [[Verifying Software Signatures|verifying software signatures]], since installation is through <code>snap</code> which does not yet verify software signatures. <ref>
+For better security and stability, <code>wickr.com</code> could provide Debian downloads, or better yet an apt repository for Debian.
+</ref>
+* <u>Installation procedure</u>: The third party package manager <code>snap</code> is required, which is generally discouraged. <ref>
+https://forums.whonix.org/t/snap-store-snaps-snapcraft-io-a-new-software-source/7631
+</ref>
+* <u>[[Avoid_nonfreedom_software|Proprietary software]]</u>: Only the Wickr Me encryption protocol is open source. The rest of the client application source code and other elements remain proprietary and unavailable for public scrutiny. <ref>
+By comparison, the Signal protocol, client application and server are [https://github.com/signalapp fully open source].
+</ref> [[Avoid_nonfreedom_software|Avoid non-freedom software]].
+}}
+
+If proceeding despite the risk, it is recommended to use a [[Multiple_Whonix-Workstations|separate]] {{project_name_workstation_long}} for greater safety.
+
+= Installation =
+== Notes ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Platform specific notice:
+
+* {{non_q_project_name}}: Functional.
+* {{q_project_name}}: Efforts to persistently install Wickr Me in [[{{q_project_name_short}}|{{q_project_name}}]] via [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs] or with snap proxy settings have proven unsuccessful. This means it needs to be [[Install_Software#Install_Software_in_a_TemplateBasedVM|installed in a TemplateBasedVM]] on every occasion it is required. Efforts to improve this situation are most welcome, see: [https://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593 Wickr Me vs Qubes-Whonix Persistence].
+}}
+
+Currently, attempting to install Wickr Me over snap over Tor will result in an error because Wickr developers instructed snap store to block downloads over Tor. ([https://forums.whonix.org/t/wickrme-snap-install-wickrme-error-snap-wickrme-not-found/12678 forum discussion]) To circumvent this, the only option is to install Wickr Me using <code>snap</code> using a mechanism called <code>sideloading</code>, in short snap sideloading.
+
+Workarounds:
+
+* '''A)''' <u>Download snap without (!) Tor method</u>: With <u>high anonymity risks</u> is to download the snap package must be without Tor, then manually transferred into {{project name workstation long}} and installed there. <u>Or</u>, alternatively
+* '''B)''' <u>Post-Tor Tunnel-link method</u>: A Post-Tor Tunnel-link should allow installation from within {{project name workstation long}}. To learn more about tunnels, see [[Tunnels/Introduction]].
+
+Both workarounds are awful and it would be much better if the user found an alternative to Wickr Me.
+
+== Instructions ==
+
+<u>Note</u>: The following instructions must be run in another Debian installation (Kicksecure, Debian, separate physical machine, etc) (anonymity risks) or while having set up a Post-Tor Tunnel-link. (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>proxy/VPN/SSH</code> &rarr; <code>Internet</code>)
+
+{{Box|text=
+'''1.''' {{Open_a__product_ws_terminal}}
+
+'''2.''' Install dependencies.
+
+{{Install Package|package=
+snapd
+}}
+
+'''3.''' Download wickrme package:
+
+{{CodeSelect|code=
+snap download wickrme
+}}
+
+'''4.''' View the downloaded file names.
+
+Such as with a file manager of your choice or use the <code>ls</code> command.
+
+{{CodeSelect|code=
+ls
+}}
+
+Expected output will include similar file names to the following:
+
+<pre>
+wickrme*.assert
+wickrme*.snap
+</pre>
+
+'''5.''' Copy the downloaded files to your {{project name workstation long}} using your preferred [[File_Transfer|file transfer method]].
+}}
+
+Inside your Whonix-Workstation:
+
+{{Box|text=
+'''1.''' {{Open_a__product_ws_terminal}}
+
+'''2.''' Install dependencies.
+
+{{Install Package|package=
+snapd
+}}
+
+'''3.''' Navigate to where you transferred your files.
+
+Might be easiest to transfer the files to your home folder.
+
+'''4.''' Install Wickr Me.
+
+{{CodeSelect|code=
+sudo snap ack wickrme*.assert
+}}
+
+{{CodeSelect|code=
+sudo snap install wickrme*.snap
+}}
+}}
+
+= Start Wickr Me =
+You launch Wickr Me from the application launcher (under Internet or by searching).
+
+To launch Wickr Me from the commandline, run:
+
+{{CodeSelect|code=
+wickrme
+}}
+
+If you haven't rebooted since installing snap, wickrme might not be in your PATH. You can reboot now or run:
+
+{{CodeSelect|code=
+/snap/bin/wickrme
+}}
+
+'''Figure:''' ''Wicker Me in {{project_name_long}}''
+
+[[Image:Wickrme.png|border]]
+
+= Troubleshooting =
+
+== error: snap "wickrme" not found ==
+
+As a workaround, try to install any other snap package first.
+
+{{CodeSelect|code=
+snap install vlc
+}}
+
+Then try to install Wickr Me again. <ref>
+A bug report was drafted, but could not be submitted to https://bugs.launchpad.net/snapcraft because of the following error:
+
+<pre>
+Timeout error
+
+Sorry, something just went wrong in Launchpad.
+
+We’ve recorded what happened, and we’ll fix it as soon as possible. Apologies for the inconvenience.
+
+Trying again in a couple of minutes might work.
+</pre>
+
+<pre>
+snap install wickrme reports 'snap "wickrme" not found' even though 'snap find wickrme' had found it
+</pre>
+
+<pre>
+Actual Result:
+
+Debian buster based.
+
+sudo apt update
+sudo apt install snapd
+
+snap find wickrme
+Name     Version  Publisher  Notes  Summary
+wickrme  5.48.9   tleavy     -      E2E Encrypted Anonymous Messaging
+
+snap install wickrme
+error: snap "wickrme" not found
+
+Expected result:
+
+wickrme gets installed or shows a better error message than 'snap "wickrme" not found' if not available for this system.
+
+System information:
+
+lsb_release -a
+No LSB modules are available.
+Distributor ID:	Debian
+Description:	Debian GNU/Linux 10 (buster)
+Release:	10
+Codename:	buster
+
+dpkg --print-architecture
+amd64
+
+uname -a
+Linux host 4.19.94-1.pvops.qubes.x86_64 #1 SMP Sun Jan 12 05:45:26 UTC 2020 x86_64 GNU/Linux
+</pre>
+</ref>
+
+== read: connection refused ==
+
+The following error occasionally appears when trying to install Wickr Me (<code>snap install wickrme</code>): <ref>https://forums.whonix.org/t/wickr-problem-help/7552</ref>
+<pre>error: cannot install "wickrme": Post
+       https://api.snapcraft.io/v2/snaps/refresh: dial tcp: lookup
+       api.snapcraft.io on [::1]:53: read udp [::1]:60220->[::1]:53: read:
+       connection refused</pre>
+
+It is suspected the server sometimes bans certain Tor relays from connecting. Try [[Tor_Controller#Nyx_Usage|changing the Tor circuit]], then repeat the command.
+
+== realpath: No such file or directory ==
+
+Sometimes running:
+
+{{CodeSelect|code=
+wickrme
+}}
+
+Results in the terminal displaying this message:
+
+<pre>
+realpath: '': No such file or directory
+realpath: '': No such file or directory
+realpath: '': No such file or directory
+realpath: '': No such file or directory
+Could not create NETLINK socket: Operation not permitted (1)
+Failed to initialize udev, possibly due to an invalid system configuration. Various device-related browser features may be broken.
+</pre>
+
+With Wickr Me still starting and showing an error during sign in that it could not connect to the Wickr Me Network (attempting to reconnect). This might be caused during the original installation of Wickr Me through <code>snap install wickrme</code>. Try reinstalling Wickr Me with the <code>--devmode</code> flag enabled and it should fix the issue. To do that, follow the steps below.
+
+{{Box|text=
+'''1.''' Remove Wickr Me.
+
+{{CodeSelect|code=
+snap remove wickrme
+}}
+
+The command needs to be run twice. The first run will disable the "wickrme" package, while the second invocation will remove "wickrme".
+
+{{CodeSelect|code=
+snap remove wickrme
+}}
+
+'''2.''' Verify Wickr Me is no longer installed.
+
+Run.
+
+{{CodeSelect|code=
+snap list
+}}
+
+It should no longer show wickrme.
+
+'''3.''' Reinstall Wicker Me.
+
+Use the following command.
+
+{{CodeSelect|code=
+snap install --devmode wickrme
+}}
+
+'''4.''' Relaunch Wicker Me.
+
+Start "wickrme" again.
+
+{{CodeSelect|code=
+wickrme
+}}
+}}
+
+= Forum Discussion =
+
+* [https://forums.whonix.org/t/wickr-problem-help/7552 Wickr problem, help]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

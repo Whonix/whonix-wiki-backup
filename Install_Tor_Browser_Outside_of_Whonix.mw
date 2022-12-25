@@ -1,0 +1,226 @@
+{{Title|title=Install Non-{{project_name_long}} Tor Browser using Tor Browser Downloader (by {{project_name_long}} developers)}}
+{{Header}}
+{{#seo:
+|description=Installing Tor Browser outside of {{project_name_long}}. Fallback if {{project_name_long}} breaks. Test Tor connectivity outside of {{project_name_long}}.
+|image=Tbboutside.jpg
+}}
+{{Contributor|
+|status=stable
+|about=About this ''Non-{{project_name_long}} Tor Browser'' Page
+|difficulty=easy
+|contributor=[https://forums.whonix.org/users/torjunkie torjunkie]
+|support=[[Support]]
+}}
+[[Image:Tbboutside.jpg|thumb]]
+= Introduction =
+{{Community_Support}}
+
+Various wiki sections recommend that a functional Tor Browser instance is maintained outside of the {{project_name_long}} platform. This is useful in various cases:
+
+* Should {{project_name_long}} ever break, it is possible to search for a solution anonymously.
+* System-wide Tor problems can be easily detected by testing connectivity outside of {{project_name_long}}.
+* Certain Tor / Tor Browser activities are difficult (or impossible) to configure in {{project_name_long}}, but are much easier in the standard configuration. <ref>For example, the [[Bridges#Snowflake|Snowflake]] pluggable transport client is currently experimental in {{project_name_long}}.</ref>
+
+In [[{{non_q_project_name_short}}|{{non_q_project_name}}]], it is recommended to have Tor Browser installed on the Linux / macOS / Windows host platform. In [[Qubes|{{q_project_name}}]], it is recommended to install Tor Browser in a <code>debian-{{Stable project version based on Debian version short}}</code>, <code>debian-{{Stable project version based on Debian version short}}-minimal</code> or <code>kicksecure</code> App Qube (advanced users).
+
+<u>Note</u>: If an expired key signature message like below appears, the steps in this chapter must be performed again due to an update of the {{project_name_long}} signing key; see [https://forums.whonix.org/t/expired-key-signature/11457 Expired key signature].
+
+<pre>The following signatures were invalid: EXPKEYSIG CB8D50BB77BB3C48 Patrick Schleizer adrelanos@whonix.org</pre>
+
+= Easy =
+
+== All Platforms: Manual Tor Browser Download ==
+
+Follow [[Tor_Browser/Manual_Download#Manually_Downloading_Tor_Browser |these instructions]] to manually download Tor Browser with Firefox-ESR via the available onion service. This method is not anonymous, unless [[Qubes|{{q_project_name}}]] users temporarily set <code>{{project_name_gateway_vm}}</code> as the NetVM for the non-{{project_name_long}} App Qube.
+
+== Debian Linux Hosts ==
+
+Tor Browser can optionally be downloaded utilizing the [https://github.com/Kicksecure/tb-updater <code>tb-updater</code>] software package by {{project_name_long}} developers. By default the download <u>does not</u> occur over Tor, meaning it is <u>not</u> anonymous.
+{{Box|text=
+{{Project-APT-Repository-Add Easy}}
+
+'''5.''' Update the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''6.''' Install <code>tb-updater</code>.
+
+{{CodeSelect|code=
+sudo apt install tb-updater
+}}
+}}
+
+= Moderate: {{q_project_name}} =
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px]]
+| text    = [[Qubes|{{q_project_name}}]] R4 only! This method is anonymous.
+}}
+
+These instructions:
+
+# Anonymously retrieve and verify the {{project_name_long}} signing key.
+# Copy the {{project_name_long}} signing key to a debian-{{Stable project version based on Debian version short}} (<code>debian-{{Stable project version based on Debian version short}}-tor</code>) or debian-{{Stable project version based on Debian version short}}-minimal (<code>debian-{{Stable project version based on Debian version short}}-minimal-tor</code>) Template clone.
+# Add the {{project_name_long}} signing key to the list of trusted keys.
+# Install apt-transport-tor in the <code>debian-{{Stable project version based on Debian version short}}-tor</code> / <code>debian-{{Stable project version based on Debian version short}}-minimal-tor</code> Template.
+# Add the {{project_name_long}} stable APT repository.
+# Install <code>tb-updater</code> from the {{project_name_long}} stable repository.
+# Create a <code>debian-tor-browser</code> / <code>debian-minimal-tor-browser</code> App Qube based on the  Template clone.
+
+The <code>debian-{{Stable project version based on Debian version short}}-minimal</code> template provides a smaller attack surface, but is recommended for advanced users. Several package prerequisites are required for full functionality; see footnote. <ref>At the time of writing the [https://www.qubes-os.org/doc/templates/minimal/ Qubes documentation] and [https://forum.qubes-os.org/t/debian-10-minimal-configuration/2603 forums] suggest the following essential packages for browsing purposes:
+* qubes-core-agent-passwordless-root
+* qubes-core-agent-networking
+* pulseaudio-qubes
+
+To utilize nautilus file manager so a GUI can be used to interact with downloaded files (optional):
+* qubes-core-agent-nautilus
+* nautilus
+* zenity
+
+If you plan on mounting encrypted drives (optional):
+* gnome-keyring
+* policykit-1
+* libblockdev-crypto2
+</ref> <ref>Also see [https://svensemmler.org/notes/deb-min-templates automate debian-minimal based template creation]</ref>
+
+== Clone the Template ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Prerequisite</u>: The <code>debian-{{Stable project version based on Debian version short}}</code> or <code>debian-{{Stable project version based on Debian version short}}-minimal</code> Template must be manually installed first if it not already available. In <code>dom0</code>, run either. {{CodeSelect|code=
+sudo qvm-template install debian-{{Stable project version based on Debian version short}}
+}}
+Or.
+{{CodeSelect|code=
+sudo qvm-template install debian-{{Stable project version based on Debian version short}}-minimal
+}}
+
+}}
+
+In Qube Manager: <code>Right-click debian-{{Stable project version based on Debian version short}} or debian-{{Stable project version based on Debian version short}}-minimal template</code> &rarr; <code><u>C</u>lone qube</code> &rarr; <code>Rename to debian-{{Stable project version based on Debian version short}}-tor or debian-{{Stable project version based on Debian version short}}-minimal-tor</code>
+
+== {{project_name_workstation_vm}} Steps ==
+
+Run the following commands in <code>{{project_name_workstation_vm}}</code> terminal. Advanced users can utilize a {{project_name_long}} DispVM instead in this section.
+{{Box|text=
+'''1.''' Download the {{project_name_long}} signing key.
+
+{{CodeSelect|code=
+curl --tlsv1.3 --proto =https --max-time 180 --output derivative.asc https://www.whonix.org/derivative.asc
+}}
+
+'''2.''' Display the key fingerprint.
+
+{{CodeSelect|code=
+gpg --keyid-format long --import --import-options show-only --with-fingerprint derivative.asc
+}}
+
+'''3.''' Verify the {{project_name_long}} signing key fingerprint.
+
+Compare the fingerprint to the one found [[Signing Key|here]]. The most important check is confirming the fingerprint <u>exactly</u> matches the output below. <ref>Minor changes in the output such as new uids (email addresses) or newer expiration dates are inconsequential.</ref>
+<pre>
+      Key fingerprint = 916B 8D99 C38E AF5E 8ADC  7A2A 8D66 066A 2EEA CCDA
+</pre>
+
+The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. Advanced users can learn more about this [[Main/Project Signing Key#OpenPGP_Web_of_Trust|here]].
+
+'''4.''' Rename the {{project_name_long}} signing key to a temporary <code>derivative.asc</code> file.
+
+{{CodeSelect|code=
+mv derivative.asc /tmp/derivative.asc
+}}
+
+'''5.''' Copy the <code>derivative.asc</code> text file to the <code>debian-{{Stable project version based on Debian version short}}-tor</code> or <code>debian-{{Stable project version based on Debian version short}}-minimal-tor</code> Template.
+
+{{CodeSelect|code=
+qvm-copy /tmp/derivative.asc
+}}
+
+When prompted, choose either the <code>debian-{{Stable project version based on Debian version short}}-tor</code> or <code>debian-{{Stable project version based on Debian version short}}-minimal-tor</code> Template.
+}}
+
+== Template Steps ==
+
+Complete the following steps in <code>debian-{{Stable project version based on Debian version short}}-tor</code> or <code>debian-{{Stable project version based on Debian version short}}-minimal-tor</code> terminal.
+{{Box|text=
+'''1.''' Add the {{project_name_long}} signing key to the list of trusted keys.
+
+{{CodeSelect|code=
+sudo cp ~/QubesIncoming/{{project_name_workstation_vm}}/derivative.asc /usr/share/keyrings/derivative.asc
+}}
+
+'''2.''' Add the {{project_name_long}} stable APT repository. <ref>
+Alternatively use the stable onion APT repository: {{CodeSelect|code=
+echo "deb [signed-by=/usr/share/keyrings/derivative.asc] http://deb.{{project_onion}} {{Stable project version based on Debian codename}} main contrib non-free" {{!}} sudo tee /etc/apt/sources.list.d/derivative.list
+}}
+</ref> <ref>
+Note: <code>tor+http</code> does not work in this configuration.
+</ref>
+
+{{CodeSelect|code=
+echo "deb [signed-by=/usr/share/keyrings/derivative.asc] https://deb.{{project_clearnet}} {{Stable project version based on Debian codename}} main contrib non-free" {{!}} sudo tee /etc/apt/sources.list.d/derivative.list
+}}
+
+'''3.''' Update the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''4.''' Install <code>tb-updater</code> by {{project_name_long}}.
+
+{{CodeSelect|code=
+sudo apt install tb-updater
+}}
+
+Note: This step will correctly install <code>tb-updater</code> and should also automatically download Tor Browser. If that does not occur, complete steps 2 to 4 below after creating an App Qube.
+}}
+
+== App Qube Steps ==
+
+{{Box|text=
+'''1.''' Create an App Qube based on the <code>debian-{{Stable project version based on Debian version short}}-tor</code> or <code>debian-{{Stable project version based on Debian version short}}-minimal-tor</code> Template.
+
+In Qube Manager: <code>Left-click <u>Q</u>ube</code> &rarr; <code>Create <u>n</u>ew qube</code>
+
+Use the following settings:
+
+* <u>Name and label:</u> debian-tor-browser or debian-minimal-tor-browser
+* <u>Type:</u> App Qube
+* <u>Template:</u> debian-{{Stable project version based on Debian version short}}-tor or debian-{{Stable project version based on Debian version short}}-minimal-tor
+* <u>Networking:</u> default (sys-firewall)
+
+'''2.''' ''Optional:'' Temporarily set <code>{{project_name_gateway_vm}}</code> as the NetVM for the Debian App Qube.
+
+If Tor Browser was not downloaded at step 5 in the previous section, complete steps 2 to 4.
+
+In Qube Manager: <code>Right-click ''debian-tor-browser''</code> or <code>''debian-minimal-tor-browser''</code> &rarr; <code>Qube s<u>e</u>ttings</code> &rarr; <code>Networking</code> &rarr; <code>Select ''{{project_name_gateway_vm}}''</code> &rarr; <code>OK</code>
+
+'''3.''' ''Optional:'' Download Tor Browser.
+
+In terminal, run.
+
+{{CodeSelect|code=
+update-torbrowser --input gui
+}}
+
+'''4.''' ''Optional:'' Revert the networking setting to <code>sys-firewall</code> in Qube Manager.
+
+'''5.''' Launch Tor Browser from the App Qube menu and check it is functional.
+
+Note: Tor Browser can be kept up-to-date using Tor Browser's internal updater. It is not necessary to run the ''update-torbrowser'' command again.
+}}
+
+'''Figure:''' ''Tor Browser in Qubes' <code>debian-minimal-tor-browser</code> App Qube''
+
+[[Image:Debian10minimaltorbrowser.png|border]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

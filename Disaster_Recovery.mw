@@ -1,0 +1,145 @@
+{{Title|title=Compromise Recovery}}
+{{Header}}
+{{#seo:
+|description=Disaster Recovery after Compromise
+|image=Recovery43324.jpg
+}}
+[[image:Recovery43324.jpg|thumb]]
+= Introduction =
+In the event a system compromise is suspected or confirmed, the ultimate goal is to re-establish a trusted, private environment for future activities. This is essential to protect yourself and other parties that are communicated with.
+
+This entry assumes you still have or have regained access to your digital property. In order to move forward, it is necessary to adopt a reasonable compromise recovery technique that poses an acceptable trade-off between difficulty and security. The possible methods outlined below are listed in order of increasing security:
+
+* powered on, Internet-connected compromised machines
+* powered on, LAN-connected compromised machines
+* powered on machines without connectivity (shared folder for VM or USB for host)
+* powered off machines and mount
+* the Qubes method
+
+The threat models below currently utilize the "powered on, LAN-connected compromised machines" method. Community contributions to outline additional techniques are most welcome.
+
+= Threat Models =
+
+== Host Compromise ==
+
+This threat model assumes a host compromise has been confirmed or is strongly suspected. In this case, it is important to remember that hardware is expendable, but data is precious. Consider your current hardware and everything attached to it as compromised.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = It is strongly recommended to no longer use the hardware, other than to salvage existing data. It is safest to assume all private data has been seized, copied, scrutinized and maliciously altered. Unless precautions are taken, the continued use of data from compromised hosts/VMs in clean systems risks reinfection.
+}}
+
+{{Box|text=
+
+'''1.''' Acquire a new laptop/desktop and external storage with cash from a store.
+
+'''2.''' Set up Debian with {{project_name_long}}.
+
+'''3.''' The compromised computer should never be allowed to connect to the Internet again; see footnote. <ref>Risk of booting a malicious VM without an Internet connection:
+
+* If disconnected from the Internet for too long, malware might be programmed to trigger the deletion or malicious editing of files (adding fabricated evidence), or perform actions which damage the hardware.
+
+Risk of maintaining an Internet connection when compromised:
+
+* Malware could load more code which might include capabilities to infect more hardware or perform a VM escape.
+* The possibility of exfiltration may not be a simple binary (yes or no) proposition. For example:
+** Imagine a scenario whereby the attacker is using malware to remotely search images/videos/other files in succession (there are screenshots/videos available about malware features).
+** Not all attackers will immediately fetch a whole image dump.
+** Malware might upload more files over time; upload over Tor is slow.
+** Depending on when the compromise was noticed, everything may not be in the hands of the attacker yet. This is particularly true with large files such as video recordings.
+* The attacker might upload illegal files (non-torified) somewhere that result in a raid by authorities.
+* The attacker might come up with a new strategy, such as uploading false evidence files to the victim’s computer followed by authority tip-offs that result in a police raid and false accusations.
+* When a malicious computer is connected, it might perform illegal activities like becoming part of a spam botnet.
+* The longer a compromised machine is connected to the Internet -- imagine a user following poor advice and taking days to search for all relevant data and making backups -- it is harder to explain away a decision to continue operating it. For example, stating “my computer was compromised, it wasn’t me” is hard to reconcile with evidence that it was used in an attack for days on end.
+
+Refer to the following image to understand what compromised computers can be used for: https://krebsonsecurity.com/wp-content/uploads/2012/10/HackedPC2012.png
+
+It is far safer to avoid these risks, so <u>do not</u> connect a compromised VM or machine to the Internet.</ref>
+
+'''4.''' Change the WiFi access point password.
+
+This step is not foolproof as an intelligent virus can attempt to connect from open hot-spots, but that might be a rare occurrence in your area. Also bear in mind that infected cellphones might be another exfiltration vector via ultrasound. For this reason it is safest to turn them off and keep them in a [https://en.wikipedia.org/wiki/Faraday_cage Faraday Cage] like a microwave for the duration of this procedure. Use a LAN connection only for the next steps.
+
+'''5.''' Turn on your compromised machine and connect any infected external USB or HDDs to that device and copy everything over to the main disk.
+
+* Install [https://syncthing.net/ Syncthing] (file synchronization program) on that machine by transferring the package offline from the new computer via a fresh USB.
+* Afterwards, discard the USB.
+* Start the Syncthing session.
+* It is recommended to keep the compromised machine in another room far away from the new computer. This will minimize the risk of hardware electromagnetic side-channel leaks that can expose key material and the information on your screen to the infected device.
+
+'''6.''' Start Syncthing in a Debian VM on the uninfected machine.
+
+Connect both machines to a LAN only connection and initiate a transfer session -- copy over everything that needs to be salvaged. Once finished, move these files out of the Debian VM via a shared folder.
+
+'''7.''' Connect new external storage to the uninfected machine and format it with encryption following the [[Full_Disk_Encryption_and_Encrypted_Images#New_Removable_Media|{{project_name_long}} guidelines]].
+
+Move the files back onto the storage device without opening them. Files are innocuous if not opened, so they can be copied over safely to the backup device. Since you cannot be sure if some file types were infected (PDFs, media), it is recommended you always copy the data you will be working on into the Workstation shared folder and execute it there from within the VM.
+
+'''8.''' Once data from the old computer has been backed up, shut it down and permanently discard it along with the infected storage.
+
+'''9.''' Consider any and all passwords as compromised.
+
+Immediately change all passwords following the recommendations outlined on the [[Passwords|Passwords page]].
+
+'''10.''' Revoke all keys and generate new key pairs.
+
+Announce this key migration action to all contacts and the reason behind it. Put notices on your code repositories to alert potential users so they can inspect them for foul play and take necessary precautions.
+
+'''11.''' Study your failures to prevent similar situations reoccurring in the future.
+
+If/when a host compromise occurs in the future, you may not be lucky enough to detect it. Understanding why your system was infiltrated is a crucial piece of information that should be gathered and shared with others.
+
+If {{project_name_long}} wiki recommendations and instructions are followed diligently and hardware has not been left unattended, then software vulnerabilities are the most plausible possibility for the breach. In this case, post Tor logs and report what Tor guard was in operation at the time. This can help the community to investigate whether the event was part of a coordinated attack on the network. Also disclose what hypervisor was used to the upstream security team and explain the situation in detail to bring it to their attention.
+}}
+
+== Workstation Compromise without Virtual Machine Escape ==
+
+This threat model assumes a Workstation compromise has been confirmed or is strongly suspected, but there has not been a [https://en.wikipedia.org/wiki/Virtual_machine_escape VM escape (breakout)].
+
+1. Transfer the data out of the Workstation via a shared folder.<br />
+2. Apply steps 9 and 10 from the section above.<br />
+3. Discard the infected Workstation snapshot or VM image.
+
+More complex ideas for recovering from an AppVM compromise on Qubes can be found [https://www.qubes-os.org/news/2017/04/26/qubes-compromise-recovery/ here]. However this may not be necessary because the steps above should equally apply to any hypervisor and are easier to grasp. Qubes does not have the concept of shared folders, so it is best to draw inspiration from ideas suggested in that link.
+
+== Gateway Compromise without Virtual Machine Escape ==
+
+This threat model assumes a Gateway compromise has been confirmed or is strongly suspected, but there has not been a VM escape (breakout).
+
+Firstly, it should be noted that a compromised Gateway has no access to the host resources. Further, a compromised Gateway does not automatically lead to a compromised {{project_name_long}} Workstation.
+
+In the hypothetical case that a remote code execution vulnerability was found in Tor, this would compromise Tor but would only cause the following limited Workstation breaches:
+
+* Ability to read (non-https) clearnet traffic originating from the Workstation (unless the Workstation has the following configuration: <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Destination tunnel</code>).
+* Ability to read onion traffic originating from the Workstation.
+* Loss of anonymity.
+
+The Gateway does not occupy a more privileged position to exploit the Workstation compared to a Tor exit. It is true the Gateway does not need to find a specific target, but a compromise of the Workstation still requires an additional vulnerability.
+
+A compromised Gateway should not lead to a compromised (as in unwanted code, malware running) Workstation. This means the Workstation's shared folder should be safe, along with any locally stored data that has never been transmitted unencrypted over the Internet. For example, any OpenPGP encrypted messages from the Workstation sent through a compromised Gateway should still be confidential.
+
+The recovery process is similar to the Workstation section above, except for the steps that involve key revocation:
+
+1. Transfer the data out of the Gateway via a shared folder. <br />
+2. Discard the infected Gateway snapshot or VM image.
+
+The most likely reasons for a Gateway compromise are:
+
+* Installation of third party software on the Gateway.
+* Purposefully browsing clearnet sites from software purposefully installed on the Gateway.
+* Installing vulnerable services on the Gateway (like DHCP) that a malicious Workstation can access and compromise.
+* Using a vulnerable version of apt to perform software updates; this happens on occasion and {{project_name_long}} routinely notifies users of the risk beforehand.
+* A remote code execution vulnerability exists in Tor itself or pluggable transports; this is considered extremely improbable according to The Tor Project's track record.
+
+= Forum Discussion =
+[https://forums.whonix.org/t/document-recovery-procedure-after-compromise/3296 Document recovery procedure after compromise]
+
+= See Also =
+* [[Factory Reset]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

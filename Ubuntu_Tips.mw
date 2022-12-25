@@ -1,0 +1,162 @@
+{{Header}}
+{{#seo:
+|description=Anonymous Ubuntu. Tunnel Ubuntu through the Tor Anonymity Network using {{project_name_long}}.
+|image=https://www.{{project_clearnet}}/w/images/b/be/Logo-ubuntusvg.png
+}}
+{{Contributor|
+|status=unmaintained
+|about=About this {{Code2|{{PAGENAME}}}} Page
+|difficulty=medium
+|contributor=none
+|support=[[Support]]
+}}
+= Most simple, least secure =
+
+https://www.whonix.org/w/images/b/be/Logo-ubuntusvg.png
+
+Unofficial Video, using {{project_name_gateway_long}} to torify Ubuntu.
+
+Html5 Video. Works without Flash inside Tor Browser. Showing the Easiest, but least secure option, see [https://www.youtube.com/embed/id_l4fKqA4Q Youtube Link].
+
+= More secure =
+
+Tested with Debian and Ubuntu.
+
+Download [https://ubuntu.com/download Ubuntu] (or use a different install CD or iso file) and verify using [https://help.ubuntu.com/community/VerifyIsoHowto VerifyIsoHowto].
+
+Create a new VM and choose following settings: Under Network set Adapter 1 to "Internal Network", rename "intnet" to "{{project_name_short}}".
+
+You can use the Live environment or install Ubuntu. When the installer asks questions, generally choose the default, most common or other non-identifying options. Language: English; keymap: choose yours (potentially risk...); Country (leave it as it is): United States (New York for Ubuntu 14.04); User Name: leave blank; Host Name: host ; Time Zone (change it): UTC (it is at the very bottom. For Ubuntu 14.04 change it later using tzdata as instructed below); Username (account name): user. This ensures that all {{project_name_long}} users have the same settings. Additionally this is more safe, when an application leaks such data, such as SSH, if you simply ssh some.host.name, it will tell your current account name, and it would be very bad if this where you real name or anything which would identify you.
+
+Reboot into the freshly installed system and open a terminal.
+
+If you forgot to set the time to UTC you can do so at any time by typing the following into the terminal:
+
+<pre>sudo dpkg-reconfigure tzdata</pre>
+
+Remove Ubuntu's “phone home” program(s). If any of these packages are not installed the error message should indicate which to delete from the command. In a terminal type:
+
+<pre>
+sudo apt --yes remove canonical-census unity-lens-shopping unity-scope-video-remote unity-scope-musicstores
+</pre>
+
+Dhcp auto-configuration like software such as network manager have to be removed, since we are using static networking.
+
+<pre>
+sudo apt remove isc-dhcp-client isc-dhcp-common network-manager network-manager-gnome resolvconf
+</pre>
+
+Setup a fixed IP for the virtual LAN network card and to use the same subnet like the {{project_name_gateway_long}} for the Internal Network. If you use a Linux desktop with network manager you can use the GUI for this step. Otherwise: open a Terminal and type
+
+{{Open with root rights|filename=
+/etc/network/interfaces
+}}
+
+You only need to configure eth0:
+
+<pre>
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface, leave as it is
+auto lo
+iface lo inet loopback
+
+auto eth0
+#iface eth0 inet dhcp
+iface eth0 inet static
+# increment last octet on additional workstations
+       address 10.152.152.50
+       netmask 255.255.192.0
+       #network 192.168.0.0
+       #broadcast 192.168.0.255
+       gateway 10.152.152.10
+</pre>
+
+Open /etc/resolv.conf.
+
+{{Open with root rights|filename=
+/etc/resolv.conf
+}}
+
+For auto-generated resolv.conf files, do this instead:
+
+{{Open with root rights|filename=
+/etc/resolvconf/resolv.conf.d/base
+}}
+
+and delete everything, then add
+
+<pre>nameserver 10.152.152.10</pre>
+
+Update package lists.
+
+<pre>sudo apt update</pre>
+
+Get latest updates.
+
+<pre>sudo apt full-upgrade</pre>
+
+= Guest additions for Ubuntu =
+You can try first, if [[VirtualBox/Guest Additions|VirtualBox Guest Additions]] work on Ubuntu, because they are a bit shorter and easier.
+
+Otherwise...
+
+On the host:
+
+<pre>sudo apt install virtualbox-guest-additions-iso</pre>
+
+Inside {{project_name_workstation_long}}:
+
+Execute the following commands. They can take a very long time, due to the Ubuntu upstream bug. <ref>[https://bugs.launchpad.net/ubuntu/+source/dpkg/+bug/947664 Unpacking linux-headers unbelievably slow in Lubuntu Precise (Beta 1)] (Affects Ubuntu precise final as well.)</ref>
+
+<pre>
+sudo apt update
+sudo apt full-upgrade
+sudo apt install dkms build-essential linux-headers-generic linux-headers-generic-pae
+</pre>
+
+Insert the guest additions iso by clicking on the VM &rarr; devices &rarr; install guest additions.
+
+<pre>
+sudo mkdir -p /mnt/sr0
+sudo mount /dev/sr0 /mnt/sr0
+sudo sh /mnt/sr0/VBoxLinuxAdditions.run
+</pre>
+
+Or start autorun.sh (not with a console, strange bug!).
+
+Force remove CD eject.
+
+Reboot. Done.
+
+= Advanced =
+
+== About Ubuntu ==
+
+'''TODO: This chapter needs revision.''' Incorporate latest developments: 
+
+[https://www.eff.org/deeplinks/2012/10/privacy-ubuntu-1210-amazon-ads-and-data-leaks Privacy in Ubuntu 12.10: Amazon Ads and Data Leaks]
+
+While Ubuntu is one of the more secure (See [https://wiki.ubuntu.com/Security/Features Overview]) Linux distributions it is by no means a secure operating system. It is designed first and foremost to bring Linux to end users. It doesn't protect against some of the threat models that some Tor users will have.
+
+Here's an (incomplete) list of things the more paranoid user will have to consider:
+
+''apt'' as currently used in Ubuntu does not protect against a ''stale mirror attack'' ([https://bugs.launchpad.net/launchpad/+bug/716535 Bug #716535: Please support Valid-Until in release files for security.ubuntu.com]) where an adversary provides validly signed but outdated metadata to prevent users from downloading and installing the latest critical security updates. When fetching updates over tor this problem is of a lesser extent because no single malicious exit relay will realistically prevent users from downloading updates more than once in a row. Malicious mirror is possible but {{project_name_workstation_long}} uses the main US mirror, any irregularities will be uncovered pretty soon. More of concern is the clear text update of the host operating system. Here it is a good idea to manually check how old the repository metadata is yourself:
+
+<pre>find /var/lib/apt/lists/* -type f | xargs cat | grep "Date: "</pre>
+
+From time to time vulnerabilities that allow installation of untrusted code are discovered in apt. New security features are often implemented in Debian first.
+
+The Ubuntu server kernel comes with everything and the kitchen sink. At any given day the kernel will be vulnerable in one way or the other. It is by far the most patched piece of code in the default Ubuntu Server installation, obviously runs at full kernel privileges and naturally can't be protected with mandatory access control. {{project_name_gateway_long}} exposes the kernel to attacks through its firewall, TCP/IP stack and whatever kernel calls Tor does or could be compelled to do.
+
+[https://www.trapkit.de/tools/checksec/ checksec.sh] --kernel reports good kernel protection: GCC stack protector support, Enforce read-only kernel data, Restrict /dev/mem and /dev/kmem access are all enabled!
+
+Userland protection for Tor is great. <ref>This would only apply if you created a Custom-{{project_name_gateway_long}}.</ref> Unlike Tor Browser the tor version distributed via the .deb comes with RELRO, canaries etc. and can fully make use of ASLR since it is compiled as PIE. Of course with Grsec the entropy would be higher.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

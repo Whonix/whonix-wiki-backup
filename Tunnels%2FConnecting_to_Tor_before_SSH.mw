@@ -1,0 +1,42 @@
+{{Header}}
+{{Title|
+title=Connecting to Tor before SSH
+}}
+{{#seo:
+|description=Instructions on how to connect to Tor before SSH
+|image=Fractal-429037640.jpg
+}}
+[[image:Fractal-429037640.jpg|thumb]]
+'''<code>User</code> &rarr; <code>Tor</code> &rarr; <code>SSH</code> &rarr; <code>Internet</code>'''
+__TOC__
+= Introduction =
+
+{{Tunnels_Introduction}}
+
+{{Stub}}
+
+= Procedure =
+
+Note that even though SSH supports SOCKS5, SSH is still not able to forward UDP on its own. Read the [https://www.zarb.org/~gc/html/udp-in-ssh-tunneling.html Performing UDP tunneling through an SSH connection] instructions for further details. To summarize: to tunnel UDP over SSH, the client and shell admin need a special setup, which is not going to happen for most shells:
+# A SSH tunnel will provide a local SOCKS5 proxy.
+# Create the SSH tunnel in the {{project_name_workstation_long}}; this will provide a local SOCKS5 proxy.
+# Utilize the SOCKS5 proxy by following the [[Tunnels/Connecting to Tor before a proxy | Connecting to Tor before a Proxy (User &rarr; Tor &rarr; proxy &rarr; Internet)]] instructions.
+# Once the SSH tunnel is established, there are not many differences except the UDP issue canvassed above  and the fact the warning about missing proxy encryption does not apply to SSH tunnels (since SSH is encrypted).
+# The SSH process needs to be allowed to access the Internet directly -- if you use transparent proxying, run the SSH process under an account which is privileged to access the Internet directly.
+
+Another possible, untested method may be [https://github.com/apenwarr/sshuttle sshuttle] ([https://sshuttle.readthedocs.io/en/stable/ stable documentation]). <ref><blockquote>As far as I know, sshuttle is the only program that solves the following common case:
+
+* Your client machine (or router) is Linux, MacOS, FreeBSD, OpenBSD or pfSense.
+* You have access to a remote network via ssh.
+* You don’t necessarily have admin access on the remote network.
+* The remote network has no VPN, or only stupid/complex VPN protocols (IPsec, PPTP, etc). Or maybe you are the admin and you just got frustrated with the awful state of VPN tools.
+* You don’t want to create an ssh port forward for every single host/port on the remote network.
+* You hate openssh’s port forwarding because it’s randomly slow and/or stupid.
+* You can’t use openssh’s PermitTunnel feature because it’s disabled by default on openssh servers; plus it does TCP-over-TCP, which has terrible performance (see below).</blockquote></ref>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

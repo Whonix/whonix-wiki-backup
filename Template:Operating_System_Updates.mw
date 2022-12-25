@@ -1,0 +1,223 @@
+'''1. Save Progress and Backup'''
+
+On rare occasions <ref>
+https://forums.whonix.org/t/whonix-xfce-for-virtualbox-users-ram-increase-required/8993
+</ref> the machine might freeze during the upgrade process. In this case any materials already in progress might be lost, for example documents or other drafts that were created. If this is applicable, save the progress before installing operating system updates. If required, backup all user data -- it is ideal to have a copy of the (VM(s)) so it is possible to try again (if necessary).
+
+'''2. Flatpak Update'''
+
+This step is only required if the user previously manually installed any software using [[Install_Software#flatpak|flatpak]]. Can be skipped otherwise.
+
+* [[{{Non q project name short}}|{{Non q project name}}]] {{CodeSelect|code=
+flatpak update
+}}
+* [[{{q project name short}}|{{q_project_name}}]] Template: {{CodeSelect|code=
+http_proxy=http://127.0.0.1:8082 flatpak update
+}}
+
+'''3. Update the APT Package Lists'''
+
+System package lists should be updated at least once per day <ref>In {{project_name_long}} ''and'' on the host.</ref> with the latest version information for new/updated packages that are available. To update [[{{project_name_gateway_short}}|{{project_name_gateway_long}}]] and [[{{project_name_workstation_short}}|{{project_name_workstation_long}}]] packages lists, run.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+The output should be similar to this.
+
+{{CodeSelect|code=
+Hit:1 tor+https://deb.debian.org/debian {{Stable project version based on Debian codename}} InRelease
+Hit:2 tor+https://deb.whonix.org bullseye {{Stable project version based on Debian codename}}
+Hit:3 tor+https://deb.debian.org/debian {{Stable project version based on Debian codename}}-updates InRelease
+Hit:4 tor+https://fasttrack.debian.net/debian {{Stable project version based on Debian codename}}-fasttrack InRelease
+Hit:5 tor+https://deb.debian.org/debian-security {{Stable project version based on Debian codename}}-security InRelease
+Hit:6 tor+https://deb.debian.org/debian {{Stable project version based on Debian codename}}-backports InRelease
+Reading package lists... Done
+}}
+
+If an error message like this appears.
+
+{{CodeSelect|code=
+W: Failed to fetch https://deb.debian.org/debian/dist/{{Stable_project_version_based_on_Debian_codename}}/contrib/binary-amd64/Packages 404 Not Found
+
+W: Failed to fetch https://deb.debian.org/debian/dist/{{Stable_project_version_based_on_Debian_codename}}/non-free/binary-amd64/Packages 404 Not Found
+
+E: Some index files failed to download. They have been ignored, or old ones used instead.
+
+Err https://deb.debian.org {{Stable_project_version_based_on_Debian_codename}} Release.gpg
+  Could not resolve 'ftp.us.debian.org'
+Err https://deb.torproject.org {{Stable_project_version_based_on_Debian_codename}} Release.gpg
+  Could not resolve 'deb.torproject.org'
+Err http://security.debian.org {{Stable_project_version_based_on_Debian_codename}}/updates Release.gpg
+  Could not resolve 'security.debian.org'
+Reading package lists... Done
+W: Failed to fetch http://security.debian.org/dists/{{Stable_project_version_based_on_Debian_codename}}/updates/Release.gpg  Could not resolve 'security.debian.org'
+
+W: Failed to fetch https://deb.debian.org/debian/dists/{{Stable_project_version_based_on_Debian_codename}}/Release.gpg  Could not resolve 'ftp.us.debian.org'
+
+W: Failed to fetch https://deb.torproject.org/torproject.org/dists/{{Stable_project_version_based_on_Debian_codename}}/Release.gpg  Could not resolve 'deb.torproject.org'
+
+W: Some index files failed to download. They have been ignored, or old ones used instead.
+}}
+
+Or this.
+
+{{CodeSelect|code=
+500  Unable to connect
+}}
+
+Then something went wrong. It could be a temporary Tor exit relay or server failure that should resolve itself. Check if the network connection is functional by [[Tor_Controller#Arm|changing the Tor circuit]] and trying again. Running [[whonixcheck|systemcheck]] might also help to diagnose the problem.
+
+Sometimes a message like this will appear.
+
+{{CodeSelect|code=
+  Could not resolve 'security.debian.org'
+}}
+
+It that case, it helps to run.
+
+{{CodeSelect|code=
+nslookup security.debian.org
+}}
+
+And then try again.
+
+'''4. APT Upgrade'''
+
+To install the newest versions of the current packages installed on the system, run.
+
+{{CodeSelect|code=
+sudo apt full-upgrade
+}}
+
+Please note that if the {{project_name_long}} APT Repository was disabled (see [[Project-APT-Repository#Disable_{{project_name_long}}_APT_Repository|Disable {{project_name_long}} APT Repository]]), then manual checks are required for new {{project_name_long}} releases and [[Dev/Build_Documentation|manual installation from source code]].
+
+'''5. Never Install Unsigned Packages!'''
+
+If a message like this appears.
+
+{{CodeSelect|code=
+WARNING: The following packages cannot be authenticated!
+  thunderbird
+Install these packages without verification [y/N]?
+}}
+
+Then do <u>not</u> proceed! Press <code>N</code> and <code><enter></code>. Running <code>apt update</code> again should fix the problem. If not, something is broken or it might be a [[Warning#Man-in-the-middle_Attacks|man-in-the-middle attack]], which is not that unlikely because updates are retrieved via Tor exit relays and some are malicious. [[Arm#Nyx_Usage|Changing the Tor circuit]] is recommended if this message appears.
+
+{{Anchor|signature verification errors}}
+{{Anchor|signature verification warnings}}
+
+'''6. Signature Verification Warnings'''
+
+No signature verification warnings should appear. If it does occur, it will look like this.
+
+{{CodeSelect|code=
+W: A error occurred during the signature verification. The repository is not updated and the previous index files will be used. GPG error: https://deb.torproject.org stable Release: The following signatures were invalid: KEYEXPIRED 1409325681 KEYEXPIRED 1409325681 KEYEXPIRED 1409325681 KEYEXPIRED 1409325681
+}}
+
+Caution is warranted even though APT will automatically ignore repositories with expired keys or signatures, and no upgrades will be received from that repository. Unless the issue is already known or documented, it should be reported for further investigation.
+
+There are two possible reasons for this occurrence. Either there is a problem with the repository that is unfixed by contributors or a [[Warning#Man-in-the-middle_Attacks|man-in-the-middle attack]] has taken place. <ref>Rollback or indefinite freeze attacks as defined by {{TUF}}.</ref> The latter is not a big issue, since no malicious packages are installed. It may also automatically resolve itself after a period of time when a different, non-malicious Tor exit relay is used, or following a [[Arm#Arm|manual change of the Tor circuit]].
+
+<div class="toccolours mw-collapsible mw-collapsed">
+In the past, various apt repositories were signed with an expired key. To see how the documentation looked at that point, please click on Expand on the right.
+<div class="mw-collapsible-content">
+For instance, the [https://gitlab.torproject.org/legacy/trac/-/issues/12994 Tor Project's apt repository key had expired] and the following warning appeared.
+
+{{CodeSelect|code=
+W: A error occurred during the signature verification. The repository is not updated and the previous index files will be used. GPG error: https://deb.torproject.org stable Release: The following signatures were invalid: KEYEXPIRED 1409325681 KEYEXPIRED 1409325681 KEYEXPIRED 1409325681 KEYEXPIRED 1409325681
+
+W: Failed to fetch https://deb.torproject.org/torproject.org/dists/stable/Release
+
+W: Some index files failed to download. They have been ignored, or old ones used instead.
+}}
+
+This issue was [https://gitlab.torproject.org/legacy/trac/-/issues/12994 quickly reported]. There was no immediate danger and the message could be safely ignored. As a reminder, never install unsigned packages as explained above.
+
+For a more recent example, see the [[Deprecated#KEYEXPIRED_Error|Whonix apt repository keyexpired error]].
+
+Please report any other signature verification errors if/when they appear, even though this is fairly rare.
+</div>
+</div>
+
+{{Anchor|Changed Configuration Files}}
+'''7. Changed Configuration Files''' [{{Archive_link
+|url=#Changed_Configuration_Files
+|text=link
+|archive=none
+}}]
+
+Be careful if a message like this appears.
+
+{{CodeSelect|code=
+Setting up ifupdown ...
+Configuration file `/etc/network/interfaces'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package contributor's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : background this process to examine the situation
+ The default action is to keep your current version.
+*** interfaces (Y/I/N/O/D/Z) [default=N] ? N
+}}
+
+It is safest to press <code>y</code>, but any customized settings will be lost (these can be re-added afterwards). <ref>
+Or {{project_name_long}} changes can be delayed, inspected, and then backported if the effort is worth it.
+</ref> <ref>
+{{project_name_long}} uses package [https://packages.debian.org/{{Stable project version based on Debian codename}}/config-package-dev <code>config-package-dev</code>] which assumes ownership of configuration files coming from “other distributions” (mostly Debian, although third party repositories might be added by users). ([[Dev/About_Debian_Packaging#config-package-dev|{{project_name_long}} on <code>config-package-dev</code>]])
+</ref>
+
+Conflicts like these should be rare if [[Configuration_Files|modular flexible <code>.d</code> style configuration folders]] are used.
+
+See also:
+
+* [[Configuration_Files#Reset_Configuration_Files_to_Vendor_Default|Reset Configuration Files to Vendor Default]]
+* [[Configuration Files]]
+
+{{Anchor|Restart Services after Updating}}
+'''8. Restart Services After Updating'''
+
+To restart services after updating, either reboot.
+
+{{CodeSelect|code=
+sudo reboot
+}}
+
+Or use the (harder) {{Code2|needrestart}} method to avoid rebooting. For readers interested in the {{Code2|needrestart}} method, please click on Expand on the right side.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<div class="mw-collapsible-content">
+Perform this step once. Install {{Code2|needrestart}}.
+
+{{CodeSelect|code=
+sudo apt update
+sudo apt install needrestart
+}}
+
+Run {{Code2|needrestart}}.
+
+{{CodeSelect|code=
+sudo needrestart
+}}
+
+The program will provide advice. Run it again after applying the advice.
+
+{{CodeSelect|code=
+sudo needrestart
+}}
+
+If nothing else needs to be restarted, it should show.
+
+{{CodeSelect|code=
+No services need to be restarted.
+}}
+
+This feature might become more usable and automated in the future. ([https://phabricator.whonix.org/T324 T324])
+</div>
+</div>
+
+'''9. Restart After Kernel Updates'''
+
+When {{Code2|linux-image-...}} is upgraded, a reboot is required for any security updates to be in effect.

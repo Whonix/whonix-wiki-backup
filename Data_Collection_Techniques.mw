@@ -1,0 +1,848 @@
+{{Title|title=Data Collection Techniques}}
+{{Header}}
+{{#seo:
+|description=How third party tracking and data mining is accomplished. Overview of Data Collection Techniques.
+|image=https://www.{{project_clearnet}}/w/images/5/5a/Cookies.png
+}}
+{{Contributor|
+|status=stable
+|about=About this {{Code2|{{PAGENAME}}}} Page
+|difficulty=easy
+|contributor=[https://forums.whonix.org/users/torjunkie torjunkie]
+|support=[[Support]]
+}}
+[[image:Cookies.png|thumb]]
+= Introduction =
+
+To achieve proper anonymity practices, it is necessary to have a basic understanding of the technical capabilities of adversaries that are seeking to undermine privacy on the Internet. For {{project_name_long}} users, this means how third-party tracking is designed to build profiles by tying information ("identifiers") to a specific individual or correlating it to a smaller group of people.
+
+The modus operandi of trackers is sourcing identifiers that are available, unique and persistent. In other words, information that: <ref name=identifiers_hazard>https://www.eff.org/wp/behind-the-one-way-mirror#Part1</ref>
+* is easily accessible
+* is specific to you or your device
+* will not change over time
+
+Examples of identifiers fulfilling the criteria include names, email addresses or phone numbers. <ref>It can also refer to tracker names identifying an individual, such as "bcd7rt42".</ref> Even though identifiers will not always meet all three criteria, they are still useful for tracking purposes. For example, many "weak" identifiers can be combined into a strong, single one. Also, identifiers that meet two of the criteria can be useful, for instance to greatly reduce the possible set of individuals. Conventional names are not necessary for tracking purposes; artificial identifiers like cookies and advertisement IDs are just as sensitive if they build up a rich profile of an individual over time, since "anonymous" profiles can usually be linked to real people later on. <ref name=identifiers_hazard />
+
+A sample of identifiers that can utilized by third-party trackers is summarized below. It should be stressed that this table and wiki entry is not an exhaustive list; new identifiers are constantly emerging from academic research and in response to technological changes over time.
+
+'''Table:''' ''Sample Internet, Mobile and Other Identifiers'' <ref name=identifiers_hazard />
+
+{| class="wikitable" style="background-color: #fff;text-align: center"
+
+! '''Identifiers'''
+! '''Unique'''
+! '''Persistent'''
+! '''Available'''
+
+|-
+! '''Web Identifiers'''
+| -
+| -
+| -
+
+|-
+! Cookies
+| Yes
+| Until user deletes
+| In some browsers without tracking protection
+
+|-
+! IP Address
+| Sometimes <!-- Frequently or rarely? --> (many users behind corporate or ISP NAT will share it)
+| On the same network, may persist for weeks or months
+| Always
+
+|-
+! TLS State
+| Yes
+| For up to one week
+| In most browsers
+
+|-
+! Local Storage Supercookie
+| Yes
+| Until user deletes
+| Only in third-party IFrames; can be blocked by tracker blockers
+
+|-
+! Browser Fingerprint
+| Only on certain browsers
+| Yes
+| Almost always; usually requires JavaScript access, sometimes blocked by tracker blockers
+
+|-
+! '''Phone Identifiers'''
+| -
+| -
+| -
+
+|-
+! Phone Number
+| Yes
+| Until user changes
+| Readily available from data brokers; only visible to applications with special permissions
+
+|-
+! IMSI and IMEI Number
+| Yes
+| Yes
+| Only visible to applications with special permissions
+
+|-
+! Advertising ID
+| Yes
+| Until user resets
+| Yes, to all applications
+
+|-
+! MAC Address
+| Yes
+| Yes
+| To applications: only with special permissions. To passive trackers: visible unless OS performs randomization or mobile device is in airplane mode
+
+|-
+! '''Other Identifiers'''
+| -
+| -
+| -
+
+|-
+! License Plate
+| Yes
+| Yes
+| Yes
+
+|-
+! Face Print
+| Yes
+| Yes
+| Yes
+
+|-
+! Credit Card Number
+| Yes
+| Yes, for months or years
+| To any companies involved in payment processing
+
+|}
+
+= Active Web Contents =
+
+Web content that is accessible by browser plugins such as [https://en.wikipedia.org/wiki/Adobe_Flash Flash], [https://en.wikipedia.org/wiki/Java_applet Java applet], [https://en.wikipedia.org/wiki/ActiveX ActiveX] and [https://en.wikipedia.org/wiki/Microsoft_Silverlight Silverlight] and even [https://en.wikipedia.org/wiki/JavaScript JavaScript] renders the Web more dynamic and colorful. However, permissions are also granted to websites to execute code locally on a machine, increasing the security risks. If executed, these plugins can read a host of details about the user's computer and network configuration and send it to a remote server. Certain techniques even permit files to be read and edited on the user's machine, and in extreme cases this allows complete control over it.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Signed Java applets are particularly hazardous. By accepting its signature and by extension the applet, the visited webserver automatically receives all user rights on the computer. The applet may then read the [[Data_Collection_Techniques#IP_Address|IP address]], [[#MAC Address|MAC address]], and even HDD/SSD contents.
+}}
+
+Limiting browsing to trusted websites does not mitigate the risk from applets. In the recent past, numerous popular websites have been hacked and infected with malicious code. Greater security requires these plugins to be blocked, deactivated or removed.
+
+With {{project_name_long}}, an adversary will not benefit from learning the IP address via this method: it is either a local IP address shared among all {{project_name_long}} users or the IP address of a Tor exit relay, both of which do not reduce the user's anonymity set. Further, the [[#MAC Address|MAC address]] is a virtual one, different from the host system, and is therefore worthless to attackers. Although active content will not reveal the real [[Data_Collection_Techniques#IP_Address|IP address]], it is deactivated in Tor Browser by default. See [[Browser Plugins]] for a detailed discussion of browser plugins in {{project_name_long}} and the potential effects on anonymity, security, and privacy.
+
+= Border Gateway Protocol =
+
+The Border Gateway Protocol (BGP) refers to the routing protocol for the Internet: <ref>https://www.thousandeyes.com/learning/glossary/bgp-border-gateway-protocol</ref>
+
+<blockquote>The BGP protocol specifies a TCP-based communications method for establishing routed peerings between [https://www.thousandeyes.com/learning/glossary/as-autonomous-system Autonomous System (AS)] border routers (ASBRs), that facilitate the exchange of information about routable IP prefixes. BGP peerings exist between all active Internet Autonomous Systems.
+
+BGP is a path vector protocol, and BGP-enabled ASBRs send path vector messages to each other with lists of Internet-routable IP prefixes along with a Autonomous System (AS) paththe list of ASNs that must be traversed to reach that prefix.
+
+BGP currently manages nearly 800K Internet-routable prefixes across the Internet.</blockquote>
+
+Unfortunately the BGP protocol is prone to leaks and vulnerable to traffic shaping.
+
+== Route Hijacking ==
+
+In this attack, groups of IP addresses are taken over via corruption of Internet routing tables maintained by the BGP: <ref>https://www.thousandeyes.com/learning/glossary/bgp-route-hijacking</ref>
+* Adversaries re-route traffic for interception or modification purposes by maliciously manipulating BGP IP prefixes -- with a specific IPV4 or IPV5 address block and a path of AS numbers, the specific ASNs the traffic must pass through (to reach the announced address block) are controlled.
+* Edge routers are then configured to announce prefixes that have not been assigned to them, leading to Internel-level BGP hijacking. If a shorter or more specific path is offered (or claimed), then the traffic is relayed to the hijacker.  <ref>Unused prefixes are most often relied upon to avoid identification by the real owner. False prefix announcements can also affect the Routing Information Base of peers, leading to further propogation and impacts on other ASes and the Internet more broadly.</ref>
+
+[https://news.mit.edu/2019/using-machine-learning-hunt-down-cybercriminals-1009 Recent research] has identified that malicious networks ("hijackers") typically have the following characteristics:
+* The address blocks of hijackers usually disappear faster than normal - suspicious networks last 50 days on average compared to almost two years for legitimate networks.
+* Serial hijackers generally advertise more IP address blocks ("network prefixes").
+* Networks advertised by serial hijackers are often registered in different countries and continents, in stark contrast to legitimate networks.
+
+For a recent, real-life BGP re-routing attack on a multi-national bank, see: [https://blog.thousandeyes.com/using-bgp-reroute-traffic-ddos/ Using BGP to Reroute Traffic during a DDoS].
+
+== Route Leaks ==
+
+The IETF has defined this phenomenon: <ref name=BGP_leak>https://www.thousandeyes.com/learning/glossary/bgp-route-leak</ref>
+
+<blockquote>The Internet Engineering Task Force (IETF) in RFC 7908 provides a working definition of a BGP Route Leak as "the propagation of routing announcement(s) beyond their intended scope. That is, an announcement from an Autonomous System (AS) of a learned BGP route to another AS is in violation of the intended policies of the receiver, the sender, and/or one of the ASes along the preceding AS path."</blockquote>
+
+Leaks pose security and privacy threats, since traffic can be redirected through unintended paths which may enable eavesdropping or traffic analysis. Leaks can be either accidental or malicious, but they usually arise from 'honest' mis-configurations. Visibility is necessary so it is possible for network operators to identify ISPs that are propagating bad routes (which are advertised during a route leak). This necessitates proper network monitoring tools so good actors can visualize and immediately modify any BGP-initiated route changes. <ref name=BGP_leak />
+
+= Browser Fingerprinting =
+
+Research from a pool of 500,000 Internet users has shown that the vast majority (84%) have unique browser configurations and version information which makes them trackable across the Internet. When Java or Flash is installed, this figures rises to 94%. <ref>https://www.eff.org/deeplinks/2010/05/every-browser-unique-results-fom-panopticlick</ref> Considering this research relied on a relatively small number of variables, <ref>Supercookie test, hash of canvas fingerprint, screen size and color depth, browser plugin details, time zone, DNT header enabled, HTTP_Accept headers, has of WebGL fingerprint, language, system fonts, platform, user agent, touch support, cookies enabled.</ref> companies with advanced fingerprinting capabilities may be approaching 100%, particularly in combination with cookies.
+
+== Fingerprinting and Anonymity ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Academics suggest that around 33 bits of information is required to positively identify one person out of several billion! <ref>https://33bits.wordpress.com/about/</ref>
+}}
+
+For anonymity purposes, it is necessary to reduce the number of bits of information (entropy) the browser provides to an acceptable lower bound; for instance, 18.1 bits of entropy means that a browser chosen at random will share the fingerprint with one in 286,777 other browsers. <ref name=Moz_fingerprinting>https://wiki.mozilla.org/Fingerprinting</ref> Browser uniqueness research has revealed the entropy associated with various pieces of browser information: <ref>https://coveryourtracks.eff.org/static/browser-uniqueness.pdf</ref>
+
+'''Table:''' ''Browser Fingerprinting Estimates''
+{| class="wikitable"
+|-
+! scope="col"| <b>Variable</b>
+! scope="col"| <b>Entropy (bits)</b>
+|-
+! scope="row"| Plugins
+|     15.4
+|-
+! scope="row"| Fonts
+|     13.9
+|-
+! scope="row" | User agent
+|     10.0
+|-
+! scope="row" | HTTP accept
+|     6.09
+|-
+! scope="row" | Screen resolution
+|     4.83
+|-
+! scope="row" | Time zone
+|     3.04
+|-
+! scope="row" | Supercookies
+|     2.12
+|-
+! scope="row" | Cookies enabled
+|     0.353
+|-
+|}
+
+== Fingerprinting Techniques ==
+
+The primary browser fingerprinting methods that are used by data miners are outlined below. Note that many of these require active JavaScript code to be effective.
+
+'''Table:''' ''Common Fingerprinting Methods'' <ref name=Moz_fingerprinting />
+
+{| class="wikitable"
+|-
+! scope="col"| <b>Method</b>
+! scope="col"| <b>Description</b>
+|-
+! scope="row"| AudioContext fingerprinting
+| The Audio API is used to fingerprint users by generating an audio signal with the oscillator and hashing the resulting signal to create an identifier; no access to the microphone is required since measurement relies on signal processing differences. <ref name=Princeton>https://webtransparency.cs.princeton.edu/webcensus/</ref> <ref>This was found in 3 scripts on 67 websites (out of 1 million).</ref>
+|-
+! scope="row"| Battery API
+| The Battery Status API allows websites to query the browser for the charging status of a host device or the current battery level. There are sufficient states and a long enough lifespan for short-term identifiers to enable tracking. <ref name=Princeton />
+|-
+! scope="row" | Clock skew/precision measurements
+| Differential parameters are used to measure the time difference (down to milliseconds) between a user's computer and that of the server. Clock precision measurements rely upon how long operations take on a partricular system.
+|-
+! scope="row" | CSS + HTML
+| This is a side-channel attack called "CSS Prime+Probe" that utilizes HTML and CSS. It relies on rendering a web page that includes a long HTML string variable that completely covers the cache. Then a search for a short, non-existent text substring is performed. The time to carry out this probing operation is sent to an attacker-controlled server, revealing differences in the traces of the cache while loading different websites. This attack does not require JavaScript and works against hardened browsers like Tor Browser. <ref>https://thehackernews.com/2021/03/new-browser-attack-allows-tracking.html</ref> <ref>Specifically: <blockquote>"The attacker first includes in the CSS an element from an attacker-controlled domain, forcing DNS resolution," the researchers explained. "The malicious DNS server logs the time of the incoming DNS request. The attacker then designs an HTML page that evokes a string search from CSS, effectively probing the cache. This string search is followed by a request for a CSS element that requires DNS resolution from the malicious server. Finally, the time difference between consecutive DNS requests corresponds to the time it takes to perform the string search, which [...] is a proxy for cache contention."</blockquote></ref>
+|-
+! scope="row" | Fonts
+| System fonts are collected by Flash or Java applets, or by CSS introspection.
+|-
+! scope="row" | getClientRects fingerprinting
+| Security researcher Jose Carlos Norte notes: <ref>http://https://web.archive.org/web/20221114004700/http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html</ref> <blockquote>getClientRects allows to get the exact pixel position and size of the box of a given DOM element. Depending on the resolution, font configuration and lots of other factors, the results of getClientRects are different, allowing for a very quick and easy fingerprinting vector, even better than the canvas fingerprinting that is fixed.</blockquote>
+If JavaScript is enabled, the [https://browserleaks.com/rects fingerprint hash] is completely dissimilar when using Tor Browser on different computers. For further technical information see: [https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects Mozilla: Element.getClientRects()] and [https://drafts.csswg.org/cssom-view/#dom-element-getclientrects CSSOM View Module: getClientRects].
+|-
+! scope="row" | HTML5 canvas
+| A precise fingerprint is provided by the rendering of WebGL, font and color data to a canvas element. This is then extracted from the image buffer, and an identifying hash is computed. For more information, see [[Data_Collection_Techniques#HTML5_Canvas_Image_Data|here]].
+|-
+! scope="row" | HTTP Accept headers
+| With every webpage request, the browser sends URL variables within the HTTP protocol framework that can be analyzed. This includes personalized language, browser type and version, operating system and version, supported character / font sets, file codecs, and the last visited webpage.
+|-
+! scope="row" | Plugins
+| The PluginDirect JavaScript library checks for common plugins on the respective platform, and code is run to check for the Acrobat Reader version. Other information may be leaked, including the CPU type.
+|-
+! scope="row" | Screen resolution
+| The exact resolution is revealed to websites, for example <code>1280x800x24</code>. <ref>In Tor Browser, Torbutton reduces the available entropy by quantising AvailWidth and AvailHeight, and setting the actual Width and Height to the values of AvailWidth and AvailHeight.</ref>
+|-
+! scope="row" | Supercookies
+| Reported entropy depends on whether the following are enabled: DOM localStorage, DOM sessionStorage, userData, Flash LSOs, Silverlight cookies, HTML5 databases, or DOM globalStorage.
+|-
+! scope="row" | User Agent string
+| When websites are visited, the browser sends precise information on the operating system and web browser being used. <ref>Research suggests this is useful for profiling and tracking Internet users, as it reveals [https://www.eff.org/deeplinks/2010/01/tracking-by-user-agent 10.5 bits of identifying information] on average. This means only one person in 1,500 shares the same User Agent.</ref>
+|-
+! scope="row" | WebRTC local IP discovery
+| WebRTC is the framework for P2P Real Time Communication in the browser (accessible via JavaScript). The best path discovery between peers requires collection of all candidate addresses, including local network interfaces (like WiFi and ethernet addresses) as well as those from the public side of the NAT. Fingerprinters use these addresses to track users because they are available to web applications without explicit user permission. <ref name=Princeton /> <ref>WebRTC was found to discover the local IP address on 715 of the top 1 million websites and was employed mostly by third-party trackers.</ref>
+|-
+! scope="row" | <code>window.name</code> property
+| The <code>window.name</code> property allows web pages to store data so it can be targeted by hyperlinks or forms to navigate to the target window. Browsers have not typically enforced the same origin policy to prevent sharing between websites, which meant that successive page visits in the same tab leaked private data to different websites. <ref>
+https://blog.mozilla.org/security/2021/04/19/firefox-88-combats-window-name-privacy-abuses/
+</ref> <ref>
+<blockquote>For example, suppose a page at https://example.com/ set the window.name property to “my-identity@email.com”. Traditionally, this information would persist even after you clicked on a link and navigated to <nowiki>https://malicious.com/</nowiki>. So the page at <nowiki>https://malicious.com/</nowiki> would be able to read the information without your knowledge or consent.</blockquote>
+</ref> To prevent malicious websites from observing the <code>window.name</code> content to collect user data, certain browsers now clear this property when navigating between websites. <ref>
+Such as Firefox 88 onward.
+</ref>
+|-
+|}
+
+== Fingerprinting Resistance ==
+
+The [https://www.eff.org/deeplinks/2010/05/every-browser-unique-results-fom-panopticlick EFF has found] that while most browsers are uniquely fingerprintable, resistance is afforded via four methods:
+
+* Disabling JavaScript with tools like [https://www.noscript.net/ NoScript].
+* Use of Tor, which is built-in with Tor Browser and enabled by default. <ref>Setting Tor Browser security level to safer/safest will disables many types of active content.</ref>
+* Use of mobile devices like Android and iPhone.
+* Corporate desktop machines which are clones of one another.
+
+With JavaScript disabled, [[Tor Browser]] provides significant resistance to browser fingerprinting: <ref>https://blog.torproject.org/effs-panopticlick-and-torbutton</ref>
+
+* The User Agent is uniform for all Torbutton users.
+* Plugins are blocked.
+* The screen resolution is rounded down to 50 pixel multiples.
+* The timezone is set to GMT.
+* DOM Storage is cleared and disabled.
+
+At the time of writing, [https://coveryourtracks.eff.org/ Cover your tracks] only returns 6.63 bits of information for Tor Browser with JavaScript disabled. This is equivalent to sharing the same fingerprint as 1 in 99 other browsers (from the testing group) due to the 2 million strong pool of near-identical users. That said, fingerprinting defense is not perfect in any browser and there are still open bugs, see issues labeled with [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/?label_name%5B%5D=Linkability Linkability] label and [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/?label_name%5B%5D=Fingerprinting Fingerprinting] label.
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Users should not rely solely on different filtering applications and services that hide or change problematic headers, like [https://www.privoxy.org/ Privoxy]. <ref>Privoxy manipulates cookies and modifies web page data and HTTP headers before the page is rendered.</ref> They cannot filter encrypted (HTTPS) connections and the setting of special values for variables actually ''worsens'' the user's fingerprint.
+}}
+
+= Browser History and Cache =
+
+== Introduction ==
+
+A user's browser history and cache enables the possibility of history sniffing attacks: <ref>https://cseweb.ucsd.edu/~lerner/papers/ccs10-jsc.pdf</ref>
+
+<blockquote>In most browsers, all application domains share access to a single visited-page history, file cache, and DNS cache. This leads to the possibility of history sniffing attacks, where a malicious site (say, attacker.com) can learn whether a user has visited a specific URL (say, bankofamerica.com), merely by inducing the user to visit attacker.com. To this end, the attack uses the fact that browsers display links differently depending on whether or not their target has been visited. In JavaScript, the attacker creates a link to the target URL in a hidden part of the page, and then uses the browser’s DOM interface to inspect how the link is displayed. If the link is displayed as a visited link, the target URL is in the user’s history. Tealium and Beencounter sell services that allow a website to collect the browsing history of their visitors using history sniffing.</blockquote>
+
+A [https://cseweb.ucsd.edu/~lerner/papers/ccs10-jsc.pdf 2010 University of California publication] found that nearly 1 per cent of the Alexa global top 50,000 websites collected information from web surfers via history sniffing. History sniffing was not just limited to fringe websites - popular sites like {{Code|youporn.com}} were found to engage in the practice. Website histories were vulnerable via a combination of malicious JavaScript and CSS hacks, leading to:
+
+* Inspection of style properties to infer browser history.
+* Transfer of the browser's history to the network.
+* Actual history hijacking.
+
+Websites can tell which sites are saved in a user's browser history using specialized commands and design elements. Three example are outlined below.
+
+* <u>CSS stylesheets</u>: Commonly the visited website will embed special formatting commands (CSS Stylesheets) that contain external links "of interest" on the pages that are visited. If one of the external websites have been visited before, the browser will react by executing a command defined in the format, for example by downloading a small picture from the website. In this way the website can learn and/or make educated guesses about the contents of a user's browser history.
+* <u>ETags</u>: The contents of the browser cache can reveal previously visited websites. Along with the website URL and numerous page elements, the browser caches also store an ETag sent by the server. If the website is visited again, the ETag is first sent to ask for changes. ETags can contain unique user IDs, which have been used by companies like [https://web.archive.org/web/20150315010559/http://www.kissmetrics.com/ KISSmetrics] to identify persons visiting some of the top 100 websites.
+* <u>Website page load time</u>: The time required for a website page to load changes when it is partially stored in the browser cache. By subtle placement of the images on the website, the server can analyze the cache elements one by one. <ref>Cache elements include graphic files (logos, icons, banners, buttons etc.), script files, photographs and HTML pages.</ref>
+
+== Deanonymization Risk ==
+
+The obvious corporate business case for information collected via history sniffing is targeted advertising. However, the same technique can be used to deanonymize web surfers.
+
+Consider the following attack vector, outlined in a  [https://web.archive.org/web/20150921023402/http://www.iseclab.org/papers/sonda-TR.pdf publication] by security researchers iSecLab. Browser history was used to collect the groups visited in the social network "Xing." Logically, it is improbable that two or more people would share membership of the same set of groups within a social network. Therefore, when this information was revealed it was possible to associate users with their real names and e-mail addresses.
+
+=== Precautions ===
+
+The only reliable protection against analysis of a user's browser history is to use Tor Browser:
+
+* This "feature" is deactivated by default.
+* Tor Browser bypasses the cache for third party content to protect users. <ref>This means a website can only learn information about itself, and not other websites.</ref>
+* The cache is deleted automatically when the browser is closed.
+
+Deactivating the browser cache is not recommended, since it can have a deleterious impact on browsing speed.
+
+= Cookies =
+
+== Introduction ==
+
+Cookies have been in existence since 1994, when they were conceived by a programmer working for Netscape Communications as a reliable method for e-commerce applications. According to Wikipedia: <ref name=HTTP_cookie>https://en.wikipedia.org/wiki/HTTP_cookie</ref>
+
+<blockquote>An HTTP cookie (also called web cookie, Internet cookie, browser cookie, or simply cookie) is a small piece of data sent from a website and stored on the user's computer by the user's web browser while the user is browsing. Cookies were designed to be a reliable mechanism for websites to remember stateful information (such as items added in the shopping cart in an online store) or to record the user's browsing activity (including clicking particular buttons, logging in, or recording which pages were visited in the past). They can also be used to remember arbitrary pieces of information that the user previously entered into form fields such as names, addresses, passwords, and credit card numbers.</blockquote>
+
+== Cookie Classification ==
+
+{{project_name_long}} users are probably most familiar with [https://en.wikipedia.org/wiki/HTTP_cookie#Third-party_cookie third-party cookies] since they can be used to track browsing history via web page content sourced from external websites, such as banner advertisements. However, cookies have a range of both useful and potentially harmful applications. <ref name=HTTP_cookie />
+
+'''Table:''' ''Cookie Classification'' <ref name=HTTP_cookie />
+
+{| class="wikitable"
+|-
+! scope="col"| '''Cookie Type'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Authentication Cookies
+| Used by web servers to know whether a user is logged in, and the account being used.
+|-
+! scope="row"| Persistent Cookies
+| Expire after a specific period of time, or on a set date. They transmit information to servers every time a user browses websites that are associated with the cookie. Persistent cookies can track a user's browsing habits over an extended period, possibly years. <ref>They also have legitimate functions such as keeping users logged into specific accounts.</ref>
+|-
+! scope="row"| Secure Cookies
+| Transmitted over encrypted (HTTPS) connections, making them less vulnerable to cookie theft.
+|-
+! scope="row"| Session Cookies
+| Exist temporarily in memory while a website is navigated and are normally deleted when the browser is closed.
+|-
+! scope="row"| Supercookies
+| Have an origin of a [https://en.wikipedia.org/wiki/Top-level_domain top-level domain] like {{Code|.org}} or a public suffix such as {{Code|.com.de}}. If not blocked by the browser, adversaries in control of malicious websites can set supercookies and then impersonate or disrupt user requests to another website sharing the same top-level domain or public suffix.
+|-
+! scope="row"| Third-party Cookies
+|
+Belong to domains that are different from the URL shown in the web browser address bar. Tracking is enabled via the following process: <br />
+# Website A contains an advertisement served by {{Code|eviladvertiser.org}} <br />
+# A cookie belonging to {{Code|eviladvertiser.org}} is downloaded and stored on the user's computer. <br />
+# Website B is visited and also contains advertising content from {{Code|eviladvertiser.org}}, setting another cookie belonging to that domain. <br />
+# Both cookies are eventually sent to {{Code|eviladvertiser.org}}, and an extensive profile of browsing history is gradually acquired over time.
+|}
+
+== Evercookies ==
+
+With 80% of users disapproving of tracking while browsing the Internet, they have progressively started to delete cookies with relevant browser settings and extensions. Advertisement and tracking networks have responded in kind, using more sophisticated methods - evercookies - to distinguish users. The various forums of evercookies are described below.
+
+'''Table:''' ''Evercookie Classification''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Evercookie Type'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Entity Tag (ETag) Cookies
+| HTTP supports simple cache control mechanisms, including ETags which store either a version number or a user identifier (ETag cookie). The purpose is to save bandwidth and have browsers use caches for web content when it has not changed, instead of reloading the complete web server content again. <ref>https://en.wikipedia.org/wiki/HTTP_ETag</ref> Unfortunately this provides a tracking mechanism which can be persistently stored, and has been used by various websites including {{Code|Hulu.com}}. ETag cookies can be, and often are respawned. <ref>https://cyberlaw.stanford.edu/blog/2011/08/tracking-trackers-microsoft-advertising</ref>
+|-
+! scope="row"| Flash Cookies (LSOs)
+| Flash cookies are also known as [https://en.wikipedia.org/wiki/Local_shared_object local shared objects (LSOs)] and store data from websites that use Adobe Flash. User permission is not sought when cookies are stored, and they are stored outside of normal browser local storage system. <ref>https://www.popularmechanics.com/technology/security/how-to/a6134/what-are-flash-cookies-and-how-can-you-stop-them/</ref> Previously, it was difficult to delete Flash cookies, as they could not be located easily with browsers. <ref>https://www.ghacks.net/2007/05/04/flash-cookies-explained/</ref> However, modern browsers, extensions and [https://en.wikipedia.org/wiki/Local_shared_object#Viewers_and_editors software] have [https://support.mozilla.org/en-US/questions/939710?db=5 relevant settings] to easily remove them. <ref>In Linux, LSOs are normally stored in:
+* {{Code|~/.macromedia/Flash_Player/#SharedObjects/}}
+* {{Code|~/.macromedia/Flash_Player/macromedia.com/support/flashplayer/sys/}}
+</ref> LSOs can be used to: <ref>https://en.wikipedia.org/wiki/Local_shared_object</ref> <br />
+* Store and retrieve information from local storage when a user access webpages with a Flash application. <br />
+* Store user preferencs. <br />
+* Save data from Flash games. <br />
+* Track users' Internet activity, even across different browsers. For example: <br />
+** Firefox is used to visit a site showing a relevant product. <br />
+** Firefox is closed, but that information was stored in a LSO. <br />
+** The same person on the same machine uses Chrome to access a website viewed in Firefox. <br />
+** The website is able to read the LSO value(s) in Chrome, and display relevant content or targeted information.
+|-
+! scope="row"| [https://www.w3schools.com/jsref/prop_doc_cookie.asp HTML5 DOM] [https://en.wikipedia.org/wiki/Web_storage Cookies]
+| Allow web application software to store data persistently in a manner similar to cookies. Local storage and session-only storage are both possible. The storage size is far greater than that available to cookies, but it is not automatically transmitted on every HTTP request. Instead, client-side scripts allow the desired interaction with the server. It is possible to remove DOM cookies without about:config changes in Firefox <ref>Set <code>dom.storage.enabled</code> to false.</ref>, or by using relevant extensions (like Click&Clean or BetterPrivacy). However, this action is no longer necessary since DOM cookies are disabled in Firefox 58 onward. [[Tor Browser]] also defends against this technique by default. <ref>https://nakedsecurity.sophos.com/2017/10/30/firefox-takes-a-bite-out-of-the-canvas-super-cookie/</ref>
+|-
+! scope="row"| Zombie Cookies
+| Automatically recreated after being deleted. Cookie content is stored in multiple locations such as [https://en.wikipedia.org/wiki/Web_storage HTML5 web storage], [https://en.wikipedia.org/wiki/Local_shared_object Flash Local shared object], client-side and server-side locations. When the cookie is deleted on a user's computer, this is detected and restored from one of the other cookie storage locations.
+|-
+! scope="row"| Other Methods
+| Samy Kamkar has demonstrated that there are other [https://samy.pl/evercookie/ possible methods] to track Internet users using evercookies.
+|}
+
+In a [https://ptolemy.berkeley.edu/projects/truststc/education/reu/11/Posters/AyensonMWambachDpaper.pdf study by the University of California, Berkeley] the methods of Space Pencil Inc. (aka KISSmetrics) were exposed. In addition to cookies and flash cookies, KISSmetrics used cache cookies via ETags, DOMStorage and IE-userData to distinguish each user. KISSmetrics was sued as a result and dispensed with using ETags. It also allegedly now respects the [https://www.eff.org/issues/do-not-track/ Do Not Track] HTTP header. <ref>Users should never rely on DNT preferences, since they are [https://en.wikipedia.org/wiki/Do_Not_Track#Adoption rarely respected by industry].</ref>
+
+[[Tor Browser]], which comes bundled with {{project_name_long}}, resists evercookies.
+
+== Cookie Threats ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Over 95 percent of websites use cookies <ref name=Cookie_threat>https://www.digitaltrends.com/computing/history-of-cookies-and-effect-on-privacy/</ref> and embedded, external advertisement and analytics services are increasingly common.
+}}
+
+It is evident that cookies are useful for website personalization, logins, monitoring purchases and other functions, but they also present a dire tracking threat. The average website places 34 cookies on a device on the first visit, and 70 percent of these are third-party cookies. Expiry dates are often set to the year "9999", indicating there is no intention to ever stop recording user behavior. <ref name=Cookie_threat />
+
+The tracking service [https://web.archive.org/web/20150509092851/http://help.yahoo.com/l/us/yahoo/ywa/documentation/install_guide/ig_get_started.html Yahoo! Web Analytics] has made claims of being able to set cookies on 99.9% of users. This [https://web.archive.org/web/20150518023058/http://smorgasbork.com/component/content/article/84-a-study-of-internet-users-cookie-and-javascript-settings indicates] that [https://ptolemy.berkeley.edu/projects/truststc/education/reu/10/Papers/GomezG,YalajuJ_paper.pdf cookie-generating JavaScript] and/or Flash cookies are deployed as the primary mechanisms.
+
+A 2011 [https://ptolemy.berkeley.edu/projects/truststc/education/reu/11/Posters/AyensonMWambachDpaper.pdf study by the University of California, Berkeley] found that the top 100 websites at that time stored a total of 5,675 cookies. Of these, 4,914 cookies were set by third party domains and not the first-party domain being purposefully visited by the user. When browsing these 100 websites, data was transmitted to 600 servers.
+
+Cookie security is dependent on whether cookie data is encrypted, since adversaries may otherwise use this information to gain access to user data or to access websites with the user's credentials. Examples of this attack include [https://en.wikipedia.org/wiki/Cross-site_scripting cross-site scripting] and [https://en.wikipedia.org/wiki/Cross-site_request_forgery cross-site request forgery].
+
+As well as gathering the IP address and/or the HTTP referrer field of the computer requesting the web page, cookies can also store the requested URL and the date/time of the request. Web hosts are therefore capable of recording a large proportion of browsing behavior over many years, and correlating the accumulated profile data with individuals. The typical Internet user has collected hundreds of cookies from various websites on their PC without their knowledge. For instance, the following figure exhibits a small number of the cookies that are stored when a request is made to {{Code|www.nytimes.com}}.
+
+'''Figure:''' ''Cookies set by the New York Times''
+
+[[Image:cookies_nytimes.png]]
+
+Most modern browsers integrate an optional function to block cookies, but the option has to be first set by the user.  [[Tor Browser]], which comes bundled with {{project_name_long}}, has activated cookie blocking by default. Firefox has also adopted Tor Browser's [https://www.bleepingcomputer.com/news/software/another-tor-browser-feature-makes-it-into-firefox-first-party-isolation/ first party isolation] feature since version 55, meaning cookies are separated on a per-domain basis. Advertisement trackers are unable to see all the cookies stored on a user's computer (only the cookie for the currently viewed domain), meaning they cannot aggregate persistent cookie data for profiling.
+
+In 2019, Firefox also implemented [https://blog.mozilla.org/blog/2019/06/04/firefox-now-available-with-enhanced-tracking-protection-by-default/ Enhanced Tracking Protection] by default as part of the 'Standard' setting in the browser. This blocks known third-party tracking cookies based on the Disconnect list. This functionality was extended in Firefox 79 ('Enhanced Tracking Protection v2.0') to mitigate [[#Redirect_Tracking|Redirect Tracking]] (see below), a technique which involves trackers being loaded as a first party and therefore being allowed to store cookies. In the future, it is expected that more functions will become available to administrate preferences and acquired cookie collections.
+
+== Redirect Tracking ==
+
+Mozilla succinctly describes this novel threat: <ref name=redirect_tracking>https://blog.mozilla.org/security/2020/08/04/firefox-79-includes-protections-against-redirect-tracking/</ref>
+
+<blockquote>When we browse the web we constantly navigate between websites; we might search for “best running shoes” on a search engine, click a result to read reviews, and finally click a link to buy a pair of shoes from an online store. In the past, each of these websites could embed resources from the same tracker, and the tracker could use its cookies to link all of these page visits to the same person. To protect your privacy ETP 1.0 blocks trackers from using cookies when they are embedded in a third party context, but still allows them to use cookies as a first party because blocking first party cookies causes websites to break. Redirect tracking takes advantage of this to circumvent third-party cookie blocking. <br /> <br />
+
+Redirect trackers work by forcing you to make an imperceptible and momentary stopover to their website as part of that journey. So instead of navigating directly from the review website to the retailer, you end up navigating to the redirect tracker first rather than to the retailer. This means that the tracker is loaded as a first party and therefore is allowed to store cookies. The redirect tracker associates tracking data with the identifiers they have stored in their first-party cookies and then forwards you to the retailer.</blockquote>
+
+To illustrate the threat, consider somebody browsing an online website advertising computer hardware who decides to click a link to purchase a laptop from a suitable retailer. The browser will quickly navigate to the relevant website and the hardware product page loads. Without realizing it, the customer may have been tracked via several steps:
+
+# The website advertising the computer hardware had the appropriate URL to redirect to the specific retailer.
+# An embedded redirect tracker intercepted the click and sent the customer to their website instead.
+# The tracker saves the intended destination  the retailer’s URL  that the customer thought they were directly visiting.
+# After the redirect tracker is loaded as a first party, it can access its cookies. This means information is stored about which website the customer came from and where they are headed, along with cookie identifiers (allowing tracking across the Internet).
+# The customer is automatically redirected to their original destination after the tracking data is saved.
+
+Fortunately Firefox 79+ partially addresses this behavior via its Enhanced Tracking Protection. Every 24 hours any cookies and site data stored by known trackers are cleared, preventing trackers from building a long-term profile of user activity. However, temporary tracking is available within that 24 hour window and a host of unknown trackers may still pose a profiling threat. <ref name=redirect_tracking />
+
+= DNS Name Resolution =
+
+Browsing history can easily leak to the network via the [https://en.wikipedia.org/wiki/Domain_Name_System Domain Name System]. During the DNS name resolution process, hostnames like ''www.whonix.org'' are mapped to their respective IP address (like <code>192.168.1.1</code>) so the relevant application can connect. <ref>https://www.bleepingcomputer.com/tutorials/what-is-domain-name-resolution/</ref> Unless DNS traffic is encrypted it is vulnerable to sniffing by network observers. <ref>[https://blog.mozilla.org/security/2018/10/18/encrypted-sni-comes-to-firefox-nightly/ Firefox and other browser vendors] have recently made the use of DNS over HTTPS an optional feature to address this threat.</ref> <ref>[https://support.mozilla.org/en-US/kb/firefox-dns-over-https Mozilla notes]: <blockquote>DNS-over-HTTPS (DoH) works differently. It sends the domain name you typed to a DoH-compatible DNS server using an encrypted HTTPS connection instead of a plain text one. This prevents third-parties from seeing what websites you are trying to access.</blockquote></ref>
+
+== Privacy Concerns ==
+
+Any device searching for a DNS record must communicate with a DNS server to do so. DNS queries are sent in <u>clear text</u> via the UDP or TCP protocol, meaning passive network observers can see all lookups that are performed. For instance, it is documented the IC rely on [https://git.gnunet.org/bibliography.git/plain/docs/mcb-en.pdf advanced tools] to undertake passive surveillance, as well as hijacking DNS when required.
+
+This means people with access to the DNS server or advanced network observers can easily link the device's IP address to exact websites, email, chat and other visited domains and when/how often these records are accessed. <ref>Although DNS records do expire, so adversaries must regularly query this information before the information is lost.</ref> <ref name=DNS_hazard>https://en.wikipedia.org/wiki/Domain_Name_System#Privacy/tracking_issues</ref> Some ISPs even log DNS queries and share this information to third parties in an opaque fashion. Considering user IDs and even MAC addresses are embedded by some ISPs within DNS queries, this allows for intimate fingerprinting. <ref>https://dnsprivacy.org/the_problem/</ref> <ref>Some CDNs embed client subnets in queries from resolvers which allows for geo-location of users.</ref>
+
+DNS look-ups are capable of leaking if a user or application networking change is improperly configured. Attacks in the wild have relied upon DNS to bypass firewalls and exfiltrate data, since the attack vector is less commonly known.
+
+== Cache Poisoning Attacks ==
+
+Mozilla notes: <ref name=cache_poisoning>https://blog.mozilla.org/security/2020/11/17/measuring-middlebox-interference-with-dns-records/</ref>
+
+<blockquote>At a high level, clients typically resolve a name by sending a query to a recursive resolver, which is responsible for answering queries on behalf of a client. The recursive resolver answers the query by traversing the DNS hierarchy, starting from a root server, a top-level domain server (e.g. for .com), and finally the authoritative server for the domain name. Once the recursive resolver receives the answer for the query, it caches the answer and sends it back to the client.</blockquote>
+
+Unfortunately the recursive resolvers involved in the DNS lookup are susceptible to [https://www.cloudflare.com/learning/dns/dns-cache-poisoning/ cache poisoning attacks]. In simple terms, attackers are able to impersonate nameservers which leads to DNS resolvers caching false information and sending users to the wrong, malicious website. This is possible because the DNS protocol does not generally include a check for the correctness of DNS responses, unless measures like [https://www.dnssec.net/ DNSSEC] are employed. In this case, domain name owners provide cryptographic signatures for their DNS records so the origin can be authenticated, which also establishes a chain of trust between servers in the DNS hierarchy. <ref name=cache_poisoning /> <ref>In late 2020, only 1.8% of <code>.com</code> records are signed and around 25% of worldwide clients use DNSSEC-validating recursive resolvers.</ref>
+
+== Solutions ==
+
+The two primary defenses against the DNS threat are: <ref name=DNS_hazard />
+
+* <u>Proxies</u>: Tor and VPNs can re-route or anonymize DNS queries, which masks the source IP address. Tor is far stronger by design, since trust is distributed among multiple relays; this is unlike the complete trust placed in a single VPN provider. <ref>Meaning if they are malicious, the user is completely compromised. Only Tor combined with the VPN service will prevent this threat.</ref>
+* <u>Intermediate DNS servers</u>: Some rely on servers that are ''supposedly'' configured with minimal logging, and which are an alternative to untrusted, primary DNS servers. This method is not recommended, since the trust is simply shifted to other, potentially malicious parties. <ref>For instance, Cloudflare provides this service as of 2018, yet in recent times (2016) the company was blocking [https://blog.torproject.org/trouble-cloudflare 80 per cent of all Tor exit relays].</ref>
+
+A longer term solution for all traffic might be changing DNS to issue queries over TLS, since it is an encrypted protocol. This would prevent passive surveillance and allow validation of the server which has been chosen as a DNS service; some [https://dnsprivacy.org/test_servers/ experimental DNS servers] are already in operation. Unfortunately this solution is unlikely to be widely adopted anytime soon. Other potential solutions include: DNS over DTLS, DNSCrypt, DNS over HTTPS (proxied), DNS over QUIC, and DNSCurve. <ref>https://dnsprivacy.org/the_solutions/</ref>
+
+= Favicons =
+
+In early 2021, researchers demonstrated that [https://en.wikipedia.org/wiki/Favicon favicons] <ref>Such as Gmail's red mail icon, Wikipedia's bold "W" and Twitter's blue bird symbol.</ref> --  the tiny icons that appear next to the page name in browser tabs -- can be used as a novel tracking mechanism that acts like a supercookie: <ref>[https://www.cs.uic.edu/~polakis/papers/solomos-ndss21.pdf Tales of FAVICONS and Caches: Persistent Tracking in Modern Browsers].</ref>
+
+<blockquote>In more detail, a website can track users across browsing sessions by storing a tracking identifier as a set of entries in the browser’s dedicated favicon cache, where each entry corresponds to a specific subdomain. In subsequent user visits the website can reconstruct the identifier by observing which favicons are requested by the browser while the user is automatically and rapidly redirected through a series of subdomains. More importantly, the caching of favicons in modern browsers exhibits several unique characteristics that render this tracking vector particularly powerful, as it is persistent (not affected by users clearing their browser data), non-destructive (reconstructing the identifier in subsequent visits does not alter the existing combination of cached entries), and even crosses the isolation of the incognito mode.</blockquote>
+
+Specifically, attacker-controlled websites can redirect users through a series of sub-domains. Each subdomain services a different favicon which creates their own entries in the favicon-cache. Mathematically speaking, a series of N-subdomains leads to a N-bit identifer that is unique to each browser. No user interaction is necessary for attackers to force the browser to visit these subdomains. <ref>https://www.cs.uic.edu/~polakis/papers/solomos-ndss21.pdf</ref>
+
+Researchers demonstrated that favicon-based tracking techniques could be combined with static fingerprinting attributes to reconstruct a 32-bit tracking identifier in less than two seconds. It is estimated that a 32-bit identifer can track around 4.5 billion unique browsers, which approximates all globally connected individuals. <ref>https://arstechnica.com/information-technology/2021/02/new-browser-tracking-hack-works-even-when-you-flush-caches-or-go-incognito/</ref>
+
+This attack was shown to be (partially) effective against most modern browsers including Chrome, Safari, Edge and Brave depending on the version and platform. Notably the original research did not identify Firefox as vulnerable due to [https://bugzilla.mozilla.org/show_bug.cgi?id=1618257 this bug], <ref><blockquote>As  part of our experiments we also test Firefox. Interestingly, while the  developer documentation and sourcecode include functionality intended for favicon  caching similar to the other browsers, we identify inconsistencies in its actual usage. In fact, while monitoring the browser during the attack’s execution we observe that it has a valid favicon cache which creates appropriate entries for every visited page with the corresponding favicons. However, it never actually uses the cache to fetch the entries. As a result, Firefox actually issues requests to re-fetch favicons that are already present in the cache. ... Nonetheless, we believe that once this bug is fixed our attack will work in Firefox, unless they also deploy countermeasures to mitigate our attack.</blockquote></ref> but [https://supercookie.me/workwise other research] suggests Firefox (and hence Tor Browser) is only partially protected at present.
+
+'''Table:''' ''Impacted Browsers and Platforms'' <ref>https://supercookie.me/workwise</ref>
+
+{| class="wikitable"
+|-
+
+| style="height: 35px;width: 170px"|
+| '''Windows'''
+| '''macOS'''
+| '''Linux'''
+| '''iOS'''
+| '''Android'''
+|-
+
+| style="height: 27px;background-color: #f9f9f9"| Chrome v87.0
+| style="background-color: {{Red}}"| Vulnerable
+| style="background-color: {{Red}}"| Vulnerable
+| style="background-color: {{Red}}"| Vulnerable
+| style="background-color: {{Red}}"| Vulnerable
+| style="background-color: {{Red}}"| Vulnerable
+|-
+
+| style="height: 27px;background-color: #f9f9f9"| Safari v14.0
+| -
+| style="background-color: {{Red}}"| Vulnerable
+| -
+| style="background-color: {{Red}}"| Vulnerable
+| -
+|-
+
+| style="height: 27px;background-color: #f9f9f9"| Edge v87.0
+| style="background-color: {{Red}}"| Vulnerable
+| style="background-color: {{Red}}"| Vulnerable
+| style="background-color: {{Green}}"| Unaffected
+| style="background-color: {{Green}}"| Unaffected
+| style="background-color: {{Red}}"| Vulnerable
+
+|-
+
+| style="height: 27px;background-color: #f9f9f9"| Firefox v85.0 <ref>The fingerprint is different in incognito mode.</ref>
+| style="background-color: {{Red}}"| Vulnerable
+| style="background-color: {{Red}}"| Vulnerable
+| style="background-color: {{Green}}"| Unaffected
+| style="background-color: {{Green}}"| Unaffected
+| style="background-color: {{Green}}"| Unaffected
+|-
+
+| style="height: 27px;background-color: #f9f9f9"| Brave v1.19.92
+| style="background-color: {{Green}}"| Unaffected
+| style="background-color: {{Green}}"| Unaffected
+| style="background-color: {{Green}}"| Unaffected
+| style="background-color: {{Blue}}"| ?
+| style="background-color: {{Green}}"| Unaffected
+|-
+
+|}
+
+The vulnerability has been disclosed to browser vendors who are exploring mitigation strategies for future releases. Researchers noted this was a proof-of-concept attack which had not been noticed in the wild. Also note that clearing website data, VPNs, adblockers, anti-tracking extensions/software and incognito mode all failed to provide protection against this threat. <ref>https://www.vice.com/en/article/n7v5y7/browser-favicons-can-be-used-as-undeletable-supercookies-to-track-you-online</ref> <ref>Incognito mode failed due to improper site isolation.</ref> In the interim, combinations of browsers and operating systems that might be vulnerable should be avoided if possible. With respect to Tor Browser, greater protection is likely once it is based on Firefox ESR 91, since the Firefox 85 release onward provides [https://blog.mozilla.org/security/2021/01/26/supercookie-protections/ partitioning of the network state] that should prevent this novel tracking threat.
+
+= HTML5 Canvas Image Data =
+
+Websites routinely request browser configuration settings in order to help select the best page format for the visitor. One of those variables is HTML5 canvas image data, which is related to graphical rendering. Canvas is a drawable region in HTML code with height and width attributes, and Javascript code can access this area though a large set of drawing functions related to animation, games, images and so on. <ref>https://en.wikipedia.org/wiki/Canvas_element</ref>
+
+In 2016, researchers from Princeton University discovered HTML canvas fingerprinting scripts on 14,371 of the top 1 million websites. <ref>https://web.archive.org/web/20161123065641/randomwalker.info/publications/OpenWPM_1_million_site_tracking_measurement.pdf</ref> When combined with other exposed browser settings this can be enough to uniquely identify an individual, even without access to the specific IP address. <ref>https://tor.stackexchange.com/questions/4029/html-5-canvas-imagedata-extraction-what-does-it-actually-mean</ref>
+
+The Tor Project provides a good explanation of this fingerprinting method: <ref>https://2019.www.torproject.org/projects/torbrowser/design/</ref>
+
+<blockquote>After plugins and plugin-provided information, we believe that the [https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API HTML5 Canvas] is the single largest fingerprinting threat browsers face today. [https://web.archive.org/web/20130102214718/https://cseweb.ucsd.edu/~hovav/dist/canvas.pdf Studies] <ref>
+2022 https://cseweb.ucsd.edu/~hovav/dist/canvas.pdf started redirecting to https://hovav.net/ucsd/dist/canvas.pdf
+</ref> [https://securehomes.esat.kuleuven.be/~gacar/persistent/the_web_never_forgets.pdf show] that the Canvas can provide an easy-access fingerprinting target: The adversary simply renders WebGL, font, and named color data to a Canvas element, extracts the image buffer, and computes a hash of that image data. Subtle differences in the video card, font packs, and even font and graphics library versions allow the adversary to produce a stable, simple, high-entropy fingerprint of a computer. In fact, the hash of the rendered image can be used almost identically to a tracking cookie by the web server.</blockquote>
+
+Tor Browser has been patched to prompt before returning valid image data to the Canvas APIs. By default, if the site has not been given previous permission to extract canvas image data, then white image data is returned to the Javscript APIs. Third parties are not allowed to extract canvas image data at all.
+
+When browsing, if a prompt appears with a message like that below, it is recommended to select {{code|n}}.
+
+<pre>This website (github.com) attempted to extract HTML5 canvas image data, which may be used to uniquely identify your computer.
+
+Should Tor browser allow this website to extract HTML5 canvas image data? </pre>
+
+{{Anchor|IP}}
+
+= IP Address =
+
+== Introduction ==
+
+The Privacy Commissioner of Canada provides a succinct definition of an IP address: <ref name=IP_address>https://www.priv.gc.ca/en/opc-actions-and-decisions/research/explore-privacy-research/2013/ip_201305/</ref>
+
+<blockquote>An Internet Protocol (IP) address is a numerical identification and logical address that is assigned to devices participating in a computer network utilizing the Internet Protocol. Although IP addresses are stored as binary numbers, they are usually displayed in a more human-readable notation, such as 208.77.188.166. The Internet Protocol also has the task of routing data packets between networks, and IP addresses specify the locations of the source and destination nodes in the topology of the routing system.</blockquote>
+
+Internet Service Providers (ISPs) assign or lease IP addresses to individuals and these can be static or dynamic. Static IP addresses have a permanent address that is assigned to the network-connected device such as a firewall or router. Dynamic IP addresses are assigned to network-connected devices on a temporary basis (typically a few months), which is often the case for household customers.
+
+In both cases, the IP address acts as a unique identifier and the ISP may save (meta)data for months or even years. This may include browsing records, time spent online, and any direct connection to Internet services. This is possible because the IP address tells the server where to send a response. So long as the IP address does not change, it is easy for ISPs to monitor when and where a user has connected.
+
+== Information Linked to IP Addresses ==
+
+Knowledge of an IP address can reveal various information about devices, networks or services.
+
+'''Table:''' ''IP Address Information'' <ref name=IP_address />
+
+{| class="wikitable"
+|-
+! scope="col"| '''Category'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Access Technology
+|
+* Databases can help reveal what hardware is being used to browse the Internet. For example, it is possible to distinguish whether a user is relying on DSL, a modem or a mobile device for connectivity. <br />
+* A reverse lookup can be performed to obtain a computer name, which can reveal the physical location or other details. <ref>This technique links the resolution of an IP address to its domain name.</ref>
+|-
+! scope="row"| ISP Provider
+| Personal data might be retrieved if the provider is known. For example, information might be sought on email addresses associated with an IP address, which in turn might relate to requests for subscriber information.
+|-
+! scope="row"| Personal Information
+|
+* Searching the WHOIS database might reveal other information about an individual, including organizational affiliations. <ref>This might include organizational address, name and phone number.</ref> <br />
+* Internet searches using the IP address or computer names might show relevant peer-to-peer (P2P) activities (such as file sharing), fragments in web server log files, or evidence of other individual activities (like Wikipedia edits). Small pieces of online history can reveal a range of personal characteristics, preoccupations and individual interests.
+|-
+! scope="row"| Physical Location
+|
+It is possible to geo-locate an IP address to the country, city and regional level: <br />
+* [https://web.archive.org/web/20120118072647/http://www.netop.org/services/ip-geolocation Geo-location] [https://www.maxmind.com/en/geoip2-services-and-databases services] are available to refine the search further to districts or office buildings. In the case of a company or computer center, it is sometimes possible to determine which terminal a user is on. <br />
+* Traceroutes can find the path to a computer, which provides information on its logical and physical location. <ref>This technique displays the path of packets across an IP network.</ref> <br />
+* Some lookup tools reveal latitude/longitude, telephone area code and a map of the location.
+|}
+
+Interested readers can refer to online sites to review some of the information that is revealed by an [https://browserleaks.com/ip IP address] or [https://browserleaks.com/ browser].
+
+== Conclusion ==
+
+Based on the preceding information, it is clear that without privacy or anonymity software, individuals are "browsing naked" on the Internet. While many of the threats in this chapter may be mitigated fully or partially without any special services, this is not the case for the IP address which is often uniquely linked to one person.
+
+This is why projects like Tor were founded, to blur any connection between a user's IP address and the websites that are visited. Similarly, this is why the {{project_name_long}} platform relies on the Tor network as the foundation for anonymous activities. <font size="-3">[https://2019.www.torproject.org/about/overview.html.en How Tor works]</font>
+
+= JavaScript =
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Do not confuse JavaScript with [https://www.java.com/en/download/faq/java_javascript.xml Java] or the active [https://stackoverflow.com/questions/11568648/difference-between-jre-and-java-plugin Java plugin], which are [https://www.differencebetween.com/difference-between-java-and-javascript/ completely different things] despite the similar name (see above). <ref>In short, JavaScript is not part of the Java platform and is a scripting language, while Java is an object-oriented programming language. The Java plugin is bundled with Java runtime and runs inside the browser; allowing Java code to run inside a client's browser process.</ref>
+}}
+
+== Introduction ==
+
+[https://en.wikipedia.org/wiki/JavaScript JavaScript] is one of the fundamental core technologies for Internet content production, alongside [https://en.wikipedia.org/wiki/HTML HTML] and [https://en.wikipedia.org/wiki/CSS CSS]. It allows sites to be interactive and dynamic, as well as provide for online applications such as video games. In contrast, HTML is a markup language that is used to create static content on sites, and Cascading Style Sheets (CSS) are designed for user formatting like interfaces, layout, colors and fonts. Modern browsers frequently use JavaScript ("scripts", "active scripting") and it is marginally safer against security and privacy vulnerabilities compared to the aforementioned plugins.
+
+In the past, JavaScript has been responsible for an estimated 84% of all security vulnerabilities on the Internet via [https://en.wikipedia.org/wiki/Cross-site_scripting cross-site scripting]. This attack allows adversaries to inject malicious client-side script into web pages, leading to users redirecting to malicious sites that phish for login credentials, bank accounts, personal information, or other sensitive data. <ref>https://gizmodo.com/why-are-javascript-attacks-so-dangerous-1453269240</ref> Similarly, JavaScript can be used by web hosts to access detailed information about a user's browser, desktop setting, operating system and hardware specifications, which forms a unique digital fingerprint of an individual. <ref> Refer to the following [https://ip-check.info/?lang=en ip-check.info anonymity test] to view some sample values which can be gathered via JavaScript (if enabled).</ref> <ref>[https://web.archive.org/web/20210125110454/https://anonymous-proxy-servers.net/forum/viewtopic.php?f=10&t=7319 ip-check.info returns some false values and confuses TBB users]</ref>
+
+== JavaScript Attack Classification ==
+
+JavaScript is essential to a fully functional browsing experience, but several classes of attacks rely upon it and are often successful.
+
+'''Table:''' ''Javascript Attack Classification'' <ref>https://www.sophos.com/en-us/security-news-trends/security-trends/malicious-javascript.aspx</ref> <ref>https://worldcomp-proceedings.com/proc/p2016/SAM9734.pdf</ref> <ref>https://en.wikipedia.org/wiki/Cross-site_scripting#Related_vulnerabilities</ref>
+
+{| class="wikitable"
+|-
+! scope="col"| '''Category'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| [https://en.wikipedia.org/wiki/Cross-site_scripting Cross-site Scripting]
+| Since the 1990s it has been possible to inject JavaScript client-side into web-based applications, servers or plug-in systems, bypassing the [https://en.wikipedia.org/wiki/Same-origin_policy same-origin policy]. After successful exploitation, users visiting the compromised site are served malicious content which is presumed to be from a trusted source. Attackers can then access sensitive page content, session cookies and other information.
+|-
+! scope="row"| [https://en.wikipedia.org/wiki/Cross-site_request_forgery Cross-site Request Forgery]
+|
+Unauthorized commands are transmitted from a user by trusted web applications. Malicious websites can use specially crafted image tags, hidden forms, and JavaScript XMLHttpRequests for this purpose. Depending on the specific vulnerability, when these elements are clicked by the user, the attacker may be able to: <br />
+* Execute remote code with root privileges. <br />
+* Forge login requests and view private information. <br />
+* Change personal information or fully compromise online accounts. <br />
+* Conduct illicit money transfers. <br />
+* Performance nearly all actions of a logged in user.
+|-
+! scope="row"| Drive-by Download Attacks
+| When users visit a compromised website running malicious code, <ref>82% of malicious sites are hacked legitimate ones.</ref> users are redirected to another site controlled by the attackers. Attackers then run code in the victim's web browser that loads an exploit kit which probes the user's OS, browser and software to find vulnerabilities. Payloads/malware are then downloaded that access personal data, encrypt the computer or other intended criminal activity.
+|-
+! scope="row"| Malicious JavaScript Email Attachments
+| When a harmless looking document is opened by the user, ransomware is downloaded to the HDD/SSD, later encrypting the computer and demanding a ransom to unlock the files.
+|-
+! scope="row"| Universal Cross-site Scripting
+| Vulnerabilities in the browser or plugins are exploited to take control over the network. For example Firefox and other browsers, as well as plugins like Flash and ActiveX controls, all have flaws which can lead to [https://en.wikipedia.org/wiki/Buffer_overflow buffer overflows]. These are often exploitable via JavaScript and allows attackers to gain access to the OS's [https://en.wikipedia.org/wiki/API Application Programming Interface (API)] with root privileges. <ref>Sandbox implementation errors can also lead to Javascript running outside of the sandbox and with elevated privileges e.g. create or delete files.</ref>
+|}
+
+== Session Replay Scripts ==
+
+Enabling Javascript does more than reveal additional information about a user's system and increase the probability of a successful browser exploit. It can also lead to a complete, literal recording of the entire browsing session if the user is unlucky enough to browse one of nearly [https://webtransparency.cs.princeton.edu/no_boundaries/session_replay_sites.html 500 sites] in the Alexa top 50,000: <ref name=Session_replay_script>https://freedom-to-tinker.com/2017/11/15/no-boundaries-exfiltration-of-personal-data-by-session-replay-scripts/</ref> <ref>This includes the usual privacy offenders such as microsoft.com, skype.com and adobe.com, along with various sites providing banking, media, torrenting, educational, telecommunications, forums, shopping, and anti-virus services.</ref>
+
+<blockquote>You may know that most websites have third-party analytics scripts that record which pages you visit and the searches you make. But lately, more and more sites use “session replay” scripts. These scripts record your keystrokes, mouse movements, and scrolling behavior, along with the entire contents of the pages you visit, and send them to third-party servers. Unlike typical analytics services that provide aggregate statistics, these scripts are intended for the recording and playback of individual browsing sessions, as if someone is looking over your shoulder.</blockquote>
+
+The law as it stands allows corporate entities to embed Javascript functions on sites in order to record highly personal information. This includes what is typed, exact movements of the mouse, and even "co-browsing", whereby an unseen intruder can watch what it is done in real time, without any form of notification. There are few limits to the data harvested;  name, email, phone number, address, social security numbers and date of birth are all considered fair game by companies like FullStory, Hotjar and Smartlook. Many offer the option to [https://web.archive.org/web/20171114004942/https://www.smartlook.com/docs/identify-visitors explicitly] [https://web.archive.org/web/20170623160320/http://help.fullstory.com/develop-js/identify link] recordings to real identities.
+
+Although full or partial redactions are attempted on passwords, credit card numbers, CVC numbers, and credit card expiry dates, sensitive information was found to leak in many instances, such as: <ref name=Session_replay_script />
+
+* Passwords entered into registration forms.
+* Leaking of credit card details on payment pages, even in real time.
+* Leaking of specific medical conditions and prescriptions.
+
+The same tracking companies often use insecure HTTP pages to deliver the recording playbacks or publisher page contents,  providing an enticing man-in-the-middle attack opportunity for advanced adversaries. <ref>Reinforcing the perception that the private sector really is a comfortable and principal ally in the surveillance-industrial complex.</ref> Fortunately, disabling Javascript is sufficient to prevent this activity completely, and ad-blocking lists are also useful in preventing data exfiltration. <ref>For instance, the EasyList and EasyPrivacy blocking lists that are available in popular extensions. However, they did not block all the major companies at the time of writing.</ref> Users should not solely rely on ad-blockers for general tracking protection, as [https://web.archive.org/web/20200930051616/https://ericmathison.com/blog/bypass-ad-blockers-and-track-your-visitors-with-piwik/ tools have already been developed] which successfully defeat the most popular extensions, including Adblock Plus, Adblocker Ultimate, Ghostery and uBlock Origin.
+
+== Conclusion ==
+
+=== Enabling or Disabling JavaScript ===
+
+JavaScript is a clear and present danger for a host of attack vectors, however, there is a [[Tor_Browser#Security_vs_Usability_Trade-off|security versus usability trade-off]] to consider before disabling JavaScript completely: <ref>See also [https://lists.torproject.org/pipermail/tor-talk/2012-May/024224.html Tor Browser disabling JavaScript anonymity set reduction].</ref>
+
+<blockquote>The take-home message is disabling all JavaScript with white-list based, pre-emptive script-blocking may better protect against vulnerabilities (many attacks are based on scripting), but it reduces usability on many sites and acts as a fingerprinting mechanism based on the select sites where it is enabled. On the other hand, allowing JavaScript by default increases usability and the risk of exploitation, but the user also has a fingerprint more in common with the larger pool of users.</blockquote>
+
+=== Safest Browser Against Exploitation ===
+
+It is clearly unwise to browse the Internet without a well secured browser, otherwise there is a danger of a browser exploit leading to an infected system. Personally configuring a secure browser is an enormous undertaking requiring expertise and significant trial and error. The safer path is to use [[Tor Browser]] -- preferably on a {{project_name_long}} platform -- since it is already hardened against data leakage.
+
+A significant body of research has already proven Tor Browser's superiority to other browsers where privacy and security are concerned. Further, new and emerging threats like [https://www.spinda.net/papers/smith-2018-revisited.pdf cache attack variants and history data leakage via the Paint API] are often solely defeated by Tor Browser. As noted in the [[Tor Browser]] chapter:
+
+<blockquote>Tor Browser is a fork of the Mozilla Firefox web browser. It is developed by The Tor Project and optimized and designed for Tor, anonymity and security.<br />
+... <br />
+Features like proxy obedience, state separation, network isolation, anonymity set preservation and a host of others are simply unsupported by other browsers.<br />
+<br />
+In stark contrast to regular browsers, Tor Browser is optimized for anonymity and has a plethora of privacy-enhancing patches and add-ons. With Tor Browser, the user "blends in" and shares the Fingerprint of nearly two million other users, which is advantageous for privacy.</blockquote>
+
+Tor Browser blocks most dangerous technologies by default, but most popular websites like Youtube will still resolve correctly. For media portals which rely on Flash or alternative plugins, the relevant files can be downloaded with special software and then viewed with an open source media player like [[Software#Media_Player|VLC]]. Websites should be avoided if they insist on the use of active plugins, see [[Browser Plugins]].
+
+= MAC Address =
+
+The [https://en.wikipedia.org/wiki/MAC_address Media Access Control (MAC) address] is the hardware address of each individual network device. It is sometimes referred to as the Ethernet-ID, Airport-ID, or physical / hardware / adapter address. Standard computer systems may have several physical or virtual network devices. These devices can be bound to a cable (LAN), wireless (WLAN), mobile (GPRS, UMTS) or virtual (VPS) environment, or another setup.
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = "MAC addresses are typically 6 groups of two hexadecimal digits (0-9,A,B,C,D,E,F), separated either by colons (:) or hyphens (-)." <ref>https://web.archive.org/web/20180526160241/http://accc.uic.edu/answer/what-my-ip-address-mac-address</ref>
+}}
+
+The MAC address serves as a unique identifier for the respective device in a local area network. Unless the computer is infected with [[Malware and Firmware Trojans|malware]] designed to disclose this identifier, it is neither used nor transmitted on the Internet. Also, an access provider can only see the MAC address if the computer is connected directly to the Internet (for example by a modem), rather than over a router.
+
+Despite the limited risk of disclosure, MAC addresses ''can'' be used for tracking purposes by adversaries. For instance, other computers on the local network can potentially log it, which would then provide proof that the user's computer has been connected to a specific network. Moreover, advanced tracking techniques exist that are able to [https://papers.mathyvanhoef.com/asiaccs2016.pdf enumerate the MAC address] of a Wi-Fi card in use, by examining its physical characteristics. For these reasons [https://de-m-wikipedia-org.translate.goog/wiki/MAC-Adresse?_x_tr_sl=de&_x_tr_tl=en&_x_tr_hl=en MAC spoofing] should be considered for particular circumstances, like when an untrusted, public network will be used. See the [[MAC_Address|MAC address entry]] for further information.
+
+= Network Leaks =
+
+Mozilla notes browsing history can leak to the network via: <ref>https://blog.mozilla.org/security/2018/10/18/encrypted-sni-comes-to-firefox-nightly/</ref>
+* <u>DNS name resolution:</u> See [[#DNS_Name_Resolution|here]] for a detailed description.
+* <u>Server IP address:</u> The server's IP address can currently leak and no interim solution has yet been proposed. However, many websites can share the same IP address, slightly lessening the privacy harm.
+* <u>TLS certificate message:</u> The new TLS 1.3 standard addresses the threat of tracking by encrypting the server certificate. Unfortunately in late-2018, only around 6 per cent of all TLS sessions were using TLS 1.3 <ref>https://blog.mozilla.org/security/2018/10/15/removing-old-versions-of-tls/</ref> <ref>At the same time, TLS 1.2 comprised around 93 per cent, while TLS 1.0 and 1.1 comprised around 2 per cent combined.</ref>
+* <u>TLS Server Name Indication (SNI):</u> This mechanism allows clients to tell a server the name of the server it is contacting, ensuring the correct certificate is selected. This helps to facilitate secure connections to servers that host multiple virtual servers on the same (single) network address. <ref>https://web.archive.org/web/20200520111626/https://tools.ietf.org/rfcmarkup?doc=6066#section-3</ref> Encrypting SNI means network attackers are further stymied in trying to discover a user's browsing history. <ref>This feature must be supported by the website in question and will initially only be supported by large [https://en.wikipedia.org/wiki/Content_delivery_network Content Distribution Networks].</ref>
+
+= Port Scanning =
+
+Many Internet users are unaware that an estimated 30,000 websites are conducting port scanning when their webpages are visited. In summary, sites like eBay collect data on open ports on the local PC as well as additional data like the User Agent and IP address. In eBay's case it scans visitor computers for remote access programs, <ref>https://www.bleepingcomputer.com/news/security/ebay-port-scans-visitors-computers-for-remote-access-programs/</ref> but it does not target Linux machines at the time of writing: <ref>https://web.archive.org/web/20200927075321/https://www.sans.org/newsletters/newsbites/xxii/42</ref>
+<blockquote>When users visit the eBay website, it conducts a local port scan on their computers. The site scans 14 ports in all ; The scan is conducted by a check.js script. It scans 14 ports associated with remote access and support tools. eBay scans Windows machines; the scans do not occur when users running Linux visit the site.</blockquote>
+
+By doing so, this creates a unique identifier to verify a user's unique digital identity. While it may be used to identify potentially compromised computers and detect fraud, it is notable that these websites do not provide any notification about this technique, nor seek permission to conduct a scan beforehand and share this data with third parties. <ref>https://blog.nem.ec/2020/05/24/ebay-port-scanning/</ref> Further, port scanning is an intrusive adversarial technique normally used by penetration testers and hackers to scan computers to determine what applications or services are listening on the network, in order to aid specific attacks. Notably, eBay's scanning is focused on ports normally used for remote administration programs/tools (VNC): <ref>https://nullsweep.com/why-is-this-website-port-scanning-me/</ref>
+<blockquote>
+* 5900: VNC
+* 5901: VNC port 2
+* 5902: VNC port 3 <br />
+* 5903: VNC port 4 <br />
+* 5279: <br />
+* 3389: Windows remote desktop / RDP <br />
+* 5931: Ammy Admin remote desktop <br />
+* 5939: <br />
+* 5944: <br />
+* 5950: WinVNC <br />
+* 6039: X window system <br />
+* 6040: X window system <br />
+* 63333: TrippLite power alert UPS <br />
+* 7070: RealAudio</blockquote>
+
+Companies like [https://www.lexisnexis.com/en-us/gateway.page LexisNexis] also claim this is necessary to deter fraud and confirm identity management, but in reality it is another method to track users across the web, particularly since they advertise a function called "True Location and Behavior Analysis" which is aimed at detection of an individual's location, even when relying upon IP spoofing, VPNs, Tor Browser, and changes in online behavior. <ref>https://risk.lexisnexis.com/corporations-and-non-profits/fraud-and-identity-management</ref>
+
+Fortunately, it appears that disabling JavaScript or using an extension like uBlockOrigin is sufficient to defeat this scanning technique <ref>Or using a non-targeted browser.</ref> since this ensures the browser denies any requests from a web page to a local IP address. Interested readers can refer to the following articles for further technical details on how port scanning is accomplished:
+* [https://blog.nem.ec/2020/05/24/ebay-port-scanning/ Ebay is port scanning visitors to their website - and they aren't the only ones]
+* [https://defuse.ca/in-browser-port-scanning.htm Timing Side Channel "Port Scanner" in the Browser]
+
+= TCP Timestamps =
+
+The Transmission Control Protocol (TCP) is a transport-layer protocol for transferring data between computers. It is necessary for using Internet protocols like http (www), smtp (email) and ftp. For example, when a computer sends a request for a website, this data is sent within many small TCP packets. In addition to the data request, a TCP packet also contains optional information fields in the header (metadata), such as the TCP timestamp. The timestamp's value is proportional to the current time of the computer and is incremented according to the computer's internal clock.
+
+The timestamp can be used by the client and/or server machine for performance metrics and optimization. However, an Internet server may recognize and track a computer by observing those timestamps. By measuring the clock skew of the timestamps to millisecond precision, an adversary can remotely calculate the [https://homes.cs.washington.edu/~yoshi/papers/PDF/ individual clock skew profile] for a computer, and determine the system uptime and boot time. These techniques work even if the user has otherwise perfectly anonymized their Internet connections.
+
+The {{project_name_long}} documentation recommends that [[Disable_TCP_and_ICMP_Timestamps|TCP timestamps be disabled on the host operating system]] due to the risk. <ref>Even though TCP timestamps protect against [https://en.wikipedia.org/wiki/Protection_Against_Wrapped_Sequence_Numbers#TCP_timestamps wrapped sequence numbers].</ref> <ref>The disabling of [[Disable_TCP_and_ICMP_Timestamps#Disable_ICMP_Timestamps|ICMP timestamps]] is also recommended for the same reason.</ref>  [[{{non_q_project_name_short}}|{{non_q_project_name}}]] and [[{{q_project_name_short}}|{{q_project_name}}]] users are already protected from this threat. The clock in {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>) does not match the clock on the host and is also set securely by [[Dev/TimeSync|sdwdate]] over {{Code|https}}, which results in a slightly different result compared to the more accurate NTP.
+
+Tor users are also being protected from being profiled by TCP timestamps in another way: Tor relays automatically replace the potentially insecure TCP packets with their own.
+
+<font size="-3"> [https://gitlab.torproject.org/legacy/trac/-/issues/8169 source 1: Tor trac #8169 replace TCP timestamp] [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorFAQ#DoesTorresistremotephysicaldevicefingerprinting source 2: Tor wiki FAQ] </font>
+
+= TLS Session Resumption =
+
+Many users are unaware that in the standard browser process, TLS handshakes are abbreviated due to use of key material exchanged in an earlier TLS session; this provides an obvious mechanism to link two TLS sessions together. "TLS session resumption" has received little attention from researchers, even though it enables a new form of tracking. <ref name=TLS_session>https://arxiv.org/pdf/1810.07304.pdf</ref>
+
+A 2018 study of 48 popular browsers and the top one million websites found that an average user with standard settings could be tracked for up to 8 days. If the current draft TLS version 1.3 recommendations are adopted (a session resumption lifetime of 7 days), then 65 per cent of all users in the research data-set could be tracked permanently. Notably, only a handful of browsers defeated this threat with standard settings, including Tor Browser and JonDoBrowser. <ref>Since browsers on mobile devices are rarely restarted, this greatly extends the likely tracking period.</ref> <ref name=TLS_session />
+
+New and emerging threats like these reinforce the stock recommendation to only use Tor Browser in {{project_name_long}}, since Firefox does not protect again TLS session resumption with its default settings. If another browser is used in {{project_name_workstation_long}} (discouraged!) then it should be regularly restarted so the TLS cache is cleared. Be aware that session tracking will also be influenced by the TLS configuration of both the chosen browser and server.
+
+= Web (Email) Beacons and Banner Ads =
+
+== Introduction ==
+
+A web/email beacon ("webbug") is a technique for tracking persons who read a specific web page or email, including the time it occurred and the details of the connecting device. <ref>The first beacons were small images.</ref> Beacons can also capture whether an email was read or forwarded, or if web pages were copied to another site. <ref name=Web_bug>https://en.wikipedia.org/wiki/Web_beacon</ref>
+
+This technique is possible because some emails and web pages are not wholly self-contained. Often content is not provided directly, but instead provided by other servers. When the browser or email client prepares the content for display, usually requests are made to the foreign servers for the additional content. These requests reveal: <ref name=Web_bug />
+
+* The IP address of the requesting device.
+* The time/date the content was requested.
+* Details of the web browser/email client making the request.
+* Whether cookies exist that were previously set by the server.
+
+Logically a detailed profile can be built over time if this information is stored by servers and each request is associated with a unique tracking token.
+
+== Web Beacons (Webbugs) ==
+
+If users examine the [[Data_Collection_Techniques#Cookies|cookies]] stored in a standard browser, usually one or more exist that are attached to data miners like [https://web.archive.org/web/20090201100641/http://www.doubleclick.com/ doubleclick.com], [https://web.archive.org/web/20060310025044/http://www.advertisement.com/ advertisement.com] or [https://www.google.com Google], even if those websites have never been visited. This is possible because these enterprises embed "webbugs" on various websites, which plant cookies in the browser and track browsing habits: <ref>https://www.scmagazine.com/news/content/cookies-and-web-bugs-and-spyware-oh-my</ref>
+
+<blockquote>Web bugs are tiny (usually a single pixel) transparent image files on web pages that are used to monitor user's online habits. As cited in a CNET article at the height of the web bug storm, critics claimed the bugs could capture IP addresses or perhaps install "pernicious files" and were therefore more invasive than cookies. The argument revolved around the capability, used or unused, that the bugs could take information given by the user at a selected web site and transfer it to any number of other sites without the user's knowledge or consent. The arguments also included the possibility of the bug's information being aggregated with that of cookies and used to create profiles of specific users' habits, instead of being used as general demographic information.</blockquote>
+
+Webbugs are usually tiny pictures around 1 x 1 pixels in size, making them invisible to the viewer. Webbugs can also be coded into banner ads embedded in a website. The website contains a picture (webbug) that is loaded from a third party server running a statistics service, such as Doubleclick or Google Analytics. The statistics service then sets or edits a cookie in the browser, without the user noticing.
+
+Afterwards, the browser will send this cookie back to the statistics service if/when a new content request is made on a site where the service's webbug is embedded. This means if a service is used on many different or popular websites, it can now track a large proportion of a user's browsing session. If a statistics service were to collaborate with a user's preferred search engine, then this could reveal nearly the entirety of Internet activities. <ref>See [https://web.archive.org/web/20140218170747/https://en.wikipedia.org/wiki/Web_bug#Implementation here] for further details on actual implementation.</ref>
+
+It is important to note that the privacy functions of most modern browsers provide an inadequate defense. Optimal protection against webbugs is not achieved by simply employing webbug filters and rejecting cookies and/or deleting them upon browser shutdown. As the [[Data_Collection_Techniques#IP_Address|IP address]] is sent to the statistics service with every request, the only effective protection is an anonymization service like Tor.
+
+== Email Beacons ==
+
+The same profiling technique via beacons can be utilized with email: <ref name=Email_beacons>https://en.wikipedia.org/wiki/Web_beacon#Email_tracking</ref>
+
+* Web beacons (tiny images) are embedded in emails with unique identifiers contained in the URL.
+* When the email is opened, the email client requests the image.
+* The email senders learn when the message was read, and the IP address of the device (or proxy server) that the user went through.
+* The same information is gathered each time the email is displayed (opened).
+
+This technique is popular with email marketers, spammers and phishers. It confirms the validity of email addresses, tests whether emails made it past the spam filters, and informs if/when the email is displayed. Detection of these emails by users and mail filters is difficult, and emails do not need to contain advertisements or any other commercial material.
+
+The general advice is to use an email client (like Mozilla Thunderbird) rather than a browser. The downloading of remote images whose URLs are embedded in HTML emails should also be disabled. Alternatively, text-based mail readers are available (like Pine or Mutt) or graphical email clients with text-based HTML capabilities (such as Mulberry), which do not interpret HTML or display images. Plain text email messages close off this attack vector completely because web beacons cannot be embedded; the contents are interpreted as display characters, rather than as embedded HTML code. <ref name=Email_beacons /> <ref>Users can also disconnect from the Internet before reading any downloaded messages, and then delete them before reconnecting.</ref>
+
+= License =
+
+{{JonDos}} The DataCollectionTechniques page contains content from the JonDonym documentation [https://anonymous-proxy-servers.net/en/help/wwwprivacy_technik.html DataCollectionTechniques] page.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]] [[Category:Design]]

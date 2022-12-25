@@ -1,0 +1,556 @@
+{{Header}}
+{{#seo:
+|description=Tor Entry Guards, Alternate Configurations, Fingerprinting Risks
+|image=Entry_guard111.jpg
+}}
+[[image:Entry_guard111.jpg|250px|thumb]]
+= Introduction =
+
+<div class="toccolours mw-collapsible mw-collapsed">
+What are Tor Entry Guards? If this is an unfamiliar term, please press on Expand on the right.
+<div class="mw-collapsible-content">
+
+{{Box|text=
+<p>
+Current practical, low-latency, anonymity designs like Tor fail when the attacker can see both ends of the communication channel. For example, suppose the attacker controls or watches the Tor relay a user chooses to enter the network, and also controls or watches the website visited. In this case, the research community is unaware of any practical, low-latency design that can reliably prevent the attacker from correlating volume and timing information on both ends.
+</p>
+<p>
+Mitigating this threat requires consideration of the Tor network topology. Suppose the attacker controls, or can observe, <i>C</i> relays from a pool of <i>N</i> total relays. If a user selects a new entry and exit relay each time the Tor network is used, the attacker can correlate all traffic sent with a probability of <i>(c/n)<sup>2</sup></i>. For most users, profiling is as hazardous as being traced all the time. Simply put, users want to repeat activities without the attacker noticing, but being noticed once by the attacker is as detrimental as being noticed more frequently. [...]
+</p>
+<p>
+The solution to this problem is "entry guards". Each Tor client selects a few relays at random to use as entry points, and only uses those relays for the first hop. If those relays are not controlled or observed, the attacker can't use end-to-end techniques and the user is secure. If those relays <i>are</i> observed or controlled by the attacker, then they see a larger <i>fraction</i> of the user's traffic — but still the user is no more profiled than before. Thus, entry guards increase the user's chance of avoiding profiling (on the order of <i>(n-c)/n</i>), compared to the former case.
+</p>
+<p>
+You can read more at [https://www.freehaven.net/anonbib/#wright02 An Analysis of the Degradation of Anonymous Protocols], [https://www.freehaven.net/anonbib/#wright03 Defending Anonymous Communication Against Passive Logging Attacks], and especially [https://www.freehaven.net/anonbib/#hs-attack06 Locating Hidden Servers].
+</p>
+<p>
+Restricting entry nodes may also help to defend against attackers who want to run a few Tor nodes and easily enumerate all of the Tor user IP addresses. <ref>Even though the attacker can't discover the user's destinations in the network, they still might target a list of known Tor users.</ref> However, this feature won't become really useful until Tor moves to a "directory guard" design as well.
+</p>
+
+Source and License, see footnote: <ref>
+Source:<br />
+[https://support.torproject.org/#about_entry-guards torproject.org What are Entry Guards?]
+<br />
+[https://www.torproject.org/about/trademark/ license]:<br />
+Content on this site is Copyright The Tor Project, Inc.. Reproduction of content is permitted under a [https://creativecommons.org/licenses/by/3.0/us/ Creative Commons Attribution 3.0 United States License]. All use under such license must be accompanied by a clear and prominent attribution that identifies The Tor Project, Inc. as the owner and originator of such content. The Tor Project Inc. reserves the right to change licenses and permissions at any time in its sole discretion.
+</ref>
+}}
+</div>
+</div>
+
+= Guard Fingerprinting =
+
+Many well-known, enhanced anonymity designs like Tor, {{project_name_long}} and the Tor Browser (TB) use persistent Tor guards. This decision is attributable to community-based research which demonstrates that persistent Tor entry guards benefit security and lower the probability of an adversary profiling a user. <ref>The risk of guard fingerprinting is less severe now that upstream (The Tor Project) has changed its guard parameters to decrease the de-anonymization risk.</ref>
+
+In general, users should not interfere with Tor guard persistence or the natural rotation of entry guards every few months. At the time of writing, the Tor client selects one guard node, but previously used a three-guard design. Guards have a primary lifetime of 120 days. <ref>Prop 291 indicates a 3.5 month guard rotation.</ref> <ref>The Tor Project is currently considering shifting to two guards per client for better anonymity, instead of having one primary guard in use.</ref> <ref>https://github.com/torproject/torspec/blob/master/proposals/291-two-guard-nodes.txt</ref>
+
+== Fingerprinting Method ==
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    ='''Note:''' Guard fingerprinting techniques are similar to MAC address tracking methods. If this is a realistic threat, then MAC address randomization is also recommended.
+}}
+
+While natural guard rotation is recommended, in some situations it is safer to <u>not</u> use the usual guard relay! There are some corner cases in which an adversary could fingerprint the entry guard(s) <ref>The [https://gitlab.torproject.org/legacy/trac/-/issues/9273#comment:3 entropy associated with one, two or three guards] is 9, 17 and 25 bits, respectively.</ref> and de-anonymize a user. For instance:
+
+* The same entry guards are used across various physical locations and access points.
+* The same entry guards are used after permanently moving to a different physical location.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+For details on how this is possible, press Expand on the right.
+<div class="mw-collapsible-content">
+Consider the following scenario. A user connects to Tor via a laptop at their home address. An advanced adversary has observed the client-to-guard-node network path to discover the user's entry point to the Tor network.
+
+Soon afterwards, the same user attends a prominent event or protest in a nearby city. At that location, the user decides to anonymously blog about what transpired using the same laptop. This is problematic for anonymity, as the Tor client is using the same entry guard normally correlated with the user’s home address.
+
+To understand the potential threat, consider the following:
+
+* There are only around 3,000 Tor guards in 2019. <ref>https://metrics.torproject.org/relayflags.html</ref>
+* By design, Tor is picking one primary guard and using it for a few months. Since the Tor user base is relatively small, it is possible that a guard might only be used by one person in an entire region.
+* As the IP address of Tor entry guards is static and Tor network traffic is easily distinguishable, this information becomes public knowledge.
+* It is feasible that if a user-guard relationship is unique in a city location, and that user moves, it is likely (but not certain) that there was a location change.
+* At the event, the user might be the only one using Tor (or among a handful).
+* If the user posts about the event ''and'' an adversary who is passively monitoring network traffic conducts the same successful observation of the client-to-guard network path, then it’s likely the "anonymous" posts will be linked with the same person who normally connects to that guard at home.
+
+The relative uncommonness of Tor usage simply exacerbates the potential for de-anonymization.
+</div>
+</div>
+
+There are several ways to [[Tor_Entry_Guards#Mitigate_the_Threat_of_Guard_Fingerprinting|mitigate the risk of guard fingerprinting]] across different physical locations. In most cases, the original entry guards can also be re-established after returning home: <ref>As concluded in ticket [https://phabricator.whonix.org/T469 research non-persistent Tor directory guards], these are covered by the following instructions.</ref>
+
+# [[Tor_Entry_Guards#Clone_{{project_name_gateway_long}}_.28{{project_name_gateway_vm}}.29_with_New_Entry_Guards|Clone {{project_name_gateway_long}} ({{project_name_gateway_vm}}) with New Entry Guards]].
+# [[Tor_Entry_Guards#Regenerate_the_Tor_State_After_Saving_the_Tor_State_Folder|Regenerate the Tor State File after Saving the Current Tor State]].
+# Configure Tor to use [[Tor_Entry_Guards#Alternating_Bridges|Alternating Bridges]].
+
+If moving to a new location permanently, create [[Tor_Entry_Guards#Fresh_Tor_Entry_Guards_by_Regenerating_the_Tor_State_File|Fresh Tor Entry Guards by Regenerating the Tor State File]].
+
+Forum discussion:<br />
+https://forums.whonix.org/t/persistent-tor-entry-guard-relays-can-make-you-trackable-across-different-physical-locations/2090
+
+= Increase Protection from Malicious Entry Guards: One Guard per Application =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Advanced users only!
+}}
+
+<div class="toccolours mw-collapsible mw-collapsed">
+Usefulness currently being discussed here: https://forums.whonix.org/t/tor-entry-guards/14478
+<div class="mw-collapsible-content">
+{{project_name_long}} developer HulaHoop recently approached Tor researcher, Tariq Elahi, to discuss how exposure to malicious guards in multi-Workstation scenarios could be measured. It was discovered that 1 guard/client per internet-connected program (not identity!) is the safest possible configuration. In fact, the probability of a network adversary observing a user's activities is lower than the default scenario, whereby one Tor Entry Guard is relied upon for all applications. This advice is meant to mitigate the damage from end-to-end correlation attacks that occur when simultaneously using malicious Entry guards + Exits and should not be confused with [[Fingerprint#Website_Traffic_Fingerprinting|Website Fingerprinting attacks]].
+<ref>
+WF means [[Fingerprint#Website_Traffic_Fingerprinting|Website Fingerprinting]].
+
+<blockquote>
+The Tor blog post speaks about website fingerprinting, which is done without the cooperation of a malicious guard or compromising any other Tor infrastructure. Defending against a malicious guard is the attack you have considered. The two are independent and have different properties and usefulness as an adversarial tool.
+
+I describe each here to fix our descriptions of the two things.
+
+A malicious guard can compromise all circuits that go through it, _if_ the honest client also picks (or is somehow manipulated into picking) a malicious exit. Then all traffic on this circuit is compromised with certainty. The rate of success for the adversary is proportional to how much bandwidth she can afford and deploy.
+
+A website fingerprinting adversary can observe and try to identify all Tor traffic flowing out of the client's machine on the way to the guard. The rate of success for the adversary is proportional to how good the website classifier she has.
+
+The first attack is straight forward. Deploy nodes and enjoy the compromises. The second attack is not so clear. For the former, the compromised guard node can separate out the different flows since it can inspect Tor application level information. For the latter, the problem is that the adversary only has network level information and must do the work of first separating out the flows into individual website accesses. Otherwise WF does not work. The advice that the Tor blog post is giving is to make this separation job harder for the adversary and hence render the WF less effective (i.e. very low accuracy).
+
+In the case that the app is a web browser then the Tor blog post makes sense, but you could take their advice and _also_ do the 1 app per 1 guard proposal, and get the best of both worlds.
+
+There is another consideration, WF works because there is a stable fingerprint to learn (in this case the website that does not change too much _and_ the adversary can generate training data by accessing this website). Is this the case of the apps (other than web browser) you have in mind? Will there be a stable traffic pattern for the adversary to learn? Do you want to hide the fact that the app is being used versus the party that is being communicating with? I think that the blog post is talking about a very narrow problem. Furthermore, there is not yet side consensus on 1) how well WF is actually working in the real world (versus very well known effectiveness or malicious guards) and 2) what the best and practical defences are (where randomly doing lots of stuff at once sounds mostly impractical if not automated and expensive in bandwidth).
+
+Tariq
+</blockquote>
+</ref>
+
+To apply this Increase Protection from Malicious Entry Guards configuration, follow these steps:
+
+# Import a {{project_name_gateway_long}} into the hypervisor that has never been started.
+# Take a snapshot and name it "Original".
+# Start {{project_name_gateway_long}} and wait for Tor to finish bootstrapping (connecting).
+# After Tor has connected, shutdown {{project_name_gateway_long}} and take another snapshot - the naming convention should match the intended activity, such as "Email".
+# This snapshot should be used with <u>all</u> {{project_name_workstation_long}} snapshots related to/called "Email", whether it is identity "John Doe", "Jane Doe" and so on. Note the Workstations should also be generated separately from a clean baseline.
+
+When a separate activity is required such as IRC, users should revert to the {{project_name_gateway_long}} snapshot (labelled "Original"), then repeat the same steps. That is, allow it to boot and connect to Tor, shut it down, then take a snapshot entitled "IRC". Note that if a webpage IRC chat client is used, then this should be done from "Browsing" snapshot.
+
+If you need to run multiple applications at the same time, then consider cloning the VMs.
+<ref>
+<blockquote>
+From: Tariq Elahi<br />
+Subject: Re: Fwd: Re: Tor revised guard behavior & chances of malicious guard<br />
+To: HulaHoop, adrelanos@whonix.org
+
+Hi,
+
+I have replied inline below.
+
+On 27/09/18 17:22, HulaHoop wrote:
+<blockquote>
+[snip]
+
+Thanks for getting back to us. With your permission I'd like to quote your reply on our wiki.
+</blockquote>
+
+Sure, but I would to take a look at what the context and quote is if that is alright, please.
+
+<blockquote>
+IIRC Tor is currently using a 2 guard per client config but will be moving to 1 because of research showing it's safer. Should we force the use of one guard even if it's not the standard configuration of most Tor users at the moment?
+</blockquote>
+
+I thought Tor was using one guard and thinking of moving to two. Is it the other way around?
+Forcing some users to do something different from other users partitions the user base and this is considered not a good thing to do in general.
+
+<blockquote>
+With 1G/A being the best option it would translate to cloning the Tor VM (for as many separate Apps desired) before first run - to ensure they don't share the same guard correct?
+</blockquote>
+
+They could share the same guard if it gets picked randomly. The likelihood of this happening at random depends on the bandwidth of the guard so it might not be as rare. The trick is making sure you don't pick an already used guard without needing to divulge information about all other apps' guards.
+
+<blockquote>
+I'm trying to think how the different Tor instances can look at each other's guard lists across different VMs. Probably through using inter-VM communication or something similar.
+
+Spawning multiple Tor instances on the same Gateway VM would be easier but getting each instance to use only it's own internal network that connects to its unique App VM is not as straight forward as the separate VM approach.
+</blockquote>
+
+Indeed, communication between the VMs is needed. Perhaps a mediation agent that could help facilitate the list matching process?
+
+I am quite interested in this now. Perhaps we should talk more about this over chat if that will help.
+
+Tariq
+</blockquote>
+</ref>
+
+== Important Caveats ==
+
+* <u>Do not</u> start the application on the Workstation before taking the Gateway snapshot. This is to prevent it from generating data on the Gateway -- such as Onion Service descriptors -- that can be linked across sessions or detected in the event of the Workstation being infected. <ref>
+https://lists.torproject.org/pipermail/tor-dev/2016-November/011636.html
+</ref>
+* If you use multiple instances of the same application concurrently -- email accounts John Doe and Jane Doe in the example above -- make sure each gets its own Gateway VM (cloned from the "Email" snapshot for example) and its own isolated network. They should never share the same Gateway because a malicious Workstation can:
+** Sniff data on the shared isolated network; and
+** Also manipulate the common Tor client into divulging information belonging to the other application.
+</div>
+</div>
+
+= Manual Rotation of Tor Guards =
+
+Creating a new {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) will ''likely'' lead to a new set of Tor entry guards, which is [https://blog.torproject.org/improving-tors-anonymity-changing-guard-parameters proven to degrade anonymity].
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    ='''Warning:''' Users considering using disposable {{project_name_gateway_long}} ProxyVMs in Qubes R4 are [[Qubes/Disposables#Warnings|warned]] that this technique severely degrades anonymity; <u>new Tor guards are created during each distinct {{project_name_long}} session.</u>
+}}
+
+== Anonymity and Performance-related Issues ==
+
+Users may be tempted to create a new {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) in the following circumstances:
+
+* Bootstrapping is slow or regularly fails.
+* Tor logs show warnings suggestive of route manipulation attacks or other oddities.
+* System logs reveal attempted attacks on {{project_name_long}} or Tor processes, for example in AppArmor logs.
+* Current Tor performance is very slow or unreliable due to collapsing circuits or other factors.
+* The user is concerned about the amount of Tor data that could be revealed if {{project_name_gateway_long}} is infected, particularly after a long period of use.
+
+== Manual Guard Rotation Threats ==
+
+Forcing the rotation of guards more often than Tor’s default is dangerous for several reasons:
+
+* It increases the likelihood of a compromised or malicious Tor guard being selected. This raises the chance of a successful [https://securityaffairs.co/wordpress/17489/intelligence/traf%EF%AC%81c-correlation-vs-anonymity-on-tor.html correlation attack] if the adversary runs Tor exit relays in the network.
+* The user is more likely to traverse a [https://www.freehaven.net/anonbib/#feamster:wpes2004 given] [https://www.freehaven.net/anonbib/#DBLP:conf:ccs:EdmanS09 set] of [https://www.freehaven.net/anonbib/#ndss13-relay-selection Internet infrastructure links] that are under the adversary's control, such as [https://web.mit.edu/6.033/www/papers/InterdomainRouting.pdf Autonomous Systems (ASes)] or [https://www.itu.int/en/wtpf-13/Documents/backgrounder-wtpf-13-ixps-en.pdf Internet Exchange Points (IXPs)].
+* Every Tor guard change acts like a fingerprinting mechanism, since other users are less likely to pick the same set. If the adversary is able to enumerate a user's Tor guards and later observes someone with the same set, the chance is high the two observations stem from the same person.
+
+For these reasons the Tor design changed in 2014 to establish a solitary primary guard node, while also increasing the set period for guard rotation. Also, do not discount the possibility that an adversary might purposefully cause poor Tor throughput, in the hope Tor guards are manually changed: <ref>https://blog.torproject.org/improving-tors-anonymity-changing-guard-parameters</ref>
+
+<blockquote>We should also consider whether an adversary can *induce* congestion or resource exhaustion to cause a target user to switch away from her guard. Such an attack could work very nicely coupled with the guard enumeration attacks discussed above.</blockquote>
+
+In one sense, slow Tor entry guards should be welcomed -- “honeypot” operators on the Tor network are unlikely to have constrained bandwidth which might chase away intended targets.
+
+== Recommendations ==
+
+If users feel compelled in their circumstances to proceed despite the anonymity risks, then it may be safer to first try:
+
+* One of the fallback primary entry guards.
+* A configured [[Bridges|bridge]].
+* Chaining other [[Tunnels/Introduction|tunnels]] with Tor.
+* Creating a fresh {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) and [[#Copy_Tor_Configuration_files_and_Settings_to_Another_{{project_name_gateway_vm}}_Instance|copying across the Tor state file]].
+
+The safest decision is to persist with poor performance and wait for normal guard rotation.
+
+= Mitigate the Threat of Guard Fingerprinting =
+
+<u>Note:</u> Weigh the fingerprinting risks outlined earlier before proceeding. In most cases the decision to not rotate guards (even temporarily) is the correct one.
+
+If guard fingerprinting across different locations is a legitimate concern, there are several ways to mitigate the threat. Viable options include: bridges, temporarily rotating guards or cloning {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) with new guards.
+
+== Clone {{project_name_gateway_long}} ({{project_name_gateway_vm}}) with New Entry Guards ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    ='''Warning:''' Do not clone the {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) with new guards at your home address. If the Tor client connects through the home network, the new guards might be correlated to the home address.
+}}
+
+It is possible to clone the current {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) and regenerate the Tor state file. Once the VM is cloned, it is important that the original is not unintentionally used for any anonymous activities. To negate this threat, disable networking in the original {{project_name_gateway_long}} until returning home.
+
+Create a {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) clone and name it {{project_name_gateway_long}}-temp (<code>{{project_name_gateway_vm}}-temp</code>):
+
+# <u>VirtualBox:</u> follow [https://dirkstrauss.com/clone-virtualbox-vm/ these instructions] to create a VM snapshot. <br /> <u>{{q_project_name}}:</u> In Qube Manager, <code>Right-click on {{project_name_gateway_vm}}</code> &rarr; <code>Clone qube</code>
+# [[#Fresh_Tor_Entry_Guards_by_Regenerating_the_Tor_State_File|Regenerate the Tor State File]].
+
+== Regenerate the Tor State After Saving the Tor State Folder ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = [[{{non_q_project_name_short}}|{{non_q_project_name}}]] only.
+}}
+
+Before arriving at the remote location, the {{project_name_gateway_long}} Tor state folder is moved to the <code>$HOME</code> directory and the Tor state file is regenerated. Perform all the following steps in {{project_name_gateway_long}} konsole.
+{{Box|text=
+'''1.''' Stop Tor.
+
+{{CodeSelect|code=
+sudo systemctl stop tor@default
+}}
+
+'''2.''' Move the Tor state folder to the <code>$HOME</code> directory.
+
+{{CodeSelect|code=
+sudo mv /var/lib/tor ~/
+}}
+
+'''3.''' Restart Tor.
+
+{{CodeSelect|code=
+sudo systemctl restart tor@default
+}}
+}}
+Before returning home, the Tor state folder is restored to its original settings.
+{{Box|text=
+'''1.''' Stop Tor.
+
+{{CodeSelect|code=
+sudo systemctl stop tor@default
+}}
+
+'''2.''' Remove the temporary Tor state folder.
+
+{{CodeSelect|code=
+sudo rm -r /var/lib/tor
+}}
+
+'''3.''' Restore the Tor state folder.
+
+{{CodeSelect|code=
+sudo mv ~/tor /var/lib
+}}
+
+'''4.''' Restart Tor.
+
+{{CodeSelect|code=
+sudo systemctl restart tor@default
+}}
+}}
+== Alternating Bridges ==
+
+If [[Bridges|Bridges]] are already configured, alternate bridges are recommended for different locations. If bridges are not being used, consider using entry guards in your primary location and relying on alternate bridges in different locations.
+
+Wording clarification: There is no such thing as "Alternating-Bridges". It's not it's own word. It means "a bridge to alternate". As in "use different bridges".
+
+Complete the following steps in {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>).
+{{Box|text=
+'''1.''' {{Disable_Tor}}
+
+'''2.''' Configure Tor to use bridges. Refer to the [[Bridges|Bridges]] documentation.
+
+'''3.''' Enable Tor at the new location.
+
+{{Enable_Tor}}
+
+'''4.''' Before leaving this location, disable Tor. If traveling to a different area, add a different bridge address. To revert to the usual Tor guards used at home, remove the torrc bridge settings before enabling the network or rollback to a VM snapshot created at home.
+}}
+
+== Copy Tor Configuration files and Settings to Another {{project_name_gateway_vm}} Instance ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = [[{{q_project_name_short}}|{{q_project_name}}]] only.
+}}
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    ='''Warning:''' Carefully follow these instructions to avoid unforeseen consequences. <ref>If an alternative command is used to remove the Tor state folder, this can result in broken file persistence across reboots. This relates to the [[{{q_project_name_short}}|{{q_project_name}}]] design, which uses <code>bind-dirs</code> file persistence for the Tor folder and other select directories. At the very least, users would need to mount and then unmount the Tor folder in the same way as <code>bind-dirs</code> does. This is likely a complicated and time-consuming task.</ref>
+}}
+
+In some circumstances [[{{q_project_name_short}}|{{q_project_name}}]] users might want to copy the Tor state and custom configuration options from an existing <code>{{project_name_gateway_vm}}</code> ProxyVM to another <code>{{project_name_gateway_vm}}</code> instance. For example, this is useful for testing later {{project_name_long}} releases without aiding deanonymization attempts by advanced adversaries <ref>As the same Tor entry guard is used.</ref> or when creating an identical backup that does not share any other persistent data, except for Tor state and custom torrc options.
+
+=== Copy Tor State Files to Another {{project_name_gateway_vm}} Instance ===
+
+The following instructions copy the Tor state from <code>{{project_name_gateway_vm}}-old</code> to <code>{{project_name_gateway_vm}}-new</code>.
+{{Box|text=
+'''1.''' In <code>{{project_name_gateway_vm}}-new</code>, stop Tor.
+
+{{CodeSelect|code=
+sudo systemctl stop tor@default
+}}
+
+'''2.''' In <code>{{project_name_gateway_vm}}-new</code>, remove the Tor state file.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    ='''Warning:'''  When removing files take care that extra spaces are not added to the file path! For example, if a space is accidentally placed before the asterisk in the command to remove the Tor state file, the <code>/</code> (root directory) and all system data would be lost.
+}}
+
+{{CodeSelect|code=
+sudo su
+}}
+
+{{CodeSelect|code=
+sudo rm /var/lib/tor/*
+}}
+
+'''3.''' In <code>{{project_name_gateway_vm}}-old</code>, stop Tor.
+
+{{CodeSelect|code=
+sudo systemctl stop tor@default
+}}
+
+'''4.''' In <code>{{project_name_gateway_vm}}-old</code>, copy the Tor state file across to <code>{{project_name_gateway_vm}}-new</code>.
+
+{{CodeSelect|code=
+sudo qvm-copy /var/lib/tor {{project_name_gateway_vm}}-new
+}}
+
+If the following error appears, it can be safely ignored (hit "OK" when prompted).
+
+<pre>
+qfile-agent: Fatal error: stat “VM” (error type: No such file or directory)
+</pre>
+
+'''5.''' In <code>{{project_name_gateway_vm}}-new</code>, list the QubesIncoming directory to ensure the Tor state file was copied over successfully.
+
+{{CodeSelect|code=
+ls ~/QubesIncoming/{{project_name_gateway_vm}}-old/tor
+}}
+
+The output should include the files below.
+
+   <code>cached-certs cached-microdescs lock</code>
+   <code>cached-microdesc-consensus cached-microdescs.new state</code>
+
+'''6.''' In <code>{{project_name_gateway_vm}}-new</code>, move the newly copied Tor state file to ''/var/lib/tor''
+
+{{CodeSelect|code=
+sudo mv ~/QubesIncoming/{{project_name_gateway_vm}}-old/tor/* /var/lib/tor
+}}
+
+'''7.''' In <code>{{project_name_gateway_vm}}-new</code>, change ownership of all files in the Tor state folder to <code>debian-tor</code>
+
+{{CodeSelect|code=
+sudo chown -R debian-tor:debian-tor /var/lib/tor
+}}
+
+'''8.''' In <code>{{project_name_gateway_vm}}-new</code>, start Tor.
+
+{{CodeSelect|code=
+sudo systemctl start tor@default
+}}
+
+'''9.''' In <code>{{project_name_gateway_vm}}-new</code>, run [https://www.kicksecure.com/wiki/Systemcheck systemcheck] to verify Tor is functioning properly. <ref>If Tor fails to start, verify the Tor folder has the proper file permissions with the following command: <code>sudo ls -l /var/lib/tor</code></ref>
+
+{{CodeSelect|code=
+whonixcheck
+}}
+}}
+=== Copy Tor Configuration Options (torrc) to Another {{project_name_gateway_vm}} ===
+
+These instructions copy custom Tor configuration options (torrc) from <code>{{project_name_gateway_vm}}-old</code> to <code>{{project_name_gateway_vm}}-new</code>.
+{{Box|text=
+'''1.'''  In <code>{{project_name_gateway_vm}}-old</code>, copy the <i>torrc</i> options across to <code>{{project_name_gateway_vm}}-new</code>. <ref>Note: From {{project_name_long}} 14 onward, all unique Tor configurations (torrc) options must be stored in <code>/usr/local/etc/torrc.d/50_user.conf</code> and nowhere else.</ref>
+
+{{CodeSelect|code=
+qvm-copy /usr/local/etc/torrc.d/50_user.conf {{project_name_gateway_vm}}-new
+}}
+
+If the following error appears, it can be safely ignored (hit "OK" when prompted).
+
+  qfile-agent: Fatal error: stat “VM” (error type: No such file or directory)
+
+'''2.''' In <code>{{project_name_gateway_vm}}-new</code>, list the <i>QubesIncoming</i> directory to ensure the <i>torrc</i> options were copied over successfully.
+
+{{CodeSelect|code=
+cat ~/QubesIncoming/{{project_name_gateway_vm}}-old/50_user.conf
+}}
+
+'''3.''' In <code>{{project_name_gateway_vm}}-new</code>, move the <i>50_user.conf</i> options from the <i>QubesIncoming</i> directory to the <i>50_user.conf</i> file.
+
+{{CodeSelect|code=
+sudo mv ~/QubesIncoming/{{project_name_gateway_vm}}-old/50_user.conf /usr/local/etc/torrc.d/50_user.conf
+}}
+
+'''4.''' In <code>{{project_name_gateway_vm}}-new</code>, change ownership of the Tor configuration file.
+
+{{CodeSelect|code=
+sudo chown -R root:root /etc/tor
+}}
+
+'''5.''' In <code>{{project_name_gateway_vm}}-new</code>, restart Tor so the newly copied Tor config options take effect.
+
+{{CodeSelect|code=
+sudo systemctl restart tor@default
+}}
+
+'''6.''' In <code>{{project_name_gateway_vm}}-new</code>, run [https://www.kicksecure.com/wiki/Systemcheck systemcheck] to verify Tor is functioning properly. <ref>If Tor is not running after restart, it is possible to verify the newly migrated torrc options are valid with the following command: <code>anon-verify</code>. The output should be similar to the following.
+<br><i>
+/===================================================================\
+|                      Report Summary                               |
+\===================================================================/
+No error detected in your Tor configuration.
+</i></ref>
+
+{{CodeSelect|code=
+whonixcheck
+}}
+}}
+= Unsafe Guard Rotation Methods =
+
+== Fresh Tor Entry Guards by Regenerating the Tor State File ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = This action is inadvisable unless the user is aware of the consequences; see [[#Introduction|Introduction]].
+}}
+
+The following instructions manually change a user's Tor entry guards. One use case for this action is before permanently relocating to a new area.
+
+<ref>
+Potential [[Unsupported]] alternative.
+
+{{CodeSelect|code=
+tor-ctrl DROPGUARDS
+}}
+</ref>
+
+{{Box|text=
+Complete the following steps in {{project_name_gateway_long}} ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>{{project_name_gateway_vm}}</code>).
+
+'''1.''' {{Disable_Tor}}
+
+'''2.''' Delete Tor's state file.
+
+{{CodeSelect|code=
+sudo rm /var/lib/tor/state
+}}
+
+'''3.''' Enable Tor at the new location.
+
+{{Enable_Tor}}
+}}
+
+== Configure Non-Persistent Entry Guards ==
+
+Some users might consider configuring non-persistent entry guards so they constantly change. In almost all cases this is inadvisable, because persistent entry guards are a [[#Introduction|critical anonymity feature]]. A far more secure alternative is [[#Alternating Bridges|Alternating Bridges]], although this requires a considerable time investment.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+To proceed in spite of the warning, press on Expand on the right.
+<div class="mw-collapsible-content">
+{{Box|text=
+Complete these steps in {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>).
+
+'''1.''' {{Disable_Tor}}
+
+'''2.''' Modify Tor settings.
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add.
+
+{{CodeSelect|code=
+DataDirectory /var/run/tor
+}}
+
+Save.
+
+'''3.''' Enable Tor at the new location.
+
+{{Enable_Tor}}
+
+'''4.''' Before leaving this location, disable Tor and repeat the above steps if traveling to a different area. To revert to the usual guard nodes at home, remove the torrc setting before enabling the network or rollback to a VM snapshot that was created there.
+}}
+</div>
+</div>
+
+= Notes =
+
+The proposed Tails solutions towards AdvGoalTracking have disadvantages <ref>https://gitlab.tails.boum.org/tails/blueprints/-/wikis/persistent_Tor_state/</ref> <ref>https://blog.torproject.org/tor-weekly-news-june-17th-2015/#A_persistent_Tor_state_for_Tails</ref> and are not suitable options for {{project_name_long}}. The reason is {{project_name_long}} does not connect directly to a user's internet LAN, so trying to remember a network based on its SSID will not work. Unlike wireless access points, physical or virtual wired networks lack SSIDs and cannot be "remembered" that way.
+
+Even if it were possible, it is best to avoid letting adversaries influence guard changes in any way. Spoofing MAC addresses or SSIDs would trigger the use of the alternative entry guard recorded for another "location profile". Global networks also have generic characteristics that cannot be differentiated from the point of view of a connecting device, resulting in the same guards being used on different networks.
+
+Developers/Auditors-only: The development discussion related to this documentation chapter can be found [https://phabricator.whonix.org/T94 here].
+
+= Footnotes =
+{{reflist|close=1}}
+
+= License =
+{{License_Amnesia|{{FULLPAGENAME}}}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,98 @@
+{{Header}}
+
+[[File:0.png|1200px]]
+
+This page is for minimalized guide written by community members.
+
+''Note (1) You are encouraged to read the [[KVM|official KVM guide]] and documentation first and only refer here if are still unsure about what to do. Please report any uncertainties about the official guide on the [https://forums.whonix.org/c/kvm/11 KVM support forum].''
+
+'' Note (2) This fast instructions for amd processors with debian as a host if you want other installation commands for different distro please check [[KVM#Install_KVM|Install KVM]], if you are first time user please check this [[KVM#First-time_User?|guide section]].
+
+'' Note (3) Copy&Paste each command separately then press Enter to run them.
+
+* You need to add your username to the sudoers:
+
+{{Sudo_Setup}}
+
+* Then follow the rest of the commands:
+
+{{CodeSelect|code=
+sudo apt update && sudo apt install --no-install-recommends qemu-kvm libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq qemu-utils -y
+}}
+{{CodeSelect|code=
+sudo addgroup "$(whoami)" libvirt}}
+{{CodeSelect|code=
+sudo addgroup "$(whoami)" kvm
+}}
+{{CodeSelect|code=
+sudo reboot
+}}
+* After Reboot:
+{{CodeSelect|code=
+virsh -c qemu:///system net-autostart default
+}}
+{{CodeSelect|code=
+virsh -c qemu:///system net-start default
+}}
+* <big>For simplicity, you can copy and paste the following commands without changes, download and store {{project_name_long}} image in your home folder (which is the default for most of the browsers to save downloads in /home/username but if you like to use the commands in /home/username/Downloads because you downloaded whonix kvm image there then up to you)</big>
+
+* <big>To download the qcow2 images please press on [[KVM#Download_Whonix_™|Download {{project_name_long}} icon]]</big>
+
+* After whonix kvm image finished downloading follow the rest of the commands:
+
+{{CodeSelect|code=
+tar -xvf Whonix*.libvirt.xz}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-define Whonix_external*.xml}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-define Whonix_internal*.xml}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-autostart Whonix-External}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-start Whonix-External}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-autostart Whonix-Internal}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-start Whonix-Internal}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system define Whonix-Gateway*.xml}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system define Whonix-Workstation*.xml}}
+{{CodeSelect|code=
+sudo mv Whonix-Gateway*.qcow2 /var/lib/libvirt/images/Whonix-Gateway.qcow2
+}}
+{{CodeSelect|code=
+sudo mv Whonix-Workstation*.qcow2 /var/lib/libvirt/images/Whonix-Workstation.qcow2
+}}
+
+* Depend on your desktop environment these images for KDE as e.g:
+
+<code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Virtual Machine Manager</code>
+
+[[File:13.jpg|468px]]
+[[File:14.jpg|468px]]
+
+<code>{{project_name_gateway_short}}</code> &rarr; <code>Open</code> &rarr; <code>Play symbol</code>
+
+[[File:15.jpg|468px]]
+[[File:16 good.jpg|468px]]
+
+<big>To take snapshots, please follow the instructions below</big>:
+
+<code>Manage VM snapshots</code> &rarr; <code>Create new snapshot</code> &rarr; <code>Type Name & Description</code> &rarr; <code>Finish</code>
+
+[[File:snapshot22.png|1200px]]
+[[File:snapshot23.png|1200px]]
+[[File:snapshot244.png|1200px]]
+[[File:4.png|1200px]]
+[[File:5.png|1200px]]
+
+<big>To start the snapshot, please follow the instructions below</big>:-
+
+<code>Right click on snapshot</code> &rarr; <code>Start snapshot</code> &rarr; <code>Yes</code>
+
+[[File:7.png|1200px]]
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,20 @@
+=== Introduction ===
+
+The [[Dev/TimeSync#Whonix_.E2.84.A2_Time_Synchronization_Mechanism|TimeSync]] page notes:
+
+<blockquote>
+* Using Boot Clock Randomization, i.e. after boot, the clock is set randomly between 0 and 180 seconds into the past or future. This is useful to enforce the design goal, that the host clock and {{project_name_long}} clock should always slightly differ. It is also useful to obfuscate the clock when sdwdate itself is running, because naturally at this time, sdwdate hasn't finished.
+* sdwdate runs after booting.</blockquote>
+
+By randomly moving the system clock a few seconds (and nanseconds) in the past or future during boot, this enforces the design goal of a slightly different host clock and VM clock, even before secure time synchornization has succeeded. This prevents time-based fingerprinting and linkability issues, thereby improving anonymity and privacy. <ref>
+https://github.com/Whonix/bootclockrandomization
+</ref>
+
+For technical discussion on the Boot Clock Randomization design, see [https://forums.whonix.org/t/bootclockrandomization-always-moving-clock-plus-or-5-seconds here]. <ref>
+Notably, one recent change is the 0-5 second time window is no longer excluded in the process as it was found to aid fingerprinting.
+</ref>
+
+=== Log Inspection ===
+{{CodeSelect|code=
+sudo journalctl -b --no-pager -u bootclockrandomization
+}}

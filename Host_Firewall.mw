@@ -1,0 +1,86 @@
+{{Header}}
+{{#seo:
+|description=Host Firewall Settings and Testing
+|image=Hostfirewall213213.jpg
+}}
+[[image:Hostfirewall213213.jpg|thumb]]
+= Essentials =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = The recommendation to install a [[Host_Firewall_Basics#How-to:_Install_and_Configure_a_Firewall|host firewall]] is documented in the Computer Security Education section, along with basic settings.
+}}
+
+= Dedicated Connection =
+
+If possible, it is safer to avoid sharing the network (LAN, Wi-Fi, hotspot) with other potentially compromised machines.
+
+= Filtering Ports =
+
+== Introduction ==
+
+From time to time a user asks which incoming/outgoing ports are required by {{project_name_gateway_long}}. The answer is:
+
+* Incoming: <code>none</code>.
+* Outgoing: <code>all</code>.
+
+An alternative technique for controlling ports might be [[Corridor|corridor (a Tor traffic whitelisting gateway)]], since it can act as a firewall. <ref name=corridor-whonix-kvm>
+[https://phabricator.whonix.org/T524 corridor for {{project_name_long}} KVM ticket]
+</ref>
+
+== Incoming ==
+
+{{project_name_gateway_long}} itself does not open any ports. Users are advised to close all ports on the host as outlined in the [[Host_Firewall_Basics#How-to:_Install_and_Configure_a_Firewall|Host Firewall Essentials]] entry.
+
+== Outgoing ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' This procedure is not recommended. Port-based filtering of outgoing traffic is not applicable (as in useful) in the case of {{project_name_gateway_long}}.
+}}
+
+Filtering outgoing ports is difficult, since Tor entry guards or bridges listen on a variety of different ports. Limiting ports Tor uses for outgoing traffic is still possible, but recommended against, since it reduces anonymity. The effect is fewer entry guards or bridges are made available to the user. If users wish to proceed despite the risk, follow the instructions below.
+
+On {{project_name_gateway_long}}.
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add.
+
+{{CodeSelect|code=
+ReachableDirAddresses *:80
+ReachableORAddresses *:443
+## maybe: FirewallPorts PORTS
+## See Tor manual: https://2019.www.torproject.org/docs/tor-manual.html.en
+}}
+
+Save.
+
+{{Reload_Tor}}
+
+This issue was also discussed [https://web.archive.org/web/20211028042010/https://sourceforge.net/p/whonix/discussion/general/thread/3a0b673a/ in the old {{project_name_long}} forum].
+
+= NAT Router =
+
+Being behind an ordinary NAT router might provide a marginal layer of extra security. In all cases, it is recommended to [[Router_and_Local_Area_Network_Security#Suitable_Hardware_and_Router_Configurations|purchase a commercial-grade router and avoid cheap models]], since they are often less-secure.
+
+It is also suggested to review the entire [[Router_and_Local_Area_Network_Security|Router and Local Area Network Security]] chapter, particularly:
+
+* [[Router_and_Local_Area_Network_Security#Recommended_Router_Settings|Recommended Router Settings]].
+* Advanced users: Flash the router with an [[Router_and_Local_Area_Network_Security#Router_Firmware|open-source GNU/Linux distribution]] for better security, control and functionality.
+
+= Port Scan =
+
+Using an [https://www.grc.com/shieldsup Internet-based port scanner service] to test the local LAN's router/firewall is a sensible idea. Users must carefully research and find a legitimate service, since many companies only want to sell a product and will purposefully present false positives. A better alternative is to scan the local LAN with a port scanning application from an external IP address. To scan the home IP address, users can either login remotely (SSH) via an external machine, or proxy through an external IP address. Detailed instructions on accomplishing that are beyond the scope of this document.
+
+A special case is presented by users who share a LAN with other PCs (a stand-alone machine is not used). In this instance, the port scanning/testing service or a port scan application from an external IP address will actually only scan the local LAN's router/firewall and not the actual host's PC. If the latter is mis-configured, then the user could be susceptible to attacks from other machines within the LAN which sit behind the router, and a false sense of security could be the result.
+
+For example, if the user shares the LAN with flatmates who are not so sophisticated in computer security, then those foreign machines should be regarded as potentially malicious. There is every possibility they may have been infected with a botnet already or other harmful programs. Therefore, the user cannot trust the output of a port scan application running on their machine. If there is no spare machine for testing, then foreign computers on the LAN can be booted from a live CD, and the user can scan their personal machine with a port scan application. Details on how to accomplish that task are also outside the scope of this document.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

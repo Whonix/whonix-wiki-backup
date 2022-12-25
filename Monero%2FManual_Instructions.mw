@@ -1,0 +1,423 @@
+__NOINDEX__
+{{Header}}
+{{#seo:
+|description=How to use Monero in {{project_name_long}}
+|image=https://www.{{project_clearnet}}/w/images/7/79/Moneroheader.png
+}}
+[[File:Monero-symbol-1280.png|thumb|60px|128px|alt=Monero|link=Monero|Monero Logo]]
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This information is now <u>out of date</u>. Refer to the main [[Monero]] chapter instead.
+}}
+
+= What is Monero? =
+Monero is a private-centric cryptocurrency launched in 2014 to allow direct and anonymous digital payments without being dependent on a central authority.
+
+= Installation =
+Apart from these hints, installing Monero in {{project_name_long}} does not differ from installing Monero on any Linux based distribution.
+
+Advanced [[Qubes]] users could look into [https://getmonero.org/resources/user-guides/cli_wallet_daemon_isolation_qubes_whonix.html CLI Wallet/Daemon Isolation with Qubes + {{project_name_long}}] <ref>
+[https://groups.google.com/forum/#!searchin/qubes-users/monero%7Csort:date/qubes-users/CKB_drF16Tw/dntMLZ1aBwAJ qubes-users - Guide: Monero wallet/daemon isolation w/qubes+whonix]
+</ref> - untested by {{project_name_long}} developers.
+
+<ref>
+Only <code>monero</code> is currently available from Debian <code>sid</code>. Monero GUI is not yet available from packages.debian.org.
+
+{{Install Unstable|package=
+monero
+}}
+</ref>
+
+# Use Tor Browser, go to the Monero download page https://getmonero.org/downloads/ and download it. <ref>We avoid wget because it does not enforce https.</ref> <ref>We avoid scurl, since there is no redirecting stable link. TODO: this can probably be resolved by telling curl to follow redirects.</ref> <ref>Monero has a command line interface (CLI) as well as a graphical interface (GUI). Prefer the CLI if you feel at home with the terminal, otherwise choose the GUI.</ref>
+# Download Monero for Linux 64-bit. <ref>
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]]: version 13 users who upgraded to {{project_name_long}} 14 and above download: Linux 32-bit.
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]]: native version 14 and above users download: Linux 64-bit.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: Linux 64-bit.
+</ref>
+# [[Warning#Always_Verify_Signatures|Always verify signatures!]] -- to verify the integrity of the file you downloaded please follow this [https://getmonero.org/resources/user-guides/verification-allos-advanced.html official guide] on the official Monero website.
+# Open the folder containing the Monero <code>.tar.bz2</code> file.
+# Right-click and choose <code>Open Terminal Here</code>.
+# Type <code>tar xvf</code> into your terminal window followed by the name of the file that you downloaded. An example is provided below.
+
+{{CodeSelect|code=
+tar xvf monero-gui-linux-x64-v0.14.0.0.tar.bz2
+}}
+
+Your terminal window will list the contents as they are being extracted. Once completed you can continue on to the next section.
+
+= Start Monero GUI =
+Open the extracted Monero folder then right-click and choose <code>Open Terminal Here</code>.
+
+Alternatively you can use <code>cd</code> in terminal to enter the Monero directory; see the example below.
+
+{{CodeSelect|code=
+cd /home/user/Downloads/Applications/monero-gui-v0.14.0.0
+}}
+
+Now type the following code into your terminal window.
+
+{{CodeSelect|code=
+./start-gui.sh
+}}
+
+= Add Monero Desktop Launcher =
+
+# Right-click on the desktop and choose <code>Create Launcher</code>.
+# In the "Name:" field type <code>Monero GUI</code>.
+# In the "Command:" field type the path leading to your extracted Monero folder followed by <code>start-gui.sh</code>. For example: <code>/home/user/Downloads/monero-gui-v0.14.0.0/start-gui.sh</code>
+
+To add an icon to the desktop link, follow these steps:
+# Visit https://getmonero.org/press-kit/symbols/monero-symbol-on-white-480.png and save the image to your downloads.
+# When creating your launcher click <code>No icon</code>. Choose <code>Image Files</code> from the "Select icon from:" drop down.
+# Now open the folder where the Monero .png image is located, select the file and choose <code>OK</code>.
+# After clicking <code>Create</code> a .desktop file will be added to the desktop.
+
+= Installation with a Remote Node =
+
+Using a remote node provides a quick way to set up your Monero wallet. You will not have to download the entire blockchain.
+
+It is important to note that the remote node:
+* Cannot spend your XMR (you hold the keys).
+* Does not know your IP address (we are connecting to it over Tor).
+* Does not know your XMR address.
+* Does not know your balance or private view key.
+
+However, using a remote node is not without risk, you can read about the possible attacks here: https://moneroworld.com/
+
+In general, if the wallet warns you about the node misbehaving exit the wallet and connect to a different node.
+
+== CLI Instructions ==
+
+==== Download the Wallet ====
+{{Box|text=
+'''1.''' Navigate to https://getmonero.org/downloads
+
+* Download the Linux, <u>64-bit</u> (Command-line Tools Only) version.
+* Save the file in Browser > Downloads.
+
+'''2.''' Open the file explorer (Thunar).
+
+* Wait for the download to complete.
+* <code>Downloads button</code> &rarr; <code>Open Containing Folder</code>.
+
+'''3.''' Right-click the archive you just downloaded.
+
+* Click <code>Extract</code> &rarr; <code>Extract Archive Here</code>.
+* After extraction a folder named <code>monero-v0.14.0.0</code> should appear.
+
+'''4.''' Copy this folder to your Home directory (<code>/home/user/</code>).
+
+* In this sidebar under 'Places' click 'Home'.
+* <code>Right-click</code> &rarr; <code>Paste One Folder</code>.
+* If the option to paste is greyed out you're probably in <code>/home/</code> instead of <code>/home/user/</code>.
+}}
+==== Create a Desktop Shortcut ====
+{{Box|text=
+'''1.''' Click on the hamburger menu.
+* <code>Top left corner of the screen</code> &rarr; <code>Configure Desktop</code>.
+* Move Tor Browser out of the way if it is not visible.
+
+'''2.''' Navigate to the 'Wallpaper' section.
+* Change 'Layout' to 'Folder View', then click Apply.
+* Icons should now appear on the desktop.
+
+'''3.''' Open the terminal.
+* Double-click on Konsole on the desktop.
+
+'''4.''' Copy and paste the following terminal command and press <code>Enter</code>.
+
+{{CodeSelect|code=
+printf "[Desktop Entry]\nComment=Start Monero wallet\nExec=~/monero-v0.14.0.0/monero-wallet-cli --daemon-host xmrtolujkxnlinre.onion:18081\nPath=~/monero-v0.14.0.0/\nTerminal=true\nType=Application\nName=Monero CLI" > ~/Desktop/MoneroCLI.desktop && chmod +x ~/Desktop/MoneroCLI.desktop
+}}
+
+A shortcut named <code>Monero CLI</code> should now appear on the desktop.
+
+The terminal can now be closed.
+}}
+==== Set up the Wallet ====
+{{Box|text=
+'''1.''' Double-click the desktop shortcut.
+* A terminal window will now appear.
+
+'''2.''' Type a name for your wallet (for example 'monero'; remember this) and press <code>Enter</code>.
+
+'''3.''' Confirm the creation of a new wallet.
+* Type 'Y' and press <code>Enter</code>.
+
+'''4.''' Enter a password and confirm the password.
+
+'''5.''' Select the desired language for your 25 word seed.
+* For English, press '1' followed by <code>Enter</code>.
+* If the process is stuck after pressing <code>Enter</code>, your node is down. Scroll down to troubleshooting for instructions on how to resolve this.
+
+'''6.''' <u>Write down your 25 word seed</u> and optionally the current block height (this can be found [https://moneroblocks.info/ here]).
+* If you fail to do this and something happens to your {{project_name_long}} install your Monero are gone forever.
+* You can use this seed to recover your wallet.
+* The wallet creation height can be used to restore the wallet from the seed faster.
+
+'''7.''' The wallet will now refresh and this can take a couple of minutes.
+* If you get "Error: refresh failed: no connection to daemon": your node is down. Scroll down to troubleshooting for instruction on how to resolve this.
+
+Congratulations, your CLI wallet is now set-up!
+}}
+===== Common Commands =====
+
+'''Table:''' ''Common Monero Commands''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Command'''
+! scope="col"| '''Terminal'''
+|-
+! scope="row"| Full Command List
+| {{CodeSelect|code=
+help
+}}
+|-
+! scope="row"| Show your Balance
+| {{CodeSelect|code=
+balance
+}}
+|-
+! scope="row"| View your Primary Address
+| {{CodeSelect|code=
+address
+}}
+|-
+! scope="row"| Create a New Subaddress
+| {{CodeSelect|code=
+address new <label>
+}}
+|-
+! scope="row"| View all (Sub)addresses
+| {{CodeSelect|code=
+address all
+}}
+|-
+! scope="row"| Create a New Transaction
+| {{CodeSelect|code=
+transfer <address> <amount>
+}}
+
+|-
+! scope="row"| Show all transfers
+| {{CodeSelect|code=
+show_transfers
+}}
+|}
+
+Incoming transactions will automatically show up in the CLI.
+
+It takes 10 blocks (~20 minutes) before your balance unlocks after receiving a tx. You will know how much of the balance is spendable by typing <code>balance</code> and looking for the unlocked balance.
+
+===== Subsequent {{project_name_long}} Boot =====
+
+When {{project_name_long}} is rebooted, double-click the <code>Monero CLI</code> shortcut on your desktop.
+
+Enter your wallet name and password, and allow the wallet to refresh.
+
+===== CLI Troubleshooting =====
+
+To change the remote node:
+# Close the wallet if it is open.
+# <code>Right-click the desktop shortcut</code> &rarr; <code>Open With</code> &rarr; <code>KWrite</code>
+# Replace the daemon host (for example <code>zdhkwneu7lfaum2p.onion:18099</code>) with a different one from the list below. Make sure to also copy the correct port.
+# Save the file and restart your wallet with the shortcut -- it should start syncing again.
+
+{{CodeSelect|code=
+xmrtolujkxnlinre.onion:18081
+xmkwypann4ly64gh.onion:18081
+mmp26upm3gig2ltk.onion:18089
+xmrag4hf5xlabmob.onion:18081
+monerospv4fuwduf.onion:18081
+7245ifq4iw3uvexs.onion:18081
+zdhkwneu7lfaum2p.onion:18099
+}}
+
+== GUI Instructions ==
+
+==== Download the Wallet ====
+{{Box|text=
+'''1.''' Navigate to https://getmonero.org/downloads
+* Download the Linux, <u>64-bit</u> version.
+* Save the file in Browser > Downloads.
+
+'''2.''' Open the file explorer (Thunar).
+* Wait for the download to complete.
+* <code>Downloads button</code> &rarr; <code>Open Containing Folder</code>.
+
+'''3.''' Right-click the archive you just downloaded and click copy.
+* Open terminal and type {{CodeSelect|code=
+tar -xjvf
+}}
+* Press <code>Ctrl</code> + <code>Shift</code> + <code>V</code> to paste your file path. It should look like this: {{CodeSelect|code=
+tar -xjvf /home/user/.tb/tor-browser/Browser/Downloads/monero-gui-linux-x64-v0.14.0.0.tar.bz2
+}}
+* Press <code>Enter</code>.
+* After extraction a folder named <code>monero-gui-v0.14.0.0</code> should appear.
+
+'''4.''' Copy this folder to your Home directory (<code>/home/user/</code>).
+
+* In the sidebar under <code>Places</code>, click <code>Home</code>.
+* <code>Right-click</code> &rarr; <code>Paste One Folder</code>.
+* If the option to paste is greyed out you are probably in <code>/home/</code> instead of <code>/home/user/</code>.
+}}
+
+==== Create a Desktop Shortcut ====
+{{Box|text=
+'''1.''' Click on the hamburger menu.
+* <code>Top left corner of the screen</code> &rarr; <code>Configure Desktop</code>.
+* Move Tor Browser out of the way if it is not visible.
+
+'''2.''' Navigate to the 'Wallpaper' section.
+* Change 'Layout' to 'Folder View', then click Apply.
+* Icons should now appear on the desktop.
+
+'''3.''' Open the terminal.
+
+* Double-click on Konsole on the desktop.
+
+'''4.''' Copy and paste the following in the terminal and press <code>Enter</code>.
+
+{{CodeSelect|code=
+printf "[Desktop Entry]\nComment=Start Monero wallet\nExec=~/monero-gui-v0.14.0.0/start-gui.sh \nPath=~/monero-gui-v0.14.0.0/\nTerminal=true\nType=Application\nName=Monero GUI" > ~/Desktop/MoneroGUI.desktop && chmod +x ~/Desktop/MoneroGUI.desktop
+}}
+
+A shortcut named 'Monero GUI' should now appear on the desktop.
+
+The terminal can now be closed.
+}}
+==== Set up the Wallet ====
+{{Box|text=
+'''1.''' Double-click the desktop shortcut.
+* A terminal window will now appear, followed by the GUI.
+
+'''2.''' Select your language, then click continue.
+
+'''3.''' Choose 'Advanced mode'.
+
+'''4.''' Choose 'Create a new wallet'.
+
+'''5.''' <u>Write down your 25 word seed</u> and optionally the current block height (this can be found [https://moneroblocks.info/ here]).
+* If you fail to do this and something happens to your {{project_name_long}} install your Monero are gone forever.
+* You can use this seed to recover your wallet.
+* The wallet creation height can be used to restore the wallet from the seed faster.
+
+'''6.''' Enter a password.
+
+'''7.''' Click 'Connect to a remote node' and fill in remote node details.
+* <u>Remote Node Hostname / IP</u>: xmrtolujkxnlinre.onion
+* <u>Port</u>: 18081
+
+'''8.''' Click on 'Use Monero'.
+
+'''9.''' Check your wallet starts synchronizing; this can take a couple of minutes to finish.
+
+* If you get "Failed to fetch remote nodes from third-party server", this means the node is down. See the troubleshooting section below for steps to resolve the problem.
+
+Congratulations, your Monero GUI wallet is now set-up!
+}}
+===== Common Actions =====
+
+To create a new subaddress: <code>Receive</code> &rarr; <code>Create new address</code>
+
+To send a transaction: Go to send, fill in the amount and address.
+
+===== Subsequent {{project_name_long}} Boot =====
+
+# Double-click the 'Monero GUI' desktop shortcut.
+# Enter your password.
+# Allow the wallet to synchronize.
+
+===== GUI Troubleshooting =====
+'''Changing the remote node'''
+{{Box|text=
+'''1.''' Close your Monero GUI wallet.
+
+'''2.''' Choose a node from the list below.
+
+{{CodeSelect|code=
+xmrtolujkxnlinre.onion:18081
+xmkwypann4ly64gh.onion:18081
+mmp26upm3gig2ltk.onion:18089
+xmrag4hf5xlabmob.onion:18081
+monerospv4fuwduf.onion:18081
+7245ifq4iw3uvexs.onion:18081
+zdhkwneu7lfaum2p.onion:18099
+}}
+
+'''3.''' Open the terminal.
+
+* Double-click Konsole on the desktop.
+
+'''4.''' Type the following command in the terminal.
+
+{{CodeSelect|code=
+sed -i 's/remoteNodeAddress=.*/remoteNodeAddress=REMOTENODE/g' ~/.config/monero-project/monero-core.conf
+}}
+
+Substitute <code>REMOTENODE</code> for the node you have chosen from the list of remote nodes. Do not forget to include the numbers at the end.
+
+'''5.''' Start your wallet.
+
+It should now start synchronizing. If it doesn't, repeat these steps with a different remote node.
+}}
+'''Restoring a wallet from file'''
+
+# Click 'Open a wallet from file'.
+# Navigate to and select your <walletname>.keys file.
+# Enter the password associated with that wallet.
+# If your client gives an error, then close and restart your wallet. It should work now, if not, try restoring from seed.
+# Continue with step 6 of Setting up the wallet.
+
+'''Restoring a wallet from the 25 word seed'''
+
+# Click 'Restore wallet from keys or mnemonic seed'.
+# Enter your 25 word seed.
+# Enter your wallet creation height / restore height (if unsure, see below).
+# Continue with step 5 of Setting up the wallet.
+
+'''Calculating the wallet creation height''''
+
+* Take the current height from https://moneroblocks.info and subtract (720 * the number of days since you created the wallet). It does not have to be exactly right, but should at least be before the the first transaction to your wallet. Use this value as your restore height.
+
+'''Large number of blocks remaining after restoring from seed'''
+
+* You probably forgot to enter the restore height. To fix this go to Settings, scroll down to Debug info. Click to change wallet creation height and enter your wallet creation height, then save. You may need to reopen the wallet to have it detect this.
+
+= Forum Discussion =
+* https://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432
+
+= Donations =
+After having installed monero, please consider making a [[Donate|donation]] to {{project_name_long}} to help keep it running for many years to come.
+
+Donate Monero (XMR) to {{project_name_long}}.
+
+{{CodeSelect|code=
+{{Pay_Monero}}
+}}
+
+= Architecture =
+
+Monero works by having contributors host large files which are equivalent to a public ledger. Any time someone broadcasts a transaction, every ledger maintainer updates their copy of the ledger and ensures no cheating or fraud has occurred. As with most cryptocurrencies, transactions are sent to Public Addresses which are derived from personally created private keys.
+
+Since transactions could otherwise be traced by watching which addresses are sending to each-other, Monero uses a Diffie-Hellman key exchange using the transaction information on the sender's side and the public address on the receiver's end of a transaction to encrypt the recipients address on the ledger. To protect the sender, spending Monero is equivalent to forwarding the output of the previous transaction, so a users address is never stored on the ledger at all - this technique is called Stealth Addressing.
+
+Since this solution is imperfect, and allows EABE attacks and is dependent on ECC for the key exchange, Monero uses a second layer of anonymity called Ring Signatures. When signing a transaction and broadcasting it to the network, Ring Signatures take signers from previous transactions and forge a new signature with Ring Size = N, where you cannot tell which entity in the group N actually authorized a transaction. This further obfuscates the blockchain and reduces the available attack vectors on the cryptocurrency as a whole, as well as introduces several zero knowledge proofs which prevent absolute analysis of the ledger.
+
+Ring Signatures combined with Stealth Addressing prevent many attack vectors, but since new transactions are forwarded outputs from previous ones you can still perform analysis by viewing the amounts spent on-chain. To address this potential issue, a solution called RingCT was introduced which obfuscates the amount spent in a transaction.
+
+Further attack vectors including cross-referencing an address posted in multiple places and IP leaks when connecting to the network are further developments sought out by the Monero community. These potential issues are addressed with Subaddresses and Kovri respectively.
+
+= See Also =
+It is recommended to read the [[Money]] wiki page as it contains a lot of related information on how to make anonymous payments.
+
+= Footnotes =
+
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

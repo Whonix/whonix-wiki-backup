@@ -1,0 +1,538 @@
+{{Header}}
+{{#seo:
+|description=Remote Administration
+|image=https://www.{{project_clearnet}}/w/images/a/ad/Remoteadmin.png
+}}
+[[image:Remoteadmin.png|thumb]]
+
+= Introduction =
+
+== Warning ==
+
+Remote administration of any system should be considered a potential anonymity hazard, since it is not under the user's physical protection and could be compromised. All activities, all programs, everything should be assumed to be monitored by the host of the server (VPS, dedicated server, etc.).
+
+Although counter-intuitive, it is necessary to follow all relevant recommendations in the [[Surfing Posting Blogging]] chapter to stay safe:
+
+* Beware of [[Surfing_Posting_Blogging#Keystroke_Fingerprinting|Keystroke]] and [[Surfing_Posting_Blogging#Mouse_Fingerprinting|Mouse Fingerprinting]].
+* Beware of [[Surfing_Posting_Blogging#Stylometry|Stylometry]].
+* Beware of difficulties in paying anonymously, see [[Money]].
+
+At a minimum, check the connection is encrypted / authenticated, because [https://en.wikipedia.org/wiki/Virtual_Network_Computing Virtual Network Computing (VNC)] by default is unencrypted / unauthenticated. Possible methods:
+
+* Perhaps by tunneling VNC through [[SSH]];
+* Running VNC through a [[Onion Services|Tor Onion Service]];
+* Using both SSH and an Onion Service, for stronger encryption and authentication; or
+* Onion Services Authentication.
+
+In case remote servers are exclusively available over <code>.onion</code>: Might get locked out due to [[Onion_Services#Onion_Services_Reliability_Issues|Onion Services Reliability Issues]].
+
+SSH has a lower attack surface than VNC (for example Mouse Fingerprinting is not possible against simple SSH (terminal only, no X11 forwarding).
+
+== UDP ==
+
+It is suggested to utilize software that does not require the User Datagram Protocol (UDP), for the following reason.
+
+{{Tor_UDP}}
+
+= Remmina =
+[[image:Remminalogo.png|Remmina Logo|thumb]]
+It is possible to remotely administer any operating system with GNU/Linux by using the [https://remmina.org/ Remmina] desktop client. Remmina supports multiple network protocols, including RDP, VNC, SPICE, NX, XDMCP, SSH and EXEC. For an overview of Remmina features, see [https://remmina.org/remmina-features/ here].
+
+Note there are two separate Debian packages:
+
+* <code>remmina</code>: the main GTK+ application.
+* <code>remmina-plugins</code>: a set of plugins to support various network protocols.
+
+{{Install Package
+|package=remmina
+}}
+
+If you are interested in using Remmina, please first search the forums for this topic: https://forums.whonix.org/search?q=remmina
+
+= SSH into {{project_name_long}} =
+== Introduction ==
+It is possible to install an SSH server on either {{project_name_gateway_short}} and/or {{project_name_workstation_long}} and make it accessible through an anonymous [[Onion Services|onion service]].
+
+== SSH into Whonix-Gateway ==
+{{Box|text=
+'''1.''' Update the package lists and install necessary software.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install the {{Code2|openssh-server}} package.
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends openssh-server
+}}
+
+'''2.''' Optionally [[SSH|harden SSH]].
+
+'''3.''' Make necessary {{project_name_gateway_long}} adjustments.
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add.
+
+{{CodeSelect|code=
+HiddenServiceDir /var/lib/tor/gateway_ssh_service/
+HiddenServicePort 22 127.0.0.1:22
+HiddenServiceVersion 3
+}}
+
+Save.
+
+'''4.''' {{Reload_Tor}}
+
+'''5.''' Retrieve the Tor onion service url.
+
+{{CodeSelect|code=
+sudo cat /var/lib/tor/gateway_ssh_service/hostname
+}}
+
+{{
+Backups_Tor_Onion_Service_private_key
+|private_key_file=/var/lib/tor/workstation_ssh_service/hs_ed25519_secret_key
+|file_name=hs_ed25519_secret_key
+}}
+}}
+== SSH into Whonix-Workstation ==
+{{Box|text=
+'''1.''' Update the package lists and install necessary software.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install the {{Code2|openssh-server}} package.
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends openssh-server
+}}
+
+'''2.''' Optionally [[SSH|harden SSH]].
+
+'''3.''' Make necessary {{project_name_gateway_long}} adjustments.
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add.
+
+Qubes-Whonix Note: Cannot use <code>10.152.152.11:22</code>. See page [[Onion Services]] for <code>/qubes-ip</code>.
+
+{{CodeSelect|code=
+HiddenServiceDir /var/lib/tor/workstation_ssh_service/
+HiddenServicePort 22 10.152.152.11:22
+HiddenServiceVersion 3
+}}
+
+Save.
+
+'''4.''' Reload Tor.
+
+{{Reload_Tor}}
+
+'''5.''' Retrieve the Tor onion service url.
+
+{{CodeSelect|code=
+sudo cat /var/lib/tor/workstation_ssh_service/hostname
+}}
+
+{{
+Backups_Tor_Onion_Service_private_key
+|private_key_file=/var/lib/tor/workstation_ssh_service/hs_ed25519_secret_key
+|file_name=hs_ed25519_secret_key
+}}
+
+'''6.''' Adjust {{project_name_workstation_long}} firewall settings.
+
+{{Firewall_Settings_Workstation}}
+
+Add.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 22 "
+}}
+
+Save.
+
+'''7.''' Reload the firewall.
+
+{{Reload_Firewall_ws}}
+}}
+== Graphical ==
+=== Introduction ===
+It is possible to install a VNC server on either {{project_name_gateway_short}} and/or {{project_name_workstation_long}} and make it accessible through an anonymous [[Onion Services|onion service]].
+
+=== x2go ===
+==== Installation ====
+{{Box|text=
+'''1.''' Set up SSH first as per above chapters.
+
+This is because x2go uses SSH. x2go [[Dev/Qubes_Remote_Support#x2go_bugs|might]] be incompatible with [[SSH|SSH hardening]]. It has been reported that x2go is incompatible with password protected SSH keys but this was not investigated further or reported upstream.
+
+'''2.''' Update the package lists and install necessary software.
+
+Either on {{project_name_gateway_short}} or {{project_name_workstation_long}}, depending on where incoming x2go connection should be accepted.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install the {{Code2|x2goserver}} package.
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends x2goserver
+}}
+}}
+
+==== Usage ====
+In a {{project_name_workstation_long}} (<code>remote-support-provider</code> VM). <ref>
+Or any other system with transparent torification. It cannot be easily made to work using socksifier <code>torsocks</code>.
+</ref>
+
+1) {{Install Package|
+package=x2goclient
+}}
+
+2) Start <code>x2goclient</code>.
+
+As user. Run <code>x2goclient</code>.
+
+* <code>host</code>: the onion v3 domain
+* <code>login</code>: the user name such as <code>user</code>
+* <code>password</code>: the user login password such as <code>changeme</code>
+* <code>session type</code>: <code>connect to local desktop</code>
+* <code>media</code> -> <code>disable client side printing support</code>
+* <code>media</code> -> <code>disable sound support</code>
+* settings for better performance
+** <code>connection</code> -> <code>connection speed</code> -> <code>WAN</code>
+** <code>connection</code> -> <code>image quality</code> <code>0</code>
+** <code>connection</code> -> <code>method</code> -> <code>8-jpeg</code>
+** feel free to experiment with these settings
+* <code>OK</code>
+* Click on the newly setup connection
+* <code>OK</code>
+
+Alternatively <code>session type</code> <code>terminal</code> could be used.
+
+=== Test Results ===
+Using [[Non-Qubes-Whonix]]. All times are created with an external stopwatch and should have +/- 2 seconds human caused inaccuracy.
+
+* keypress delay: 2 seconds
+* maximize xfce4-terminal-emulator window: 1.5 seconds
+* <code>cd /etc && ls -la</code>: 2 seconds
+* clock in systray (shows seconds) update: every 1 or 2 seconds
+* start thunar: 5 seconds
+
+Using Qubes / Qubes-Whonix is [[Dev/Qubes_Remote_Support#Test_Results|a lot slower]], has additional challenges and is still under development, see [[Dev/Qubes_Remote_Support]].
+
+= Qubes - SSH or VNC into Qubes dom0 =
+== Introduction ==
+Encrypted, authenticated SSH or VNC into Qubes dom0 over an authenticated Tor onion v3 service.
+
+Design <ref>
+* https://github.com/QubesOS/qubes-issues/issues/6364#issuecomment-767166712
+* [[Dev/Qubes Remote Support]]
+</ref>:
+
+* Encrypted. <ref>
+Thanks to encryption provided by Tor onion v3 and SSH.
+</ref>
+* Authenticated. <ref>
+Thanks to authentication provided by Tor onion v3, onion authentication and SSH.
+</ref>
+* Over Tor.
+* Implemented using an authenticated Tor onion v3 service.
+* Even if {{project_name_long}} on <code>qubes-remote-support-<u>receiver</u></code> machine was compromised, the attacker will not be able to access dom0. <ref>
+Thanks to encryption/authentication provided by SSH.<br />
+<br />
+Public/private keys for SSH are generated in Qubes dom0 by <code>qubes-remote-support-<u>receiver</u></code>. At no point, any {{project_name_long}} VM on <code>qubes-remote-support-<u>receiver</u></code> has access to any SSH keys.<br />
+<br />
+SSH keys are transferred from  <code>qubes-remote-support-<u>receiver</u></code> to <code>qubes-remote-support-<u>provider</u></code> using [[File_Sharing#Magic-Wormhole|magic-wormhole]] tool over Tor.
+</ref>
+* <blockquote>The package will not be installed by default.</blockquote>
+* <blockquote>The design requires explicit connection initiation by the user (no any open ports, extra network connections etc before that point). And when the user initiate the connection, it requires sharing a code word with the remote party to be able to connect.</blockquote>
+* No open ports required.
+* No router settings changes required.
+* Works behind NAT.
+* Works over mobile networks (3G, 4G, 5G).
+
+Instructions:
+
+* <code>qubes-remote-support-<u>receiver</u></code> have to be applied by the person who intents to <u>receive</u> remote support.
+* <code>qubes-remote-support-<u>provider</u></code> have to be applied by the person who intents to <u>provide</u> remote support.
+
+== qubes-remote-support-receiver ==
+Not available for Qubes <code>R4.<u>0</u></code>! Only available on Qubes <code>R4.<u>1</u></code> (and above).
+
+Security advice: Giving a third party remote support access is a very delicate permission. As with any remote support permission, the <code>qubes-remote-support-<u>provider</u></code> could persistently compromise the <code>qubes-remote-support-<u>receiver</u></code> with [[malware]] without the user having a chance to notice that. Learn [[Malware_and_Firmware_Trojans#The_Importance_of_a_Malware_Free_System|The Importance of a Malware Free System]].
+
+'''1)''' Qubes <code>R4.<u>1</u></code> dependency installation.
+
+Install package <code>qubes-remote-support-receiver-dom0</code> in Qubes dom0. <ref>
+https://github.com/QubesOS/qubes-remote-support
+</ref> <ref>
+* https://github.com/QubesOS/qubes-issues/issues/6364
+* https://github.com/QubesOS/updates-status/issues/2353
+</ref>
+
+{{CodeSelect|code=
+sudo qubes-dom0-update qubes-remote-support-receiver-dom0
+}}
+
+'''2)''' Run the <code>qubes-remote-support-receiver-start</code> command line utility.
+
+{{CodeSelect|code=
+qubes-remote-support-receiver-start
+}}
+
+Will show something like this (example):
+
+<blockquote>wormhole_code: 9-support-concert</blockquote>
+
+'''3)''' Notification.
+
+Tell the wormhole code (for example <code>9-support-concert</code>) to the person you would like to receive Qubes remote support from, i.e. the <code>qubes-remote-support-<u>provider</u></code>.
+
+Note: not <code>9-support-concert</code>. The actual code as shown in terminal / graphical user interface.
+
+'''4)''' To check status of remote support.
+
+{{CodeSelect|code=
+qubes-remote-support-receiver-status
+}}
+
+'''5)''' To terminate remote support.
+
+{{CodeSelect|code=
+qubes-remote-support-receiver-stop
+}}
+
+== qubes-remote-support-provider ==
+'''1)''' Dependency installation.
+
+Start <code>{{project_name_workstation_template}}</code> Template.
+
+(The latter package <code>x2goclient</code> can be omitted from installation connecting to <code>qubes-remote-support-<u>receiver</u></code> use of x2go (VNC) is unwanted.)
+
+{{Install Package|package=
+openssh-client x2goclient
+}}
+
+Shutdown <code>{{project_name_workstation_template}}</code> Template.
+
+'''2)''' Start virtual machine (VM).
+
+Open a <code>{{project_name_workstation_template}}</code> based VM. Recommended but optional: DispVM. This will be refereed to as <code>qubes-remote-support-<u>provider</u></code> VM.
+
+'''3)''' Run <code>qubes-remote-support-<u>provider</u></code> script in <code>qubes-remote-support-<u>provider</u></code> VM.
+
+{{CodeSelect|code=
+qubes-remote-support-provider
+}}
+
+It is an interactive script. Read what it says. Continue by pressing enter.
+
+'''4)''' When it says:
+
+<blockquote>INFO: Install authenticated Tor onion v3 service private key with the following command in {{project_name_gateway_vm}}.<br />
+sudo sourcefile=~/QubesIncoming/disp4522/1.auth_private anon-server-to-client-install</blockquote>
+
+Do as instructed in <code>{{project_name_gateway_vm}}</code> VM. Do not copy the command from here. Copy the command from <code>qubes-remote-support-<u>provider</u></code> VM script output, then paste and run in <code>{{project_name_gateway_vm}}</code> VM. Then press enter to continue in <code>qubes-remote-support-<u>provider</u></code> VM.
+
+'''5)''' Done.
+
+Should now be connected by SSH.
+
+'''6)''' Optional: Connect by graphical remote support (x2go).
+
+As per instructions below.
+
+=== x2goclient ===
+Broken until upstream fix for issue [https://github.com/QubesOS/updates-status/issues/2353 x2goagent 3.5.99.26 crashes on connect] flows to Qubes R4.1 dom0.
+
+In a {{project_name_workstation_long}} (<code>remote-support-<u>provider</u></code> VM).
+
+'''1)''' Start <code>x2goclient</code>.
+
+As user. Run <code>x2goclient</code>.
+
+'''2)''' x2goclient settings
+
+* <code>session</code> tab
+** <code>host</code>: the onion v3 domain
+** enable <code>Try auto login (via SSH agent or default SSH key)</code>
+** <code>session type</code>: <code>connect to local desktop</code>
+* <code>media</code> tab
+** <code>media</code> -> <code>disable client side printing support</code>
+** <code>media</code> -> <code>disable sound support</code>
+* <code>connection</code> tab
+** These are optional settings for better performance. Feel free to experiment with these settings.
+** <code>connection</code> -> <code>connection speed</code> -> <code>WAN</code>
+** <code>connection</code> -> <code>image quality</code> <code>0</code>
+** <code>connection</code> -> <code>method</code> -> <code>8-jpeg</code>
+* <code>OK</code>
+* Click on the newly setup connection
+* <code>OK</code>
+
+Alternatively session type terminal could be used.
+
+If you can only see a black screen, the the desktop might be locked (xscreensaver). Any mouse movement or any keypress should prompt for password.
+
+Not required:
+
+* <code>login</code>: not required
+* <code>password</code>: not required
+
+== printout ==
+=== Qubes Remote Support Receiver ===
+<pre>
+qubes-remote-support-receiver-start
+</pre>
+
+<pre>
+INFO: Starting Qubes Remote Support Receiver.
+INFO: This tool is supposed to be run by those who wish to receive remote support.
+INFO: Setting up... This will take a moment...
+INFO: Remote support archive file '/tmp/tmp.Yfv3ehL6ZJ/remote-support-keys.tar.gz' was successfully created.
+INFO: (That file allows a Qubes Remote Support Provider to connect to this machine.)
+INFO: (No need to do anything with that file.)
+INFO: Starting the file transfer tool magic-wormhole... This will take a moment...
+INFO: File transfer too magic-wormhole successfully started.
+INFO: The next line will show a wormhole code phrase. Send the code to the Qubes Remote Support Provider. Once the the Qubes Remote Support Provider acknowledged receipt, just wait.
+wormhole_code: 9-one-two-three-four
+INFO: The Qubes Remote Support Provider successfully received the remote support archive file and is now able to establish remote support.
+INFO: This can take up to 10 minutes.
+
+INFO: Should you wish to stop this Qubes Remote Support Session, please run:
+qubes-remote-support-receiver-stop
+
+INFO: This tool will exit now and there is nothing else to do besides waiting.
+INFO: Success.
+</pre>
+
+<pre>
+qubes-remote-support-receiver-status
+</pre>
+
+<pre>
+● sshd.service - OpenSSH server daemon
+     Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: disabled)
+     Active: active (running) since Sat 2021-02-13 06:49:51 EST; 3 weeks 3 days ago
+[...]
+Hint: Some lines were ellipsized, use -l to show in full.
+INFO: /etc/qubes-rpc/policy/qubes.ConnectTCP+22 looks OK.
+qvm-check: {{project_name_gateway_vm}}: running
+INFO: VM '{{project_name_gateway_vm}}' already running, ok.
+___ qubes-whonix-remote-support.service - Qubes-Whonix Remote Support
+   Loaded: loaded (/lib/systemd/system/qubes-whonix-remote-support.service; disabled; vendor preset: disabled)
+   Active: active (running) since Tue 2021-03-09 13:51:30 UTC; 9min ago
+[...]
+___ tor@default.service - Anonymizing overlay network for TCP
+   Loaded: loaded (/lib/systemd/system/tor@default.service; enabled-runtime; vendor preset: enabled)
+[...]
+   Active: active (running) since Tue 2021-03-09 13:43:23 UTC; 17min ago
+[...]
+INFO: Success.
+</pre>
+
+<pre>
+qubes-remote-support-receiver-stop
+</pre>
+
+<pre>
+INFO: sshd was previously running, therefore not stopping it, ok.
+INFO: VM '{{project_name_gateway_vm}}' already running, ok.
+INFO: Success, remote support received has been turned off.
+</pre>
+
+=== Qubes Remote Support Provider ===
+<pre>
+qubes-remote-support-provider
+</pre>
+
+<pre>
+INFO: Starting Qubes Remote Support Provider.
+INFO: This tool is supposed to be run by those who wish to provide remote support.
+INFO: Setting up... This will take a moment...
+INFO: Ask the remote support receiver for the wormhole code phrase and enter it below.
+Enter receive wormhole code: 9-one-two-three-four
+ (note: you can use <Tab> to complete words)
+Receiving file (814 Bytes) into: remote-support-keys.tar.gz
+ok? (y/N): y
+Receiving (->relay:tcp:magic-wormhole-transit.debian.net:4001)..
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 814/814 [00:00<00:00, 3.82MB/s]
+Received file written to remote-support-keys.tar.gz
+INFO: Success, received remote support archive file '/tmp/tmp.ZTe9baxU6Z/remote-support-keys.tar.gz'.
+INFO: (That file allows a Qubes Remote Support Provider to connect to this machine.)
+INFO: (No need to do anything with that file.)
+INFO: Setting up... This will take a moment...
+
+Success. Please continue as instructed below.
+
+INFO: To avoid confusion, it is advised your delete folder ~/QubesIncoming in {{project_name_gateway_vm}} if it exists. In most cases no such folder exists.
+INFO: If there is nothing you need to backup, you could run the following command in {{project_name_gateway_vm}}:
+
+rm -rf ~/QubesIncoming
+
+INFO: When done, press enter to continue.
+
+
+INFO: Will ask to copy 1.auth_private to {{project_name_gateway_vm}}.
+INFO: When Qubes dom0 asks, answer to copy to {{project_name_gateway_vm}}.
+INFO: Press enter to continue.
+
+
+sent 0/1 KB
+
+INFO: Install authenticated Tor onion v3 service private key by running the following command in {{project_name_gateway_vm}}:
+
+sudo sourcefile=~/QubesIncoming/disp2887/1.auth_private anon-server-to-client-install
+
+INFO: When done, press enter to continue.
+
+
+INFO: Do you want to SSH to 'xxx.onion'?
+INFO: Press enter to continue.
+
+
+INFO: Trying SSH...
+INFO: Will keep trying to run the following command...
+ssh 'xxx.onion'
+INFO: This can take up to 10 minutes.
+Last login: Tue Mar  9 08:49:28 2021 from xx.xx.xx.x
+[user@dom0 ~]$
+</pre>
+
+== Test Results ==
+* Running a simple command such as <code>ls -la</code> takes 1 second until results are drawn.
+* There is an 1 seconds delay between a keypress on inside <code>remote-support-provider</code> VM until it gets visible in the remote terminal.
+* Click Xfce start menu: 2 seconds
+* clock in systray (shows seconds) update: every 1 or 2 seconds
+* There is a bug where I have no idea if caused by Qubes R4.1 testing version or x2go or a combination of it. When pressing any key it sometimes happen that this key is auto-repeat "jammed". I.e. "a" becomes "aaaaaaaaaaaaaaa" (no exact counting).
+
+= See Also =
+* [[SSH]]
+
+= Help Wanted =
+Please contribute by helping to create full working instructions in Whonix! See: [https://phabricator.whonix.org/T547 add user documentation for Remote Administration, Keystroke Fingerprinting, Stylometry].
+
+= Future Research =
+
+<blockquote>
+[1] comparing vnc, nx(x2go) and spice. VNC sends the least amount of data. nx has a stable perf irrelevant of bandwidth conditions however one disadvantage I came across was it is heavily tied to X11 and therefore not future proof. https://bbs.archlinux.org/viewtopic.php?id=225765
+
+[1] https://www.diva-portal.org/smash/get/diva2:530960/FULLTEXT01.pdf
+
+VNC perf depends heavily on implementation details. TigerVNC is better than realvnc, but Remmina is commented to be better than tiger. "A 2010 reviewer found the TigerVNC product "much faster than Vinagre https://en.wikipedia.org/wiki/Vinagre but not quite as responsive as Remmina https://en.wikipedia.org/wiki/Remmina https://en.wikipedia.org/wiki/TigerVNC
+"
+
+Tiger can be further optimized for constrained environments by ratcheting up the compression and lowering the jpeg quality. NB turbo isn't in Debian and it seems geared towards 3D usage. https://turbovnc.org/About/TigerVNC
+</blockquote>
+
+= Footnotes =
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]

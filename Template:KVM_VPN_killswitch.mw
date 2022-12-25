@@ -1,0 +1,31 @@
+There has been a lot of debate about a fail-closed mechanism or a kill switch for VPN users on Whonix. (Cutting off all traffic to Tor if the VPN drops).
+
+VPN-Firewall covers all host VPN traffic. However, for users who wish to only ensure that traffic originating from Whonix-Gateway goes through a VPN inclusive of a fail-closed mechanism, but excluding host traffic from the VPN this seems like a very interesting solution.
+
+This guide is for VPNs that are set up on the host.
+All that is needed is modification of <code>Whonix-External.xml</code> to reflect the following:
+
+<pre style="white-space: pre-wrap;">
+<network>
+  <name>Whonix-External</name>
+  <forward dev='tun0' mode='nat'/>
+  <bridge name='virbr1' stp='on' delay='0'/>
+  <ip address='10.0.2.2' netmask='255.255.255.0'>
+  </ip>
+</network>
+</pre>
+
+This is the key component, specifically telling libvirt to use tun0 for NAT.
+<code><forward dev='tun0' mode='nat'/></code>
+
+Libvirt will <u>automatically</u> create these iptables rules when the Whonix-External Network is started, only allowing established forwarded traffic between the Whonix Gateway and the tun0 interface.
+<pre style="white-space: pre-wrap;">
+-A FORWARD -m conntrack --ctstate ESTABLISHED -j ACCEPT
+-A FORWARD -s 10.0.2.0/24 -i virbr1 -o tun0 -j ACCEPT
+</pre>
+
+That’s it.
+
+If your VPN connection drops, all Whonix connectivity will die instantly, because tun0 is the only target for NAT.
+
+Thus, incoming traffic can’t reach because the the ESTABLISHED connection rule points to the internal IP of your tun0 interface (which is not assigned if the VPN drops) and outgoing doesn’t work either for the same reason.<ref>https://forums.whonix.org/t/guide-easy-fix-for-whonix-firewall-kill-switch/14449</ref>

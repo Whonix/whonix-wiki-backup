@@ -1,0 +1,68 @@
+<div class="toccolours mw-collapsible mw-collapsed">
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Testers only.
+}}
+
+If you are an interested tester, click on Expand on the right.
+
+<div class="mw-collapsible-content">
+
+The following command will configure Qubes <code>dom0</code> salt to use <code>qubes-templates-community-testing</code> for downloading {{project_name_long}}.  <ref>
+* [https://github.com/QubesOS/updates-status/issues/623 qubes-mgmt-salt-dom0-virtual-machines v4.0.13 (r4.0)]
+* [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/pull/15 {{q_project_name}} salt - allow choice of repository / don't hardcode repository]
+* [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/pull/15 whonix: Add pillar file for easily enabling templates testing repository]
+</ref>
+
+{{CodeSelect|code=
+sudo qubesctl top.enable qvm.whonix-testing pillar=true
+}}
+
+<div class="toccolours mw-collapsible mw-collapsed">
+The following steps to enable the <code>qubes-templates-community-testing</code> repository should no longer be required. Please report if these steps were necessary for you.
+
+If you are an interested tester, click on Expand on the right.
+<div class="mw-collapsible-content">
+
+{{Box|text=
+'''1.''' Enable <code>qubes-templates-community-testing</code> repository.
+
+View the [https://github.com/QubesOS/qubes-qubes-release/blob/87a279b64c37e7bb3ae7d24aa413b33734da8856/qubes-templates.repo Qubes Templates <code>.repo</code>] file.
+
+{{CodeSelect|code=
+cat /etc/yum.repos.d/qubes-templates.repo
+}}
+
+'''2.''' Ensure the file contains <code>[qubes-templates-community-testing]</code>.
+
+The following text should be included.
+
+<pre>
+[qubes-templates-community-testing]
+name = Qubes Community Templates repository
+#baseurl = https://yum.qubes-os.org/r$releasever/templates-community-testing
+metalink = https://yum.qubes-os.org/r$releasever/templates-community-testing/repodata/repomd.xml.metalink
+enabled = 0
+fastestmirror = 1
+gpgcheck = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-$releasever-templates-community
+</pre>
+
+'''3.''' Fix any missing sections.
+
+If the <code>[qubes-templates-community-testing]</code> section is missing, then the user has probably already modified the file. In this case <code>dnf</code> <ref>Which is invoked by <code>qubes-dom0-update</code>.</ref> preserves user changes by saving updates to <code>/etc/yum.repos.d/qubes-templates.repo.rpmnew</code> <ref>Note the file extension <code>.repo.rpmnew</code>.</ref> instead of overwriting the file. Since the <code>.repo.rpmnew</code> file is ignored by <code>qubes-dom0-update</code>, the <code>.repo</code> file must be manually updated.
+
+Either:
+
+* Manually add the changes from <code>.repo.rpmnew</code> to the <code>.repo</code> file; or
+* Overwrite the <code>.repo</code> file with the <code>.repo.rpmnew</code> file:
+** {{CodeSelect|code=
+sudo cp /etc/yum.repos.d/qubes-templates.repo.rpmnew /etc/yum.repos.d/qubes-templates.repo
+}}
+** And then manually add back necessary changes. If the command fails because <code>/etc/yum.repos.d/qubes-templates.repo.rpmnew</code> does not exist, then the user probably has <code>[qubes-templates-community-testing]</code> already.
+}}
+</div>
+</div>
+</div>
+</div>

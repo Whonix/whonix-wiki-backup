@@ -1,0 +1,290 @@
+{{Header}}
+{{#seo:
+|description=Using Bitcoin Core in {{project_name_long}}. Fully verifying a Bitcoin wallet. Based on the original reference code by Satoshi Nakamoto.
+|image=Bitcoin234234234.jpg
+}}
+{{bitcoin_mininav}}
+[[image:120px-Bitcoin.png|200px]]
+[[File:Bitcoin-core.png|thumb|Bitcoin Core Logo]]
+[[File:BC_Logo_.png|thumb|Bitcoin Logo|200px]]
+= Introduction =
+
+{{stub}}
+
+== Software Origin ==
+
+Bitcoin Core is the client software directly descended from the original Bitcoin software client first released by Satoshi Nakamoto. Bitcoin Core consists of both "full-node" software which can fully validate the blockchain, as well as a Bitcoin wallet. <ref>
+https://bitcoincore.org/en/about
+</ref> The official open source project that maintains and releases the software can be found [https://bitcoincore.org/ here] ([http://6hasakffvppilxgehrswmffqurlcjjjhd76jgvaqmsg6ul25s7t3rzyd.onion/ .onion]). The project also maintains related software such as cryptographic libraries on GitHub.
+
+== Bitcoin Wallet Recommendation ==
+
+It is impossible to provide a blanket recommendation regarding which Bitcoin wallet to use. This is an individual decision that depends upon:
+
+* technical skill
+* personal risk assignment
+* financial value in Bitcoin
+* available time
+* various other factors
+
+Other bitcoin wallets like [[electrum|Electrum]] may have better usability, but they also come with their own issues; see [[Electrum#Warnings|Electrum Warnings]] for example. Despite Bitcoin Core limitations it should be seriously considered for security reasons because it is the official Bitcoin client, particularly if transacting with Bitcoin accounts of significant financial value. Relative strengths include:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* developed by the Bitcoin Core development team
+* most peer reviewed
+* most conservative, security-focused development
+* reproducible builds <ref>
+<blockquote>Special warning about https://bitcoinbinary.org/ as a trusted reference: While good to have a compilation of reproducible binaries, if nobody is auditing the build procedure, then it becomes a blind spot. Bitcoin core is reproducible and extensive work was made with guix sigs.
+
+One example that is not reproducible building from source is Sparrow wallet, which is listed on the site of the first post - deterministic build, differences in modules · Issue #192 · sparrowwallet/sparrow · GitHub. Observing the video of the reproducible build, made by the same person in Github Issue #192 it is noticeable that the entire folder is not compared, only a single file. If comparing the whole folder, which has more binaries, there would be a diff from the released binaries and the built ones
+
+In short:
+Bitcoin Core is reproducible but linking to bitcoinbinary(dot)org, is unfortunate, as the process of submitting new software to that page is not investigated, it is just accepted.</blockquote>
+
+Paraphrased from forum user nyxnor's post https://forums.whonix.org/t/repository-of-reproducible-build-proofs-for-bitcoin-projects/12506/4
+</ref>
+* full validating node
+** transactions are validated against the complete blockchain - this lowers the probability of servers 'lying' to the client (the client has a higher probability of seeing its true Bitcoin balance)
+* higher privacy
+** all blocks are downloaded - the locally running node will not tell servers which wallet addresses belong to the node
+</div>
+Unfortunately, it takes a very long time to download and verify the blockchain. A large amount of disk space is also required, which may or may not be more manageable by using Bitcoin pruning mode.
+
+== Bitcoin Core Usability ==
+
+Compared to Electrum, some things are more difficult in Bitcoin Core such as:
+
+* Simple backups - unfortunately Bitcoin Core does not support mnemonic phrase backup.
+* Wallet configuration - it is not easy to set up a split offline wallet (cold storage) and online watch only wallet. However since Bitcoin Core v23.0 descriptor wallets are the default wallet type and makes it much easier to create an offline/air gap setup:
+
+[OFFLINE PC]: Create a wallet and export descriptors
+# <code>Window</code> &rarr; <code>Console</code>
+{{CodeSelect|code=
+listdescriptors
+}}
+
+[ONLINE PC]: Create a watch-only wallet and import descriptors:
+# <code>Window</code> &rarr; <code>Console</code>
+{{CodeSelect|code=
+importdescriptors
+}}
+
+After importing descriptors, the watch-only wallet will be functional, allowing you to create receiving addresses and create unsigned transactions. Unsigned transactions are copied by default to the clipboard but can also be saved in a .PSBT file (Partially signed bitcoin transaction) which can be transferred to the offline PC in order to sign. After signing just transfer the signed .PSBT file to the online PC to broadcast the transaction.
+
+
+Another way to do this activities are likely possible, but are [[Unsupported|undocumented]] here; refer to the footnotes for possible information sources. <ref>
+[[Terms_of_Service#Non-Endorsement|Non-Endorsement]]: these links have not been audited by {{project_name_long}}, but are worthy of further investigation:
+
+* https://github.com/JWWeatherman/yeticold
+* https://github.com/BenWestgate/yeti.Bash
+* https://github.com/BlockchainCommons/Airgapped-Wallet-Community/discussions/39
+</ref>
+
+= Bitcoin Core Setup =
+
+== Installation ==
+
+Perform these steps inside {{project_name_workstation_long}} ({{Q_project_name}}: <code>{{project_name_workstation_vm}}</code> App Qube).
+
+{{Box|text=
+'''1.''' Retrieve, verify and add a signing key or multiple signing keys.
+
+Note: Any alternative method could be used. This is [[unspecific|unspecific to {{project name long}}]]. The following method is available for convenience. <ref>
+Thanks to [https://github.com/JKAbrams JKAbrams] for [https://github.com/Kicksecure/gpg-bash-lib/pull/2 Add example showcasing how multiple signatures can be checked]!
+</ref>
+
+{{CodeSelect|code=
+gpg --import /usr/share/gpg-bash-lib/misc/bitcoind-pub-keys.d/*
+}}
+
+'''2.''' Download the signed hash sum file.
+
+{{CodeSelect|code=
+scurl-download https://bitcoincore.org/bin/bitcoin-core-23.0/SHA256SUMS
+}}
+
+'''3.''' Download the signed hash sum signature.
+
+{{CodeSelect|code=
+scurl-download https://bitcoincore.org/bin/bitcoin-core-23.0/SHA256SUMS.asc
+}}
+
+'''4.''' Download Bitcoin.
+
+{{CodeSelect|code=
+scurl-download https://bitcoincore.org/bin/bitcoin-core-23.0/bitcoin-23.0-x86_64-linux-gnu.tar.gz
+}}
+
+'''5.''' Verify the hash sum digital signature.
+
+{{CodeSelect|code=
+gpg --verify SHA256SUMS.asc
+}}
+
+<u>If the virtual machine image is correct</u>, the output will include a statement the signature is good:
+
+<pre>
+Good signature
+</pre>
+
+This output might be followed by a warning as follows.
+
+{{Template:GnuPG-Warning}}
+
+'''6.''' Perform a hash sum check.
+
+{{CodeSelect|code=
+sha256sum --check --ignore-missing SHA256SUMS
+}}
+
+Expected output.
+
+<pre>
+bitcoin-23.0-x86_64-linux-gnu.tar.gz: OK
+</pre>
+
+'''7.''' Extract the tar file.
+
+{{CodeSelect|code=
+tar xvf bitcoin-23.0-x86_64-linux-gnu.tar.gz
+}}
+
+'''8.''' Done.
+
+Download, digital signature verification and extraction of Bitcoin Core is complete.
+}}
+
+== Enable Stream Isolation ==
+
+{{Box|text=
+'''1.''' ''Optional:'' Disable networking for the virtual machine.
+
+This step is optional but recommended to ensure stream isolation is always used from the first connection. This step can be omitted if:
+
+* '''A)''' The {{project_name_long}} [[Stream_Isolation#Transparent_Proxy|transparent proxy]] feature has been [[Stream_Isolation#Disable_Transparent_Proxying|disabled]]; <ref>
+Because then Bitcoin Core cannot connect using transparent proxying anyhow.
+</ref> <u>and/or</u>
+* '''B)''' Proxy settings are configured using the Bitcoin Core configuration file <code>~/.bitcoin/bitcoin.conf</code> before the first start. <ref>
+Perhaps as part of the [[ElectrumX]] instructions.
+</ref>
+
+'''2.''' Start Bitcoin-Qt as documented further below.
+
+'''3.''' Enable [[Stream_Isolation|Stream Isolation]] in the client.
+
+* '''A)''' navigate to the client settings
+* '''B)''' locate the Network tab
+* '''C)''' enable the SOCKS proxy as follows:
+** Host: <code>10.152.152.10</code>
+** Port: <code>9111</code>
+** Proxy: <code>SOCKS5</code>
+
+'''4.''' Re-enable networking for the virtual machine.
+}}
+
+== Add a bitcoin-qt Start Menu Entry ==
+
+Perform the following steps to create a <code>bitcoin-qt</code> start menu entry; this procedure is optional.
+
+{{Box|text=
+Inside {{project_name_workstation_long}} ({{Q_project_name}}: <code>{{project_name_workstation_vm}}</code> App Qube).
+
+'''1.''' Create folder <code>~/.local/share/applications</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.local/share/applications
+}}
+
+'''2.''' Open file <code>~/.local/share/applications/bitcoin.desktop</code> in an editor as a regular, non-root user.
+
+{{CodeSelect|code=
+mousepad ~/.local/share/applications/bitcoin.desktop
+}}
+
+'''3.''' Paste the following contents.
+
+{{CodeSelect|code=
+[Desktop Entry]
+Name=bitcoin-qt
+Comment=bitcoin-qt
+Exec=bash -c '~/bitcoin-*/bin/bitcoin-qt'
+Terminal=false
+Type=Application
+Icon=money-manager-ex
+StartupWMClass=bitcoin
+MimeType=x-scheme-handler/bitcoin;
+Categories=Finance;
+}}
+
+'''4.''' Save.
+
+'''5.''' {{Q_project_name}}: perform platform-specific steps.
+
+In <code>dom0</code>, refresh Qubes' appmenu: <code>VM settings</code> &rarr; <code>Applications</code> &rarr; <code>Refresh Applications</code> &rarr; <code>Add desktop shortcut</code>.
+
+'''6.''' Done.
+
+The <code>bitcoin-qt</code> start menu entry should now be available.
+}}
+
+== Autostart bitcoin-qt ==
+
+Perform these steps to automatically start <code>bitcoin-qt</code>; this step is optional.
+
+{{Box|text=
+Inside {{project_name_workstation_long}} ({{Q_project_name}}: <code>{{project_name_workstation_vm}}</code> App Qube).
+
+'''1.''' Apply the [[#Add a bitcoin-qt Start Menu Entry|Add a bitcoin-qt Start Menu Entry]] instructions first.
+
+'''2.''' Create folder <code>~/.config/autostart</code>.
+
+{{CodeSelect|code=
+mkdir -p ~/.config/autostart
+}}
+
+'''3.''' Create a symlink from <code>~/.local/share/applications/bitcoin.desktop</code> to <code>~/.config/autostart/bitcoin.desktop</code>.
+
+{{CodeSelect|code=
+ln -s ~/.local/share/applications/bitcoin.desktop ~/.config/autostart/bitcoin.desktop
+}}
+
+'''4.''' Done.
+
+<code>bitcoin-qt</code> will now automatically start the next time the VM is booted.
+}}
+
+== Start from Command Line ==
+
+To start <code>bitcoin-qt</code> (part of Bitcoin Core) from the command line, run.
+
+{{CodeSelect|code=
+~/bitcoin-*/bin/bitcoin-qt
+}}
+
+== Creating a Watch-Only Wallet ==
+
+# Start <code>bitcoin-qt</code>.
+# <code>Window</code> &rarr; <code>Console</code>
+# Import address.
+
+Note: replace <code>address</code> with the actual address to be watched.
+
+{{CodeSelect|code=
+importaddress address
+}}
+
+= See Also =
+
+* [[Bitcoin]]
+
+= Donations =
+
+After installing a Bitcoin client, please consider making a [[Donate|donation]] to {{project_name_long}} to help keep it running for many years to come.
+
+{{Pay_Bitcoin_Specific}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

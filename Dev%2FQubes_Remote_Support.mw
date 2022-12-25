@@ -1,0 +1,705 @@
+{{Header}}
+
+Development notes: QubesOS to be remotely manageable from on-demand, ephemeral, hidden onion service to dom0/AdminVM.
+
+user documentation: [[Remote_Administration#Qubes_-_SSH_or_VNC_into_Qubes_dom0|Qubes - SSH or VNC into Qubes dom0]]
+
+= challenges =
+* There are no Open Source remote support tools which are usable by laymen.
+** There is teamviewer but it's proprietary and therefore the teamviewer company could take over any users who use it.
+* The existing Open Source tools do not account for that most users nowadays are behind common NAT routers which make it hard to receive unsolicited incoming connections, i.e. hard to run servers. Would require port forwardings which are difficult for users. The internet is full of users seeking help how and failing to create port forwardings. Users are also often on networks (3/4G) that do not even support incoming (server) connections.
+* Even if some remote support instructions use Open Source software and work on Linux, these won't work easily in Qubes dom0 since non-networked by default.
+* Most if not all existing remote support Open Source software does not use encryption by default.
+** Therefore any man-in-the-middle could take over the connection and compromise the remote support receiver.
+*** It's possible to run VNC over encrypted/authenticated SSH but this is not something which laymen users that need remote support are capable to use.
+
+= goals =
+* functional for users with reasonable slow internet connections
+* reasonable security
+* Open Source
+* work behind NAT
+
+= desired security properties =
+* encrypted
+* authenticated
+* clear and reliable signaling to the user whether remote admin is enabled and whether it is currently in use
+* Even after {{project_name_gateway_vm}} compromise the attacker should not be able to access dom0 through VNC.
+
+= Implementation Draft =
+* Command line tools (which can be called by any GUI).
+* Whonix-Workstation script. (GUI and command line tools would run here.)
+* Whonix-Gateway script. (Tor onion service)
+* dom0 package (Qubes dom0 configuration, SSH/VNC server)
+* Packaging of a (python) GUI [1] (the GUI itself to be written by Marek)
+
+= {{project_name_gateway_vm}} GUI =
+able to see already existing hidden services per <code>{{project_name_gateway_vm}}</code> in a widget.
+
+Adding remote support thought requirements:
+
+* List configured onion services.
+* Delete them.
+* Create new remote support related hidden onion service. When done, output onion address, port and shared secret for the user to copy paste to chosen secured communication channel.
+* create time based or persistent remote support
+* <s>multiple remote support onions at the same time</s> remove?
+* optionally a feature to send access info to the support agent from the GUI
+
+= Missing parts =
+Avoidable?
+
+* Qubes dom0 salt
+* Qubes dom0 GUI
+
+= Idea =
+== general ==
+* x2go supports SSH.
+** (Needless to say that SSH or any extra encryption complicates things.)
+** TODO: test if x2go can work in acceptable speed over a Tor onion. FreeNX (maybe outdated), SPICE, x2go... x2go [in packages.debian.org: yes] seems most promising.
+* Run an SSH server in dom0.
+* magic-wormhole?
+** [in packages.debian.org: yes]
+** ([[File_Sharing#Magic-Wormhole]])
+** These code words are quite usable. Example: <code>7-crossover-clockwork</code> We'd need two of these.
+
+questions:
+
+* SSH server running in dom0 is OK?
+* I guess running VNC (and perhaps SSH) in dom0 is OK?
+* Things can always be more compartmentalized, secure but also getting more and more complicated, fragile.
+
+I am considering to script this entirely from dom0 using `qvm-run`. Only expectation: installed (use salt?) and non-broken <code>{{project_name_gateway_vm}}</code>
+
+= Draft Concept =
+== remote-support-provider ==
+On remote support provider machine.
+
+* dom0 <code>qvm-start</code> <code>{{project_name_gateway_vm}}</code>
+* dom0 <code>qvm-run</code> <code>{{project_name_gateway_vm}}</code> create <code>.onion</code> service config file in <code>/usr/local/etc/torrc.d/40_remote_support.conf</code>
+** [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/man/anon-auth-autogen.8.ronn <code>anon-auth-autogen</code>]
+* dom0 <code>qvm-run</code> <code>{{project_name_gateway_vm}}</code> restart Tor <ref name=tor-reload-bug>
+reload should be sufficient but probably some bug in Tor required restart instead.
+</ref>
+* dom0 <code>qvm-start</code> <code>remote-support-provider-server</code> VM
+* dom0 <code>qvm-run</code> <code>remote-support-provider-server</code> VM install openssh-server
+* make openssh-server reachable through <code>.onion</code> running inside <code>{{project_name_gateway_vm}}</code> VM
+* dom0 <code>wormhole send</code> <code>connection.zip</code>
+** write wormhole code into script variable
+* <code>connection.zip</code> contains
+** <code>.onion</code> hostname of remote support provider
+** <code>~/.ssh/known_hosts</code>
+** <code>.auth_private</code> file (private key) for authenticated Tor onion service
+** ssh key
+* tell remote support receiver out of band (telephone, chat, e-mail) the wormhole code
+* wait for remote support receiver to start the remote support receiver tool and to enter the wormhole code
+* inside <code>remote-support-provider-server</code> VM: x2go connect to remote support receiver localhost:port [reverse ssh]
+
+== remote-support-receiver ==
+On remote support receiver machine.
+
+* dom0 <code>sudo dnf install x2go-server</code>
+* dom0 <code>qvm-start</code> <code>{{project_name_gateway_vm}}</code>
+* dom0 <code>wormhole receive</code> <code>connection.zip</code>
+** Must be done in dom0. Not <code>{{project_name_gateway_vm}}</code>. Because goal is <code>{{project_name_gateway_vm}}</code> to be untrusted.
+* dom0 install <code>~/.ssh/known_hosts</code>
+* dom0 <code>qvm-run</code> <code>{{project_name_gateway_vm}}</code> install <code>.auth_private</code> file (private key)
+** <code>sudo sourcefile=~/user.auth_private anon-server-to-client-install</code> (adjust path)
+* dom0 <code>qvm-run</code> <code>{{project_name_gateway_vm}}</code> test connection to <code>.onion</code>
+* dom0 test connection to <code>.onion</code>
+* dom0 reverse ssh connect to remote support provider <code>.onion</code>
+* There is now an open port on remote support receiver machine over ssh and over <code>.onion</code> available to remote support provider.
+
+== qubes-remote-support-provider-gui ==
+Not needed. Remote support provider can use CLI tools for connection setup. Would be encapsulated into a simple CLI call and telling the remote support receiver the wormhole code. Once the remote support receiver connected to the remote support provider (reverse SSH), the remote support provider can use a $VNC viewer (which is graphical) to connect.)
+
+== notes ==
+* Can use two wormhole codes if not avoidable.
+* Automatically re-connect if reverse SSH is down.
+
+= ssh keys =
+challenges:
+
+* Have to manage file <code>/root/.ssh/authorized_keys</code> using scripts.
+** Use secure, long, script generated passwords instead?
+
+= send access into to gpg agent =
+
+> optionally a feature to send access info to the support agent from the GUI (for example GPG encrypted email)
+
+Patrick said: I would discourage that. Challanges:
+
+* calling e-mail / gpg from command line
+* calling e-mail / gpg from dom0 or adminVM?
+
+= Preliminary Work Done =
+* https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/man/anon-auth-autogen.8.ronn
+* https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/bin/anon-auth-autogen
+* https://forums.whonix.org/t/onion-services-authentication/975/4
+* https://www.whonix.org/wiki/Onion_Services#Configure_Onion_Services_Authentication
+* https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/bin/anon-server-to-client-install
+* https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/man/anon-server-to-client-install.8.ronn
+* [[SSH]]
+* [[Remote Administration]]
+
+= See also =
+* [[Dev/Qubes#ssh_into_Qubes_dom0]]
+* https://github.com/fepitre/qubes-remote-desktop
+
+= x2go =
+== pros ==
+* Easy to use, built-in support for using over SSH.
+* Connection settings for slow/high latency connections (i.e. hopefully useful over Tor).
+
+== x2go bugs ==
+Happening with hardened SSH config file.
+
+https://bugs.x2go.org/cgi-bin/bugreport.cgi?bug=1349
+
+<pre>
+NXPROXY - Version 3.5.99.19
+
+Copyright (c) 2001, 2011 NoMachine (https://www.nomachine.com)
+Copyright (c) 2008-2014 Oleksandr Shneyder <o.shneyder@phoca-gmbh.de>
+Copyright (c) 2014-2016 Ulrich Sibiller <uli42@gmx.de>
+Copyright (c) 2014-2016 Mihai Moldovan <ionic@ionic.de>
+Copyright (c) 2011-2016 Mike Gabriel <mike.gabriel@das-netzwerkteam.de>
+Copyright (c) 2015-2016 Qindel Group (https://www.qindel.com)
+
+NXCOMP, NX protocol compression and NX extensions to this software
+are copyright of the aforementioned persons and companies.
+
+Redistribution and use of the present software is allowed according
+to terms specified in the file LICENSE.nxcomp which comes in the
+source distribution.
+
+All rights reserved.
+
+NOTE: This software has received contributions from various other
+contributors, only the core maintainers and supporters are listed as
+copyright holders. Please contact us, if you feel you should be listed
+as copyright holder, as well.
+
+NX protocol compression is derived from DXPC project.
+
+Copyright (c) 1995,1996 Brian Pane
+Copyright (c) 1996,1997 Zachary Vonler and Brian Pane
+Copyright (c) 1999 Kevin Vigor and Brian Pane
+Copyright (c) 2000,2003 Gian Filippo Pinzari and Brian Pane
+
+All rights reserved.
+
+See https://github.com/ArcticaProject/nx-libs for more information.
+
+Info: Proxy running in server mode with pid '5072'.
+Session: Starting session at 'Mon Jul  6 18:19:31 2020'.
+Info: Using errors file '/home/user/.x2go/S-user-50-1594059610_stDXFCE_dp24/sessions'.
+Info: Using stats file '/home/user/.x2go/S-50/stats'.
+Loop: WARNING! Overriding auxiliary X11 port with new value '1'.
+Warning: Overriding auxiliary X11 port with new value '1'.
+Info: Using abstract X11 socket in kernel namespace for accessing DISPLAY=:0.
+Info: Connecting to remote host 'localhost:51683'.
+Info: Connected to remote proxy on FD#5.
+Loop: WARNING! Non printable character decimal '10' received in remote data from FD#5.
+Warning: Non printable character decimal '10' received in remote data from FD#5.
+Connection timeout, abortingInfo: Aborting the procedure due to signal '15'.
+Session: Session terminated at 'Mon Jul  6 18:20:01 2020'.
+</pre>
+
+* https://bugs.x2go.org/cgi-bin/bugreport.cgi?bug=1417
+* can connect to local desktop but cannot spawn new session
+* TODO: Qubes R4.1 testing version
+
+<pre>
+Unable to execute: rdesktop  -g 800x600
+</pre>
+
+= magic-wormhole =
+A challenge is to get magic-wormhole into Qubes R4.0 dom0 since Fedora 25 (which Qubes R4.0 dom0 is based on) has no package for magic-wormhole and Fedora does not offer backports.
+
+* there is no appimage / flatpak / standalone / statically compiled / portable version of magic-wormhole for Linux available for download - https://github.com/magic-wormhole/magic-wormhole/issues/204
+* pyinstaller: not in packages.debian.org
+* magic-wormhole bug report: [https://github.com/magic-wormhole/magic-wormhole/issues/390 Debian pyinstaller ModuleNotFoundError: No module named '__main__.cli'; '__main__' is not a package]
+* nuitka: packages.debian.org. https://github.com/magic-wormhole/magic-wormhole/issues/255 TODO
+* cx_Freeze: not in packages.debian.org
+* bbFreeze: not in packages.debian.org
+* alternative [https://github.com/schollz/croc croc] (standalone, no dependency hell) but [https://github.com/schollz/croc/issues/225 no signed git tags yet]
+
+= CLI GUI Communication Design =
+TODO: plan how this CLI script would interact with the GUI
+
+idea:
+
+1) stdout could just show the wormhole password (currently implemented)
+
+2) stderr could contain debug information (the bash xtrace) (currently implemented)
+
+3) Or better communicate with the GUI thorugh the file system?
+The GUI could watch for a file /path/to/wormhole_password and once
+created, show that to the user.
+Also /path/to/error_output could contain human readable error summaries.
+Then stdout/stderr could be shown in GUI when a user clicks "show debug
+information". (Suggested method.)
+
+= CLI GUI Timeout Handling Design =
+How should timeouts be handled?
+
+* One way would be using a lot command `timeout` inside this script. That would make this script look more complex.
+* This script could stay as is and another wrapper script could handle timeouts.
+* Or the GUI could handle timeouts. If timeout is reached, just show debug info. This is hopefully only required in development.
+
+= Proof of Concept =
+== ssh and VNC into Qubes dom0 ==
+Using the term VNC loosely here as these instructions are using x2go.
+
+=== remote-support-receiver {{project_name_gateway_vm}} setup ===
+<ref>
+Useful for debugging.
+
+x) <code>{{project_name_gateway_vm}}</code> software installation
+
+Inside <code>{{project_name_gateway_vm}}</code> VM. Install ssh and x2go.
+
+<pre>
+sudo apt --no-install-recommends install openssh-client x2goclient
+</pre>
+</ref>
+
+'''1.''' <code>{{project_name_gateway_vm}}</code> <code>qvm-connect-tcp</code> listener setup
+
+Inside <code>{{project_name_gateway_vm}}</code> VM. Start <code>socat</code> listener. <ref>
+Previously functional socat method.
+<pre>
+sudo socat TCP-LISTEN:22,fork EXEC:"qrexec-client-vm dom0 local.ssh"
+</pre>
+
+Last tested, functional version of this page using <code>socat</code>: https://www.whonix.org/w/index.php?title=Dev/Qubes_Remote_Support&oldid=58559
+</ref> <ref>
+<pre>
+user@host:~$ qvm-connect-tcp
+Usage: /usr/bin/qvm-connect-tcp [localport]:[vmname]:[port]
+Bind localport to another VM port using the qubes.ConnectTCP RPC service.
+</pre>
+</ref> <ref>
+Symptom inside <code>{{project_name_gateway_vm}}</code> VM if refused/missing dom0 qrexec policy in dom0.
+
+<pre>
+2020/07/11 13:20:25 socat[2807] E waitpid(): child 2808 exited with status 126
+</pre>
+</ref>
+
+<pre>
+qvm-connect-tcp 22:dom0:22
+</pre>
+
+Should show:
+
+<blockquote>
+Binding TCP 'dom0:22' to 'localhost:22'...
+</blockquote>
+
+'''3.''' setup authenticated onion v3
+
+<ref>
+See [[#Archive|archive]] for unauthenticated onion v3.
+</ref>
+
+Inside <code>{{project_name_gateway_vm}}</code> VM.
+
+<pre>
+sudo virtport=22 hsport=22 hsname=remote_support client=1 anon-auth-autogen
+</pre>
+
+Will show.
+
+<blockquote>
+INFO: Created torconffile '/usr/local/etc/torrc.d/43_remote_support_hs_autogen.conf'.<br />
+INFO: Reloading Tor.<br />
+INFO: Giving Tor 5 seconds to create hidden service file.<br />
+INFO: Installed ".auth" file (public key) '/var/lib/tor_autogen/remote_support/1.auth' to '/var/lib/tor_autogen/remote_support/1.auth' to allow client '1' to access hsname 'remote_support' onion_url 'xxx.onion'.<br />
+INFO: Reloading Tor again to activate ".auth" (public key) file for client '1'.<br />
+INFO: You need to provide client '1' with ".auth_private" file (private key) '/var/lib/tor_autogen/remote_support/1.auth_private'.<br />
+INFO: Visitors that use Whonix could store '/var/lib/tor_autogen/remote_support/1.auth_private' in '/home/user/1.auth_private' and then run 'sudo sourcefile=/home/user/1.auth_private anon-server-to-client-install'.<br />
+</blockquote>
+
+'''4.''' restart Tor
+
+Inside <code>{{project_name_gateway_vm}}</code> VM.
+
+<ref name=tor-reload-bug />
+
+<pre>
+sudo systemctl restart tor@default
+</pre>
+
+'''5.''' get onion v3 domain name
+
+Inside <code>{{project_name_gateway_vm}}</code> VM.
+
+<pre>
+sudo cat /var/lib/tor/remote_support/hostname
+</pre>
+
+=== remote-support-receiver dom0 setup ===
+'''1.''' In dom0. Install packages.
+
+Optional. Some tool to simplify copying files from a VM to dom0 will later greatly simplify the setup.
+
+<pre>
+mkdir -p ~/bin
+</pre>
+
+<pre>
+nano ~/bin/qubes-copy-from-vm
+</pre>
+
+<pre>
+#!/bin/bash
+qvm-run --user root --pass-io "$1" "cat $2" > "$3"
+</pre>
+
+<pre>
+chmod +x ~/bin/qubes-copy-from-vm
+</pre>
+
+'''2.''' In dom0. Install packages. <ref>
+Initial proof of concept had <code>socat</code> added here too.
+</ref>
+
+<pre>
+sudo qubes-dom0-update openssh-server x2goserver x2goserver-xsession
+</pre>
+
+<ref>
+sftp-server required.
+
+<pre>
+Unable to find the sftp-server binary. Neither bundled, nor found in $PATH nor additional directories.
+
+If you are using a Linux-based operating system, please ask your system administrator to install the package containing the sftp-server binary. Common names are openssh, openssh-server or openssh-sftp-server depending upon distribution.
+
+If the sftp-server binary is installed on your system, please report a bug mentioning its path on:
+
+https://wiki.x2go.org/doku.php/wiki:bugs
+</pre>
+</ref>
+
+'''3.''' dom0 SSH server configuration hardening
+
+In dom0.
+
+Optional.
+
+<ref>
+Currently broken.
+
+<s>Use [[SSH#Server_Configuration_File|this]] file as <code>/etc/ssh/sshd_config</code>.</s>
+</ref> <ref name=brokenx2go>
+Currently broken due to [[#x2go_bugs|x2go bugs]].
+</ref>
+
+'''4.''' ssh PasswordAuthentication No
+
+At least the following should be set.
+
+<code>/etc/ssh/sshd_config</code>
+
+<pre>
+PasswordAuthentication No
+</pre>
+
+'''5.''' enable sshd
+
+In dom0.
+
+<pre>
+sudo systemctl enable sshd
+</pre>
+
+'''6.''' start sshd
+
+In dom0.
+
+<pre>
+sudo systemctl start sshd
+</pre>
+
+'''7.''' reload sshd
+
+In dom0.
+
+<ref>
+This should not be required only in cases where sshd was previously running.
+</ref>
+
+<pre>
+sudo systemctl reload sshd
+</pre>
+
+'''8.''' check sshd status
+
+In dom0.
+
+<pre>
+sudo systemctl status sshd
+</pre>
+
+'''9.''' dom0 x2go setup
+
+<pre>
+sudo x2godbadmin --createdb
+</pre>
+
+<pre>
+sudo systemctl enable x2gocleansessions.service
+</pre>
+
+<pre>
+sudo systemctl start x2gocleansessions.service
+</pre>
+
+'''10.''' dom0 qrexec policy setup
+
+In dom0.
+
+<ref>
+x) dom0 qrexec rpc setup
+
+In dom0. Setup qrexec rpc.
+
+Open file <code>/etc/qubes-rpc/local.ssh</code> in an editor with root rights.
+
+Add.
+
+<pre>
+#!/bin/sh
+exec socat STDIO TCP-CONNECT:localhost:22
+</pre>
+
+Save.
+
+Make executable.
+
+(Symptom if qubes-rpc is not executable.)
+
+<pre>
+2020/07/10 14:00:35 socat[14462] E waitpid(): child 14463 exited with status 127
+</pre>
+
+<pre>
+sudo chmod +x /etc/qubes-rpc/local.ssh
+</pre>
+
+Previous functional example using <code>socat</code>.
+
+{{Open with root rights|
+filename=/etc/qubes-rpc/policy/local.ssh
+}}
+
+Add.
+
+<pre>
+{{project_name_gateway_vm}} dom0 allow
+</pre>
+</ref>
+
+Open file <code>/etc/qubes-rpc/policy/qubes.ConnectTCP</code> in an editor with root rights.
+
+Append.
+
+<pre>
+{{project_name_gateway_vm}} dom0 allow,target=dom0
+</pre>
+
+Save.
+
+'''11.''' dom0 ssh authorized_keys setup
+
+Contents of <code>remote-support-provider</code> file <code>/home/user/.ssh/id_ed25519.pub</code> need to be transferred to dom0 <code>/home/user/.ssh/id_ed25519.pub</code>.
+
+Inside <code>remote-support-provider</code> VM.
+
+In dom0. As user. Not root!
+
+<pre>
+qubes-copy-from-vm {{project_name_gateway_vm}} /home/user/.ssh/id_ed25519.pub
+</pre>
+
+In dom0. As user. Not root!
+
+<pre>
+mkdir -p ~/.ssh
+</pre>
+
+In dom0. As user. Not root!
+
+WARNING: If you used ssh previously, you might want to append instead. The following command would overwrite your <code>~/.ssh/authorized_keys</code>.
+
+<pre>
+mv id_ed25519.pub ~/.ssh/authorized_keys
+</pre>
+
+In dom0. As user. Not root! <ref>
+<code>chmod og-rwx ~/.ssh/authorized_keys</code> was insufficient, sshd would refuse with insecure permissions error message.
+
+<code>chmod --recursive og-rwx ~/.ssh</code> was insufficient probably because file was owned by root, not user.
+</ref>
+
+<pre>
+sudo chmod --recursive og-rwx ~/.ssh
+</pre>
+
+=== remote-support-provider setup ===
+'''remote-support-provider <code>{{project_name_gateway_vm}}</code> setup'''
+
+'''1.''' get <code>1.auth_private</code>
+
+Get <code>/var/lib/tor_autogen/remote_support/1.auth_private</code> from remote-support-receiver <code>{{project_name_gateway_vm}}</code> and copy to remote-support-provider <code>{{project_name_gateway_vm}}</code>.
+
+Could use for example in remote-support-provider <code>{{project_name_gateway_vm}}</code> <code>sudo wormhole send /var/lib/tor_autogen/remote_support/1.auth_private</code> and in remote-support-provider <code>{{project_name_gateway_vm}}</code> <code>wormhole receive</code>.
+
+<ref>
+During testing in remote-support-receiver <code>{{project_name_gateway_vm}}</code> VM.
+
+<pre>
+qvm-copy /var/lib/tor_autogen/remote_support/1.auth_private
+</pre>
+
+In another <code>{{project_name_gateway_vm}}-two</code> remote-support-provider VM.
+
+<pre>
+mv QubesIncoming/{{project_name_gateway_vm}}/1.auth_private ~/
+</pre>
+</ref>
+
+'''2.''' authenticated onion v3 key installation
+
+Move <code>1.auth_private</code> key to Tor onion v3 private key folder.
+
+Inside remote-support-provider <code>{{project_name_gateway_vm}}</code> VM.
+
+<pre>
+sudo sourcefile=/home/user/1.auth_private anon-server-to-client-install
+</pre>
+
+'''remote-support-provider AppVM setup'''
+
+'''3.''' <code>remote-support-provider</code> VM creation.
+
+Create a VM named <code>remote-support-provider</code> (or any other name) based on <code>whonix-ws-15</code> Template with networking set to <code>{{project_name_gateway_vm}}</code>. Usual instructions for [[Multiple Whonix-Workstation]]. Could even skip VM creation and use an already existing VM <code>{{project_name_workstation_vm}}</code> instead.
+
+'''4.''' Install SSH client and x2go client.
+
+Inside <code>remote-support-provider</code> VM.
+
+<pre>
+sudo apt install --no-install-recommends openssh-client x2goclient
+</pre>
+
+'''5.''' Create SSH key.
+
+Inside <code>remote-support-provider</code> VM.
+
+<pre>
+ssh-keygen -t ed25519
+</pre>
+
+'''6.''' View id_ed25519 public key.
+
+Inside <code>remote-support-provider</code> VM.
+
+<pre>
+cat /home/user/.ssh/id_ed25519.pub
+</pre>
+
+'''7.''' ssh client configuration hardening
+
+Inside <code>remote-support-provider</code> VM.
+
+Optional. <ref>
+Currently broken.
+
+<s>Harden <code>/etc/ssh/ssh_config</code> as per [[SSH#Client_Configuration_File|here]].</s>
+</ref> <ref name=brokenx2go />
+
+== Usage ==
+== Introduction ==
+After making an SSH server available in Qubes dom0 as per above instructions it will be accessible through an anonymous [[Onion Services|onion service]].
+
+=== ssh ===
+Test this first.
+
+Inside <code>remote-support-provider</code> VM.
+
+Qubes dom0 requires the SSH key being added to Qubes dom0 <code>~/.ssh/authorized_keys</code> as documented earlier on this page.
+
+<pre>
+ssh xxx.onion
+</pre>
+
+=== x2goclient ===
+Moved to [[Remote_Administration#x2goclient]].
+
+== Test Results ==
+All times are created with an external stopwatch and should have +/- 2 seconds human caused inaccuracy.
+
+* Qubes R4.0
+** ssh:
+*** ssh connection initialization takes 12 seconds.
+*** There is a 2 second delay after each simple command such as <code>ls</code>.
+*** Running a simple command such as <code>ls -la</code> in a folder with 60 files takes 2 seconds until results are drawn.
+*** Comparable to a SSH connection over clearnet.
+** x2go session type terminal:
+*** connection speed setting "modem":
+**** Establishing a connection takes 90 seconds.
+**** There is an two seconds delay between a keypress on inside <code>remote-support-provider</code> VM until it gets visible in the remote terminal.
+**** Running a simple command such as <code>ls -la</code> in a folder with 60 files takes 18 seconds until results are drawn.
+**** from opening the x2go viewer to having the full desktop contents drawn it takes 180 seconds
+*** connection speed setting "WAN":
+**** time to open x2go viewer: 100 seconds
+**** delay from clicking menu bar to actually seeing menu bar: 6 seconds
+**** Running a simple command such as <code>ls -la</code> in a folder with 60 files takes 18 seconds until results are drawn.
+**** Redraw screen after pressing enter: 18 seconds
+** This is [[Remote_Administration#Test_Results|much faster]] with [[Non-Qubes-Whonix]] when following instructions for [[Remote_Administration#SSH_into_Whonix_.E2.84.A2|SSH into Whonix]] with [[Remote_Administration#Graphical|x2go]]. This might be because Qubes R4.0 dom0 is based Fedora 25 which ships an older version of x2go. It could also be because the x2go version of Qubes dom0 Fedora 25 is older than the x2go version in Debian buster based Whonix 15. The speed issues might be fixed with the release of Qubes R4.1 which will come with a more newer dom0 version of Fedora and thereby with a newer version of x2go.
+* Qubes R4.1
+** Moved to [[Remote_Administration#Test_Results_2]].
+
+== Debugging ==
+* Perhaps Exercise setting up a simple [[Onion Services|onion service]] web server first.
+* [[Remote_Administration#SSH_into_Whonix-Gateway|SSH into Whonix-Gateway]] (conflicts with above Tor configuration)
+* Could copy <code>remote-support-provider</code> folder <code>~/.ssh</code> key to <code>{{project_name_gateway_vm}}</code> and then use <code>ssh 127.0.0.1</code> directly inside <code>{{project_name_gateway_vm}}</code> to test if the SSH connection is functional. This was successfully tested during development. Useful to exclude any potential Tor connectivity issues.
+** Same as above but can also be done using <code>x2goclient</code>.
+* dom0: <code>sudo journalctl -f -u sshd</code>
+* dom0: journalctl to watch qrexec logs
+
+= Implementation =
+* https://github.com/Whonix/qubes-whonix/blob/master/lib/systemd/system-preset/50-qubes-whonix.preset
+* https://github.com/Whonix/qubes-whonix/blob/master/lib/systemd/system/qubes-whonix-remote-support.service
+* https://github.com/QubesOS/qubes-remote-support/blob/master/qubes-remote-support-receiver-start
+* https://github.com/QubesOS/qubes-remote-support/blob/master/qubes-remote-support-receiver-stop
+* https://github.com/QubesOS/qubes-remote-support/blob/master/qubes-remote-support-receiver-status
+* https://github.com/QubesOS/qubes-remote-support/blob/master/qubes-remote-support-receiver-wormhole-helper
+* https://github.com/Whonix/qubes-whonix/blob/master/usr/bin/qubes-remote-support-provider
+
+= Debug Scripts =
+* As a connectivity test run <code>whonixcheck --leak-tests</code> in <code>{{project_name_gateway_vm}}</code> of remote-support-receiver and remote-support-provider due to Tor network issues. <ref>
+<blockquote>
+[NOTICE] Guard guard-name ($fingerprint) is failing more circuits than
+usual. Most likely this means the Tor network is overloaded. Success counts are 200/300. Use counts are
+0/0. 294 circuits completed, 0 were unusable, 100 collapsed, and 280 timed out. For reference, your timeout
+cutoff is 60 seconds.
+</blockquote>
+</ref>
+* <code>/var/lib/tor/remote_support</code>
+* <code>/var/lib/tor_autogen/remote_support</code>
+
+= Proof of Concept Documentation =
+Moved to [[Remote_Administration#Qubes_-_SSH_or_VNC_into_Qubes_dom0]].
+
+(Latest version on this page was https://www.whonix.org/w/index.php?title=Dev/Qubes_Remote_Support&oldid=60584#Proof_of_Concept_Documentation].)
+
+= Archive =
+* Proof of concept, tested, functional version of this page using <code>socat</code> and unauthenticated Tor onion services: https://www.whonix.org/w/index.php?title=Dev/Qubes_Remote_Support&oldid=58559
+* Proof of concept, tested, functional version of this page using <code>qvm-connect-tcp</code>and unauthenticated Tor onion services: https://www.whonix.org/w/index.php?title=Dev/Qubes_Remote_Support&oldid=58610
+
+= Footnotes =
+<references />
+{{Footer}}

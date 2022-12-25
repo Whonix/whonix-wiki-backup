@@ -1,0 +1,424 @@
+{{Header}}
+{{Title|title=
+Whonix versus Proxies
+}}
+{{#seo:
+|description=Comparison of Whonix versus Proxies
+|image=Masks-827730640.jpg
+}}
+{{other_networks_mininav}}
+[[image:Masks-827730640.jpg|thumb]]
+{{#widget:Icon_Bullet_List
+
+|addClass=minimal
+
+|fontSize=17px
+
+|item=fas fa-times cs-red,<b><a href="#VPNs_don't_make_you_anonymous">Proxies don't make you anonymous</a></b>
+
+|item=fas fa-times cs-red,<b><a href="#VPN_Providers_Know_What_You_Are_Doing">Proxy providers know what you are doing</a></b>
+
+|item=fas fa-times cs-red,<b><a href="#Security_Experts_Opinion_on_VPNs">Security experts are not even talking about proxies</a></b>
+
+}}
+__TOC__
+= Summary =
+* <u>Missing leak shield:</u> Proxies don't have a leak shield. Configuration an application such as a web browser to reliably use a proxy for all connections is very difficult. Web browser are notoriously known to leak the user's real IP address through WebRTC, browser plugins and a number of other techniques. Proxies are usually used without a leak shield. A leak shield is required to make sure all applications are used by a tunnel such as a proxy, VPN or Tor. In case of Tor, projects such as Tor Browser and {{project name long}} are entirely focused to provide a leak shield. There is no project that is actively working on implementing a leak shield for proxies. {{project name long}} is a leak shield to force all connections to use the Tor anonymity network. Nothing comparable exists for proxies.
+* <u>Browser fingerprinting:</u> Even if proxies had a leak shield, due to [[Data_Collection_Techniques#Browser_Fingerprinting|browser fingerprinting]], proxies are not suitable for being anonymous when browsing the internet. Even if the user's IP address was replaced by a proxy without any leaks, proxies do not ensure that users have an uniform appearance on the Internet; see [[Data Collection Techniques]]. By merging the data, this means users are distinguishable and easily identifiable.
+* <u>No legitimate proxy providers:</u> There are no known legitimate and free public HTTP(S) or SOCKS4(a)/5 proxies.
+* <u>Missing encryption:</u> There are no known HTTP(S) or SOCKS4(a)/5 proxies that offer an encrypted connection between itself and the user. Therefore, the {{isp}} or any [https://en.wikipedia.org/wiki/Man-in-the-middle_attack man-in-the-middle] can see connection details, including the destination IP address. If the destination server is not using [[SSL|SSL/TLS]], then the entire content of traffic is vulnerable as well.
+
+= Proxies Comparison =
+
+== Proxies Introduction ==
+
+Proxies are famous for "anonymity on demand". Acting as an intermediary, proxy servers relay your traffic to the destination and send the answer back to you so that the destination server ''potentially'' only sees the proxy and not your IP address: <ref name=proxy_server>
+https://en.wikipedia.org/wiki/Proxy_server
+</ref>
+<blockquote>Instead of connecting directly to a server that can fulfill a requested resource, such as a file or web page for example, the client directs the request to the proxy server, which evaluates the request and performs the required network transactions. This serves as a method to simplify or control the complexity of the request, or provide additional benefits such as load balancing, privacy, or security. Proxies were devised to add structure and encapsulation to distributed systems.</blockquote>
+
+There are two basic types of proxy server: <ref name=proxy_server />
+* <u>Open proxies</u>: these forward requests from and to anywhere on the Internet and are accessible by any Internet user. <ref>Hundreds of thousands are suspected to be in operation.</ref>
+** Anonymous proxies reveal their identity as a proxy server but do not disclose the client's originating IP address.
+** Transparent proxies also reveal their identity as a proxy server, but the originating IP address is accessible due to factors such as the <code>X-Forwarded-For</code> HTTP header. The benefit of these proxies is the ability to cache websites for faster retrieval.
+* <u>Reverse proxies</u>: these connect the Internet to an internal network. Therefore, users making requests connect to the proxy and may not be aware of the internal network as the response is returned as if it came from the original server.
+
+As noted above, some open HTTP(S) proxies send the "HTTP forwarded for" header which discloses a user's IP address. HTTP(S) proxies that do not send this header are sometimes called "elite" or "anonymous" proxies.
+
+== Proxies Comparison Tables ==
+
+The tables below briefly compare the features offered by proxies found on many proxy sharing websites with various anonymization services.
+
+=== Proxy Type Feature Comparison ===
+'''Table:''' ''Proxy Type Feature Comparison''
+
+<div class="scroll-table">
+{|   class="wikitable"
+
+! '''Proxy Type'''
+! '''Comment'''
+! '''HTTP''' <ref name=destination_server>Connection to the destination server, for example to the  torproject.org webserver.</ref>
+! '''HTTPS''' <ref name=destination_server />
+! '''TransPort''' <ref name=TransPort>Transparent TCP Port.</ref>
+! '''UDP'''
+! '''Remote DNS'''
+! '''Hides IP''' <ref name=no_http_forwarded_for_header>No <code>X-Forwarded-For</code> HTTP header.</ref>
+! '''User-to-proxy Encryption'''
+|-
+
+! HTTP
+| <ref>These do not support the connect method (see [[#CGIproxies_Comparison|below]]). Therefore connections to SSL/TLS protected websites are impossible.</ref>
+| {{Yes}}
+| {{No}}
+| {{No}}
+| {{No}}
+| {{Yes}} <ref name=remote_dns_exception>This is true only when being used as proxy settings and not when  used as a transparent proxy.</ref>
+| style="background-color: {{Yellow}}"| Depends <ref name=forwarded_for_depends_on_proxy>Depends on the proxy.</ref>
+| {{No}}
+|-
+
+! HTTPS
+| <ref>The term HTTPS proxy is misleading because the connection to the proxy is not encrypted. The proxy additionally supports the connect method, which is required to access SSL/TLS protected websites and other services other than HTTP.</ref>
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+| {{No}}
+| {{Yes}} <ref name=remote_dns_exception />
+| style="background-color: {{Yellow}}"| Depends <ref name=forwarded_for_depends_on_proxy />
+| {{No}}
+|-
+
+! SOCKS4 <ref>https://en.wikipedia.org/wiki/SOCKS#SOCKS4</ref>
+| -
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+| {{No}}
+| {{No}}
+| {{Yes}}
+| {{No}}
+|-
+
+! SOCKS4a <ref>https://en.wikipedia.org/wiki/SOCKS#SOCKS4a</ref>
+| -
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+| {{No}}
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+|-
+
+! SOCKS5 <ref>https://en.wikipedia.org/wiki/SOCKS#SOCKS5</ref>
+| -
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+| {{Yes}}
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+|-
+
+! CGI <ref>https://en.wikipedia.org/wiki/CGIProxy</ref>
+| See [[#CGIproxies_Comparison|below]]
+| style="background-color: {{Blue}}"| Depends <ref name=forwarded_for_depends_on_proxy />
+| style="background-color: {{Yellow}}"| Depends <ref name=forwarded_for_depends_on_proxy />
+| {{No}}
+| {{No}}
+| {{Yes}}
+| style="background-color: {{Yellow}}"| Depends <ref name=forwarded_for_depends_on_proxy />
+| style="background-color: {{Yellow}}"| Depends <ref name=forwarded_for_depends_on_proxy />
+
+|}
+</div>
+
+=== Anonymization Service Feature Comparison ===
+'''Table:''' ''Anonymization Service Feature Comparison''
+
+<div class="scroll-table">
+{|   class="wikitable"
+
+! '''Anonymization Service'''
+! '''Comment'''
+! '''HTTP''' <ref name=destination_server />
+! '''HTTPS''' <ref name=destination_server />
+! '''TransPort''' <ref name=TransPort />
+! '''UDP'''
+! '''Remote DNS'''
+! '''Hides IP''' <ref name=no_http_forwarded_for_header />
+! '''User-to-proxy Encryption'''
+|-
+
+! I2P
+| -
+| {{Yes}} <ref name=eepsites_only>eepsites only. Connections to clearnet are only possible through outproxies (no SSL/TLS to the destination site).</ref>
+| {{Yes}} <ref name=eepsites_only />
+| {{No}}
+| {{Yes}} <ref> [https://geti2p.net/en/docs/protocol I2P End-to-end Transport Layer] allows TCP- or UDP-like functionality on top of I2P.</ref>
+| {{Yes}}
+| {{Yes}}
+| {{Yes}}
+|-
+
+! JonDo
+| <ref>For a more detailed review of the JonDonym network, see: [[JonDonym]].</ref>
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+| style="background-color: {{Blue}}"| Premium only <ref>The SOCKS interface is only available to paying users.</ref>
+| {{Yes}}
+| {{Yes}}
+| {{Yes}}
+|-
+
+! Tor
+| <ref>Tor can offer a SocksPort (SOCKS4(a)/5), DnsPort and TransPort. A third party HTTP/2 socks converter ([https://www.privoxy.org/ privoxy]) is available.</ref>
+| {{Yes}}
+| {{Yes}}
+| {{Yes}}
+| {{No}} <ref>Tor offers a SOCKS5 interface but [https://gitlab.torproject.org/legacy/trac/-/issues/7830 the Tor software does not support UDP itself yet]. {{project_name_long}} provides a limited workaround for using UDP anyway, in the most secure manner available; see [[Tunnel_UDP_over_Tor|Tunnel UDP over Tor]].</ref>
+| {{Yes}}
+| {{Yes}}
+| {{Yes}}
+|-
+
+|}
+</div>
+
+== Proxies Conclusion ==
+
+Proxies are highly susceptible to the misuse and theft of user data: many proxies (HTTP/HTTPS/SOCKS) are computers that have been hijacked by hackers or criminals, or are honeypots exclusively offered for the purpose of user observation. Even if they were legitimate, any single operator can decide to enable logging. In addition, some proxies automatically reveal the user's IP address to the destination server.
+
+At best, proxies only offer weak protection against destination website logging, and they offer no protection against third party eavesdropping. For these reasons their use is strongly discouraged.
+
+= Proxy Chains Comparison =
+
+== Proxy Chains Introduction ==
+
+<blockquote>Isn't seven proxies (proxy chains) better than Tor with only three Hops?</blockquote>
+
+Some readers might be familiar with the Internet meme: "Good luck, I'm behind 7 proxies", which is sarcastic retort sometimes used when somebody threatens to report you to authorities, or claims they can identify your location. <ref>h
+ttps://knowyourmeme.com/memes/good-luck-im-behind-7-proxies
+</ref>
+
+In short, multiple proxies used in combination are not more secure than Tor; many people are unaware of this fact. As outlined [[Whonix_versus_Proxies#Proxies_Comparison_Tables|above]], proxies are not very secure.
+
+In contrast, the Tor design ensures the first hop (Tor relay) is unable to see the IP address of the last hop because it cannot decrypt the message for the second hop. If one hop can be trusted, then the connection is secure; see [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorFAQ#which-tor-node-knows-what Which Tor node knows what?], [[:File:Tor-without-https.png]], [https://2019.www.torproject.org/about/overview.html.en How Tor Works] and the onion design to learn more.
+
+Quote The Tor Project, [https://2019.www.torproject.org/docs/faq.html.en#Proxychains Aren't 10 proxies (proxychains) better than Tor with only 3 hops?]:
+
+<blockquote>Proxychains is a program that sends your traffic through a series of open web proxies that you supply before sending it on to your final destination. Unlike Tor, proxychains does not encrypt the connections between each proxy server. An open proxy that wanted to monitor your connection could see all the other proxy servers you wanted to use between itself and your final destination, as well as the IP address that proxy hop received traffic from.
+
+Because the Tor protocol requires encrypted relay-to-relay connections, not even a misbehaving relay can see the entire path of any Tor user.
+
+While Tor relays are run by volunteers and checked periodically for suspicious behavior, many open proxies that can be found with a search engine are compromised machines, misconfigured private proxies not intended for public use, or honeypots set up to exploit users.</blockquote>
+
+== Proxy Chains Comparison ==
+In comparison to Tor, proxies have serious weaknesses, even when SOCKS proxies or "elite"/"anonymous" proxies are utilized. Firstly, all connections between the user and all proxies in the chain are unencrypted. This holds true irrespective of the use of SSL/TLS. For demonstration purposes, assume a user is connecting to an SSL/TLS protected web server. In human terms, this is basic sketch of how the package for the first proxy in the proxy chain would appear:
+
+* Proxy1, please forward "forward to Proxy3; forward to Proxy4; forward to Proxy5; forward to [https://web.archive.org/web/20180327004016/https://encrypted.google.com/ https://encrypted.google.com] 'c8e8df895c2cae-some-garbage-here-(encrypted)-166bad027fdf15335b'" to Proxy2?
+Notably, the actual transmission is safely encrypted and can only be decrypted by the HTTPS protected webserver, but every proxy will see its predecessor IP address and all successor IP addresses. There is simply no way to encrypt that information in an attempt to mirror Tor onion functions. The proxy protocols (HTTP(S), SOCKS4(a)/5) do not support encryption.
+
+It is clear that proxy chains require trust to be placed in every successor proxy concerning the IP address. However, placing trust in open proxies is also misguided for the following reasons:
+
+* Most are a simple misconfiguration; the owners are not aware of the situation and did not intend on public access in the first place.
+* Many are compromised machines (worm infected).
+* Some are honeypots that engage in logging or active exploits (DNS spoofing, protocol spoofing, SSL/TLS spoofing).
+* Few are provided by generous people who only have good intentions in providing the best possible anonymity (similar to most Tor server administrators).
+
+The above factors may not apply for proxy chains of SSH and/or encrypted VPN servers, but this has not been researched yet. Nevertheless, it is not possible to access numerous SSH and/or VPN servers for free (without hacking) and/or anonymous payment.
+
+= CGIproxies Comparison =
+
+== CGIproxies Introduction ==
+
+This section compares the use of [https://en.wikipedia.org/wiki/CGI_proxy#CGI_proxy CGIproxies] in Mozilla Firefox on the host operating system without utilizing a platform like {{project_name_long}} or Tails. A CGI web proxy: <ref>
+https://en.wikipedia.org/wiki/CGI_proxy#CGI_proxy
+</ref>
+
+<blockquote>... accepts target URLs using a Web form in the user's browser window, processes the request, and returns the results to the user's browser. Consequently, it can be used on a device or network that does not allow "true" proxy settings to be changed.</blockquote>
+
+This means CGIproxies provide Internet pages with a form field in which the user can input the target address they wish to visit anonymously. The web proxy subsequently delivers the content of the requested website and automatically patches all links to use the web proxy when clicked. When using web proxy services the browser configuration does not need to be changed.
+
+In comparison to network proxies, CGIproxies have the disadvantage of not being able to replace each link correctly, in particular on websites with JavaScript code. This makes it easier for the user's IP address to "leak" to the web server, which the proxy should actually prevent. The https://ip-check.info anonymity test displays the weakness of some web proxies in the comparison table below.
+
+It is also important to note that CGIproxies can ''potentially'' only anonymize browser traffic and not the traffic of other applications; but to be fair, they do not claim more than anonymizing browser traffic.
+
+== CGIproxies Comparison Tables ==
+
+To interpret the table below, refer the [https://en.wikipedia.org/wiki/CGIProxy Wikipedia CGIProxy entry] and the following legend.
+
+<u>Legend</u>
+
+* <code>Broken</code>: The real IP address is revealed.
+* <code>*</code>: The highlighted service does not reach the test site if JavaScript is activated. It parses so poorly that the browser may leave the service silently in some cases.
+* <code>OK</code>: no leak found.
+* <code>?</code>: Untested and therefore unknown.
+* <code>NI</code>: Not installed by default.
+* <code>DE</code>: Deactivated even if installed.
+* <code>RA</code>: Recommended against by maintainers.
+* <code><sup>1</sup></code> Encrypted connection to the CGI proxy (SSL/TLS) <sup>2</sup> or Tor exit relay.
+* <code><sup>2</sup></code> Uses a proper SSL/TLS certificate recognized by certificate authorities.
+
+=== CGIproxies vs. Anonymization Software/Platforms ===
+'''Table:''' ''CGIproxies vs. Anonymization Software/Platforms''
+
+<div class="scroll-table">
+{|   class="wikitable"
+
+! '''Software / Provider'''
+! '''HTML/CSS/FTP'''
+! '''JavaScript'''
+! '''Java'''
+! '''Encrypted <sup>1</sup>'''
+|-
+
+! Whonix
+| {{Ok}}
+| {{Ok}}
+| NI DE RA OK
+| {{Yes}}
+|-
+
+! Tails
+| {{Ok}}
+| {{Ok}}
+| NI DE RA ?
+| {{Yes}}
+|-
+
+! Tor Browser
+| {{Ok}}
+| {{Ok}}
+| NI DE RA (Broken)
+| {{Yes}}
+|-
+
+! Anonymouse
+| {{Broken}}
+| {{Broken}}*
+| {{Broken}}
+| style="background-color: {{Blue}}"|Premium only
+|-
+
+! WebProxy.to
+| {{Ok}}
+| {{Broken}}
+| {{Broken}}
+| {{No}}
+|-
+
+! KProxy
+| {{Broken}}
+| {{Broken}}*
+| {{Broken}}
+| {{Yes}}
+|-
+
+! Guardster
+| {{Ok}}
+| {{Broken}} (if allowed)*
+| {{Broken}}
+| style="background-color: {{Blue}}"| Premium only
+|-
+
+! Megaproxy
+| {{Broken}}
+| style="background-color: {{Blue}}"| Premium only
+| style="background-color: {{Blue}}"| Premium only
+| {{Yes}}
+|-
+
+! Proxify
+| style="background-color: {{Blue}}"| Premium only
+| ?
+| ?
+| ?
+|-
+
+|}
+</div>
+
+=== Links to Software / Provider and Tests ===
+
+In the following table, "(check manually)" means enter the test link manually in the browser.
+
+<div class="scroll-table">
+{| class="wikitable"
+
+! '''Project'''
+! '''Link'''
+|-
+
+! Whonix
+| [https://check.torproject.org click] (check manually)
+|-
+
+! [https://tails.boum.org Tails]
+| [https://check.torproject.org click] (check manually)
+|-
+
+! [https://www.torproject.org/ Tor Browser]
+| [https://check.torproject.org click] (check manually)
+|-
+
+! [http://anonymouse.org/ Anonymouse]
+| [http://anonymouse.org/cgi-bin/anon-www.cgi/https://check.torproject.org click]
+|-
+
+! [http://webproxy.to/ webproxy USA]
+| [http://webproxy.to/ click] (check manually)
+|-
+
+! [https://www.kproxy.com/ KProxy]
+| [https://www.kproxy.com/ click] (check manually)
+|-
+
+! [https://www.guardster.com/ Guardster]
+| [https://www.guardster.com/free/ click] (check manually)
+|-
+
+! [https://www.megaproxy.com/ Megaproxy]
+| [https://www.megaproxy.com/freesurf/ click] (check manually)
+|-
+
+! [https://proxify.com/ Proxify]
+| [https://proxify.com/ click] (check manually)
+|-
+
+|}
+</div>
+
+== CGIproxies Conclusion ==
+
+In comparison to Tor, CGIproxies are only one hop proxies. This means they know who is connecting and the details of the requested destination server resource. This makes CGIproxies far inferior to Tor because they could potentially read all transmissions, even if entering SSL/TLS protected domain names.
+
+Due to these serious disadvantages, it is not worthwhile discussing other security features which have been canvassed in other wiki chapters comparing {{project_name_long}}, Tails and Tor Browser (such as UTC timezone and fingerprinting).
+
+= Tor and VPN Services Comparison =
+Moved to [[Whonix versus VPNs]].
+
+= License =
+
+'''Tor and Proxies Comparison'''
+
+This was originally posted by adrelanos (proper) to the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/proxy TorifyHOWTO/proxy] ([https://gitlab.torproject.org/legacy/trac/-/wikis/doc/LegalStuff license]). Adrelanos didn't surrender any copyrights and can therefore re-use it here. It is under the same license as the rest of the page.
+
+{{JonDos}} The "Tor and Proxies Comparison" chapter of the "Tor vs. Proxies, Proxy Chains" wiki page contains content from the JonDonym [https://anonymous-proxy-servers.net/en/help/otherServices.html Other Services] documentation page.
+-----
+'''{{project_name_long}}, Tails, Tor Browser and CGIproxies Comparison'''
+
+Appreciation is expressed to [https://anonymous-proxy-servers.net/ JonDos] ([https://web.archive.org/web/20131225084524/https://anonymous-proxy-servers.net/forum/viewtopic.php?p=31220#p31220 Permission]). The "{{project_name_long}}, Tails, Tor Browser and CGIproxies Comparison" chapter of the "Tor vs. Proxies, Proxy Chains" wiki page contains content from the JonDonym documentation [https://anonymous-proxy-servers.net/en/help/otherServices.html Other Services] page.
+-----
+'''Tor and Proxy Chains Comparison'''
+
+This was originally posted by adrelanos (proper) to the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorFAQ#Arent10proxiesproxychainsbetterthanTorwithonly3hops-proxychainsvsTor TorFAQ] ([https://gitlab.torproject.org/legacy/trac/-/wikis/doc/LegalStuff license]). Adrelanos didn't surrender any copyrights and can therefore re-use it here. It is under the same license as the rest of the page.
+
+= Footnotes =
+{{reflist|close=1}}
+
+[[Category:Design]]
+
+{{Footer}}

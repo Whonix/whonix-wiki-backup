@@ -1,0 +1,214 @@
+{{Header}}
+{{#seo:
+|description=Multi-player Onion Gaming
+|image=Oniongamings3422.jpg
+}}
+[[image:Oniongamings3422.jpg|thumb]]
+
+= Introduction =
+
+Whether they be libre or non-libre, add the guide for your multiplayer .onion game here. For now there is only one game server and client guide that is being worked on, for a game called TEG.
+
+This guide was made for {{project_name_long}} 14. If you are only a player you might not even need {{project_name_long}} to play, this guide is mostly about how to host a TEG server and how to manage it and the players that connect and preventing DDOS attacks.
+
+TEG or "Tenes Empanadas Graciela" is a [https://www.wikidata.org/wiki/Q335874 turn-based strategy video game] which is played through a server / client system.
+
+= Game Connection: {{project_name_long}} 14 =
+
+These steps show how to connect to the game server that supports standard authentication (which most Tor users are used to).
+
+This section is applicable when the game server uses standard onion services -- the .onion addresses that most people are used to, connecting just by entering the address like 3g2upl4pq6kufc4m.onion. To connect to the game server in this case, first install the game.
+
+{{CodeSelect|code=
+sudo apt install teg
+}}
+
+If a password prompt appears, type “changeme” and press Enter (unless the password was changed).
+
+After installation, open up the game from the system menu: <code>K</code> &rarr; <code>Applications</code> &rarr; <code>Games</code> &rarr; <code>Tactics & Strategy</code> &rarr; <code>Tenes Empanadas Graciela client</code> <ref>Or type in a terminal window: tegclient</ref>
+
+After it starts it should open a “Connect to server” window. If not, open it from the menu <code>Game</code> &rarr; <code>Connect</code>
+
+If it already says “2000” in the Server port field leave it as is. Where it says “Server name” add the onion address, for example w7jnpxhu3re5qarr.onion. Next, choose a “Name” in the field for your playername and you’re good to go -- press OK if you want to join the server.
+
+In case you only want to observe the game and not play check the checkbox “Dont play, just observe” and then hit the OK button.
+
+= Game Connection: stealth auth {{project_name_long}} 14 =
+
+This section is yet to be written. If you cannot wait until that time, feel free to edit this section yourself.
+
+= TEG Server: Standard =
+
+These instructions are for hosting a game server for TEG and assumes {{project_name_long}} 14 is in use.
+
+The initial setup is heavily based on and inspired by the [[Onion_Services|Onion Services]] wiki entry.
+
+== {{project_name_long}} Gateway Virtualbox Configuration ==
+
+Open up a terminal and type.
+
+{{Open with root rights|filename=
+/usr/local/etc/torrc.d/50_user.conf
+}}
+
+Then type your password. If it has not changed, the original is “changeme”.
+
+Next, modify the file as follows.
+<pre>
+HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 2000 10.152.152.11:2000
+HiddenServiceVersion 3
+
+DisableNetwork 0
+</pre>
+
+Save and close the file. For the changes to take effect, open a terminal and type the following command.
+
+{{CodeSelect|code=
+sudo service tor@default reload
+}}
+
+Enter the password mentioned previously if a prompt appears.
+
+To check if everything is functional, run.
+
+{{CodeSelect|code=
+sudo service tor@default status
+}}
+
+Enter the password if it is prompted.
+
+If the output states.
+<pre>
+Active: active (running) since
+</pre>
+
+Where "active (running)" is in green, this means everything is fine. If something went wrong, please [[Onion_Services#Step_3:_make_changes_to_Tor_config_take_effect|troubleshoot]] the problem.
+
+Now it’s time to find out which .onion address you can share with your friends. Open up a terminal and run (a password prompt might appear).
+
+{{CodeSelect|code=
+sudo cat /var/lib/tor/hidden_service/hostname
+}}
+
+The output should be an .onion address with alphanumeric characters which can be shared with your friends so they can play on your server; for example w7jnpxhu3re5qarr.onion.
+
+Now the {{project_name_long}} Workstation firewall must be edited.
+
+== {{project_name_long}} Workstation VirtualBox Configuration ==
+
+Open a terminal and run.
+
+{{Open with root rights|filename=
+/etc/whonix_firewall.d/50_user.conf
+}}
+
+Enter the password if a prompt appears.
+
+Add the following line.
+
+<pre>
+EXTERNAL_OPEN_PORTS+=" 2000 "
+</pre>
+
+Save the file.
+
+In case you already have a webserver on port 80 and you also want to have this game server, then make the following change.
+
+<pre>EXTERNAL_OPEN_PORTS+=" 80 2000 "</pre>
+
+Now reload the firewall (enter the password if prompted).
+
+{{CodeSelect|code=
+sudo whonix_firewall
+}}
+
+Next the actual game server software must be started. In {{project_name_long}} Workstation, open a console and run.
+
+{{CodeSelect|code=
+tegserver
+}}
+
+Once the server is running, you can share the .onion address that you got earlier. In this example it is  w7jnpxhu3re5qarr.onion, but it will probably be different for you. If you completed these instructions too quickly the link that was generated for you might not work. In that case you need to be patient and wait until the time it works. If it doesn't work maybe ask somebody else to verify if the instructions still work.
+
+= TEG Server: stealth auth =
+
+Very basic protection against DDOS attacks done versus your server so follow this guide if you want to abandon the ‘single point of failure’ that is your only .onion address that all your players know (as of the previous “standard guide”). This section is to protect you against at least 1 bad player who wants to ddos your game server (regardless of the reason).
+
+== {{project_name_long}} Gateway VirtualBox Configuration ==
+
+Open up a terminal and run (enter the password if prompted).
+
+{{Open with root rights|filename=
+/usr/local/etc/torrc.d/50_user.conf
+}}
+
+Modify the file as follows.
+<pre>
+HiddenServiceDir /var/lib/tor/hidden_service/
+HiddenServicePort 2000 10.152.152.11:2000
+HiddenServiceVersion 3
+
+#1234567890123400 ends with 00 because this I plan to be the 'public address'
+#In the event the server gets a ddos attack the public address should be disabled
+#and if not done already give individual players that you trust
+#the addresses that are generated from the numbers ending with 01,02 etc.
+#max amount of addresses is until 1234567890123415 is reached because that amount+00
+#means 16 different .onion addresses which is the current max
+#on this specific anti ddos design
+HiddenServiceAuthorizeClient stealth 1234567890123400,1234567890123401,1234567890123402,1234567890123403,1234567890123404,1234567890123405,1234567890123406,1234567890123407,1234567890123408,1234567890123409,1234567890123410,1234567890123411,1234567890123412,1234567890123413,1234567890123414,1234567890123415
+
+#The above long line is a total of 16 numbers. If you add another number
+#Tor will refuse to reload so stick with 16.
+
+#not sure if we really need "DisableNetwork 0" but let's leave it as is. I didn't have it before but I re-added it just in case it is needed.
+DisableNetwork 0
+</pre>
+
+Save and close the file. For the changes to take effect, open a terminal and run (enter the password if prompted).
+
+{{CodeSelect|code=
+sudo service tor@default reload
+}}
+
+Alternatively, open the "K" menu, search for reload and click on “Reload Tor”. <ref>This basically runs ''sudo service tor@default reload'' and ''sudo service tor@default status''</ref>
+
+Now discover which .onion addresses you can share with your friends. Open up a terminal and run (enter the password if prompted).
+
+{{CodeSelect|code=
+sudo cat /var/lib/tor/hidden_service/hostname
+}}
+
+Since I’m going to regenerate all my .onion addresses by making new ones, I’m posting what this might actually look like when you try it yourself. Your ‘player invites’ will be similar to the following.
+
+<pre>
+aokofajrpe4g2zrf.onion QlQlXlPdXyTUf6WIOf1tfR # client: 1234567890123400
+3wsajgpzqxytcsjo.onion Whi+D0Y/352YqMK3uTJNWx # client: 1234567890123401
+umaenixqbqevdk5a.onion TE1Biv1JFjveN/mQqWOmSh # client: 1234567890123402
+gwumcsrrfkc3kne5.onion VYzN3LVk9DVhbp3TRQuDXB # client: 1234567890123403
+vuhiosfqgegorbkh.onion P5ns2xtCC+VJAVeW3FrC+x # client: 1234567890123404
+jye4cftpe6xq2eka.onion vnCPwf6RWWMkv9iCKDZHlh # client: 1234567890123405
+gvzl37orywkzxtr7.onion H+izJm1pwnt+FMdJnL2MWh # client: 1234567890123406
+hdtjcfdpcnnnxws3.onion H6XIO5+ts0mz2AtBcbEJOx # client: 1234567890123407
+gdgj2p5k7jqgv3k7.onion RvnG94Blww6jDLSpQSZW1B # client: 1234567890123408
+6np4ynkdqg7e2cmx.onion X1st9nX4486nwJ9LmbJDNx # client: 1234567890123409
+ywabarc6ziuwdhbl.onion ym9me7GXGUctLJwTgyWhgh # client: 1234567890123410
+agyinmgx7qeodrx2.onion 6YUDbaghoXr0LWSoso7MeR # client: 1234567890123411
+6xsjhpgrmf2rbnka.onion JP7giIIzLmhhn2r3EcbWWB # client: 1234567890123412
+5fixfx3mvvj5cu7u.onion wmxp4ZoPmFb31WoCS2d/8B # client: 1234567890123413
+rczg4s5reivwhd7p.onion pl/3phzLLB4hHsknnfOOxB # client: 1234567890123414
+yl6ulm2lzvtsvdfx.onion G0v/YtNeaCgBuvFw6QfTTR # client: 1234567890123415
+</pre>
+
+I posted the above because I’ve already changed the client numbers for all my 16 addresses already to begin with and reloading Tor after changing something in your client numbers makes Tor regenerating a new address for each of those 16 possible clients/‘groups of players’ where you changed an id. Right now I don’t have the above addresses so I took the step to post how it actually looked like when I followed the guide myself and that’s what you see above. Also when Tor generates new addresses it also generates the ‘gibberish’ that you see right next to each .onion address, let’s take the .onion address yl6ulm2lzvtsvdfx.onion as an example. To the right of that address there is this number “G0v/YtNeaCgBuvFw6QfTTR” which is going to be explained later in this guide.
+
+= Credits =
+
+This wiki entry would not have been possible without the [[Onion_Services#Tor_Onion_Services:_Configuration|Tor Onion Services: Configuration]] guide.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

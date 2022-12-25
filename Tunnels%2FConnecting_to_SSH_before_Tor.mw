@@ -1,0 +1,108 @@
+{{Header}}
+{{Title|
+title=Connecting to SSH before Tor
+}}
+{{#seo:
+|description=Instructions on how to connect to SSH before Tor (User &rarr; SSH &rarr; Tor &rarr; Internet)
+|image=Norman-79860640.jpg
+}}
+[[image:Norman-79860640.jpg|thumb]]
+
+'''<code>User</code> &rarr; <code>SSH</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>'''
+
+= Introduction =
+
+{{Tunnels_Introduction}}
+{{Stub}}
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px]]
+| text    =
+<u>Advertisement</u>:<br/>
+It's possible to pay for the completion of this wiki page. Send reasonable price suggestions. Get in [[Contact#For_Private_Inquiries|contact]].
+}}
+
+The SSH tunnel be configured on the host or inside {{project_name_gateway_long}}.
+
+= Install SSH Client =
+
+{{CodeSelect2|code=
+sudo apt update
+}}
+
+{{CodeSelect2|code=
+sudo apt install ssh
+}}
+
+=  Test Connection =
+{{CodeSelect2|code=
+ssh yourusername@your.ssh.server
+}}
+
+* '''TODO''': Public key authentication steps
+
+{{CodeSelect2|code=
+apt install lynx
+}}
+
+{{CodeSelect2|code=
+lynx check.torproject.org
+}}
+
+{{CodeSelect2|code=
+exit
+}}
+
+= Configure Local Server =
+
+{{CodeSelect2|code=
+ssh -D 1080 your.ssh.server
+}}
+
+* '''TODO''': Run in background on each start up before Tor.
+* '''TODO''': Public Key authentication steps
+
+= Configure Tor =
+
+==== Option 1: Use {{Code2|Anon Connection Wizard}} ====
+
+Beginning with {{project_name_long}} 14, a prefixed proxy can be configured easily using [[Anon_Connection_Wizard|Anon Connection Wizard]].
+<div class="toccolours mw-collapsible mw-collapsed">
+<div class="mw-collapsible-content">
+===== Step 1: Start Anon Connection Wizard =====
+{{Start_Anon_Connection_Wizard}}
+
+===== Step 2: Use Proxy Configuration Page =====
+{{Anon_Connection_Wizard_Use_Proxy}}
+</div>
+</div>
+
+==== Option 2: Manually Configure Proxy ====
+
+<div class="toccolours mw-collapsible mw-collapsed">
+<div class="mw-collapsible-content">
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+* If SSH tunnel was setup from {{project_name_gateway_long}}:
+{{CodeSelect2|code=
+Socks5Proxy 127.0.0.1:1080
+}}
+
+* If SSH tunnel was setup from host operating system, change IP:PORT as needed:
+{{CodeSelect2|code=
+Socks5Proxy IP:PORT
+}}
+
+</div>
+</div>
+
+= Firewall Configuration =
+* '''TODO''': if running inside {{project_name_gateway_long}}, new firewall rules are probably required.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,44 @@
+<pre style="white-space: pre-wrap;">
+#!/bin/bash
+
+## Copyright (C) 2012 - 2015 Patrick Schleizer <adrelanos@whonix.org>
+## See the file COPYING for copying conditions.
+
+set -o pipefail
+
+error_handler() {
+  echo "ERROR!" >&2
+  exit 1
+}
+
+trap "error_handler" ERR
+
+[ -n "$iptables_cmd" ] || iptables_cmd="iptables --wait"
+[ -n "$ip6tables_cmd" ] || ip6tables_cmd="ip6tables --wait"
+
+$iptables_cmd -P INPUT ACCEPT
+$iptables_cmd -P FORWARD ACCEPT
+$iptables_cmd -P OUTPUT ACCEPT
+
+$iptables_cmd -F
+$iptables_cmd -X
+$iptables_cmd -t nat -F
+$iptables_cmd -t nat -X
+$iptables_cmd -t mangle -F
+$iptables_cmd -t mangle -X
+$iptables_cmd -t raw -F
+$iptables_cmd -t raw -X
+
+$ip6tables_cmd -P INPUT ACCEPT
+$ip6tables_cmd -P OUTPUT ACCEPT
+$ip6tables_cmd -P FORWARD ACCEPT
+
+$ip6tables_cmd -F
+$ip6tables_cmd -X
+$ip6tables_cmd -t mangle -F
+$ip6tables_cmd -t mangle -X
+$ip6tables_cmd -t raw -F
+$ip6tables_cmd -t raw -X
+
+exit 0
+</pre>

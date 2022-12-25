@@ -1,0 +1,157 @@
+{{Header}}
+
+= User's Preferences =
+== By Host Operating System ==
+* Windows users &rarr; Install VirtualBox from virtualbox.org &rarr; recommend [[VirtualBox]] ova's
+* Linux users &rarr; Install VirtualBox by using distribution's package manager &rarr; recommend using [[KVM]] and {{Code2|.qcow2}} images
+* Mac users &rarr; Install VirtualBox by ? &rarr; recommend VirtualBox ova's
+* Qubes users &rarr; [[Qubes]]
+
+== By Target Platform ==
+* [[VirtualBox]]
+* [[QEMU]]
+* [[KVM]]
+* [[Qubes]]
+* two physical computers ([[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]])
+* probably in long term future other virtualizers as well
+
+== By Security / Usability Compromise ==
+* {{Code|Download Easy}}
+** http-only, direct http download link ([https://github.com/{{project_name_short}}/{{project_name_short}}/issues/177 https as soon as implemented])
+** no notes about download anonymity
+* {{Code|Download More Secure}}
+** Torrent + note, that anonymous download is difficult<ref>or at least very hard without {{project_name_long}}, which is what they want to download in the first place</ref>
+** http-only, direct http download link + hash check + note anonymous download
+* {{Code|Download Most Secure}}
+** http([https://github.com/{{project_name_short}}/{{project_name_short}}/issues/177 s]) + gpg
+** onion + gpg
+** notes about anonymous download
+* {{Code|Download Utmost Secure}}
+** Build from source code
+
+== By Download Method ==
+* http([https://github.com/{{project_name_short}}/{{project_name_short}}/issues/177 s])
+* [[Download_Security#Onion_Mirror|onion]]
+* torrent
+
+== By Download Anonymity ==
+Low priority. Perhaps leaving this out.
+
+* preferred download anonymity &rarr; http(s) or onion, avoiding torrent
+* no preference about download anonymity &rarr; nevermind http(s) or torrent
+
+== By Release Life Cycle ==
+* Stable Releases
+* Testers-Only Releases
+* Experimental Releases
+
+= Threat Models =
+== No attacks prevented ==
+* Http-only download without verification.
+* Good for new users who should be warned that this is only to try {{project_name_long}} and practice getting used to Linux.
+* &rarr; {{Code|Download Easy}}
+
+== MITM download ==
+* Man-in-the-middle attack between mirror and downloader.
+* Can be defeated by using hash check, SSL, onion or BitTorrent.
+* &rarr; {{Code|Download More Secure}}
+
+== whonix.org server compromise ==
+* Prevented by OpenPGP verification.
+* &rarr; {{Code|Download Most Secure}}
+
+== build server compromise ==
+* Prevented by building from source code.
+* &rarr; {{Code|Download Utmost Secure}}
+
+= Multiple Download Pages Considerations =
+If we consider multiple download pages, users are accustomed to share direct download links. One who decided to use VirtualBox is likely to share the VirtualBox download page link. So the VirtualBox download page should ideally briefly mention, that there are also options on the main download page. Just a consideration. IF we decide that route.
+
+= Windows Verification is hosed =
+To check the hash, windows users have to either: <br />
+1. Download a utility from a website and follow the instructions about how to check a hash <- Possible, but tedious. <br />
+2. Download via Bittorrent <- Requires prior knowledge of Bittorrent <br />
+3. All downloads via SSL <- [https://github.com/{{project_name_short}}/{{project_name_short}}/issues/177 Can't right now] <br />
+4. Learn GPG <- an important skill; but now we're jumping directory to the "advanced verification" stage
+
+Verifying file integrity is not something Windows encourages.
+
+No one is providing a https enabled download link for a Windows hash verification tool. Maybe we should redistribute [https://portableapps.com/apps/utilities/rapid-crc-unicode-portable rapid-crc-unicode-portable] (just 1 MB) over https on whonix.org?
+
+= Implementation Ideas =
+== Using html fieldset tag ==
+Compatibility, it looks like everyone supports it: https://www.w3schools.com/tags/tag_fieldset.asp
+=== Example Draft ===
+'''Dropdown menu examples'''
+
+No javascript required.
+
+{{project_name_long}} can run on top of many host operating systems (Windows, Linux, Mac, Qubes and more). {{project_name_long}} [[Pre_Install_Advice#Which_host_operating_system_do_you_recommend.3F|recommends]] Debian Wheezy. ([[#TODO|More Options]])
+
+<pre>
+<html>
+<form class="form-download gap-from-top" action="/download/" method="get">
+	<fieldset>
+		<input type="hidden" name="version" value="9.1" />
+		<label for="input-operating-system">Choose your operating system</label>
+		<select id="input-operating-system" name="architecture">
+			<option value="Windows" selected="selected">Windows</option>
+			<option value="Linux">Linux</option>
+			<option value="Mac">Mac</option>
+		</select>
+	</fieldset>
+	<div>
+		<button type="submit">Next</button>
+	</div>
+</form>
+</html>
+</pre>
+{{project_name_long}} can run on top of various target platforms such as VirtualBox, KVM, Qemu, Qubes, VMware or with no virtualizer.
+<pre>
+<html>
+<form class="form-download gap-from-top" action="/download/" method="get">
+	<fieldset>
+		<input type="hidden" name="version" value="9.1" />
+		<label for="input-operating-system">Choose your target platform</label>
+		<select id="input-operating-system" name="architecture">
+			<option value="Windows" selected="selected">VirtualBox [status: stable] [usability: easiest]</option>
+			<option value="Linux">KVM [status: testers-only] [usability: medium]</option>
+			<option value="Mac">Qubes [status: testes-only] [usability: harder]</option>
+			<option value="Mac">VMware [status: unmaintained] [usability: easy]</option>
+			<option value="Mac">no virtualizer (physical isolation, bare metal) [status: stable] [usability: harder]</option>
+		</select>
+	</fieldset>
+	<div>
+		<button type="submit">Download</button>
+	</div>
+</form>
+</html>
+</pre>
+== Expand Button Examples ==
+=== One ===
+<div class="toccolours mw-collapsible mw-collapsed">
+Interested in safer download options? Click on expand on the right side.
+<div class="mw-collapsible-content">
+Unfortunately, safer download options are more complicated, but well worth the effort. [...]
+</div>
+</div>
+
+=== Two ===
+<div class="toccolours mw-collapsible mw-collapsed">
+More download options? Torrent, sha512 hash files, etc.? Click on expand on the right side. Without JavaScript those are expanded by default.
+<div class="mw-collapsible-content">
+Torrent, sha512 hash files, etc. [...]
+</div>
+</div>
+
+= See Also =
+* [https://forums.whonix.org/t/download-page-redesign-for-kvm-qubes-and-more-needed/716 Related forum discussion about this topic.]
+* Secure downloader. Stub downloader. Small tool that could be served from whonix.org over https, that could download and install the bigger files from elsewhere without https and do the verification. &rarr; [[Software_Signature_Verification_Usability_Issues_and_Proposed_Solutions]] &rarr; Probably not. The Tor Project failed to implement such as tool (Thandy). And it is a different topic.
+* [[Dev#Download|Other Download Related Topics]]
+* [https://tails.boum.org/install/index.en.html Tails Installation Assistant]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+[[Category:Development]]

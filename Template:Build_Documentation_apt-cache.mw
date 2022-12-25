@@ -1,0 +1,79 @@
+<noinclude>{{Header}}</noinclude>
+<div class="toccolours mw-collapsible mw-collapsed">
+Using an apt cache will greatly improve build speed when building several times in a row (e.g. when debugging, during development). {{project_name_long}} build script sets up an apt cache by default.
+
+If you are interested in a torified apt-cacher-ng or host apt-cacher-ng, click on Expand on the right.
+<div class="mw-collapsible-content">
+{{Box|text=
+'''torified apt-cacher-ng'''
+
+{{Box|text=
+The following torified apt-cacher-ng setup only has to be applied, if you are building using onion apt sources using <code>--connection onion</code>. When building inside {{project_name_workstation_long}}, this is not required.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+Note, this neither torifies all of the build script's connections nor hides Tor from your ISP! See [[Dev/Build Anonymity|Build Anonymity]].
+}}
+
+Install <code>apt-cacher-ng</code>, <code>torsocks</code> and <code>tor</code>.
+
+<pre>
+sudo apt install apt-cacher-ng torsocks tor
+</pre>
+
+Create folder apt-cacher-ng systemd drop-in folder <code>/lib/systemd/system/apt-cacher-ng.service.d</code>.
+
+<pre>
+sudo mkdir -p /lib/systemd/system/apt-cacher-ng.service.d
+</pre>
+
+{{Open with root rights|
+filename=/lib/systemd/system/apt-cacher-ng.service.d/50_user.conf
+}}
+
+Add.
+
+<pre>
+[Service]
+ExecStart=
+ExecStart=torsocks /usr/sbin/apt-cacher-ng SocketPath=/run/apt-cacher-ng/socket -c /etc/apt-cacher-ng ForeGround=1
+</pre>
+
+Save.
+
+Reload systemd.
+
+<pre>
+sudo systemctl daemon-reload
+</pre>
+
+Restart apt-cacher-ng.
+
+<pre>
+sudo systemctl restart apt-cacher-ng
+</pre>
+}}
+}}
+
+{{Box|text=
+'''host apt-cacher-ng'''
+
+{{Box|text=
+Be sure to have a firewall, so the whole internet cannot use the apt-cacher-ng service.
+
+When building inside a non-Whonix VM, an apt cache can be used on the host. In that case, adjust the IP accordingly and manually test that it is reachable. When building inside a ({{project_name_long}}) VM, just install the apt cache inside the VM and point to a localhost apt cache.
+
+Prepend <code>REPO_PROXY=http://127.0.0.1:3142</code> before the build command.
+
+Replace the IP <code>127.0.0.1</code> with the IP address of your host. For security reasons, this should only be done over LAN and not over the internet.
+
+<pre>
+sudo REPO_PROXY=http://127.0.0.1:3142 ./derivative-maker ...
+</pre>
+}}
+}}
+</div>
+</div>
+
+<noinclude>{{Footer}}</noinclude>

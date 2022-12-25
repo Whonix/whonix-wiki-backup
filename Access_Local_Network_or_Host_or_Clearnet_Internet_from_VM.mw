@@ -1,0 +1,109 @@
+{{Header}}
+{{title|
+title=Access Local Network, Host or Clearnet Internet from VM
+}}
+{{#seo:
+|description=Connections from inside a VM to a service running on the host, inside the local area network (LAN) or clearnet internet. (Esoteric Documentation)
+|image=Access12323.jpg
+}}
+[[image:Localaccessnet1163108640.jpg|thumb]]
+
+= Introduction =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This is an esoteric subject and the instructions are probably unnecessary -- advanced users only!
+}}
+
+[[File Transfer]] might be a far simpler alternative.
+
+= Prerequisite Knowledge =
+
+* [[Stream_Isolation/Easy|Stream Isolation: Basic Knowledge]]
+* [[Stream_Isolation/Disable_Easy|Disable Stream Isolation]]
+
+= Instructions =
+
+The following example uses <code>ssh</code>, but it could be replaced with something else.
+
+If <code>ssh</code> is utilized, its setup on the host (such as public key setup) and related issues are out of scope for this documentation and are considered prerequisite knowledge. This wiki chapter is focused on connectivity and not server configuration details.
+
+* These instructions only apply to {{project_name_gateway_long}}.
+* {{project_name_workstation_long}} is currently [[Undocumented]]. It would likely require a complex setup and pose a high risk of clearnet leaks; see footnote. <ref>
+It would probably require:
+
+* <u>Less safe</u>: enabling IP forwarding inside {{project_name_gateway_long}}; or
+* <u>Safer</u>: [[{{project_name_gateway_short}} Firewall|Opening an Incoming Port on {{project_name_gateway_long}} Firewall]] and running some kind of proxy software in {{project_name_gateway_short}} with user <code>clearnet</code> that permits forwarding to host, local area network or clearnet Internet.
+</ref> Instead of using these instructions it is recommended to consider [[File_Transfer#SSH_into_{{project_name_gateway_long}}|SSH / SSHFS (ssh file system) into {{project_name_gateway_long}}]], [[File_Transfer#SSH_into_{{project_name_workstation_long}}|SSH / SSHFS into {{project_name_workstation_long}}]], and [[sshfs into Whonix-Workstation|SSHFS into {{project_name_workstation_long}}]].
+
+== On the Host ==
+
+Install the server software. Note: <code>ssh</code> is used as an example but can be replaced with alternatives.
+
+{{Install Package
+|package=ssh
+}}
+
+== Inside the VM ==
+
+Install the client software. Note: <code>openssh-client</code> is used as an example but can be replaced with alternatives.
+
+{{Box|text=
+'''1.''' Install <code>openssh-client</code>.
+
+{{Install Package
+|package=openssh-client
+}}
+
+'''2.''' ''Optional:'' Create a persistent home folder for user <code>clearnet</code>.
+
+{{Box|text=
+{{CodeSelect|code=
+sudo usermod -d /home/clearnet clearnet
+}}
+
+{{CodeSelect|code=
+sudo mkhomedir_helper clearnet
+}}
+}}
+
+'''3.''' Open a shell under user <code>clearnet</code>.
+
+{{CodeSelect|code=
+sudo -u clearnet bash
+}}
+
+'''4.''' Permanently disable stream isolation or temporarily circumvent stream isolation.
+
+Syntax:
+
+{{CodeSelect|code=
+client-software ip-address
+}}
+
+In the following example, note:
+
+* Replace <code>ssh</code> with the desired client software.
+* Replace the IP <code>192.168.1.0</code> with the actual local LAN IP of the host.
+* Drop <code>.anondist-orig</code> if the command is not uwt-wrapped by default.
+
+{{CodeSelect|code=
+ssh.anondist-orig 192.168.1.0
+}}
+}}
+
+= Troubleshooting =
+
+* A configured host firewall might block connections to the service.
+
+= See Also =
+* [[Hosting a %28private%29 %28obfuscated%29 bridge or %28exit%29 relay|Host a Bridge or Tor Relay]]
+* [[Ports]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

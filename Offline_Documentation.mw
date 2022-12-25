@@ -1,0 +1,117 @@
+{{Header}} {{Title|
+title=Browsing {{project_name_long}} Documentation Offline
+}} {{#seo:
+|description=Reading documentation without internet connection.
+|image=https://www.{{project_clearnet}}/w/images/5/5a/Offline-2342342354.png
+}}
+[[image:Offline-2342342354.png|thumb|250px]]
+= Installation =
+{{Install Package
+|package=git
+}}
+
+{{CodeSelect|code=
+mkdir ~/Downloads/
+}}
+
+{{CodeSelect|code=
+cd ~/Downloads/
+}}
+
+Use <code>git</code> to download the {{project_name_long}} wiki documentation.
+
+{{CodeSelect|code=
+git clone --depth=1 https://gitlab.com/{{project_name_short_lowercase}}/{{project_name_short_lowercase}}-wiki-html.git
+}}
+
+= Usage =
+{{CodeSelect|code=
+x-www-browser ~/Downloads/{{project_name_short_lowercase}}-wiki-html/Documentation.html
+}}
+
+= Advantages =
+* Very fast to browse once installed.
+* Higher privacy.
+
+= Warnings =
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=warning]]
+| text    =
+'''Warning:''' For users who intend to avoid internet connections.
+
+No special measures were taken to enforce not using the internet. When clicking external links, the internet will be used. Browsing offline documentation pages might result in external internet connections. If external content must not be loaded, disable networking of the virtual machine or the host computer.
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=warning]]
+| text    =
+Offline documentation will likely be older than online documentation. For time critical issues such as version numbers refer to the online version.
+}}
+
+= Limitations =
+* Some links might be broken.
+* [https://forums.whonix.org/t/offline-documentation-discussion/413/90 Large image view is broken.]
+* Simple code boxes. One has to manually select the contents of a code box for copy and paste.
+* Boxes for "click on Expand on the right" are already expanded by default.
+* Layout, tables look a bit different.
+* Other imperfections.
+
+= Forum Discussion =
+https://forums.whonix.org/t/offline-documentation-discussion/413/89
+
+= Wiki Database Dump =
+'''A)''' [https://gitlab.com/{{project_name_short_lowercase}}/wiki-backup-dump-content-current {{project_name_long}} wiki as <code>mediawiki XML</code> database dump <u>not</u> including full history <code>dumpContent.xml</code> but including all wiki images]
+* Using <code>git</code>, on gitlab.
+* Ugly binary file.
+* Restoration possible in new mediawiki.
+* <code>rsync://{{project_clearnet}}/{{project_name_short_lowercase}}/developer-meta-files/{{project_name_short_lowercase}}-wiki-backup-dump-content-current</code>
+
+'''B)''' [https://download.{{project_clearnet}}/developer-meta-files/{{project_name_short_lowercase}}-wiki-backup-dump-content-full/dumpContent.xml {{project_name_long}} wiki as <code>mediawiki XML</code> database dump including full history but <code>not</code> including wiki images <code>dumpContent.xml</code>]
+
+* [https://download.{{project_clearnet}}/developer-meta-files/{{project_name_short_lowercase}}-wiki-backup-dump-content-full/dumpContent.xml.sha512sum <code>dumpContent.xml.sha512sum</code>]
+* Not using <code>git</code> because file size to big.
+* Ugly binary file.
+* Restoration possible in new mediawiki.
+* <code>rsync://{{project_clearnet}}/{{project_name_short_lowercase}}/developer-meta-files/{{project_name_short_lowercase}}-wiki-backup-dump-content-full</code>
+
+'''Hints:'''
+
+* Best to combine the two downloads above (full history '''A''' + all wiki images '''B''').
+* Possible to [[Hosting a Mirror#rsync_from_{{project_clearnet}}|rsync from {{project_clearnet}}]].
+
+Recommended steps to restore in a new mediawiki installation:
+
+'''1)''' Restore full wiki history.
+
+{{CodeSelect|code=
+sudo -u www-data php /var/www/w/maintenance/importDump.php --uploads --dry-run /path/to/{{project_name_short_lowercase}}-wiki-backup-dump-content-full/dumpContent.xml
+}}
+
+* Path to mediawiki maintenance script <code>importDump.php</code> will likely be different.
+* drop: <code>--dry-run</code>
+* Probably also drop (likely broken) <code>--uploads</code> (not important)
+
+'''2)''' Restore all wiki images.
+
+{{CodeSelect|code=
+sudo -u www-data php /var/www/w/maintenance/importImages.php /path/to/wiki/wiki-backup-dump-content-current/mediafiles
+}}
+
+* Path to mediawiki maintenance script <code>importImages.php</code> will likely be different.
+* Check permissions. Folder to import from must be readable by user www-data. To test, run: <code>sudo -u www-data cp -r /path/to/wiki/wiki-backup-dump-content-current/mediafiles /tmp/delete</code> or so.
+
+= Alternative Wiki Backup Formats =
+* '''C)''' [https://gitlab.com/{{Project_name_short_lowercase}}/{{project_name_short_lowercase}}-wiki-backup {{project_name_long}} wiki as <code>mediawiki markdown</code>]
+** Looks nicer.
+** No automated path to restoration.
+** <code>rsync://{{project_clearnet}}/{{project_name_short_lowercase}}/developer-meta-files/{{project_name_short_lowercase}}-wiki-backup</code>
+
+* '''D)''' [https://gitlab.com/{{Project_name_short_lowercase}}/{{project_name_short_lowercase}}-wiki-html {{project_name_long}} wiki as <code>HTML</code>]
+** Looks nicer.
+** No automated path to restoration.
+= Forum Backups =
+* https://github.com/{{project name short}}/{{project name short lowercase}}-discourse-html-backup
+
+{{reflist|close=1}}
+[[Category:Documentation]]
+{{Footer}}

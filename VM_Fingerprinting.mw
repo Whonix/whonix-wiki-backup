@@ -1,0 +1,153 @@
+{{Header}}
+{{#seo:
+|description=Linking two or more locally compromised Virtual Machines (VMs) to the same pseudonym.
+|image=Vmfingerprint123123.jpg
+}}
+{{Title|title=
+VM Fingerprinting
+}}
+[[image:Vmfingerprint123123.jpg|thumb]]
+Linking two or more locally compromised Virtual Machines (VMs) to the same pseudonym
+= Threat Model =
+
+In computing terms, the [https://en.wikipedia.org/wiki/Threat_model threat model] concerns potential threats or structural vulnerabilities that can be exploited by adversaries; in the case of {{project_name_long}} this means possible identifiers leading to full or partial deanonymization.
+
+VM fingerprinting threats arise when two VMs are compromised, for instance:
+
+* VMs infected with malware.
+* VMs that have software locally installed which includes anti-features such as privacy-intrusive, tracking elements.
+
+For the context of this wiki page, in short called, tracking software.
+
+In this case, the goal of the adversary is to link two or more VMs to the same pseudonym.
+
+Note:
+
+* This is a general issue. This is not a {{project_name_long}} specific problem. All operating systems running inside virtualizers are affected.
+* This is not a VM / virtualizer specific problem. All VMs / virtualizers are affected.
+* When running an operating system on hardware without any VMs, i.e. if tracking software runs on hardware, the problem is even worse than when using VMs. That is because in that case, there is no compartmentalization through VMs and tracking software can access hardware serial numbers.
+
+Related: [[Dev/Technical_Introduction#Goals_and_Non-Goals|Tor Browser and {{project_name_long}} goals and non-goals]]
+
+= Definitions =
+== Local Non-Deterministic Artifacts ==
+
+=== Automatically Generated Local Non-Deterministic Artifacts ===
+
+A number of non-deterministic artifacts are present in the various {{project_name_long}} variants - consider the examples below:
+
+* In [[{{q_project_name_short}}|{{q_project_name}}]], the contents of many log files like <code>/var/log/apt/history.log</code> usually contain text such as <code>Start-Date: 2020-04-11  07:20:20</code>. This is  visible in both the Qubes Template and in AppVMs/DispVMs based on that Template due to the usual [https://www.qubes-os.org/intro/#features Qubes root file system sharing]. <ref>
+Qubes debian-{{Stable project version based on Debian version short}} Template
+
+<pre>
+cat /var/log/apt/history.log
+</pre>
+
+<pre>
+Start-Date: 2020-04-11  07:20:20
+</pre>
+</ref>
+* The file creation timestamps of numerous files will be unique in a Template, but also shared with multiple Qubes TemplateBased AppVMs/DispVMs that are based on that Template. <ref>
+<pre>
+ls -la /etc/apt/trusted.gpg
+</pre>
+
+Qubes whonix-ws based DispVMs:
+
+<pre>
+-rw-r--r-- 1 root root 1138 Mar  7 09:39 /etc/apt/trusted.gpg
+</pre>
+
+Qubes debian-{{Stable project version based on Debian version short}} based VM:
+
+<pre>
+-rw-r--r-- 1 root root 1138 Mar 26  2018 /etc/apt/trusted.gpg
+</pre>
+</ref>
+* Hardware details can potentially be used for identification, including <code>/proc/cpuinfo</code>, <code>/proc/bus</code>, <code>/proc/scsi</code> and <code>/sys</code>. For this reason, {{project_name_long}} includes an opt-in (currently being tested) <code>hide-hardware-info.service</code> systemd unit to limit this information to the root user only; see [[Security-misc#Restrict_Hardware_Information_to_Root|Restrict Hardware Information to Root]].
+* The [[Protocol-Leak-Protection and Fingerprinting-Protection|Protocol Leak Protection and Fingerprinting Protection]] chapter outlines a host of other possible fingerprinting identifiers.
+* These variables are related to the [https://reproducible-builds.org reproducible builds] movement which is working on preventing non-deterministic artifacts in packages and ultimately also iso, template, raw, and other images. It is also related to most operating systems not being [[Dev/Stateless|stateless]].
+
+Please note this is not an exhaustive list.
+
+=== User-generated Local Non-Deterministic Artifacts ===
+Non-deterministic artifacts are also caused by any user modifications inside the VM, such as editing <code>~/.bashrc</code> or changing the default editor.
+
+= Attacks =
+
+== Non-Deterministic Artifacts ==
+
+As noted in the [[#Threat_Model|Threat Model]] introduction, non-deterministic local artifacts matter in:
+
+* VMs infected with malware.
+* VMs that have software locally installed which includes anti-features such as privacy-intrusive, tracking features.
+
+For the context of this wiki page, in short called, tracking software.
+
+In that case, the impact on {{non_q_project_name}} and {{q_project_name}} users is noted below.
+
+=== {{non_q_project_name}} ===
+
+All VMs are "StandaloneVMs". <ref>[https://www.qubes-os.org/doc/glossary/ Qubes]: <blockquote>In general terms, a VM is described as standalone if and only if it does not depend on any other VM for its root filesystem. (In other words, a VM is standalone if and only if it is not a TemplateBasedVM.)</blockquote></ref> Automatically generated, non-deterministic, local artifacts are "somewhat" unique in every VM. At a minimum, an adversary could use these local artifacts to determine the build version of {{project_name_long}} because these artifacts are shared among all<ref>Or most.</ref> {{project_name_long}} images of that specific version.
+
+Further identifiers then depend on individual behavior as to what kind of user-generated, local, non-deterministic artifacts exist. For example, if users change the keyboard layout to German, set their shell to python, and install an adblocker in every Tor Browser instance inside of a VM, this will very likely create enough uniqueness to permit an adversary that has compromised multiple VMs to link all of these to the same pseudonym.
+
+=== {{q_project_name}} ===
+
+* <u>TemplateBased AppVMs / DispVMs</u>: There are a lot of automatically generated, non-deterministic, local artifacts in the root file system which will be shared by all TemplateBased AppVMs based on that Template, as well as in the root file system of every DispVM which is spawned from the Template upon which it is based. These local artifacts are unique to each Template but shared among all AppVMs / DispVMs that are based on that Template. Therefore tracking software (an adversary with access -- which can be via malware of locally installed applications which include anti-features) -- that compromised two VMs based on that Template can link these VMs to the same pseudonym.
+* <u>PVH StandaloneVMs</u>: The impact depends on when the StandaloneVM was cloned from a Template.
+** Right after creation download: Theoretically, this case could be better and might be similar to {{non_q_project_name}}. However, in practice local artifacts are still created since Qubes automatically boots VMs right after download due to Qubes' [https://dev.qubes-os.org/projects/core-admin/en/latest/qubes-features.html qvm-features-request] mechanism.
+** Later cloned after starting the Template: A lot of automatically generated, non-deterministic, local artifacts will already exist.
+* <u>HVM StandaloneVMs</u>: Probably very few users are utilizing these. Even if they are in use, these would probably not be based on <code>whonix-ws</code>, which would be even worse. If a <code>whonix-ws</code> based HVM StandaloneVM is utilized, this might be a similar situation to {{non_q_project_name}}.
+
+== Benchmarking ==
+
+An adversary could benchmark the CPU, GPU, HDD, RAM, other hardware (such as the microphone, keyboard, and camera) and/or network connection to create a unique profile which is similar enough to link two compromised VMs to the same pseudonym.
+
+= Defenses =
+== General ==
+* [[Avoid nonfreedom software|Avoid non-freedom software]] since these are more likely (and often) contain privacy-intrusive, tracking anti-features.
+** Related comment: [https://github.com/QubesOS/qubes-issues/issues/5764#issuecomment-612019652 Pitfalls of proprietary software]
+** Related comment: [https://github.com/QubesOS/qubes-issues/issues/5764#issuecomment-612123999 Difficulties in protecting against proprietary software]
+* Avoid exploitation and work on improving general security on the {{project_name_long}} platform.
+
+== Non-Deterministic Artifacts ==
+
+* A future goal is to consider the possibility of "clean" templates / images. "Clean" in this case refers to a template or image which is free of any non-deterministic artifacts. At a minimum this probably requires reproducible builds as a prerequisite. In addition, the operating system inside the VM should be [[Dev/Stateless|stateless]] so that all users who do not customize their base VM (install any packages) look similar.
+* [https://github.com/Kicksecure/security-misc security-misc] has a feature currently in testing to [[Security-misc#Restrict_Hardware_Information_to_Root|Restrict Hardware Information to Root]].
+* [https://github.com/QubesOS/qubes-issues/issues/1885 Package security-misc from {{project_name_long}} to Qubes]
+* [https://github.com/QubesOS/qubes-issues/issues/2238#issuecomment-546984756 {{kicksecure}} in Qubes]
+* [[Dev/Strong_Linux_User_Account_Isolation|Strong Linux User Account Isolation]]
+** [https://github.com/QubesOS/qubes-issues/issues/2695 Qubes requires sudo hardening]
+* Planned security features for [[Kicksecure]] such as untrusted root user.
+* Unifying file creation timestamps during build might be beneficial. This will occur as a byproduct of eventual reproducible build efforts.
+* Unifying file creation timestamps at boot might be beneficial.
+* Qubes specific:
+** During startup of TemplateBased AppVMs and DispVMs, logs that were generated in the Template could be purged. (During that boot phase, no tracking software can be active unless the Template was compromised.)
+
+== Benchmarking ==
+
+Where possible, limits could be enforced for the CPU, GPU (theoretically), HDD, RAM and network connection.
+
+Related ticket: [https://phabricator.whonix.org/T12 virtualizer: enforce maximum system resources a virtual machine may use].
+
+Such a feature could potentially be implemented in [https://github.com/Whonix/sandbox-app-launcher sandbox-app-launcher] ([https://forums.whonix.org/t/system-wide-sandboxing-framework/9008 development discussion]). This would be useful in the case of buggy / misbehaving applications not accidentally DDOS'ing the host as well as compromised applications trying to benchmark the VM.
+
+= Forum Discussion =
+
+[https://forums.whonix.org/t/vm-fingerprinting-linking-two-or-more-locally-compromised-vms-to-the-same-pseudonym/9310 VM Fingerprinting - linking two or more locally compromised VMs to the same pseudonym]
+
+= See Also =
+
+* {{kicksecure_wiki|wikipage=CPUID|text=CPUID}}
+* [[Dev/Installation_from_Repository#Distro_Morphing_vs_Builds|Distro Morphing vs Builds]]
+* [[Comparison with Others#Fingerprint|Fingerprint: {{project_name_long}} vs other anonymity systems or tools]]
+* [[Fingerprint|Network, Browser and Website Fingerprint]]
+* [[Protocol-Leak-Protection_and_Fingerprinting-Protection|Protocol Leak Protection and Fingerprinting Protection]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

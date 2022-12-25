@@ -1,0 +1,200 @@
+{{Header}}
+{{Title|
+title=Connecting to Tor before a Proxy using Transparent Proxying Method
+}}
+{{#seo:
+|description=Instructions on how to connect to Tor before a proxy (User &rarr; Tor &rarr; Proxy &rarr; Internet) using Transparent Proxying Method
+}}
+{{proxy_methods}}
+== Introduction ==
+'''Advanced users only!'''
+
+To make clear, what this is about. {{project_name_gateway_long}} is already serving as a Transparent Proxy <ref>anonymizing middlebox</ref>, which means, that all applications not explicitly configured <ref>by uwt socksifier or proxy settings</ref> to use a <code>SocksPort</code>, can connect through Tor without any settings. This section is about configuring {{project_name_workstation_long}} also to act as a Transparent Proxy <ref>local redirection</ref>. Use case: a user wants to ensure all traffic goes through Tor (by using {{project_name_gateway_long}}) and want to additionally ensure, all traffic goes through a proxy choosen by the user after the Tor link, i.e. user &rarr; Tor &rarr; proxy &rarr; internet.
+
+<ref>[https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorBOX/OptionalConfigurations?version=129#TransparentProxying torproject.org wiki version 129] contains an old example using privoxy, JonDo and httpsdnsd. The new example uses redsocks and is simpler.</ref>
+
+You always have to keep in mind, which kind of data and which kind of proxy you are using. There are CGIproxies, http(s) proxies and socks4/4a/5 proxies.
+
+In case you redirect the network layer directly with iptables, you need a <code>TransPort</code>. Unfortunately very few applications, do offer a <code>TransPort</code>. For example, Tor supports a <code>TransPort</code>. In most other cases, you need to translate the different kinds of data.
+
+Due to the nature of Transparent Proxying, we need to redirect with iptables and end up with a "Trans data stream". Because most proxies are either http or socks we need to translate this. Below we discuss a few tools which help here, not all are required, depending on what you want to do.
+
+Required reading:
+
+* [[Whonix_versus_Proxies|Whonix_versus_Proxies]]
+* [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorPlusVPN Tor Plus VPN or proxy]
+
+== Tools ==
+
+Tor is a socks proxy and also has a <code>TransPort</code>. You must also keep in mind, that Tor does not support UDP, although it offers a <code>DnsPort</code>.
+
+[https://darkk.net.ru/redsocks/ redsocks] can also accept "Trans data streams" and can forward them to http'''s''', socks4 and socks5 proxies. If you were to use a http proxy (no https, without connect-method, see [[Whonix_versus_Proxies|proxy article]]), you could access only http sites, no https sites. Rather redsocks can convert UDP DNS queries to TCP DNS queries.
+
+== DNS resolution ==
+
+The complication (and also advantage/feature) with transparent proxying is, that the internet application (browser, etc.) is not aware of the proxy. Therefore the internet application will attempt to do the DNS resolution itself using the system, not using the proxy. The DNS requests also must be considered. Since Tor does not support UDP, we have to transmit DNS queries via TCP.
+
+It is impossible to resolve DNS directly on the proxy, when using the proxy as a transparent proxy, see [[Dev/Inspiration#Transparent_Proxying_Method|Transparent Proxying Method]] for explanation. You need an extra DNS server, which answers over TCP.
+
+You have several options to resolve DNS.
+
+* '''A)''' <u>Tor:</u> Either leave the setup as it is, Tor's <code>DnsPort</code> and therefore the Tor exit relays will still do the DNS requests. (See DNS rule #1.) This is probably <u>not what you want</u>, since you wanted to cloak your identity with an additional proxy after Tor.
+* '''B)''' <u>Public DNS resolver:</u> Alternatively you can use a public DNS resolver. The instructions for [[Alternative DNS Resolver]] should work out of the box (tested). (See DNS rule #2.)
+
+All DNS resolvers <ref>
+https://en.wikipedia.org/wiki/Comparison_of_DNS_server_software
+</ref> should work, as long TCP is supported and as long you are querying a TCP enabled DNS server. <ref>
+You can't simply add another public DNS resolver (i.e. OpenDNS or Google) to <code>/etc/resolv.conf</code> in {{project_name_workstation_long}} (i.e. Tor &rarr; public DNS resolver), it would have no effect, as explained under [[Install_Software#{{project_name_workstation_long}}_is_Firewalled|{{project_name_workstation_long}} is Firewalled]].
+</ref> <ref>
+Also httpsdnsd by JonDos might work, but you'd need to make some changes (use httpsdnsd as a system wide, {{project_name_workstation_long}} wide, DNS resolver, not just for a specific user account).
+</ref> <ref>
+DNSCrypt and httpsdnsd add the advantage, that neither the proxy nor the Tor exit relay can sniff or manipulate your DNS requests, since they are encrypted and authenticated.
+</ref> <ref>
+Or perhaps also [https://www.mulliner.org/collin/ttdnsd.php ttdnsd] with Google could work.
+</ref>
+
+Read the [[Secondary DNS Resolver|DNS related warnings]].
+
+== How to setup proxy tunnel-link after Tor (User&rarr;Tor&rarr;Proxy&rarr;Internet) ==
+'''Unfinished!''' <br />
+'''Advanced users only!'''
+
+'''Everything on {{project_name_workstation_long}}.'''
+
+Get a working proxy and test (with any of the above methods) if it works reliable.
+
+Install redsocks.
+
+{{CodeSelect2|code=
+sudo apt install redsocks
+}}
+
+Enable redsocks autostart.
+
+{{Open with root rights|filename=
+/etc/default/redsocks
+}}
+
+Look for.
+
+{{CodeSelect2|code=
+START=no
+}}
+
+And replace it with.
+
+{{CodeSelect2|code=
+START=yes
+}}
+
+Configure redsocks by editing {{Code|/etc/redsocks.conf}} to your needs.
+
+{{Open with root rights|filename=
+/etc/redsocks.conf
+}}
+
+Under.
+
+{{CodeSelect2|code=
+redsocks {
+}}
+
+You have to edit.
+
+<pre>
+        ip = 127.0.0.1;
+        port = 1080;
+        type = socks5
+</pre>
+
+To your needs.
+
+Start redsocks.
+
+{{CodeSelect2|code=
+sudo service redsocks start
+}}
+
+Create a file {{Code|fw.bsh}}.
+
+And use the following firewall rules.
+
+<pre>
+#!/bin/bash
+## These iptables rules redirect the traffic for all users,
+## including root, with the exception of the user redsocks,
+## through the proxy.
+
+## TODO: these iptables rules need review.
+## TODO: use iptables default policy drop.
+
+## Choose either DNS rule #1 or DNS rule #2.
+
+## For debugging/testing use this command in console.
+## tail -f /var/log/syslog
+
+## Flush old rules.
+iptables -F
+iptables -t nat -F
+iptables -X
+
+## Allow unlimited traffic on the loopback interface.
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT --dst 127.0.0.1 -j ACCEPT
+
+## Established incoming connections are accepted.
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+## Established outgoing connections are accepted.
+iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+## DNS rule #1.
+## Allow DNS directly through {{project_name_gateway_long}}.
+#iptables -A OUTPUT --dst 10.152.152.10 -p udp --dport 53 -j ACCEPT
+
+## DNS rule #2.
+## For DNSCrypt set /etc/resolv.conf to
+## nameserver 127.0.0.1
+##
+## sudo dnscrypt-proxy --tcp-only --user=user
+##
+## DNSCrypt listening on port 53
+iptables -t nat -A OUTPUT --dst 127.0.0.1 -p udp --dport 53 -j ACCEPT
+iptables -t nat -A OUTPUT --dst 127.0.0.1 -p tcp --dport 53 -j ACCEPT
+
+## redsocks must be allowed to establish direct connections.
+iptables -A OUTPUT -j ACCEPT -m owner --uid-owner redsocks
+iptables -t nat -A OUTPUT -j ACCEPT -m owner --uid-owner redsocks
+
+## Redirect remaining traffic to redsocks.
+iptables -t nat -A OUTPUT -p tcp -j REDIRECT --to-port 12345
+
+## TODO: UDP rule untested.
+#iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-port 10053
+
+## Log blocked traffic for debugging.
+iptables -A OUTPUT -j LOG --log-level 4 --log-prefix "iptables: "
+
+## Reject all other traffic.
+iptables -A OUTPUT -j REJECT
+</pre>
+
+Make the firewall script executable.
+
+{{CodeSelect2|code=
+sudo chmod +x fw.bsh
+}}
+
+Apply the firewall rules.
+
+{{CodeSelect2|code=
+sudo fw.bsh
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,169 @@
+{{Header}} {{#seo:
+|description=Tor Version, Package source (Debian, backports, Tor Project package repository), Config Files, Miscellaneous
+}} {{title|title=
+Tor integration in {{project_name_long}} Development Notes
+}}
+{{forkme}}
+= Tor Version =
+According to the [https://trac.torproject.org/projects/tor/wiki/org/teams/NetworkTeam/CoreTorReleases#Listofreleases Tor release note], there are usually several different major versions of Tor supported by the Tor project. However, due to the the limited time the Tor packager has, only a few major versions are packaged and ready to be used.
+
+For example, in December, 2017, five major versions of Tor were supported. Specifically:
+
+# Debian <code>stretch</code> repository contained another LTS, which was version <code>0.2.9</code>.
+# <code>deb.torproject.org</code>, also known as Tor, Tor Project or TPO repository, had the latest stable Tor which was version <code>0.3.1.9</code>.
+
+A major consideration in choosing the most suitable Tor version for {{project_name_long}} is that the latest stable found in the TPO repository may lead to network breakage. <ref>https://forums.whonix.org/t/whonix-gateway-tor-0-2-9-9-unrecommended-no-update-unsafe/4240/8</ref> The reason is the "stable" tag indicates it is stable version of Tor, which does not necessarily match the "stable" Debian version that {{project_name_long}} is actually using. <ref>
+The Debian target is usually the stable package, which is currently: {{Stable_project_version_based_on_Debian_codename}}) or {{project_name_long}}.
+</ref>
+
+There are three primary Tor options for {{project_name_long}} developers and each of them has pros and cons:
+
+'''1. Use the Tor LTS version from the official Debian package repository: <code>packages.debian.org</code>'''
+
+* Advantages: Minimal effort is required in {{project_name_long}}.
+* Disadvantages: Misses the advantages of later versions (see below).
+
+'''2. Use latest stable in TPO repository and allow testers to use the Tor nightly build in {{project_name_long}}, with bug reporting bug to TPO'''
+
+* Advantages: Latest features, better security, improved Tor Browser compatibility (using <code>SocksPort</code> with flags and even better connectivity performance). <ref>
+Patrick: "Historically when there was a botnet starting to use Tor, the LTS version barely connected while the latest stable had the ntor handshake which worked." See [https://blog.torproject.org/tor-weekly-news-september-4th-2013 tor-weekly-news-september-4th-2013].
+</ref>
+* Disadvantages:
+** From the {{project_name_long}} perspective, these packages are uploaded to <code>deb.torproject.org</code> at random times. These packages are not guaranteed to be compatible with {{project_name_long}}. While there are no security concerns, these packages could break a system's APT package management (due to incompatible dependencies) or connectivity, in case Tor refuses to start. This can arise due to a configuration incompatibility in a newer version of Tor, or for other reasons such as systemd or apparmor related changes.
+** In May 2021 a [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/40436 transient repository issue] [https://forums.whonix.org/t/whonix-on-mac-m1-arm/11310/74? broke] {{project_name_long}} build process.
+** There is nothing similar to <code>snapshot.debian.org</code>. Keeps changing (newer versions being added). Hence, can introduce build issues such as above. Unsuitable for reproducible builds / [[Verifiable Builds]].
+** [[Dev/Porting|Porting to other architectures]] issues.
+*** Only available for the <code>i386</code>, <code>amd64</code>, <code>arm64</code> architectures.
+*** Introduces differences / issues such as for example for the <code>ppc64el</code> platform. <ref>
+<code>Package: tor-geoipdb</code> <code>Version: 0.4.5.8-1~d10.buster+1</code> is <code>Architecture: all</code> and <code>Depends: tor (>= 0.4.5.8-1~d10.buster+1)</code>. Thereby for example ended up in {{project_name_long}} repository for architecture <code>ppc64el</code>. This did not cause an issue yet.
+</ref>
+
+'''3. Versions are downloaded from <code>deb.torproject.org</code>, verified to work, and then migrated to <code>deb.whonix.org</code>'''
+
+* Advantages: Flexibility in version selection, a guaranteed way to confirm that only stable Tor versions which are functional in {{project_name_long}} will be uploaded.
+* Disadvantages:
+** A few testers are needed, manual uploads are required, and {{project_name_long}} touches Tor.
+** Other issues from 2. above equally apply.
+
+{{project_name_long}} developers have chosen the third method for now. <ref>
+Relative {{project_name_long}} Forum discussion: https://forums.whonix.org/t/tor-releases-discussion/4578</ref> However, the comparison above suggests better security and compatibility is afforded by the second option. This approach requires a lot of active testers who can use the Tor nightly build and report bugs to the Tor project or {{project_name_long}}. <ref>Please contact us if you would like to be a Tor nightly build tester for {{project_name_long}}.
+</ref>
+
+= Tor Config Files =
+== Rationale for Tor Drop-In Configuration Folder ==
+Having a Tor [[Configuration_Files#Configuration_Drop-In_Folders|Configuration Drop-In Folder]] makes implementation of additional features that require additional Tor settings much easier. For example it could improve usability to provide a <code>whonix-gw-hidden-webserver</code> package, that automates the {{project_name_gateway_long}} specific instructions for [[Onion Services]]. Such a package could just drop the configuration snippet there, and if the feature gets disabled or the package installed, that configuration snippet gets purged. Adding additions to <code>/etc/tor/torrc</code> with a script is problematic, because those additions cannot be removed by a script if the user slightly modified those lines and because these can cause a [[Configuration_Files#dpkg_interactive_conflict_resolution_dialog|<code>dpkg interactive conflict resolution dialog</code>]].
+
+== Current Implementation ==
+The implementation is as it follows.
+
+* <code>/etc/tor/torrc</code> holds minimal content, so ideally it will need as few updates as possible or never again in the future. The only effective command is <code>%include /etc/torrc.d/</code> which results in parsing folder [https://github.com/Whonix/anon-gw-anonymizer-config/tree/master/etc/torrc.d <code>/etc/torrc.d</code>].
+* The lexical high file [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/torrc.d/95_whonix.conf <code>/etc/torrc.d/95_whonix.conf</code>] instructions to <code>%include /usr/local/etc/torrc.d/</code>.
+* Instructions in <code>/etc/tor/torrc</code> and [[Tor|documentation]] instructs users to not edit that file and use use <code>/usr/local/etc/torrc.d/50_user.conf</code> instead.
+* <code>/etc/tor/torrc.examples</code> contains configuration examples.
+* Some {{project_name_long}} Tor settings unfortunately still go into [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/share/tor/tor-service-defaults-torrc.anondist <code>/usr/share/tor/tor-service-defaults-torrc</code>] due to [https://phabricator.whonix.org/T947 Qubes-Whonix eth1 static networking] feature not being implemented yet.
+* Most users probably ignore <code>/usr/share/tor/tor-service-defaults-torrc</code>, because this file is barely advertised and barely popular.
+* <code>/usr/share/tor/tor-service-defaults-torrc</code> can be modified by Qubes-Whonix [https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-whonix/replace-ips <code>replace-ips</code>] without any conflicts with user modifications or [[Configuration_Files#dpkg_interactive_conflict_resolution_dialog|<code>dpkg interactive conflict resolution dialog</code>]].
+* [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/lib/anon-gw-anonymizer-config/torrc-d-cleaner <code>torrc.d</code> cleaner] by {{project_name_long}} developers moves files in folder <code>/usr/local/etc/torrc.d/</code> and <code>/etc/torrc.d/</code> that do not have the <code>.conf</code> file extension out of the way. This is to workaround a [https://gitlab.torproject.org/legacy/trac/-/issues/25140 Tor upstream issue], namely only supporting parsing all files in a folder which can include which end have a <code>~</code> file extension (backup files created by file editors) or start with a dot ("<code>.</code>") ("hidden files") which can then result in effective configurations other than what the user expects. These superfluous files users are unaware off often contain settings the user already changed in the real (non-backup) file.
+** https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/lib/systemd/system/anon-gw-anonymizer-config.service
+** https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/lib/systemd/system/tor%40default.service.d/30_clean-torrc-d-on-reload.conf
+* Debian feature request: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=866187 add torrc.d configuration directory]
+* Initial Tor feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/1922 torrc.d-style configuration directories]
+* Improvement Tor feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/25140 Parse only .torrc files in torrc.d directory]
+* https://github.com/{{project_name_short}}/anon-gw-anonymizer-config
+
+== Rejected Alternatives ==
+=== Only Two Config Files ===
+* Using only {{Code2|/usr/share/tor/tor-service-defaults-torrc}} and {{Code2|/etc/tor/torrc}}, not using {{Code2|/etc/tor/torrc.examples}}.
+* And having configuration examples (instructions) in {{Code2|/usr/share/tor/tor-service-defaults-torrc}}. Using a minimal {{Code2|/etc/tor/torrc}} to tell them to look into {{Code2|/usr/share/tor/tor-service-defaults-torrc}} for configuration examples.
+* This is a bad idea, because users get tempted comment in things in {{Code2|/usr/share/tor/tor-service-defaults-torrc}}.
+* When they do this, they settings would get lost and overwritten without asking next time they update [https://github.com/{{project_name_short}}/anon-gw-anonymizer-config anon-gw-anonymizer-config], because {{Code2|/usr/share/tor/tor-service-defaults-torrc}} is not a configuration file (since in {{Code2|/usr}}, not {{Code2|/etc}} folder).
+
+=== Only One Config File ===
+* Using only {{Code2|/etc/tor/torrc}}, leaving {{Code2|/usr/share/tor/tor-service-defaults-torrc}} with defaults (from Debian), not using {{Code2|/etc/tor/torrc.examples}}.
+* Using {{Code2|/etc/tor/torrc}} for user examples, user's own modifications and {{project_name_long}} Tor settings.
+* This is bad, because when users have edited {{Code2|/etc/tor/torrc}} and anon-gw-anonymizer-config gets updated, it will throw an [[Configuration_Files#dpkg_interactive_conflict_resolution_dialog|<code>dpkg interactive conflict resolution dialog</code>]]. Users might decide to keep their old config file and will miss (security) improvements.
+
+= Tor Control =
+See [[Dev/onion-grater
+#Talking_to_the_real_Tor_Control_Port|Talking to the real Tor Control Port]].
+
+= Why Waste Network Bandwidth by Downloading Operating System Updates over Tor? =
+
+The short answer is this option was discussed with The Tor Project and {{project_name_long}} was granted permission to do so.
+
+Interested readers who want to learn more should review the following:
+
+* Tor Project thread about this issue; see [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorBOX/Dev/ArchivedDiscussion/DOCUMENTATION#updatesoverTorshouldnotwasteTorbandwidthDOCUMENTATIONSOLVED updates over Tor, should not waste Tor bandwidth].
+* The Tor Project was asked directly, after this issue and possible solutions were discussed thoroughly by the {{project_name_long}} team; see [https://lists.torproject.org/pipermail/tor-talk/2012-March/023486.html tor-talk Operating system updates / software installation behind Tor Transparent Proxy]. <ref>Click [https://lists.torproject.org/pipermail/tor-talk/2012-March/subject.html#23507 here] for an overview of all answers.</ref>
+* Andrew Lewman, a former Executive Director, Director and press contact for Tor downloads a lot of updates over the network and [https://lists.torproject.org/pipermail/tor-talk/2012-March/023493.html did not complain].
+
+= Forum Discussion =
+* https://forums.whonix.org/t/tor-integration-in-whonix/10593
+* https://forums.whonix.org/t/tor-upgrades/10302
+
+= Tor Duplicate Config File Restart Bug =
+<pre>
+May 27 13:04:26 host systemd[1]: tor.service: Succeeded.
+May 27 13:04:26 host systemd[1]: Stopped Anonymizing overlay network for TCP (multi-instance-master).
+May 27 13:04:26 host systemd[1]: Stopping Anonymizing overlay network for TCP (multi-instance-master)...
+May 27 13:04:26 host systemd[1]: Stopping Anonymizing overlay network for TCP...
+May 27 13:04:26 host systemd[1]: tor@default.service: Succeeded.
+May 27 13:04:26 host systemd[1]: Stopped Anonymizing overlay network for TCP.
+May 27 13:04:26 host systemd[1]: tor@default.service: Consumed 1min 6.810s CPU time.
+May 27 13:04:26 host systemd[1]: anon-gw-anonymizer-config.service: Succeeded.
+May 27 13:04:26 host systemd[1]: Stopped Make Sure Torrc Files Exist and Clean Tor Config Folders.
+May 27 13:04:26 host systemd[1]: Stopping Make Sure Torrc Files Exist and Clean Tor Config Folders...
+May 27 13:04:26 host systemd[1]: Starting Make Sure Torrc Files Exist and Clean Tor Config Folders...
+May 27 13:04:26 host tor-config-sane[17986]: + '[' '!' -d /etc/tor ']'
+May 27 13:04:26 host tor-config-sane[17986]: + '[' '!' -d /etc/torrc.d ']'
+May 27 13:04:26 host tor-config-sane[17986]: + '[' '!' -d /usr/local/etc/torrc.d ']'
+May 27 13:04:26 host tor-config-sane[17986]: + '[' '!' -e /etc/tor/torrc ']'
+May 27 13:04:26 host tor-config-sane[17986]: + '[' '!' -e /etc/torrc.d/95_whonix.conf ']'
+May 27 13:04:26 host tor-config-sane[17986]: + '[' '!' -e /usr/local/etc/torrc.d/40_tor_control_panel.conf ']'
+May 27 13:04:26 host tor-config-sane[17986]: + '[' '!' -e /usr/local/etc/torrc.d/50_user.conf ']'
+May 27 13:04:26 host tor-config-sane[17986]: + '[' -n '' ']'
+May 27 13:04:26 host tor-config-sane[17986]: + tor_user=debian-tor
+May 27 13:04:26 host tor-config-sane[17986]: + '[' -n '' ']'
+May 27 13:04:26 host tor-config-sane[17986]: + tor_group=debian-tor
+May 27 13:04:26 host tor-config-sane[17986]: + '[' -n '' ']'
+May 27 13:04:26 host tor-config-sane[17986]: + tor_dir=/var/lib/tor
+May 27 13:04:26 host tor-config-sane[17986]: + '[' -n '' ']'
+May 27 13:04:26 host tor-config-sane[17986]: + client_onion_auth_dir=/var/lib/tor/authdir
+May 27 13:04:26 host tor-config-sane[17986]: + mkdir -p /var/lib/tor/authdir
+May 27 13:04:26 host tor-config-sane[17986]: + chown debian-tor:debian-tor /var/lib/tor/authdir
+May 27 13:04:26 host tor-config-sane[17986]: + search='%include /etc/torrc.d/
+May 27 13:04:26 host tor-config-sane[17986]: %include /etc/torrc.d/95_whonix.conf'
+May 27 13:04:26 host tor-config-sane[17986]: + replace='%include /etc/torrc.d/'
+May 27 13:04:26 host tor-config-sane[17986]: + file_name=/etc/tor/torrc
+May 27 13:04:26 host tor-config-sane[17986]: + LANG=C
+May 27 13:04:26 host tor-config-sane[17986]: + str_replace '%include /etc/torrc.d/
+May 27 13:04:26 host tor-config-sane[17986]: %include /etc/torrc.d/95_whonix.conf' '%include /etc/torrc.d/' /etc/tor/torrc
+May 27 13:04:26 host tor-config-sane[17989]: Nothing replaced
+May 27 13:04:26 host tor-config-sane[17986]: + true 0
+May 27 13:04:26 host tor-config-sane[17990]: /usr/libexec/anon-gw-anonymizer-config/torrc-d-cleaner INFO: start.
+May 27 13:04:26 host tor-config-sane[17990]: INFO: dpkg-new file found: /etc/torrc.d/60_network.conf.dpkg-new
+May 27 13:04:26 host tor-config-sane[17990]: INFO: dpkg-new file found: /etc/torrc.d/65_gateway.conf.dpkg-new
+May 27 13:04:26 host tor-config-sane[17990]: INFO: dpkg-new file found: /etc/torrc.d/65_leak_tests.conf.dpkg-new
+May 27 13:04:26 host tor-config-sane[17990]: INFO: dpkg-new file found: /etc/torrc.d/70_workstation.conf.dpkg-new
+May 27 13:04:26 host tor-config-sane[17990]: INFO: dpkg-new file found: /etc/torrc.d/95_whonix.conf.dpkg-new
+May 27 13:04:26 host tor-config-sane[17990]: /usr/libexec/anon-gw-anonymizer-config/torrc-d-cleaner INFO: success.
+May 27 13:04:26 host systemd[1]: Finished Make Sure Torrc Files Exist and Clean Tor Config Folders.
+May 27 13:04:26 host systemd[1]: Starting Anonymizing overlay network for TCP (multi-instance-master)...
+May 27 13:04:26 host systemd[1]: Starting Anonymizing overlay network for TCP...
+May 27 13:04:26 host systemd[1]: Finished Anonymizing overlay network for TCP (multi-instance-master).
+May 27 13:04:26 host vanguards[762]: WARNING[Fri May 27 13:04:26 2022]: Tor daemon connection closed. Trying again...
+May 27 13:04:26 host tor[17993]: May 27 13:04:26.803 [notice] Tor 0.4.7.7 running on Linux with Libevent 2.1.12-stable, OpenSSL 1.1.1n, Zlib 1.2.11, Liblzma 5.2.5, Libzstd 1.4.8 and Glibc 2.31 as libc.
+May 27 13:04:26 host tor[17993]: May 27 13:04:26.803 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+May 27 13:04:26 host tor[17993]: May 27 13:04:26.806 [notice] Read configuration file "/usr/share/tor/tor-service-defaults-torrc".
+May 27 13:04:26 host tor[17993]: May 27 13:04:26.806 [notice] Read configuration file "/etc/tor/torrc".
+May 27 13:04:26 host tor[17993]: May 27 13:04:26.807 [notice] Processing configuration path "/etc/torrc.d/" at recursion level 1.
+May 27 13:04:26 host tor[17993]: May 27 13:04:26.807 [notice] Including configuration file "/etc/torrc.d//60_network.conf".
+May 27 13:04:26 host tor[17993]: May 27 13:04:26.808 [notice] Including configuration file "/etc/torrc.d//60_network.conf.dpkg-new".
+</pre>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Development]]

@@ -1,0 +1,330 @@
+{{Header}}
+{{#seo:
+|description=Authenticated / Encrypted Connections between {{project_name_gateway_long}} and {{project_name_workstation_long}}, ARP spoofing defense, SSH, OpenVPN, Using additional (isolated) network interfaces
+|image=Binary-503583640.jpg
+}}
+{{Title|title=
+Connections between {{project_name_gateway_long}} and {{project_name_workstation_long}}
+}}
+[[image:Binary-503583640.jpg|thumb]]
+= Introduction =
+
+* This chapter does not apply to [[{{q_project_name_short}}|{{q_project_name}}]]. <ref name=qubes_network_isolated>Because by Qubes default, AppVMs behind the same ProxyVM [or NetVM] are prevented from connecting to each other.</ref>
+* This chapter applies to [[{{non_q_project_name_short}}|{{non_q_project_name}}]] using [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]].
+* This chapter applies to [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]] (using [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]]).
+* You should read it if using any custom, non-stock, configurations.
+
+TODO: document that an open port in Whonix-Workstation can be accessed by other Whonix-Workstation in Non-Qubes-Whonix which is often unwanted.
+
+== Essentials ==
+
+By default, {{project_name_long}} assumes that {{project_name_gateway_long}} and {{project_name_workstation_long}} are connected by (virtual) LAN cable. Wireless technologies are not recommended as a malware compromised {{project_name_workstation_long}} could access (other) wireless access points and subsequently connect without Tor or find user's location based on WiFi SSIDs. Using a (virtual) cable enforces that {{project_name_workstation_long}} can only connect through {{project_name_gateway_long}}. For the same reason, connections to {{project_name_gateway_long}} over the internet are also not recommended.
+
+By default, connections between {{project_name_workstation_long}} and {{project_name_gateway_long}} are neither authenticated nor encrypted. The above (virtual) LAN connection between {{project_name_workstation_long}} and {{project_name_gateway_long}} is assumed to be secure. <ref>Here, secure is an assumption that nothing within your (virtual) LAN will MITM attack anything else.</ref> Adding authentication and/or encryption by default would further increase the complexity of {{project_name_long}}, which is to be avoided as explained in earlier chapters.
+
+If you want to run [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] at the same time inside the same (virtual) isolated LAN, authentication should be added:
+
+* Inside virtual LANs:
+** Authentication is enough.
+** Encryption is not required. (When machines cannot be impersonated, MITM attacks are not possible from within the virtual LAN.)
+* Inside physical LANs:
+** If your threat model includes the possibility of a MITM attack, encryption is needed .
+
+If you want to connect to a {{project_name_gateway_long}} over insecure, untrusted, or unknown foreign networks (internet):
+
+* Both authentication and encryption should be added.
+** Encryption is required to deny MITM eavesdropping.
+** Authentication validates the identity of the connecting machine.
+*** Encryption solutions such as OpenVPN and ssh also provide authentication.
+
+== Motivation for secure {{project_name_gateway_long}} / {{project_name_workstation_long}} connections ==
+'''Only applies to ''non-stock'' configurations''': If you run [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] simultaneously or want to connect to {{project_name_gateway_long}} over insecure or untrusted networks (internet):
+
+A compromised {{project_name_workstation_long}} can impersonate the {{project_name_gateway_long}}, or any other {{project_name_workstation_long}}, within the same (virtual) LAN, perform active MITM attacks, or passively eavesdrop.
+
+== Libvirt Isolated Ports ==
+
+Isolated ports are a Libvirt feature supported since 6.1.0. <ref>https://libvirt.org/formatdomain.html#isolating-guests-s-network-traffic-from-each-other</ref>
+
+The <code>port</code> element property <code>isolated</code>, when set to <code>yes</code> (default setting is <code>no</code>) is used to isolate this interface's network traffic from that of other guest interfaces connected to the same network that also have <code><port isolated='yes'/></code>. This setting is only supported for emulated interface devices that use a standard tap device to connect to the network via a Linux host bridge. This property can be inherited from a libvirt network, so if all guests that will be connected to the network should be isolated, it is better to put the setting in the network configuration. (NB: this only prevents guests that have isolated='yes' from communicating with each other; if there is a guest on the same bridge that doesn't have <code>isolated='yes'</code>, even the isolated guests will be able to communicate with it.)
+
+<pre style="white-space: pre-wrap;">
+<devices>
+  <interface type='network'>
+    <source network='default'/>
+    <port isolated='yes'/>
+  </interface>
+</devices>
+</pre>
+
+== OpenVPN vs SSH ==
+
+Encryption can be added using OpenVPN or SSH. SSH, but not OpenVPN, has the advantage of being able to still easily tunnel a VPN through Tor, later. If you don't plan to do so, OpenVPN is probably easier. SSH has the disadvantage of increased setup complexity in this use case - you are probably better off using OpenVPN.
+
+= Authenticated connections between {{project_name_gateway_long}} and {{project_name_workstation_long}} =
+
+== ARP spoofing defense ==
+
+This has only been quickly researched: From the [https://en.wikipedia.org/wiki/ARP_spoofing Wikipedia article about ARP spoofing], it appears that ''Static ARP entries'' could be used to authenticate connections between {{project_name_gateway_long}} and {{project_name_workstation_long}}.
+
+== Using additional (isolated) network interfaces ==
+=== Theoretical ===
+''(This chapter is actually not authentication, but solves the threat nonetheless.)''
+
+A workaround, when running all vm's on the same VirtualBox host:
+
+* One can enable additional Virtual Network Adapters with uniquely named internal virtual networks, inherently isolating up to 7 {{project_name_workstation_long}} per {{project_name_gateway_long}}, <ref>"[https://www.virtualbox.org/manual/ch06.html Four of the network cards can be configured in the "Network" section of the settings dialog in the graphical user interface of VirtualBox. You can configure all eight network cards on the command line via VBoxManage modifyvm]"</ref>
+
+A workaround, for {{project_name_long}} with Physical Isolation, where ''all'' possible connecting machines are trusted:
+
+* {{project_name_gateway_long}} inherently requires two network interfaces - external and internal. Additional physical and/or virtual LAN interfaces could be added. ''(Ensure no bridging takes place.)''
+
+=== Instructions ===
+<div class="toccolours mw-collapsible mw-collapsed">
+'''DRAFT! UNFINISHED!'''
+
+If you would like to see the unfinished documentation, please press on expand on the right.
+<div class="mw-collapsible-content">
+These instructions explain how to do it using [[VirtualBox]].
+
+For basic setup, see this forum thread:<br/>
+https://forums.whonix.org/t/running-2-isolated-workstations-on-a-single-gateway/835
+
+The original poster is on a good track already. Some more changes required.
+
+On {{project_name_workstation_long}} in an additional isolated network.
+
+{{Network_Config}}
+
+Use these settings.
+
+{{CodeSelect|code=
+address 10.152.152.17
+netmask 255.255.192.0
+gateway 10.152.152.13
+}}
+
+On {{project_name_gateway_long}}.
+
+{{Network_Config}}
+
+Add this.
+
+{{CodeSelect|code=
+auto eth2
+iface eth2 inet static
+       address 10.152.152.13
+       netmask 255.255.192.0
+}}
+
+{{Firewall_Settings}}
+
+And add additional interfaces to the firewall config.
+
+{{CodeSelect|code=
+INT_IF="\
+eth1
+eth2"
+
+INT_TIF="$INT_IF"
+}}
+
+Reload {{project_name_long}} firewall (or reboot).
+
+{{CodeSelect|code=
+sudo whonix_firewall
+}}
+
+Restart networking.
+
+{{CodeSelect|code=
+sudo service networking restart
+}}
+
+Perhaps NetworkManager is interfering and must be disabled.
+
+Also the file /usr/share/tor/tor-service-defaults-torrc needs some changes. Tor needs to listen on the additional interfaces.
+
+{{Open with root rights|filename=
+/usr/share/tor/tor-service-defaults-torrc
+}}
+
+Use this file:<br/>
+https://github.com/{{project_name_short}}/anon-gw-anonymizer-config/blob/tor_listen_on_all_interfaces/usr/share/tor/tor-service-defaults-torrc.anondist
+
+<ref>This likely should not be made the default version. Because... '''TODO''': Explain.</ref>
+
+Restart Tor.
+
+{{CodeSelect|code=
+sudo service tor@default restart
+}}
+
+It will now loudly complain, that Tor is listening on all IPs that that may not be what you want. You can ignore this, because the external network interface is firewalled.
+
+'''TODO''': Explain what happens during upgrades.
+
+{{project_name_workstation_long}} whonixcheck / timesync / Tor Browser won't work. (Would need updated IP of the other gateway internal interface.) '''TODO''': Expand.
+
+{{project_name_workstation_long}} TransPort access should be functional though. I.e. nslookup check.torproject.org and/or Firefox should work.
+
+{{project_name_customworkstation_long}} should work.
+</div>
+</div>
+<br />
+
+= Encrypted and authenticated connections between {{project_name_gateway_long}} and {{project_name_workstation_long}} =
+
+== Using SSH (not tested/recommended) ==
+
+&#42; DO NOT ALLOW SSH LOGINS!<ref>See: [https://serverfault.com/questions/56566/ssh-tunneling-only-access ssh login]</ref>
+
+Each Gateway and Workstation should have its own SSH account and certificate distributed to each machine to which it will connect. <ref>Internet search How to set up ssh keys, for example, for instructions.</ref>  Each Gateway and Workstations will need  ssh installed and the service started. Workstations need to be configured to automatically reconnect - in case {{project_name_workstation_long}} starts before the Gateway, or restarts. <ref>Consider: autossh</ref> Workstations need to use the tunnel IP to connect to the Gateway. The {{project_name_gateway_long}} should only accept certificate authentication, and only forward or answer to Tor over the SSH tunnel. All Workstations must use the established SSH tunnel to the Gateway, redirect such network access to socks via tranSOCKS_ev or similar. The {{project_name_gateway_long}} firewall may need corresponding changes. Not impossible to use SSH for this - but intricate.
+
+You may be better off using OpenVPN. ''However - OpenVPN is a full machine to machine connection, while ssh is easily port restricted.''
+<br />
+
+== Using OpenVPN ==
+<div class="toccolours mw-collapsible mw-collapsed">
+'''DRAFT! UNFINISHED!'''
+
+If you would like to see the unfinished documentation, please press on expand on the right.
+<div class="mw-collapsible-content">
+Right now only supports two modes/security domains:
+
+* {{project_name_workstation_long}} with the secret key (=trusted) and
+* other workstation with no key/vpn configured.
+
+NOTE:
+
+* Transparent proxying doesn't seem to work at all, therefore you need to configure all applications to use socks ports.
+
+On the gateway:
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Whonix first time users warning]
+| text    =
+The following information only applies to the <u>deprecated</u> version of {{project_name_long}} 0.5.6. It requires updating for more recent versions of {{project_name_long}}. Nowadays using wireguard instead of openvpn? Please help.
+}}
+
+{{CodeSelect|code=
+sudo -i
+}}
+{{CodeSelect|code=
+apt --yes install openvpn
+}}
+
+Create a new symmetric key
+
+{{CodeSelect|code=
+sudo -u user openvpn --genkey --secret /home/user/static.key
+}}
+
+Copy key to workstation (Firewall needs to be disabled and openssh-server installed on {{project_name_workstation_long}} for this to work).
+
+{{CodeSelect|code=
+sudo -u user scp /home/user/static.key user@10.152.152.10:/home/user/static.key
+}}
+{{CodeSelect|code=
+mv /home/user/static.key /etc/openvpn/static.key
+}}
+{{CodeSelect|code=
+chown root:root /etc/openvpn/static.key
+}}
+{{CodeSelect|code=
+chmod 700 /etc/openvpn/static.key
+}}
+
+Create server configuration.
+
+{{CodeSelect|code=
+echo "
+user nobody
+group nogroup
+daemon
+dev tun
+ifconfig 10.8.0.1 10.8.0.2
+secret /etc/openvpn/static.key" > /etc/openvpn/server.conf
+}}
+{{CodeSelect|code=
+service openvpn restart
+}}
+
+Edit torrc.<br />
+TODO: only selectively change listening addresses. TransPort and optionally other SocksPorts have to remain available, if unauthenticated workstations are to be used. NOTE: we are using a hardcoded default IP here, if you are using non standard settings this will have to be edited.
+
+{{CodeSelect|code=
+ed -s /usr/local/etc/torrc.d/50_user.conf <<< $',s/10.152.152.10/10.8.0.1/g\nw'
+}}
+
+Edit /usr/local/bin/whonix_firewall.<br />
+TODO: Put this automatically where it actually belongs
+{{CodeSelect|code=
+echo '
+# Allow openvpn in on port 1194
+iptables -A INPUT -i $INT_IF -p udp --dport 1194 -j ACCEPT' >> /usr/local/bin/whonix_firewall
+# TODO: replace hardcoded "eth1" with a wildcard
+}}
+{{CodeSelect|code=
+ed -s /usr/local/bin/whonix_firewall<<< $',s/INT_TIF=eth1/INT_TIF=tun0/g\nw'
+}}
+{{CodeSelect|code=
+/usr/local/bin/whonix_firewall
+}}
+
+On the Workstation(s):
+
+TODO: Disable/tweak the new firewall
+
+{{CodeSelect|code=
+sudo -i
+}}
+{{CodeSelect|code=
+mv /home/user/static.key /etc/openvpn/static.key
+}}
+{{CodeSelect|code=
+chown root:root /etc/openvpn/static.key
+}}
+{{CodeSelect|code=
+chmod 700 /etc/openvpn/static.key
+}}
+
+Should be in the default installation.
+
+{{CodeSelect|code=
+apt --yes install --no-install-recommends torsocks
+}}
+{{CodeSelect|code=
+echo "
+user nobody
+group nogroup
+daemon
+remote 10.152.152.10
+dev tun
+ifconfig 10.8.0.2 10.8.0.1
+secret /etc/openvpn/static.key" > /etc/openvpn/server.conf
+}}
+
+Edit resolv.conf.
+
+{{CodeSelect|code=
+chattr -i /etc/resolv.conf
+}}
+{{CodeSelect|code=
+echo "nameserver 10.8.0.1" > /etc/resolv.conf
+}}
+{{CodeSelect|code=
+chattr +i /etc/resolv.conf
+}}
+</div>
+</div>
+
+= See Also =
+* [[{{project_name_workstation_short}}_Firewall|{{project_name_workstation_long}} Firewall]]
+
+= Footnotes / References =
+{{reflist|close=1}}
+
+[[Category:Documentation]]
+
+{{Footer}}

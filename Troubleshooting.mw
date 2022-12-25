@@ -1,0 +1,637 @@
+{{Header}}
+{{#seo:
+|description=Troubleshooting Installation and Network Issues with {{project_name_long}}
+|image=Troubleshooting-114197640.jpg
+}}
+[[image:Troubleshooting-114197640.jpg|thumb]]
+<div class="mininav">
+* [[#Connectivity Troubleshooting|Connectivity Troubleshooting]]
+* [[#General Troubleshooting|General Troubleshooting]]
+</div>
+= Connectivity Troubleshooting =
+== Essential Connectivity Troubleshooting Steps ==
+
+In case of connectivity issues:
+
+{{Box|text=
+'''1.''' "Forget" about {{project_name_long}} for a moment and imagine you had never heard of the platform. Test your host computer first.
+
+'''2.''' Test if the host internet connection is functional. <ref>
+By using ping.
+
+For example, ping <code>8.8.8.8</code>.
+
+On the host, run.
+
+{{CodeSelect|code=
+ping 8.8.8.8
+}}
+
+Ping <code>google.com</code> and/or other websites.
+
+{{CodeSelect|code=
+ping google.com
+}}
+
+and so on.
+</ref>
+
+Open different websites such as <code>{{project_clearnet}}</code> in a host web browser. If the host internet connection is dysfunctional, {{project name long}} connectivity will also be broken. The host internet connection needs to be fixed first.
+
+'''3.''' Speed and ping test the the host internet connection.
+
+Running a internet speed test and ping test might show if there is something wrong with the host internet connection.
+
+'''4.''' VPN/proxy related connectivity issues.
+
+Using a VPN or proxy? ('''<code>User</code> &rarr; <code>Tor</code> &rarr; <code>proxy/VPN/SSH</code> &rarr; <code>Internet</code>''') If yes, the following tests should be performed.
+
+* '''A)''' The host internet connection and speed without VPN and without Tor should be tested first.
+* '''B)''' Next the host internet connection should be tested with a VPN only but without Tor.
+* '''C)''' Only then complex setups such as Tor in combination with a VPN should be tested.
+
+'''5.''' Check the date and time. <ref>
+{{CodeSelect|code=
+date
+}}
+</ref>
+
+Check if the host clock time and date has accuracy of up to ± 30 minutes. If the host clock is more than 1 hour in the past or more than 3 hours in the future, Tor cannot connect. ([[Network Time Synchronization|details]])
+
+If not, fix host clock, power off VM and restart the VM.
+
+'''6.''' [[timezone|Do not change system timezone setting.]]
+
+'''7.''' Unnecessary use of [[Bridges]].
+
+Have bridges been configured? The user should consider if that is really necessary in their area. Note: Bridges are not necessarily more secure than entry guards ([[Bridges#Before_Configuring_a_Bridge|link to sources]]) and have the potential to cause broken, unreliable and slow connections. <ref name=bridges-and-wifi-slow-report>
+https://forums.whonix.org/t/time-too-long-error-or-very-long-time/12716/4
+</ref>
+
+'''8.''' Using WiFi or mobile internet connection?
+
+Both, WiFi and mobile internet connections might be unreliable. Clearnet browsing might be able to recover more easily from slight unreliability issues than Tor. If practical, it should be considered to use a wired internet connection such as DSL, fiber or cable internet. This might result in more stable and faster connections <ref name=bridges-and-wifi-slow-report /> and would also be more secure, resistant to de-anonymization attacks.
+
+'''9.''' Check if Tor Browser works on the host to rule out a possible [[Network Obstacle]].
+
+Download the Tor Browser Bundle from [https://www.torproject.org/download/ torproject.org] and test if it is working on the host.
+
+If the Tor Browser Bundle is not functional on the host, then {{project_name_long}} is unlikely to work either. In that case, see [[Unspecific|unspecific to {{project_name_long}}]].
+
+It is recommended to have a recent Tor Browser Bundle version installed at all times. This way users can test if they live in a censored area or not and whether Tor is blocked by the ISP. Further, if (private) (obfuscated) [[bridges]] are necessary for Tor Browser Bundle functionality on the host, then {{project_name_long}} will similarly require them.
+
+Follow one of the methods outlined in [[Install_Tor_Browser_Outside_of_{{project_name_short}}|Non-{{project_name_long}} Tor Browser]].
+
+'''10.''' Run [https://www.kicksecure.com/wiki/Systemcheck systemcheck].
+
+'''11.''' [[Whonix-Workstation_Firewall#Ping|Forget about <code>ping</code>.]]
+
+'''12.''' Check if other virtual machines have Internet connectivity, such as newly created ones or those from a different vendor.
+
+See [[#General Virtualizer Connectivity Test|General Virtualizer Connectivity Test]].
+
+'''13.''' ICMP
+
+Using dial-up connection? Or Tor bootstrapping stuck at 45%? See [[#ICMP Fix|ICMP Fix]].
+
+'''14.''' [[Tor#Connectivity_Troubleshooting|Tor Connectivity Troubleshooting]].
+}}
+
+Information pertaining to these points should be included in any [[Support|support]] request or [[Reporting_Bugs|bug report]].
+
+== ICMP Fix ==
+
+Using a dial-up connection? Or is Tor bootstrapping stuck at 45%?
+
+[https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol ICMP] [https://forums.whonix.org/t/have-firewall-accept-icmp-fragmentation-needed/10233/2 is disabled in {{project_name_long}} by default for security reasons] because only a minority of users require it.
+
+Try allowing incoming ICMP on [[{{project_name_gateway_short}}|{{project_name_gateway_short}}]].
+
+{{box|text=
+'''1.''' {{Firewall_Settings}}
+
+'''2.''' Paste.
+
+{{CodeSelect|code=
+GATEWAY_ALLOW_INCOMING_ICMP=1
+}}
+
+'''3.''' Save.
+
+'''4.''' {{Reload_Firewall}}
+
+'''5.''' Done.
+
+The process of enabling ICMP on {{project_name_gateway_short}} is complete.
+}}
+
+There might be [https://forums.whonix.org/t/have-firewall-accept-icmp-fragmentation-needed/10233/3 a more restricted ICMP permission] but it is not implemented. [[Reporting_Bugs#Contributions|Contributions welcome!]]
+
+Also see this related [https://forums.whonix.org/t/icmp-support-is-required-for-networking-in-some-cases/12503 forum discussion].
+
+== Advanced Connectivity Troubleshooting Steps ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = These Advanced Connectivity Troubleshooting Steps are supplementary and not a substitute, "better", or a shortcut.
+}}
+
+{{Box|text=
+'''1.''' Start with the [[#Essential Connectivity Troubleshooting Steps|Essential Connectivity Troubleshooting Steps]] above.
+
+'''2.''' Consider [[#Clearnet Connectivity Test|Clearnet Connectivity Test]].
+
+'''3.''' Investigate virtualizer-specific troubleshooting.
+
+* [[VirtualBox/Troubleshooting|VirtualBox Troubleshooting]]
+* [[KVM#Troubleshooting|KVM Troubleshooting]]
+
+'''4.''' Check [[#General Troubleshooting|General Troubleshooting]] steps.
+}}
+
+== Clock Fix ==
+Broken internet connectivity is to be expected if the clock is incorrect. At all times it is recommended to have a host clock with accuracy of up to ± 30 minutes.
+
+Quote {{project_name_long}} [[Post Install Advice]]:
+
+<blockquote>To protect against time zone leaks, the system clock inside {{project_name_long}} is set to UTC. This means it may be a few hours before or ahead of your host system clock. <u>Do not change this setting!</u></blockquote>
+
+See [[Network_Time_Synchronization#Manually_Set_Clock_Time_and_Date|Manually Set Clock Time and Date]].
+
+== Clearnet Connectivity Test ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' The following test might reveal the {{project_name_long}} platform is in use. If that is a valid concern, then omit this step.
+}}
+
+It is possible to check if a non-torified, non-anonyomus, direct connection to check.torproject.org is functional. <ref>This test only uses TCP and not DNS.</ref>
+
+On {{project_name_gateway_long}}, run.
+
+{{CodeSelect|code=
+sudo -u clearnet {{Curl_Plain}} {{Curl_Secure}} -H 'Host: check.torproject.org' -k https://{{Check.torproject.org IP}} | grep IP
+}}
+
+== General Virtualizer Connectivity Test ==
+If networking is unavailable inside {{project_name_long}}, then try:
+
+# Installing an operating system in a non-{{project_name_long}} virtual machine or downloading a regular image without Tor enforcement.
+# Testing network functionality in a freshly downloaded non-{{project_name_long}} virtual machine.
+
+If networking is still not functional, then {{project_name_long}} will not work either. The user must first resolve this issue, which might require re-installation of the virtualizer, followed by a reboot and further connectivity test(s).
+
+If networking is functional, then users should note that networking is working in non-{{project_name_long}} VMs as part of the support request or bug report.
+
+== Unsuitable Connectivity Troubleshooting Tools ==
+
+The following tools have limited usefulness when attempting to fix connectivity issues.
+
+* [[tor-control-panel|Tor Control Panel]]
+* [[Anon Connection Wizard]]
+* Others listed further below.
+
+These tools can offer assistance for Tor configuration, either by simply enabling access to the public Tor network or by configuring Tor to use [[Bridges]]. If an internet service provider (ISP) prevents access to the public Tor network, then using these tools to configure bridges might help. If the ISP prevents access to one type of bridges or specific (such as built-in) bridges, then choosing another type and/or different bridge might help.
+
+However, these are simple utilities that create a Tor configuration file, restart Tor, and report what the Tor software is saying about the Tor bootstrap (connection) status. These tools do not have sophisticated features to debug complex connectivity issues; they are designed to:
+
+# Ask for user input.
+# Create Tor configuration file.
+# Restart Tor.
+# Show Tor bootstrap status.
+
+Constant monitoring of network issues is not implemented. For example, after the initial setup is done -- such as using Tor Control Panel for Anon Connection Wizard -- these tools do not keep supervising Tor or other parts of the system. Therefore, the Tor Control Panel message stating "Connected to the Tor network" could be stale. That was true when the tool was started, but it is not constantly monitored.
+
+From the perspective of the Tor software, these are [https://en.wikipedia.org/wiki/High-level_programming_language high-level level programming language] tools developed by a third party. <ref>
+<blockquote>In computer science, a high-level programming language is a programming language with strong abstraction from the details of the computer. In contrast to low-level programming languages, it may use natural language elements, be easier to use, or may automate (or even hide entirely) significant areas of computing systems (e.g. memory management), making the process of developing a program simpler and more understandable than when using a lower-level language. The amount of abstraction provided defines how "high-level" a programming language is.<blockquote></ref> These tools have a limited "understanding" of Tor's internals, let alone other aspects of the system configuration that might be broken. <ref>Such as broken networking in either the host network or in all virtual machines.
+</ref> When attempting to debug connectivity issues, the "lower" level must be inspected which is closer to the system, virtualizer and Tor.
+
+[[sdwdate]], sdwdate logs and [[sdwdate-gui]] have limited usefulness for connectivity troubleshooting. These tools might point out issues with the system time but other than that sdwdate requires an already functional Tor to be able to fetch the time from onions.
+
+Other unsuitable connectivity troubleshooting tools include:
+
+* Mostly: [[Whonix-Workstation_Firewall#Ping|Using <code>ping</code> inside {{project_name_workstation_long}}]].
+
+Other [[#Connectivity Troubleshooting|recommended steps]] mentioned on this page are far more promising.
+
+== Why can't I Ping the {{project_name_gateway_long}}? ==
+
+The {{project_name_gateway_long}} does not respond to ping or similar commands because it is firewalled for security reasons; see ''{{W_Firewall}}'' or refer to the {{project_name_long}} source code. In most cases it is unnecessary to ping the {{project_name_gateway_long}} anyhow.
+
+If you insist on pinging the {{project_name_gateway_long}} or have a unique setup that requires it, then this can be tested by clearing all firewall rules with the [https://github.com/Kicksecure/developer-meta-files/blob/master/dangerous-scripts/dev_clearnet dev_clearnet] script. Alternatively, a script can be run to try and [[Dev/Firewall_Unload|unload / remove every iptables rule]], or the {{project_name_long}} firewall can be hacked to not load at all. The latter method is only for experts and it is necessary to comment out ''exit 0'' at the beginning.
+
+----
+
+= General Troubleshooting =
+
+== Introduction ==
+
+Troubleshooting issues can be time intensive and success cannot be guaranteed. Some users expect {{project_name_long}} to provide an easy experience similar to a Windows machine. While the {{project_name_long}} developers make every effort to meet user expectations, limited funding and human resources makes meeting these expectations impossible.
+
+Even though problems emerge when using {{project_name_long}}, the cause is most often unrelated to {{project_name_long}} code. For example, users often report the same {{project_name_long}} release worked on different hardware and/or with a different host operating system. Most software such as the host operating system or the virtualizer is developed by independent entities; this is the norm in Linux distributions. See {{kicksecure_wiki
+|wikipage=Linux User Experience versus Commercial Operating Systems
+|text=Linux User Experience versus Commercial Operating Systems
+}} to learn more about these relationships, as well as organizational and funding issues in the Open Source ecosystem.
+
+== Essential General Troubleshooting Steps ==
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px|alt=info]]
+| text    = The following recommended steps will fix many startup, freezing or other unusual issues in {{project_name_long}}. Skips steps that are no longer possible, such as the "run systemcheck" command if a virtual machine is no longer bootable.
+}}
+
+{{box|text=
+'''1.''' "Forget" about {{project_name_long}} for a moment and imagine you had never heard of the platform. Test your host computer first.
+
+'''2.''' Exclude basic [[#Hardware Issues|hardware issues]].
+
+'''3.''' Ensure the virtual machine (VM) images have been imported into a supported virtualizer listed on the [[Download]] page.
+
+'''4.''' Run [https://www.kicksecure.com/wiki/Systemcheck systemcheck], if possible.
+
+This verifies the {{project_name_long}} system is up-to-date and that everything is in proper working order.
+
+'''5.''' Debian (based) Linux host operating system users only: The following command should not show any errors. <ref name=lengthy_test>
+This process can be lengthy.
+</ref>
+
+{{CodeSelect|code=
+sudo dpkg-reconfigure -a
+}}
+
+'''6.''' Debian (based) Linux host operating system users only: The following command should be silent and not show any errors or output at all. <ref name=lengthy_test />
+
+{{CodeSelect|code=
+sudo dpkg --configure -a
+}}
+
+'''7.''' Debian (based) Linux host operating system users only: Next attempt to retrieve all available updates.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+{{CodeSelect|code=
+sudo apt full-upgrade
+}}
+
+'''8.''' Check for possible [[#Low RAM Issues|Low RAM Issues]].
+
+* [[#Free up Additional Memory Resources|Free up Additional Memory Resources]].
+* Also refer to [[RAM|Advice for Systems with Low RAM]].
+
+'''9.''' Virtualizer-specific troubleshooting.
+
+* [[VirtualBox/Troubleshooting|VirtualBox Troubleshooting]] / [[VirtualBox/Troubleshooting#General VirtualBox Troubleshooting Steps|General VirtualBox Troubleshooting Steps
+]]
+* [[KVM#Troubleshooting|KVM Troubleshooting]]
+
+'''10.''' Try a non-Whonix VM.
+
+Check if other VMs are functional, such as newly created ones or those from a different vendor.
+
+# "Forget" about {{project_name_long}} for a moment and imagine you had never heard of the platform. Test the virtualizer host software first.
+# Try a VM other than {{project_name_long}} such as Debian <code>{{Stable project version based on Debian codename}}</code>.
+# If the issue persists, this means the root issue is not caused by {{project_name_long}}, see: [[unspecific]] to {{project_name_long}}. In this case, attempt to resolve the issue as per [[Support#Free_Support_Principle|Free Support Principle]].
+
+'''11.''' Check [[#System Logs|System Logs]].
+
+* Sometimes crashing or freezing issues are easier to detect by [[#Watch Systemd Journal Log of Current Boot|Watching Systemd Journal Log of <u>Current</u> Boot]].
+* Sometimes it is necessary to [[#Enable Persistent Systemd Journal Log|Enable Persistent Systemd Journal Log]] and to [[#Check Systemd Journal Log of Previous Boot|Check Systemd Journal Log of <u>Previous</u> Boot]].
+
+'''12.''' If a graphical environment (where one can use a computer mouse) is unavailable after booting, utilize a virtual console to acquire system logs.
+
+# [[Recovery#Virtual_Consoles|Recovery, Virtual Consoles]].
+# Check system logs of the previous boot (step 11).
+
+'''13.''' Use recovery mode to acquire system logs.
+
+# Boot in [[Recovery#Recovery_Mode|recovery mode]].
+# Check system logs of previous boot (step 11).
+
+'''14.''' Use a chroot to acquire system logs.
+
+If a virtual console is inaccessible and recovery mode is also broken, try [[Recovery#Chroot|using a chroot for recovery]].
+}}
+
+== Low RAM Issues ==
+
+If insufficient RAM is available for {{project_name_long}} VMs they might become unusable. Low RAM issues in {{project_name_long}} are commonly caused by:
+
+* Unnecessary processes running and/or multi-tasking on the host OS.
+* Multiple, open browser tabs.
+* Unnecessary processes running in the {{project_name_long}} VM(s).
+* Allocating more RAM to the {{project_name_long}} VM than is available; this prevents the VM from booting.
+* Insufficient RAM allocated to the {{project_name_long}} VM(s).
+* Other non-{{project_name_long}} VMs running in parallel.
+
+Insufficient RAM can cause multiple issues, but the most common effects include:
+
+* Slow or unresponsive applications.
+* The VM, mouse and/or keyboard freeze.
+* Scrolling causes window staggers or jumps.
+* Issues become worse when additional browser tabs or processes are spawned.
+* Overall performance is poor.
+
+See also: [[RAM|Advice for Systems with Low RAM]].
+
+=== Free up Additional Memory Resources ===
+
+If a VM needs additional memory, then free up resources and/or add more RAM to the VM:
+
+* Terminate any non-essential processes on the host.
+* Shut down any non-essential VMs.
+* Shut down and/or close non-essential processes and browser tabs in {{project_name_long}} VMs.
+* [[{{non_q_project_name_short}}|{{non_q_project_name}}]] only: If low memory issues emerge in {{project_name_workstation_long}}, additional resources can be freed by reducing RAM in {{project_name_gateway_long}} with [[RAM_Adjusted_Desktop_Starter|rads]].
+
+To add additional RAM to the {{project_name_long}} VM(s), follow the platform-specific advice below.
+
+=== KVM ===
+{{KVM_RAM}}
+
+=== {{q_project_name}} ===
+
+Utilize Qube Manager: <br />
+* <code>Qube Manager</code> &rarr; <code>VM_name</code> &rarr; <code>Qubes s<u>e</u>ttings</code> &rarr; <code>Advanced</code> &rarr; <code>Max memory:</code> <code><i>mem_size</i></code>
+
+=== VirtualBox ===
+
+# To add RAM in VirtualBox the VM <u>must</u> first be powered down.
+# <code>Virtual machine</code> &rarr; <code>Menu</code> &rarr; <code>Settings</code> &rarr; <code><i>Adjust</i></code> <code>Memory slider</code> &rarr; <code><i>Hit:</i> OK</code>
+
+See also: [[VirtualBox/Troubleshooting]].
+
+= System Logs =
+<ref>
+"user support template": https://forums.whonix.org/t/workstation-keeps-freezing/7693/6
+</ref>
+
+== Check Systemd Journal Log of Current Boot ==
+To inspect the systemd journal log of the current boot, run.
+
+{{CodeSelect|code=
+sudo journalctl -b
+}}
+
+This command requires pressing arrow keys like &uarr;, &darr;, &larr;, &rarr;, as well as <code>PgUp</code> and <code>PgDn</code> for scrolling.
+
+For convenient reading of the log (until the command is issued), the log can be dumped to file. For example, the following command would write the log to file <code>~/systemd-log</code>.
+
+{{CodeSelect|code=
+sudo journalctl -b > ~/systemd-log
+}}
+
+Use any available editor to read the log file, such as <code>mousepad</code>.
+
+{{CodeSelect|code=
+mousepad ~/systemd-log
+}}
+
+== Watch Systemd Journal Log of Current Boot ==
+It is possible to to watch the systemd journal log as it is written.
+
+{{CodeSelect|code=
+sudo journalctl -b -f
+}}
+
+== Enable Persistent Systemd Journal Log ==
+By default, a persistent systemd journal log is not enabled in Debian. <ref>
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=801906
+</ref> To enable it, apply the following steps.
+
+Platform specific notes:
+
+* <u>Non-Qubes-Whonix</u>: No special steps are required; follow the steps below.
+* <u>Qubes users</u>: The following changes must be applied in a VM with a persistent root image like a Template or Standalone. It could be confusing if applied in App Qubes since the systemd journal log might be mixed up with boots by the Template, while the App Qube systemd journal logs would not be persistent. [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs] might be helpful, but further research is required.
+
+{{Box|text=
+'''1.''' Create folder <code>/etc/systemd/journald.conf.d</code>.
+
+{{CodeSelect|code=
+sudo mkdir -p /etc/systemd/journald.conf.d
+}}
+
+'''2.''' {{Open with root rights|filename=
+/etc/systemd/journald.conf.d/60_persistent_journal.conf
+}}
+
+'''3.''' Add the following setting.
+
+{{CodeSelect|code=
+[Journal]
+Storage=persistent
+}}
+
+Save.
+
+'''4.''' Restart <code>systemd-journald</code>.
+
+{{CodeSelect|code=
+sudo systemctl restart systemd-journald
+}}
+
+A persistent systemd journal log has now been enabled.
+}}
+
+== Check Systemd Journal Log of Previous Boot ==
+
+After following the [[#Enable Persistent Systemd Journal Log|Enable Persistent Systemd Journal Log]] steps, it is possible to inspect the systemd journal log of the previous boot.
+
+{{CodeSelect|code=
+sudo journalctl -b -1
+}}
+
+This command requires pressing arrow keys like &uarr;, &darr;, &larr;, &rarr;, as well as <code>PgUp</code> and <code>PgDn</code> for scrolling.
+
+For convenient reading of the log (until the command is issued), the log can be dumped to file. For example, the following command would write the log to file <code>~/systemd-log-previous</code>.
+
+{{CodeSelect|code=
+sudo journalctl -b -1 > ~/systemd-log-previous
+}}
+
+Use any available editor to read the log file, such as <code>mousepad</code>.
+
+{{CodeSelect|code=
+mousepad ~/systemd-log-previous
+}}
+
+== View List of Systemd Journal Logs ==
+{{CodeSelect|code=
+sudo journalctl --list-boots
+}}
+
+{{Anchor|Daemon Log}}
+
+== Daemon Log View ==
+To view the log of a specific systemd unit. Syntax:
+
+(Replace <code>unit-name</code> with the actual name of the systemd unit.)
+
+{{CodeSelect|code=
+sudo journalctl -b --no-pager -u unit-name
+}}
+
+Example:
+
+{{CodeSelect|code=
+sudo journalctl -b --no-pager -u sdwdate
+}}
+
+== Daemon Log Follow ==
+To follow the log of a specific systemd unit. Syntax:
+
+(Replace <code>unit-name</code> with the actual name of the systemd unit.)
+
+{{CodeSelect|code=
+sudo journalctl -f -b --no-pager -u unit-name
+}}
+
+Example:
+
+{{CodeSelect|code=
+sudo journalctl -f -b --no-pager -u sdwdate
+}}
+
+== Daemon Status ==
+To view the status of a specific systemd unit. Syntax:
+
+(Replace <code>unit-name</code> with the actual name of the systemd unit.)
+
+{{CodeSelect|code=
+sudo systemctl status --no-pager unit-name
+}}
+
+Example:
+
+{{CodeSelect|code=
+sudo systemctl status --no-pager sdwdate
+}}
+
+== Check Systemd Journal Log of Failed Boot ==
+
+An alternative to recovery mode might be [[Desktop#Virtual_Consoles|virtual consoles]], since they are an easier and more lightweight solution. A virtual console login might still be possible when the graphical user interface no longer starts.
+
+Prerequisite knowledge: [[Desktop#Virtual Consoles|Virtual Consoles]]. Try to log in to a virtual console in a functional VM as an exercise. If that works, try a virtual console login in the broken VM.
+
+If a virtual console is unavailable:
+
+# Boot into [[Recovery|Recovery Mode]].
+# [[#Enable_Persistent_Systemd_Journal_Log|Enable Persistent Systemd Journal Log]] (if not previously enabled).
+# Reboot into normal mode so a log for the failed boot will be written (if not previously enabled).
+# Boot into recovery mode again.
+# [[#Check_Systemd_Journal_Log_of_Previous_Boot|Check Systemd Journal Log of Previous Boot]].
+
+= Permission Fix =
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px|alt=info]]
+| text    = If something does not work, do not arbitrarily try to use sudo / root without any indication this is appropriate. Otherwise, this can negatively affect the correct user home folder permissions. See also: [[root|Safely Use Root Commands]].
+}}
+
+{{Open a product ws terminal}}
+
+{{CodeSelect|code=
+sudo chown --recursive user:user /home/user
+}}
+
+= Hardware Issues =
+
+== General Recommendations ==
+
+Rhetorical questions:
+
+* When was the last time a qualified person disassembled your computer/notebook and removed dust from the fan and checked the cooling system of the CPU?
+* How often should maintenance be performed?
+* What is your CPU temperature under heavy system load?
+* What is the room temperature where the computer is operating?
+* What is your hard drive's health status?
+
+Recommendations:
+
+* Ensure your computer or notebook has regular, proper maintenance.
+* Monitor CPU temperature by utilizing relevant host operating system tools.
+* Consider cooling the room where computers/notebooks operate.
+* Better placement (more air space) around computers or notebooks can help.
+* Consider a passive or active (notebook) cooling pad. <ref>Perform thorough research beforehand.</ref>
+* [[#memtest86+|Run <code>memtest86+</code>]] to rule out RAM problems.
+* [[#gsmartcontrol|Run <code>gsmartcontrol</code>]] to rule out hard drive defects.
+
+None of these issues are related to {{project_name_long}}. Therefore, please do not ask these questions in {{project_name_long}} support channels (until there is a Whonix-Host operating system) as per [[Support#Free_Support_Principle|Free Support Principle]].
+
+== memtest86+ ==
+
+{{Box|text=
+'''1.''' Install the <code>memtest86+</code> tool.
+
+On Debian (based) hosts such as [[Kicksecure]].
+
+{{Install Package|package=
+memtest86+
+}}
+
+For other host operating systems, refer to <code>memtest86+</code> upstream documentation.
+
+'''2.''' Reboot.
+
+'''3.''' Start <code>memtest86+</code> from (grub) boot menu.
+
+* Choose <code>memory test (memtest86+.elf)</code>.
+* <code>memory test (memtest86+.bin, serial console)</code> serial console not needed.
+
+'''4.''' Keep <code>memtest86+</code> running for a significant period.
+
+A single pass of <code>memtest86+</code> from 0 to 100% progress is insufficient. The memory testing should be run for as long as practically possible; for example, ideally overnight or for 8+ hours. This is because RAM issues might not happen during <code>memtest86+</code>'s first pass. Sometimes only after a few 10 minutes or few hours issues can be detected because the issue might be related to stress, heat and not be easily and quickly reproducible.
+
+'''5.''' Check the <code>memtest86+</code> output.
+
+If there are any issues, red error messages appear in the middle of the screen.
+
+'''6.''' Done.
+
+The memory test is complete.
+
+If <code>memtest86+</code> identified any issues, these can manifest in various ways such as system crashes at random times. In such cases, the only likely solution is replacing the faulty hardware (RAM banks). <ref>RAM bank warranties may apply.</ref>
+}}
+
+== gsmartcontrol ==
+{{Box|text=
+'''1.''' Install the <code>gsmartcontrol+</code> tool.
+
+On Debian (based) hosts such as [[Kicksecure]].
+
+{{Install Package|package=
+gsmartcontrol
+}}
+
+For other host operating systems, refer to <code>gsmartcontrol</code> upstream documentation.
+
+'''2.''' Reboot.
+
+'''3.''' Start <code>gsmartcontrol</code>.
+
+'''4.''' Run the short and extended tests on all hard drives.
+
+'''5.''' Done.
+
+The hard drive test is complete.
+
+If <code>gsmartcontrol</code> identified any issues, these can manifest in various ways such as system crashes at random times. In such cases, the only likely solution is replacing the faulty hardware (hard drive). <ref>
+Hard drive warranties may apply.
+</ref>
+}}
+
+= See Also =
+
+* [[RAM|Advice for Systems with Low RAM]]
+* [[VirtualBox/Troubleshooting|VirtualBox Troubleshooting]]
+* [[KVM#Troubleshooting|KVM Troubleshooting]]
+* [[Qubes/Troubleshooting|{{Q project name}} Troubleshooting]]
+* [[Recovery|Recovery Mode]]
+* [[SysRq|System Recovery using SysRq Key]]
+* [[Core Dumps]]
+
+= Footnotes =
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]

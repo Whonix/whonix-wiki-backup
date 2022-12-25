@@ -1,0 +1,377 @@
+{{Header}}
+{{Title|
+title=VPN Tunnel Setup Examples
+}}
+{{#seo:
+|description=Instructions on how to combine VPN tunnels with Tor in {{project_name_long}}
+|image=Dykeroad-41832640.jpg
+}}
+[[image:Dykeroad-41832640.jpg|thumb]]
+
+= Introduction =
+
+{{Tunnels_Introduction}}
+
+This page is intended to demonstrate how easy it is to add a VPN to {{project_name_long}}, whether utilizing a VPN tunnel-link before Tor (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>) or after Tor (<code>User</code> &rarr; <code>VPN</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>).
+
+The examples below are mainly for testing purposes. It is possible to set up accounts for the same reasons, or  the information can be used as a very rough guide for setting up a VPN with {{project_name_long}}. To remain anonymous:
+
+* In all cases, never enter personal information when signing up for an account.
+* Use an extra email address solely for registration purposes.
+* If planning on the <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> configuration, then you should obviously sign up through Tor.
+* If planning on the <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Tor</code> configuration, it is unknown whether it is best to sign up via Tor or not, but it probably cannot hurt.
+
+= Riseup =
+
+== Riseup Quick VPN Command Line Test ==
+
+[https://riseup.net/ Riseup] is known to support TCP, UDP and [[SSL|TLS]].
+
+{{Box|text=
+'''1.''' Create a [https://account.riseup.net/user/new new Riseup account].
+
+Note an account can only be created with an [https://support.riseup.net/en/topics/10340-invite-code/posts invite code].
+
+'''2.''' Obtain your VPN secret (VPN password).
+
+* login to <code>account.riseup.net</code>
+* click Passwords on the left sidebar
+* click the Service Passwords tab
+
+'''3.''' Download the Riseup CA certificate.
+
+The "CA certificate" is used by the local program to confirm the identity of servers you connect to. Download it from [https://riseup.net/es/security/network-security/riseup-ca this page] or click this link: [https://riseup.net/es/security/network-security/riseup-ca/RiseupCA.pem RiseupCA.pem].
+
+'''4.''' Open a terminal.
+
+Navigate to the folder where <code>RiseupCA.pem</code> was saved.
+
+'''5.''' Install [https://openvpn.net/ OpenVPN].
+
+{{CodeSelect2|code=
+sudo apt update && sudo apt install openvpn
+}}
+
+'''6.''' Test the connection from the command line.
+
+The following line from the Riseup OpenVPN for Linux page <ref>https://riseup.net/en/vpn/linux</ref> will not work for the connection: <code>user</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>, because the Tor network does not support UDP.
+
+{{CodeSelect2|code=
+sudo openvpn --client --dev tun --auth-user-pass --remote vpn.riseup.net 1194 --keysize 256 --auth SHA256 --cipher AES-256-CBC --ca RiseupCA.pem
+}}
+
+Instead, use the following functional command utilizing TCP for the connection: <code>user</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>.
+
+{{CodeSelect2|code=
+sudo openvpn --client --dev tun --auth-user-pass --remote vpn.riseup.net 1194 --keysize 256 --auth SHA256 --cipher AES-256-CBC --ca RiseupCA.pem --proto tcp
+}}
+
+'''7.''' For DNS, see [[#Riseup DNS|Riseup DNS]] below.
+}}
+
+== Riseup riseup.conf ==
+
+[https://riseup.net/ Riseup] is known to support TCP, UDP and [[SSL|TLS]].
+
+{{Box|text=
+
+'''1.''' Utilize the Riseup account and name created in the previous section.
+
+'''2.''' Obtain your VPN secret (VPN password).
+
+Navigate to the [https://account.riseup.net/ Riseup Red Account] page ([http://3xeiol2bnhrsqhcsaifwtnlqkylrerdspzua7bcjrh26qlrrrctfobid.onion/ .onion]), log in and click on "VPN".
+
+'''3.''' Download the Riseup CA certificate.
+
+The "CA certificate" is used by the local program to confirm the identity of servers you connect to. Download it from [https://riseup.net/es/security/network-security/riseup-ca this page] or click this link: [https://riseup.net/es/security/network-security/riseup-ca/RiseupCA.pem RiseupCA.pem].
+
+'''4.''' Create a file <code>auth.txt</code> inside the same folder.
+
+<pre>
+riseupusername
+vpnsecret
+</pre>
+
+'''5.''' Create a file <code>riseup.conf</code> inside the same folder.
+
+<pre>
+client
+dev tun
+auth-user-pass auth.txt
+#remote vpn.riseup.net 443
+#remote seattle.vpn.riseup.net 443
+remote nyc.vpn.riseup.net 80
+ca RiseupCA.pem
+remote-cert-tls server
+script-security 1
+#user nobody
+#group nobody
+proto tcp
+#log /var/log/openvpn.log
+</pre>
+
+'''6.''' Start OpenVPN.
+
+{{CodeSelect2|code=
+sudo openvpn riseup.conf
+}}
+
+'''7.''' For DNS, see [[#Riseup DNS|Riseup DNS]] below.
+}}
+
+== Riseup DNS ==
+
+=== Setup ===
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/etc/resolv.conf
+}}
+
+'''2.''' Comment out the nameserver.
+
+<pre>
+#nameserver 10.152.152.10
+</pre>
+
+'''3.''' Add the Riseup OpenVPN DNS server.
+
+<pre>
+## Riseup.net OpenVPN DNS server
+nameserver 172.27.100.1
+</pre>
+
+If Riseup is not being used in your configuration, then replace <code>172.27.100.1</code> with the virtual LAN IP address of your VPN provider's DNS server. It probably can be obtained directly from the VPN provider. Another method of inferring it is running <code>sudo route</code> after successfully connecting to the VPN. The first destination default gateway should also function as a DNS server.
+
+Save the file.
+
+'''4.''' ''Optional:'' Prevent overwriting of the configuration file.
+
+To ensure that <code>/etc/resolv.conf</code> is not overwritten by other packages like DHCP or resolvconf, run.
+
+{{CodeSelect2|code=
+sudo chattr +i /etc/resolv.conf
+}}
+
+If you ever want to remove it, use ''-i''.
+}}
+
+=== Testing ===
+
+Use nslookup to query the DNS to obtain domain name and IP address mapping. <ref>https://en.wikipedia.org/wiki/Nslookup</ref>
+
+When using <code>nameserver 10.152.152.10</code> ...
+
+{{CodeSelect2|code=
+nslookup vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion
+}}
+
+The command will show.
+
+<pre>
+Server:         10.152.152.10
+Address:        10.152.152.10#53
+Non-authoritative answer:
+Name:   vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion
+Address: 10.192.0.1
+</pre>
+
+When using <code>nameserver 172.27.100.1</code> ...
+
+{{CodeSelect2|code=
+nslookup vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion
+}}
+
+The command will show.
+
+<pre>
+Server:         172.27.100.1
+Address:        172.27.100.1#53
+** server can't find vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion: NXDOMAIN
+</pre>
+
+The reason is <code>.onion</code> domains cannot be accessed when a VPN has been chained (<code>user</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>).
+
+Resolving clearnet DNS should work.
+
+{{CodeSelect2|code=
+nslookup riseup.net
+}}
+
+The command should show.
+
+<pre>
+Server:         172.27.100.1
+Address:        172.27.100.1#53
+Non-authoritative answer:
+Name:   riseup.net
+Address: 198.252.153.35
+</pre>
+
+= USAIP =
+
+<div class="toccolours mw-collapsible mw-collapsed">
+For testing purposes, [https://www.usaip.eu/en/index.php usaip.eu (USAIP)] was used in the past. The primary reason was they were free and did not block the tested, outgoing UDP port. The free version of USAIP is only suitable for testing purposes, because this version forcibly disconnects every seven minutes. For longer and serious/stable use, another VPN account is necessary. If you would still like to learn more, please press on expand on the right.
+<div class="mw-collapsible-content">
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = At the time of writing, it appeared that USAIP was probably blocking [[SSL|TLS]], therefore the following command is possibly non-functional:
+{{CodeSelect2|code=
+{{Curl_Plain}} {{Curl_Secure}} https://check.torproject.org
+}}
+}}
+
+{{Box|text=
+'''1.''' Install OpenVPN.
+
+{{CodeSelect2|code=
+sudo apt install openvpn
+}}
+
+'''2.''' Navigate to [https://usaip.eu/en/index.php USAIP] and source the free test.
+
+* click on [https://usaip.eu/en/free_vpn.php Free Demo]
+* download <code>usaip.zip</code> (this contains the OpenVPN configuration files)
+* unpack the file
+
+'''3.''' Open a terminal.
+
+Navigate to the USAIP folder.
+
+{{CodeSelect2|code=
+cd usaip
+}}
+
+List the available files.
+
+{{CodeSelect2|code=
+dir
+}}
+
+'''4.''' Connect to a free VPN.
+
+For example, run.
+
+{{CodeSelect2|code=
+sudo openvpn /home/user/usaip/eu-luxemburg.ovpn
+}}
+
+At the time of writing, the page stated, the password was ''demo'', while the password was also ''demo''.
+
+Wait until it has connected. If it is successful, it will show "Initialization Sequence Completed". If the connection does not succeed for some unknown reason, then try replacing <code>eu-luxemburg.ovpn</code> from the above example with another <country>.ovpn from the USAIP folder.
+
+Note: DNS settings have not been considered in this entry.
+}}
+</div>
+</div>
+
+= Using a Graphical User Interface =
+
+== KDE Network Manager ==
+
+<div class="toccolours mw-collapsible mw-collapsed">
+This entry is useful if you want to install the KDE Network Manager.
+If you would like to see more information, please press on expand on the right.
+<div class="mw-collapsible-content">
+{{CodeSelect2|code=
+sudo apt install network-manager-kde
+}}
+
+<code>Start menu</code> &rarr; <code>System Settings</code> &rarr; <code>Network Settings</code>
+
+At the time of writing the former, there is no OpenVPN instructions for KDE on riseup website (removed). Another guide for KDE Network Manager might be found via Internet research, or use the command line based examples above.
+
+Also, do not be concerned if you cannot see the {{project_name_workstation_long}} (virtual) wired network interface to {{project_name_gateway_long}}; see footnote. <ref>
+That is still managed by the ordinary ifupdown way.
+* /etc/network/interfaces
+* /etc/network/interfaces.d/30_non-qubes-whonix
+See [[Dev/Network Manager]] for further information on why network-manager is not used by default in {{project_name_long}}.
+</ref>
+</div>
+</div>
+
+== GNOME Network Manager ==
+
+<div class="toccolours mw-collapsible mw-collapsed">
+It is usually possible to integrate GNOME applications.
+If you would like to see more information, please press on expand on the right.
+<div class="mw-collapsible-content">
+In the case of GNOME Network Manager, more fiddling is required because upstream developers wanted to make GNOME and KDE as compatible as possible. This means that one settings manager will not show up when the other desktop has been started in a dual (KDE, GNOME) installation.
+
+If you want to install the GNOME Network Manager, run.
+
+{{CodeSelect2|code=
+sudo apt install network-manager-gnome network-manager-openvpn-gnome
+}}
+
+=== Autostart GNOME Network Manager ===
+
+If you want to autostart GNOME Network Manager, follow these steps.
+{{Box|text=
+'''1.''' Open <code>/etc/xdg/autostart/nm-applet.desktop</code> with root rights.
+
+{{Open with root rights|filename=
+/etc/xdg/autostart/nm-applet.desktop
+}}
+
+'''2.''' Comment out.
+
+{{CodeSelect2|code=
+NotShowIn=KDE;
+}}
+}}
+=== Visible nm-applet Start Menu Entries ===
+
+If you want to make the nm-applet start menu entries visible and to start it manually, follow these steps.
+{{Box|text=
+'''1.''' Open <code>/usr/share/applications/nm-applet.desktop</code>.
+
+{{Open with root rights|filename=
+/usr/share/applications/nm-applet.desktop
+}}
+
+'''2.''' Comment out.
+
+{{CodeSelect2|code=
+NotShowIn=KDE;
+}}
+
+'''3.''' Add.
+
+{{CodeSelect2|code=
+Categories=GNOME;GTK;Settings;X-GNOME-NetworkSettings;
+}}
+}}
+=== Visible nm-connection-editor Start Menu Entries ===
+
+If you want to make the nm-connection-editor start menu entries visible and to start it manually, follow these steps.
+{{Box|text=
+'''1.''' Open <code>nm-connection-editor.desktop</code>.
+
+{{Open with root rights|filename=
+/usr/share/applications/nm-connection-editor.desktop
+}}
+
+'''2.''' Comment out.
+
+{{CodeSelect2|code=
+NotShowIn=KDE;
+}}
+
+'''3.''' Open the settings.
+
+<pre>
+Applications &rarr; Settings &rarr; Network Connections
+</pre>
+
+Alternatively, you could also try the [https://riseup.net/en/vpn/linux#have-the-tray-icon-visible-on-gnome Riseup OpenVPN instructions for GNOME].
+}}
+</div>
+</div>
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

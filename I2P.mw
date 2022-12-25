@@ -1,0 +1,487 @@
+{{Header}}
+{{Title|title=
+Invisible Internet Project (I2P)
+}}
+{{#seo:
+|description=I2P over Tor. Tunneling the I2P Anonymizing Network over the Tor Anonymizing Network. Connection Schema: Tor &rarr; I2P &rarr; Destination.
+|image=I2Pmainlogo.svg.png
+}}
+[[image:I2Pmainlogo.svg.png|I2P Logo|thumb]]
+{{Anchor|I2P anonymizing network - Introduction}}
+= Introduction =
+== Network ==
+The [https://geti2p.net/en/about/intro Invisible Internet Project (I2P) homepage] provides a simple overview of the protocol:
+
+<blockquote>I2P is an anonymous network built on top of the internet. It allows users to create and access content and build online communities on a network that is both distributed and dynamic. It is intended to protect communication and resist monitoring by third parties such as ISPs.
+
+Aside from anonymizing traffic within the network, I2P functions with the same capabilities as the Internet, however its design and decentralization create a censorship resistant environment for the free-flow of information.
+
+Mirrored sites hosted on the network allow access to news outlets and other resources in areas where information is being filtered or denied. Online communities wishing to organize in restrictive environments can do so anonymously to mitigate political threat and protect each other.</blockquote>
+
+The I2P anonymous network exposes a simple layer that applications can use to anonymously and securely send messages to each other through "tunnels". The network itself is strictly message-based (IP), but there is a library available to allow reliable streaming communication on top of it (TCP). All communication is encrypted end-to-end -- in total there are four layers of encryption used when sending a message -- and even the end points ("destinations") are cryptographic identifiers (essentially a pair of public keys). <ref>https://geti2p.net/en/about/intro</ref>
+
+This design is known as [https://en.wikipedia.org/wiki/Garlic_routing garlic routing] which is a variant of [https://en.wikipedia.org/wiki/Onion_routing onion routing] (used in the Tor network) and benefits from the research on the latter but makes some different tradeoffs. <ref>https://geti2p.net/en/research</ref> Each client application has their own I2P 'router' that finds other clients by querying against the fully distributed 'network database' - a custom structured distributed hash table (DHT) based on the [https://en.wikipedia.org/wiki/Kademlia Kademlia algorithm]. Every router transports traffic for its peers which it uses as cover traffic for its own. To learn more about I2P technical details, see [https://geti2p.net/en/docs here].
+
+In contrast to the Tor network, I2P is focused on creating a community around P2P darknet services rather than providing "outproxies"(exits) to the clearnet. The I2P development [https://geti2p.net/en/about/team team] is an open group that welcomes all parties who are interested in [https://geti2p.net/en/get-involved getting involved]. All the code is [https://geti2p.net/en/get-involved/develop/licenses open source]. The core I2P Software Development Kit (SDK) and the current router implementation is accomplished in Java, <ref>Currently working with both sun and kaffe; gcj support is planned for later.</ref> and there is a [https://geti2p.net/en/docs/api/sam simple socket based API] for accessing the network from other languages (with a C library available, and both Python and Perl in development). The network is actively being developed and has not yet reached the 1.0 release, but the current [https://geti2p.net/en/get-involved/roadmap roadmap] describes their active schedule.
+
+== Tor vs I2P ==
+
+Many of Tor's concepts have (virtual) equivalents in I2P, despite the [https://geti2p.net/en/comparison/tor terminology] being somewhat different.
+
+'''Table:''' ''Tor vs. I2P Terminology'' <ref name=I2P_terminology>https://geti2p.net/en/comparison/tor</ref>
+
+{| class="wikitable"
+|-
+! scope="col"| '''Tor Terminology'''
+! scope="col"| '''I2P Equivalent'''
+|-
+! scope="row"| Cell
+| Message
+|-
+! scope="row"| Circuit
+| Tunnel
+|-
+! scope="row"| Client
+| Router or Client
+|-
+! scope="row"| Directory
+| NetDb
+|-
+! scope="row"| Directory Server
+| Floodfill Router
+|-
+! scope="row"| [[Tor_Entry_Guards|Entry Guards]]
+| Fast Peers
+|-
+! scope="row"| Entry Node
+| Inproxy
+|-
+! scope="row"| Exit Node
+| Outproxy
+|-
+! scope="row"| [[Onion_Services|Hidden (Onion) Service]]
+| Hidden Service, Eepsite or Destination
+|-
+! scope="row"| Hidden Service Descriptor
+| LeaseSet
+|-
+! scope="row"| [[Onion_Services#Onion_Service_Authentication|Hidden Service 'Stealth Mode']]
+| I2P Client Whitelist <ref>https://twitter.com/i2p/status/756952247662239744</ref> or Encrypted LeaseSets <ref>https://geti2p.net/sv/docs/how/network-database</ref> <ref>I2P documentation is lacking in describing these features, but there are plans to improve the situation.</ref>
+|-
+! scope="row"| Introduction Point
+| Inbound Gateway
+|-
+! scope="row"| Node
+| Router
+|-
+! scope="row"| Onion Proxy
+| I2PTunnel Client (more or less)
+|-
+! scope="row"| Relay
+| Router
+|-
+! scope="row"| Rendezvous Point
+| Similar to Inbound Gateway + Outbound Endpoint
+|-
+! scope="row"| Router Descriptor
+| RouterInfo
+|-
+! scope="row"| Server
+| Router
+|-
+! scope="row"| Single Onion Service
+| I2P 0-hop Tunnel <ref>https://twitter.com/i2p/status/756948810790821888</ref>
+|}
+
+The I2P comparison page notes the relative strengths of Tor and I2P; those are summarized below.
+
+Tor's primary strengths are: a larger user base; greater academic interest and research; significant funding; a large development team; greater resistance to state-level censorship (TLS transport and bridges); large number of exit nodes; better memory usage; thorough documentation; low client bandwidth overhead; higher throughput and lower latency. <ref name=I2P_terminology />
+
+In comparison, I2P's primary strengths are: optimization for hidden services; a fully distributed design; better peer selection; varied and untrusted directory servers; peer-to-peer friendly nature; improved load balancing and resilience; unidirectional tunnels; <ref>This should make it more difficult for adversaries to compromise the relevant information.</ref> protection against client activity detection; short-lived tunnels; <ref>Making it harder for adversaries to sample for attack purposes.</ref> low bandwidth overhead for full peers; TCP and UDP transports; and being based on the Java programming language. <ref name=I2P_terminology />
+
+= How-to: Use I2P in {{project_name_long}} =
+
+There are two methods of using I2P in {{project_name_long}}:
+# [[#Inproxies inside Whonix-Workstation|Inproxies inside Whonix-Workstation]]; or
+# [[#I2P client inside Whonix-Workstation|I2P client inside Whonix-Workstation]] (recommended)
+
+The inproxy method is better suited for causal use of I2P. In this instance, users just want to anonymously view an Eepsite and are not concerned about eavesdroppers so long as anonymity is assured.
+
+It is safer to use the I2P client inside {{project_name_long}}, since all I2P traffic is tunneled through Tor and access is fully featured. This is a little more difficult than installing I2P the ordinary way, that is using I2P in the clear, not over Tor.
+
+Readers who are considering using I2P in {{project_name_long}} are suggested to review the related [https://forums.whonix.org/t/whonix-i2p-documentation/1729 forum thread].
+
+== Inproxies inside Whonix-Workstation ==
+
+There are several I2P inproxies and they have similar functionality to [https://www.tor2web.org/ Tor2web]. <ref>Tor2web is a project which allows Internet users access to Tor Onion Services without Tor Browser.</ref> Simply use [[Tor Browser]] which is installed in {{project_name_long}} by default to directly access the I2P proxies listed.
+
+Although this is the easiest method, on the downside end-to-end encryption is lost when connecting to the eepsites. This is not the case when I2P is installed directly inside {{project_name_workstation_long}} or if I2P is used in the ordinary way. Further, potentially [[Warning#Exit_Relays_can_Eavesdrop_on_Communications|Tor Exit Nodes can Eavesdrop on Communications]] if an inproxy uses plain http, since it is an unencrypted connection. This risk is averted if the inproxy uses http'''s''' or is reachable via an onion service. In any case, the I2P inproxy administrator <u>can</u> see all of your traffic in the I2P network and it is impossible to prevent that.
+
+Example of I2P inproxy domains might be found in (or might be not if removed or down):
+
+* https://mk16.de/
+* https://i2p.rocks/blog/
+* https://www.awxcnx.de/
+* https://web.archive.org/web/20170411140534/https://www.hiddenservice.net/
+
+{{Anchor|I2P Client inside Whonix-Workstation}}
+
+== I2P Client inside Whonix-Workstation ==
+{{Anchor|Connecting to Tor before I2P}}
+=== Introduction ===
+
+The preferred configuration is to connect to Tor before I2P inside {{project_name_workstation_long}}: <code>user</code> &rarr; <code>Tor</code> &rarr; <code>I2P</code> &rarr; <code>Internet</code>
+
+Before configuring this tunnel link, it is recommended to read the following related wiki entries for general educational purposes on tunnel links. There is no need to apply any instructions from these wiki entries.
+
+* [[Tunnels/Introduction|Combining Tunnels with Tor]]
+* [[Tunnels/Connecting_to_Tor_before_a_proxy|Connecting to Tor before a Proxy]]
+
+=== Post-Tor I2P Tunnel Effects ===
+
+'''Table:''' ''Post-Tor I2P Connections''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Domain'''
+! scope="col"| '''Information'''
+|-
+! scope="row"| Advantages
+|
+* Anonymity is provided by Tor.<br />
+* The [http://127.0.0.1:7657/confignet I2P router console] works normally inside Tor Browser. There is no need to install a graphical user interface on {{project_name_gateway_long}}.<br />
+* Eepsites (.i2p) can be reached directly from Tor Browser.<br />
+* I2P's end-to-end encryption will be used as usual.
+|-
+! scope="row"| Disadvantages
+|
+* Adds load to Tor. <br />
+* Adds load to I2P. <br />
+* This is slower than using I2P directly on {{project_name_gateway_long}} or the ordinary configuration. <br />
+* No contributions are provided to the I2P network ('leeching'). <ref>This sounds worse than it really is because very few people are expected to use I2P over Tor. Further, I2P itself offers this option. It is not like a leeching mod.</ref>
+|-
+! scope="row"| Warning: No Stream-isolation Support
+|
+* I2P does not have stream isolation support which means that visits to Eepsites are linkable and fingerprintable -- each request includes the same X-I2P-Dest* headers, which are unique to each user. This might be true for outproxy requests as well. <br />
+* If you access <code>site1.i2p</code> followed by <code>site2.i2p</code>, <code>site3.i2p</code> and so on, each one of those operators will see the exact same X-I2P-Dest* values. This means if they are colluding, they will know that the same person accessed all of them. <br />
+* I2P operators can build a more detailed profile the longer I2P is left running. The X-I2P-Dest* values only change upon restart of the I2P instance or when the HTTP Proxy tunnel is stopped/started. I2P does not have a fix for this at present, <ref>https://www.reddit.com/r/i2p/comments/579idi/warning_i2p_is_linkablefingerprintable/</ref> however an experimental plugin is being written to provide a stream-isolating mechanism for http-over-I2P, see: [https://github.com/eyedeekay/eeProxy eeProxy].
+|}
+
+=== Installation and Setup ===
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Note</u>:
+* When following these instructions, the <code>about:config</code> changes in Tor Browser worsen the [[Data_Collection_Techniques#Browser_Fingerprinting|browser fingerprint]]. This is unavoidable if the user intents to use I2P. The modified Tor Browser should only be used for I2P purposes.
+** In [[Qubes|{{q_project_name}}]], a separate <code>{{project_name_workstation_vm}}-I2P</code> App Qubes is recommended.
+}}
+
+{{Third Party Repository}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Possible Broken - Development Required:'''
+
+Will likely not work as is.
+
+* TODO - developer contributions wanted!
+* The (non-)progress can be watched here: https://forums.whonix.org/t/i2p-client-inside-whonix-workstation-issues/15890/15
+}}
+
+'''1.''' Add the I2P signing key.
+
+([[Qubes|{{q_project_name}}]]: <code>{{project name workstation template}}-clone-1</code> Template).
+
+{{apt_key_add_derivative
+|download_command=scurl-download --tlsv1.2 https://geti2p.net/_static/i2p-archive-keyring.gpg
+|source_filename=i2p-archive-keyring.gpg
+|target_filename=/usr/share/keyrings/i2p-archive-keyring.gpg
+|download_command_qubes_templatevm=scurl-download --proxy http://127.0.0.1:8082 --tlsv1.2 https://geti2p.net/_static/i2p-archive-keyring.gpg
+|gpg_fingerprint=7840 E761 0F28 B904 7535  49D7 67EC E560 5BCF 1346
+}}
+
+'''2.''' Add the I2P APT repository.
+
+([[Qubes|{{q_project_name}}]]: <code>{{project name workstation template}}-clone-1</code> Template).
+
+{{CodeSelect|code=
+echo "deb [signed-by=/usr/share/keyrings/i2p-archive-keyring.gpg] tor+https://deb.i2p2.de/ {{Stable project version based on Debian codename}} main" {{!}} sudo tee /etc/apt/sources.list.d/i2p.list
+}}
+
+'''3.''' I2P installation.
+
+([[Qubes|{{q_project_name}}]]: <code>{{project name workstation template}}-clone-1</code> Template).
+
+{{Install Package|
+package=i2p i2p-keyring
+}}
+
+'''4.''' Configure I2P service to start automatically upon boot and as well it will use I2P apparmor profile.
+
+([[Qubes|{{q_project_name}}]]: <code>{{project name workstation template}}-clone-1</code> Template).
+
+{{CodeSelect|code=
+sudo dpkg-reconfigure i2p
+}}
+
+'''5.''' Platform specific notices.
+
+* Non-Qubes-Whonix: No special notices.
+* Qubes-Whonix: Shutdown <code>{{project name workstation template}}-clone-1</code> Template.
+
+'''6.''' Configure [[Tor Browser]] to allow connections to I2P.
+
+([[Qubes|{{q_project_name}}]]: <code>{{project_name_workstation_vm}}-I2P</code> App Qube)
+
+{{Box|text=
+<u>Note</u>: The following steps will no longer be required once {{project_name_long}} releases a custom Tor Browser for connecting to alternative networks. <ref>Except in the case of [[YaCy]], which needs internet access.</ref>
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:'''
+* This step changes the [[Fingerprint#web_fingerprint|web fingerprint]] of Tor Browser!
+* Leave all other settings as is!
+}}
+
+'''A.''' Tor Browser &rarr; URL bar &rarr; Type: {{CodeSelect|code=
+about:config
+}} &rarr; Press <code>Enter</code>
+
+'''B.''' Search for and modify: {{CodeSelect|code=
+extensions.torbutton.use_nontor_proxy
+}} &rarr; set to <code>true</code>
+
+'''C.''' Search for and modify: {{CodeSelect|code=
+network.proxy.share_proxy_settings
+}} &rarr; set to <code>true</code>
+
+'''D.''' Search for and modify: {{CodeSelect|code=
+network.proxy.http
+}} &rarr; set to {{CodeSelect|code=
+127.0.0.2
+}}
+
+'''E.''' Search for and modify: {{CodeSelect|code=
+network.proxy.http_port
+}} &rarr; set to 
+{{CodeSelect|code=
+4444
+}}
+
+'''F.''' Search for and modify: {{CodeSelect|code=
+network.proxy.no_proxies_on
+}} &rarr; set to {{CodeSelect|code=
+127.0.0.2
+}}
+
+'''G.''' Search for and modify: {{CodeSelect|code=
+network.proxy.socks_remote_dns
+}} &rarr; set to <code>false</code>
+
+'''H.''' Search for and modify: {{CodeSelect|code=
+dom.security.https_first_pbm
+}} &rarr; set to <code>false</code>
+
+'''I.''' Search for and modify: {{CodeSelect|code=
+dom.security.https_only_mode
+}} &rarr; set to <code>false</code>
+
+'''J.''' Done.
+
+Tor Browser configuration has been completed.
+}}
+
+'''7.''' Done.
+
+The process of installing I2P has been completed.
+
+=== Usage ===
+Open [http://127.0.0.2:7657 I2P Console] in Tor Browser
+
+([[Qubes|{{q_project_name}}]]: <code>{{project_name_workstation_vm}}-I2P</code> App Qube).
+
+{{CodeSelect|code=
+http://127.0.0.2:7657
+}}
+
+=== Notes ===
+
+* <u>Known Error Messages:</u> If errors appear like: "Network: ERR-UDP Disabled and Inbound TCP host/port not set" or "ERR-Clock Skew of X min" or "WARN [Timestamper] .router.time.RouterTimestamper: Unable to reach any of the NTP servers ...", they can be safely ignored.
+* <u>Network Bootstrap Waiting Time:</u> Once the Local Tunnels (shared clients) section shows a green connection, I2P should be fully functional and it is possible to browse eepsites like <code>zzz.i2p</code>. Some users report this process can be sorta lengthy and can take more than 10 minutes before the tunnels are stable/available.
+* <u>I2P over Tor viewpoint by I2P upstream developers:</u> I2P is functional over Tor but user should be aware that I2P developers do not really support it nor recommending it to be used over Tor. Just because it is functional does not mean it is supported. In other words I2P upstream developers will not change any I2P behavior just for the sake of connectivity issues of I2P over Tor because I2P is not designed to be running over Tor.
+* <u>Whonix pre-configuration:</u> settings for I2P (because its over Tor) can be viewed here: https://github.com/Whonix/anon-apps-config/tree/master/var/lib/i2p/i2p-config
+* <u>i2prouter start:</u> Note: '''Do not''' use <code>i2prouter start</code> command as it will not use I2P apparmor profile.
+* <u>Broken Onion Services:</u> Setting <code>network.proxy.http</code> &rarr; set to <code>127.0.0.2</code> will break the connection to onion. services. Read more [https://forums.whonix.org/t/i2p-integration/4981/347 here]. There is no known way to avoid this issue.
+
+== I2P Eepsites (I2P websites) ==
+*search engine example:
+Ahmia which is onion service search engine now supports I2P eepsites https://ahmia.fi/i2p/ and Tor2Web plans on adding I2P support. <ref>https://lists.torproject.org/pipermail/tor-talk/2016-January/039814.html</ref> <ref>https://github.com/tor2web/Tor2web/issues/82</ref>
+
+* Eepsites (I2P services) lists:
+** http://stats.i2p
+** http://identiguy.i2p 
+** http://planeta.i2p
+** http://notbob.i2p 
+** http://scanner.linuxfarm.i2p
+** http://reg.i2p
+** http://inr.i2p
+
+'''Figure:''' ''I2P Browsing in {{project_name_long}}''
+
+[[Image:I2Pbrowsing.png]]
+
+= Services =
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = The [https://getI2P.net/en/docs/applications/supported I2P supported applications webpage] warns that no guarantee can be provided about the safety of compatible applications, plugins and services -- they must be properly configured and might jeopardize anonymity due to design faults or carelessness. Carefully vet these tools and research them diligently beforehand.
+}}
+
+Many interesting features and functionality are implemented for I2P in the form of stand-alone packages or plugins that can be optionally installed from their [http://echelon.i2p official plugin eepsite]. Various tools are available for:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* blogging, forums and wikis
+* decentralized file storage
+* development tools
+* domain naming
+* email
+* file sharing
+* network administration
+* real-time chat
+* web browsing
+* website hosting
+</div>
+The instructions are simple to follow. The signing keys for these plugins are already built into the official I2P package and so are already white-listed. This is not a complete list.
+
+For documentation about default port numbers of I2P plugins, see [https://geti2p.net/en/docs/ports this page].
+
+== IRC ==
+
+I2P has ready irc tunnel to be used and connect to their official irc servers go to: 
+
+http://127.0.0.2:7657/help#faq
+
+If you scroll down you will find: 
+
+<blockquote> How do I connect to IRC within I2P?
+
+A tunnel to the main IRC server network within I2P, Irc2P, is automatically started when the I2P router starts. To connect to it, tell your IRC client to connect to server: 127.0.0.1 port: 6668.
+
+HexChat-like client users can create a new network with the server 127.0.0.1/6668, or you can connect with the command /server 127.0.0.1 6668. Different IRC clients may require a different command, consult the client documentation.</blockquote>
+
+'''Practical practice:'''
+
+* Hexchat inside whonix need specific small tweak:
+** Go to Settings → Preferences
+** Then Network setup → Proxy Server then follow the image instruction then press ok
+
+[[File:HexchatI2P1.png|400px]]
+
+[[File:HexchatI2P2.png|400px]]
+
+* Back to hexchat press on Hexchat → Network list
+
+[[File:HexchatI2P3.png|400px]]
+
+* Press on Add button and name it anything you like e.g I2P then hit Enter
+
+[[File:HexchatI2P4.png|400px]]
+
+* Press on I2P then press on Edit... button 
+
+[[File:HexchatI2P5.png|400px]]
+
+* Double click the top field to change it or press on it then press on Edit button then change the value to <code>127.0.0.1/6668</code> then hit Enter and press on close
+
+[[File:HexchatI2P6.png|400px]]
+
+* Make sure I2P is the one highlighted then press on Connect button
+
+[[File:HexchatI2P7.png|400px]]
+
+* Wait for couple of minutes then here you go
+
+[[File:HexchatI2P8.png|400px]]
+
+== I2P-Bote ==
+{{Template:I2P-Bote}}
+
+{{Anchor|I2PBOX}}
+
+== RetroShare ==
+[[RetroShare]] is a [https://en.wikipedia.org/wiki/Friend-to-friend friend-to-friend] (F2F) network that enables end-to-end encrypted communications, including general messaging, mail, forums, publish-subscribe messaging ('pubsub'), file exchange and even telephony. It can be used as an alternative to [[#Syndie|Syndie]] (see further below) and can be tunneled through I2P for enhanced anonymity.
+
+{{Template:I2P_Retroshare}} Also see: [https://retroshare.readthedocs.io/en/latest/tutorial/i2p-hidden-rs-node/ I2P Hidden RetroShare Nodes].
+
+{{Anchor|Installing I2P on {{project_name_gateway_long}} (I2PBOX)}}
+
+To install RetroShare, see: [[RetroShare#Installation|Installation]].
+
+== Syncthing ==
+
+[https://syncthing.net/ Syncthing] is a popular libre software for file syncing based on the bittorrent protocol. <ref><blockquote>Syncthing is a continuous file synchronization program. It synchronizes files between two or more computers and replaces proprietary sync and cloud services with something open, trustworthy and decentralized. Your data is your data alone and you deserve to choose where it is stored, if it is shared with some third party and how it's transmitted over the internet.</blockquote></ref> Syncthing provides several benefits: <ref>https://syncthing.net/</ref>
+* cross-platform availability
+* data is not stored on a central server, but only on your computer(s)
+* all communication is secured with TLS and [https://www.perfectforwardsecrecy.com/ perfect forward secrecy]
+* every node is identified by a strong cryptographic certificate
+* a completely open protocol -- open source, open development and open discourse
+* portable and simple to use Web GUI
+
+It is possible to tunnel Syncthing traffic over I2P as shown in [https://web.archive.org/web/20171008035012/https://barry.im/post/2017/10/6/syncthing-over-i2p/ this guide]. <ref>This guide is also reposted [https://i2p.rocks/blog/syncthing-over-i2p.html here].</ref>
+
+To install Syncthing, run.
+
+{{CodeSelect|code=
+sudo apt install syncthing
+}}
+
+== Syndie ==
+[https://syndie.de/ Syndie] is I2P's distributed (decentralized) forum software, allowing asynchronous conversations between anonymous participants. It was the focus of I2P's creator shortly before he ceased public activity. It supports single and multiple author modes, adjustable visibility of posts and post moderation. Syndie features its own minimalist and secure reader to protect against browser exploitation. In 2018, Syndie was being rewritten in another programming language to provide a more modern and simple interface, along with basic image rendering. <ref>https://i2pforum.net/viewtopic.php?f=25&t=9</ref>
+
+A key benefit of Syndie is that unlike centralized forums, it cannot be easily taken offline via denial of service attacks or administrative action, and there is no single point to monitor group activity. Offline forum participation is possible, by 'syncing up' any accumulated changes when it is convenient (days, weeks or even months later). In addition to simple text messages, entire webpages or the full content of sites can be packaged into a single post, which can even be browsed offline.
+
+The Syndie Technical Features section notes: <ref>https://syndie.de/features.html</ref>
+
+<blockquote>On the whole, Syndie works at the *content layer* - individual posts are contained in encrypted zip files, and participating in the forum means simply sharing these files. There are no dependencies upon how the files are transferred (over [https://geti2p.net/ I2P], [https://www.torproject.org/ Tor], [https://www.freenetproject.org/ Freenet], [https://en.wikipedia.org/wiki/Gnutella gnutella], [https://www.bittorrent.com/ bittorrent], [https://en.wikipedia.com/wiki/RSS RSS], [https://en.wikipedia.com/wiki/Usenet usenet], [https://en.wikipedia.com/wiki/Email email]), but simple aggregation and distribution tools will be bundled with the standard Syndie release.</blockquote>
+
+To install Syndie, run.
+
+{{CodeSelect|code=
+sudo apt install syndie
+}}
+
+== ZeroNet ==
+
+Unfortunately, I2P is not yet natively supported as a tunneling option in [[ZeroNet]]. No real progress has been made towards this goal for years; see footnotes to follow developments. <ref>https://github.com/HelloZeroNet/ZeroNet/issues/57</ref> <ref>https://github.com/HelloZeroNet/ZeroNet/issues/45</ref>
+
+= Installing I2P on Whonix-Gateway =
+It is possible to run I2P and Tor simultaneously on {{project_name_gateway_long}}:
+
+* <code>user</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>; <u>and</u>
+* <code>user</code> &rarr; <code>I2P</code> &rarr; <code>Internet</code>
+
+Users who are interested in this configuration should follow the detailed instructions found [https://web.archive.org/web/20180802221447/https://github.com/mutedstorm/Whonix-I2P here].
+
+This configuration is untested by {{project_name_long}} developers and it is considered experimental. Also, {{project_name_long}} developer HulaHoop has noted it is difficult to have a preconfigured Tor Browser for accessing <code>.i2p</code> domains and other non-clearnet top-level domains, as well as optimizing I2P operations when tunneled over Tor.
+
+For further information and to report successes/failures of this approach, refer to the
+[https://forums.whonix.org/t/i2p-integration/4981 development discussion] and [https://forums.whonix.org/t/i2p-running-on-whonix-gateway old development discussion].
+
+= Development =
+This chapter is for developers for informational purposes only. Users can skip it.
+
+{{project name long}} integration:
+
+* https://github.com/Whonix/anon-apps-config/blob/master/usr/share/i2p/router.config.anondist
+* [https://forums.whonix.org/t/tor-browser-customization-using-user-js-for-example-for-i2pbrowser/13719 Tor Browser Customization using user.js (for example for i2pbrowser)]
+* [https://forums.whonix.org/t/i2p-integration/4981 development discussion]
+* [https://forums.whonix.org/t/i2p-running-on-whonix-gateway old development discussion]
+
+= Footnotes =
+
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,59 @@
+<noinclude>{{Header}}</noinclude>'''This chapter is recommended for better security, but is not strictly required.''' (See [[Trust]].)
+
+Change directly into source code folder.
+
+{{CodeSelect|code=
+cd derivative-maker
+}}
+
+Git fetch. <ref>
+Optional. [...]
+</ref>
+
+{{CodeSelect|code=
+git fetch
+}}
+
+Verify the chosen tag to build. Replace with tag you want to build.
+
+{{CodeSelect|code=
+git verify-tag {{VersionNew}}-stable
+}}
+
+The output should look similar to this.
+
+<div class="pre">object 1844108109a5f2f8bddcf2257b9f3675be5cfb22
+type commit
+tag {{VersionNew}}
+tagger Patrick Schleizer <adrelanos@{{project_clearnet}}> 1392320095 +0000
+
+.
+gpg: Signature made Thu 13 Feb 2014 07:34:55 PM UTC using RSA key ID 77BB3C48
+gpg: Good signature from "Patrick Schleizer <adrelanos@{{project_clearnet}}>" [ultimate]</div>
+
+{{gpg_signature_timestamp}}
+
+The warning.
+
+<div class="pre">gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.</div>
+
+Is explained on the [[Signing_Key|{{project_name_long}} Signing Key]] page and can be safely ignored.
+
+By convention, git tags should point to signed git commits. <ref>
+Beginning from git tag 9.6 and above.
+</ref> ([https://forums.whonix.org/t/security-git-general-verification-verifying-whonix-submodules/513 forum discussion]) It is advisable to verify the signature of the git commit as well (replace <code>{{VersionNew}}</code> with the actual git tag being verified).
+
+{{CodeSelect|code=
+git verify-commit {{VersionNew}}-stable^{commit}
+}}
+
+The output should look similar to this.
+
+<div class="pre">commit 5aa1c307c943be60e7d2bfa5727fa5ada3a79c4a
+gpg: Signature made Sun 07 Dec 2014 01:22:22 AM UTC using RSA key ID 77BB3C48
+gpg: Good signature from "Patrick Schleizer <adrelanos@{{project_clearnet}}>" [ultimate]
+Author: Patrick Schleizer <adrelanos@{{project_clearnet}}>
+Date:   Sun Dec 7 01:22:22 2014 +0000
+
+    .</div><noinclude>{{Footer}}</noinclude><noinclude>[[Category:MultiWiki]]</noinclude>

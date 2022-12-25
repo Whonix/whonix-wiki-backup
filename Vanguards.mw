@@ -1,0 +1,96 @@
+{{Header}}
+{{title|title=
+Vanguards - Tor Anonymity Improvement
+}}
+{{#seo:
+|description=Protects against Tor guard discovery and related traffic analysis attacks.
+|image=https://www.{{project_clearnet}}/w/images/f/fd/Vanguard.png
+}}
+[[image:Vanguard.png|thumb|250px|vanguards logo]]
+[[File:Whonix_connection_design_vanguards.jpg|thumb|250px|Tor is using 4 Tor relays thanks to vanguards.]]
+= Introduction =
+
+The vanguards specification overview notes: <ref>https://gitlab.torproject.org/tpo/core/torspec/-/blob/main/proposals/292-mesh-vanguards.txt</ref>
+
+<blockquote>This document tries to make the above guard discovery + compromise attack harder to launch. It introduces a configuration option which makes the hidden service also pin the second and third hops of its circuits for a longer duration.
+
+With this new path selection, we force the adversary to perform a Sybil attack and two compromise attacks before succeeding. This is an improvement over the current state where the Sybil attack is trivial to pull off, and only a single compromise attack is required. With this new path selection, an attacker is forced to do a one or more node compromise attacks before learning the guard node of a hidden service. This increases the uncertainty of the attacker, since compromise attacks are costly and potentially detectable, so an  attacker will have to think twice before beginning a chain of node compromise attacks that they might not be able to complete.</blockquote>
+
+In his July 2018 blog post [https://blog.torproject.org/announcing-vanguards-add-onion-services Announcing Vanguards for Onion Services], Tor developer Mike Perry provided a simpler description of vanguards: to protect against guard discovery and related traffic analysis attacks. This add-on is useful for general {{project_name_long}} users, since it affords additional protection for Tor clients and Tor onion services (underline added):
+
+<blockquote>We believe that the most serious threat that v3 onion services currently face is guard discovery. A guard discovery attack enables an adversary to determine the guard node(s) that are in use <u>by a Tor client and/or</u> Tor onion service. Once the guard node is known, traffic analysis attacks that can deanonymize an onion service (or onion service user) become easier. ... The add-on uses our Control Port Protocol and the corresponding Stem Library to defend against these attacks. The hope is that it will we will be able to study the performance and functionality of this feature and gather feedback before we deploy these changes in Tor for all onion services <u>and clients</u>.</blockquote>
+
+== {{project_name_long}} Vanguards Adoption ==
+
+From {{project_name_long}} version <code>15.0.0.8.7</code> and above, vanguards is installed by default. It should be noted that a recent Tor vulnerability affecting onion services is [https://lists.torproject.org/pipermail/tor-dev/2020-February/014157.html sufficiently mitigated by vanguards]; see Tor [https://nvd.nist.gov/vuln/detail/CVE-2020-8516 CVE-2020-8516 Hidden Service deanonymization]:
+
+<blockquote>The daemon in Tor through 0.4.1.8 and 0.4.2.x through 0.4.2.6 does not verify that a rendezvous node is known before attempting to connect to it, which might make it easier for remote attackers to discover circuit information.</blockquote>
+
+Tor developers have recently developed a proposal for "Vanguards lite". This is identical to the existing proposal, except: <ref>https://lists.torproject.org/pipermail/tor-dev/2021-June/014569.html</ref>
+
+<blockquote>
+* No third layer of guards is used.
+* The Layer2 lifetime uses the max(x,x) distribution with a minimum of one day and maximum of 12 days. This makes the average lifetime approximately a week. We let NUM_LAYER2_GUARDS=4.
+* We don't write guards on disk. This means that the guard topology resets when tor restarts.
+
+By avoiding a third-layer of guards we reduce the linkability issues of Proposal 292, which means that we don't have to add an extra hop on top of our paths. This simplifies engineering.</blockquote>
+
+The technical specifications of this proposal require further consideration by {{project_name_long}} developers to determine its suitability for the broader {{project_name_long}} user population (as it will exist alongside standard vanguards). While removing a third-layer of guards reduces linkability risks and latency, it also makes it easier to launch guard discovery attacks against clients and onion services.
+
+Also note that [https://onionbalance.readthedocs.org onionbalance] is now available for onion v3 services, <ref>
+* https://github.com/DonnchaC/onionbalance/issues/69#issuecomment-58108608
+* [https://lists.torproject.org/pipermail/tor-dev/2020-January/014142.html Tor development mailing list - Request for onionbalance v3 pre-alpha testing]
+</ref> see: [https://blog.torproject.org/cooking-onions-reclaiming-onionbalance Cooking with Onions: Reclaiming the Onionbalance]. This means onion service administrators can load balance v3 onion services so they have high availability.
+
+= Log Analysis =
+
+Quote [https://github.com/mikeperry-tor/vanguards/blob/master/README.md#user-content-what-do-the-logs-mean What do the logs mean?]:
+
+<blockquote>This is an experimental addon with many heuristics that still need tuning. Events that represent severe issues are at WARN level. You should react to these events. Warns are currently emitted for the following conditions:
+
+1. When your service is disconnected from the Tor network, we WARN. Downtime can be a side channel signal or a passive information leak, and you should ensure your Internet connection is reliable to minimize downtime of your service as much as possible.
+2. When a hidden service descriptor circuit sends more than 30KB, we WARN. If this happens, it is either a bug, a heavily-modified hidden service descriptor, or an actual attack.
+3. When you set ExcludeNodes in Tor to exclude countries, but do not give Tor a GeoIP file, we WARN.
+4. If you disable killing circuits in the rendguard component, we WARN when use counts for rends are exceeded.
+5. With Tor 0.3.4.10 and above, we WARN upon receipt of any dropped/ignored cell.
+Events that are detected by heuristics that still need tuning are at NOTICE level. They may be a bug, a false positive, or an actual attack. If in doubt, don't panic. Please check the [https://github.com/mikeperry-tor/vanguards/issues/ Github issues] to see if any known false positives are related to these lines, and if not, consider filing an issue. Please redact any relay fingerprints from the messages before posting.</blockquote>
+
+= Technical Information =
+
+The full specification for Proposal 292: Mesh-based vanguards can be found [https://gitlab.torproject.org/tpo/core/torspec/-/blob/main/proposals/292-mesh-vanguards.txt here]. The vanguards add-on actually has three components: vanguards, bandguards and rendguards. Mike Perry [https://blog.torproject.org/announcing-vanguards-add-onion-services succinctly describes the role of each subsystem]:
+
+'''Vanguards'''
+
+<blockquote>The core functionality is provided by the Vanguards component which implements the Mesh Vanguards (Proposal 292). This ensures that all onion service circuits are restricted to a set of second and third layer guards, which have randomized rotation times as defined in that proposal. Basically, now all the hops of onion service circuits are pinned to specific nodes instead of sampling random ones from the whole network every time.<br />
+
+This change to fixed nodes for the second and third layer guards is designed to force the adversary to have to run many more nodes, and to execute both an active sybil attack, as well as a node compromise attack. In particular, the addition of second layer guard nodes means that the adversary goes from being able to discover your guard in minutes by running just one middle node, to requiring them to sustain the attack for weeks or even months, even if they run 5% of the network.</blockquote>
+
+'''Bandguards'''
+
+<blockquote>Additionally, the Bandguards component of the add-on also checks for evidence of bandwidth side channel attacks, which may be used by the adversary to aid/amplify traffic analysis attacks. <br />
+
+When these attacks are detected, the circuit is (optionally) closed.</blockquote>
+
+'''Rendguards'''
+
+<blockquote>Finally, the Rendguards component of the add-on performs analysis on the prevalence of rendezvous points on the onion service side. The rendezvous point is chosen by the client when it connects to an onion service, and some attacks rely on the use of a malicious rendezvous point to aid in traffic analysis. <br />
+
+This component tracks the frequency of rendezvous point use, and when it finds overuse, it optionally closes circuits from that rendezvous point and emits a log message.</blockquote>
+
+= See Also =
+
+To learn more about vanguards, consult the following resources:
+* basic information about [[Tor Entry Guards]]
+* the [https://blog.torproject.org/announcing-vanguards-add-onion-services Announcing Vanguards for Onion Services] blog post by The Tor Project
+* the [https://github.com/mikeperry-tor/vanguards/blob/master/README_SECURITY.md security readme] by vanguards author and Tor developer Mike Perry regarding attacks against onion services and related defenses
+* [https://github.com/mikeperry-tor/vanguards/blob/master/README_TECHNICAL.md vanguard's technical readme]
+* [https://forums.whonix.org/t/vanguards-additional-protections-for-tor-onion-services/8064 {{project_name_long}} forum vanguards integration development discussion]
+* [https://lists.torproject.org/pipermail/tor-dev/2021-June/014569.html Vanguards lite proposal]
+* [[Dev/vanguards]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

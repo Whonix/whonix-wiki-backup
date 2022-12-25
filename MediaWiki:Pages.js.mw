@@ -1,0 +1,40 @@
+/* On this page there is functionality for specific pages. This is seldomly needed */
+
+(function() {
+	
+	// ============
+	// Page_Hompage
+	
+	if( $('body').hasClass('page-Homepage') ) {
+		
+		// Section Competition
+		
+		$('.section-competition .show-more').on( 'click', function() {
+			$(this).remove();
+			$('.section-competition .show-for-nojs-only').removeClass('show-for-nojs-only');
+		});
+		
+		// Section Features
+		
+		$('.section-features, .section-values').find('.inner-wrapper > div:not(.mw-collapsible-content) a').on( 'click', function(e) {
+			e.preventDefault();
+			
+			$('#' + $(this).attr('data-modal')).miniModal('show');
+			
+			return false;
+		});
+		
+		// Start playing video
+
+		$('.section-banner #hide-overview-image').on('click', () => {
+			let handle = setInterval( () => {
+				if( document.querySelector('.section-banner .overview-image-and-video-player video').readyState < 1 ) return;
+				
+				clearInterval( handle );
+				$('.section-banner .overview-image-and-video-player video').css('display','block');
+				$('.section-banner .overview-image-and-video-player video')[0].play()
+			}, 500 );
+		});
+	}
+	
+})();

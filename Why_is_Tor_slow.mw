@@ -1,0 +1,200 @@
+{{Header}}
+<!--
+Copyright:
+
+   {{project_name_long}} Why is Tor slow wiki page Copyright (C) Amnesia <amnesia at boum dot org>
+   {{project_name_long}} Why is Tor slow wiki page Copyright (C) 2014 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to:
+
+    Free Software Foundation, Inc.
+    51 Franklin St, Fifth Floor
+    Boston, MA 02110-1301, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License can be found in the /usr/share/common-licenses' directory.
+
+The complete text of the GNU General Public License can also be found online on gnu.org <https://www.gnu.org/licenses/gpl.html>, in {{project_name_long}} virtual machine images in /usr/share/common-licenses/GPL-3 file or on Github <https://github.com/{{project_name_short}}/derivative-maker/blob/master/GPLv3>.
+-->
+<!--
+This wiki page is a fork of the Tails Why is Tor slow page, from this exact source <https://git-tails.immerda.ch/tails/tree/wiki/src/doc/anonymous_internet/why_tor_is_slow.mdwn?id=31b348e2b974555bac5b7457c89c99429c6799cf>.
+-->
+{{Title|title=
+Why is Tor Slow?
+}}
+{{#seo:
+|description=Factors Affecting Tor Throughput
+|image=Whyslowww.jpg
+}}
+[[image:Whyslowww.jpg|thumb]]
+= Introduction =
+
+Users often complain that the Tor network is slow or has inconsistent speed. This page briefly describes some reasons for affected Tor throughput and how to create a {{project_name_gateway_long}} with a different set of guards for testing purposes. Interested readers can also refer to [https://2019.www.torproject.org/docs/faq.html.en#WhySlow the Tor Project FAQ] ([http://jqyzxhjk6psc6ul5jnfwloamhtyh7si74b4743k2qgpskwwxrzhsxmad.onion/docs/faq.html.en#WhySlow .onion]) and [https://svn.torproject.org/svn/projects/roadmaps/2009-03-11-performance.pdf relevant research] for a more detailed explanation of this topic.
+
+= Factors Affecting Tor Throughput =
+
+== Misuse of the Tor Network ==
+
+Some actors misuse the Tor network, either purposefully or due to a lack of knowledge. For instance, Tor is sometimes used to conduct [https://en.wikipedia.org/wiki/Denial-of-service_attack DDoS attacks]. By doing this, the Tor relays are the ones who actually suffer from the attack, instead of the intended target. Some people use [https://en.wikipedia.org/wiki/Peer-to-peer peer-to-peer software] (like [https://www.bittorrent.com/ BitTorrent]) through Tor which slows down the network for all users. <ref>A large file downloaded through BitTorrent can translate to several hours of browsing for the regular Tor Browser user.</ref>
+
+== Relay Quality ==
+
+Tor relays are run by volunteers <ref>And hostile actors.</ref> in a decentralized way. Consequently, relays do not have uniform quality; some are big and fast, while others are smaller and slower. As a whole, the network could be faster if it had [https://metrics.torproject.org/bandwidth.html more capacity] ([http://hctxrvjzfpvmzh2jllqhgvvkoepxb4kfzdjm6h7egcwlumggtktiftid.onion/bandwidth.html .onion)]. To improve the capacity of the Tor network, users can either [https://community.torproject.org/relay/ run a Tor relay] ([http://xmrhfasfg5suueegrnc4gsgyi2tyclcy5oz7f5drnrodmdtob6t2ioyd.onion/relay/index.html .onion]) or [https://www.torservers.net/partners.html help existing relays].
+
+== Tor Circuits Lengthen Connections ==
+
+When navigating to clearnet resources, Tor provides anonymity by building circuits with three relays. So instead of connecting directly to the destination server, a connection is made between each relay of the circuit and this takes more time. In the case of [[Onion_Services#How_Onion_Services_Connections_Work|onion services]], a six-relay arrangement is used in the connection -- three picked by the user and three picked by the onion service.
+
+In addition to using multiple relays, Tor tries to build circuits with relays in different geographical locations. This necessarily causes connections to travel further and slows down the fetching of resources.
+
+== Other Factors ==
+
+Research by computer scientists Roger Dingledine <ref>Roger Dingledine is the co-creator of the first alpha version of Tor.</ref> and Steven Murdoch has noted several other factors that affect Tor throughput.
+
+'''Table:''' ''Tor Throughput Factors'' <ref>https://svn.torproject.org/svn/projects/roadmaps/2009-03-11-performance.pdf</ref> <ref>As the research is dated, some of these issues may have been fully or partially mitigated by now.</ref>
+
+{| class="wikitable"
+|-
+
+! scope="col"| '''Factor'''
+! scope="col"| '''Description'''
+|-
+
+! scope="row"| Directory Information Download Overhead
+| Users with low bandwidth (like those on cell phones) have to spend too much time downloading directory information. Tor protocols need to be optimized for efficiency.
+|-
+
+! scope="row"| Excessive User Load
+| Some users put excessive traffic load on the Tor network relative to their network contributions. Methods of limiting these effects and prioritizing other users need to be implemented. <ref>This may involve targeting specific user profiles (e.g. throttling certain protocols) so the original Tor design of high throughput and good latency properties can be realized.</ref>
+|-
+
+! scope="row"| Tor Congestion Control
+| Tor's mechanism does not work well in combining high-volume (bulk transfer) and low-volume (browsing) streams.
+|-
+
+! scope="row"| Tor Latency Failures
+| Tor is inefficient in handling connection failures or high / variable latency. Better heuristics to move away from bad circuits and a more uniform latency response is required.
+|-
+
+! scope="row"| Tor Load Distribution
+| Tor's current path selection algorithms do not effectively distribute the network load. The properties of relays need to be more accurately estimated so relays do not become over or under-loaded. <ref>Capacity is currently estimated by observing the largest traffic burst seen in the past day. This bandwidth capacity is advertised in the directory information, leading clients to preference their path selection based upon a relay's estimated bandwidth.</ref>
+|-
+
+! scope="row"| Tor Network Capacity
+| As noted earlier, the total capacity of the Tor network is insufficient relative to unmet privacy demand. A significant boost in the overall number of relays is required. <ref>Economics suggests increased supply will lead to more users arriving to fill the void.</ref>
+|-
+
+|}
+
+= {{project_name_long}} has Slowed Tor Connections Dramatically! =
+
+This is likely an incorrect assumption. Since {{project_name_long}} [[Tor#Does_Whonix_.E2.84.A2_Modify_Tor.3F|does not modify the Tor package]] directly, nor attempt to improve the Tor routing algorithm, any sudden drop in network speed is almost certainly related to:
+
+* User (mis)configurations relating to a VPN, proxy or other relevant settings.
+* Tor network anomalies.
+* [[Tor_Entry_Guards|Tor entry guards]] which are:
+** malicious
+** overloaded
+** under attack
+** misconfigured
+* A change in the Tor guard selection which has resulted in poor throughput due to capacity issues.
+
+Before posting about the issue in forums, first use one of the following two methods to create a test {{project_name_gateway_long}} with a different set of guards.
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = There is a small chance of receiving the same set of Tor guards using both methods below. Use [[Arm#Nyx|Nyx]] to explicitly check the new Tor guards are different before testing Tor throughput.
+}}
+
+== Easy: {{project_name_gateway_long}} Clone ==
+
+This procedure is less useful for {{project_name_long}} debugging.
+{{Box|text=
+'''1.''' Create a clone of the slow {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) and name it {{project_name_gateway_long}}-test VM (<code>{{project_name_gateway_vm}}-test-vm</code>). <ref>Alternatively follow the instructions to use [[Multiple_{{project_name_gateway_short}}|Multiple {{project_name_gateway_long}}]].</ref>
+* VirtualBox: follow [https://dirkstrauss.com/clone-virtualbox-vm/ these instructions] to create a VM snapshot.
+* {{q_project_name}}: <code>Right-click on {{project_name_gateway_vm}}</code> &rarr; <code>Clone VM</code>
+
+'''2.''' [[Tor_Entry_Guards#Regenerate_the_Tor_State_After_Saving_the_Tor_State_Folder|Regenerate the Tor State File]].
+
+'''3.''' Retest the speed of Tor connections.
+}}
+
+== Moderate Difficulty: Manual Regeneration of the Tor State File ==
+
+This procedure is more useful for {{project_name_long}} debugging.
+{{Box|text=
+'''1.''' Copy the {{project_name_gateway_long}} Tor state folder to a temporary folder.
+
+Run the following terminal commands.
+
+{{CodeSelect|code=
+sudo systemctl stop tor@default
+}}
+
+{{CodeSelect|code=
+sudo mv /var/lib/tor /tmp
+}}
+
+{{CodeSelect|code=
+sudo systemctl restart tor@default
+}}
+
+'''2.''' Retest the speed of Tor connections.
+
+After testing Tor throughput, run these terminal commands to restore the Tor state folder to its original settings.
+
+{{CodeSelect|code=
+sudo systemctl stop tor@default
+}}
+
+{{CodeSelect|code=
+sudo rm -r /var/lib/tor
+}}
+
+{{CodeSelect|code=
+sudo mv /tmp/tor /var/lib
+}}
+
+{{CodeSelect|code=
+sudo systemctl restart tor@default
+}}
+
+}}
+
+== Interpreting the Test Results ==
+
+There is no guarantee the test VM / new Tor state will be faster. However, if there is a significant difference in speed between the test and normal {{project_name_gateway_long}} VMs / Tor state, then this can be attributed to the Tor guards that are normally in use. This also means there is no bug in {{project_name_long}}.
+
+If the test VM / new Tor state does not speed up, the user may have selected Tor guards with poor throughput, or it could be a bug in {{project_name_long}}. Before reporting the problem in the forums, regenerate the Tor state file and test the Tor throughput again. If it is still slow, then this ''may'' indicate a {{project_name_long}} bug or other issue.
+
+It is strongly discouraged to use the {{project_name_gateway_long}}-test VM / new Tor state (with a new Tor guard set) for activities other than testing, even if it is faster. It is feasible that adversaries might try to induce the user to switch their guards. By switching, the probability that a new chosen guard set is adversary-controlled increases, aiding end-to-end correlation attacks that deanoymize connections.
+
+= License =
+<blockquote>
+{{project_name_long}} Why is Tor Slow? wiki page Copyright (C) Amnesia <amnesia at boum dot org> <br />
+{{project_name_long}} Why is Tor Slow? wiki page Copyright (C) 2014 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+
+This program comes with ABSOLUTELY NO WARRANTY; for details see the wiki source code.
+This is free software, and you are welcome to redistribute it
+under certain conditions; see the wiki source code for details.
+</blockquote>
+
+= Footnotes =
+
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

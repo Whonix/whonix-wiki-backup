@@ -1,0 +1,1113 @@
+{{Title|title=
+Tor Browser Advanced Topics
+}}
+{{Header}}
+{{#seo:
+|description=Tor Browser Adversary Model and Torbutton Design. Custom homepage, configurations and proxy settings. Tor Browser update technical details. Platform-specific issues.
+|image=Toradvanced.jpg
+}}
+<div class="mininav">
+* [[Tor Browser|Tor Browser Essentials]]
+* [[Tor Browser/Advanced Users|Tor Browser Advanced]]
+</div>
+[[image:Toradvanced.jpg|thumb]]
+= Tor Browser Adversary Model =
+The Tor Browser design has carefully considered the goals, capabilities and types of attacks undertaken by adversaries and planned accordingly. The design specifications address:
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* Application data isolation.
+* Cross-origin fingerprinting unlinkability.
+* Cross-origin identifier unlinkability.
+* Disk avoidance.
+* Long-term unlinkability via the "New Identity" button.
+* Proxy obedience.
+* State separation.
+* Other security measures to address many of the risks outlined below. <ref>https://2019.www.torproject.org/projects/torbrowser/design/#Implementation</ref> <ref>This has also informed the development of the Torbutton extension.</ref>
+</div>
+== Adversary Goals ==
+
+'''Table:''' ''Adversary Goals'' <ref name=torbutton_adversary>https://2019.www.torproject.org/docs/torbutton/en/design/index.html.en#adversary</ref> <ref name=torbrowser_adversary>https://2019.www.torproject.org/projects/torbrowser/design/#adversary</ref>
+
+{| class="wikitable"
+|-
+! scope="col"| '''Adversary Goals'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Anonymity Set Reduction (Fingerprinting)
+| To identify specific individuals, system data like the browser build,  timezone or display resolution is used to track down (or at least track) their activities.
+|-
+! scope="row"| Bypassing Proxy Settings
+| Directly compromising and bypassing Tor, or forcing connections to specific IP addresses.
+|-
+! scope="row"| Correlating Activity across Multiple Sites
+| Learning if the person who visited site A is the same person who visited site B, in order to serve targeted advertisements.
+|-
+! scope="row"| Correlating Tor and Non-Tor activity
+| If a proxy bypass is not possible, correlation of Tor and non-Tor activity is sought via cookies, cache identifiers, JavaScript events and Cascading Style Sheets (CSS).
+|-
+! scope="row"| History Disclosure
+| Querying user history for censored search queries or websites.
+|-
+! scope="row"| History Records and other On-disk Information
+| Seizing the computers of all Tor users in a given area and extracting history records, cache data, hostnames and disk-logged spoofed MAC address history.
+|-
+! scope="row"| Location Information
+| Seeking timezone and locality information to determine if the user originates from a specific region they are trying to control, or focusing in on dissidents or whistleblowers.
+|}
+
+== Adversary Positioning Capabilities ==
+
+'''Table:''' ''Positioning Capabilities'' <ref name=torbutton_adversary /> <ref name=torbrowser_adversary />
+
+{| class="wikitable"
+|-
+! scope="col"| '''Location'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Adservers and/or Malicious Websites
+| Running websites or contracting ad space from adservers to inject content. Reducing a Tor user's anonymity is also good for marketing purposes. <ref>Partially explaining the unholy alliance between the corporate sector and government.</ref>
+|-
+! scope="row"| Exit Node or Upstream Router
+| Running exit nodes or controlling routers upstream of exit nodes. <ref>This has already been observed.</ref>
+|-
+! scope="row"| Local Network / ISP / Upstream Router
+| Injecting malicious content at the upstream router when Tor is disabled in order to correlate Tor and non-Tor activity. Additionally, block Tor or attempt to recognize traffic patterns of specific web pages at the entrance to the Tor network.
+|-
+! scope="row"| Physical Access
+| Constant or intermittent physical access to computer equipment. This may happen to Internet cafe users or those in jurisdictions where equipment is confiscated due to general suspicion or solely for Tor use.
+|}
+
+== Adversary Attack Capabilities ==
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' Advanced adversaries have numerous surveillance methods and attack vectors to deanonymize and spy on individuals.
+}}
+
+'''Table:''' ''Attack Capabilities'' <ref name=torbutton_adversary /> <ref name=torbrowser_adversary />
+
+{| class="wikitable"
+|-
+! scope="col"| '''Attack Capabilities'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Inserting CSS
+|
+* <u>Using CSS pop-ups</u>: Correlate Tor and non-Tor activity in order to reveal the non-Tor IP address.<br />
+* <u>Using CSS and JavaScript</u>: Perform CSS-only history disclosure attacks. <br />
+* <u>CSS media queries</u>: Gather information about desktop size, widget size, display type, DPI, user agent type and other information.
+|-
+! scope="row"| Inserting JavaScript
+|
+* <u>Extracting fingerprinting information</u>: Available fonts, DOM objects to ascertain the user agent, WebGL to reveal the video card in use, and high precision timing information to reveal the CPU and interpreter speed. <br />
+* <u>Executing history disclosure attacks</u>: Query the history of different attributes of visited links for specific queries, sites, or for user profiling (gender, interests etc.). <br />
+* <u>Querying</u>: The user's timezone via the date object and reducing the anonymity set by querying the navigator object for operating system, CPU, location and user agent information.
+|-
+! scope="row"| Inserting or Exploiting Plugins
+|
+* <u>Using plugins</u>: Perform network activity that is independent of browser (or its own) proxy settings in order to obtain the non-Tor IP address. <br />
+* <u>Using active plugin exploits</u>: Leak the non-Tor IP address. <br />
+* <u>Enumerating</u>: The list of plugins to fingerprint the user. <br />
+* <u>Gathering information</u>: Use plugins capable of extracting font lists, interface addresses and other machine information. <br />
+* <u>Retrieving</u>: Unique plugin identifiers.
+|-
+! scope="row"| Reading and Inserting Identifiers
+|
+* <u>Storing identifiers</u>: HTTP auth, DOM storage, cached scripts, other elements with embedded identifiers, client certificates and TLS session IDs. <br />
+* <u>Performing a man-in-the-middle (MITM) attack</u>: Inject elements to both read and inject cookies for arbitrary domains (affecting even SSL/TLS secured websites).
+|-
+! scope="row"| Other Attacks
+|
+* <u>Creating arbitrary cached content</u>: Reading the browser cache which stores unique identifiers.<br />
+* <u>Observing request behavior</u>: Fingerprinting is aided by observing the user agent, Accept-* headers, pipeline usage, and request ordering. Fingerprinting is worsened by custom filters like AdBlock and UBlock Origin. <br />
+* <u>Fingerprinting</u>: Using the large number of browser attributes to reduce the anonymity set, or even uniquely fingerprinting individuals. <ref>For instance, there is an estimated 29 bit-identifier based on the browser and desktop window resolution information alone.</ref><br />
+* <u>Website traffic fingerprinting</u>: Attempting to recognize the encrypted traffic patterns of specific websites, either between the user and the Guard node, or at the Guard node itself. <ref>This attack is somewhat mitigated by the ocean of Tor traffic, which rapidly increases the rate of false positives when larger traffic sets are analyzed.</ref><br />
+* <u>Remotely or locally exploiting the browser and/or OS</u>: Exploiting the browser, plugin or OS vulnerabilities to install malware or surveillance software, or physically access the machine to do the same.
+|}
+
+= Torbutton Design =
+With the [https://blog.torproject.org/new-release-tor-browser-90 release of Tor Browser 9.0] in late-2019, both the Torbutton and Tor Launcher extensions have been tightly integrated into Tor Browser, meaning Torbutton has been moved from the URL bar and neither appears on the <code>about:addons</code> page. Other changes include the New Identity function shifting to the URL bar and the New Tor Circuit function being accessible via the hamburger menu. As [https://2019.www.torproject.org/docs/torbutton/torbutton-faq.html.en noted by Tor developers]:
+
+<blockquote>Now that the Tor Browser includes a patched version of Firefox, and because we don't have enough developer resources to keep up with the accelerated Firefox release schedule, the toggle model of Torbutton is [https://blog.torproject.org/toggle-or-not-toggle-end-torbutton no longer supported]. Users should be using Tor Browser, not installing Torbutton themselves.</blockquote>
+
+No functionality has been lost -- Torbutton's functions in Tor Browser behavior have [https://gitlab.torproject.org/legacy/trac/-/issues/10760 simply moved into direct Firefox patches] <ref>https://2019.www.torproject.org/projects/torbrowser/design/#components</ref> which address the following dimensions.
+
+'''Table:''' ''Torbutton Features Integrated into Tor Browser'' <ref>https://2019.www.torproject.org/docs/torbutton/en/design/index.html.en#requirements</ref> <ref>Some of the design features have been deprecated due to changes in the Tor / Tor Browser design.</ref>
+
+{| class="wikitable"
+|-
+! scope="col"| '''Feature'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Anonymity Set Preservation
+| Tor Browser should not leak any other anonymity set reducing or fingerprinting information (such as user agent, extension presence, and resolution information) automatically via Tor.
+|-
+! scope="row"| Disk Avoidance
+| Tor Browser should not write any Tor-related state to disk, or store it in memory beyond one Tor toggle.
+|-
+! scope="row"| Interoperability
+| Tor Browser should inter-operate with third-party proxy switchers that enable the user to switch between a number of different proxies, with full Tor protection.
+|-
+! scope="row"| Location Neutrality
+| Tor Browser should not leak location-specific information, like the timezone or locale via Tor.
+|-
+! scope="row"| Proxy Obedience
+| Tor Browser must not bypass Tor proxy settings.
+|-
+! scope="row"| State Separation
+| Cookies, cache, history, DOM storage, and more accumulated in one Tor state must not be accessible via the network in another Tor state.
+|-
+! scope="row"| Update Safety
+| Tor Browser should not perform unauthenticated updates or upgrades via Tor.
+|}
+
+Tor Browser patches and the integrated Torbutton features can potentially disable some functionality or interfere with the proper operation of some Internet sites, but the vast majority of websites work well. To learn more about former Torbutton, see:
+
+* [https://2019.www.torproject.org/docs/torbutton/ The Torbutton homepage]
+* [https://2019.www.torproject.org/docs/torbutton/torbutton-faq.html.en The Torbutton FAQ]
+* [https://2019.www.torproject.org/docs/torbutton/en/design/index.html.en Torbutton Design Documentation]
+* The Torbutton function design section immediately below.
+
+== New Identity Design ==
+The Tor Browser design document describes the full features provided by this extension: <ref>https://gitlab.torproject.org/legacy/trac/-/issues/523</ref> <ref name=new_identity>https://2019.www.torproject.org/projects/torbrowser/design/#new-identity</ref> <br />
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* Disables Javascript and plugins on all tabs and windows.
+* Stops all page activity for each tab.
+* Clears the Tor Browser state:
+** OCSP state.
+** Content and image cache.
+** Site-specific zoom.
+** Cookies and DOM storage.
+** The safe browsing key.
+** Google Wi-Fi geolocation token.
+** Last opened URL preference (if it exists).
+** Searchbox and findbox text.
+** Purge session history.
+** HTTP authentication.
+** SSL session IDs.
+** Crypto tokens.
+** Site-specific content preferences.
+** Undo tab history.
+** Offline storage.
+** Domain isolator state.
+** NoScript's site and temporary permissions.
+** All other browser site permissions.
+* Closes all remaining HTTP keep-alive connections.
+* Sends Tor the "newnym" signal to issue a new Tor circuit.
+</div> <br />
+After this process above, a fresh browser window is opened and the current browser window is closed (this does not spawn a new Firefox process, only a new window). When the final window is closed, any blob:UUID URLs that were created by websites are purged. <ref name=new_identity />
+
+== New Tor Circuit Design ==
+The "New Tor Circuit for this Site" feature sends the "newnym" signal to the Tor control port to cause a new circuit to be created for the <i>current</i> Tor Browser tab. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/9442</ref> Other open tabs and windows from the same website will use the new circuit as well once they have reloaded, but connections to other websites on separate tabs are not affected. <ref>https://tb-manual.torproject.org/managing-identities/</ref>
+
+== Security Slider Design ==
+The Security Level preference tab and Tor Project manual describe the exact effect of each level and which features are disabled or partially disabled. Note that as of Tor Browser release v8.5, the security slider function has shifted from Torbutton to the taskbar ("shield" icon). <ref>https://blog.torproject.org/new-release-tor-browser-85</ref> <ref>https://gitlab.torproject.org/legacy/trac/-/issues/29825</ref>
+
+'''Table:''' ''Security Slider Settings'' <ref>https://tb-manual.torproject.org/security-settings/</ref>
+
+{| class="wikitable"
+|-
+! scope="col"| '''Setting'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Standard
+|
+* All Tor Browser and website features are enabled.
+|-
+! scope="row"| Safer
+|
+* Dangerous website features are disabled; some sites lose functionality. <br />
+* On non-HTTPS sites, JavaScript is disabled. <br />
+* Some fonts and maths symbols are disabled. <br />
+* WebGL and HTML5 media (like audio and video) are click-to-play. <br />
+|-
+! scope="row"| Safest
+|
+* Only website features required for basic services and static sites are allowed; images, media and scripts are affected. <br />
+* Javascript is disabled on all sites; some images, fonts, icons and math symbols are disabled. <br />
+* HTML5 media (like audio and video) are click-to-play.
+|}
+
+== Disabled Tor Browser Functions ==
+
+=== Open Network Settings ===
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = {{project_name_long}} has modified environment variables to prevent visibility of the "Open Network Settings..." menu option in Tor Browser.
+}}
+
+The regular Tor Browser Bundle from The Tor Project (without {{project_name_long}}) allows networking settings to be changed inside Tor via the Open Network Settings menu option. It has the same effect as editing Tor's torrc configuration file.
+
+In {{project_name_long}}, the environment variable export <code>TOR_NO_DISPLAY_NETWORK_SETTINGS=1</code> has been [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh set] to disable the <code>Tor Browser</code> &rarr; <code>Open Network Settings...</code> menu item. It is not useful and confusing to have in the {{project_name_workstation_long}} because: <ref>https://gitlab.torproject.org/legacy/trac/-/issues/19652</ref> <ref>https://gitlab.torproject.org/legacy/trac/-/issues/14100</ref>
+
+* In {{project_name_long}}, there is only limited access to Tor's control port (see [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] for more information).
+* For security reasons, Tor must be manually configured via ''/usr/local/etc/torrc.d/50_user.conf'' in {{project_name_gateway_long}}, and not inside {{project_name_workstation_long}} (see [[Features#Tunnel Support|VPN/Tunnel support]] for more information).
+
+=== Tor Circuit View ===
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = {{project_name_long}} has removed the Tor Circuit View from Tor Browser for security reasons.
+}}
+
+Normally this option in Tor Browser shows the three Tor relays used for the website in the current tab. This includes the IP addresses of each and the countries they are located in, and whether a bridge is being used (see below). The node immediately above the destination website reflects the Tor exit relay. <ref>https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html</ref>
+
+'''Figure:''' ''Tor Circuit View - Disabled in Whonix'' <ref> [https://blog.torproject.org/new-release-tor-browser-80a9 New Release: Tor Browser 8.09a9] License: [https://creativecommons.org/licenses/by/3.0/us/ Creative Commons Attribution 3.0 United States License]</ref>
+
+[[File:Torcircuitviewupdate.png|frame|none|alt=|Tor Browser Bundle's Improved Circuit Display]]
+
+The [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] configuration in {{project_name_long}} intentionally does not whitelist the Tor control protocol commands that would be required for Tor Circuit View to function. This information is made unavailable to {{project_name_workstation_long}} because {{project_name_workstation_long}} should not have access to IP address information. If unavailable it cannot leak. Otherwise [[Malware and Firmware Trojans|malicious]] or broken applications could leak it. Users might also unintentionally make screenshots of this information. One of the main advantages of {{project_name_long}} is, that there is no way to determine the real external IP address of the user from within {{project_name_workstation_long}}. Therefore also the IP address of the Tor entry guard or bridge as well as Tor middle relay should be inaccessible from {{project_name_workstation_long}}. Otherwise this information might aid an attacker who gained remote code execution capability within {{project_name_workstation_long}}.
+
+If you want to help fix the Tor Button Circuit view, read more on [[Dev/onion-grater#Circuit_View]].
+
+{{Anchor|SecBrowser: Tor Browser without Tor}}
+
+= Savings Files in Shared Folder =
+Saving downloaded files in the shared folder is no longer trivially possible due to the [https://forums.whonix.org/t/install-apparmor-profiles-apparmor-profiles-extra-apparmor-profiles-kicksecure-by-default/13753 now pre-installed] Tor Browser {{kicksecure_wiki
+|wikipage=AppArmor
+|text=AppArmor
+}} profile.
+
+Multiple options. Choose one.
+
+* '''A)''' Saving files in <code>/home/user/Downloads</code> folder instead as per [[Tor Browser#Navigating Tor Browser Downloads|Navigating Tor Browser Downloads]] and then move the files from there to the shared folder.
+* '''B)''' Modify the Tor Browser AppArmor profile <code>/etc/apparmor.d/home.tor-browser.firefox</code> by addition of an additional permission in the local <code>/etc/apparmor.d/local/home.tor-browser.firefox</code> file. See [[#Tor Browser AppArmor Permit Shared Folder|Tor Browser AppArmor Permit Shared Folder]].
+* '''C)''' Attempt the {{kicksecure_wiki
+|wikipage=AppArmor#Fix_Profiles
+|text=Fix AppArmor Profiles
+}} instructions once this issues appeared. [[Unsupported]].
+* '''D)''' Deactivate the Tor Browser AppArmor profile. Recommended against since this lowers security.
+* '''E)''' Deactivate AppArmor Recommended against since totally unnecessary and it this lowers security.
+
+== Tor Browser AppArmor Permit Shared Folder ==
+[[Unsupported]]. Please test and [https://forums.whonix.org/t/tor-browser-save-download-to-shared-folder-access-on-whonix-workstation-xfce-apparmor-issue/14370 leave feedback].
+
+'''1.''' {{Open with root rights|filename=
+/etc/apparmor.d/local/home.tor-browser.firefox
+}}
+
+'''2.''' Paste.
+
+{{CodeSelect|code=
+/media/sf_shared/        r,
+/media/sf_shared/**      rwl,
+}}
+
+'''3.''' Reload the Tor Browser AppArmor profile.
+
+Note: The following filename is different from above and correct. <ref>
+Should not include <code>/local/</code>.
+</ref>
+
+{{CodeSelect|code=
+sudo aa-enforce /etc/apparmor.d/home.tor-browser.firefox
+}}
+
+'''4.''' Done.
+
+= Custom Homepage =
+
+It is unclear whether [https://forums.whonix.org/t/new-whonix-bugs setting a custom homepage] in Tor Browser settings will currently work. Previous attempts lead to the {{project_name_long}} default homepage being loaded on startup, even though a different homepage was manually set. The custom homepage only appeared following use of the New Identity function. <ref>This is a potential bug since the custom homepage does not overrule the {{Code2|TOR_DEFAULT_HOMEPAGE}} environment variable. No bug has yet been reported.</ref>
+
+The [https://github.com/{{project_name_short}}/whonix-welcome-page whonix-welcome-page] package currently sets [https://gitlab.torproject.org/legacy/trac/-/issues/13835 the environment variable] {{Code2|TOR_DEFAULT_HOMEPAGE}} to {{Code2|/usr/share/homepage/whonix-welcome-page/whonix.html}} when setting the Tor Browser homepage. This is done via the [https://github.com/{{project_name_short}}/whonix-welcome-page/blob/master/usr/libexec/whonix-welcome-page/env_var.sh bash script file] <ref>Also <i>/usr/lib/whonix-welcome-page/env_var.sh</i></ref> associated with the package. In light of this design, there are three possible options for a user-set custom homepage (untested):
+
+# Attempting to purge the whonix-welcome-page package. <ref>
+{{CodeSelect|code=
+sudo apt purge whonix-welcome-page
+}}
+</ref> This solution is difficult due to technical limitations as explained on the [[Debian_Packages|{{project_name_long}} Debian Packages]] page.
+# Modifying {{Code2|/usr/lib/whonix-welcome-page/env_var.sh}}. <ref>
+{{Open with root rights|
+filename=/usr/lib/whonix-welcome-page/env_var.sh
+}}
+</ref> Unfortunately these changes will revert after an upgrade.
+# Setting the environment variable {{Code2|TOR_DEFAULT_HOMEPAGE}} to a custom value. This would have a similar effect as setting environment variables as outlined in [[Tor_Browser#Key_Terminology|Tor Browser Transparent Proxying]].
+
+A recent forum discussion in relation to this topic can be found [https://forums.whonix.org/t/tor-browser-in-whonix here].
+
+= Custom Configurations =
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Custom configurations is an advanced topic. Only a small minority will ever need to apply the steps in this section.
+}}
+
+== Verify New Identity ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Usually this action is only necessary for custom configurations, like when using a [[Other Operating Systems|{{project_name_customworkstation_long}}]].
+}}
+
+If attempts to create a New Identity fail, then a related Tor Browser notification should appear once it realizes it cannot connect to Tor's ControlPort. If this error notification does not appear, then it likely means there are no problems.
+
+After Tor Browser is restarted, click "IP Check" on the landing page. This will redirect to https://check.torproject.org automatically, but the URL can be manually entered if preferred. In <i>most, but not all cases</i> <ref>Getting a new circuit does not guarantee receiving a new exit relay; this is normal behavior. Also see: [[Stream_Isolation|Stream Isolation]].</ref> a new Tor exit relay will be received, with a different IP address being reported.
+
+On {{project_name_gateway_long}}, examine the [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] log while using Tor Browser's New Identity feature.
+
+{{CodeSelect|code=
+sudo journalctl -f -u onion-grater
+}}
+
+If the output is similar to the following.
+
+<pre>
+Aug 16 05:30:19 host onion-grater[2316]: 10.137.0.10:41334 (filter: 30_autogenerated): &rarr; SIGNAL NEWNYM
+Aug 16 05:30:19 host onion-grater[2316]: 10.137.0.10:41334 (filter: 30_autogenerated): <- 250 OK
+</pre>
+
+Then the Control Port Filter Proxy received both the request from Tor Browser and Tor confirmation that it worked.
+
+== Get a New Identity without Tor ControlPort Access ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This action is usually only needed for custom configurations, like when not using the [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]].
+}}
+
+Simulate Tor Browser's New Identity functionality via these steps.
+
+# Close Tor Browser. <br />
+# Get a new identity in {{project_name_gateway_long}} using [[Tor Controller|nyx]]. <br />
+# Start Tor Browser again. <br />
+
+The procedure is complete.
+
+{{Anchor|Change/Remove Proxy Setting}}
+{{Anchor|Change / Remove Proxy Setting}}
+
+= Proxy Settings =
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = These steps are usually only needed for advanced tunneling scenarios.
+}}
+
+== Remove Proxy Settings ==
+To remove Tor Browser proxy settings (set no proxy), apply the following instructions.
+{{Tor_Browser_Remove_Proxy_Settings}}
+
+{{Anchor|Tor Browser Proxy Configuration}}
+
+== Change Proxy Settings ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = These instructions <u>do not</u> apply to accessing [[Tor_Browser#Local_Connections|local web-interfaces]].
+}}
+
+Complete the following steps inside {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>).
+
+{{TorBrowser_Proxy_Configuration}}
+
+= Backup and Restore =
+It is possible to restore data from an old browser profile to a new browser profile. [https://support.mozilla.org/en-US/kb/recovering-important-data-from-an-old-profile Regular Firefox documentation applies], except different file paths must be inspected.
+
+In the old browser folder <code>~/.tb/tor-browser</code> search for the following files:
+
+* <code>~/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/key4.db</code> - This file stores the key database for passwords. To transfer saved passwords, this file and the one immediately below must be copied.
+* <code>~/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/logins.json</code> - Saved passwords.
+* <code>~/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/places.sqlite</code> - Bookmarks, downloads and browsing history.
+
+Either backup these files or backup the whole browser folder, which is safer. Afterwards, copy them over after re-downloading Tor Browser.
+
+= Restore Backup =
+These <code>Restore Backup</code> instructions are untested and possibly incomplete.
+
+== Permission Fix ==
+When restoring a backup, sometimes a fix is necessary due to lost file permissions. Note that the fix below has not yet been tested.
+
+To apply a general permission fix, run.
+
+{{CodeSelect|code=
+sudo chown --recursive user:user /home/user
+}}
+
+Retrieve a list of executable files from a functional Tor Browser version. Ideally it should be the same version as the one you are attempting to restore, possibly in a separate VM.
+
+{{CodeSelect|code=
+find ~/.tb/tor-browser/ -type f -executable -print
+}}
+
+Then <code>chmod +x</code> all of these files.
+
+<div class="toccolours mw-collapsible mw-collapsed">
+In the collapsible section you can find a list created in June 2019. It might be outdated by now so you might have to create your own. Please press on Expand on the right.
+<div class="mw-collapsible-content">
+{{CodeSelect|code=
+chmod +x /home/user/.tb/tor-browser/Browser/libmozavcodec.so
+chmod +x /home/user/.tb/tor-browser/Browser/libplds4.so
+chmod +x /home/user/.tb/tor-browser/Browser/libnspr4.so
+chmod +x /home/user/.tb/tor-browser/Browser/libsmime3.so
+chmod +x /home/user/.tb/tor-browser/Browser/updater
+chmod +x /home/user/.tb/tor-browser/Browser/libxul.so
+chmod +x /home/user/.tb/tor-browser/Browser/libssl3.so
+chmod +x /home/user/.tb/tor-browser/Browser/libmozgtk.so
+chmod +x /home/user/.tb/tor-browser/Browser/plugin-container
+chmod +x /home/user/.tb/tor-browser/Browser/gtk2/libmozgtk.so
+chmod +x /home/user/.tb/tor-browser/Browser/libnss3.so
+chmod +x /home/user/.tb/tor-browser/Browser/liblgpllibs.so
+chmod +x /home/user/.tb/tor-browser/Browser/execdesktop
+chmod +x /home/user/.tb/tor-browser/Browser/abicheck
+chmod +x /home/user/.tb/tor-browser/Browser/libmozavutil.so
+chmod +x /home/user/.tb/tor-browser/Browser/libmozsqlite3.so
+chmod +x /home/user/.tb/tor-browser/Browser/libnssdbm3.so
+chmod +x /home/user/.tb/tor-browser/Browser/libnssckbi.so
+chmod +x /home/user/.tb/tor-browser/Browser/libsoftokn3.so
+chmod +x /home/user/.tb/tor-browser/Browser/libmozsandbox.so
+chmod +x /home/user/.tb/tor-browser/Browser/firefox.real
+chmod +x /home/user/.tb/tor-browser/Browser/libnssutil3.so
+chmod +x /home/user/.tb/tor-browser/Browser/libfreeblpriv3.so
+chmod +x /home/user/.tb/tor-browser/Browser/start-tor-browser
+chmod +x /home/user/.tb/tor-browser/Browser/libplc4.so
+chmod +x /home/user/.tb/tor-browser/Browser/start-tor-browser.desktop
+chmod +x /home/user/.tb/tor-browser/Browser/firefox
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/libssl.so.1.0.0
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/libstdc++/libstdc++.so.6
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/libevent-2.1.so.6
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fteproxy-lib/libgmp.so.10
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/zope/interface/_zope_interface_coptimizations.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fteproxy/tests/test_record_layer.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fteproxy/cli.py
+/home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/obfs4proxy
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/meek-client
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fteproxy.wrapper
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/meek-client-torbrowser
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fteproxy.bin
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/test_bit_ops.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test4.regex
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test3.dfa
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test1.dfa
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test6.dfa
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test4.dfa
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test6.regex
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test5.dfa
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test2.regex
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/__init__.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test2.dfa
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test1.regex
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test5.regex
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/dfas/test3.regex
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/__init__.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/test_encrypter.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/tests/test_encoder.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/cDFA.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/encoder.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/conf.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/encrypter.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/rank_unrank.cc
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/rank_unrank.h
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/bit_ops.py
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/fte/cDFA.cc
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/obfsproxy.bin
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/twisted/runner/portmap.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/twisted/python/sendmsg.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/twisted/test/raiser.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Util/strxor.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Util/_counter.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Cipher/_AES.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Cipher/_ARC4.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Cipher/_XOR.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Cipher/_ARC2.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Cipher/_DES.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Cipher/_CAST.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Cipher/_DES3.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Cipher/_Blowfish.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Hash/_SHA256.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Hash/_SHA512.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Hash/_MD2.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Hash/_RIPEMD160.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Hash/_SHA384.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Hash/_SHA224.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/Crypto/Hash/_MD4.so
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/libcrypto.so.1.0.0
+chmod +x /home/user/.tb/tor-browser/Browser/TorBrowser/Tor/tor
+chmod +x /home/user/.tb/tor-browser/start-tor-browser.desktop
+}}
+</div>
+</div>
+
+= Tor Browser Hard Reset =
+{{project name long}} 16.0.5.3 does not have this feature yet. The next stable point release will have this feature. The is feature is already available after [[Update]].
+
+A Tor Browser Hard Reset is usually not needed. If the user runs [[Tor_Browser#Tor_Browser_Downloader_by_Whonix_.E2.84.A2|Tor Browser Downloader by {{project_name_long}}]] ({{Code2|tb-updater}} package) ({{Code2|update-torbrowser}}) normally (without the <code>--reset</code> parameter), Tor Browser will be re-downloaded, re-installed and thereby a hard reset is automatically performed.
+
+The <code>--reset</code> parameter is usually not useful for fixing any Tor Browser issues.
+
+{{Box|text=
+'''1.''' Platform specific.
+
+Apply the following steps...
+
+* {{Non q project name}}: in {{project name workstation long}}.
+* {{Q project name}}: in Template <code>{{project name workstation template}}</code>.
+
+'''1.''' {{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''3.''' Disable automatic deletion of the Tor Browser compressed archive after Tor Browser installation.
+
+By default, the Tor Browser compressed archive after Tor Browser installation to save disk space. However, if the user wishes to later reinstall Tor Browser (hard reset) without re-downloading Tor Browser, this needs to be disabled. In order to disable this, add.
+
+{{CodeSelect|code=
+TB_NO_CLEANUP=true
+}}
+
+'''4.''' Save the file and exit.
+
+'''5.''' Platform specific.
+
+* {{Non q project name}}: No special steps required.
+* {{Q project name}}: Shut down Template. <code>update-torbrowser</code> in the correct price as per the usual {{Q project name}} Tor Browser documentation.
+
+'''6.''' Use <code>update-torbrowser</code> with parameter <code>--reset</code>
+
+{{CodeSelect|code=
+update-torbrowser --reset
+}}
+
+'''7.''' Done.
+
+Tor Browser should now be re-installed without prior re-download.
+}}
+
+Forum discussion:
+https://forums.whonix.org/t/tor-browser-downloader-anondist-suggestion-hard-reset/14151
+
+= Local Connections Exception Threat Analysis =
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This section applies to those who are configuring an exception for [[Tor_Browser#Local_Connections|Local Connections]] in Tor Browser.
+}}
+
+According to [https://bugzilla.mozilla.org/show_bug.cgi?id=354493 this] Firefox ticket, JavaScript can be abused to scan internal networks, fingerprint devices, and make malicious commands to those devices if they have a web interface.
+
+In {{project_name_long}}, there are no embedded devices attached to an internal network; it is isolated and untrusted. However, malicious Javascript can reveal to an attacker that a service is running on a localhost port. Consequently, this can reduce the user's anonymity set. Further, daemons listening on the localhost can be maliciously misconfigured, but this has limited impact because traffic is still forced through {{project_name_gateway_long}}.
+
+For further reading on this topic, see this related [https://forums.whonix.org/t/workaround-available-i2p-no-longer-works-with-the-latest-tor-browser/182/14 {{project_name_long}} Forum topic] and [https://gitlab.torproject.org/legacy/trac/-/issues/11493 Tor Browser bug report].
+
+The configured exception means a small trade-off in privacy, but it is much safer than using another browser. <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/10419#comment:37
+</ref>
+
+= tor-launcher vs torbrowser-launcher =
+tor-launcher and torbrowser-launcher are two completely different things with similar names:
+
+* [https://lists.torproject.org/pipermail/tor-dev/2013-May/004761.html tor-launcher] ([https://web.archive.org/web/20211102001639/http://trial.pearlcrescent.com/tor/torlauncher/2013-05-03/SetupWizard/wizard-all.png screenshots]) is a Tor Controller that has replaced [https://dist.torproject.org/vidalia-bundles Vidalia]. It is an add-on that is included in the Tor Browser (TB) by default.
+* [https://web.archive.org/web/20160316094119/https://micahflee.com/torbrowser-launcher/ torbrowser-launcher] ([https://web.archive.org/web/20181030072217/https://micahflee.com/wp-content/uploads/2013/04/tbl.png screenshot]) is an application to download Tor Browser, and is an alternative to [[Tor_Browser/Internal_Updater#Tor_Browser_Downloader_by_{{project_name_long}}|Tor Browser Updater ({{project_name_long}})]] ([https://github.com/Kicksecure/tb-updater tb-updater]).
+
+== tor-launcher ==
+Do not be concerned that tor-launcher might result in a [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] scenario, as this is prevented by [[Tor_Browser/Advanced_Users#Proxy_Settings|{{project_name_long}} proxy settings]]. By default, tor-launcher is disabled in {{project_name_workstation_long}}.
+
+In theory it is possible to remove tor-launcher from TBB, but this would not make any difference. Taking this step is untested and seems unlikely to provide any additional advantages. For that reason, it is best to leave it enabled so the platform has the same tested and functional setup as everyone else.
+
+tor-launcher is not yet available for use in {{project_name_gateway_long}}. <ref>https://phabricator.whonix.org/T118</ref>
+
+== torbrowser-launcher ==
+[[Tor_Browser/Internal_Updater#Tor_Browser_Downloader_by_{{project_name_long}}|Tor Browser Updater ({{project_name_long}})]] ([https://github.com/Kicksecure/tb-updater tb-updater]) is installed by default and specifically designed to be functional when installed alongside torbrowser-launcher. A possible long-term development goal in {{project_name_long}} is to deprecate tb-updater and instead install torbrowser-launcher by default. See this [https://forums.whonix.org/t/using-torbrowser-launcher-instead-of-tb-updater-in-whonix forum development discussion] if that is of interest.
+
+= Platform-specific Issues: {{q_project_name}} =
+{{Anchor|Running Tor Browser in Qubes Template}}
+== Running Tor Browser in Qubes Template or Disposable Template ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Do not start Tor Browser in the <code>{{project name workstation template}}</code> Template or <code>whonix-ws-dvm</code> Disposable Template! It is unexpected behavior and dangerous.
+}}
+
+<div class="toccolours mw-collapsible mw-collapsed">
+To understand why, please press on Expand on the right.
+<div class="mw-collapsible-content">
+* Tor Browser should be used in its stock configuration with as few modifications as possible. This is in accordance with upstream recommendations by The Tor Project.
+* Internet connections are established if Tor Browser is started in a Disposable Template -- this risks a compromise of the template and all Disposables based upon it.
+* Various files are created when Tor Browser starts -- these might make an individual  [[Tips_on_Remaining_Anonymous#Study:_Anonymity_and_Pseudonymity_are_not_the_same|pseudonymous rather than anonymous]], even if software has been designed against this. It is undesirable to have the same pseudonym linked to all App Qubes based on a singular Template.
+* It is far safer to start Tor Browser for the first time in a App Qube, rather than the Template. It is unrealistic to expect Tor Browser will perform perfectly, without any critical bugs being revealed later on. Current and past Tor Browser issues support this assertion; for example, see [https://gitlab.torproject.org/search?group_id=268&scope=issues&search=linkability&state=opened here] and [https://gitlab.torproject.org/search?group_id=268&repository_ref=&scope=issues&search=fingerprinting&snippets=&state=opened here].
+* See also [[Tor Browser#Unsafe Tor Browser Habits|Unsafe Tor Browser Habits]].
+</div>
+</div>
+
+== tb-updater in Qubes Template ==
+
+Tor Browser is installed by default in {{project_name_workstation_long}}.
+
+=== Default Behavior ===
+
+{{project_name_workstation_long}} builds by default automatically run [[Tor_Browser#Tor_Browser_Downloader_by_Whonix_.E2.84.A2|Tor Browser Downloader by {{project_name_long}}]] ({{Code2|tb-updater}} package) ({{Code2|update-torbrowser}}) following its initial installation within chroot. If the attempt to run the {{Code2|tb-updater}} package is unsuccessful, then it will fail closed by default and nothing will be installed. As a consequence, this could lead to an error while building {{project_name_long}} images from source code or when [[Dev/Installation_from_Repository|installing {{project_name_long}} from the repository]]. Although this is undesirable behavior, developers have still decided to install Tor Browser by default in {{project_name_workstation_long}}. This means the only way to ensure Tor Browser is really installed by default is to also fail closed when necessary.
+
+Qubes-{{project_name_workstation_long}} Templates by default automatically run {{Code2|update-torbrowser}} during upgrades of [[Tor_Browser#Tor_Browser_Downloader_by_Whonix_.E2.84.A2|Tor Browser Downloader by {{project_name_long}}]] ({{Code2|tb-updater}} package). If the {{Code2|update-torbrowser}} process fails, it will fail open by default. In this case, a terminal message will inform that no new Tor Browser could be downloaded, but APT will terminate normally. This is necessary to implement the {{q_project_name}} feature ensuring an [https://phabricator.whonix.org/T417 up-to-date version of Tor Browser] is available in freshly created App Qubes. <ref>Which is in turn inherited from updated Templates.</ref>
+
+=== Update Failures ===
+
+If an update failure occurs, this only poses a small inconvenience. The problem is easily solved by one of the following methods:
+
+# Running [[Tor_Browser/Internal_Updater#In_Qubes-Whonix_.E2.84.A2|Tor Browser Downloader by {{project_name_long}}]] in {{project_name_workstation_long}} Template (<code>{{project name workstation template}}</code>) or in an App Qube like <code>{{project_name_workstation_vm}}</code>.
+# Using the [[Tor_Browser/Internal_Updater#Tor_Browser_Internal_Updater|Internal Updater]] in an App Qube like <code>{{project_name_workstation_vm}}</code>.
+# [[Tor_Browser/Internal_Updater#Tor_Browser_Manual_Update|Manually downloading]] Tor Browser in an App Qube like <code>{{project_name_workstation_vm}}</code>.
+
+=== Optional Package Configuration ===
+
+Actions of the tb-updater package can be optionally configured.
+
+==== Disable Automatic Update Downloads ====
+
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''2.''' Disable automatic downloads.
+
+When the tb-updater package is upgraded in the Qubes-{{project_name_workstation_long}} Template, by default a hard-coded <ref>In the tb-updater package.</ref> version Tor Browser tarball and signature is automatically downloaded. In order to disable this, add.
+
+{{CodeSelect|code=
+tb_install_follow=false
+}}
+
+'''3.''' Save the file and exit.
+}}
+
+=== Technical Details ===
+
+By default, during the Debian maintainer postinst script run in Qubes-{{project_name_workstation_long}} Templates, the folders <code>/var/cache/tb-binary/.cache/tb/</code> and <code>/var/cache/tb-binary/.tb/tor-browser</code> will be deleted if they exist. tb-updater will then download files to <code>/var/cache/tb-binary/.cache/tb/</code>
+
+{{CodeSelect|code=
+find /var/cache/tb-binary/.cache/tb/
+}}
+
+<pre>
+/var/cache/tb-binary/.cache/tb/
+/var/cache/tb-binary/.cache/tb/temp
+/var/cache/tb-binary/.cache/tb/temp/pv_wrapper_fifo
+/var/cache/tb-binary/.cache/tb/temp/tbb_remote_folder
+/var/cache/tb-binary/.cache/tb/temp/tar_fifo
+/var/cache/tb-binary/.cache/tb/temp/sha256_output
+/var/cache/tb-binary/.cache/tb/files
+/var/cache/tb-binary/.cache/tb/files/sha256sums-unsigned-build.txt.asc
+/var/cache/tb-binary/.cache/tb/files/sha256sums-unsigned-build.txt
+/var/cache/tb-binary/.cache/tb/last_used_gpg_bash_lib_output_signed_on_date
+/var/cache/tb-binary/.cache/tb/tbb_version_last_downloaded_save_file
+/var/cache/tb-binary/.cache/tb/RecommendedTBBVersions
+/var/cache/tb-binary/.cache/tb/last_used_gpg_bash_lib_output_signed_on_unixtime
+/var/cache/tb-binary/.cache/tb/gpgtmpdir
+/var/cache/tb-binary/.cache/tb/gpgtmpdir/pubring.kbx
+/var/cache/tb-binary/.cache/tb/gpgtmpdir/private-keys-v1.d
+/var/cache/tb-binary/.cache/tb/gpgtmpdir/trustdb.gpg
+/var/cache/tb-binary/.cache/tb/gpgtmpdir/gpg_bash_lib_internal_gpg_verify_output_file
+/var/cache/tb-binary/.cache/tb/gpgtmpdir/pubring.kbx~
+/var/cache/tb-binary/.cache/tb/gpgtmpdir/gpg_bash_lib_internal_gpg_verify_status_fd_file
+</pre>
+
+After gpg verification, tb-updater will extract the Tor Browser archive to <i>/var/cache/tb-binary/.tb</i>
+
+{{CodeSelect|code=
+find /var/cache/tb-binary/.tb
+}}
+
+<pre>
+/var/cache/tb-binary/.tb/tor-browser/...
+</pre>
+
+In essence, when a Qubes-{{project_name_workstation_long}} App Qube is booted for the first time, the systemd unit file <i>/lib/systemd/system/tb-updater-first-boot.service</i> <ref>https://github.com/Kicksecure/helper-scripts/blob/master/usr/libexec/helper-scripts/first-boot-skel</ref> runs <i>/usr/lib/tb-updater/first-boot-home-population</i>. <ref>https://github.com/Kicksecure/tb-updater/blob/master/usr/lib/tb-updater/first-boot-home-population</ref> That script copies <i>/var/cache/tb-binary</i> to <i>/home/user</i>
+
+The result is.
+
+{{CodeSelect|code=
+ls -la /home/user/.tb
+}}
+
+<pre>
+drwxr-xr-x  6 user user 4096 Jun  8 01:17 .
+drwx------ 20 user user 4096 Jun  8 01:17 ..
+-rw-r--r--  1 user user    0 Jun  8 01:17 first-boot-home-population.done
+drwxr-xr-x  3 user user 4096 Jun  8 01:17 tor-browser
+</pre>
+
+{{CodeSelect|code=
+ls -la /home/user/.cache/tb
+}}
+
+<pre>
+drwxr-xr-x 5 user user 4096 Jun  8 01:17 .
+drwxr-xr-x 3 user user 4096 Jun  8 01:17 ..
+-rw-r--r-- 1 user user  167 Jun  8 01:17 RecommendedTBBVersions
+drwxr-xr-x 2 user user 4096 Jun  8 01:17 files
+drwx------ 3 user user 4096 Jun  8 01:17 gpgtmpdir
+-rw-r--r-- 1 user user   26 Jun  8 01:17 last_used_gpg_bash_lib_output_signed_on_date
+-rw-r--r-- 1 user user   11 Jun  8 01:17 last_used_gpg_bash_lib_output_signed_on_unixtime
+-rw-r--r-- 1 user user    6 Jun  8 01:17 tbb_version_last_downloaded_save_file
+drwxr-xr-x 2 user user 4096 Jun  8 01:17 temp
+</pre>
+
+=== File Locations ===
+
+==== Browser ====
+
+Template:
+
+<pre>
+/var/cache/tb-binary/.tb/tor-browser
+</pre>
+
+Home folder:
+
+<pre>
+~/.tb/tor-browser
+</pre>
+
+==== user.js ====
+
+Path to <code>user.js</code> in this documentation is just a hint. {{project_name_long}} does not influence that path, although it might change in later versions of Tor Browser. Any contents inside the <code>/Browser/</code> folder are unmodified; this is the same as Tor Browser by The Tor Project. {{project_name_long}} does not perform any modifications.
+
+<pre>
+/var/cache/tb-binary/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/user.js
+</pre>
+
+<pre>
+~/.tb/tor-browser/Browser/TorBrowser/Data/Browser/profile.default/user.js
+</pre>
+
+=== Creating {{project_name_long}} Using the Build Script ===
+
+If {{q_project_name}} is built with the available script and it should fail open in general, then before building in chroot a file <i>/etc/torbrowser.d/50_user.conf</i> must be created with the following content.
+
+{{CodeSelect|code=
+anon_shared_inst_tb=open
+}}
+
+If {{q_project_name}} is built with the available script and skipping the initial download of Tor Browser is preferred, then before building {{project_name_long}} in chroot a file <i>/etc/torbrowser.d/50_user.conf</i> must be created with the following content.
+
+{{CodeSelect|code=
+tb_install_in_chroot=false
+}}
+
+== tb-updater in Qubes DisposableVM Template ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Tor Browser Downloader by {{project_name_long}} should <u>not</u> be launched in Disposable Templates (<code>{{whonix-ws-dvm}}</code>)!
+}}
+
+The only safe place to run Tor Browser Downloader by {{project_name_long}} is in either:
+
+* The Template (<code>{{project_name_workstation_template}}</code>); or
+* The App Qube which is based on this template (<code>{{project_name_workstation_vm}}</code>).
+
+The reason is because Tor Browser is stored in folder <code>/var/cache/tb-binary</code> which is non-persistent in Qubes' Disposable Template (<code>{{whonix-ws-dvm}}</code>), but persistent in Qubes' Template (<code>{{project_name_workstation_template}}</code>).
+
+{{Qubes_persistence}}
+
+To learn more about persistence, see [https://www.qubes-os.org/doc/templates/#important-notes here] or [[Dev/Qubes#Qubes_Persistence|here]].
+
+Updating Tor Browser in Qubes' Template <code>{{project_name_workstation_template}}</code> is sufficient to make a copy of the latest Tor Browser available to all <u>newly</u> created App Qubes based upon it.
+
+{{Anchor|Start Tor Browser in Qubes Disposable Template}}
+
+{{Anchor|DVM_Template_Customization}}
+== Template Customization ==
+Similar to [[#Disposable Template Customization|Disposable Template Customization]].
+
+[[#Running_Tor_Browser_in_Qubes_Template_or_Disposable_Template|Tor Browser customization is discouraged!]]
+
+To start Tor Browser from the command line or in debugging mode in a Qubes Disposable Template, choose any of the following options below.
+
+* [[#Option 1: Disposable Template Method|Option 1: Disposable Template Method]] cannot be used.
+* Only [[#Option 2: Template Method|Option 2: Template Method]] or [[#Option 3: Manual Method|Option 3: Manual Method]] can be used.
+
+== Disposable Template Customization ==
+
+[[#Running_Tor_Browser_in_Qubes_Template_or_Disposable_Template|Tor Browser customization is discouraged!]]
+
+To start Tor Browser from the command line or in debugging mode in a Qubes Disposable Template, choose any of the following options below.
+
+Forum discussion: [https://forums.whonix.org/t/how-do-i-customise-tor-browser-in-a-whonix-templatebased-dvm-in-whonix-14/5580 How to customize Tor Browser in a {{project_name_long}} TemplateBased DVM?]
+
+=== Option 1: Disposable Template Method ===
+
+Using this method, customization would only apply to the Disposable Template and any Disposables based on that Disposable Template.
+
+{{Box|text=
+'''1.''' Start {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>).
+
+'''2.''' Disable Tor Browser Downloader Disposable Service. <ref>
+* This is to prevent mounting <code>/var/cache/tb-binary/.tb</code> to <code>/home/user/.tb</code>.
+* <code>/lib/systemd/system/tb-updater-dispvm.service</code>
+* <code>/usr/lib/tb-updater/dispvm</code>
+
+The following will not work.
+
+{{CodeSelect|code=
+sudo mkdir -p /usr/local/lib/systemd/system/
+}}
+
+{{CodeSelect|code=
+sudo ln -s /dev/null /usr/local/lib/systemd/system/tb-updater-dispvm.service
+}}
+
+This is probably because Qubes mounts /usr/local too late to be regarded by systemd.
+</ref>
+
+{{CodeSelect|code=
+sudo systemctl mask tb-updater-dispvm.service
+}}
+
+'''3.''' Shutdown Template.
+
+{{CodeSelect|code=
+sudo poweroff
+}}
+
+'''4.''' Open a terminal emulator in {{project_name_workstation_long}} Disposable Template <code>{{project_name_workstation_template}}-dvm</code>.
+
+Run in dom0 terminal emulator.
+
+{{CodeSelect|code=
+qvm-run -a {{project_name_workstation_template}}-dvm xfce4-terminal
+}}
+
+'''5.''' Open Tor Browser Starter / Tor Browser Downloader (by {{project_name_long}} developers) configuration file.
+
+In {{project_name_workstation_long}} Disposable Template <code>{{project_name_workstation_template}}-dvm</code>:
+
+Create folder <code>/usr/local/etc/torbrowser.d</code>.
+
+{{CodeSelect|code=
+sudo mkdir -p /usr/local/etc/torbrowser.d
+}}
+
+Open file <code>/usr/local/etc/torbrowser.d/50_user.conf</code> in an editor with root rights.
+<!-- Wiki editors note: cannot use template {{Open_with_root_rights}} because that would say "Qubes-Whonix: in Template" which would be wrong here. -->
+
+{{CodeSelect|code=
+sudoedit /usr/local/etc/torbrowser.d/50_user.conf
+}}
+
+'''6.''' Paste.
+
+<pre>
+tb_qubes_dvm_template() {
+   true
+}
+</pre>
+
+'''7.''' Save.
+
+'''8.''' Tor Browser in Disposable Template.
+
+Running Tor Browser Starter / Tor Browser Downloader (by {{project_name_long}} developers) in Disposable Template is now possible. <ref>
+When running <code>torbrowser</code> (Tor Browser Starter by {{project_name_long}} developers) in Disposable Template it will first copy <code>/var/cache/tb-binary/.tb/tor-browser</code> to user home folder <code>/home/user/.tb/tor-browser</code>. (Folder <code>/var/cache/tb-binary/.tb/tor-browser</code> was previously created by Tor Browser Downloader (by {{project_name_long}} developers).) Second, it will start the Tor Browser binary from folder <code>/home/user/.tb/tor-browser</code>.
+</ref>
+
+Start Tor Browser.
+
+{{CodeSelect|code=
+torbrowser
+}}
+
+Optional: Download a new version Tor Browser Downloader by {{project_name_long}}. Read chapter [[Tor_Browser#Tor_Browser_Downloader_by_Whonix_.E2.84.A2|Tor Browser Downloader by {{project_name_long}}]] beforehand.
+
+{{CodeSelect|code=
+update-torbrowser
+}}
+
+'''9.''' Customize Tor Browser.
+
+Perform customization changes.
+
+'''10.''' Shut down Disposable Template.
+
+{{CodeSelect|code=
+sudo poweroff
+}}
+
+'''11.''' Start Tor Browser in Disposable.
+
+'''12.''' Done.
+
+Customized Tor Browser should now be started in the Disposable.
+}}
+
+=== Option 2: Template Method ===
+
+Using this method, customization this way would apply to all App Qubes and Disposables based on this Template.
+
+{{Box|text=
+In {{project_name_workstation_long}} Template <code>{{project_name_workstation_template}}</code>.
+
+'''1.''' Open a terminal.
+
+'''2.''' Change ownership of Tor Browser.
+
+Change the ownership of the folder from <code>root</code> to <code>user</code> to be able to launch the browser from that folder.
+
+{{CodeSelect|code=
+sudo chown -R user:user /var/cache/tb-binary
+}}
+
+'''3.''' Change directory.
+
+{{CodeSelect|code=
+cd /var/cache/tb-binary/.tb/tor-browser/Browser
+}}
+
+'''4.''' Start Tor Browser in debugging mode.
+
+{{CodeSelect|code=
+./start-tor-browser --debug
+}}
+
+Note: Tor Browser can also be started manually without the <code>--debug</code> argument.
+
+'''5.''' Apply the desired modification.
+
+'''6.''' Close Tor Browser.
+
+'''7.''' Change back the ownership to <code>root</code>.
+
+{{CodeSelect|code=
+sudo chown -R root:root /var/cache/tb-binary
+}}
+
+'''8.''' Disable automatic update downloads.
+
+Optional: Consider [[#Disable Automatic Update Downloads|Disable Automatic Update Downloads]] since these would overwrite any user modifications. <ref name=no-user-freedom-restrictions>
+[[#Tor_Browser_Update:_Technical_Details|Due to technical limitations.]] Because whole folder <code>/var/cache/tb-binary/.tb/tor-browser</code> is replaced. [[Reasons for Freedom Software#No_Intentional_User_Freedom_Restrictions|This is not an intentional user freedom restriction or security feature.]]
+</ref>
+
+'''9.''' Apply Tor Browser updates.
+
+From time to time when updated for Tor Browser are available, re-apply this procedure and use [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] to update Tor Browser. Alternatively use any other update method as documented on the [[Tor Browser]] wiki page.
+
+'''10.''' Done.
+
+Tor Browser customization using Qubes Template Method has been completed.
+
+'''Note:''' If using Tor Browser Downloader by {{project_name_long}}, user modifications in folder <code>/var/cache/tb-binary/.tb/tor-browser</code> will be lost and would need to be re-applied. <ref name=no-user-freedom-restrictions />
+}}
+
+=== Option 3: Manual Method ===
+
+It is possible to ignore most of what {{project_name_long}} has implemented relating to Tor Browser and go back to square one, performing it all manually.
+
+{{Box|text=
+# Start a terminal emulator in Qubes Disposable Template.
+# Ignore command <code>torbrowser</code> / <code>/usr/bin/torbrowser</code> on the command line. (Ignore Tor Browser Starter by {{project_name_long}} developers.)
+# Ignore command <code>update-torbrowser</code> / <code>/usr/bin/update-torbrowser</code> on the command line. (Ignore Tor Browser Downloader by {{project_name_long}} developers.)
+# Ignore Tor Browser (AnonDist) (by {{project_name_long}} developers) Qubes start menu entry.
+# Manually install Tor Browser to folder <code>/home/user</code> as per instructions from The Tor Project. Nothing {{project_name_long}} specific. [[Support#Free_Support_Principle|Free Support Principle]] applies. However, instructions for [[Tor_Browser/Manual_Download|Tor Browser: Manual Download]] might be handy.
+# Manually (by ignoring as instructed above) start Tor Browser such as from folder <code>/home/user/tor-browser</code>.
+# Make any desired modifications.
+# Close Tor Browser.
+# Shutdown Qubes Disposable Template.
+# Start a terminal emulator in Disposable.
+# Navigate to the folder where you manually installed Tor Browser.
+# Start Tor Browser.
+
+Feel free to customize this further such as adding a new Qubes start menu entry. This is outside the scope of this documentation and can be done as per the usual Qubes start menu modification procedures.
+
+[[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] is a non-issue in this case due to minimal [[Tor_Browser#Whonix_.E2.84.A2_Tor_Browser_Differences|{{project_name_long}} Tor Browser Differences]].
+}}
+
+The advantage of this method is that whatever {{project_name_long}} implemented will probably not cause any issues. The disadvantage is slightly reduced usability, such as the superfluous Qubes start menu entry which can be ignored.
+
+=== Split Tor Browser for Qubes ===
+
+TODO: Try, review and document [https://phabricator.whonix.org/T585 Qubes' Split Tor Browser].
+
+= Platform-specific Issues: {{project_name_long}} Custom Linux Workstation =
+
+For instructions on how to configure Tor Browser in a {{project_name_long}}-Custom-Linux-Workstation, see: [[Other_Operating_Systems#Configure_Tor_Browser_Settings|{{project_name_long}}-Linux-Workstation Tor Browser Settings]].
+
+= Platform-specific Issues: Windows =
+
+Instructions to configure Tor Browser in a {{project_name_long}}-Custom-Windows-Workstation are ''untested and unfinished.'' Please [[contribute]] by testing and finishing these [[Other_Operating_Systems#Tor_Browser_Settings|Windows Tor Browser Settings]] instructions.
+
+{{Anchor|Cumbersomeness}}
+
+= Tor Browser Update: Technical Details =
+== Linux Generally ==
+Updating Tor Browser works differently in Debian and other Linux distributions generally, since it cannot be upgraded with APT package sources like most other applications ([[About#Based_on_Debian|{{project_name_long}} is based on Debian]]). The reason is there are unresolved upstream issues, namely deb packages and/or a deb repository with Tor Browser are not provided:
+
+* [https://gitlab.torproject.org/legacy/trac/-/issues/5236 Make a deb of the Torbrowser and add to repository]
+* [https://gitlab.torproject.org/legacy/trac/-/issues/3994 Get TorBrowser in Debian]
+
+Tor Browser Developer Georg Koppen (gk) has stated: <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/5236#comment:45
+</ref>
+
+<blockquote>
+We don't have plans to pick this up, but maybe someone from the community...
+</blockquote>
+
+The usual process for general, non-{{project_name_long}} Linux platforms such as for example Debian supported by The Tor Project is:
+
+# Navigate to torproject.org
+# Download Tor Browser for the relevant platform.
+# Verify Tor Browser.
+# Extract Tor Browser inside the home folder.
+# Launch Tor Browser.
+
+This process is simplified by programs such as torbrowser-launcher (for Debian users) and tb-updater (for Debian and {{project_name_long}} users), yet Tor Browser is still installed inside of the home folder. For this reason, Tor Browser cannot be updated by package management tools like apt.
+
+torbrowser-launcher and tb-updater are Tor Browser installers. torbrowser-launcher (for Debian users) and tb-updater are <u>not</u> Tor Browser updaters. The difference between an installer and an updater is that an installer is incapable of preserving user data after updates -- only an updater can achieve that. In the long term, tb-updater will likely be renamed to tpo-downloader.
+
+Another issue is that Tor Browser mixes binaries and user data into the same folder. Usually binaries used by users in Linux distributions generally reside in folder <code>/usr/bin</code> and user data resides in folder <code>/home/user</code>. This is further complicated since Tor Browser folder structure has changed over time. Future changes might happen. Therefore it would be unwise for a downstream Linux distribution such as {{project_name_long}} to attempt to separate binaries and user data. Since Tor Browser comes with its own internal updater and folder structure might change in future, updates might break or user data might become inaccessible if such attempts were made.
+
+== Qubes-specific ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Prerequisite knowledge: see [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template_or_Disposable_Template|Qubes R4 Inheritance and Persistence]].
+}}
+
+The Tor Project requires Tor Browser to be installed inside of the home folder as explained earlier; see [[#Linux_Generally|Linux Generally]]. Qubes' App Qubes have their own home folder, independent from the Template they are based on. This means updates of a Qubes' Template will not update Tor Browser which is already installed in a Qubes App Qube's home folder. In short, Tor Browser updates are a more cumbersome task in Qubes OS due to Qubes-specific design choices and technical limitations.
+
+Due to these restrictions, the safest configuration that {{project_name_long}} has [https://phabricator.whonix.org/T417 implemented] is to ensure that <u>new</u> App Qubes and [[Qubes/Disposables|Disposables]] are created with a copy of the latest Tor Browser version. In essence:
+
+* When tb-updater is run in a Qubes Template, it stores Tor Browser in folder <code>/var/cache/tb-binary</code>.
+* When a App Qube starts and it has never copied Tor Browser before (likely only at first boot), and there is no copy of Tor Browser in <code>/home/user</code>, Tor Browser is copied from <code>/var/cache/tb-binary</code> to <code>/home/user</code>.
+** Existing copies of Tor Browser in the home folder are not overwritten. This is due to an explicit design goal to avoid data loss; see [[#tb-updater_in_Qubes_Template|tb-updater in Qubes Template VM]] for technical details.
+
+Since Tor Browser mixes binaries and user data into the same folder, special configurations such as [[Tor_Browser/Advanced_Users#Disposable_Template_Customization|Qubes Disposable Template Customization]] are more complicated than for other software. This is because either folder <code>/var/cache/tb-binary</code> is being kept up to date or user data is being preserved. There is no maintainable way for {{project_name_long}} to separate Tor Browser binaries from user data.
+
+= Multiple Tor Browser Instances and Workstations =
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = As noted on the [[Warning]] page, [[Warning#Separation_of_Different_Contextual_Identities|{{project_name_long}} does not Separate Different Contextual Identities]].
+}}
+
+Appropriate compartmentalization of user activities is important when different identities and/or additional software are in use. Multiple Tor Browser instances provide some separation of distinct identities, however this issue has not yet been fully solved by [[Tor_Browser|Tor Browser]] or [[Tor_Browser#Torbutton|Torbutton]]. A more secure method of compartmentalization is using [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]], which are easily created.
+
+== Multiple Tor Browser Instances ==
+
+To better separate different contextual identities, consider starting multiple Tor Browser instances. Follow the steps in the [[Manually Downloading Tor Browser]] entry, except for minor changes that are necessary; for example Tor Browser must be extracted into a different folder.
+
+This method is less secure than using multiple {{project_name_workstation_long}}, which is outlined below.
+
+== Multiple {{project_name_workstation_long}} ==
+
+For tasks requiring different identities and/or additional software, it is recommended to utilize [[Multiple Whonix-Workstation|two or more {{project_name_workstation_long}} VMs]] since different torified clients are isolated from each other. In this configuration, a Tor Browser exploit in one {{project_name_workstation_long}} cannot simultaneously read the user's identity in another VM (for example, an IRC account). <ref>This does not protect against the sudden loss of networking, which could reveal to the attacker that two activities / accounts suddenly going off-line are probably related.</ref>
+
+This method is less secure than using Tor Browser in a Qubes [[Qubes/Disposables|{{project_name_workstation_long}} DisposableVM]].
+
+= See Also =
+* [[Tor Browser|Tor Browser Essentials in {{project_name_long}}]]
+* [[Qubes/Tor_Browser|Using Tor Browser in {{q_project_name}}]]
+* [[Browser Plugins]]
+
+= Footnotes / References =
+{{reflist|close=1}}
+
+= License =
+
+<blockquote>{{project_name_long}} Tor Browser Advanced Topics wiki page Copyright (C) Amnesia <amnesia at boum dot org>
+{{project_name_long}} Tor Browser Advanced Topics wiki page Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+
+This program comes with ABSOLUTELY NO WARRANTY; for details see the wiki source code.
+This is free software, and you are welcome to redistribute it under certain conditions; see the wiki source code for details.</blockquote>
+
+{{Footer}}
+
+[[Category:Documentation]]

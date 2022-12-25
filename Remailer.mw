@@ -1,0 +1,149 @@
+{{Title|title=Remailers: Send Emails without Registration}}
+{{Header}}
+{{#seo:
+|description=Anonymous Mail/Messages. Remailer over Tor. Tunnelling remailer through Tor. Connection Schema: user &rarr; Tor &rarr; remailer &rarr; recipient
+|image=https://www.{{project_clearnet}}/w/images/8/8a/Remailer.png
+}}
+[[image:Remailer.png|thumb]]
+= Introduction =
+
+An anonymous remailer is: <ref>
+https://en.wikipedia.org/wiki/Anonymous_remailer
+</ref>: <blockquote>... a server that receives messages with embedded instructions on where to send them next, and that forwards them without revealing where they originally came from. There are [https://en.wikipedia.org/wiki/Cypherpunk_anonymous_remailer Cypherpunk anonymous remailers], [https://en.wikipedia.org/wiki/Mixmaster_anonymous_remailer Mixmaster anonymous remailers], and [https://en.wikipedia.org/wiki/Pseudonymous_remailer nym servers], among others, which differ in how they work, in the policies they adopt, and in the type of attack on anonymity of e-mail they can (or are intended to) resist.</blockquote>
+
+In {{project_name_workstation_long}}, remailers can be used over Tor. The goal is access to a cheap tool that can send messages without registration, rather than offering more anonymity for (web) messages than Tor can provide.
+
+In theory, remailers are high latency networks that should provide more security than using low latency networks like Tor in isolation; see [[Dev/Anonymity Network|Anonymity Network]] for further details.  However, the unfortunate reality is there are no known high latency networks which meet the following criteria at the time of writing (2019):
+
+* <u>Development</u>: active development is indicated by regular:
+** developer commits addressing bugs, maintenance and design improvements
+** press releases and blog posts
+** forum/mailing list activity
+* <u>Infrastructure</u>: users have reliable access to multiple servers.
+* <u>User Base</u>: a significant population regularly utilizes remailers for (pseudo)-anonymous messages.
+
+In practice, the dearth of users and servers means it is safest to assume that remailers provide little to no additional anonymity. {{project_name_long}} developers would welcome a rebirth of high latency networks and an active, sizable user/developer community, but this is an unlikely outcome in the near-medium term.
+
+= Remailer Tips =
+
+'''Table:''' ''Remailer Recommendations''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Domain'''
+! scope="col"| '''Recommendation'''
+|-
+! scope="row"| Message Encryption
+|
+* Dependent on your requirements, it is suggested to encrypt the content of the mail/message, otherwise the last (or only) remailer and the recipient's mail provider can read it.
+* It is safer to use a subject line that does not provide any hints about the contents -- therefore an empty or random subject is recommended.
+|-
+! scope="row"| Remailer Chain
+|
+* Due to the small existing remailer ecosystem, it is recommended to only use one remailer at a time and not a chain of them. This will ensure the message/mail is delivered quickly and more reliably. <ref>Those who believe remailer chains will improve anonymity are free to disregard this advice and create a path length of their choosing.</ref>
+|-
+! scope="row"| Remailer Software/Interface
+|
+* It is safest to install and use remailer software directly inside  {{project_name_workstation_long}} over Tor.
+* The alternative is to utilize a [[Remailer#Third_Party_Web_Interface|Third Party Web Interface]] (see further below). For security reasons this is recommended against, since the website owner can monitor various [[Metadata|metadata]], conduct [[Surfing_Posting_Blogging#Keystroke_Fingerprinting|keystroke fingerprinting]] and inspect 'cleartext' (unencrypted content) communications.
+|-
+! scope="row"| Remailer Test
+|
+* Do <u>not</u> test the remailer by sending a remailed mail/message to yourself.
+|}
+
+= Remailer Attacks =
+
+If remailers are not careful, various attacks are possible when attempts are made to send mail/messages.
+
+'''Table:''' ''Remailer Threats'' <ref name=mixmaster_remailers />
+
+{| class="wikitable"
+|-
+! scope="col"| '''Threat'''
+! scope="col"| '''Description'''
+|-
+! scope="row"| Adversary Threat Model
+|
+* Adversaries can record the contents of all unencrypted messages into and out of remailers, as well as time metadata related to arrival and departure.
+* Adversaries can send an unlimited number of messages through emails, and also try to prevent messages arriving at their destintation.
+|-
+! scope="row"| Man-in-the-Middle Attack
+|
+* It is possible for adversaries to intercept the very first message to a correspondent, and substitute a genuine public key with a fake one. If undetected, the respondent will write a 'confidential' message using the fake public key for encryption, which when intercepted can be read by the adversary using the private key they created. <ref>This can be averted by exchanging public keys in person and on disk, downloading public keys over a secure website, or using a digital signature certificate from a qualified company.</ref>
+|-
+! scope="row"| Reordering
+|
+* Messages ''can'' be traced through chains of remailers with encryption if the incoming messages are processed and forwarded directly.
+* Delaying messages for a period of time does not fully address this problem, since remailers generally have little traffic <ref>Or experience network outages.</ref> to disguise the messages.
+* 'Reordering' tries to address this threat by keeping some messages in the remailer at all times ('message pool') and then randomly sending out one of the messages in the pool. However, this is susceptible to spam attacks. This threat is mitigated by sending out all messages periodically and at random intervals.
+|-
+! scope="row"| Replay Attack
+|
+* If remailer settings do not refuse to send a message more than once, <ref>By including a random ID number for each hop.</ref> then adversaries can follow a message to the final destination or trace the original sender. <ref>Tracing a message forward requires an adversary to capture the message and then send many copies to the first remailer. When multiple, identical messages emerge from the remailer and move to the next hop, the 'bump' in remailer traffic reveals the route it took.</ref>
+|-
+! scope="row"| Size and Distinguishability
+|
+* Messages can be tracked by their size, even though default messages decrease in size by a fraction at each hop due to the removal of padding.
+* Very large messages will stand out to adversaries and can be pinpointed for attacks.
+* Mitigating this threat requires each mail/message to be exactly the same size.
+|-
+! scope="row"| Trivial Attacks
+|
+* A number of attacks are possible when a message is sent unencrypted, or when the message is encrypted but the remailer is compromised (since the operator knows both originating and final addresses).
+|}
+
+= Mixmaster: Tor Remailer =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This option is now deprecated. Mixmaster is dead upstream and has been [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=880101 permanently removed from Debian].
+}}
+
+Mixmaster remailers do several things: <ref name=mixmaster_remailers>https://mason.gmu.edu/~afinn/html/tele/components/anonymous_remailers.htm</ref>
+
+<blockquote>
+* They send a message to another e-mail address or post it to a news group.
+* They accept encrypted messages with instructions for processing hidden inside the encrypted envelope.
+* They strip all mail headers.
+* They add new headers such as subject lines.
+* They remove some information from the end of the message.
+* They encrypt part of a message using a key specified in the message.
+</blockquote>
+
+Interested readers are still free to peruse the [[Mixmaster]] documentation. Historical tests with this software were successful -- when utilizing one remailer, mail/messages took between 10-120 minutes before arriving in the recipient's inbox.
+
+= Third Party Web Interface =
+
+As noted earlier, Tor Browser can be paired with a third party web interface. However, this configuration is less secure and should be used with care because the server administrator is capable of snooping on cleartext as it is typed or pasted.
+
+== Mixmaster ==
+
+* [https://www.awxcnx.de/handbuch_34.htm German Privacy Foundation (awxcnx) email]
+* German Privacy Foundation (awxcnx) [https://en.wikipedia.org/wiki/Usenet usenet]
+* [http://webmixmaster.paranoici.org/ Webmixmaster paranoici (clearnet SSL)]
+* [https://gilc.org/speech/anonymous/remailer.html W3- Anonymous Remailer (clearnet)]
+
+<u>Note</u>: The [https://www.cotse.net/cgi-bin/mixnews.cgi Cotse.net clearnet SSL] mixmaster public usenet interface has been taken offline due to repeated abuse by botnets. It is now only possible to pay for a subscription to the service.
+
+== Unknown ==
+
+* [https://web.archive.org/web/20220424062910/http://anonymouse.org/anonemail_de.html Anonymouse (clearnet, German website)]
+* [https://send-email.org/ send-email.org (clearnet)]
+* [https://www.ngz-server.de/ NGZ-Server.de (clearnet, SSL)]
+* [https://www.guerrillamail.com/ Guerrilla Mail]
+= Cypherpunk Remailer =
+
+<u>Note</u>: Readers are welcome to correct any inaccuracies in this section.
+
+The Wikipedia [https://en.wikipedia.org/wiki/Cypherpunk_anonymous_remailer Cypherpunk anonymous remailer] article and [https://web.archive.org/web/20160509032241/http://remailer.paranoici.org/rlist2.html list of Cypherpunk remailer services] suggests these services utilize Mixmaster. Online, associated help files <ref>Broken link: http://https://web.archive.org/web/20160423030615/http://cypherpunks.to/remailers/help.txt</ref> also explain that it is safer to use Mixmaster, since Cypherpunk remailers just provide an email based interface.
+
+Since the full list of type I and type II remailer servers <ref>https://web.archive.org/web/20160509032241/http://remailer.paranoici.org/rlist2.html</ref> reveals that most type I (Cypherpunk) are also type II (Mixmaster) servers, it does not appear necessary to learn and document how Cypherpunk remailers work. In fact, it does not appear to be an actual alternative, since Cypherpunk remailers cannot be used if Mixmaster is non-functional for some reason. This option would also defeat the purpose of this wiki entry (sending mail without registration), since it still requires a mail provider.
+
+= Footnotes / References =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,147 @@
+{{Header}}
+{{title|
+title=Access {{project_name_gateway_long}} Ports from the Host
+}}
+{{#seo:
+|description=Access {{project_name_gateway_long}} Port From Host (Esoteric Documentation)
+|image=Accessgateway.jpg
+}}
+[[image:Accessgateway.jpg|thumb]]
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This is very esoteric and you probably do not need it! Advanced users only!
+}}
+
+= Access {{project_name_gateway_long}} Port From Host =
+'''Not tested since {{project_name_long}} 0.5.6. May or may not work. Might need changes for later versions.'''
+
+== Example: Make port 9050 accessible from the host. ==
+=== Host Setup ===
+On the host.
+
+In the {{project_name_gateway_long}} VM network settings. &rarr; Set up Port Forwarding: &rarr; within the <code>Adapter 1</code> tab click <code>Advanced</code> &rarr; then <code>Port Forwarding</code> &rarr; Insert a new rule as follows.
+
+<pre>
+Name: 9050
+Protocol: TCP
+Host IP: 127.0.0.1
+Host Port: 9050
+Guest IP: leave blank
+Guest Port: 9050
+</pre>
+
+Or the same as command line. You might have to adjust the name of your Whonix-Gateway.
+
+XFCE:
+
+{{CodeSelect|code=
+VBoxManage modifyvm "{{project_name_gateway_short}}-XFCE" --natpf1 "9050",tcp,127.0.0.1,9050,,9050
+}}
+
+CLI:
+
+{{CodeSelect|code=
+VBoxManage modifyvm "{{project_name_gateway_short}}-CLI" --natpf1 "9050",tcp,127.0.0.1,9050,,9050
+}}
+
+=== {{project_name_gateway_long}} Setup ===
+Inside {{project_name_gateway_long}}...
+
+IP <code>10.0.2.15</code> is usually obtained from VirtualBox's DHCP server. Hope this always works, otherwise you have to adjust the IP or edit the network config. And use a static virtual LAN IP. ([[Template:Network_Config]])
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add. (The second line is not strictly required, useful for debugging.)
+
+{{CodeSelect|code=
++SocksPort 10.0.2.15:9050
++SocksPort 127.0.0.1:9050
+}}
+
+Save.
+
+{{Reload_Tor}}
+
+<ref>
+* https://github.com/Whonix/whonix-firewall/blob/master/etc/whonix_firewall.d/30_whonix_gateway_default.conf
+* https://forums.whonix.org/t/redirect-host-traffic-to-whonix-gateway-allow-multiple-incoming-flashproxy-ports/7448
+* Look at <code>/etc/whonix_firewall.d/30_whonix_gateway_default.conf</code>.
+
+{{Open File|filename=
+/etc/whonix_firewall.d/30_whonix_gateway_default.conf
+}}
+
+Read information about the following configuration options.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 9050 "
+EXTERNAL_UDP_OPEN_PORTS+=" 9050 "
+}}
+</ref>
+
+{{Firewall_Settings}}
+
+Add.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 9050 "
+EXTERNAL_UDP_OPEN_PORTS+=" 9050 "
+}}
+
+Save.
+
+{{Reload_Firewall}}
+
+== Debugging ==
+
+Inside {{project_name_gateway_long}}...
+
+Switch to clearnet user.
+
+{{CodeSelect|code=
+sudo -u clearnet bash
+}}
+
+{{CodeSelect|code=
+cd ~
+}}
+
+Test if the port you want to make available on the host is available from inside {{project_name_workstation_long}}. (If that's not the case, something is fundamentally wrong and you need to fix this first.)
+
+Circumventing [[Stream_Isolation|uwt]] curl wrapper.
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl --output - 127.0.0.1:9050
+}}
+
+It should answer <code>This is a SOCKs proxy, not an HTTP proxy.</code>.
+
+== Testing ==
+
+On the host...
+
+{{CodeSelect|code=
+curl 127.0.0.1:9050
+}}
+
+It should answer <code>This is a SOCKs proxy, not an HTTP proxy.</code>.
+
+If you see that, that indicates that Tor is, which runs inside {{project_name_gateway_long}} is accessible on the host as well.
+
+== Forwarding that port to LAN ==
+
+On the host...
+
+This is untested, but should work.
+
+You can use something like <code>socat</code>, <code>systemd-socket-proxyd</code> or [[SSH]] port forwarding to redirect that port <code>127.0.0.1:9050</code> to a different network interface. Otherwise you could experiment with the {{project_name_gateway_long}} VM network settings.
+
+= See Also =
+* [[Hosting a %28private%29 %28obfuscated%29 bridge or %28exit%29 relay|Hosting a (private) (obfuscated) bridge or (exit) relay]]
+* [[Ports]]
+* [[Access Workstation Port From Host|Access {{project_name_workstation_long}} Ports from the Host]]
+
+{{Footer}}
+
+[[Category:Documentation]]

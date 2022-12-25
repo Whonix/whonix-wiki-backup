@@ -1,0 +1,253 @@
+{{Header}}
+{{#seo:
+|description=Preventing Tor over Tor for Tor Browser, TorChat and others.
+}}
+
+= Why? =
+See [[Tips_on_Remaining_Anonymous#Prevent_Tor_over_Tor_scenarios|Prevent Tor over Tor Scenarios]].
+
+[https://forums.whonix.org/t/anon-ws-disable-stacked-tor-considered-useless/8471 Rationale on implementation details, SocksSocket vs TCP, environment variables vs settings file]
+
+= Implementation =
+== Environmental Variable Adjustments ==
+* [https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/etc/X11/Xsession.d/20torbrowser <code>/etc/X11/Xsession.d/20torbrowser</code>]
+* [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh <code>/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh</code>]
+
+== providing virtual Tor package ==
+Implemented in [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor anon-ws-disable-stacked-tor], [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/debian/control {{Code|debian/control}}]. The package uses the <code>Provides: tor</code> field<ref>See "7.5 Virtual packages - Provides" on https://www.debian.org/doc/debian-policy/ch-relationships.html</ref>, which should avoid any kinds of conflicts, in case upstream releases a higher version of Tor. This won't work for packages, which depend on an explicit version of Tor (such as TorChat). This is non-ideal, since for example the {{Code|torchat}} package will install Tor, but still acceptable, because of the following additional implementations.
+
+== Tor binary replacement ==
+Tor's binary was replaced (dpkg-diverted using config-package-dev) with dummy executables, so even if the real {{Code|tor}} package gets installed, it won't be automatically started.
+
+* https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/bin/tor.anondist
+* https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/sbin/tor.anondist
+
+== systemd-socket-proxyd listening port redirection ==
+[https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/lib/anon-ws-disable-stacked-tor/systemd-unit-files-generator Listening] using <code>systemd-socket-proxyd</code> on the following listening ports:
+
+** Tor's default listening ports. I.e.:
+*** system [[Tor]]'s {{Code|127.0.0.1:9050}}, {{Code|127.0.0.1:9051}} and,
+*** [[Tor Browser]]'s {{Code|127.0.0.1:9150}}, {{Code|127.0.0.1:9051}},
+*** [[Tor Messenger]]'s {{Code|127.0.0.1:9152}} (<code>SocksPort</code>) -> gateway <code>SocksPort</code> <code>9153</code>, {{Code|127.0.0.1:9153}} <code>ControlPort</code> -> gateway <code>9051</code> <code>ControlPort</code> (actually control port filter proxy, onion-grater)
+** and others, see [https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/usr/lib/anon-ws-disable-stacked-tor/systemd-unit-files-generator full list]
+** Those listening ports forwarded to {{project_name_gateway_long}}.
+** This prevents the default Tor Browser, Tor Messenger and/or Tor package by The Tor Project from opening these default ports, which will result in Tor failing to open its listening port and therefore exiting, thus preventing Tor over Tor.
+
+TODO: describe
+
+* systemd socket activation
+* https://phabricator.whonix.org/T357
+
+== Unix Domain Socket File Redirection ==
+Since Tor Browser, [[OnionShare]] ([https://cloud.githubusercontent.com/assets/156128/21556064/8ead0338-cdd2-11e6-918c-d4ca61724b52.png screenshot]) among more and more other applications require [https://phabricator.whonix.org/T192 SocksSocket] <ref>
+* https://gitlab.torproject.org/legacy/trac/-/issues/14272#comment:3
+* https://gitlab.torproject.org/legacy/trac/-/issues/20111#comment:5
+</ref>, anon-ws-disable-stacked-tor is also providing:
+
+* Tor Control Unix Domain Socket file: <code>/var/run/tor/control</code>, which is redirected to Control Port Filter Proxy on {{project_name_gateway_long}}.
+* [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/share/anon-ws-disable-stacked-tor/control.authcookie Tor Control Auth Cookie]: a functional <code>/var/run/tor/control.authcookie</code> that works with [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]].
+* Tor Socks Unix Domain Socket file: <code>/var/run/tor/socks</code> that is redirected to {{project_name_gateway_long}} Tor port <code>9050</code>
+** [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/etc/anon-ws-disable-stacked-tor.d/30_anon-dist.conf full list]
+
+== Tor state file creation ==
+All required state files which Tor would normally create in <code>/var/run/tor</code> and <code>/var/lib/tor</code> are being created by [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/lib/anon-ws-disable-stacked-tor/state-files /usr/lib/anon-ws-disable-stacked-tor/state-files].
+
+== bindp ==
+TODO: describe
+
+* bindp
+* https://phabricator.whonix.org/T561
+
+== socat ==
+There are no <code>socat</code> redirections by default in {{project_name_long}}.
+
+Advanced setups such as [https://getmonero.org/resources/user-guides/cli_wallet_daemon_isolation_qubes_whonix.html Monero CLI Wallet/Daemon Isolation with {{q_project_name}}] are using things like <code>EXEC</code>. From that example.
+
+<pre>
+socat TCP-LISTEN:18081,fork,bind=127.0.0.1 EXEC:"qrexec-client-vm monerod-ws user.monerod"
+</pre>
+
+<code>systemd-socket-proxyd</code> does not support <code>EXEC</code>, hence <code>socat</code> is useful here.
+
+= Limitations =
+Not all arbitrary application with their own Tor integration have their internal Tor disabled.
+
+* Applications installed from Debian package sources and manually installed applications have the "lowest risk" of Tor over Tor / "highest chance" of anon-ws-disable-stacked-tor being functional. If the application honors common environment variable <code>TOR_SKIP_LAUNCH=1</code>, then there should be no issue.
+* Applications shipped through Flatpak: There is currently no technical approach how anon-ws-disable-stacked-tor could disable application's internal chroot in the flatpak chroot. This matters for example for [[OnionShare]] if installed from Flatpak, see [[Dev/OnionShare]].
+* Applications shipped through appimages: same as above.
+
+= Debugging =
+Run.
+
+{{CodeSelect|code=
+echo "$TOR_SOCKS_IPC_PATH"
+}}
+
+Should show the following.
+
+<pre>
+/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock
+</pre>
+
+----
+
+Run.
+
+{{CodeSelect|code=
+echo "$TOR_CONTROL_IPC_PATH"
+}}
+
+Should show the following.
+
+<pre>
+/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock
+</pre>
+
+Also please run.
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl 127.0.0.1:9150
+}}
+
+Should show the following.
+
+<pre>
+<html>
+<head>
+<title>Tor is not an HTTP Proxy</title>
+</head>
+<body>
+<h1>Tor is not an HTTP Proxy</h1>
+<p>
+It appears you have configured your web browser to use Tor as an HTTP proxy.
+This is not correct: Tor is a SOCKS proxy, not an HTTP proxy.
+Please configure your client accordingly.
+</p>
+<p>
+See <a href="https://www.torproject.org/documentation.html">https://www.torproject.org/documentation.html</a> for more information.
+<!-- Plus this comment, to make the body response more than 512 bytes, so      IE will be willing to display it. Comment comment comment comment      comment comment comment comment comment comment comment comment.-->
+</p>
+</body>
+</html
+</pre>
+
+Run a similar command.
+
+<pre>
+echo GET | socat - UNIX-CONNECT:/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock
+</pre>
+
+Should show the same as above.
+
+-----
+
+Next one to try.
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 curl 127.0.0.1:9151
+}}
+
+Should show the following.
+
+<pre>
+510 Request filtered
+...
+</pre>
+
+Run a similar command.
+
+<pre>
+echo GET | socat - UNIX-CONNECT:/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock
+</pre>
+
+Should show.
+
+<pre>
+510 Request filtered
+</pre>
+
+= Debugging with curl =
+
+Trying to use <code>curl</code> rather than <code>curl.anondist-org</code> is a common mistake when debugging {{project_name_long}} network issues.
+
+<code>curl</code> is a symlink to <code>curl.anondist-orig</code>. In turn, this symlinks to <code>uwtwrapper</code> which runs <code>curl</code> under <code>torsocks</code>. <code>torsocks</code> then forces Tor to run on <code>localhost</code> for stream isolation.
+
+==== To use curl ====
+
+* The <code>uwt</code> steam isolation wrapper must be circumvented or disabled.
+* The command must be run under user <code>clearnet</code>
+
+
+In {{project_name_gateway_long}} or <code>{{project_name_gateway_vm}}</code> [[Qubes|{{q_project_name}}]]
+
+'''1.''' Change to user <code>clearnet</code>
+
+{{CodeSelect|code=
+sudo -su clearnet
+}}
+
+'''2.''' Circumvent <code>uwt</code> stream isolation wrapper by appending <code>.anondist-orig</code> to <code>curl</code>
+
+{{CodeSelect|code=
+curl.anondist-orig <your_url>
+}}
+
+==== Using curl in {{project_name_long}} 14 ====
+
+In the following examples, the <code>exec</code> calls from the command output shows the difference between running <code>curl</code> with the <code>uwtwrapper</code> both enabled and disabled.
+
+'''<i>Example 1</i>'''
+
+<code>curl</code> is run with the <code>uwtwrapper</code> enabled.
+
+{{CodeSelect|code=
+uwtwrapper_verbose=1 curl <your_url>
+}}
+
+This results in the following <code>exec</code> calls. Only the latest (most recent) call matters which shows <code>torsocks</code> is prepended before running <code>curl</code>.
+
+ exec torsocks /usr/lib/uwtexec something <your_url>
+ exec -a /usr/bin/curl /usr/bin/curl.anondist-orig <your_url>
+
+'''<i>Example 2</i>'''
+
+<code>curl</code> is run with the <code>uwtwrapper</code> disabled.
+
+{{CodeSelect|code=
+uwtwrapper_verbose=1 UWT_DEV_PASSTHROUGH=1 curl <your_url>
+}}
+
+This command results in the following <code>exec</code> calls which show <code>torsocks</code> does not get prepended before <code>curl</code>. Since <code>curl</code> does not run under <code>torsocks</code>, local connections are not hindered and there is no stream isolation.
+
+  exec /usr/lib/uwtexec <your_url>
+  exec -a /usr/bin/curl /usr/bin/curl.anondist-orig <your_url>
+
+'''The output from the previous commands establish the following'''.
+
+* <code>/usr/bin/curl</code> is symbolically linked to <code>/usr/bin/curl.anondist-orig</code>. This demonstrates <code>/usr/bin/curl.anondist-orig</code> is the actual (real) <code>curl</code> binary.
+
+* When <code>/usr/bin/curl.anondist-orig</code> is run with the <code>uwtwrapper</code> disabled all <code>uwt</code> logic is circumvented.
+
+
+Users can either circumvent the <code>uwt</code> stream isolation wrapper or disabled it either permanently or temporary.
+
+Links:
+
+* [[Stream_Isolation|Stream Isolation]]
+* [[Stream_Isolation/Disable_Easy|Stream Isolation/Disable Easy]]
+
+-----
+
+= Application Developers =
+* [[Dev/Project_friendly_applications_best_practices|{{project_name_long}} friendly applications best practices]]
+* [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/Tor_friendly_applications_best_practices Tor friendly applications best practices]
+
+= See Also =
+* [[Redirect Whonix-Workstation Ports or Unix Domain Socket Files to Whonix-Gateway]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Design]]

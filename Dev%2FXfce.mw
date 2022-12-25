@@ -1,0 +1,49 @@
+desktop background files in the git repository:
+
+* Kicksecure: https://github.com/Kicksecure/desktop-config-dist/blob/master/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml (that package will be renamed at some point)
+* Whonix-Workstation: https://github.com/Whonix/anon-ws-base-files/blob/master/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml.anondist
+* Whonix-Gateway: https://github.com/Whonix/anon-gw-base-files/blob/master/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml.anondist
+
+These files will be copied to user's home folder at first boot - and at first boot only. Because that is the only time when files are copied from /etc/skel/ to user home.
+
+From:
+
+<pre>
+etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+</pre>
+
+To:
+
+<pre>
+/home/user/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+</pre>
+
+File in home folder will be modified by Xfce.
+
+Any other updates to files in /etc/skel/ by package, developer or user will be disregarded by Xfce even after reboot. That is because Xfce uses the files in the home folder only which won't notice any change in /etc/skel/.
+
+Additionally xfconfd seems to cache the current state of settings. Modifications to <code>/home/user/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml</code> while Xfce is running are disregarded and might even be overwritten when xfconfd is shutdown. Xfce does not reload settings from the home folder once it is running but might overwrite manual changes.
+
+Prerequisite knowledge: [[Dev/About_Debian_Packaging#Files_in_.2Fetc.2Fskel|Files in /etc/skel]]
+
+Therefore, testing modified files in /etc/skel is cumbersome. Instructions:
+
+'''1.''' Update <code>/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml</code>
+
+{{CodeSelect|code=
+sudoedit /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+}}
+
+'''2.''' Use a [[Desktop#Virtual_Consoles|virtual console]]!
+
+Not a virtual terminal emulator such as xfce4-terminal. A virtual console is required because the following command is ineffective is run from inside a running Xfce.
+
+'''3.''' Have a look at <code>desktop-background-skel-test</code>.
+
+[https://github.com/Kicksecure/helper-scripts/blob/master/usr/libexec/helper-scripts/desktop-background-skel-test <code>/usr/libexec/helper-scripts/desktop-background-skel-test</code>]
+
+'''4.''' Run <code>desktop-background-skel-test</code>.
+
+{{CodeSelect|code=
+/usr/libexec/helper-scripts/desktop-background-skel-test
+}}

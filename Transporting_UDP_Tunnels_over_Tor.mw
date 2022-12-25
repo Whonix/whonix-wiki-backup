@@ -1,0 +1,47 @@
+{{Header}}
+{{#seo:
+|description=Transporting UDP Tunnels over Tor
+|image=Transportudp2314234.jpg
+}}
+[[image:Transportudp2314234.jpg|thumb]]
+= Tor Design =
+
+According to the Tor Project: <ref>https://blog.torproject.org/moving-tor-datagram-transport</ref>
+
+<blockquote>Tor transports data over encrypted TLS tunnels between nodes, which is in turn carried by TCP.</blockquote>
+
+The current Tor design does not support the transport of [https://gitlab.torproject.org/legacy/trac/-/issues/7830 UDP-based protocols] through exit nodes in the network. <ref>The Tor ticket was closed as "wontfix" in 2017.</ref> This is unlikely to be supported in the near future due to incompatibility with cryptographic protocols in use and those planned.
+
+The consequence is that UDP-based protocols and applications cannot be used to transmit UDP datagrams between guards and exit nodes in the default configuration. This affects a number of activities, such as [[VoIP]] or video applications. <ref>https://en.wikipedia.org/wiki/User_Datagram_Protocol</ref>
+
+= Transporting UDP Tunnels over Tor with a VPN =
+
+A solution to this problem is to use a [https://en.wikipedia.org/wiki/Tunneling_protocol tunneling protocol]. In simple terms, this allows a user to access a foreign protocol or network service that the underlying (Tor) network does not support or provide directly.
+
+The tested and working method in {{project_name_long}} is to utilize a Virtual Private Network (VPN) with a trusted provider that does not block UDP traffic in the following configuration: <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>[Other Anonymizing Network]</code> &rarr; <code>Internet</code>. Some VPN protocols like OpenVPN can use UDP while implementing reliable connections and error checking at the application level. <ref>Other VPN implementations may also be useful, but they have not been researched yet.</ref>
+
+Before following the instructions to [[Tunnel_UDP_over_Tor|tunnel UDP over Tor]], please first read the related VPN documentation and warnings:
+
+* [[Tunnels/Connecting to Tor before a VPN|Connecting to Tor before a VPN (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>)]].
+* [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorPlusVPN Tor Plus VPN or Proxy].
+* [[Tunnels/Introduction#Comparison_Table|Tunneling comparison table]].
+* [[Terms_of_Service#{{project_name_long}}_VPN_disclaimer|{{project_name_long}} VPN disclaimer]]
+
+The current [https://web.archive.org/web/20170706042927/http://sec.cs.ucl.ac.uk/users/smurdoch/papers/tor11datagramcomparison.pdf Tor architecture] may lead to a negative performance impact on user activities. This arises from high latency due to congestion in the network, queue length on nodes (mixing of traffic across multiple nodes), and TCP mechanisms which attempt to account for lost packets and hold delivery of future packets until a resend is complete. <ref>https://guardianproject.info/2012/12/10/voice-over-tor/</ref>
+
+== Warnings ==
+
+{{Tunnel/Warnings/Adds_Complexity}}
+
+= {{project_name_long}} Recommendations =
+
+{{project_name_long}} recommends the use of [https://openvpn.net/ OpenVPN] as the most secure (SSL/TLS-based) protocol, rather than reliance upon IKE, L2TP/IPsec or PPTP. OpenVPN is considered extremely secure when used with encryption algorithms such as AES. <ref>IKE is being exploited by advanced agencies to decrypt IPSec traffic. IPsec configured with pre-shared keys is vulnerable to MITM attacks. PPTP is an obsolete method for VPN implementation with a host of security weaknesses. For further reading on adversary capabilities against VPN protocols see: https://web.archive.org/web/20190324102418/https://www.spiegel.de/media/media-35515.pdf</ref>
+
+A dedicated virtual machine is recommended for this activity; see [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]].
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

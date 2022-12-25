@@ -1,0 +1,66 @@
+[[Update]] the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install <code>resolvconf</code>. <ref>
+<code>/etc/openvpn/update-resolv-conf</code> uses <code>resolvconf</code>.
+
+<code>resolvconf</code> needs to be installed for the lines beginning with ''script-security'', ''up'', and ''down'' to function properly.
+</ref>
+
+{{CodeSelect|code=
+sudo apt install resolvconf
+}}
+
+Users preferring not to install resolvconf should read the footnotes. <ref>
+{{Box|text=
+'''1.''' In the <code>/etc/openvpn/openvpn.conf</code> file, change the following text.
+
+<pre>
+script-security 2
+up "/etc/openvpn/update-resolv-conf script_type=up dev=tun0"
+down "/etc/openvpn/update-resolv-conf script_type=down dev=tun0"
+</pre>
+
+To the following. Remove or comment out the lines beginning with "up" and "down", and change the 2 to a 1.
+
+<pre>
+script-security 1
+</pre>
+
+'''2.''' {{Open with root rights|filename=
+/etc/resolv.conf
+}}
+
+'''3.''' Comment out the nameserver.
+
+<pre>
+#nameserver 10.152.152.10
+</pre>
+
+'''4.''' Add the VPN provider's DNS server.
+
+<pre>
+## Riseup.net OpenVPN DNS server
+nameserver 172.27.100.1
+</pre>
+
+If Riseup is not in use, replace ''172.27.100.1'' with the virtual LAN IP address of the VPN provider's DNS server. If unsure, the VPN provider might provide it. To try to infer it, run <code>sudo route</code> after successfully connecting to the VPN. The first destination default gateway should also function as a DNS server.
+
+'''5.''' Save and exit.
+
+'''6.''' ''Optional:'' Prevent <code>/etc/resolv.conf</code> being overwritten by other packages like DHCP or <code>resolvconf</code>.
+
+Run.
+
+<pre>
+sudo chattr +i /etc/resolv.conf
+</pre>
+
+In order to revert this change, use ''-i''.
+
+Ignore the <code>/etc/resolv.conf</code> instructions below.
+}}
+</ref>

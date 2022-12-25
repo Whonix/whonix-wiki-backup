@@ -1,0 +1,126 @@
+{{Header}}
+{{#seo:
+|description=How to open a Port in {{project_name_gateway_long}} Firewall
+|image=https://www.{{project_clearnet}}/w/images/a/a0/Firewall146529640.png
+}}
+[[File:Firewall146529640.png|thumb]]
+<div class="mininav">
+* [[Whonix-Gateway Firewall]]
+* [[Whonix-Workstation Firewall]]
+</div>
+= Introduction =
+{{project_name_long}} has an iptables rules script and firewall configuration file for both {{project_name_gateway_long}} and {{project_name_workstation_long}}. {{project_name_gateway_long}} firewall features include: <ref>
+https://github.com/{{project_name_short}}/whonix-firewall
+</ref>
+
+<div style="column-count:3;-moz-column-count:3;-webkit-column-count:3">
+* transparent proxying
+* stream isolation
+* reject invalid packages
+* fail closed mechanism
+* optional VPN-Firewall
+* optional isolating proxy
+* optional incoming flash proxy
+* optional Tor relay
+</div>
+
+The firewall should not be removed unless you no longer wish to use {{project_name_long}}.
+
+= {{project_name_gateway_long}} Firewall Settings =
+
+{{Box|text=
+'''1.''' {{Firewall_Settings_Gateway}}
+
+'''2.''' Add setting.
+
+'''3.''' Save.
+
+'''4.''' {{Reload_Firewall}}
+
+'''5.''' Done.
+
+The procedure is complete.
+}}
+
+= How-to: Open an Incoming Port on {{project_name_gateway_long}} Firewall =
+
+== From the Outside ==
+
+{{Firewall_Custom}}
+
+'''<code>Host</code> &rarr; <code>{{project_name_gateway_long}}</code>
+
+'''<code>Internet</code> &rarr; <code>Host</code> &rarr; <code>{{project_name_gateway_long}}</code>
+
+This will allow an incoming connection on {{project_name_gateway_short}} originating from:
+
+* if using VM: the host.
+* if using physical isolation: the Internet.
+
+{{Box|text=
+
+'''1.''' {{Firewall_Settings}}
+
+'''2.''' Add.
+
+Replace <code>80</code> with the actual port you would like to open.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 80 "
+}}
+
+'''3.''' Save.
+
+'''4.''' {{Reload_Firewall}}
+
+'''5.''' Done.
+
+The procedure is complete.
+}}
+
+== For Connections Originating from {{project_name_workstation_long}} ==
+
+{{Firewall_Custom}}
+
+'''<code>{{project_name_workstation_long}}</code> &rarr; <code>{{project_name_gateway_long}}</code>'''
+
+This will allow incoming connections from {{project_name_workstation_long}} to {{project_name_gateway_long}}.
+
+It might be useful for [[Tor#Additional_SocksPorts|Tor additional <code>SocksPort</code>s]]. ('''<code>{{project_name_workstation_long}}</code> &rarr; <code>{{project_name_gateway_long}}</code> &rarr; Tor <code>SocksPort</code>''')
+
+{{Box|text=
+
+'''1.''' {{Firewall_Settings}}
+
+'''2.''' Add.
+
+Note:  Replace <code>9230</code> with the actual port you would like to open. <ref>
+https://forums.whonix.org/t/internal-open-ports-setting/11404/1
+</ref>
+
+{{CodeSelect|code=
+INTERNAL_OPEN_PORTS+=" 9230 "
+}}
+
+'''3.''' Save.
+
+'''4.''' {{Reload_Firewall}}
+
+The procedure is complete.
+}}
+
+= See Also =
+* [[Ports|Open a Port(s) in {{project_name_long}} and Port Forwarding]]
+* [[Whonix_Configuration_Files#Configuration_Drop-In_Folders|{{project_name_long}} Configuration Drop-In Folders]]
+* https://github.com/Whonix/whonix-firewall/blob/master/etc/whonix_firewall.d/30_whonix_gateway_default.conf
+* https://github.com/Whonix/whonix-firewall/blob/master/usr/bin/whonix-gateway-firewall
+* https://github.com/Whonix/whonix-firewall
+* [[{{project_name_workstation_short}}_Firewall|{{project_name_workstation_long}} Firewall]]
+* [[Install_Software#Whonix-Workstation_.E2.84.A2_is_Firewalled|{{project_name_workstation_long}} is Firewalled]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

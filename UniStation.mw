@@ -1,0 +1,286 @@
+{{Header}}
+{{#seo:
+|description=Only one machine. Either a real or virtual machine (VM). All traffic is routed through Tor. An Anonymizing Transparent Proxy.
+}}
+{{title|title=
+UniStation - A Tor TransparentProxy with only One Machine
+}}
+
+{{Testers-only}}
+
+= Introduction =
+
+[[About|{{project_name_long}}]] needs at least two systems. One running Tor, {{project_name_gateway_short}}. The other running clients that are routed through Tor, {{project_name_workstation_long}}. This ensures the highest possible security and isolation. We can implement this using different strategies: Two VMs (Gateway VM and Workstation VM) or bare metal.
+
+A different approach is to run Tor and applications all on the same machine. This can be either a VM or bare metal host.
+
+This site will guide you through all required steps to set up a UniStation. A machine which routes all traffic through the Tor anonymity network. This is an implementation of a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxy Tor TransparentProxy].
+
+Advantages:
+
+* Only one machine required.
+* Lower system requirements.
+
+Disadvantages:
+
+* More difficult to install.
+* User might have to set the [[#interface|network interface setting]].
+* If using VMs: Guest VM can see MAC address of host?
+* Less secure than {{project_name_long}} with {{project_name_gateway_short}} and {{project_name_workstation_long}}.
+* This is not as well polished, developed and thought through as {{project_name_long}} yet.
+* Enhancements that come with {{project_name_workstation_long}} such as:
+** [[Tor Browser]]
+** [https://github.com/Whonix/anon-apps-config anon-apps-config]
+** [https://www.kicksecure.com/wiki/Systemcheck systemcheck]
+** [[Whonix Live]]
+** [[kloak]]
+** [[Linux_Kernel_Runtime_Guard_LKRG|LKRG]]
+** [https://github.com/Kicksecure/tirdad tirdad]
+** [[AppArmor]]
+** [[Anon Connection Wizard]]
+** [[sdwdate-gui]]
+** [https://github.com/Kicksecure/open-link-confirmation open-link-confirmation]
+** [[Bridges]] usability, [[Documentation]]
+** and maybe [https://github.com/Whonix others]
+* have not been considered yet.
+* This will potentially not be maintained as well as {{project_name_long}}.
+
+= Prerequisites =
+{{kicksecure_Prerequisites}}
+
+= Installation =
+== Packages ==
+Install gnupg. <ref>
+Required for Debian netinst "minimal" (no default system tools).
+</ref>
+
+{{CodeSelect|code=
+sudo apt install gnupg
+}}
+
+{{Box|text=
+{{W-APT-Repository-Key}}
+}}
+
+{{Project-APT-Repository-Add}}
+
+{{Box|text=
+{{Install Package|package=
+usability-misc
+}}
+}}
+
+<ref>
+apt-get-noninteractive to avoid asking this question.
+<pre>
+Setting up anon-base-files (3:4.6-1) ...
+
+Configuration file '/etc/machine-id'
+ ==> File on system created by you or by a script.
+ ==> File also in package provided by package contributor.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package contributor's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+*** machine-id (Y/I/N/O/D/Z) [default=N] ? i
+</pre>
+</ref>
+
+{{CodeSelect|code=
+sudo apt-get-noninteractive install --no-install-recommends kicksecure-cli whonix-firewall uwt anon-gw-dns-conf ipv4-forward-disable ipv6-disable
+}}
+
+Update: Packages anon-gw-dns-conf, ipv4-forward-disable, ipv6-disable are deprecated (merged into anon-gw-anonymizer-config) in {{project_name_long}} developers repository (upcoming stable) but these packages are so trivial that the 1 config file per package can be manually set up.
+
+== Firewall Settings ==
+Find out your network interface name. You can learn about what interfaces you have by running.
+
+{{CodeSelect|code=
+sudo ifconfig
+}}
+
+Edit <code>/etc/whonix_firewall.d/50_user.conf</code>.
+
+{{CodeSelect|code=
+sudoedit /etc/whonix_firewall.d/50_user.conf
+}}
+
+Paste.
+
+{{anchor|interface}}
+You might have to change <code>#EXT_IF="eth0"</code> by removing the hash <code>#</code> in front of it and by setting it to the name of your network interface such as <code>wlan0</code>. I.e. the full line might look like this: <code>EXT_IF="wlan0"</code> Include it with the to be pasted text below. <ref>
+VirtualBox: <code>EXT_IF="enp0s3"</code>
+</ref>
+
+{{CodeSelect|code=
+## 0: disabled
+## 1: enabled
+
+## External interface
+## defaults to:
+#EXT_IF="eth0"
+
+WORKSTATION_TRANSPARENT_TCP=0
+WORKSTATION_TRANSPARENT_UDP=0
+WORKSTATION_TRANSPARENT_DNS=0
+WORKSTATION_ALLOW_SOCKSIFIED=0
+CONTROL_PORT_FILTER_PROXY_ENABLE=0
+
+GATEWAY_TRANSPARENT_TCP=1
+GATEWAY_TRANSPARENT_UDP=0
+GATEWAY_TRANSPARENT_DNS=1
+GATEWAY_ALLOW_INCOMING_ICMP=0
+}}
+
+If you want port 22 to open for incoming SSH, also paste:
+
+{{CodeSelect|code=
+GATEWAY_ALLOW_INCOMING_SSH=1
+}}
+
+Save.
+
+== Qubes ==
+
+Qubes only. Does not hurt otherwise.
+
+{{CodeSelect|code=
+sudo systemctl mask qubes-iptables
+}}
+
+Qubes Debian based VMs would require further <code>/etc/whonix_firewall.d/50_user.conf</code> modifications. See footnote. <ref>
+This was required in Qubes to make Whonix-Gateways Own Traffic Transparent Proxy work. In that case, append to <code>/etc/whonix_firewall.d/50_user.conf</code>.
+
+{{CodeSelect|code=
+NON_TOR_GATEWAY="\
+            127.0.0.0-127.0.0.24 \
+            10.137.0.0-10.138.255.255 \
+         "
+}}
+</ref>
+
+== torsocks ==
+torsocks config not required. uwt sets that up for us.
+
+* https://github.com/Whonix/uwt
+* https://github.com/Whonix/uwt/blob/master/etc/tor/torsocks.conf.anondist
+
+== Tor Configuration ==
+Open Tor configuration file <code>/etc/tor/torrc</code> with root rights.
+
+{{CodeSelect|code=
+sudoedit /etc/tor/torrc
+}}
+
+Paste. <ref>
+<code>DisableNetwork 0</code> is required to make sdwdate work because the connectivity check locks at it.
+</ref>
+
+{{CodeSelect|code=
+TransPort 127.0.0.1:9041
+DnsPort 127.0.0.1:5400
+DisableNetwork 0
+}}
+
+Save.
+
+Restart Tor.
+
+{{CodeSelect|code=
+sudo systemctl restart tor
+}}
+
+== APT ==
+Check if there is something you need in <code>/etc/apt/sources.list</code>.
+
+Move original <code>/etc/apt/sources.list</code> out of the way because <code>/etc/apt/sources.list.d/debian.list</code> by {{kicksecure}} replaces it.
+
+{{CodeSelect|code=
+sudo mv /etc/apt/sources.list ~/
+}}
+
+== Reboot ==
+Reboot required.
+
+{{CodeSelect|code=
+sudo reboot
+}}
+
+= Usage =
+== check sdwdate ==
+{{CodeSelect|code=
+sudo systemctl status sdwdate --no-pager
+}}
+
+== Updates ==
+Update as per usual. See also [[Operating System Software and Updates]].
+
+Thanks to [https://github.com/Whonix/uwt uwt] it is [[Stream Isolation|stream isolated]] (using Tor <code>SocksPort</code>). No need to use <code>torsocks</code>. <code>uwt</code> uses <code>torsocks</code> which is configued to use <code>IsolatePID 1</code>.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+== Transparent DNS Functional ==
+{{CodeSelect|code=
+nslookup torproject.org
+}}
+
+<pre>
+Server:		127.0.0.1
+Address:	127.0.0.1#53
+
+Non-authoritative answer:
+Name:	torproject.org
+Address: 95.216.163.36
+** server can't find torproject.org: NXDOMAIN
+</pre>
+
+== Transparent DNS Functional ==
+{{CodeSelect|code=
+cd /tmp
+}}
+
+{{CodeSelect|code=
+wget.anondist-orig torproject.org
+}}
+
+<pre>
+--2019-12-10 12:25:43--  http://torproject.org/
+Resolving torproject.org (torproject.org)... 95.216.163.36
+Connecting to torproject.org (torproject.org)|95.216.163.36|:80... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://www.torproject.org/ [following]
+--2019-12-10 12:25:45--  https://www.torproject.org/
+Resolving www.torproject.org (www.torproject.org)... 116.202.120.165
+Connecting to www.torproject.org (www.torproject.org)|116.202.120.165|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 19623 (19K) [text/html]
+Saving to: ‘index.html’
+
+index.html                  100%[===========================================>]  19.16K  62.3KB/s    in 0.3s
+
+2019-12-10 12:25:47 (62.3 KB/s) - ‘index.html’ saved [19623/19623]
+</pre>
+
+= Troubleshooting =
+Depending on network configuration perhaps <code>/etc/whonix_firewall.d/50_user.conf</code> need to be appended.
+
+{{CodeSelect|code=
+NON_TOR_GATEWAY="\
+            127.0.0.0-127.0.0.24 \
+            10.137.0.0-10.138.255.255 \
+         "
+}}
+
+= Forum Discussion =
+https://forums.whonix.org/t/debian-onevm-anononevm-non-self-contained-host-depending-onevm-unistation-a-tor-transparentproxy-with-only-one-machine/5470
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,397 @@
+{{Title|
+title=VPN-Firewall: Enforce use of a VPN
+}}
+{{Header}}
+{{#seo:
+|description=Instructions on how to use VPN-Firewall. A Fail Closed Mechanism for VPNs. Prevent leaks when using VPNs. Force all connections through VPNs. Prevents shared VPN/Tor server leak bug.
+|image=Vpnfirewall1234322134.jpg
+}}
+[[File:Vpnfirewall1234322134.jpg|thumb|350px]]
+
+= Why =
+
+If you simply add a VPN using common instructions, it generally fails open. That means, if the VPN breaks down, because the connection is interrupted, traffic will be send without the VPN.
+
+It’s much safer when it fails closed, i.e. when the VPN connection breaks down, the whole internet connection must be down as long as the VPN connection isn’t restored.
+
+= What does it do =
+
+* Forbid outgoing traffic after the VPN / tunnel software broke down for some reason.
+* Tight firewall rules, using iptables policy drop.
+* Defeat [https://github.com/adrelanos/vpn-firewall/issues/12 shared VPN/Tor server leak bug].
+* Only tested with OpenVPN. Should work with other VPN and tunnel clients such as PPTP in theory, you should test if it does what it claims anyway.
+* Only tested on Debian {{Stable_project_version_based_on_Debian_codename}}. Should work in many Linux distribution supporting netfilter-persistent in theory, you should test if it does what it claims.
+* Open Source / Free Software
+
+= What does it NOT do =
+
+* Care about DNS leaks. If you want to ensure that no plaintext nameserver request packets are being leaked over the course of your VPN session then you will need to analyze the packets leaving your hardware NIC.
+* Block WebRTC leaks. [1]
+* Defend against [https://blog.torproject.org/bittorrent-over-tor-isnt-good-idea IP leaks]. If a locally installed application uses trickery to obtain the the users real IP and sends it somewhere though the VPN. [1]
+* Defend against adversaries, which are in position to run code locally, i.e. manipulate the firewall rules.
+* Prevent any other kind trickery to circumvent using the VPN.
+* Prevent leaks caused by bugs in the VPN software.
+* Be compatible with {{project_name_gateway_long}}/Workstation. (VPN-Firewall is incompatible with {{project_name_gateway_long}}/Workstation’s firewall! Use {{project_name_long}} documentation and use their built-in features.)
+* Manage IPv6 traffic. IPv6 traffic is blocked.
+* Install (Open)VPN.
+* Configure (Open)VPN.
+* Autostart (Open)VPN.
+* Anything else not mentioned above in “What does it do”.
+
+[1] This probably does not apply to VMs / computers behind a VPN-Gateway (when using the [[#Forwarding]] feature).
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = You should test if VPN-Firewall does what it claims.
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Use VPN-Firewall outside of {{project_name_long}} only! ({{project_name_long}} users should use the built-in VPN_FIREWALL features of {{project_name_gateway_long}} and/or {{project_name_workstation_long}}, see [[Tunnels/Introduction]] and its sub pages for documentation.)
+}}
+
+__TOC__
+
+= How to use VPN-Firewall =
+== Preparation ==
+Since setting up OpenVPN including a secure, leak preventing fail closed mechanism is challenging, it is highly recommend to learn how to set up OpenVPN on Debian stable (currently: {{Stable_project_version_based_on_Debian_codename}}). Get a Debian stable VM. Install the Debian openvpn package. (sudo apt install openvpn) Figure out how to set up your VPN using OpenVPN in the command line. Only proceed if you succeeded setting that up. Do not post support requests regarding these instructions before you succeeded with that basic exercise. You find some help with general VPN setup in the [[#VPN Setup]] chapter or on the [[TestVPN]] page. There however are ways to get [[Support|help]] from various sources for that basic exercise, also your VPN provider may be of assistance.
+
+Existing users who upgrade may remember variable VPN_SERVERS. Don't wonder. That variable was abolished for better security. <ref>https://phabricator.whonix.org/T460</ref>
+
+== Remove old versions of VPN-Firewall ==
+If you had any installed. Otherwise you can skip this.
+
+<pre>
+sudo update-rc.d vpnfirewall remove
+sudo update-rc.d vpn-firewall remove
+sudo rm /usr/local/bin/vpnfirewall
+sudo rm /usr/bin/vpnfirewall
+sudo rm /usr/bin/vpn-firewall
+sudo rm /etc/init.d/vpnfirewall
+sudo rm /etc/init.d/vpn-firewall
+</pre>
+
+== Qubes specific ==
+Non-Qubes users can ignore this.
+
+1) If you are using [https://www.qubes-os.org Qubes OS] as your host operating system, it is recommended to use a StandaloneVM for this. For more information, see footnote. <ref>
+This is due to technical limitations. The VPN-Firewall instructions assume to modify a files located in the root image, which by default do not persist in TemplateBasedVMs. So a convenient one time setup and then having it just work including autostart of VPN-Firewall and OpenVPN will not work yet. Help welcome!
+
+In future, perhaps the following instructions could be made to work after some [https://github.com/marmarek/qubes-core-agent-linux/blob/master/vm-systemd/bind-dirs.sh bind-dirs.sh] enhancements.
+
+When using a TemplateBasedVM, to persist these changes use the Qubes bind dirs mechanism.
+
+<pre>
+sudo mkdir /rw/config/qubes-bind-dirs.d
+</pre>
+
+{{Open with root rights|filename=
+/rw/config/qubes-bind-dirs.d/50_user.conf
+}}
+
+<pre>
+binds+=( '/etc/openvpn' )
+binds+=( '/lib/systemd/system/openvpn@openvpn.service' )
+binds+=( '/etc/systemd/system/multi-user.target.wants/openvpn@openvpn.service' )
+</pre>
+
+TODO: Does not work yet. Files need to exist first.
+
+TODO: umount during run is probably not sane.
+<pre>
+/usr/lib/qubes/bind-dirs.sh umount
+</pre>
+
+TODO: re-running bind-dirs.sh without previous umount does not work yet.
+<pre>
+/usr/lib/qubes/bind-dirs.sh
+</pre>
+</ref>
+
+2) Enable netfilter-persistent Qubes qvm-service.
+
+<pre>
+Qubes VM Manager &rarr; right click on VM &rarr; services &rarr; enter (without the single quotes) 'netfilter-persistent' &rarr; click on + &rarr; OK
+</pre>
+
+== VPN Setup ==
+====== Introduction ======
+{{VPN/Setup/Introduction}}
+
+====== Get VPN Certificate ======
+{{VPN/Setup/Get VPN Certificate}}
+
+====== VPN Credentials ======
+{{VPN/Setup/VPN Credentials}}
+
+====== VPN IP Address ======
+{{VPN/Setup/VPN IP Address}}
+
+====== VPN Configuration File ======
+{{Open with root rights|filename=
+/etc/openvpn/openvpn.conf
+}}
+
+Add.
+
+Note: make sure to adjust the {{Code|remote 198.252.153.226 80}} variable in your config (unless you are using {{Code|nyc.vpn.riseup.net}} as your VPN service). Replace the IP ({{Code|198.252.153.226}}) and port ({{Code|80}}) to match your VPN service.
+
+<pre>
+##############################
+## VPN provider specific settings ##
+##############################
+auth-user-pass auth.txt
+
+## using nyc.vpn.riseup.net 80
+remote 198.252.153.226 80
+
+ca RiseupCA.pem
+
+remote-cert-tls server
+keysize 256
+auth SHA256
+cipher AES-256-CBC
+
+#############################
+## VPN-Firewall specific settings ##
+#############################
+
+client
+dev tun0
+
+persist-tun
+persist-key
+
+script-security 2
+up "/etc/openvpn/update-resolv-conf script_type=up dev=tun0"
+down "/etc/openvpn/update-resolv-conf script_type=down dev=tun0"
+</pre>
+
+Save.
+
+====== install resolvconf ======
+{{VPN/Setup/install_resolvconf}}
+
+====== DNS Configuration ======
+{{VPN/Setup/DNS Configuration}}
+
+====== add user account tunnel ======
+<pre>
+sudo adduser tunnel
+</pre>
+
+====== Configure Folder Permissions ======
+{{VPN/Setup/Configuration Folder Permissions}}
+
+====== systemd setup ======
+{{Template:VPN/Setup/Systemd}}
+
+===== resolvconf adjustments =====
+{{VPN/Setup/resolvconf adjustments}}
+
+===== Verify DNS Settings =====
+See current /etc/resolv.conf settings.
+
+<pre>
+sudo cat /etc/resolv.conf
+</pre>
+
+Should not include your original DNS settings.
+
+===== Test the VPN =====
+Ping test. Ping some IP. In the example below, we ping google's DNS server. Maybe better use some server of your choice.
+
+<pre>
+ping 8.8.8.8
+</pre>
+
+Test TCP.
+
+<pre>
+TODO
+</pre>
+
+DNS Test.
+
+<pre>
+nslookup google.com
+</pre>
+
+Test DNS and output IP address. Remember these results so you can compare it to what you get later after VPN-Firewall is installed and running.
+
+{{scurl|myip.is}}
+
+===== Install VPN-Firewall =====
+<pre>
+sudo apt install debhelper faketime make dpkg-dev devscripts netfilter-persistent git config-package-dev ruby-ronn
+</pre>
+
+<pre>
+git clone https://github.com/adrelanos/vpn-firewall.git
+</pre>
+
+<pre>
+cd vpn-firewall
+</pre>
+
+Signed git tags and commits available. TODO: document how to verify, use some wiki template
+
+<pre>
+make deb-icup
+</pre>
+
+===== Forwarding =====
+If you want to forward traffic for virtual machines (or other computers on the LAN), it can be enabled through an option.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Experimental! (The forwarding feature has not yet been tested for leaks!)
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = The forwarding feature has only been developed and tested in a Qubes ProxyVM. Non-Qubes is [[Unsupported|unsupported]]!
+}}
+
+(The forwarding feature was introduced in May 29 2016. You might need to update vpn-firewall.)
+
+Create a new folder.
+
+* Qubes users: run the following command.
+* Non-Qubes users: can skip this.
+
+<pre>
+sudo mkdir -p /rw/config/vpn-firewall.d/
+</pre>
+
+Create a new file.
+
+* Qubes users: /rw/config/vpn-firewall.d/50_user.conf
+* Non-Qubes users: /etc/vpn-firewall.d/50_user.conf
+
+Add.
+
+<pre>
+FORWARDING=true
+</pre>
+
+Save.
+
+===== Start VPN-Firewall =====
+Qubes users only: create qvm-service netfilter-persistent status file.
+
+<pre>
+sudo touch /run/qubes-service/netfilter-persistent
+</pre>
+
+Start VPN-Firewall by restarting netfilter-persistent. <ref>
+Debian feature request: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=824290 add dpkg trigger for /usr/share/netfilter-persistent/plugins.d folder to have newly installed plugins take effect]
+</ref>
+
+<pre>
+sudo service netfilter-persistent restart
+</pre>
+
+Check netfilter-persistent status.
+
+<pre>
+sudo service netfilter-persistent status
+</pre>
+
+Should look like the following.
+
+<pre>
+● netfilter-persistent.service - netfilter persistent configuration
+   Loaded: loaded (/lib/systemd/system/netfilter-persistent.service; enabled)
+  Drop-In: /lib/systemd/system/netfilter-persistent.service.d
+           └─30_qubes.conf
+   Active: active (exited) since Wed 2016-05-11 19:21:36 UTC; 2s ago
+  Process: 3950 ExecStop=/usr/sbin/netfilter-persistent stop (code=exited, status=1/FAILURE)
+  Process: 3954 ExecStart=/usr/sbin/netfilter-persistent start (code=exited, status=0/SUCCESS)
+ Main PID: 3954 (code=exited, status=0/SUCCESS)
+
+May 11 19:21:36 work netfilter-persistent[3954]: run-parts: executing /usr/share/netfilter-persistent/plugins.d/30_vpn-firewall start
+May 11 19:21:36 work netfilter-persistent[3954]: OK: The firewall should not show any messages,
+May 11 19:21:36 work netfilter-persistent[3954]: OK: besides output beginning with prefix OK:...
+May 11 19:21:36 work netfilter-persistent[3954]: OK: VPN firewall loaded.
+May 11 19:21:36 work systemd[1]: Started netfilter persistent configuration.
+</pre>
+
+(There will only be a 30_qubes.conf drop-in for Qubes users. Non-Qubes users can ignore this.)
+
+At next boot, VPN-Firewall should be automatically starting. It would not hurt to check it really does by checking netfilter-persistent status at next boot.
+
+===== Test VPN-Firewall =====
+
+1) Have VPN-Firewall set up as per above instructions.
+
+2) Test if it works. Check whatismyipaddress.com to see if you your external IP is from the VPN. Check your DNS using dnsleaktest.com as well and compare these results to the results you had earlier. If your nameserver is the same as before or does not match your VPN's DNS then there is a problem and you will need to troubleshoot.
+
+3) Kill the VPN client.
+
+Example OpenVPN:
+
+<pre>
+sudo killall openvpn
+</pre>
+
+4) Check if you can still connect to whatismyipaddress.com.
+
+If yes, bad, something is wrong.
+
+If no, good, you won't connect to any remote servers.
+
+===== Qubes specific - Fallback Firewall =====
+Qubes users only. Non-Qubes users can skip this chapter.
+
+Untested! Please test and leave feedback!
+
+The following is great for users for additional protection from leaks. This fallback is as safe as previous ways to firewall VPNs. It however would not defeat the [https://github.com/adrelanos/vpn-firewall/issues/12 shared VPN/Tor server leak bug]. (It however is awful for developers since this would cloak eventual leaks in VPN-Firewall.)
+
+<pre>
+Qubes VM Manager &rarr; sys-vpn &rarr; right click &rarr; VM Settings &rarr; Firewall rules &rarr; choose "deny all network access except..." &rarr; add the IP and port of your VPN server &rarr; OK
+</pre>
+
+===== Done =====
+Done.
+
+= Appendix =
+===== Troubleshooting =====
+{{VPN-Firewall/Troubleshooting}}
+
+===== Unload VPN Firewall =====
+How to unload VPN Firewall? If you know what you are doing... Either...
+
+<pre>
+sudo /usr/share/netfilter-persistent/plugins.d/30_vpn-firewall flush
+</pre>
+
+Or...
+
+<pre>
+sudo service netfilter-persistent flush
+</pre>
+
+
+===== Security Discussion =====
+Statement by the creator of VPN-Firewall, Patrick Schleizer.
+
+I don't think I can ever make this standalone VPN-Firewall  project as leak proof as {{project_name_long}} as is. This is because I invented VPN-Firewall alone from scratch - in comparison {{project_name_long}} was an evolution of existing previous documentation and created by multiple contributors. Also VPN-Firewall is younger, receives less attention by the community, and a lot more difficult to set up than {{project_name_long}}. All these factors lead to lower popularity and thereby less eyes on the implementation. Specifically the [[#Forwarding]] feature should be activated with care, since it is my first project using IP forwarding. If you have any suggestions on how to avoid IP forwarding, please make them.
+
+===== Alternatives =====
+
+* One could play with the linux equivalent of the [https://web.archive.org/web/20130405080545/http://cranthetrader.blogspot.se/2011/10/dont-allow-non-vpn-traffic.html route] command.
+* [https://www.inputoutput.io/hardening-your-vpn-setup-with-iptables/ Hardening your VPN Setup with iptables]
+* [https://www.guavi.com/vpncheck_free.html VPNCheck] - No source code. Nice looking user interface.
+* [https://web.archive.org/web/20150429080413/http://vpnetmon.webs.com/ VPNetMon] - No source code. Windows only. Checks every, let’s say 500 ms, if the VPN IP is still valid, if not, kill a list of applications. This is not very secure, it’s a game if that time period is sufficient to stop a leak and if killing the applications is fast enough. Nice looking user interface.
+* [https://openvpnchecker.com/ OPENVPN Watchdog] - No source code. Windows only. Nice looking user interface.
+* [https://sourceforge.net/projects/vpnlife VPN Lifeguard]
+* [https://zorrovpn.com/articles/windows-firewall-vpn-only Windows firewall]. Windows only.
+* [https://superuser.com/questions/268902/how-to-block-all-traffic-but-one-ip-in-windows-firewall IP Security Policies]. Windows only.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

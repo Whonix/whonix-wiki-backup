@@ -1,0 +1,39 @@
+<!--{*
+0. For detailed usage documentation see Dev/mediawiki. The following explanation only regards the knowledge needed to edit the code below
+1. regex_replace is a smarty function, see https://www.smarty.net/docs/en/language.modifier.regex.replace.tpl
+2. this function is used to extract the request protocol and the apex domain by replacing the unwanted infos with empty string
+3. If testingcontext is defined it overrides context
+4. It is also important to know that in smarty `$var` expressed the $var in a string, so you can pre process everything in ``
+5. The requestProtocol only finds http or https
+6. The apexDomain only finds domainName.topLevelDomain like whonix.org or abc.onion
+7. After that everything is simple: $append is added and $text is added in the respective places
+8. Sub step variables (not used later)
+8.1. projectDomainClearnetRegexp: replace the dot "." with backslash dot "\." to make it regexp compatible
+8.2. projectDomainOnionRegexp: replace the dot "." with backslash dot "\." to make it regexp compatible
+8.3. apexDomainPre1: replace every character before the apexDomain options
+8.4. apexDomain: replace every character in apexDomainPre1 after the apexDomain options
+*}-->
+
+<!--{if $testingcontext != '{{{testingcontext}}}'}-->
+ <!--{assign var="context" value="`$testingcontext`" }-->
+<!--{/if}-->
+
+<!--{assign var="projectDomainClearnetRegexp" value="`$projectDomainClearnet|regex_replace:"/\./":"\."`" }-->
+<!--{assign var="projectDomainOnionRegexp" value="`$projectDomainOnion|regex_replace:"/\./":"\."`" }-->
+
+<!--{assign var="apexDomainPre1" value="`$context|regex_replace:"/.+(?=$projectDomainClearnetRegexp|$projectDomainOnionRegexp)/":""`"}-->
+<!--{assign var="apexDomain" value="`$apexDomainPre1|regex_replace:"/(?<=$projectDomainClearnetRegexp|$projectDomainOnionRegexp)\/.*/":""`"}-->
+
+<!--{assign var="requestProtocol" value="`$context|regex_replace:"/:.+/":""`" }-->
+
+<!--{if $result == '{{{result}}}' || $result == 'link'}--><a href="<!--{/if}-->
+
+<!--{if $result == 'parts'}-->
+ <!--{$requestProtocol}-->,<!--{$apexDomain}-->
+<!--{else}-->
+ <!--{$requestProtocol}-->://<!--{$sub}-->.<!--{$apexDomain}--><!--{$append}-->
+<!--{/if}-->
+
+<!--{if $result == '{{{result}}}' || $result == 'link'}-->"><!--{$text}--></a><!--{/if}--><noinclude>
+[[Category:MultiWiki]]
+</noinclude>

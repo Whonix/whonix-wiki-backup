@@ -1,0 +1,63 @@
+/*
+Establishes global mwDev object, measures page loading, constructs promise-like structure to make custom JS wait for mediawiki JS
+See Dev/mediawiki for more info
+*/
+
+// ------------
+// 1. Dev Tools
+// This is available immediately
+
+window.mwDev = { info: {}, test: {} };
+
+window.mwDev.test.pageLoading = (function() {
+	let events = [];
+	return function( event ) {
+		let now = new Date();
+		events.push( [ event, now ] );
+		console.info( 'mwDev.test.pageLoading : event "' + event + '" at ' + now.toLocaleTimeString('en-GB', {
+			hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits:3,
+		}));
+		for( var i = 0; i < events.length - 1; i++ ) {
+			// output the diff to all previous events
+			console.info( 'mwDev.test.pageLoading : diff (' + event + ',' + events[i][0] + ') = ' + (now.valueOf() - events[i][1]) + ' ms'  );
+		}
+	};
+})();
+
+// Pagespeed measurement
+mwDev.test.pageLoading('pageLoadStart');
+
+// ---------
+// 2. All JS
+// This is available after Common.js is loaded
+
+function triggerWhenReady() {
+	// URL parameter to delay page loading
+	if( (new URLSearchParams(window.location.search)).get('delayedPageLoad') ) {
+		document.body.style.display = 'none';
+		setTimeout( function() {
+			document.body.style.display = 'block';
+		}, 20000 );
+	}
+	
+	// Setup for controlled deactivation of isolated scripts
+	let dontloadString = new URLSearchParams(window.location.search).get("dontload");
+	mwDev.info.jsload = {};
+	if( dontloadString && typeof dontloadString == "string" ) {
+		dontloadString.split(",").forEach( function(el) {
+			mwDev.info.jsload[ "MediaWiki:" + el + ".js" ] = false;
+		});
+	}
+/*WRAPPEDCONTENT*/	
+	mwDev.test.pageLoading('pageLoadFinished');
+}
+
+if( window.mediaWikiCommonJsIsLoaded ) {
+	triggerWhenReady();
+} else {
+	window.addEventListener( 'mediaWikiCommonJsIsLoaded', triggerWhenReady );
+}
+
+/*
+[[Category:MultiWiki]]
+*/

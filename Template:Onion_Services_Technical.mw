@@ -1,0 +1,19 @@
+To understand how onion services work, a simple overview of the process is outlined below. <ref>https://support.torproject.org/onionservices/</ref>
+
+'''Step 1.''' Onion services advertise their existence in the Tor network. This is done by randomly picking some relays and building circuits, before asking these relays to act as introduction points by providing the service's public key. The onion server's location (IP address) is shielded.
+
+'''Step 2.''' The onion service generates an onion service descriptor containing the public key and a summary of introduction points. This is signed with its private key and then uploaded to a distributed hash table, so users can find the service when searching for a <i>.onion</i> resource.  <ref>This is currently a 16 character name, but will be increased to 54 characters in the near-medium term to upgrade the cryptographic strength of <i>.onion</i> services. See: https://blog.torproject.org/cooking-onions-names-your-onions </ref> This also forms an important verification mechanism for the user to confirm they are talking to the right onion service.
+
+'''Step 3.''' The user who learnt that the <i>.onion</i> resource exists requests more information from the database, by downloading the descriptor from the distributed hash table. If the descriptor exists, the user now knows the introduction points and the right public key to use. The user also creates a Tor circuit to another randomly picked relay to use as a rendezvous point (with a one-time secret).
+
+'''Step 4.''' If the descriptor is present and the rendezvous point is ready, the user assembles an "introduce message". This is encrypted to the onion service's public key and includes the rendezvous point address and the one-time secret. The user requests this be delivered to the onion service (via a Tor circuit) anonymously, so the IP address remains hidden.
+
+'''Step 5.''' The onion service decrypts the user's introduce message and finds the rendezvous point address and one-time secret in it. The service creates a circuit to the rendezvous point and sends the one-time secret to it in a rendezvous message. The onion service <i>must</i> use the same set of entry guards when creating circuits, to prevent attackers from forcing onion services to use corrupt relays as an entry node (and learning the onion server's IP address via timing analysis).
+
+'''Step 6.''' The rendezvous point notifies the user the successful connection has been established. Both the user and onion service use their circuits to the rendezvous point for communication. The rendezvous point relays end-to-end encrypted messages from user to service and vice versa.
+
+Use of <i>.onion</i> addresses leads to a 6 relay arrangement: 3 picked by the user (with the third used as a rendezvous point), and 3 picked by the onion service. The final successful connection between a user and an onion service is represented in the picture below.
+
+'''Figure:''' ''Alice (User) and Bob (Onion Service) Successful Connection'' <ref>https://2019.www.torproject.org/images/tor-onion-services-6.png</ref>
+
+[[File:Tor_Onion_Service_Connection_Success.png|600px]]

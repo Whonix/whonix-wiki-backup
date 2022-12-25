@@ -1,0 +1,255 @@
+{{Header}}
+{{#seo:
+|description=Design Documentation about Redistribution of {{project_name_long}}
+}}
+
+== Introduction ==
+Developers only!
+
+These are notes for producing official [[Download|downloadable]] binary {{project_name_long}} images.
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px|alt=info]]
+| text    =
+Only required if you want to redistribute (official) {{project_name_long}} builds.
+}}
+
+== Pre Building ==
+=== Major Upgrade ===
+'''1.''' check if https://github.com/{{project_name_short}}/whonix-base-files/blob/master/etc/whonix_version needs update
+
+'''2.''' '''deprecate /rw/config in Qubes-Whonix'''
+
+=== Point Release ===
+'''1.''' package <code>timesanitycheck</code>: <code>./usr/share/timesanitycheck/date-minimum-file-create</code>
+
+=== Unsorted ===
+{{Box|text=
+Clean source code
+
+* <ref>
+get rid of .directory files inside the source code:
+
+<code>thunar</code> &rarr; <code>preferences</code> &rarr; <code>general</code> &rarr; <code>behavior</code> &rarr; <code>use common view properties for all folders</code>
+
+</ref>
+* <ref>
+Get rid of <code>~backup</code> files. In other words, get rid of files starting with <code>~</code>.
+
+{{CodeSelect|code=
+find ./ -name '*~' {{!}} xargs trash-put
+}}
+</ref>
+* You can get a list of unwanted files with <code>git clean -dfxn</code> and remove them with <code>git clean -dfx</code>.
+
+* Update {{project_name_long}} debian package repository.
+
+* add your own <code>default-key</code> to your own <code>/home/user/.gnupg/gpg.conf</code>.
+
+* Check that all packages point to a signed git commit and signed git tag.
+
+{{CodeSelect|code=
+~/derivative-maker/packages/kicksecure/developer-meta-files/debug-steps/packaging-helper-script pkg_verify_signed_commit_and_tag
+}}
+
+* push the source code to github
+
+{{CodeSelect|code=
+git push origin master
+}}
+
+* Check, that the current git commit is a signed. <ref>
+You might wish using a <code>git</code> or <code>bash</code> alias to safe typing.
+</ref>
+
+{{CodeSelect|code=
+git log --show-signature HEAD^..HEAD
+}}
+
+Or use the generic makefile as a shortcut.
+
+{{CodeSelect|code=
+make git-commit-verify
+}}
+
+* Create an OpenPGP signed git tag. This will also be used as {{project_name_long}} version number.
+
+{{CodeSelect|code=
+git tag -s version
+}}
+
+* Make sure the current git head is a signed git commit and signed git tag.
+
+To simplify this, you could use the generic makefile.
+
+{{CodeSelect|code=
+make git-verify
+}}
+
+* Push the OpenPGP signed git tag to github.
+
+{{CodeSelect|code=
+git push origin version
+}}
+}}
+
+== Building ==
+=== Notes ===
+'''1.''' <u>Remote Repository:</u> By convention, enable {{project_name_long}} stable repository gets default using <code>--repo true</code>. Already included in build command below.
+
+'''2.''' For other options and platforms also see [[Dev/Build_Documentation|build documentation]].
+
+=== Build ===
+
+'''1.''' Build {{project_name_gateway_long}}. For example {{project_name_gateway_long}} with Xfce for VirtualBox.
+
+{{CodeSelect|code=
+sudo ./derivative-maker --build --repo true --target virtualbox --flavor whonix-gateway-xfce --repo true
+}}
+
+'''2.''' Build {{project_name_workstation_long}}. For example {{project_name_workstation_long}} with Xfce for VirtualBox.
+
+{{CodeSelect|code=
+sudo ./derivative-maker --build --repo true --target virtualbox --flavor whonix-workstation-xfce --repo true
+}}
+
+== Post Building ==
+{{Box|text=
+'''Image Signing'''
+
+* '''A)''' <u>own</u> custom builds: '''Optionally''' sign the images.
+* '''B)''' <u>official</u> {{project_name_long}} builds: '''Mandatory''' sign the images.
+
+{{Box|text=
+* OpenPGP sign the images.
+
+{{CodeSelect|code=
+~/derivative-maker/packages/kicksecure/developer-meta-files/release/prepare_release --flavor whonix-workstation --target virtualbox --build
+}}
+}}
+}}
+
+{{Box|text=
+{{Box|text=
+'''Only required if you want to redistribute (official) {{project_name_long}} builds.'''
+}}
+* Upload the images.
+
+{{CodeSelect|code=
+~/derivative-maker/packages/kicksecure/developer-meta-files/release/upload_images
+}}
+}}
+
+=== Testing ===
+* {{CodeSelect|code=
+/usr/share/whonix-ws-firewall/unit_tests/stream_isolation_test
+}}
+* At least a few testers should test final releases before posting a news. Testers may be found by posting a news.
+* [[LeakTests]]!
+* [[Test]] the images before final release! (Testers-only releases can be uploaded straight away.)
+
+=== Update Permanent Links ===
+{{Box|text=
+Update permalinks.
+
+<pre>
+sudoedit /etc/nginx/conf.d/download_redirects
+</pre>
+
+<pre>
+cacheclear-minimal
+</pre>
+
+([https://phabricator.whonix.org/T895 ticket])
+}}
+
+=== Git Tag ===
+Create <code>-testers-only</code> or <code>-stable</code> git tag.
+
+=== Announcement Text Creation ===
+Create Changelog and Announcement.
+
+{{CodeSelect|code=
+./debug-steps/packaging-helper-script pkg_git_packages_git_log_writer
+}}
+
+=== Wiki Page Updates ===
+{{Box|text=
+'''Only required if you want to redistribute (official) {{project_name_long}} builds.'''
+
+{{Box|text=
+* Check, if [[Tor Browser/Manual Download]] is still up to date.
+* Update [[Download|Download Table]].
+* See if the download table works in Tor Browser using New Identity.
+* Update [[Known Issues]].
+* See if [[Documentation]] still makes sense.
+* Search the wiki for [[Special:WhatLinksHere/Template:Stable]] and [[Special:WhatLinksHere/Template:Testing]] and act accordingly.
+* Update links on the [[Dev/Build Documentation]] page.
+* Update [[Features]].
+* Update [[Template:VersionNew]].
+* Update [[Template:VersionShort]].
+* Incorporate new documentation which has been prepared on the page: [[Next]].
+* [[Template:Stable_project_version_based_on_Debian_codename]]
+* [[Template:Stable_project_version_based_on_Debian_version_short]]
+* [[Template:Debian_Codename_Testing]]
+* Copy/move contents from [[Testers Release]] to [[Release Notes]].
+* Instructions containing backports.
+}}
+}}
+
+=== Misc ===
+{{Box|text=
+'''Only required if you want to redistribute (official) {{project_name_long}} builds.'''
+
+{{Box|text=
+* See https://github.com/{{project_name_short}}?utf8=%E2%9C%93&q=deprecated&type=&language= for deprecated repositories to be deleted.
+* https://www.qubes-os.org/doc/supported-versions/#templatevms
+* ask for an announcement on https://www.qubes-os.org/news/
+** (similar to https://www.qubes-os.org/news/2018/08/07/whonix-14-has-been-released/)
+** (similar to https://github.com/QubesOS/qubes-posts/blob/master/2018-08-07-whonix-14-has-been-released.md)
+** (similar to https://github.com/QubesOS/qubes-issues/issues/4193)
+}}
+}}
+
+* https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/blob/master/qvm/whonix.jinja
+
+=== Announcement ===
+{{Box|text=
+'''Only required if you want to redistribute (official) {{project_name_long}} builds.'''
+
+{{Box|text=
+==== Contents ====
+* introduction (what is {{project_name_long}}) (The release announcement may be the first thing that new people who learn about {{project_name_long}} see.)
+* similar to https://forums.whonix.org/t/whonix-14-has-been-released
+* deprecation notice of old {{project_name_long}} version with date of deprecation
+
+==== Where ====
+* Finally announce: Post a news. (Not nagging external lists. Common sense. Mostly only final releases.)
+** In {{project_name_long}} Important and Feature Blog.
+** https://lists.debian.org/debian-derivatives/
+*** debian-derivatives@lists.debian.org
+** https://lists.torproject.org/pipermail/tor-talk/
+*** tor-talk@lists.torproject.org
+** https://nmap.org/mailman/listinfo/fulldisclosure
+*** fulldisclosure@seclists.org
+** https://mailman.stanford.edu/mailman/listinfo/liberationtech
+*** liberationtech@lists.stanford.edu
+** Also this will do the job as well:
+*** [[Official Online Profiles#{{project_name_long}}_Forums_Profiles|{{project_name_long}} Forums Profiles]]
+}}
+}}
+
+=== Cleanup ===
+* any deprecated repositories (none at time of writing)
+
+= See Also =
+* [[Dev/Maintenance]]
+* [[Dev/APT Repository]]
+* [[Dev/Installation_from_Repository#Distro_Morphing_vs_Builds|Distro Morphing vs Builds]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Development]] [[Category:Design]]

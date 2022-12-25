@@ -1,0 +1,85 @@
+{{Header}}
+{{#seo:
+|description=How to open a port in {{project_name_long}} / port forwarding / opening ports
+|image=Buttons-1688111640.jpg
+}}
+__FORCETOC__
+[[image:Buttons-1688111640.jpg|thumb]]
+= Introduction =
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text =
+There is a lot confusion surrounding this topic and before proceeding with opening ports, for your security, you are advised to understand the following writeup.
+}}
+= Opening Ports: Clearnet/Tor Impact and Security Issues =
+We have to clearly distinguish between opening when referring to clearnet versus referring to opening a port when using Tor.
+
+Most times when talking generally about opening ports (clearnet, unrelated to Tor), technically one is referring to allow unsolicited incoming connections. Imagine a public web server. The websever is supposed to be able to reply to unsolicited incoming connections by clients. On the other hand however, clients usually (except when they are behind some corporate, national or similar firewall) can use any outgoing port. When a client is creating an outgoing connection, the operating system picks a random port where it expects the solicited incoming answer. Sometimes end users want to open a port such for example when they want to install a public webserver on their home connection. The end users have mostly unrestricted outgoing access, but unsolicited incoming connections are restricted by their home router's NAT firewall. Opening a port for them often means that they use their router's web interface, configure the port they want to open and forward it to a computer in their LAN network. Also when they are using a firewall that restricts unsolicited incoming connections, they need to open an incoming port in their firewall in order to make their server application reachable from the open internet. By doing so, the users real public IP address is exposed. You would not want to open a port using this method if you wish to stay anonymous.
+
+When talking about [[Tor]], the topic of opening ports often causes confusion. By default Tor works only as a client, which means it lets the user establish outgoing connections<ref>TCP and some types of DNS</ref> and receives the solicited answers. The Tor software by default does not block any outgoing ports. However, some Tor exit relays restrict outgoing ports. In theory, if there was no Tor exit relay supporting outgoing port 22, then you could not exit the Tor network directly through that port. In these cases there would be no way to force open that port since that is a Tor relay, not Tor client setting.
+
+[[Hosting Location Hidden Services|Hosting Location Onion Services]] over Tor is possible. One way to accomplish this is using [[Onion Services]]. To oversimplify this, by configuration Tor it instructions the Tor network to open an incoming port at Tor relays for Tor onion hostname which gets forwarded to a port on the machine where Tor is running (called virtport). The users real public IP address remains hidden. That onion hostname is only reachable by other Tor clients.
+
+At the time of writing, it makes limited sense to open a port. There are very few exceptions.
+
+* [[Access_Gateway_Port_From_Host|Access Gateway Port From Host]]
+* [[Hosting a %28private%29 %28obfuscated%29 bridge or %28exit%29 relay|Hosting a (private) (obfuscated) bridge or (exit) relay]]
+* In past, using the now deprecated censorship circumvention Tor pluggable transport [[Deprecated#flashproxy|flashproxy]] required opening a clearnet port to accept unsolicited clearnet incoming connections.
+
+If you want to host a Tor onion service, you will need to open a port in {{project_name_workstation_long}} firewall so {{project_name_gateway_long}} can forward the incoming Tor onion service connection to {{project_name_workstation_long}}. This will be covered in [[Onion Services]] instructions.
+
+When Tor users ask about how to open a port, they often do not need to and try to fix the wrong problem. Common issues are:
+
+* Services such as IRC servers ban connections from Tor users. This cannot be remedied by opening any ports.
+* Sometimes applications such as VPNs do not work. Either because one is trying to use UDP, while the Tor network does not support that <ref>[[Tor#UDP]]</ref> or because of VPN configuration issues, see [[Tunnels/Introduction]].
+* Sometimes applications such as [[OnionShare]] when run in {{project_name_workstation_long}} expect Tor to be running on localhost because there are Tor-friendly applications, i.e. applications preconfigured to use Tor by the developer of the application. Now for OnionShare this is a non-issue because {{project_name_long}} developers preconfigured {{project_name_long}} using package [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]] to make OnionShare work inside {{project_name_long}} without the user having to setup port redirections. See our {{project_name_long}} [[OnionShare]] instructions if you specifically care about OnionShare. Otherwise see [[Redirect {{project_name_workstation_short}} Ports or Unix Domain Socket Files to {{project_name_gateway_short}}|Redirect {{project_name_workstation_long}} Ports or Unix Domain Socket Files to {{project_name_gateway_long}}]].
+
+If you really need an anonymous incoming port your primary option is Tor [[Onion Services]] and some methods listed on [[Hosting Location Hidden Services]].
+
+= How-to =
+[[Undocumented]]. Pointers:
+
+* https://github.com/{{project_name_short}}/whonix-firewall/blob/95bbe7fd32fef12ee8544a9e9132973532d6a41d/etc/whonix_firewall.d/30_whonix_gateway_default.conf#L75-L84
+* [[Access Gateway Port From Host]]
+
+== Open {{project_name_gateway_long}} Port ==
+{{Firewall_Settings_Gateway}}
+
+Add.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 80 "
+}}
+
+Save.
+
+{{Reload_Firewall}}
+
+== Open {{project_name_workstation_long}} Port ==
+{{Firewall_Settings_Workstation}}
+
+Add.
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 80 "
+}}
+
+Save.
+
+{{Reload_Firewall_ws}}
+
+= Forum Discussion =
+https://forums.whonix.org/t/new-wiki-page-to-clear-up-confusion-about-opening-ports
+
+= See Also =
+* [[{{project_name_workstation_short}} Firewall]]
+* [[Onion Services]]
+* [[Hosting Location Hidden Services]]
+* [[Redirect {{project_name_workstation_short}} Ports or Unix Domain Socket Files to {{project_name_gateway_short}}|Redirect {{project_name_workstation_long}} Ports or Unix Domain Socket Files to {{project_name_gateway_long}}]]
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

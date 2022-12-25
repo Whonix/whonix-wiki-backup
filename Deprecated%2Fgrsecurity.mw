@@ -1,0 +1,558 @@
+{{Header}}
+{{#seo:
+|description=grsecurity installation instructions
+|image=Padlocks-597815640.jpg
+}}
+__NOINDEX__
+[[image:Padlocks-597815640.jpg|thumb]]
+{{archived}}
+= Grsecurity + Pax =
+
+== Introduction ==
+
+Grsecurity is a GPL licensed, extensive security enhancement to the Linux kernel that defends against a wide range of security threats through intelligent access control, memory corruption-based exploit prevention, and a host of other system hardening that generally require no configuration. It has been actively developed and maintained for the past 14 years. Commercial support for Grsecurity is available through Open Source Security, Inc.
+
+Instead of chasing and fixing individual bugs, Grsecurity and PaX end exploitation of entire bug classes and provide kernel self-protection against zero-days.
+
+== How-To: {{non_q_project_name_short}} ==
+
+=== Grsecurity Kernel  Setup ===
+
+This guide is to get you up and running with the latest Grsecurity kernel inside a KVM {{project_name_long}} guest or Host. VirtualBox is incompatible with many important defenses provided in [[Grsecurity]] hardened kernels including KERNEXEC, UDEREF, and RANDKSTACK. <ref>https://github.com/linux-scraping/linux-grsecurity/commit/31e606aa9da683109cee72d45c9cda60992f01dc</ref> The instructions here are inspired by the [https://en.wikibooks.org/wiki/Grsecurity official Grsecurity guide] but adapted for the command line and includes helpful information not mentioned in the original. It will cover downloading, verifying, configuring, compiling and installing the hardened kernel and how to install and use its admin tools. With minimal changes you can compile another architecture. There are many attempts to automate this and get them in upstream Debian but a solution is yet to exist.
+
+The kernel should be anonymously compiled in {{project_name_workstation_long}}. Be sure to add more CPUs to speed up the compilation process before starting.
+
+Import and verify developer keys. Always check the fingerprint for yourself:
+
+<pre>
+pub  4096R/0x44D1C0F82525FE49 2013-11-10 Bradley Spengler (spender) <spender@grsecurity.net>
+      Key fingerprint = DE94 52CE 46F4 2094 907F  108B 44D1 C0F8 2525 FE49
+</pre>
+
+<pre>
+pub   4096R/0x38DBBDC86092693E 2011-09-23
+      Key fingerprint = 647F 2865 4894 E3BD 4571  99BE 38DB BDC8 6092 693E
+</pre>
+
+{{gpg_key_download}}
+
+{{CodeSelect|code=
+gpg --recv-keys "DE94 52CE 46F4 2094 907F  108B 44D1 C0F8 2525 FE49"
+}}
+
+{{CodeSelect|code=
+gpg --recv-keys "647F 2865 4894 E3BD 4571  99BE 38DB BDC8 6092 693E"
+}}
+
+{{CodeSelect|code=
+gpg --list-keys --fingerprint "DE94 52CE 46F4 2094 907F  108B 44D1 C0F8 2525 FE49"
+}}
+
+{{CodeSelect|code=
+gpg --list-keys --fingerprint "647F 2865 4894 E3BD 4571  99BE 38DB BDC8 6092 693E"
+}}
+
+By the time you read this the file names may be outdated despite best efforts to keep this guide current so you may have to adjust file names accordingly.
+
+Download the latest components for your chosen hardware architecture (Only the Testing branch is freely available) and their matching signatures: <ref>https://grsecurity.net/download.php</ref> <ref>https://superuser.com/questions/301044/how-to-wget-a-file-with-correct-name-when-redirected</ref>
+
+
+{{CodeSelect|code=
+scurl -J -O https://grsecurity.net/test/grsecurity-3.1-4.3.3-201512282134.patch
+scurl -J -O https://grsecurity.net/test/grsecurity-3.1-4.3.3-201512282134.patch.sig
+scurl -J -O https://grsecurity.net/stable/gradm-3.1-201507191652.tar.gz
+scurl -J -O https://grsecurity.net/stable/gradm-3.1-201507191652.tar.gz.sig
+scurl -J -O https://grsecurity.net/stable/grsecurity-2.2.0-iptables.patch
+scurl -J -O https://grsecurity.net/stable/grsecurity-2.2.0-iptables.patch.sig
+scurl -J -O https://grsecurity.net/paxctld/paxctld_1.0-4_i386.deb
+scurl -J -O https://grsecurity.net/paxctld/paxctld_1.0-4_i386.deb.sig
+}}
+
+Look at the matching kernel version number in the patch name grsecurity-3.1-'''4.2.7'''-201512092320.patch and fetch the tarball from kernel.org:
+
+{{CodeSelect|code=
+scurl -J -O https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.3.3.tar.xz
+scurl -J -O https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.3.3.tar.sign
+}}
+
+
+The command will verify everything just downloaded in the home directory. Look for file names that passed the check in this part of the output: assuming signed data in `paxctld_1.0-3_i386.deb'. You should see '''Good signature from "Bradley Spengler (spender) <spender@grsecurity.net>''' for each component.
+
+{{CodeSelect|code=
+gpg --verify --multifile grsecurity* gradm* paxctld*
+}}
+
+The signature is made against the uncompressed version of the archive. This is done so there is only one signature required for .gz, .bz2 and .xz compressed versions of the release. Start by uncompressing the archive, using unxz. You should see '''Good signature from "Greg Kroah-Hartman''':
+
+{{CodeSelect|code=
+sudo apt install xz-utils
+unxz linux*.tar.xz
+gpg --verify linux*.tar.sign
+}}
+
+In this document the kernel source archive linux*.tar and the matching grsecurity patch grsecurity*.patch are both files are in the same directory.
+
+
+{{CodeSelect|code=
+tar -xf linux*.tar
+cd linux*
+sudo patch -p1 < ../grsecurity-*-*-*.patch
+}}
+
+Install the build tools:
+
+{{CodeSelect|code=
+sudo apt install flex bison libncurses5-dev fakeroot gcc-4.9-plugin-dev libgmp-dev libmpfr-dev libmpc-dev libssl-dev build-essential
+}}
+
+See what version of GCC you have installed and install the matching plugin-dev packages for it. <ref>https://forums.grsecurity.net/viewtopic.php?f=3&t=3484</ref>
+
+{{CodeSelect|code=
+gcc -v
+}}
+
+To open the kernel configuration menu run:
+
+{{CodeSelect|code=
+sudo make menuconfig
+}}
+
+Grsecurity is endlessly customizable and if you have different security requirements feel free to dive in the documentation <ref>
+https://en.wikibooks.org/wiki/Grsecurity/Appendix/Grsecurity_and_PaX_Configuration_Options
+</ref> <ref>
+https://en.wikibooks.org/wiki/Grsecurity/Runtime_Configuration
+</ref> but be advised very high security settings usually break Xorg server and common packages like Iceweasel and OpenJDK. However for the purposes of compiling a kernel suitable for normal desktop use the Automatic configuration comes with sane defaults. Same for the other usage profiles provided. To have a bootable desktop you will need to disable PaX mprotect at first<ref>https://web.archive.org/web/20190211085205/http://www.insanitybit.com/2012/05/31/compile-and-patch-your-own-secure-linux-kernel-with-pax-and-grsecurity/</ref> It can be re-enabled later when an exception list is loaded.
+
+The configuration should look like this. A lack of mention means leave as default:
+
+<pre>
+
+Networking Support &rarr; Networking options &rarr; Network packet filtering framework (Netfilter) &rarr; IP:Netfilter Configuration &rarr; Enable: IPv4 masquerade support + iptables NAT support
+
+Security options &rarr; Grsecurity &rarr; Configuration Method &rarr; Automatic
+			       &rarr; Usage Type &rarr; Desktop
+			       &rarr; Virtualization Type &rarr; Guest
+			       &rarr; Virtualization Software &rarr; KVM
+                               &rarr; Required Priorities &rarr; Security
+			       &rarr; Customize Configuration &rarr; PaX &rarr; Non-executable pages &rarr; Deselect: Restrict mprotect
+                               &rarr; Customize Configuration &rarr; Memory Protections &rarr; Disable privileged I/O
+                               &rarr; Customize Configuration &rarr; Role Based Access Control Options &rarr; Hide kernel processes
+                               &rarr; Customize Configuration &rarr; Sysctl Support &rarr; Deselect: Sysctl support
+</pre>
+
+To save time you can compile one kernel for both the guest and host . NB This only works if you compiled a custom {{project_name_long}} x64. A x64 Linux Host/Guest configuration would look like:
+
+<pre>
+64-bit kernel
+
+Networking Support &rarr; Networking options &rarr; Network packet filtering framework (Netfilter) &rarr; IP:Netfilter Configuration &rarr; Enable: IPv4 masquerade support + iptables NAT support
+
+Security options &rarr; Grsecurity &rarr; Configuration Method &rarr; Automatic
+			       &rarr; Usage Type &rarr; Desktop
+			       &rarr; Virtualization Type &rarr; Host
+			       &rarr; Virtualization Software &rarr; KVM
+                               &rarr; Required Priorities &rarr; Security
+			       &rarr; Customize Configuration &rarr; PaX &rarr; Non-executable pages &rarr; Deselect: Restrict mprotect
+                               &rarr; Customize Configuration &rarr; Memory Protections &rarr; Disable privileged I/O
+                               &rarr; Customize Configuration &rarr; Role Based Access Control Options &rarr; Hide kernel processes
+                               &rarr; Customize Configuration &rarr; Sysctl Support &rarr; Deselect: Sysctl support
+</pre>
+
+Once you are done select save and keep the .config name then exit out of all menus.
+
+
+Compile while specifying the number of cores after the '''-j''' option. The number should be the number of cores assigned to the VM + 1. This will result in a huge speed up during compilation and reduce compilation time drastically.
+
+{{CodeSelect|code=
+sudo fakeroot make -j 5 deb-pkg
+}}
+
+Now sit tight. Go make yourself a cup of coffee or read a book until its finished.
+
+To install your new packages including Pax's configuration utility in the guest run:
+
+{{CodeSelect|code=
+cd ..
+sudo dpkg -i linux-image-*-grsec_*-*_*.deb
+sudo dpkg -i linux-firmware*.deb
+sudo dpkg -i linux-headers*.deb
+sudo dpkg -i linux-libc*.deb
+sudo dpkg -i paxctld*.deb
+}}
+
+Move the package to the host via a shared folder and install with dpkg from there.
+
+{{CodeSelect|code=
+mv linux-image-*-grsec_*-*_*.deb /mnt/shared
+mv linux-firmware*.deb /mnt/shared
+mv linux-headers*.deb /mnt/shared
+mv linux-libc*.deb /mnt/shared
+}}
+
+Done. After installation the system should automatically boot up with the Grsecurity kernel. To inspect the kernel version type:
+
+{{CodeSelect|code=
+uname -r
+}}
+
+==== Upgraded Kernel Builds ====
+
+Backup your customized kernel configuration file [named .config]. Its available in the root of the kernel source code folder. You may need to enable viewing of hidden files to see it.
+
+To build with newer kernel releases, restore the .config file to the source folder and run:
+
+{{CodeSelect|code=
+sudo make oldconfig
+}}
+
+Hold 'Enter' to answer questions about new kernel features.
+
+=== Gradm ===
+
+Gradm is the administration tool for RBAC, Grsecurity's intelligent Mandatory Access Control system. Unlike other MACs that require painstaking attention to configuration, RBAC is capable of automatic behavior learning and auto-generating safe program acess policies.
+
+==== Compilation and Installation ====
+
+To  prepare and compile:
+
+{{CodeSelect|code=
+tar xzf gradm*.tar.gz
+cd gradm
+}}
+
+Add the iptables patch:
+
+{{CodeSelect|code=
+sudo patch -p1 < ../grsecurity-*-iptables.patch
+}}
+
+Compile and install:
+
+{{CodeSelect|code=
+sudo make install
+}}
+
+For the Host install the required build dependencies (make sure '''apt-transport-tor''' is installed on host first) then move the patched extracted and patched gradm directory via the shared folder into your home directory. Then run the same commands as above.
+
+{{CodeSelect|code=
+sudo apt install bison flex
+}}
+
+Its very important you choose a long password that's different from your root account's.
+
+To upgrade to a newer gradm release, re-run the same build commands above.
+
+==== Usage ====
+
+A detailed [https://wiki.archlinux.org/title/Grsecurity#RBAC guide] on generating and enforcing RBAC policy is available on the Arch Linux wiki. Note these instructions apply to all distros.
+
+==How-To: {{q_project_name}}==
+
+This work is being undertaken by Coldhak and the instructions are drawn almost exclusively from their blog and github account. <ref>https://coldhak.ca/blog/2016/12/12/coldkernel-qubes-1.html</ref> <ref>https://github.com/coldhakca/coldkernel</ref> The Debian-8 Template is currently supported. Work is ongoing to support the Fedora and {{project_name_long}} Templates, as well as the Qubes DisposableVM and dom0. <ref>https://github.com/coldhakca/coldkernel/issues</ref>
+
+Note: These instructions have been tested to work with the 4.8 Linux "coldkernel" in a Debian-8 Template. At the time of writing, Qubes users report post-build Template problems when using the 4.9 Linux kernel with pvgrub2 in a Debian-8 template. <ref>https://github.com/QubesOS/qubes-issues/issues/2762</ref> It is advisable to use the 4.8 Linux coldkernel series until this bug is fixed or alternatively attempt to build the 4.9 Linux coldkernel in a Debian-9 Template (untested).
+
+'''Warning:''' These instructions are extremely alpha and may potentially break the template. Always clone default templates before proceeding!
+
+===Debian Template===
+
+====Configuring the Debian Template====
+
+'''1. Clone the Debian Template'''
+
+'''2. Increase the Maximum Storage Size of the Debian Template'''
+
+https://coldhak.ca/assets/img/blog/coldkernel_pt1/size.png
+
+Note: A minimum of 4GB is recommended. 10GB is a safe value so you don't run out of disk space at the end of the build.
+
+'''3. Edit sources.list'''
+
+In the Debian Template, run.
+<pre>
+sudoedit /etc/apt/sources.list
+</pre>
+Uncomment the lines starting with deb-src. It should look something like this.
+<pre>
+deb https://deb.debian.net/debian jessie main contrib non-free
+deb-src https://deb.debian.net/debian jessie main contrib non-free
+
+deb https://security.debian.org jessie/updates main contrib non-free
+deb-src https://security.debian.org jessie/updates main contrib non-free
+</pre>
+Save and exit.
+
+'''4. Install dom0 Dependencies'''
+
+In dom0, run.
+<pre>
+sudo qubes-dom0-update grub2-xen
+</pre>
+'''5. Install Debian Dependencies'''
+
+In the Debian Template, run.
+<pre>
+sudo apt install qubes-kernel-vm-support grub2-common
+sudo apt install paxctl bc wget gnupg fakeroot build-essential devscripts libfile-fcntllock-perl git gcc-4.9-plugin-dev
+sudo apt build-dep linux
+</pre>
+
+====Building the grsec Coldkernel====
+
+'''1. Clone and Verify the Coldkernel Build Scripts'''
+
+Note: Always verify and checkout the latest kernel available from coldhak. For the 4.8 Linux kernel branch, this is version 4.8.17. For the 4.9 Linux kernel branch, as at April 2017 this was version 4.9.20. The 4.8.17 (stable) coldkernel is referenced in instructions below.
+
+In the Debian Template, run.
+<pre>
+wget "https://coldhak.ca/coldhak/keys/coldhak.asc" -O coldhak.asc
+gpg --import coldhak.asc
+git clone https://github.com/coldhakca/coldkernel
+cd coldkernel
+git verify-tag coldkernel-0.9a-4.8.17
+git checkout --quiet tags/coldkernel-0.9a-4.8.17
+</pre>
+The verfication step (git verify-tag) should produce a good signature from the Coldhak developers, similar to this.
+<pre>
+gpg: Signature made Mon 03 Apr 2017 11:50:21 AM EDT using RSA key ID DE32FEBB
+gpg: Good signature from "Coldhak developers (signing key) <contact@coldhak.ca>"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg: There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 1073 B61B 69CB 0444 33B6  4F7B 0B1F 9321 DE32 FEBB
+</pre>
+
+The fingerprint should match that found on the coldhak website.
+https://coldhak.ca/assets/img/blog/coldkernel_pt1/verify.png
+
+'''2. Build the grsec Coldkernel'''
+
+Note: This step can take several hours depending on your computer hardware; later architectures can finish this step in less than one hour. This process is CPU intensive, and the system may crash if other programs are used simultaneously.
+
+To make the build with hypervisor support, in the Debian Template run.
+<pre>
+make qubes-guest
+</pre>
+The output should look as follows.
+<pre>
+patching file coldkernel.config
+Importing signing keys...                                                                                                       [DONE]
+Removing previous working directory (if one exists)...                                                          [DONE]
+Fetching kernel sources and signatures...                                                                            [DONE]
+Fetching grsecurity patch and signatures...                                                                          [DONE]
+Unpacking Linux Kernel sources...                                                                                        [DONE]
+Verifying the Linux Kernel sources...                                                                                     [DONE]
+Verifying Kernel patches...                                                                                                    [DONE]
+Extracting Linux Kernel sources...                                                                                         [DONE]
+Applying grsecurity patch, and moving coldkernel.config into place...                                   [DONE]
+Building coldkernel...                                                                                                             [DONE]
+</pre>
+
+====Installing the grsec Coldkernel====
+
+Note: During the <i>sudo update-grub2</i> step below, this error message can be safely ignored if it appears. <ref>https://github.com/QubesOS/qubes-doc/blob/master/configuration/managing-vm-kernel.md</ref>
+<pre>
+ grub2-probe: error: cannot find a GRUB drive for /dev/mapper/dmroot. Check your device.map
+</pre>
+
+Post-build, in the Debian Template VM run.
+<pre>
+wget https://grsecurity.net/paxctld/paxctld_1.2.1-1_amd64.{deb,deb.sig}
+gpg --homedir=.gnupg --verify paxctld_1.2.1-1_amd64.{deb.sig,deb}
+sudo dpkg -i paxctld_1.2.1-1_amd64.deb
+sudo make install-deb
+sudo cp paxctld.conf /etc/paxctld.conf
+sudo paxctld -d
+sudo systemctl enable paxctld
+sudo mkdir /boot/grub
+sudo update-grub2
+sudo shutdown -h now
+</pre>
+
+====Post-install Template Configuration====
+
+'''1. Change the Debian Template Kernel'''
+
+After the Template has been shutdown, change the kernel in the Qubes VM Manager to use pvgrub2.
+
+https://coldhak.ca/assets/img/blog/coldkernel_pt1/pvgrub.png
+
+'''2. Check the Debian Template is Functional'''
+
+Start the Debian Template. If successful, the VM state should be green in Qubes VM Manager and the VM log should contain output similar to this.
+<pre>
+Linux Version 4.8.17-coldkernel-grsec-2
+</pre>
+'''3. Set Default Grsec Special Groups'''
+
+In the Debian Template, run.
+<pre>
+sudo groupadd -g 9001 grsecproc
+sudo groupadd -g 9002 tpeuntrusted
+sudo groupadd -g 9003 denysockets
+</pre>
+Note: Respectively, users in these groups are:
+
+* Exempted from grsecurity's /proc restrictions.
+* Unable to execute any files that are not in root-owned directories writable only by root.
+* Unable to connect to other hosts from your machine or run server applications.
+
+
+'''4. Install paxtest and Check that Grsecurity is Running'''
+
+In the Debian Template, run.
+<pre>
+sudo apt install paxtest
+paxtest blackhat
+</pre>
+You should see output similar to this.
+<pre>
+Executable anonymous mapping: Killed
+Executable bss: Killed
+Executable data: Killed
+Executable heap: Killed
+Executable stack: Killed
+Executable shared library bss: Killed
+Executable shared library data: Killed
+Executable anonymous mapping (mprotect): Killed
+Executable bss (mprotect): Killed
+Executable data (mprotect): Killed
+Executable heap (mprotect): Killed
+Executable stack (mprotect): Killed
+Executable shared library bss (mprotect): Killed
+Executable shared library data (mprotect): Killed
+Writable text segments: Killed
+Anonymous mapping randomisation test: 28 bits (guessed)
+Heap randomisation test (ET_EXEC): 23 bits (guessed)
+Heap randomisation test (PIE): 35 bits (guessed)
+Main executable randomisation (ET_EXEC): 28 bits (guessed)
+Main executable randomisation (PIE): 28 bits (guessed)
+Shared library randomisation test: 28 bits (guessed)
+Stack randomisation test (SEGMEXEC): 35 bits (guessed)
+Stack randomisation test (PAGEEXEC): 35 bits (guessed)
+Arg/env randomisation test (SEGMEXEC): 39 bits (guessed)
+Arg/env randomisation test (PAGEEXEC): 39 bits (guessed)
+Randomization under memory exhaustion @~0: 29 bits (guessed)
+Randomization under memory exhaustion @0: 28 bits (guessed)
+Return to function (strcpy): paxtest: return address contains a NULL byte.
+Return to function (memcpy): Killed
+Return to function (strcpy, PIE): paxtest: return address contains a NULL byte.
+Return to function (memcpy, PIE): Killed
+</pre>
+'''5. ''Advanced (Untested)'' - Secure the AppVM Further by Using gradm2 in Learning Mode'''
+
+Follow the steps [https://en.wikibooks.org/wiki/Grsecurity/The_Administration_Utility#Full_System_Learning here].
+
+====Post-install Debian AppVM Configuration====
+
+'''1. Create an AppVM Based on the Debian Coldkernel Template'''
+
+'''2. Change the AppVM Kernel Selection'''
+
+Use Qubes VM Manager to set "pvgrub2" for the AppVM's kernel selection. Otherwise, it defaults to the standard Qubes kernel.
+
+====Upgraded Kernel Builds====
+
+When an upgraded grsec Linux kernel is released by Coldhak, <ref>https://github.com/coldhakca/coldkernel</ref> the kernel version of the existing grsec Template can be bumped via the following steps.
+
+'''1. Fetch and Verify the Upgraded Kernel Branch'''
+
+Note: Do not perform the cloning step again. The signing key is not imported again, unless it has changed.
+
+''If the signing key has changed,'' in the Template run.
+<pre>
+wget "https://coldhak.ca/coldhak/keys/coldhak.asc" -O coldhak.asc
+gpg --import coldhak.asc
+</pre>
+
+In all cases, verify and checkout the upgraded kernel branch (change the kernel reference below to match the updated release) in the Template.
+<pre>
+cd coldkernel
+git fetch
+git verify-tag coldkernel-0.9a-4.9.20
+git checkout --quiet tags/coldkernel-0.9a-4.9.20
+</pre>
+
+The verfication step (git verify-tag) should produce a good signature from the Coldhak developers.
+<pre>
+gpg: Signature made Mon 03 Apr 2017 11:50:21 AM EDT using RSA key ID DE32FEBB
+gpg: Good signature from "Coldhak developers (signing key) <contact@coldhak.ca>"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg: There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 1073 B61B 69CB 0444 33B6  4F7B 0B1F 9321 DE32 FEBB
+</pre>
+The fingerprint should match that found on the coldhak website.
+https://coldhak.ca/assets/img/blog/coldkernel_pt1/verify.png
+
+'''2. Build the Upgraded Kernel'''
+
+To make the build with hypervisor support, in the Template run.
+<pre>
+make qubes-guest
+</pre>
+The output should look as follows.
+<pre>
+patching file coldkernel.config
+Importing signing keys...                                                                                                       [DONE]
+Removing previous working directory (if one exists)...                                                          [DONE]
+Fetching kernel sources and signatures...                                                                            [DONE]
+Fetching grsecurity patch and signatures...                                                                          [DONE]
+Unpacking Linux Kernel sources...                                                                                        [DONE]
+Verifying the Linux Kernel sources...                                                                                     [DONE]
+Verifying Kernel patches...                                                                                                    [DONE]
+Extracting Linux Kernel sources...                                                                                         [DONE]
+Applying grsecurity patch, and moving coldkernel.config into place...                                   [DONE]
+Building coldkernel...                                                                                                             [DONE]
+</pre>
+
+'''3. Installing the Upgraded grsec Coldkernel'''
+
+paxctld is not downloaded again, unless there was an update. First check: https://github.com/coldhakca/coldkernel to see if this is required.
+
+<i>If paxctld has changed,</i> change the paxctld reference below to match the updated release and run in the Template.
+<pre>
+wget https://grsecurity.net/paxctld/paxctld_1.2.1-1_amd64.{deb,deb.sig}
+gpg --homedir=.gnupg --verify paxctld_1.2.1-1_amd64.{deb.sig,deb}
+sudo dpkg -i paxctld_1.2.1-1_amd64.deb
+</pre>
+
+In all cases, repeat these installation steps.
+<pre>
+sudo make install-deb
+sudo cp paxctld.conf /etc/paxctld.conf
+sudo paxctld -d
+sudo update-grub2
+sudo shutdown -h now
+</pre>
+
+'''4. Post-install Template Configuration'''
+
+Follow steps 2-4 [[Grsecurity#Post-install_Template_Configuration|here]], except:
+* Do not set default grsec special groups again, unless they have changed.
+* Do not install paxtest again, only run <i>paxtest blackhat</i> to check grsecurity is running correctly.
+
+
+'''5. Post-install AppVM Configuration'''
+
+Follow [[Grsecurity#Post-install_Debian_AppVM_Configuration|these steps]] to create a new AppVM based on the upgraded kernel branch.
+
+===Fedora Template===
+
+''To do following Coldhak release.''
+
+==={{project_name_long}} Templates===
+
+''To do following Coldhak release.''
+
+===Qubes DisposableVM===
+
+''To do following Coldhak release.''
+
+===Qubes dom0===
+
+''To do following Coldhak release.''
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+[[Category:Documentation]]

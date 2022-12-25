@@ -1,0 +1,285 @@
+<!--
+Copyright:
+
+   Copyright (C) Amnesia <amnesia at boum dot org>
+   Copyright (C) 2012 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to:
+
+    Free Software Foundation, Inc.
+    51 Franklin St, Fifth Floor
+    Boston, MA 02110-1301, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License can be found in the /usr/share/common-licenses' directory.
+
+The complete text of the GNU General Public License can also be found online on gnu.org <https://www.gnu.org/licenses/gpl.html>, in {{project_name_long}} virtual machine images in /usr/share/common-licenses/GPL-3 file or on Github <https://github.com/{{project_name_short}}/derivative-maker/blob/master/GPLv3>.
+-->
+<!--
+This wiki page is a fork of the Tails Trusting Tails signing key page, from this exact source <https://git.immerda.ch/?p=amnesia.git;a=blob;f=wiki/src/doc/get/trusting_tails_signing_key.mdwn;hb=63b68fb4970361131cbd1713b40521244e88c204>.
+-->
+{{Header}}
+{{Title|title=
+Download the {{project_name_long}} Signing Key for VirtualBox, Source Code and APT Repository
+}}
+{{#seo:
+|description=Get {{project_name_long}} VirtualBox, Source Code and APT Repository OpenPGP signing key. Verify {{project_name_long}} VirtualBox Downloads, APT Repository and/or Source Code.
+|image=Keysigning.jpg
+}}
+<div class="mininav">
+* [[Main/Project Signing Key|{{project_name_long}} Main, VirtualBox, APT Repository and Source Code Signing Key]]
+* [[KVM/Project Signing Key|{{project_name_long}} KVM Signing Key]]
+</div>
+[[image:Keysigning.jpg|thumb]]
+= Introduction =
+
+Since all {{project_name_long}} VirtualBox releases are signed with the same key, it is unnecessary to verify the key every time a new release is announced. Trust in the key might gradually increase over time, but cryptographic signatures must still be verified every time a new release is downloaded.
+
+This page is strongly related to the [[Trust|Placing Trust in {{project_name_long}}]] page.
+
+{{always_verify_signatures_reminder}}
+
+{{Anchor|Download the Key}}
+
+= Download the OpenPGP Key =
+<!--
+EDITORS NOTES:
+- Not recommending 'scurl': Because these instructions are done on the host. Perhaps by users that are not yet {{project_name_long}} users. 'scurl' is not available to them.
+- Not recommending curl: Because it may not be installed on their host. Perhaps Windows users are looking at these instructions.
+- Instructions target regular users. Not from-source-builders.
+-->
+
+{{Box|text=
+{{gpg_init}}
+}}
+
+{{Box|text=
+Select your operating system.
+
+<div class="tab-content-controller" data-tcc-id="key-download-different-os"></div>
+<div class="active" data-tcc-id="key-download-different-os" data-tcc-title="Windows, macOS, Linux" >
+'''1.''' [[Secure_Downloads|Securely]] download [[Patrick Schleizer]]'s (adrelanos') [[OpenPGP]] key. <ref>
+<!--
+WIKI EDITOR NOTE:
+
+Wiki templates limitations. Wiki wide update of [[Template:Curl_Secure]] to --tlsv1.3 would break too much. Hence, not using {{Curl_Secure}} below.
+-->
+{{CodeSelect|code=
+curl --tlsv1.3 --proto =https --max-time 180 --output derivative.asc https://www.{{project_clearnet}}/keys/derivative.asc
+}}
+</ref> <ref>
+* https://www.{{project_clearnet}}/keys/derivative.asc
+* https://github.com/Whonix/qubes-template-whonix/blob/master/keys/whonix-developer-derivative.asc
+* https://github.com/QubesOS/qubes-builder/blob/master/keys/916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA.asc
+</ref>
+
+{{signing_key_main}}
+
+'''2.''' Store the key as <code>derivative.asc</code>.
+
+'''3.''' Check fingerprints/owners without importing anything.
+
+{{CodeSelect|code=
+gpg --keyid-format long --import --import-options show-only --with-fingerprint derivative.asc
+}}
+
+'''4.''' Verify the output.
+
+The most important check is confirming the key fingerprint <u>exactly</u> matches the output below. <ref>
+Minor changes in the output such as new uids (email addresses) or newer expiration dates are inconsequential.
+</ref>
+
+<pre>
+      Key fingerprint = 916B 8D99 C38E AF5E 8ADC  7A2A 8D66 066A 2EEA CCDA
+</pre>
+
+The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. Advanced users can learn more about this [[#OpenPGP Web of Trust|below]].
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|warning|40px]]
+| text    =
+'''Warning:'''
+
+Do not continue if the fingerprint does not match! This risks using infected or erroneous files! The whole point of verification is to confirm file integrity.
+}}
+
+'''5.''' Import the key.
+
+{{CodeSelect|code=
+gpg --import derivative.asc
+}}
+
+The output should include the key was imported.
+
+<pre>
+gpg: Total number processed: 1
+gpg:               imported: 1
+</pre>
+
+''If the {{project_name_long}} signing key was already imported in the past'', the output should include the key is unchanged.
+
+<pre>
+gpg: Total number processed: 1
+gpg:              unchanged: 1
+</pre>
+
+If the following message appears at the end of the output.
+
+<pre>
+gpg: no ultimately trusted keys found
+</pre>
+
+This extra message does not relate to the {{project_name_long}} signing key itself, but instead usually means the user has not created an OpenPGP key yet, which is of no importance when verifying virtual machine images.
+
+Analyze the other messages as usual.
+
+'''6.''' Advanced users can check [[#Web of Trust|Web of Trust]] further below for better security.
+</div>
+
+<div data-tcc-id="key-download-different-os" data-tcc-title="Kicksecure or Whonix" >
+'''1.''' Import the key.
+
+Since the key is already available in Kicksecure or Whonix, importing the key is simpler than for other operating systems. 
+
+{{CodeSelect|code=
+gpg --import /usr/share/keyrings/derivative.asc
+}}
+
+The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. Advanced users can learn more about this [[#OpenPGP Web of Trust|below]].
+
+'''2.''' Skip a few steps.
+
+Steps '''2.''' to '''6.''' (which would be require for Windows, macOS and other Linux) can be skipped here. Proceed to step '''7.''' below.
+</div>
+</div>
+
+'''7.'''  Complete the {{project_name_long}} verification steps.
+
+If verifying {{project_name_long}} images, navigate to the relevant verification page below to finish the process:
+
+* [[Verify the_virtual_machine_images_using_the_command line|In Linux on the Command Line]]
+* [[Verify_the_virtual_machine_images_using_Windows|In Windows]]
+* [[Verify_the_virtual_machine_images_using_macOS|In macOS]]
+}}
+
+= OpenPGP Key Features =
+* sign/verify {{project name long}} VirtualBox images: yes
+* sending encrypted e-mails to {{project name long}} KVM developer Patrick: no
+
+= Advanced Users =
+{{Anchor|Web of Trust}}
+== OpenPGP Web of Trust ==
+A few people have signed [[Patrick Schleizer]]'s (adrelanos') OpenPGP key in [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]].
+
+Jan Dittberner <ref>
+https://jan.dittberner.info/
+</ref> ({{Code2|Debian Developer}}) <ref>
+https://qa.debian.org/developer.php?login=Jan+Dittberner
+</ref> signed Patrick's key. So did intrigeri (Tails developer, {{Code2|Debian Developer}}); Peter Palfrader ({{Code2|Debian Developer}}); Richard King; and Michael Carbone (accessnow.org).
+
+Users relying on Debian or one of the many Debian derivatives (like Ubuntu) already trust apt, the APT repository of the relevant distribution. This means the Debian keyring can be installed as a trusted source for obtaining Jan's, intrigeri's or Peter's key, to check their signature on Patrick's key.
+{{Box|text=
+'''1.''' [[Update]] the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''2.''' Install the Debian keyring.
+
+{{CodeSelect|code=
+sudo apt install debian-keyring
+}}
+
+'''3.''' Extract a signer's key from the Debian keyring and import it into your own keyring.
+
+Here is an example using Jan's key.
+
+{{CodeSelect|code=
+gpg --no-default-keyring --keyring /usr/share/keyrings/debian-keyring.gpg --armor --export B2FF1D95CE8F7A22DF4CF09BA73E0055558FB8DD {{!}} gpg --import
+}}
+
+'''4.''' ''Optional:'' Try to establish a better trust path to the signer by checking signatures on the signer's key.
+
+Check signatures on Patrick's key.
+
+{{CodeSelect|code=
+gpg --check-sigs 916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA
+}}
+
+The output of the above command should show signatures on Patrick's key, which should include the signer's signature.
+}}
+
+== Download the signify Key ==
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Advanced users only!
+}}
+
+<ref>
+<pre>
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+untrusted comment: Patrick Schleizer adrelanos@whonix.org signify public key
+RWQ6KRormNEETq+M8IysxRe/HAWlqZRlO8u7ACIiv5poAW0ztsirOjCQ
+-----BEGIN PGP SIGNATURE-----
+
+iQKTBAEBCgB9FiEEbpebKKbzfEO+MK+hy41Qu3e7PEgFAmInQmhfFIAAAAAALgAo
+aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldDZF
+OTc5QjI4QTZGMzdDNDNCRTMwQUZBMUNCOEQ1MEJCNzdCQjNDNDgACgkQy41Qu3e7
+PEhSyg/+J2R20mA5xVDT0FlZrtHXnNkZzg48FbSteak6utpmd9HGZlTxlEA3ou8z
+MlDGDHAYgpfe74suqQl2dEql6Mio4YuUou8GW2aEJ+AVa5jRlHMj4H9alTGmUtok
+UdaCVVQQO/FCE3y1N00TmuxyDghP9dm1cT8mho0P0RbVoqQyMTDIzLiXCa5aPwu/
+nyBGwxdVPuGNZ0WYJfKXLRdb/3q2xprYDQOTehLDHnUVins2kKnsbwVTBY4u4575
+KQfOwZD176oQZlZOuw6qxhOd0RWF33TMnQXKPjmaTpTjtsbKOascNBqnjDZbDNhl
+MSmRKvPZ4bi3IbpSsZdRiwXEOEnyeRhqlwhGX8UecU5e31iMRx8vJDA3u2oSQnrZ
+l8vnFvnnkGe3/COMAAlIEH+bFofFui3QMWYzX5A2g4jHzfgdrYJcNEZmaeptIRJj
+qs2eteI7FFt/hQaEZimN6TES0o91+JDLQPHDkEbbE8V9qOxUE6+pqLnRmr/uAMbc
+3WA73dphJQfBHQOT2k+ByrrZ/h18x5YrMhvr8HB0f8ejU9YiWG/YnbPvvPNuSdQb
+1xSaWmWrXpFgDMOJuG0H7uQi+IcZgQj+JsPaMXTZ6ehHyAr50c61TBoG/UzOXTJg
+YlD+NW0yh7b2XBXsL4Xj0X1lrHBxFGHiaM7zC//pIPKTG7kfyJ4=
+=n5bK
+-----END PGP SIGNATURE-----
+</pre>
+</ref>
+
+<pre>
+untrusted comment: Patrick Schleizer adrelanos@whonix.org signify public key
+RWQ6KRormNEETq+M8IysxRe/HAWlqZRlO8u7ACIiv5poAW0ztsirOjCQ
+</pre>
+
+= Further Reading =
+* [https://en.wikipedia.org/wiki/GNU_Privacy_Guard GnuPG wikipedia] - free OpenPGP software.
+* [https://www.apache.org/dev/openpgp.html Apache: How To OpenPGP].
+* [https://www.debian.org/events/keysigning Debian: Keysigning] - a tutorial on signing keys of other people.
+* [https://www.rubin.ch/pgp/weboftrust.en.html rubin.ch: An explanation of the PGP web of trust].
+
+{{Template:GnuPG-Troubleshooting}}
+
+= See Also =
+* [[Verify the virtual machine images|Verify {{project_name_long}} Images]]
+* [[Verifying Software Signatures]]
+* [[Trust|Placing Trust in {{project_name_long}}]]
+* [[OpenPGP|OpenPGP key distribution strategies]]
+
+= License =
+{{License_Amnesia|{{FULLPAGENAME}}}}
+
+= Footnotes =
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]
+[[Category:MultiWiki]]

@@ -1,0 +1,162 @@
+{{Header}}
+{{#seo:
+|description=Decentralized social sharing network with strong cryptography. Supports chat, mail, file sharing and experimental video/voice features.
+|image=https://www.{{project_clearnet}}/w/images/c/c3/Retroshare34235423423.png
+}}
+[[image:Retroshare34235423423.png|thumb]]
+
+= Introduction =
+[https://retroshare.cc/index.html RetroShare] is not an [https://en.wikipedia.org/wiki/Anonymizer anonymizing network], it is a [https://en.wikipedia.org/wiki/Friend-to-friend friend-to-friend] (F2F) network, or optionally a [https://en.wikipedia.org/wiki/Darknet darknet]. RetroShare has a very different audience and threat model.
+
+RetroShare is in active development. Users can operate servers for themselves, but the architecture doesn't depend on them. Communications are encrypted end-to-end and provide for messaging, mail, forums, pubsub, file exchange and even telephony. The problems with RetroShare are the confused user interface, the necessity to have it run most of the time and contribute to the distributed hashtable (DHT, causing continuous CPU usage) and three relevant privacy aspects: You expose your social graph to a global passive adversary because friends connect to friends directly. Your public IP is available in the DHT, allowing to track your physical locations. And your visible user name is exposed in the TLS certificate when somebody connects to your RetroShare node.
+
+Several of these problems can be solved by disabling the built-in DHT and hiding RetroShare behind a Tor onion service. People who scan Tor onion services will however still be able to connect the service and see the RetroShare user name in the self-signed certificate. This can be prevented by setting up [[Onion_Services#Onion_Service_Authentication|Authenticated Onion Services]] and limiting connections only to trusted people.
+
+On November 4, 2014, RetroShare scored 6 out of 7 points on the Electronic Frontier Foundation's secure messaging scorecard. It lost a point because there has not been an independent code audit. <ref>
+https://www.eff.org/secure-messaging-scorecard
+</ref> A recent audit by the pen-testing group Elttam uncovered many bugs in the code (some remotely exploitable) that were promptly fixed. The auditor's opinion was that RetroShare's codebase lacked secure coding practice. <ref>
+https://www.elttam.com/blog/a-review-of-the-eff-secure-messaging-scorecard-pt1/
+</ref>
+
+Running RetroShare through Tor enables you, to do things, which are normally potentially dangerous, such as adding random people (from a forum), while staying anonymous. (For example, to join a RetroShare forum.) This is '''not''' a recommendation, just stating a possibility. You can exchange your key on dedicated chat servers at: https://retroshare.rocks/
+
+After adding tons of random "friends" from a public forum, connection to a very few people over TCP. <ref>
+Chance of working better ('''untested'''): [[Tunnel UDP over Tor]].
+</ref> <ref>
+Note, in case you are using the previous footnote, [[Security_Guide#Other_Anonymizing_Networks_over_Tor_UDP_Tunnel|Other Anonymizing Networks over Tor UDP Tunnel]] applies.
+</ref> Approximately only 5% were online. Although probably only a very small portion of the network could be seen, the content of the network looked pretty interesting.
+
+RetroShare reports Right click &rarr; DHT Details: NET WARNING No DHT; Behind NAT UNKNOWN NAT STATE MANUAL FORWARD
+
+There still may be some privacy caveats left with RetroShare trying to communicate outside of Tor, but that doesn't matter if {{project_name_long}} makes any non-Tor traffic impossible.
+
+= Installation =
+'''WARNING: RetroShare packages are signed with [https://github.com/RetroShare/RetroShare/issues/355 weak] 1024 bit keys. Until this is fixed we recommend using Ricochet IM with OnionShare instead.'''
+
+{{Third_Party_Repository}}
+
+''RetroShare is currently available on Debian 7.0 Wheezy and 6.0 Squeeze for armel, armhf, i386 and amd64 architectures and for 8.0 Jessie.''
+
+Before adding the repo <ref>
+https://retroshare.cc/downloads.html
+</ref>, fetch the key and verify <ref>
+https://download.opensuse.org/repositories/network:retroshare/Debian_11/Release.key
+</ref> fingerprints. Always check the fingerprint for yourself. The output at the moment is:
+
+<pre>
+pub  1024D/0x9418A47921691F91 2011-08-16 home:AsamK OBS Project <home:AsamK@build.opensuse.org>
+      Key fingerprint = E2CE 3677 C801 5772 D097  B0AA 9418 A479 2169 1F91
+</pre>
+
+Download key with curl to home folder.
+
+{{CodeSelect|code=
+curl -o retroshare-pubkey.asc https://download.opensuse.org/repositories/network:retroshare/Debian_11/Release.key
+}}
+
+Check fingerprints/owners without importing anything.
+
+{{CodeSelect|code=
+gpg --keyid-format long --with-fingerprint retroshare-pubkey.asc
+}}
+
+If it looks good import into trusted.gpg.d. <ref>T
+o import asc key files into trusted.gpg.d they must be converted into a .gpg keychain file first.
+</ref>
+
+{{CodeSelect|code=
+sudo apt-key --keyring /etc/apt/trusted.gpg.d/retroshare-pubkey.gpg add retroshare-pubkey.asc
+}}
+
+For stable builds:
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb https://download.opensuse.org/repositories/network:/retroshare/Debian_11/ /' > /etc/apt/sources.list.d/retroshare06.list"
+}}
+
+For nightly builds:
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb https://download.opensuse.org/repositories/network:/retroshare/Debian_11/ /' > /etc/apt/retroshare06-git.list"
+}}
+
+{{Update}}
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Install Retroshare.
+
+{{CodeSelect|code=
+sudo apt install retroshare06
+}}
+
+For the latest nightly package name install <code>retroshare06-git</code> instead.
+
+<ref>
+[https://retroshare.cc/downloads.html RetroShare .deb Packages installation instructions from RetroShare's third party repository]
+</ref>
+
+= Setup =
+
+RetroShare setup:
+
+* Pick a pseudonym and password. Don't use real name or location obviously. Move your mouse to generate enough entropy.
+* Check ''Advanced Options'' &rarr; ''Create a hidden node''
+* Change key-length to 4096 bits for adequate security then generate the new profile.
+
+= Configuration =
+
+== I2P ==
+
+{{Template:I2P_Retroshare}}
+
+== Tor ==
+
+'''INCOMPLETE - Depends on unimplemented features for Whonix'''<ref>
+https://github.com/RetroShare/RetroShare/issues/356
+</ref> <ref>
+This task is up for grabs: https://phabricator.whonix.org/T560
+</ref>
+
+<u>On your {{project_name_gateway_long}}.</u>
+
+If you want to read an introduction about onion services and to learn about about onion service security, see [[Onion Services]].
+
+If you also want to run a hidden web server on the same .onion domain (nice for testing and learning Onion Services basics), see [[Onion Services]].
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+Add. <ref>
+Arbitrary choice of port to avoid conflicts with custom RetroShare setups.
+</ref>
+
+{{CodeSelect|code=
+HiddenServiceDir /var/lib/tor/retroshare/
+HiddenServicePort 7812 10.152.152.11:<Local Address port>
+HiddenServiceVersion 3
+}}
+
+Save.
+
+{{Reload_Tor}}
+
+Reminder: To get your onion service url.
+
+{{CodeSelect|code=
+sudo cat /var/lib/tor/retroshare/hostname
+}}
+
+{{
+Backups_Tor_Onion_Service_private_key
+|private_key_file=/var/lib/tor/retroshare/hs_ed25519_secret_key
+|file_name=hs_ed25519_secret_key
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,41 @@
+{{Header}}
+{{#seo:
+|description=Privacy Risks Posed by Hostnames
+|image=Hostnames.jpg
+}}
+[[image:Hostnames.jpg|thumb]]
+= Introduction =
+
+Computers are given hostnames for a number of good reasons. For instance, this is particularly useful for computers which operate on a network, as administrators and users are then able to ping computers, remotely connect to the computer, mount computer disks, and conduct other relevant activities. Naming conventions for computers are usually left to the individual, and may either comprise random chosen selections (“MrBig”, “coffeelover”, “{{q_project_name}}Rocks” etc.), or default values that comprise information such as user name, login name, and device brand / model / make.
+
+In the case of smaller devices like smart phones, these usually have manufacturer-assigned names which are either generic (“Samsung Phone”) or completely unique (“android_f7s89f8ir78etywt”), and may contain information such as the brand name, language used, and the name of the device owner. In many cases, hostnames cannot be changed - or at least not without “rooting” the device. <ref name=ietf>https://tools.ietf.org/html/rfc8117</ref> In the case of {{project_name_long}}, the hostname is always set to "host". <ref>https://github.com/{{project_name_short}}/anon-base-files</ref> <ref>https://github.com/Whonix/whonix-base-files/blob/master/etc/hostname.whonix</ref>
+
+= Privacy Risks =
+
+The hostname given to a user’s home computer or device can be leaked via a number of protocols, posing a privacy risk depending on the specificity of the naming convention. Vulnerable protocols which may leak the hostname include, but are not limited to: <ref name=ietf /> <ref>Refer to the source paper for further information on these protocols.</ref>
+
+* [https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol Dynamic Host Configuration Protocol (DHCP)].
+* [https://en.wikipedia.org/wiki/Domain_Name_System DNS] address to name resolution.
+* [https://en.wikipedia.org/wiki/Multicast_DNS Multicast DNS (mDNS)].
+* [https://en.wikipedia.org/wiki/Link-Local_Multicast_Name_Resolution Link-local Multicast Name Resolution].
+* [https://web.archive.org/web/20220531040811/http://www.dns-sd.org/ DNS service discovery].
+
+Disclosure of information is particularly problematic for mobile devices, since adversaries that monitor remote networks (like Wi-Fi hotspots) are able to obtain the hostname via passive monitoring, or active probing using a variety of Internet protocols. In combination with traffic analysis, adversaries that can obtain a hostname may be able to extract information that identifies the particular device and its properties; potentially revealing unique individuals utilizing the device. <ref name=ietf />
+
+Even if generic names are used for hostnames such as “pinkrose” or “linuxfan”, the possible identity of the user is narrowed significantly to a much smaller subset, particularly when combined with data on sites that are visited. This may quickly lead to user identification because hostname disclosure allows for tracking of the computer or device across many domains, and one-time exposure of the user via clearnet traffic can inform databases which link unique hostnames to user identities.
+
+As a further example, consider an adversary that is tracking users connecting to a specific Wi-Fi hot spot in an airport. After retrieving the hostname of a particular user “ABSmith”, and observing VPN connections to the Apple corporate network, the two pieces of information reveal that Mr Smith is the owner, and is an employee of Apple.
+
+= Recommendations =
+
+Obviously a generic hostname is advisable, but in practice, there are limited other solutions available at present. One is to turn off any protocols that are not strictly necessary and which leak hostnames, particularly when insecure places are visited. This reduces the attack surface, but is impractical for certain protocols; for example, DHCP is necessary for Internet connectivity and many services depend on protocols such as mDNS. Another option is to use different hostnames for different purposes, rather than relying on a global hostname - this option is available on some OSes. Ultimately, a randomized hostname protocol is necessary to protect privacy, similar to methods utilized for MAC addresses. <ref name=ietf />
+
+= See Also =
+* [[Essential_Host_Security|Essential Host Security]]
+
+= References =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

@@ -1,0 +1,109 @@
+{{Header}}
+{{#seo:
+|description=is a software framework for decentralized, peer-to-peer networking and an official GNU package.
+|image=https://www.{{project_clearnet}}/w/images/3/38/Gnunet.png
+}}
+[[image:Gnunet.png|GNUnet Logo|thumb|200px]]
+
+{{Stub}}
+
+= Introduction =
+
+GNUnet is a next generation, private and anonymous P2P networking stack that rebuilds the internet from the bottom-up on these principles. It exceeds all the other members of the big four (Tor, I2P and Freenet) in scope and design assumptions. <ref>
+https://n0.is/b/2017/guix-and-gnunet-fs---a-public-draft/
+</ref> <ref>
+https://secushare.org/anonymity
+</ref> Architecturally it is a master-piece that has been undergoing constant development since 2001.
+
+== Feature List ==
+
+A no where near exhaustive feature list: (GNUnet has 45 deployed subsystems for details see: <ref>
+https://gnunet.org/concepts
+</ref> <ref>
+[https://grothoff.org/christian/psc2015.pdf The Architecture of the GNUnet: 45 Subsystems in 45 Minutes]
+</ref>)
+<div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
+* A very clean modular and documented architecture that allows for adding functionality without encumbering the protocol or limiting future changes
+* GNUnet primarily written in C, but the gnunet-java subsystem provides an API for developing extensions in Java <ref>
+https://gnunet.org/svn/gnunet-java/doc/gnunet-java-tutorial.pdf
+</ref>. Similar work is being done for Rust.
+* A P2P consensus system designed under the assumption that a powerful adversary controls nodes in the network - compared to a centralized directory servers model (Tor)
+* Can use TCP,UDP,HTTPS,HTTP and Bluetooth transports
+* ECRS is a distributed file store like Freenet but with many improvements including:
+** allowing direct sharing of files from the local drive without encrypting and inserting them first.
+** can share and mount directories via FUSE
+** file download swarming for improved speeds
+** global private keyword search for files
+** resistance to keyword/unrelated content spam by using trusted namespaces <ref>
+https://gnunet.org/sites/default/files/ecrs.pdf
+</ref>
+** resource accounting to reward contributors and limit attacks
+* User controllable anonymity levels for traffic routing - allows for more latency sensitive use-cases between peers like VoIP
+* An anonymous routing capability that allows for:
+** VPN functionality between peers
+** IP protocol routing as opposed to just TCP
+** traffic exits that allow connecting to the legacy Internet
+* By implementing alpha-mixing (mixing traffic of varying latencies) it can provide more cover traffic for resisting traffic analysis
+* A strong adversary resistant DHT that handles network churn
+* GNS, a secure and memorable name system with query privacy and key revocation
+* PSYC2 (WIP) an extensible messaging format that runs on the multicast subsystem to create social networking application (secushare <ref>
+https://secushare.org/
+</ref>)
+* Conversation, a VoIP application
+</div>
+
+= GNUnet in {{project_name_long}} =
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = These instructions are incomplete.
+}}
+
+GNUnet's capabilities makes it an excellent choice for a planned {{project_name_long}} notification system, a censorship resistant host of project files and even as a Tor alternative on the gateway in the future. It is currently packaged in Debian but the rapid development cycle makes the versions packaged in stable obsolete and incapable of connecting to the network. See [https://phabricator.whonix.org/T114 ticket].
+
+* https://forums.whonix.org/t/gnunet-in-sid-chroot/3447
+* See also [[chroot]].
+
+<ref>
+* <code>systemd-container</code> is optional. Could use normal <code>chroot</code> command which might be less secure. Under research.
+* <code>apt-cacher-ng</code> is optional but then below <code>--aptopt='Acquire::http { Proxy "http://127.0.0.1:3142"; }'</code> should be removed too.
+</ref>
+
+{{Install Package
+|package=mmdebstrap systemd-container apt-cacher-ng
+}}
+
+Create a [[chroot]]. <ref>
+<code>--aptopt='Acquire::http { Proxy "http://127.0.0.1:3142"; }'</code> is optional but useful to avoid repeat package download while experimenting.
+</ref>
+
+{{CodeSelect|code=
+sudo mmdebstrap --verbose --include gnunet --aptopt='Acquire::http { Proxy "http://127.0.0.1:3142"; }' sid ~/debian-sid-chroot
+}}
+
+Enter chroot.
+
+{{CodeSelect|code=
+sudo systemd-nspawn -D ~/debian-sid-chroot
+}}
+
+Or start systemd inside chroot. This requires using above command, creating user password, otherwise no login is possible.
+
+{{CodeSelect|code=
+sudo systemd-nspawn -D ~/debian-sid-chroot /sbin/init
+}}
+
+{{systemd-nspawn-exit}}
+
+= See Also =
+
+* [https://docs.gnunet.org/handbook/gnunet.html GNUnet Reference Manual]
+* [https://gnunet.org/en/use.html How to use GNUnet - in a nutshell]
+
+=Footnotes=
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]
