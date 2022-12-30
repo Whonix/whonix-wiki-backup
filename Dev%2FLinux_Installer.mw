@@ -89,56 +89,11 @@ Exit code 0 does not guarantee that the script did what was expected to be done,
 = Development Todo =
 
 == Soon ==
-=== apt-get update debugging ===
-In https://forums.whonix.org/t/can-i-report-a-bug-here/16142/2 a user reported a log containing:
-
-<pre>
-709 log_run “root_cmd ${pkg_mngr_update}”
-</pre>
-
-1) That is not verbose enough. Would be better if the log could be seen.
-
-2) Users having local issues (not caused by installer-dist) with their APT package management system could be quite common. (Duplicate sources, some broken repositories.) Therefore installer-dist should advice the user so the user doesn't have to ask in the forums.
-
-Advice could either be built into installer-dist or probably better, a link to a wiki page? If a wiki page, then Patrick could 
-
-=== apt-get install debugging ===
-Users having local issues (not caused by installer-dist) with their APT package management system could be quite common. (Such as when APT / dpkg was previously interrupted during a dist-upgrade or a package installation.) In these cases no packages can be installed. This includes the inability to install VirtualBox.
-
-To find out if that is happening, the installer could run a few commands as sanity test. Some pseudo code inspired by systemcheck:
-
-<pre>
-   ## If a package manager is running:
-   ## sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; echo $?
-   ## /var/lib/dpkg/lock:  15601
-   ## /var/cache/apt/archives/lock: 15601
-   ## 0
-   ##
-   ## If no package manager is running:
-   ## sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; echo $?
-   ## 1
-   if sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; then
-      echo "A package manager is already running. Cannot proceed. See: link to wiki"
-   fi
-</pre>
-
-<pre>
-   ## dpkg --audit does not exit with a non-zero exit code if something is wrong.
-   ## dpkg --audit does not return anything, if everything is fine.
-   ## Therefore we see if dpkg has to say something, and if yes, the system is
-   ## broken and we abort.
-   dpkg_audit_output="$(dpkg --audit 2>&1)" || true
-
-   if [ "$dpkg_audit_output" = "" ]; then
-      ## OK
-   else
-      ## issue. Show output of dpkg_audit_output and link to wiki.
-   fi
-</pre>
 
 === misc ===
 
 * add support for Oracle Vbox repo. Currently there is no need, maybe in the future with outdated packages on the main distributions.
+** one of the problems is that the vbox key needs to be contained in the installer, while we are using signify to verify the images because it is better and the key is only two lines long.
 ** https://www.kicksecure.com/wiki/VirtualBox/Other_Versions#Install_from_VirtualBox.org_Repository
 *** use extrepo? or manual method? extrepo might not support tor+?
 **** problem with extrepo is as of current stable Debian 11 (Bullseye), extrepo-data is only available from backports and the problem with manual method is gpg.
@@ -337,6 +292,65 @@ Same as above.
 *** https://bazaar.launchpad.net/~cpu-checker-dev/cpu-checker/trunk/view/head:/kvm-ok
 ** systool: necessary, better to grep directly the CPU flags. Requires installation of sysfsutils.
 *** https://stackoverflow.com/a/51272679
+
+
+=== apt-get install debugging ===
+Users having local issues (not caused by installer-dist) with their APT package management system could be quite common. (Such as when APT / dpkg was previously interrupted during a dist-upgrade or a package installation.) In these cases no packages can be installed. This includes the inability to install VirtualBox.
+
+To find out if that is happening, the installer could run a few commands as sanity test. Some pseudo code inspired by systemcheck:
+
+
+<pre>
+   ## dpkg --audit does not exit with a non-zero exit code if something is wrong.
+   ## dpkg --audit does not return anything, if everything is fine.
+   ## Therefore we see if dpkg has to say something, and if yes, the system is
+   ## broken and we abort.
+   dpkg_audit_output="$(dpkg --audit 2>&1)" || true
+
+   if [ "$dpkg_audit_output" = "" ]; then
+      ## OK
+   else
+      ## issue. Show output of dpkg_audit_output and link to wiki.
+   fi
+</pre>
+
+
+== dropped due to outdated installer version ==
+
+=== apt-get update debugging ===
+
+Note: this is not a problem with apt-get update, it was a problem with the script itself and its logs no being correctly printed.
+
+In https://forums.whonix.org/t/can-i-report-a-bug-here/16142/2 a user reported a log containing:
+
+<pre>
+709 log_run “root_cmd ${pkg_mngr_update}”
+</pre>
+
+1) That is not verbose enough. Would be better if the log could be seen.
+
+2) Users having local issues (not caused by installer-dist) with their APT package management system could be quite common. (Duplicate sources, some broken repositories.) Therefore installer-dist should advice the user so the user doesn't have to ask in the forums.
+
+Advice could either be built into installer-dist or probably better, a link to a wiki page? If a wiki page, then Patrick could 
+
+=== dpkg/apt log debugging ===
+
+Note: apt already warns that another process is holding the lock and tells the user to wait.
+
+<pre>
+   ## If a package manager is running:
+   ## sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; echo $?
+   ## /var/lib/dpkg/lock:  15601
+   ## /var/cache/apt/archives/lock: 15601
+   ## 0
+   ##
+   ## If no package manager is running:
+   ## sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; echo $?
+   ## 1
+   if sudo --non-interactive fuser /var/lib/dpkg/lock /var/cache/apt/archives/lock ; then
+      echo "A package manager is already running. Cannot proceed. See: link to wiki"
+   fi
+</pre>
 
 = Forum Discussion =
 [https://forums.whonix.org/t/whonix-linux-installer/15917 Forum discussion]

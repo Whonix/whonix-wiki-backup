@@ -195,26 +195,26 @@ This means users have access to many new software packages in concert with exist
 * Migrated <code>usr/share/homepage</code> to <code>usr/share/doc/homepage</code>. <ref>https://github.com/Whonix/whonix-welcome-page/commit/e260ebb241936d17d5699d90e6cf568e7eeecde7</ref>
 
 [https://github.com/whonix/derivative-maker Whonix build script]:
-* Removed <code>virtualbox-guest-dkms</code>; it is deprecated in Debian (integrated into the kernel). <ref>https://github.com/Whonix/derivative-maker/commit/d6f4b0beeb7da7c857a0944d5341f738a1825ca0</ref>
-* Implemented fasttrack changes. <ref>https://github.com/Whonix/derivative-maker/commit/993dc55adef8fd6227dcf028a31f78df7af4af38</ref> <ref>https://github.com/Whonix/derivative-maker/commit/4117aa571c4c54268098949377fec890be300edf</ref> <ref>https://github.com/Whonix/derivative-maker/commit/1097167d5d947b2591319ba7c727380bfdbb9852</ref>
-* Migrated <code>.gpg</code> to <code>.asc</code>. <ref>https://github.com/Whonix/derivative-maker/commit/61a4fa8feb1ca8bb66f8692f98fe0ed0b0f6a347</ref>
-* Reverted “build sources, Debian fasttrack: disable temporarily”;  this reverts commit 288323a86e2dc037b03e004c62ab3f8ce2b1f616. <ref>https://github.com/Whonix/derivative-maker/commit/ea0ea5ed5b66bb99c4b1851954d4c116b690a3c4</ref>
-* Avoided a build dependency on <code>ftpsync</code> (for <code>rsync</code> test script). <ref>https://github.com/Whonix/derivative-maker/commit/db2b3b0439da69198e6fe15da14cd539f89a48bb</ref>
-* VirtualBox builds: switched back to guest additions packages - <code>virtualbox-guest-utils</code>, <code>virtualbox-guest-dkms</code> and <code>virtualbox-guest-x11</code>. (Previously <code>virtualbox-guest-additions-iso</code>.) <ref>https://github.com/Whonix/derivative-maker/commit/22c9e145a9fdb53358e56fd37fa34ebe3db5fb6c</ref>
-* VirtualBox builds: temporarily download the <code>virtualbox</code> package from Debian sid until it becomes available from either Debian fasttrack or <code>virtualbox.org</code>. <ref>[https://forums.whonix.org/t/challenges-installing-virtualbox/9984/6 Challenges Installing VirtualBox].</ref> <ref>https://github.com/Whonix/derivative-maker/commit/79f73c563c0c12afbf19b479e2c6426ac9ebc005</ref>
-* VirtualBox builds: accept both sources of VirtualBox packages - either package <code>virtualbox</code> (by Debian), or package <code>virtualbox-6.1</code> (by virtualbox.org). <ref>https://github.com/Whonix/derivative-maker/commit/2e9b99f5991dd5a62083a91bde597ccd4100f108</ref>
-* Build sources, Debian fasttrack: disabled temporarily until https://salsa.debian.org/fasttrack-team/support/-/issues/24 is fixed. <ref>https://github.com/Whonix/derivative-maker/commit/288323a86e2dc037b03e004c62ab3f8ce2b1f616</ref> <ref>Note: the https://fasttrack.debian.net/debian offline issue has now been resolved.</ref>
-* <code>help-steps/repo_download_chroot_script</code>: fixed for Debian <code>bullseye</code> - updated the order of parameters passed to APT. <ref>https://github.com/Whonix/derivative-maker/commit/4c4b6899446b65ff98b0c714806e22879cd22ea6</ref>
-* Disabled <code>download_virtualbox_packages_virtualbox_guest_additions_iso_from_debian_sid</code> moving to Debian fasttrack version. <ref>https://github.com/Whonix/derivative-maker/commit/37a58d3ccef9e055fa77375f08f609c37f34a4dc</ref>
-* Disabled <code>download_virtualbox_packages_virtualbox_org</code> moving to Debian fasttrack version. <ref>https://github.com/Whonix/derivative-maker/commit/d18114145217bd0fa97c5b90a162fa4115a44675</ref>
-* Default <code>derivative-maker_auto_retry=“0”</code> auto retry function error handler trap lacks variables such as variable APTGETOPT. <ref>This would miss security-related APT configuration options: <code>apt --error-on=any / -o APT::Update::Error-Mode=any</code>.</ref> <ref>https://github.com/Whonix/derivative-maker/commit/a00bd523073aaceb1f5cd674b54e734fb93c7518</ref>
-* Added backports and fasttrack to build sources by default to support downloading VirtualBox from Debian fasttrack. <ref>https://github.com/Whonix/derivative-maker/commit/067b8c2f6dafbbcb6ea00eaf2f25c90b88508764</ref>
-* Added build dependencies for maintainers. <ref>https://github.com/Whonix/derivative-maker/commit/6a0f72a701799879b23de92a2855aba7f756bb22</ref>
-* Removed <code>python</code> from cowbuilder image. It is no longer necessary because the <code>apt-get-update</code> wrapper is no longer required. <ref>https://github.com/Whonix/derivative-maker/commit/21451c66870549e441e50f2bdd8008ba33f8d4a5</ref> <ref>https://github.com/Whonix/derivative-maker/commit/ff75fd30f698c61a3276a811c8fcd5a5be7a1298</ref>
-* Reverted to the Tor version from <code>packages.debian.org</code> (instead of the earlier <code>deb.torproject.org</code>), see: [[Dev/Tor|Tor integration in {{project_name_long}} Development Notes]]. <ref>[https://forums.whonix.org/t/tor-integration-in-whonix/10593 Tor integration in Whonix].</ref> <ref>https://github.com/Whonix/derivative-maker/commit/e6b372d18f582b35900899d2aa076e4d1b5073a2</ref>
-* Removed <code>mmdebstrap</code> copy from the source code; it is no longer required as the Debian <code>bullseye</code> package is sufficient. <ref>https://github.com/Whonix/derivative-maker/commit/37d3c0062d8fbb4413d3113cc67f2ea4020e9cba</ref>
-* <code>python3.9</code> is no longer required in <code>grml_packages</code> because <code>apt --error-on=any</code> obsoleted any need for a python-based <code>apt</code> wrapper. <ref>https://github.com/Whonix/derivative-maker/commit/a8aaeddad3feb15ba894c4c0c75288b20642a3e1</ref>
-* Replaced the unnecessary <code>/usr/libexec/security-misc/apt-get-wrapper</code> with <code>apt --error-on=any</code>. <ref>https://github.com/Whonix/derivative-maker/commit/2ba4bcec1cd56c58cec7cb18b82d801abc58a0ae</ref> <ref>https://github.com/Whonix/derivative-maker/commit/9cdc94271739b373ff19eeb7506193c6a9b47250</ref>
+* Removed <code>virtualbox-guest-dkms</code>; it is deprecated in Debian (integrated into the kernel). <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/d6f4b0beeb7da7c857a0944d5341f738a1825ca0</ref>
+* Implemented fasttrack changes. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/993dc55adef8fd6227dcf028a31f78df7af4af38</ref> <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/4117aa571c4c54268098949377fec890be300edf</ref> <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/1097167d5d947b2591319ba7c727380bfdbb9852</ref>
+* Migrated <code>.gpg</code> to <code>.asc</code>. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/61a4fa8feb1ca8bb66f8692f98fe0ed0b0f6a347</ref>
+* Reverted “build sources, Debian fasttrack: disable temporarily”;  this reverts commit 288323a86e2dc037b03e004c62ab3f8ce2b1f616. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/ea0ea5ed5b66bb99c4b1851954d4c116b690a3c4</ref>
+* Avoided a build dependency on <code>ftpsync</code> (for <code>rsync</code> test script). <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/db2b3b0439da69198e6fe15da14cd539f89a48bb</ref>
+* VirtualBox builds: switched back to guest additions packages - <code>virtualbox-guest-utils</code>, <code>virtualbox-guest-dkms</code> and <code>virtualbox-guest-x11</code>. (Previously <code>virtualbox-guest-additions-iso</code>.) <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/22c9e145a9fdb53358e56fd37fa34ebe3db5fb6c</ref>
+* VirtualBox builds: temporarily download the <code>virtualbox</code> package from Debian sid until it becomes available from either Debian fasttrack or <code>virtualbox.org</code>. <ref>[https://forums.whonix.org/t/challenges-installing-virtualbox/9984/6 Challenges Installing VirtualBox].</ref> <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/79f73c563c0c12afbf19b479e2c6426ac9ebc005</ref>
+* VirtualBox builds: accept both sources of VirtualBox packages - either package <code>virtualbox</code> (by Debian), or package <code>virtualbox-6.1</code> (by virtualbox.org). <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/2e9b99f5991dd5a62083a91bde597ccd4100f108</ref>
+* Build sources, Debian fasttrack: disabled temporarily until https://salsa.debian.org/fasttrack-team/support/-/issues/24 is fixed. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/288323a86e2dc037b03e004c62ab3f8ce2b1f616</ref> <ref>Note: the https://fasttrack.debian.net/debian offline issue has now been resolved.</ref>
+* <code>help-steps/repo_download_chroot_script</code>: fixed for Debian <code>bullseye</code> - updated the order of parameters passed to APT. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/4c4b6899446b65ff98b0c714806e22879cd22ea6</ref>
+* Disabled <code>download_virtualbox_packages_virtualbox_guest_additions_iso_from_debian_sid</code> moving to Debian fasttrack version. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/37a58d3ccef9e055fa77375f08f609c37f34a4dc</ref>
+* Disabled <code>download_virtualbox_packages_virtualbox_org</code> moving to Debian fasttrack version. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/d18114145217bd0fa97c5b90a162fa4115a44675</ref>
+* Default <code>derivative-maker_auto_retry=“0”</code> auto retry function error handler trap lacks variables such as variable APTGETOPT. <ref>This would miss security-related APT configuration options: <code>apt --error-on=any / -o APT::Update::Error-Mode=any</code>.</ref> <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/a00bd523073aaceb1f5cd674b54e734fb93c7518</ref>
+* Added backports and fasttrack to build sources by default to support downloading VirtualBox from Debian fasttrack. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/067b8c2f6dafbbcb6ea00eaf2f25c90b88508764</ref>
+* Added build dependencies for maintainers. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/6a0f72a701799879b23de92a2855aba7f756bb22</ref>
+* Removed <code>python</code> from cowbuilder image. It is no longer necessary because the <code>apt-get-update</code> wrapper is no longer required. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/21451c66870549e441e50f2bdd8008ba33f8d4a5</ref> <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/ff75fd30f698c61a3276a811c8fcd5a5be7a1298</ref>
+* Reverted to the Tor version from <code>packages.debian.org</code> (instead of the earlier <code>deb.torproject.org</code>), see: [[Dev/Tor|Tor integration in {{project_name_long}} Development Notes]]. <ref>[https://forums.whonix.org/t/tor-integration-in-whonix/10593 Tor integration in Whonix].</ref> <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/e6b372d18f582b35900899d2aa076e4d1b5073a2</ref>
+* Removed <code>mmdebstrap</code> copy from the source code; it is no longer required as the Debian <code>bullseye</code> package is sufficient. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/37d3c0062d8fbb4413d3113cc67f2ea4020e9cba</ref>
+* <code>python3.9</code> is no longer required in <code>grml_packages</code> because <code>apt --error-on=any</code> obsoleted any need for a python-based <code>apt</code> wrapper. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/a8aaeddad3feb15ba894c4c0c75288b20642a3e1</ref>
+* Replaced the unnecessary <code>/usr/libexec/security-misc/apt-get-wrapper</code> with <code>apt --error-on=any</code>. <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/2ba4bcec1cd56c58cec7cb18b82d801abc58a0ae</ref> <ref>https://github.com/{{project_name_short}}/derivative-maker/commit/9cdc94271739b373ff19eeb7506193c6a9b47250</ref>
 
 = {{project_name_long}} 16 Updates =
 
@@ -815,16 +815,16 @@ https://github.com/Whonix/whonix-firewall/commit/cda126ad2bdde60c42a3fc3349845ad
 </ref>
 [https://github.com/whonix/derivative-maker <code>Whonix build script</code>]:
 * tor-ctrl <ref>
-https://github.com/Whonix/derivative-maker/commit/38827606b04cd08e7439e27e3c79216ab36879bf
+https://github.com/{{project_name_short}}/derivative-maker/commit/38827606b04cd08e7439e27e3c79216ab36879bf
 </ref>
 * add tor-ctrl <ref>
-https://github.com/Whonix/derivative-maker/commit/e90bc12bfbbb1754cf4b3863c772b38e9e116acb
+https://github.com/{{project_name_short}}/derivative-maker/commit/e90bc12bfbbb1754cf4b3863c772b38e9e116acb
 </ref>
 * squashfs-tools-ng <ref>
-https://github.com/Whonix/derivative-maker/commit/0f682f9dd382897fc55f87f35b8b0462e336aa89
+https://github.com/{{project_name_short}}/derivative-maker/commit/0f682f9dd382897fc55f87f35b8b0462e336aa89
 </ref>
 * remove buster repository <ref>
-https://github.com/Whonix/derivative-maker/commit/ed5a8a6fce5f6d3963c6dcc2966138354a6858fe
+https://github.com/{{project_name_short}}/derivative-maker/commit/ed5a8a6fce5f6d3963c6dcc2966138354a6858fe
 </ref>
 
 == {{project_name_long}} 16.0.3.7 ==
@@ -1140,18 +1140,18 @@ https://github.com/Kicksecure/xfce-desktop-config-dist/commit/94d1c6a8048755235e
 </ref>
 [https://github.com/Whonix/derivative-maker <code>Whonix build script</code>]:
 * Re-enabled downloading of Tor from `deb.torproject.org`. <ref>See: [[Dev/Tor|Tor integration in {{project_name_long}} Development Notes]].</ref> <ref>[https://forums.whonix.org/t/tor-integration-in-whonix/10593 Tor integration in Whonix].</ref> <ref>
-https://github.com/Whonix/derivative-maker/commit/8360f544bcd4bba4cb60f3fde9011f43d5d89803
+https://github.com/{{project_name_short}}/derivative-maker/commit/8360f544bcd4bba4cb60f3fde9011f43d5d89803
 </ref>
 * CI changes. <ref>
-https://github.com/Whonix/derivative-maker/commit/6850283e88d52dd96a5f82412f99d0818117d905
+https://github.com/{{project_name_short}}/derivative-maker/commit/6850283e88d52dd96a5f82412f99d0818117d905
 </ref>
 * Fixed `help-steps/repo_download_chroot_script`. <ref>
-https://github.com/Whonix/derivative-maker/commit/5542f3491045ac2ef9db42f8ffcc112baef4cd7b
+https://github.com/{{project_name_short}}/derivative-maker/commit/5542f3491045ac2ef9db42f8ffcc112baef4cd7b
 </ref>
 * {{project_name_long}} [[KVM]]: Enable extended L2 entries, and reduced cluster size.
 ** I/O perf should improve thanks to extended L2, see: [https://blogs.igalia.com/berto/2020/12/03/subcluster-allocation-for-qcow2-images/ Subcluster allocation for qcow2 images].
 ** Decreasing cluster size produces smaller images. <ref>
-https://github.com/Whonix/derivative-maker/commit/bec122d15dc891a9b7ecad9fba702f3979783b65
+https://github.com/{{project_name_short}}/derivative-maker/commit/bec122d15dc891a9b7ecad9fba702f3979783b65
 </ref> <ref>Appreciation is expressed to @HulaHoop.</ref>
 
 == {{project_name_long}} 16.0.3.1 ==

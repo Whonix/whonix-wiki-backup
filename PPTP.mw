@@ -28,11 +28,11 @@ In this chapter, PPTP is utilized because it is useful, very easy to configure a
 
 == Virtual Private Networks (VPNs) ==
 
-A VPN ([https://en.wikipedia.org/wiki/Vpn Virtual private network]) is a method for users to connect to another network and access resources that can be seen from that network.
+A VPN ([https://en.wikipedia.org/wiki/Virtual_private_network Virtual private network]) is a method for users to connect to another network and access resources that can be seen from that network.
 
 In this case, VPN is used to allow other users on your local LAN to connect and use your {{project_name_long}} to connect to Tor with minimal configuration. Unlike Tor-VM where all network connections are forced through Tor or rejected, workstations connected over PPTP are NOT automatically protected against network level leaks and application level exploits.
 
-We use [https://en.wikipedia.org/wiki/Pptp PPTP] here due to its wide install base (every installation of Windows since Windows 95 includes a client) and ease of installation. Be aware of the [https://en.wikipedia.org/wiki/Pptp#Security_of_the_PPTP_protocol enormous security issues with PPTP].
+We use [https://en.wikipedia.org/wiki/Point-to-Point_Tunneling_Protocol PPTP] here due to its wide install base (every installation of Windows since Windows 95 includes a client) and ease of installation. Be aware of the [https://en.wikipedia.org/wiki/Point-to-Point_Tunneling_Protocol#Security enormous security issues with PPTP].
 
 '''Warning''', PPTP should '''NOT''' be used with {{project_name_long}} over the Internet, only for local trusted sources. See below for an OpenVPN implementation that allows use of Tor with minimal client configuration and should be secure enough to allow Internet connections (coming soon).
 
@@ -85,7 +85,7 @@ Setup your <code>localip</code> and <code>remoteip</code> settings:
 <pre>localip 192.168.0.1 #your eth1 address
 remoteip 192.168.0.200-250 #a range of unassigned IP's</pre>
 
-See the [http://poptop.sourceforge.net/dox/pptpd.conf.txt official documentation here].
+See the [https://poptop.sourceforge.net/dox/pptpd.conf.txt official documentation here].
 
 '''Discussion:'''
 
@@ -93,7 +93,7 @@ This can be potentially confusing, as the documentation in the configuration fil
 
 <code>remoteip</code> is a bit simpler. It is the IP address (or addresses) that are assigned to the client's computer when they connect. They get their own virtual adapter, which needs its own IP address.
 
-See the [http://poptop.sourceforge.net/dox/qna.html#19 FAQ here for information]. For a simple overview of the VPN process see [https://help.ubuntu.com/community/VPNClient#Extra_credit:''how''VPN_works VPNClient @ Ubuntu Community Documentation].
+See the [https://poptop.sourceforge.net/dox/qna.html#19 FAQ here for information]. For a simple overview of the VPN process see [https://help.ubuntu.com/community/VPNClient#Extra_credit:_how_VPN_works''how''VPN_works VPNClient @ Ubuntu Community Documentation].
 
 '''localip''', for simplicity should be the IP of your eth1, as Tor is already configured to listen here and we don't actually do any routing creating an IP address conflict. '''remoteip''', should be several IP's on your internal network (you should have as many IP's as potential clients, for example the “192.168.0.200-250” range above defines IP's for 50 clients)
 
@@ -116,9 +116,9 @@ require-mschap-v2
 require-mppe-128
 ms-dns <eth1 address></pre>
 
-'''Discussion:''' [http://poptop.sourceforge.net/dox/options.pptpd.txt See official documentation here].
+'''Discussion:''' [https://poptop.sourceforge.net/dox/options.pptpd.txt See official documentation here].
 
-'''refuse-pap''': [https://en.wikipedia.org/wiki/Password_authentication_protocol PAP style authentication], insecure, so we don't want to use it if we can help it. '''refuse-chap''': [https://en.wikipedia.org/wiki/Challenge-Handshake_Authentication_Protocol CHAP authentication], insecure. '''refuse-mschap''': [https://en.wikipedia.org/wiki/MSCHAP MS-CHAP], insecure '''require-mschap-v2''': [https://en.wikipedia.org/wiki/MSCHAPv2 MS-CHAPv2], make sure that any connecting client must use this. It is as secure a we can get for a supported authentication method for PPTP. '''require-mppe-128''': [https://en.wikipedia.org/wiki/MPPE Microsoft Point-to-Point Encryption], as secure encryption as we can get over PPTP, 128 bit is the maximum supported. '''ms-dns''': Use this address as the DNS server for connecting (Windows) clients.
+'''refuse-pap''': [https://en.wikipedia.org/wiki/Password_Authentication_Protocol PAP style authentication], insecure, so we don't want to use it if we can help it. '''refuse-chap''': [https://en.wikipedia.org/wiki/Challenge-Handshake_Authentication_Protocol CHAP authentication], insecure. '''refuse-mschap''': [https://en.wikipedia.org/wiki/MS-CHAP MS-CHAP], insecure '''require-mschap-v2''': [https://en.wikipedia.org/wiki/MS-CHAP MS-CHAPv2], make sure that any connecting client must use this. It is as secure a we can get for a supported authentication method for PPTP. '''require-mppe-128''': [https://en.wikipedia.org/wiki/Microsoft_Point-to-Point_Encryption Microsoft Point-to-Point Encryption], as secure encryption as we can get over PPTP, 128 bit is the maximum supported. '''ms-dns''': Use this address as the DNS server for connecting (Windows) clients.
 
 = Configure IPtables rules for client connect and disconnect =
 
@@ -177,7 +177,7 @@ From a client on your network (preferably one outside of your Tor network, e.g. 
 
 Instructions for a variety of clients:
 
-[http://pptpclient.sourceforge.net/documentation.phtml Linux (many flavors, direct from the pptp-client site)] [https://web.archive.org/web/20120207123212/http://support.microsoft.com/kb/314076 How to configure a connection to a virtual private network (VPN) in Windows XP] [https://help.ubuntu.com/community/VPNClient VPNClient @ Ubuntu Community Documentation] [https://web.archive.org/web/20120825041858/http://www.pcworld.com/article/210562/how_to_set_up_vpn_in_windows_7.html Windows 7 VPN step by step guide]
+[https://pptpclient.sourceforge.net/documentation.phtml Linux (many flavors, direct from the pptp-client site)] [https://web.archive.org/web/20120207123212/http://support.microsoft.com/kb/314076 How to configure a connection to a virtual private network (VPN) in Windows XP] [https://help.ubuntu.com/community/VPNClient VPNClient @ Ubuntu Community Documentation] [https://web.archive.org/web/20120825041858/http://www.pcworld.com/article/210562/how_to_set_up_vpn_in_windows_7.html Windows 7 VPN step by step guide]
 
 Now verify the connection on the gateway, after successfully connecting: ({{project_name_gateway_long}})
 
