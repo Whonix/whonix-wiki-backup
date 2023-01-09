@@ -99,19 +99,19 @@ gpg --import /usr/share/gpg-bash-lib/misc/bitcoind-pub-keys.d/*
 '''2.''' Download the signed hash sum file.
 
 {{CodeSelect|code=
-scurl-download https://bitcoincore.org/bin/bitcoin-core-23.0/SHA256SUMS
+scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMS
 }}
 
 '''3.''' Download the signed hash sum signature.
 
 {{CodeSelect|code=
-scurl-download https://bitcoincore.org/bin/bitcoin-core-23.0/SHA256SUMS.asc
+scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMS.asc
 }}
 
 '''4.''' Download Bitcoin.
 
 {{CodeSelect|code=
-scurl-download https://bitcoincore.org/bin/bitcoin-core-23.0/bitcoin-23.0-x86_64-linux-gnu.tar.gz
+scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/bitcoin-24.0.1-x86_64-linux-gnu.tar.gz
 }}
 
 '''5.''' Verify the hash sum digital signature.
@@ -120,7 +120,7 @@ scurl-download https://bitcoincore.org/bin/bitcoin-core-23.0/bitcoin-23.0-x86_64
 gpg --verify SHA256SUMS.asc
 }}
 
-<u>If the virtual machine image is correct</u>, the output will include a statement the signature is good:
+If the hash sum digital signature is correct, the output will include a statement the signature is good:
 
 <pre>
 Good signature
@@ -139,13 +139,13 @@ sha256sum --check --ignore-missing SHA256SUMS
 Expected output.
 
 <pre>
-bitcoin-23.0-x86_64-linux-gnu.tar.gz: OK
+bitcoin-24.0.1-x86_64-linux-gnu.tar.gz: OK
 </pre>
 
 '''7.''' Extract the tar file.
 
 {{CodeSelect|code=
-tar xvf bitcoin-23.0-x86_64-linux-gnu.tar.gz
+tar xvf bitcoin-24.0.1-x86_64-linux-gnu.tar.gz
 }}
 
 '''8.''' Done.
@@ -164,7 +164,7 @@ This step is optional but recommended to ensure stream isolation is always used 
 Because then Bitcoin Core cannot connect using transparent proxying anyhow.
 </ref> <u>and/or</u>
 * '''B)''' Proxy settings are configured using the Bitcoin Core configuration file <code>~/.bitcoin/bitcoin.conf</code> before the first start. <ref>
-Perhaps as part of the [[ElectrumX]] instructions.
+As part of the [[ElectrumX#Bitcoin-Qt_Configuration]] instructions.
 </ref>
 
 '''2.''' Start Bitcoin-Qt as documented further below.
@@ -173,10 +173,9 @@ Perhaps as part of the [[ElectrumX]] instructions.
 
 * '''A)''' navigate to the client settings
 * '''B)''' locate the Network tab
-* '''C)''' enable the SOCKS proxy as follows:
-** Host: <code>10.152.152.10</code>
+* '''C)''' enable the SOCKS5 proxy (default proxy) as follows:
+** Proxy IP: <code>10.152.152.10</code>
 ** Port: <code>9111</code>
-** Proxy: <code>SOCKS5</code>
 
 '''4.''' Re-enable networking for the virtual machine.
 }}

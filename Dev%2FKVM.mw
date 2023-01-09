@@ -32,7 +32,15 @@ https://etbe.coker.com.au/2016/12/24/video-mode-kvm/
 
 QEMU changes will likely need kernel commandline adjustment to adjust and re-enable console video mode.
 
-=== Document new features and open relevant upstream tickets ===
+== Document new features and open relevant upstream tickets ==
+
+== VirtIO Bluetooth ==
+Unsure about its usecases but cool to have anyhow.
+
+https://www.phoronix.com/scan.php?page=news_item&px=VirtIO-Bluetooth-Next
+
+
+==QEMU LLVM Support==
 https://www.phoronix.com/scan.php?page=news_item&px=QEMU-6.0-Released
 
 Interesting is the LLVM CFI/LTO support that can be leveraged for more security. open a Debian feature request asking if they plan to build it with these flags.
@@ -208,7 +216,17 @@ https://www.phoronix.com/scan.php?page=news_item&px=VirtIO-Video-2020
 
 KVM has recently added virtualized TPM support. They can be very valuable from a security standpoint  (and more trustworthy than hardware TPMs). A big thing is they can be used like virtual smartcards providing security like Qubes' split-gpg but for more types of software keys like OpenSSH, OpenSSL and more.
 
-'''Update:''' GPG 2.3 now supports TPM2 https://www.gnupg.org/blog/20210315-using-tpm-with-gnupg-2.3.html
+To boot a VM after adding the emulated TPM virtual hardware, on the host install:
+
+sudo apt install swtpm-tools
+
+'''Update:''' 
+
+* GPG 2.3 now supports TPM2 https://www.gnupg.org/blog/20210315-using-tpm-with-gnupg-2.3.html
+
+* OpenSSH has added TPM2 support and can import existing keys as of 1.7.0-rc0<ref>https://github.com/tpm2-software/tpm2-pkcs11/releases/tag/1.7.0-rc0</ref> 
+https://blog.ledger.com/ssh-with-tpm/
+
 
 The upstream TPM2 project is looking at consolidating the multiple code projects out there into an upstream implementation superseding the projects below.
 
@@ -546,8 +564,7 @@ Preallocating metadata speeds up disk use in guest at expense of time during dis
 
 https://www.jamescoyle.net/how-to/2060-qcow2-physical-size-with-different-preallocation-settings
 
-
-
+Other options like falloc and full cause the disk to loose sparse properties.
 
 == QCOW2 L2 Subcluster Allocation ==
 
@@ -586,6 +603,10 @@ $ qemu-img create -f qcow2 -o extended_l2=on,cluster_size=128k img.qcow2 1T
 
 And that’s all you need to do. Once the image is created all allocations will happen at the subcluster level.
 </pre>
+
+
+Change commit:
+https://github.com/adrelanos/Whonix/pull/1/commits/16f5404eb929b6748178948ceb509211c95a016c
 
 == Biometric Fingerprinting ==
 
