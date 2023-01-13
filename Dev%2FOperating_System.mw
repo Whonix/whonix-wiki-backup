@@ -126,22 +126,22 @@ https://web.archive.org/web/20220330200223/http://www.cs.arizona.edu/stork/packa
 which resulted as far as I understand in greatly improved package manager security in many distributions.)
 
 One can ask the TUF people, who are in my experience very friendly and helpful, for their opinion on their mailing list:<br />
-https://groups.google.com/forum/#!forum/theupdateframework
+https://groups.google.com/g/theupdateframework
 
 ==== Arch Linux ====
-TODO: Check its package manager security. (See above.)
+[https://forums.whonix.org/t/arch-linux-distro-preview/13387 Arch Linux Distro Preview]
 
 ==== NixOS ====
 
 Doesn't really care about the OS itself to hardenize it, It just care about Nix package manager. So to expect from them caring about OS security is sorta faraway.
 
-They dont use MAC/Namespaces by default. (MAC: [https://search.nixos.org/options?channel=20.09&show=security.apparmor.enable&from=0&size=50&sort=relevance&query=apparmor Apparmor] and Namespaces: [https://search.nixos.org/options?channel=20.09&show=programs.firejail.enable&from=0&size=50&sort=relevance&query=firejai firejail] are Turned OFF by default, While SElinux is [https://github.com/NixOS/rfcs/pull/41 unsupported] yet)
+They dont use MAC/Namespaces by default. (MAC: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=apparmor Apparmor] and Namespaces: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=firejail firejail] are Turned OFF by default, While SElinux is [https://github.com/NixOS/rfcs/pull/41 unsupported] yet)
 
 ==== GuixOS ====
 
-They do have some care for security but they need contributors to do that (MAC/Namespaces support doesnt exist in GuixOS yet)
+Need contributors, not yet a reliable distro (MAC/Namespaces support doesnt exist in GuixOS yet).
 
-More: [[Dev/Default_Application_Policy#guix]]
+More: [https://forums.whonix.org/t/guixsd-distro-preview/11727 GuixSD Distro preview] and [[Dev/Default_Application_Policy#guix]]
 
 ==== Hyperbola ====
 * https://www.hyperbola.info
@@ -221,15 +221,15 @@ Despite these strengths, the primary downside to adopting OpenBSD relates to the
 * [https://www.bsdstats.org/ bsdstats.org], suggests OpenBSD has  few users. While bsdstats is not representative of the total population of OpenBSD users due to the opt-in data collection program, 9 systems at the time of writing is a very small figure. By comparison, TrueOS has over 15,000 users in 2019.
 * Although unscientific, [https://distrowatch.com/dwres.php?resource=popularity DistroWatch] also shows OpenBSD attracts far less interest than popular Linux distributions.
 * OpenBSD is estimated to have less than 10 percent of total BSD market share. <ref>https://en.wikipedia.org/wiki/Comparison_of_BSD_operating_systems#Popularity</ref>
-* Estimates of BSD market share across all categories (desktops, servers etc.) is [https://en.wikipedia.org/wiki/OS_market_share tiny].
+* Estimates of BSD market share across all categories (desktops, servers etc.) is [https://en.wikipedia.org/wiki/Usage_share_of_operating_systems tiny].
 
 One valid concern is that if a critical mass of users does not gravitate to OpenBSD, then naturally less human resources ("eyeballs") in the population will be searching for, identifying, and remedying security flaws. While the audit team is skilled, a relatively small number of people must inspect code across an entire operating system. As a result, this could ''potentially'' aid targeted attacks or other exploits.
 <ref>One example previously cited is this years old bug which remains unfixed: [https://web.archive.org/web/20170324012358/http://thread.gmane.org/gmane.os.openbsd.bugs/18754 security vulnerability - NTP not authenticated]. Possibly limited human resources has impacted this bug which affects everyone using the distribution.</ref> <ref>This bug would also impact {{project_name_long}} -- the suggested solution was to authenticate the connection to the NTP server, but this would not be possible for several reasons:
 * The {{project_name_long}} design focuses on distributing trust and not using only one NTP server.
 * Further, {{project_name_long}} depends on free services which are available to anyone, ruling out  a solution that requires a personal server.
-* Even if {{project_name_long}} used authenticated NTP, it has been [https://twitter.com/feldpos/status/493426189282054144 pointed out] that the clock could not be moved more than 600 seconds. This is better than nothing, but still inadequate for adversaries who are capable of moving the clock more than 600 seconds, harming anonymity/privacy in the process (see [[Dev/TimeSync]] for further details).</ref>
+* Even if {{project_name_long}} used authenticated NTP, it has been [https://archive.ph/FobRy pointed out] that the clock could not be moved more than 600 seconds. This is better than nothing, but still inadequate for adversaries who are capable of moving the clock more than 600 seconds, harming anonymity/privacy in the process (see [[Dev/TimeSync]] for further details).</ref>
 
-In comparison, alternatives like Debian have a large user/contributor base, a similar [https://www.debian.org/security/ focus on security], renowned stability, and a solid reputation in security-critical environments such as web servers. <ref>In fact, Debian's popularity and large contributor base has resulted in its adoption in around [https://en.wikipedia.org/wiki/OS_market_share#Market_share_by_category one-third of all Linux web servers] and led to an expansive software library of over 50,000 packages.</ref> It is also strongly contested that BSD variants have [https://www.openbsd.org/innovations.html innovative security improvements] that provide greater protection than modern platforms like Qubes OS; see [[Qubes/Why_use_Qubes_over_other_Virtualizers#Security|Qubes Security]].
+In comparison, alternatives like Debian have a large user/contributor base, a similar [https://www.debian.org/security/ focus on security], renowned stability, and a solid reputation in security-critical environments such as web servers. <ref>In fact, Debian's popularity and large contributor base has resulted in its adoption in around [https://en.wikipedia.org/wiki/Usage_share_of_operating_systems#Market_share_by_category one-third of all Linux web servers] and led to an expansive software library of over 50,000 packages.</ref> It is also strongly contested that BSD variants have [https://www.openbsd.org/innovations.html innovative security improvements] that provide greater protection than modern platforms like Qubes OS; see [[Qubes/Why_use_Qubes_over_other_Virtualizers#Security|Qubes Security]].
 
 * https://isopenbsdsecu.re/
 * https://isopenbsdsecu.re/mitigations/
@@ -248,18 +248,18 @@ To avoid presenting information that will quickly become out-of-date or that may
 ** If not, what special settings are required?
 ** Are users expected to run their own repository?
 * Does FreeBSD defend against outdated metadata; for example, can a man-in-the-middle use a roll back or freeze attack against the repository?
-* Does FreeBSD defend against [https://www.cs.arizona.edu/stork/packagemanagersecurity/ various attacks on package managers?]
+* Does FreeBSD defend against [https://www2.cs.arizona.edu/stork/packagemanagersecurity/attacks-on-package-managers.html various attacks on package managers?]
 * Does FreeBSD defend against attacks on the software update process by using the [https://theupdateframework.io/security/ TUF threat model]?
 
 Research which might provide a strong case for FreeBSD does not exclude the possibility of weaknesses or missing security features. The best way to determine the strength of the platform and its relative resilience is to directly ask the developers of that project. Honest replies can reasonably be expected from vibrant, open source communities.The only problem is, the Linux/BSD ecosystems have hundreds of distributions and it is a daunting prospect to rank their merits in this way.
 
 Ultimately, the burden of proof falls on FreeBSD advocates (and not {{project_name_long}} developers) to prove that it is the most secure distribution available. Properly researched contributions that answer the questions above would be a good start, along with possibly approaching FreeBSD developers directly. Alternatively, research into why various aforementioned protections are not necessary to improve security would also be welcomed. Until claims about FreeBSD are substantiated, one should not take offense that it has not already been adopted.
 
-At time of writing FreeBSD had not even Address Space Layout Randomization (ASLR), see https://wiki.freebsd.org/ASLR
+To check for FreeBSD security features see: https://wiki.freebsd.org/CategorySecurity
 
 ==== OpenWRT ====
 
-[https://openwrt.org/ OpenWRT] is not used for the same reasons outlined above. Further, in early 2018 OpenWRT [https://wiki.openwrt.org/doc/packages did not have signed packages].
+[https://openwrt.org/ OpenWRT] is not used for the same reasons outlined above. Further, in early 2018 OpenWRT [https://openwrt.org/packages/start did not have signed packages].
 
 ==== Tails ====
 ===== How is {{project_name_long}} Different from Tails? =====
@@ -278,9 +278,7 @@ Several parts of {{project_name_long}} are based on Tails. For example, the deve
 
 Other examples of Tails and {{project_name_long}} cooperation include:
 
-* [[Dev/onion-grater
-#onion-grater_by_Tails|onion-grater]] - a whitelisting filter for dangerous Tor control protocol commands - was developed by Tails developer {{Code2|anonym}} with {{project_name_long}} in mind. {{project_name_long}} then [[Dev/onion-grater
-#onion-grater_by_Tails_forked_by_{{project_name_long}}|forked the Python code]] to add a few necessary improvements. <ref>https://github.com/{{project_name_short}}/onion-grater</ref>
+* [[Dev/onion-grater#onion-grater_by_Tails|onion-grater]] - a whitelisting filter for dangerous Tor control protocol commands - was developed by Tails developer {{Code2|anonym}} with {{project_name_long}} in mind. {{project_name_long}} then [[Dev/onion-grater#onion-grater_by_Tails_forked_by_{{project_name_long}}|forked the Python code]] to add a few necessary improvements. <ref>https://github.com/{{project_name_short}}/onion-grater</ref>
 * Tails has expressed interest in using [[Anon Connection Wizard]] in the future.
 
 ===== Why {{project_name_long}} is a Separate Project =====
@@ -295,31 +293,31 @@ Further examples are outlined in the table below. Note that some of these items 
 !  align="left" | <b>Tails Issue Tracker (TODO)</b>
 !  align="left" | <b>{{project_name_long}} Design / Instructions</b>
 |-  class="odd"
-|  align="left" | [https://tails.boum.org/todo/remember_installed_packages/ Remember installed packages]
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5551 Remember installed packages]
 |  align="left" | By design, everything persists <ref>This is actually a disadvantage for anonymity because it is the opposite of an amnesic system, which many users prefer.</ref>
 |-  class="even"
-|  align="left" | [https://tails.boum.org/todo/applications_audit/ Applications Audit]
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5769 Applications Audit]
 |  align="left" | By design, protocol leaks cannot lead to deanonymization
 |-  class="odd"
-|  align="left" | [https://tails.boum.org/todo/Two-layered_virtualized_system/ Two-layered, virtualized system]
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5748 Two-layered, virtualized system]
 |  align="left" | By design, this is achieved by either software compartmentalization (VMs) or [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]]
 |-  class="even"
-|  align="left" | [https://tails.boum.org/todo/vpn_support/ VPN support]
-|  align="left" | [[Features#VPN / Tunnel support|VPN / Tunnel support]]
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5858 VPN support]
+|  align="left" | [[Features#Tunnel_Support|VPN / Tunnel support]]
 |-  class="odd"
-|  align="left" | [https://tails.boum.org/todo/Include_JonDo_Software/ JonDo] over Tor
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/6071 JonDo] over Tor
 |  align="left" | [[JonDonym]]
 |-  class="even"
-|  align="left" | [https://tails.boum.org/todo/freenet_project/ Freenet] over Tor
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/6078 Freenet] over Tor
 |  align="left" | [[Freenet]]
 |-  class="odd"
-|  align="left" | [https://tails.boum.org/doc/first_steps/startup_options/bridge_mode/index.en.html obfsproxy] <ref>Bridges were not natively supported by Tails when {{project_name_long}} was founded.</ref>
+|  align="left" | [https://tails.boum.org/doc/anonymous_internet/tor/index.en.html obfsproxy] <ref>Bridges were not natively supported by Tails when {{project_name_long}} was founded.</ref>
 |  align="left" | [[Bridges]]
 |-  class="even"
-|  align="left" | [https://tails.boum.org/doc/about/fingerprint/index.en.html Can I hide the fact that I am using Tails?]
+|  align="left" | [https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html#fingerprint Can I hide the fact that I am using Tails?]
 |  align="left" | [[Hide Tor from your Internet Service Provider|Hide Tor and {{project_name_long}} from your ISP]]
 |-  class="odd"
-|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/12264 I2P over Tor] <ref>The I2P feature was [https://tails.boum.org/news/version_2.11/index.en.html removed in Tails 2.11] due to the developer effort required.</ref>
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/12264 I2P over Tor] <ref>The I2P feature was [https://tails.boum.org/news/version_2.11/ removed in Tails 2.11] due to the developer effort required.</ref>
 |  align="left" | [[I2P]]
 |-  class="even"
 |  align="left" | [https://tails.boum.org/contribute/design/Tor_enforcement/ Transparent Proxy as a fallback mechanism]
@@ -331,17 +329,17 @@ Further examples are outlined in the table below. Note that some of these items 
 |  align="left" | [https://tails.boum.org/contribute/design/stream_isolation/ Stream Isolation] <ref>Tails has basic stream isolation functionality compared to {{project_name_long}}.</ref>
 |  align="left" | [[Stream Isolation]]
 |-  class="even"
-|  align="left" | [https://tails.boum.org/todo/evaluate_web_fingerprint/ Evaluate web fingerprint] <ref>See also:  https://tails.boum.org/doc/about/fingerprint/ The bundling of uncommon extensions in Tor Browser like ''uBlock Origin'' increase the likelihood of fingerprinting Tails users specifically.</ref>
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5362 Evaluate web fingerprint] <ref>See also:  https://tails.boum.org/contribute/design/#index19h2 The bundling of uncommon extensions in Tor Browser like ''uBlock Origin'' increase the likelihood of fingerprinting Tails users specifically.</ref>
 |  align="left" | Same as Tor Browser
 |-  class="odd"
-|  align="left" | [https://tails.boum.org/todo/improve_fingerprint_of_the_Unsafe_Browser/ Unsafe browser fingerprint]
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5412 Unsafe browser fingerprint]
 |  align="left" | [[Logging in to captive portals]]
 |-  class="even"
-|  align="left" | [https://tails.boum.org/blueprint/tails_server/ Location Hidden/IP Hidden Servers]
+|  align="left" | [https://gitlab.tails.boum.org/tails/blueprints/-/wikis/tails_server/ Location Hidden/IP Hidden Servers]
 |  align="left" | [[Hosting Location Hidden Services|Location/IP Hidden Servers]]
 |-  class="odd"
-|  align="left" | [https://tails.boum.org/todo/VoIP_support/ VoIP]
-|  align="left" | [[Voip|VoIP]]
+|  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5709 VoIP]
+|  align="left" | [[VoIP|VoIP]]
 |-  class="even"
 |  align="left" | ...
 |  align="left" | ...
@@ -407,13 +405,6 @@ Reasons for being based on Debian:
 * Tor has ties to Debian.
 * [[#Switch_from_Ubuntu_to_Debian|No legal/trademark issues.]]
 
-Related statements from the FAQ reasoning why Debian is the base for {{project_name_long}} Example Implementation:
-
-* [[FAQ#Why_are_the_{{project_name_long}}_images_so_big.3F|Why are the {{project_name_long}} images so big?]]
-* [[FAQ#Why_not_Use_a_Live_CD.2FDVD_as_the_{{project_name_workstation_long}}_operating_system.3F|Why not use a Live CDs as {{project_name_workstation_long}} operating system?]]
-* [[FAQ#Why_is_KDE_.28big.29_the_default_desktop_environment.3F_Why_not_use_a_minimal_DE.3F|Why is KDE (big) the default desktop environment? Why not use a minimal DE?]]
-* [[FAQ#Why_aren.27t_you_using_OpenBSD.2C_it.27s_the_most_secure_OS_ever.21.21.211.21|Why aren't you using OpenBSD, it is the most secure OS ever!!!1!]]
-
 General explanation, why so many distributions are based on Debian:
 
 * [https://upsilon.cc/~zack/blog/posts/2011/09/why_there_are_so_many_debian_derivatives/ why there are so many debian derivatives]
@@ -426,7 +417,10 @@ Also interesting:
 Related:
 
 * [https://wiki.debian.org/Derivatives/Census/{{project_name_short}} Derivatives Census {{project_name_long}}]
-* [[Dev/Relationship With Upstream]]
+* {{kicksecure_wiki
+|wikipage=Dev/Relationship_With_Upstream
+|text=Dev/Relationship With Upstream
+}}
 
 {{Anchor|Why is {{project_name_long}} 8 based on Debian Stable, not Debian Testing?}}
 
@@ -581,7 +575,10 @@ Signatures are in <code>.dsc</code> files and can be verified using <code>dscver
 | ?
 
 |-
-! [[Verified Boot]]
+! {{kicksecure_wiki
+|wikipage=Verified_Boot
+|text=Verified Boot
+}}
 | {{No}}
 | ?
 | ?
