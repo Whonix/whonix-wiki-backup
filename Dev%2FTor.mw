@@ -5,7 +5,7 @@ Tor integration in {{project_name_long}} Development Notes
 }}
 {{forkme}}
 = Tor Version =
-According to the [https://trac.torproject.org/projects/tor/wiki/org/teams/NetworkTeam/CoreTorReleases#Listofreleases Tor release note], there are usually several different major versions of Tor supported by the Tor project. However, due to the the limited time the Tor packager has, only a few major versions are packaged and ready to be used.
+According to the [https://gitlab.torproject.org/legacy/trac/-/wikis/org/teams/NetworkTeam/CoreTorReleases#list-of-releases Tor release note], there are usually several different major versions of Tor supported by the Tor project. However, due to the the limited time the Tor packager has, only a few major versions are packaged and ready to be used.
 
 For example, in December, 2017, five major versions of Tor were supported. Specifically:
 
@@ -30,7 +30,7 @@ Patrick: "Historically when there was a botnet starting to use Tor, the LTS vers
 </ref>
 * Disadvantages:
 ** From the {{project_name_long}} perspective, these packages are uploaded to <code>deb.torproject.org</code> at random times. These packages are not guaranteed to be compatible with {{project_name_long}}. While there are no security concerns, these packages could break a system's APT package management (due to incompatible dependencies) or connectivity, in case Tor refuses to start. This can arise due to a configuration incompatibility in a newer version of Tor, or for other reasons such as systemd or apparmor related changes.
-** In May 2021 a [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/40436 transient repository issue] [https://forums.whonix.org/t/whonix-on-mac-m1-arm/11310/74? broke] {{project_name_long}} build process.
+** In May 2021 a [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/40436 transient repository issue] [https://forums.whonix.org/t/whonix-on-mac-m1-arm-user-support-still-unsupported-at-time-of-writing/11310/74 broke] {{project_name_long}} build process.
 ** There is nothing similar to <code>snapshot.debian.org</code>. Keeps changing (newer versions being added). Hence, can introduce build issues such as above. Unsuitable for reproducible builds / [[Verifiable Builds]].
 ** [[Dev/Porting|Porting to other architectures]] issues.
 *** Only available for the <code>i386</code>, <code>amd64</code>, <code>arm64</code> architectures.
@@ -63,9 +63,9 @@ The implementation is as it follows.
 * Some {{project_name_long}} Tor settings unfortunately still go into [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/share/tor/tor-service-defaults-torrc.anondist <code>/usr/share/tor/tor-service-defaults-torrc</code>] due to [https://phabricator.whonix.org/T947 Qubes-Whonix eth1 static networking] feature not being implemented yet.
 * Most users probably ignore <code>/usr/share/tor/tor-service-defaults-torrc</code>, because this file is barely advertised and barely popular.
 * <code>/usr/share/tor/tor-service-defaults-torrc</code> can be modified by Qubes-Whonix [https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-whonix/replace-ips <code>replace-ips</code>] without any conflicts with user modifications or [[Configuration_Files#dpkg_interactive_conflict_resolution_dialog|<code>dpkg interactive conflict resolution dialog</code>]].
-* [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/lib/anon-gw-anonymizer-config/torrc-d-cleaner <code>torrc.d</code> cleaner] by {{project_name_long}} developers moves files in folder <code>/usr/local/etc/torrc.d/</code> and <code>/etc/torrc.d/</code> that do not have the <code>.conf</code> file extension out of the way. This is to workaround a [https://gitlab.torproject.org/legacy/trac/-/issues/25140 Tor upstream issue], namely only supporting parsing all files in a folder which can include which end have a <code>~</code> file extension (backup files created by file editors) or start with a dot ("<code>.</code>") ("hidden files") which can then result in effective configurations other than what the user expects. These superfluous files users are unaware off often contain settings the user already changed in the real (non-backup) file.
+* <nowiki>[https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/lib/anon-gw-anonymizer-config/torrc-d-cleaner <code>torrc.d</code> cleaner]</nowiki> by {{project_name_long}} developers moves files in folder <code>/usr/local/etc/torrc.d/</code> and <code>/etc/torrc.d/</code> that do not have the <code>.conf</code> file extension out of the way. This is to workaround a [https://gitlab.torproject.org/legacy/trac/-/issues/25140 Tor upstream issue], namely only supporting parsing all files in a folder which can include which end have a <code>~</code> file extension (backup files created by file editors) or start with a dot ("<code>.</code>") ("hidden files") which can then result in effective configurations other than what the user expects. These superfluous files users are unaware off often contain settings the user already changed in the real (non-backup) file.
 ** https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/lib/systemd/system/anon-gw-anonymizer-config.service
-** https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/lib/systemd/system/tor%40default.service.d/30_clean-torrc-d-on-reload.conf
+** <nowiki>https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/lib/systemd/system/tor%40default.service.d/30_clean-torrc-d-on-reload.conf</nowiki>
 * Debian feature request: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=866187 add torrc.d configuration directory]
 * Initial Tor feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/1922 torrc.d-style configuration directories]
 * Improvement Tor feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/25140 Parse only .torrc files in torrc.d directory]
@@ -84,8 +84,7 @@ The implementation is as it follows.
 * This is bad, because when users have edited {{Code2|/etc/tor/torrc}} and anon-gw-anonymizer-config gets updated, it will throw an [[Configuration_Files#dpkg_interactive_conflict_resolution_dialog|<code>dpkg interactive conflict resolution dialog</code>]]. Users might decide to keep their old config file and will miss (security) improvements.
 
 = Tor Control =
-See [[Dev/onion-grater
-#Talking_to_the_real_Tor_Control_Port|Talking to the real Tor Control Port]].
+See [[Dev/onion-grater#Talking_to_the_real_Tor_Controller|Talking to the real Tor Control Port]].
 
 = Why Waste Network Bandwidth by Downloading Operating System Updates over Tor? =
 
