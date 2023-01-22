@@ -1,6 +1,7 @@
 /*
 MiniModal Gadget - JS Initialisation, Setup, Events. A fully functional but minimal modal
 See detailed documentation in Dev/mediawiki
+deferrable:NO -- Because a other scripts are dependent on it
 */
 
 (function() {

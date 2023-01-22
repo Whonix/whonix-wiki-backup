@@ -1,6 +1,7 @@
 /*
 Adds a PayPal payment module to the given DOM elements
 See detailed documentation in Dev/mediawiki
+deferrable:YES -- This script needs a little bit to load anyways
 */
 
 (function () {

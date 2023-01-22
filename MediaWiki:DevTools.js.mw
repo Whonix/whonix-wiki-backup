@@ -1,0 +1,53 @@
+/*
+Adds developer tools which are usable via the console
+See detailed documentation in Dev/mediawiki
+deferrable:YES -- This is an augmentation
+*/
+
+(function() {
+	
+	// mwDev.tool is globally available
+	
+	// ---------------------------------------------------------
+	// 1. Replace all references to files in the wiki with links
+	
+	mwDev.tool.fileRefsToLinks = function( selector = $("#mw-content-text *"), linkAttr = { target: '_blank' }, query = { action: 'edit' } ) {
+		selector.contents().each( function() {
+			// If not Textnode, return
+			if( this.nodeType != 3 ) return;
+			// If parent is already <a> return
+			if( $(this).parent().prop('tagName') == 'A' ) return;
+			// If not matching return
+			let ref = this.textContent.match( /Media(W|w)iki:[^\.]+.(js|css)/ );
+			if( ! ref ) return;
+			
+			let queryString = '';
+			for( let key in query ) {
+				if( ! queryString ) queryString +=`?${key}=${query[key]}`;
+				else queryString +=`&${key}=${query[key]}`;
+			}		
+			
+			let linkAttrString = '';
+			for( let key in linkAttr ) linkAttrString +=` ${key}="${linkAttr[key]}"`;
+			
+			let parts = this.textContent.split(ref[0]);
+			let newNodes = [];
+			if( parts[0] ) newNodes.push( $( document.createTextNode( parts[0] ) ) );
+			newNodes.push( $(`<a href="/wiki/${ref[0]}${queryString}"${linkAttrString}>${ref[0]}</a>`) );
+			if( parts[1] ) newNodes.push( $( document.createTextNode( parts[1] ) ) );
+			
+			// Replace old TextNode with newNode
+			$(this).replaceWith( newNodes );
+		});
+	};
+	
+	// Execute always if on Build.json (if not in edit mode)
+	if( mw.config.get('wgPageName') == 'MediaWiki:Build.json'
+		&& (new URLSearchParams( window.location.href )).get('action') != 'edit'
+	) mwDev.tool.fileRefsToLinks ();
+	
+})();
+
+/*
+[[Category: MultiWiki]]
+*/
