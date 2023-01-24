@@ -9,7 +9,7 @@
 = Introduction =
 This chapter is dedicated to give an introduction into the {{project_name_long}} source code. '''''If you prefer to read and understand the source code just by reading scripts you may skip this optional chapter.''''' It can be quite difficult to get started with hacking existing big complex projects.
 
-'''build-steps'''
+==build-steps==
 
 This is a high level overview. {{project_name_long}}-Example-Implementation can currently be build in nine steps. (There is also a derivative-maker script, which automates these eight steps for your convenience.)
 
@@ -25,7 +25,7 @@ This is a high level overview. {{project_name_long}}-Example-Implementation can 
 * 2700_export-vbox-vm
 * 2800_create-report
 
-'''help-steps'''
+==help-steps==
 
 Boring methods, which are required by the build-steps above.
 
@@ -37,11 +37,11 @@ Boring methods, which are required by the build-steps above.
 * pre gets sourced by all other scripts.
 * variables gets sourced by all other scripts.
 
-'''derivative-maker'''
+==derivative-maker==
 
 Is a script, which simply runs all other build-steps. Actually it is "optional". It has very little functionality besides running all other steps. You are free to run all steps one by one. That is useful for learning and for debugging purposes. In case you want to fix a bug or in case you want to upgrade the distribution or in case you want to switch the operating system or whatever you are better off running the steps manually. Run it with --help to see available switches.
 
-'''''Overview''''':
+==Overview==
 
 # prepare-build-machine: installs build dependencies and applies a few other required settings for building from source.
 # export-libvirt-xml: Copies files from {{Code2|libvirt}} folder to {{Code2|~/whonix_binary}} folder and adds version numbers to them.
@@ -53,23 +53,23 @@ Is a script, which simply runs all other build-steps. Actually it is "optional".
 # convert-raw-to-vdi: The '''.raw''' image gets converted to a '''.vdi''' image. (Actually not converted, as explained above.)
 # create-vbox-vm: A virtual machine (VirtualBox) will be created and the '''.vdi''' image will be attached.
 
-'''''Modularity:'''''
+==Modularity==
 
 All steps could be easily replaced to add support for additional virtualizers, operating systems and so on. The numbers before the script names (20_..., 25_..., 30..., ...) are honored by derivative-maker (using [https://manpages.ubuntu.com/manpages/kinetic/en/man8/run-parts.8.html run-parts]), which runs these steps in lexical order. Therefore you can easily add steps to the beginning or the end or even wretch steps in between.
 
-'''''File sizes:'''''
+==File sizes==
 
 Do not get shocked by file sized. Initially the .raw is created with a size of 100 GB, but it will actually only take a fraction of that space on the harddrive. This is because .raw .vdi and .vmdk are all [[sparse files]], which means they do not take their maximum size, but only as much data as really is inside these images.
 
-'''Chroot Scripts'''
+==Chroot Scripts==
 
 * packages/anon-*-build-*/usr/lib/anon-dist/chroot-scripts-post.d/
 
-'''''Summary:'''''
+==Summary==
 
 Thus, given the nature of the build step orientated scripts, you can easily work on the different aspects of {{project_name_long}}. For example, once you have created a clean virtual machine with the operating system only, you can make a copy, run either the gateway or the workstation copy routine or Chroot Scripts as often as you need to test your changes and if something goes wrong, go back to backup. You don't have to build everything from scratch again. <ref>If something would go wrong, you would have to reinstall the whole operating system every time again. That's why we use separate steps.</ref>
 
-'''''Another Introduction:'''''
+==Another Introduction==
 
 It is really not that difficult after all. If you like, you could read [[Manually Creating Whonix|Manually Creating {{project_name_long}}]], which is a similar topic, which covers part of this in other words.
 
