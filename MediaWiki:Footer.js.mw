@@ -11,11 +11,17 @@ deferrable:YES -- This add functionality, but is independent
 	// Setup
 
 	let fmodal = $('#footer-show-qr-codes-modal');
+	let initComplete = false;
 
 	// Events
 	
 	$('#custom-footer .donate a:not(.donate-button)').on('click', function( e ) {
 		e.preventDefault();
+		
+		if( ! initComplete ) {
+			$('<img width="300" height="300">').insertAfter('#footer-show-qr-codes-modal .qr-area h5');
+			initComplete = true;
+		}
 		
 		fmodal.find('h5').text( $(this).attr('title') );
 		fmodal.find('img').attr( 'src', $(this).children('img').attr('src') );

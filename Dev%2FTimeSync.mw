@@ -257,11 +257,12 @@ Open question: would the GPS/atomic clock be too accurate and would that make {{
 {{Anchor|NTP authentication (autokey) is insecure}}
 * unauthenticated by default
 * NTP insecure
-** https://gist.github.com/CHEF-KOCH/12976cf15012d64b8fd2
+** https://web.archive.org/web/20200209084816/https://gist.github.com/CHEF-KOCH/12976cf15012d64b8fd2
 ** https://blog.hboeck.de/archives/863-Dont-update-NTP-stop-using-it.html
 * NTP authentication (autokey):
-** info: https://tools.ietf.org/html/draft-ietf-ntp-network-time-security-00
-** insecure: http://www.innovationslab.net/~brian/NTP/autokey-analysis.pdf [down, contacted author]
+** info: https://datatracker.ietf.org/doc/html/draft-ietf-ntp-network-time-security-00
+** insecure: <nowiki>http://www.innovationslab.net/~brian/NTP/autokey-analysis.pdf</nowiki> [down, contacted author] might be helpful alternatives [https://web.archive.org/web/20200206053329/http://zero-entropy.de/autokey_analysis.pdf Analysis of the NTP Autokey], [https://doc.ntp.org/reflib/reports/stime1/stime.pdf The Autokey Security Architecture, Protocol and Algorithms]
+Procedures
 ** insecure: https://web.archive.org/web/20210225205522/http://zero-entropy.de/autokey_analysis.pdf
 ** Does not work behind NAT? <ref>https://web.archive.org/web/20210618153528/http://lists.ntp.org/pipermail/questions/2010-November/028033.html</ref> <ref>https://gitlab.tails.boum.org/tails/tails/-/issues/6113</ref>
 * NTP leaks the local time. <ref name=ntp-rfc>
@@ -292,7 +293,7 @@ Cons:
 * Only native SSL CA pinning support. No direct SSL certificate pinning support.
 * Does not distribute trust. <ref>As {{Code2|sdwdate}} does.</ref> <ref>https://github.com/ioerror/tlsdate/issues/112</ref> <ref>https://github.com/ioerror/tlsdate/issues/143#issuecomment-57053323</ref> The single time source can send by error or by malicious intent send wrong time replies.
 * Does not support hooks for user notifications about state of network time synchronization. &rarr; Users shouldn't use the internet in {{project_name_workstation_long}} before network time synchronization finished, and timesync is informing users about this. &rarr; Implementing notifications would be difficult or require patching tlsdate.
-* Produces clock jumps, which confuses various applications. Does not gradually adjust as {{Code2|sdwdate}} does with [https://github.com/{{project_name_short}}/derivative-maker/issues/169 Slow Clock Adjuster]. <ref>[https://github.com/{{project_name_short}}/sdwdate/blob/master/usr/lib/sclockadj sclockadj]</ref>
+* Produces clock jumps, which confuses various applications. Does not gradually adjust as {{Code2|sdwdate}} does with [https://github.com/Whonix/Whonix/issues/169 Slow Clock Adjuster]. <ref>[https://github.com/{{project_name_short}}/sdwdate/blob/master/usr/lib/sclockadj sclockadj]</ref>
 * Cannot connect to (most) Tor onion services, because most of those do not support SSL. <ref>Because in most cases, there is little need to combine Tor onion services with SSL. [[Onion_Services#Notes_about_End-to-end_security_of_Onion_Services|connections to Tor onion services are Tor-to-Tor encrypted by default ("not exactly end-to-end")]].</ref> <ref>https://github.com/ioerror/tlsdate/issues/157</ref>
 * Minor: {{Code2|command line parser doesn't fail closed on extraneous / unknown command line parameters}} <ref>https://github.com/ioerror/tlsdate/issues/158</ref> - not that important in the absence of bugs, butsafer behavior for {{Code2|tlsdate}} would be to fail closed on on extraneous / unknown command line parameters.
 * Likely denial of service issue: https://github.com/ioerror/tlsdate/issues/149
@@ -426,7 +427,7 @@ Applications running on a separate computer/VM ({{project_name_workstation_long}
 * {{project_name_workstation_long}}: No clock correctness requirements for ability of reaching onions.
 
 ===== Reasons for relying solely on anondate for time setting =====
-* Does not require [<nowiki>https://github.com/{{project_name_short}}/derivative-maker/issues/24</nowiki> ssl certificate pinning].
+* Does not require [<nowiki>https://github.com/Whonix/Whonix/issues/24</nowiki> ssl certificate pinning].
 * Does not rely on remote web servers.
 * Does not require a somewhat accurate clock as Remote Web Servers Method requires to get a rough time guess.
 
