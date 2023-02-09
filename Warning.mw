@@ -374,18 +374,25 @@ Traces of software installations, files or other user activities depend on wheth
 {{live}}
 
 == A Live Operating System or [[Live Mode]] is not Configured ==
+* '''A)''' <u>persistent mode</u>:
 
 If any software is downloaded or used on a computer, local traces of the download, installation and use will be left on the device's mass storage device (hard drive, HDD, SSD). This normal mode of operation is referred to as "persistent mode" since any files downloaded, documents created and so on will persist after reboot.
 
 Any created files still exist after the computer is powered-off or rebooted, unless steps are taken to securely wipe the files or otherwise remove all signs of their existence. Unless [[Live Mode]] are used, there are no preventative measures to limit what is written to disk. This can lead to evidence of activity in created files, backup files, temporary files, swap, chat history, browser history and so on.
 
-Be aware that although [[Live Mode]] inside [[{{non_q_project_name_short}}|{{non_q_project_name}}]] virtual machines (VMs) make writes go to RAM instead of the HDD/SSD, traces of activity may be left in swap files, core dumps or via other configurations on the host. If this is a risk in your circumstances, refer to [[Anti-Forensics Precautions]] or preferably utilize [[Live Mode]]. <ref>
+It is likely most {{project_name_long}} users are utilizing persistent mode. For this reason it is recommended to [[{{project_name_workstation_short}}_Security#VM_Snapshots|use multiple VM Snapshots]] and to [[Full_Disk_Encryption|apply Full Disk Encryption on the host]]. A higher level of security is afforded by encrypting everything, including data, system and swap partitions.
+
+* '''B)''' <u>Live Mode inside a VM</u>:
+
+This is useful to stop persistent [[malware]] as well as for testing. Be aware that although [[Live Mode]] inside [[{{non_q_project_name_short}}|{{non_q_project_name}}]] virtual machines (VMs) make writes go to RAM instead of the HDD/SSD, traces of activity may be left in swap files, core dumps or via other configurations on the host {{os}}. If this is a risk in your circumstances, refer to [[Anti-Forensics Precautions]] or preferably utilize [[Live Mode]] on the host OS. <ref>
 Unix-like operating systems also [https://en.wikipedia.org/wiki/Swap_partition#Unix_and_Unix-like_systems swap (move) memory pages between host RAM and the host disk], and this behavior cannot be prevented in {{project_name_long}} VMs. The danger is data leakage might occur and an unencrypted swap partition could reveal interesting data to an attacker or be used to store unencrypted copies of files in <i>/tmp</i> for later retrieval.
 </ref> <ref>
 https://www.linuxtopia.org/online_books/linux_administrators_security_guide/06_Linux_File_System_and_File_Security.html
 </ref>
 
-It is likely most {{project_name_long}} users are utilizing persistent mode. For this reason it is recommended to [[{{project_name_workstation_short}}_Security#VM_Snapshots|use multiple VM Snapshots]] and to [[Full_Disk_Encryption|apply Full Disk Encryption on the host]]. A higher level of security is afforded by encrypting everything, including data, system and swap partitions.
+* '''C)''' <u>Live Mode inside on the host OS</u>:
+
+Without the disadvantages mentioned above. See [[Live Mode]].
 
 == A Live Operating System or [[Live Mode]] is Configured ==
 
@@ -446,8 +453,17 @@ At the time of writing {{project_name_long}} does not offer a Live DVD / USB. Th
 
 ! scope="row"| RAM
 |
-* Wipe RAM on shut down. See [https://web.archive.org/web/20120905142231/http://brainstorm.ubuntu.com/idea/30076/ Idea #30076: Enhancy Privacy/Security, Wipe RAM on shut down, reboot and trigger]. <br />
-* Wipe video RAM on shut down. See [https://gitlab.tails.boum.org/tails/tails/-/issues/5356 Tails -erase video memory on shutdown].
+* Wipe RAM on shut down.
+** (When using {{Kicksecure_wiki
+|wikipage=Main_Page
+|text={{Kicksecure}}
+}} as a host operating system, consider {{kicksecure_wiki
+|wikipage=Cold_Boot_Attack_Defense
+|text=Cold Boot Attack Defense / Wipe RAM
+}}.)
+* Wipe video RAM on shut down. <ref>
+[https://gitlab.tails.boum.org/tails/tails/-/issues/5356 Tails feature request - erase video memory on shutdown]
+</ref>
 |-
 
 ! scope="row"| Security Updates

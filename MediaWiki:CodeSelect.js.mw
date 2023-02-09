@@ -5,25 +5,46 @@ deferrable:NO -- Because other scripts are dependent on it
 */
 
 (function () {
+	
+	// --------
+	// Settings
 
+	var targetPadding = 15; // only relevant for use with target
+	var defaultLang = 'bash'; // other option: 'none'. Or languages which are supported for highlighting (see documentation)
+	
+	// Additional function names that should also be highlighted for bash (currently outsourced to MediaWiki:CodeSelectHighlightList)
+	var highlightBashAdditionalFunctionNames = window.mwDev ? window.mwDev.data.codeSelectHighlightBashAdditionalFunctionNames : [];
+	
+	// ------
 	// Global
 
-	var innerContent = $( ""
-		+ '<i class="far fa-clone fa-rotate-90 cbutton">'
-		+ '</i>'
-		+ '<span class="tooltip2">'
-		+  '<span class="hover">Click = Copy</span>'
-		+  '<span class="copied">'
-		+   '<i class="fa fa-check-square-o"></i>'
-		+   'Copied to clipboard!'
-		+  '</span>'
-		+ '</span>'
-		+ '<span class="code"></span>'
-	);
+	var innerContent = $( `
+		<i class="far fa-clone fa-rotate-90 cbutton">
+		</i>
+		<span class="tooltip2">
+			<span class="hover">Click = Copy</span>
+			<span class="copied">
+				<i class="fa fa-check-square-o"></i>
+				Copied to clipboard!
+			</span>
+		</span>
+		<span class="code"></span>
+	`);
+	
 	var cbuttonIcons = { normal: 'far fa-clone fa-rotate-90', copied: 'fas fa-check' };
-
-	// Private
-
+	
+	var highlightLangBashIsExtended = false;
+	function extendHighlightLangBash() {
+		if( ! highlightLangBashIsExtended ) {
+			// Extend language bash with extra keywords
+			let bashFnPattern = Prism.languages.bash.function.pattern;
+			// We're using apt as a fixpoint, because it's very common and it's surrounded by pipes |
+			let newBashFnPattern = new RegExp( bashFnPattern.source.replace( '|apt|', '|' + ['apt', ...highlightBashAdditionalFunctionNames].join('|') + '|' ), bashFnPattern.flags );
+			Prism.languages['bash'] = Prism.languages.extend('bash', { 'function': { lookbehind: true, pattern: newBashFnPattern }});
+			highlightLangBashIsExtended = true;
+		}
+	}
+	
 	function markSelection( jqDom ) {
 		let selection = window.getSelection();
 		selection.removeAllRanges();
@@ -33,6 +54,7 @@ deferrable:NO -- Because other scripts are dependent on it
 		selection.addRange(range);
 	}
 
+	// ----------------
 	// jQuery Extension
 
 	$.fn.codeSelect = function( action ) {
@@ -46,16 +68,36 @@ deferrable:NO -- Because other scripts are dependent on it
 			
 			// Setup
 			
-			let codeSelect = $(this);
-			let htmlMode = codeSelect.hasClass('insert-mode-html');
+			const codeSelect = $(this);
+			const htmlMode = codeSelect.hasClass('insert-mode-html');
+			
 			let content = codeSelect[ htmlMode ? 'html' : 'text' ]();
 			codeSelect
 				.empty()
 				.append( innerContent.clone() )
 				.find('.code')[ htmlMode ? 'html' : 'text' ]( content );
+				
+			let target = codeSelect.attr('data-target');
+			if( target && $(target).length ) {
+				target = $(target).eq(0);
+				// If we have a target and no content (only white space) was given, copy target's content
+				if( ! content.match(/\S/) ) codeSelect.find('.code').text( target.text() );
+				// Position over target
+				let helper = $('<div class="code-select-target-helper"></div>');
+				helper.append( codeSelect );
+				helper.insertAfter( target );
+				codeSelect.css( {
+					position: 'absolute',
+					top: targetPadding - target.outerHeight() - ( parseInt( target.css('marginBottom') ) || 0 ),
+					right: targetPadding,
+				});
+				if( ! codeSelect.attr('data-button-image-src' ) ) codeSelect.attr('data-button-image-src','');
+			}
+			else target = null;
 			
 			let imageButton = false;
-			if( codeSelect.attr('data-button-image-src') ) {
+			let imageSrc = codeSelect.attr('data-button-image-src');
+			if( imageSrc && imageSrc.match(/\S/) ) {
 				$('<img class="cbutton" src="' + codeSelect.attr('data-button-image-src') + '" />').insertAfter( codeSelect.find('.cbutton') );
 				codeSelect.find('i.cbutton').remove();
 				imageButton = true;
@@ -63,6 +105,36 @@ deferrable:NO -- Because other scripts are dependent on it
 	
 			let cbutton = codeSelect.find('.cbutton');
 			let tooltip = codeSelect.find('.tooltip2');
+			
+			// Highlighting
+			
+			const lang = codeSelect.attr('data-language') || defaultLang;
+			
+			if( htmlMode || lang == 'none' ) {
+				codeSelect.find('.code').addClass( 'language-none' );
+			} else {
+				let syntaxElement;
+				// If CodeSelect is icon or imageButton no highlight for code box needed
+				if( imageSrc == undefined ) {
+					syntaxElement = codeSelect.find('.code')[0];
+					codeSelect.find('.code').addClass( 'language-' + lang );
+				}
+				// If target then only highlight target
+				if( target ) {
+					syntaxElement = target[0];
+					target.addClass( 'language-' + lang );
+				}
+				
+				function highlight() {
+					extendHighlightLangBash();
+					// Execute highlight
+					if( syntaxElement ) Prism.highlightElement( syntaxElement );
+				};
+				
+				// Execute if dependency is ready if not do it later on event basis
+				if( Prism ) highlight();
+				else $('#highlight-code-script').on( 'load', highlight );
+			}
 	
 			// Events
 	
@@ -87,11 +159,18 @@ deferrable:NO -- Because other scripts are dependent on it
 			codeSelect.find('.code').on('click', function() {
 				markSelection( $(this).parent().find('.code') );
 			});
+			
+			if( target ) {
+				target.on( 'click', function() {
+					markSelection( target );
+				});
+			}
 	
 			codeSelect.addClass('js-fully-loaded');
 		});
 	};
 	
+	// -------------------------------------
 	// Enrich selection of standard elements
 	
 	$('.code-select').codeSelect('init');

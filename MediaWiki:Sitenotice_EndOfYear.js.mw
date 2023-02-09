@@ -3,39 +3,45 @@ Fully JS EndofYear Sitenotice, init events etc
 See detailed documentation in Dev/mediawiki
 */
 
-function initEndOfYearSitenotice( domElementToPrependTo, assetWikiUrl = '', contentForSlides ) {
+function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl = '/wiki/Donate', isLocalFileSystem = false ) {
+
+	const localStorageName = 'dismiss-end-of-year-sitenotice';
+	
+	let valid = true;
 	
 	// Basic error checks
-	if( ! contentForSlides ) console.error('Dev: contentForSlides is missing but needed. Please check for errors');
-	if( ! domElementToPrependTo ) console.error('Dev: domElementToPrependTo is missing but needed. Please check for errors');
-	if( ! contentForSlides || ! domElementToPrependTo ) return;
-
-	// Will not be executed after 2022-31-12 23:59:59
-	if( Date.now() > 1672527599000 ) return; 
+	if( ! contentForSlides ) {
+		console.error('Dev: contentForSlides is missing but needed. Please check for errors');
+		valid = false;
+	}
 
 	// If the user has the dismissed less than a week ago, it will not be executed
-	if( localStorage.getItem('dismiss-end-of-year-sitenotice') > Date.now() ) {
-		$('#siteNotice').addClass('hide-notice');
+	if( isLocalFileSystem && localStorage.getItem(localStorageName) > Date.now() ) valid = false;
+	
+	// If it failed at least on test
+	if( ! valid ) {
+		$('#donate-end-of-year').hide();
 		return;
 	}
-	// Else remove item (because it's not valid) if it exists
-	localStorage.removeItem('dismiss-end-of-year-sitenotice');
+	
+	// Remove item (because it's not valid) if it exists
+	if( isLocalFileSystem ) localStorage.removeItem(localStorageName);
 	
 	// --------------------
 	// Settings and Globals
-		
-	let settings = {
+	
+	const settings = {
 		durationSlide: 10000, // Milliseconds
 		durationProgressbar: 9500, // Milliseconds
 		mobileBreak: 660, // Pixels
 		paymentBottomBorderSpace: 15, // Pixels
 	};
 	
-	let refs = {
+	const refs = {
 		playNextTimeout: null,
 	};
 	
-	let states = {
+	const states = {
 		slideIndex: null,
 		slideCount: 0,
 		isPlay: null,
@@ -45,58 +51,44 @@ function initEndOfYearSitenotice( domElementToPrependTo, assetWikiUrl = '', cont
 	// ---
 	// DOM
 
-	$('#siteNotice').addClass('show-notice');
-
-	let endOfYear = $(`
-		<div id="donate-end-of-year" class="robots-nocontent">
-			<!--googleoff: index-->
-				<!--noindex-->
-					<div class="h1">	
-						<i class="fas fa-times dismiss"></i>	
-						<span>Please support us!</span>	
-					</div>	
-					<div class="slideshow">	
-						<div class="content"></div>	
-						<div class="control">	
-							<div class="progress"></div>	
-							<div class="slide-buttons"></div>	
-							<div class="flow">	
-								<i class="fas fa-pause is-play"></i>	
-								<i class="fas fa-play is-pause"></i>	
-							</div>	
-						</div>	
-					</div>	
-					<div class="payment">	
-						<div class="h2">PayPal</div>	
-						<div class="pay-via-paypal-module"></div>	
-						<div class="h2 crypto">Or Crypto<br>Addresses</div>	
-						<div class="crypto-container">	
-							<div class="code-select btc" data-button-image-src="/w/images/thumb/2/29/BC_Logo_.png/40px-BC_Logo_.png"></div>	
-							<div class="code-select xmr" data-button-image-src="/w/images/thumb/0/05/Monero-symbol-1280.png/40px-Monero-symbol-1280.png"></div>	
-							<div class="code-select eth" data-button-image-src="/w/images/thumb/2/2c/Ethereumlogo.png/40px-Ethereumlogo.png"></div>	
-						</div>	
-						<a href="${assetWikiUrl}/wiki/Donate" target="_blank">Or Other Payment Options</a>
-					</div>
-				<!--/noindex-->
-			<!--googleon: index-->
-		</div>	
+	let content = $(`
+	    <div class="h1"> <span>Please support us!</span> </div>
+	    <div class="slideshow">
+	        <div class="content"></div>
+	        <div class="control">
+	            <div class="progress"></div>
+	            <div class="slide-buttons"></div>
+	            <div class="flow"> <i class="fas fa-pause is-play"></i> <i class="fas fa-play is-pause"></i> </div>
+	        </div>
+	    </div>
+	    <div class="payment">
+	        <div class="h2">PayPal</div>
+	        <div class="pay-via-paypal-module"></div>
+	        <div class="h2 crypto">Or Crypto<br>Addresses</div>
+	        <div class="crypto-container">
+	            <div class="code-select btc" data-button-image-src="/w/images/thumb/2/29/BC_Logo_.png/40px-BC_Logo_.png"></div>
+	            <div class="code-select xmr" data-button-image-src="/w/images/thumb/0/05/Monero-symbol-1280.png/40px-Monero-symbol-1280.png"></div>
+	            <div class="code-select eth" data-button-image-src="/w/images/thumb/2/2c/Ethereumlogo.png/40px-Ethereumlogo.png"></div>
+	        </div> <a href="${donatePageUrl}" target="_blank">Or Other Payment Options</a>
+	    </div>
 	`);
 	
+	endOfYearDiv = $(endOfYearDiv);
+	endOfYearDiv.append( content );
+	
 	let mobileDonateButtonTemplate = $('<span class="mobile-donate-button">Donate</span>');
-
-	let hiddenHelperContainer = $('<div style="position: fixed; opacity: 0;"></div>');
 
 	// ---
 	// FNs
 	
 	function switchSlide( slideButton ) {
-		endOfYear.find('.slideshow .content > div').removeClass('active');
-		endOfYear.find('.slideshow .control > .slide-buttons span').removeClass('active');
+		endOfYearDiv.find('.slideshow .content > div').removeClass('active');
+		endOfYearDiv.find('.slideshow .control > .slide-buttons span').removeClass('active');
 		
-		endOfYear.find('.slideshow .slide-buttons span.active').removeClass('active');
+		endOfYearDiv.find('.slideshow .slide-buttons span.active').removeClass('active');
 		slideButton.addClass('active');
 		states.slideIndex = slideButton.index();
-		let slide = endOfYear.find('.slideshow .content > div').eq( states.slideIndex );
+		let slide = endOfYearDiv.find('.slideshow .content > div').eq( states.slideIndex );
 		slide.addClass('active');
 		slide.css( 'opacity', 0 );
 		slide.animate( { opacity: 1 }, 300 );
@@ -105,13 +97,13 @@ function initEndOfYearSitenotice( domElementToPrependTo, assetWikiUrl = '', cont
 	function playNext( isPlay ) {
 		if( isPlay != 'auto' ) {
 			clearTimeout( refs.playNextTimeout );
-			endOfYear.find('.slideshow .progress').stop( true );
+			endOfYearDiv.find('.slideshow .progress').stop( true );
 			
 			if( isPlay != states.isPlay ) {
 				if( typeof isPlay == 'boolean' ) states.isPlay = isPlay;
 				else if( isPlay == 'toggle' ) states.isPlay = ! states.isPlay;
-				endOfYear.find('.slideshow .control .flow i').removeClass('active');
-				endOfYear.find('.slideshow .control .flow i.is-' + ( states.isPlay ? 'play' : 'pause'  ) ).addClass('active');
+				endOfYearDiv.find('.slideshow .control .flow i').removeClass('active');
+				endOfYearDiv.find('.slideshow .control .flow i.is-' + ( states.isPlay ? 'play' : 'pause'  ) ).addClass('active');
 			}
 			
 			if( ! states.isPlay ) return;
@@ -119,34 +111,31 @@ function initEndOfYearSitenotice( domElementToPrependTo, assetWikiUrl = '', cont
 		
 		if( states.slideIndex == null || states.slideIndex >= states.slideCount - 1 ) states.slideIndex = 0;
 		else states.slideIndex++;
-		switchSlide( endOfYear.find( '.slideshow .slide-buttons span' ).eq( states.slideIndex ) );
-		endOfYear.find('.slideshow .progress').css( 'width', '1%' ).stop( true ).animate( { width: '100%' }, settings.durationProgressbar );
+		switchSlide( endOfYearDiv.find( '.slideshow .slide-buttons span' ).eq( states.slideIndex ) );
+		endOfYearDiv.find('.slideshow .progress').css( 'width', '1%' ).stop( true ).animate( { width: '100%' }, settings.durationProgressbar );
 		refs.playNextTimeout = setTimeout( () => playNext( 'auto' ), settings.durationSlide );
 	}
 	
 	// -----
 	// Setup
 	
-	$('body').append(hiddenHelperContainer);
-	hiddenHelperContainer.append( endOfYear );
-	
 	// Imported Initializations
 	
-	endOfYear.find('.pay-via-paypal-module').payViaPaypal('init');
-	endOfYear.find('.payment .crypto-container .code-select').codeSelect('init');
+	endOfYearDiv.find('.pay-via-paypal-module').payViaPaypal('init');
+	endOfYearDiv.find('.payment .crypto-container .code-select').codeSelect('init');
 	
 	// Content
 	
-	endOfYear.find('.content').html( contentForSlides );
+	endOfYearDiv.find('.content').html( contentForSlides );
 
-	if( endOfYear.find('.content h1').length > 0 ) {
-		endOfYear.find( '.h1 span' ).html( endOfYear.find('.content h1').html() );
-		endOfYear.find('.content h1').remove();
+	if( endOfYearDiv.find('.content h1').length > 0 ) {
+		endOfYearDiv.find( '.h1 span' ).html( endOfYearDiv.find('.content h1').html() );
+		endOfYearDiv.find('.content h1').remove();
 	}
 
-	if( endOfYear.find('.content [data-crypto-addresses]').length > 0 ) {
-		let crypto = JSON.parse( endOfYear.find('.content [data-crypto-addresses]').attr('data-crypto-addresses') );
-		endOfYear.find('.content [data-crypto-addresses]').remove();
+	if( endOfYearDiv.find('.content [data-crypto-addresses]').length > 0 ) {
+		let crypto = JSON.parse( endOfYearDiv.find('.content [data-crypto-addresses]').attr('data-crypto-addresses') );
+		endOfYearDiv.find('.content [data-crypto-addresses]').remove();
 		states.crypto = { ...crypto };
 	}
 	
@@ -154,47 +143,42 @@ function initEndOfYearSitenotice( domElementToPrependTo, assetWikiUrl = '', cont
 	if( ! states.crypto.payMonero ) console.warn('Dev: payMonero is missing. Please check for errors');
 	if( ! states.crypto.payEthereum ) console.warn('Dev: payEthereum is missing. Please check for errors');
 
-	endOfYear.find('.payment .btc .code').text( states.crypto.payBitcoin );
-	endOfYear.find('.payment .xmr .code').text( states.crypto.payMonero );
-	endOfYear.find('.payment .eth .code').text( states.crypto.payEthereum );
-
+	endOfYearDiv.find('.payment .btc .code').text( states.crypto.payBitcoin );
+	endOfYearDiv.find('.payment .xmr .code').text( states.crypto.payMonero );
+	endOfYearDiv.find('.payment .eth .code').text( states.crypto.payEthereum );
+	
 	// Add Mobile donate link button
 	
 	if( $(window).width() <= settings.mobileBreak ) {
-		endOfYear.find('.content > div').append( mobileDonateButtonTemplate.clone() );
+		endOfYearDiv.find('.content > div').append( mobileDonateButtonTemplate.clone() );
 	}
 	
 	// Iterate over slides
 	
 	let maxHeight = 0;
 
-	endOfYear.append
-	
-	endOfYear.find('.slideshow .content > div').each( function() {
+	endOfYearDiv.find('.slideshow .content > div').each( function() {
 		$(this).css('display','block');
 		if( $(this).outerHeight() > maxHeight ) maxHeight = $(this).outerHeight();
 		$(this).css('display','');
-		endOfYear.find('.slideshow .slide-buttons').append( '<span' + ( $(this).hasClass('active') ? ' class="active"' : '' ) + '></span>' );
+		endOfYearDiv.find('.slideshow .slide-buttons').append( '<span' + ( $(this).hasClass('active') ? ' class="active"' : '' ) + '></span>' );
 		states.slideCount++;
 	});
 	
 	// If not mobile include the height of payment
 	if( $(window).width() > settings.mobileBreak ) {
-		let paymentAdjustedHeight = endOfYear.find('.payment').outerHeight() - endOfYear.find('.slideshow .control').outerHeight() - settings.paymentBottomBorderSpace;
+		let paymentAdjustedHeight = endOfYearDiv.find('.payment').outerHeight() - endOfYearDiv.find('.slideshow .control').outerHeight() - settings.paymentBottomBorderSpace;
 		if( paymentAdjustedHeight > maxHeight ) maxHeight = paymentAdjustedHeight;
 	}
 	
-	endOfYear.find('.slideshow .content').height( maxHeight );
+	endOfYearDiv.find('.slideshow .content').height( maxHeight );
 	
-	// Put endOfYear container in the right place before the events as bound
-	endOfYear.css( 'opacity', 0 );
-	$(domElementToPrependTo).prepend(endOfYear);
-	hiddenHelperContainer.remove();
-
+	endOfYearDiv.find('.payment').animate( { opacity: 1}, 300 );
+	
 	// ------
 	// Events
 
-	endOfYear.find('.slideshow .slide-buttons span').on( 'click', function() {
+	endOfYearDiv.find('.slideshow .slide-buttons span').on( 'click', function() {
 	  console.info([ states, $(this) ]);
 		if( states.isPlay ) {
 			states.slideIndex = $(this).index() - 1;
@@ -204,29 +188,27 @@ function initEndOfYearSitenotice( domElementToPrependTo, assetWikiUrl = '', cont
 		}
 	});
 	
-	endOfYear.find('.dismiss').on('click', function() {
-		$('#siteNotice').animate({ height: 0, opacity: 0 }, 1000, function() {
-			$(this).attr('style','display:none !important;');
+	if( isLocalFileSystem ) {
+		$('#siteNotice .sitenotice-close').on('click', function() {
+			localStorage.setItem(localStorageName, Date.now() + cookieValidity );
 		});
-		localStorage.setItem('dismiss-end-of-year-sitenotice', Date.now() + 7 * 24 * 3600 * 1000 );
-	});
+	}
 	
-	endOfYear.find('.slideshow .control .flow i').on( 'click', () => playNext( 'toggle' ) );
+	endOfYearDiv.find('.slideshow .control .flow i').on( 'click', () => playNext( 'toggle' ) );
 	
-	endOfYear.find('.content .mobile-donate-button').on( 'click', function() {
+	endOfYearDiv.find('.content .mobile-donate-button').on( 'click', function() {
 		playNext( false );
-		endOfYear.find('.slideshow').hide();
-		endOfYear.find('.payment').show();
-		endOfYear.css('height','auto');
-		$('#siteNotice').css('height','auto');
+		endOfYearDiv.find('.slideshow').hide();
+		endOfYearDiv.find('.payment').show();
+		endOfYearDiv.css('height','auto');
 	});
 	
 	// ----
 	// Init
 	
 	// FadeIn endOf year the start playing the slideshow
-	endOfYear.animate( { opacity: 1}, 300 );
-	playNext( true )
+	endOfYearDiv.animate( { opacity: 1}, 300 );
+	playNext( true );
 		
 }
 

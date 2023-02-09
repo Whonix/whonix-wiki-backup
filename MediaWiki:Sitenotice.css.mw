@@ -3,11 +3,25 @@ All styles for Widget:Sitenotice
 See detailed documentation in Dev/mediawiki
 */
 
+/* ----------------- */
+/* 0. Banner Control */
+
+/*
+Active Banner Control
+(1) Copy the following line (2) Replace "someBannerId" with a real banner ID (3) Do this for every active banner that you're still tracking (4) remove space to activate the inner comment (5) Once you deactivate the banner by removing the active class in the widget, replace "not-yet" by the date of deactivation, e. g. 2023-01-01
+body.ctbc_hide-sitenotice-someBannerId_true #siteNotice [data-banner-id=someBannerId] { display: none !important; } /* Deativated: not-yet * /
+*/
+
+body.ctbc_hide-sitenotice-banner-01_true #siteNotice [data-banner-id=banner-01] { display: none !important; } /* Deativated: not-yet */
+
 /* --------------------- */
 /* 1. General SiteNotice */
 
 #siteNotice {
-	/* display: block; */
+	display: none;
+}
+
+body.ctbc_sitenotice-banner-expired_true #siteNotice {
 	display: none !important;
 }
 
@@ -19,54 +33,87 @@ See detailed documentation in Dev/mediawiki
 	display: none !important;
 }
 
-#siteNotice .mw-dismissable-notice {
-	opacity: 0;
-	transition: opacity .3s;
+#siteNotice .sitenotice-body {
+	position: relative;
 }
 
-#siteNotice.show-notice .mw-dismissable-notice {
-	opacity: 1;
-}
-
-#siteNotice .mw-dismissable-notice-body {
-	margin: 0;
-}
-
-#siteNotice .mw-dismissable-notice-close {
+#siteNotice .sitenotice-close {
+	width: 14px;
+	height: 14px;
 	position: absolute;
-	right: 5px;
-	top: 3px;
+	top: 11px;
+	right: 13px;
+	filter: brightness( 2 );
 	z-index: 10;
+	cursor: pointer;
 }
 
-#siteNotice .mw-dismissable-notice-close a {
-	font-size: 20px;
-	color: #555;
-	padding: 0 8px;
+#siteNotice .sitenotice-close img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;	
 }
 
-#siteNotice .mw-dismissable-notice-close a:hover i {
-	transform: scale(1.2);
-	color: black;
+#siteNotice .sitenotice-close:hover {
+	filter: brightness( 1.7 );
+	transform: scale( 1.3 );
+}
+
+#siteNotice .sitenotice-close.dark {
+	filter: brightness( 0 );	
+}
+
+#siteNotice .sitenotice-close.dark:hover {
+	filter: brightness( .9 );	
 }
 
 /* -------------- */
 /* 2. All Banners */
 
 #siteNotice .banner {
-	/* display: block; */
 	display: none;
-	position: absolute;
-	top: 0;
 }
 
 #siteNotice .banner.active {
-	/* display: block; */
+	display: block;
+}
+
+body.ctbc_sitenotice-banner-expired_true #siteNotice .banner.active {
 	display: none !important;
 }
 
 #siteNotice .banner > * {
 	vertical-align: middle;
+}
+
+/* ----------------------------------------- */
+/* 3. Individual banner styles for all wikis */
+
+/* 3.1. banner-01 */
+
+#siteNotice [data-banner-id=banner-01] {
+	padding: 5px 0;
+	background: linear-gradient( #22a7dF, #43b3f1 );
+	color: white;
+	font-size: 20px;
+	border-radius: 10px;
+	border: 1px solid #22a7dF;
+	text-decoration: none;
+	width: 100%;
+}
+
+#siteNotice [data-banner-id=banner-01]:hover {
+	background: linear-gradient( #1297cF, #43b3f1 );
+}
+	
+#siteNotice [data-banner-id=banner-01] .icon {
+	margin-right: 13px;
+	height: 40px;
+}
+
+#siteNotice [data-banner-id=banner-01] span {
+	position: relative;
+	top: 1px;
 }
 
 /*

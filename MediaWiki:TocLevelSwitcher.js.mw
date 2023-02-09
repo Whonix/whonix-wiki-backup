@@ -7,6 +7,8 @@ deferrable:YES -- This is just an augmentation
 (function() {
 
 	if( $('#toc').length ) {
+		
+		let cookieName = 'ctbc_tocLevelSet';
 
 		// If there's no level 2, TocLevelSwitcher can do nothing
 		if( $('.toclevel-2').length == 0 ) return;
@@ -41,11 +43,13 @@ deferrable:YES -- This is just an augmentation
 			$(this).addClass('active');
 
 			let highestLevel = $(this).attr('data-level');
-
+			
+			$('body').removeClass( cookieName + '_' + $.cookie( cookieName ) );
 			if( highestLevel == 'all' ) {
-				window.localStorage.removeItem( 'tocLevelSwitcherSetting' );
+				$.removeCookie( cookieName );
 			} else {
-				window.localStorage.setItem( 'tocLevelSwitcherSetting', highestLevel );
+				$.cookie( cookieName, highestLevel );
+				$( 'body' ).addClass( cookieName + '_' + highestLevel );
 			}
 
 			if( highestLevel == 'all' ) {
@@ -91,13 +95,11 @@ deferrable:YES -- This is just an augmentation
 			}
 
 		});
+		
+		// Execute at startup
 
-		// Execute
-
-		let chosenLevelSelector = $('#toc-level-switcher > span[data-level="' + window.localStorage.getItem('tocLevelSwitcherSetting') + '"]');
-		if( chosenLevelSelector.length > 0 ) {
-			chosenLevelSelector[0].click();
-		}
+		let cookieValue = $.cookie( cookieName );
+		if( cookieValue ) $( `#toc-level-switcher > span[data-level=${ cookieValue }]` )[0].click();
 
 	}
 

@@ -18,6 +18,19 @@ See detailed documentation in Dev/mediawiki
 	overflow: hidden;
 	min-height: 31px;
 }
+
+html.client-nojs .code-select {
+	font-family: Courier, monospace;
+	font-size: 14px;
+	color: #0054a8;
+	line-height: 1.6em;
+	width: 100%;
+	overflow: auto;
+	white-space: pre;
+	padding: 4px 13px 2px 15px;
+	cursor: auto !important;
+}
+
 .code-select, .code-select > *:not(.cbutton) {
 	cursor: copy !important;
 }
@@ -29,6 +42,7 @@ See detailed documentation in Dev/mediawiki
 .code-select.js-fully-loaded {
 	overflow: visible;
 	padding-left: 38px;
+	white-space: unset;
 }
 
 /* 2. Tooltip */
@@ -133,6 +147,10 @@ See detailed documentation in Dev/mediawiki
 
 /* 5. Variant : Image Button */
 
+html.client-nojs .code-select[data-button-image-src] {
+	display: none !important;
+}
+
 .code-select[data-button-image-src] {
 	border: none;
 	background: transparent;
@@ -141,23 +159,40 @@ See detailed documentation in Dev/mediawiki
 	box-shadow: none;
 }
 
+.code-select[data-button-image-src], .code-select[data-button-image-src] > *:not(.cbutton) {
+	cursor: auto !important;
+}
+
 .code-select[data-button-image-src]:not(.js-fully-loaded) {
 	visibility: hidden;
 }
 
-.code-select[data-button-image-src] .cbutton {
+.code-select[data-button-image-src] .cbutton:not(i) {
 	width: inherit;
 	height: auto;
 	transition: filter .3s;
 }
 	
-.code-select[data-button-image-src] .cbutton:hover {
+.code-select[data-button-image-src] .cbutton:not(i):hover {
 	filter: brightness( .97 );
+}
+
+.code-select[data-button-image-src] i.cbutton {
+	font-size: 18px;
+}
+
+.code-select[data-button-image-src] i.cbutton:hover {
+	color: #003870;
 }
 
 .code-select[data-button-image-src] .tooltip2 {
 	top: -43px;
 	left: -1px;
+}
+
+.code-select[data-button-image-src] i.cbutton + .tooltip2 {
+	top: -46px;
+	left: -9px;
 }
 
 .code-select[data-button-image-src] .tooltip2::after {
@@ -170,6 +205,20 @@ See detailed documentation in Dev/mediawiki
 	display: inline-block;
 	opacity: 0;
 	overflow: hidden;
+}
+
+/* 6. CodeSelect with target */
+
+.code-select-target-helper {
+	position: relative;
+}
+
+.code-select[data-target] {
+	display: none;
+}
+
+.code-select-target-helper .code-select[data-target] {
+	display: block;
 }
 
 /*
