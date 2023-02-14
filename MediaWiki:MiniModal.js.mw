@@ -5,16 +5,25 @@ deferrable:NO -- Because a other scripts are dependent on it
 */
 
 (function() {
-
+	
+	let urlObj = window.mwDev.data.app.url.obj;
+	let baseUrl = window.mwDev.data.app.url.baseUrl;
+	
 	// Functions
+	
+	// Check if the current state of the URL matches with potential url hash Modals
+	function checkForModalsCalledByHash() {
+		let potentialModalSelector = `.mini-modal[data-url-hash=${urlObj.hash.substring(1)}]`;
+		if( ! urlObj.hash ) $('.mini-modal.active').miniModal('hide');
+		else if( $(potentialModalSelector).length ) $(potentialModalSelector).miniModal('show');
+	}
 
+	// Init a selection of MiniModals
 	function init( $this ) {
 		$this.each( function() {
-			if( ! $this.hasClass('mini-modal') || ! $this.attr('id') || $this.hasClass('init-complete') ) {
-				return;
-			} else {
-				$this.addClass('init-complete');
-			}
+			if( ! $this.hasClass('mini-modal') || ! $this.attr('id') || $this.hasClass('init-complete') ) return;
+
+			$this.addClass('init-complete');
 
 			let temp = $(`<div style="display: none;" id="mini-modal-temp-container-${Math.random().toString().substr(2)}"></div>`);
 			$('body').append(temp);
@@ -36,27 +45,37 @@ deferrable:NO -- Because a other scripts are dependent on it
 			});
 		});
 	}
+	
+	function show( $this, preventPushState ) {
+		init( $this );
+		$this.addClass('active');
+		if( ! preventPushState ) window.history.pushState( { info: 'js pushState' }, '[Param deprecated]', baseUrl + '#' + ( $this.attr('data-url-hash') || '' ) );
+		$this.trigger( 'shown.miniModal' );
+	}
+	
+	function hide( $this, preventPushState ) {
+		init( $this );
+		$this.removeClass('active');
+		if( ! preventPushState ) window.history.pushState( { info: 'js pushState' }, '[Param deprecated]', baseUrl );
+		$this.trigger( 'hidden.miniModal' );
+	}
+	
+	// Events
+	
+	// Global event: If user navigates back via back button, close modal if active
+	$(window).on( 'popstate', checkForModalsCalledByHash );
 
-	// Setup
+	// JQUERY extension
 
 	$.fn.miniModal = function(command) {
 		switch( command ) {
-			case 'show':
-				init($(this));
-				$(this).addClass('active');
-				$(this).trigger( 'shown.miniModal' );
-			break;
-			case 'hide':
-				init($(this));
-				$(this).removeClass('active');
-				$(this).trigger( 'hidden.miniModal' );
-			break;
-			case 'init':
-				init($(this));
-			break;
+			case 'checkForModalsCalledByHash': checkForModalsCalledByHash(); break;
+			case 'init': init($(this)); break;
+			case 'show': show( $(this) ); break;
+			case 'hide': hide( $(this) ); break;
 		}
 	}
-
+	
 })();
 
 /*

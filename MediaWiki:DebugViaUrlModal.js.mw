@@ -54,7 +54,7 @@ deferrable:YES -- Because it's a gadget and is not a needed dependency
 	let modal = $(
 		`<div class="mini-modal" id="debug-via-url-modal">
 			<h2>Disable server cache for this browser</h2>
-			<span class="activate-nocache-cookie-for-server${ $.cookie( 'nocache' ) ? ' active' : '' }">Activate <b>nocache (true)</b> server cookie for my browser</span>
+			<span class="activate-nocache-cookie-for-server${ $.cookie && $.cookie( 'nocache' ) ? ' active' : '' }">Activate <b>nocache (true)</b> server cookie for my browser</span>
 			<h2>Debug vis URL</h2>
 			<div class="code-select">${initialUrl}</div>
 			<a class="direct-link" target="_blank" href="${initialUrl}"></a>
@@ -74,8 +74,8 @@ deferrable:YES -- Because it's a gadget and is not a needed dependency
 	
 	$('body').append( modal );
 	
-	for( let file in mwDev.info.jsload ) {
-		modal.find('.dontload-options').append( '<div' + ( mwDev.info.jsload[file] ? ' class="loaded"' : '' ) + '>' + file + '</div>' );
+	for( let file in mwDev.data.log.jsload ) {
+		modal.find('.dontload-options').append( '<div' + ( mwDev.data.log.jsload[file] ? ' class="loaded"' : '' ) + '>' + file + '</div>' );
 	}
 	
 	modal.miniModal('init');

@@ -4,30 +4,36 @@ See Dev/mediawiki for more info
 deferrable:NO -- This is essential for the rest of the loading process
 */
 
+// ----------
+// 0. Globals
+
+// tool - tool scripts for dev to use across all scripts, test - testing tools, data - general data to use across all scripts, log - global logging data, app - global data between scripts
+window.mwDev = { tools: { test: {} }, data: { log: {}, app: {} } };
+
+window.mwDev.data.app.url = {};
+window.mwDev.data.app.url.obj = new URL(window.location);
+window.mwDev.data.app.url.baseUrl = window.mwDev.data.app.url.obj.origin + window.mwDev.data.app.url.obj.pathname.replace('/wiki/Homepage','')
+
 // ------------
 // 1. Dev Tools
-// This is available immediately
 
-// info - Information, test - tools and data for testing, tool - general tools to use across all scripts, data - general data to use across all scripts
-window.mwDev = { info: {}, test: {}, tool: {}, data: {} };
-
-window.mwDev.test.pageLoading = (function() {
+window.mwDev.tools.test.pageLoading = (function() {
 	let events = [];
 	return function( event ) {
 		let now = new Date();
 		events.push( [ event, now ] );
-		console.info( 'mwDev.test.pageLoading : event "' + event + '" at ' + now.toLocaleTimeString('en-GB', {
+		console.info( 'mwDev.tools.test.pageLoading : event "' + event + '" at ' + now.toLocaleTimeString('en-GB', {
 			hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits:3,
 		}));
 		for( var i = 0; i < events.length - 1; i++ ) {
 			// output the diff to all previous events
-			console.info( 'mwDev.test.pageLoading : diff (' + event + ',' + events[i][0] + ') = ' + (now.valueOf() - events[i][1]) + ' ms'  );
+			console.info( 'mwDev.tools.test.pageLoading : diff (' + event + ',' + events[i][0] + ') = ' + (now.valueOf() - events[i][1]) + ' ms'  );
 		}
 	};
 })();
 
 // Pagespeed measurement
-mwDev.test.pageLoading('pageLoadStart');
+mwDev.tools.test.pageLoading('pageLoadStart');
 
 // ---------
 // 2. All JS
@@ -44,14 +50,14 @@ function triggerWhenReady() {
 	
 	// Setup for controlled deactivation of isolated scripts
 	let dontloadString = new URLSearchParams(window.location.search).get("dontload");
-	mwDev.info.jsload = {};
+	mwDev.data.log.jsload = {};
 	if( dontloadString && typeof dontloadString == "string" ) {
 		dontloadString.split(",").forEach( function(el) {
-			mwDev.info.jsload[ "MediaWiki:" + el + ".js" ] = false;
+			mwDev.data.log.jsload[ "MediaWiki:" + el + ".js" ] = false;
 		});
 	}
 /*WRAPPEDCONTENT*/	
-	mwDev.test.pageLoading('pageLoadFinished');
+	mwDev.tools.test.pageLoading('pageLoadFinished');
 }
 
 if( window.mediaWikiCommonJsIsLoaded ) {
