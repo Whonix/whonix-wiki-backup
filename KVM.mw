@@ -113,6 +113,80 @@ sudo systemctl enable libvirtd
 </div>
 </div>
 
+=== Fedora ===
+<div class="toccolours mw-collapsible mw-collapsed">
+If you are using Fedora, click on Expand on the right.
+
+<div class="mw-collapsible-content">
+
+==== Check System Requirements ====
+
+As KVM requires a CPU with virtualization extensions, check whether the system has either Intel VT or AMD-V. If the following command prints nothing, the system does not support the relevant virtualization extensions.
+
+<code>egrep '^flags.*(vmx|svm)' /proc/cpuinfo</code>
+
+==== Install Dependencies ====
+
+To install mandatory and default packages in the virtualization group, run.
+
+{{CodeSelect|code=
+sudo dnf install @virtualization
+}}
+
+Alternatively, to install the mandatory, default, and optional packages, run.
+
+{{CodeSelect|code=
+sudo dnf group install --with-optional virtualization
+}}
+
+After package installation, start the libvirtd service.
+
+{{CodeSelect|code=
+sudo systemctl start libvirtd
+}}
+
+To start the service on boot, run.
+
+{{CodeSelect|code=
+sudo systemctl enable libvirtd
+}}
+
+Verify the KVM kernel modules loaded properly. If this command lists <code>kvm_intel</code> or <code>kvm_amd</code>, KVM is properly configured.
+
+<code>lsmod | grep kvm</code>
+
+==== Edit the libvirtd Configuration ====
+
+System administration is limited to the root user by default. To enable a regular user, run the following commands.
+
+Open the <code>/etc/libvirt/libvirtd.conf</code> file for editing.
+
+{{CodeSelect|code=
+sudo nano /etc/libvirt/libvirtd.conf
+}}
+
+Set the domain socket group ownership to libvirt.
+
+{{CodeSelect|code=
+unix_sock_group = "libvirt"
+}}
+
+Adjust the Unix socket permissions for the R/W socket.
+
+{{CodeSelect|code=
+unix_sock_rw_perms = "0770"
+}}
+
+Save and exit.
+
+To administer libvirt as a regular user, add the user to the libvirt group.<ref>Otherwise the sudo password is required every time virtual-manager is started.</ref>
+
+{{CodeSelect|code=
+sudo usermod -a -G libvirt $(whoami)
+}}
+
+You must log out and log in to apply the changes.
+
 === Other Distributions ===
 <div class="toccolours mw-collapsible mw-collapsed">
 If you are using a Linux distribution that is not documented above, click on Expand on the right.
