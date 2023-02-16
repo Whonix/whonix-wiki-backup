@@ -2,10 +2,14 @@
 
 (function() {
 	
-	// ============
-	// Page_Hompage
+	// ==============
+	// Page: Homepage
 	
 	if( $('body').hasClass('page-Homepage') ) {
+		
+		let scrollMargin = 70;
+		let urlObj = window.mwDev.data.app.url.obj;
+		let baseUrl = window.mwDev.data.app.url.baseUrl;
 		
 		// Section Competition
 		
@@ -14,17 +18,52 @@
 			$('.section-competition .show-for-nojs-only').removeClass('show-for-nojs-only');
 		});
 		
-		// Section Features
+		// Section Features and Section Values
 		
-		$('.section-features, .section-values').find('.inner-wrapper > div:not(.mw-collapsible-content) a').on( 'click', function(e) {
-			e.preventDefault();
+		if( urlObj.hash && urlObj.hash.match( /^#explain-/ ) ) {
+			// Open extendable box containing card
+			let collapseContainer = $( urlObj.hash ).parents('.mw-collapsed')
+			if( collapseContainer.length ) collapseContainer.find('.mw-collapsible-toggle')[0].click();
+			// Scroll to card and open Modal
+		    $('html, body').stop().animate( { 'scrollTop': $( urlObj.hash ).offset().top - scrollMargin }, 800, 'swing', () => $(window).miniModal('checkForModalsCalledByHash') );
+		}
+		
+		$('.section-features, .section-values').find('.col-container .card-wrapper').each( function() {
 			
-			$('#' + $(this).attr('data-modal')).miniModal('show');
+			// Setup
 			
-			return false;
+			let id = $(this).attr('id');
+			
+			// Replace a-anchor with div (to make text selectable)
+			let linkReplacement = $('<div></div>');
+			linkReplacement.append( $(this).find( 'a > *' ) );
+			$(this).children().replaceWith( linkReplacement );
+			
+			// Add share link to modal
+			let shareButtonForModal = $( `<span class="code-select" data-button-image-src="/w/images/thumb/9/9f/Share-icon.png/40px-Share-icon.png">${baseUrl}#${id}</span>` );
+			$( '#modal-' + id ).append( shareButtonForModal );
+			shareButtonForModal.codeSelect('init');
+			
+			// Add attribute to modal to make it react to url hash
+			$( '#modal-' + id ).attr( 'data-url-hash', id );
+			
+			// When there is a hash corresponding to a card, highlight that card
+			if( $( urlObj.hash ).length ) $( urlObj.hash ).addClass( 'hash-target' );
+			
+			// Events
+			
+			// If there's no text selection, open modal and change url
+			linkReplacement.on( 'click', function(e) {
+				let sel = window.getSelection();
+				if( sel && sel.type != 'None' && ! sel.isCollapsed ) return;
+				$( '#modal-' + id ).miniModal('show');
+			});
+			
 		});
 		
-		// Start playing video
+		// Events
+		
+		// Click to start playing video
 
 		$('.section-banner #hide-overview-image').on('click', () => {
 			let handle = setInterval( () => {
@@ -35,6 +74,7 @@
 				$('.section-banner .overview-image-and-video-player video')[0].play()
 			}, 500 );
 		});
+		
 	}
 	
 })();

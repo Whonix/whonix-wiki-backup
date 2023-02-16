@@ -1,12 +1,17 @@
 {{Header}}
+{{title|title=
+Security-Focused Operating System Comparison as Base for {{project name short}}
+}}
 {{#seo:
 |description=Comparison and Consideration of various Operating Systems as base for the {{project_name_long}} Anonymous Operating System. Design Documentation.
 }}
-
+{{intro|
+Comparison and Consideration of various Operating Systems as base for the {{project_name_long}} Anonymous Operating System. Design Documentation.
+}}
 == Introduction ==
 This chapter applies to the host(s), {{project_name_gateway_long}} and {{project_name_workstation_long}}.
 
-''{{project_name_long}} Example Implementation'' is currently based on Debian. There were development discussions about switching to BSD, Alpine Linux or other secure operating systems.
+''{{project_name_long}} Example Implementation'' is currently based on Debian. Historically there have been development discussions about switching to BSD, Alpine Linux or other secure operating systems.
 
 {{project_name_long}} can't protect against malicious code inserted into upstream operating system infrastructure. Debian ensures some chain of trust as it requires contributors to sign commits.
 
@@ -31,19 +36,19 @@ Another serious disadvantage of Live CD/DVDs in the context of an anonymity-orie
 
 == Why don't you use <your favorite most secure operating system> for {{project_name_long}}? ==
 ==== Generally ====
-Why do you use Debian, and not...
+Why do you use Debian, and not...?
 
-The operating system must have
+General Base Operating System Requirements:
 
-* acceptable usability
-* must be somewhat popular, because only that leads to sufficient public scrutiny and enough available documentation.
-* For redistribution of {{project_name_long}}, there are no legal/trademark issues such as with Ubuntu, see [[#Ubuntu Legal Issues]] chapter below for details.
-* Must have a secure operating system updater (package manager), i.e. must not fall through the [https://theupdateframework.io/security/ TUF Threat Model]. Not having a secure updater is [https://krebsonsecurity.com/2011/11/apple-took-3-years-to-fix-finfisher-trojan-hole/ very dangerous].
-* Source based distributions take a long time for upgrading and installation of packages, which users complain about. The same or even better security characteristics can be reached with deterministic (reproducible) builds.
+* usability: acceptable usability
+* popularity: must be somewhat popular, because only that leads to sufficient public scrutiny and enough available documentation.
+* legal: For redistribution of {{project_name_long}}, there are no legal/trademark issues such as with Ubuntu, see [[#Ubuntu Legal Issues]] chapter below for details.
+* package manager security: Must have a secure operating system updater (package manager), i.e. must not fall through the [https://theupdateframework.io/security/ TUF Threat Model]. Not having a secure updater is [https://krebsonsecurity.com/2011/11/apple-took-3-years-to-fix-finfisher-trojan-hole/ very dangerous].
+* binary distribution: Source based distributions take a long time for upgrading and installation of packages, which users complain about. The same or even better security characteristics can be reached with deterministic (reproducible) builds.
 
 Debian is a good compromise of security and usability.
 
-By the way, this chapter won't only include examples which fall through {{project_name_long}} threat model.
+The following list of distributions either fail or pass the requirements for the [[Dev/Threat Model|{{project_name_long}} threat model]].
 
 ==== Ubuntu ====
 ===== Ubuntu Introduction =====
@@ -119,13 +124,9 @@ The question to ask is "Does the package manager pass the TUF Threat Model?"
 The Update Framework (TUF) - Attacks and Weaknesses:
 
 * https://theupdateframework.io/security/
+** Made by similar people who created the research paper [https://web.archive.org/web/20220330200223/http://www.cs.arizona.edu/stork/packagemanagersecurity/attacks-on-package-managers.html attacks on package managers], which resulted as far as I understand in greatly improved package manager security in many distributions.
 
-
-(Made by similar people who created this research:<br />
-https://web.archive.org/web/20220330200223/http://www.cs.arizona.edu/stork/packagemanagersecurity/attacks-on-package-managers.html<br />
-which resulted as far as I understand in greatly improved package manager security in many distributions.)
-
-One can ask the TUF people, who are in my experience very friendly and helpful, for their opinion on their mailing list:<br />
+One can ask the TUF people, who are in my experience very friendly and helpful, for their opinion on their mailing list:
 https://groups.google.com/g/theupdateframework
 
 ==== Arch Linux ====
@@ -152,15 +153,10 @@ More: [https://forums.whonix.org/t/guixsd-distro-preview/11727 GuixSD Distro pre
 
 ==== Voidlinux ====
 
-Went into many mess and changes with short time:
-
-- Their main developer left the project,they [https://itsfoss.com/void-linux-crisis/ lost access to their resources] like github, IRC, Domain..etc. (some of them regained access to only)
-
-- Another sad lost to the project by the pass out of [https://voidlinux.org/news/2021/03/In-memoriam-pullmoll.html Jürgen Buchmüller (pullmoll)] on of their main maintainers.
-
-- After almost 6 years they [https://voidlinux.org/news/2021/02/OpenSSL.html switched back] from libressl to openssl
-
-- They dont sandbox their packages with MAC/Namespaces by default, Only xbps-src which is the package builder but not for sandboxing packages within their distro.
+* Their main developer left the project,they [https://itsfoss.com/void-linux-crisis/ lost access to their resources] like github, IRC, Domain..etc. (some of them regained access to only)
+* Another sad loss of the project was the passing away of [https://voidlinux.org/news/2021/03/In-memoriam-pullmoll.html Jürgen Buchmüller (pullmoll)], one of their main maintainers.
+* After almost 6 years they [https://voidlinux.org/news/2021/02/OpenSSL.html switched back] from libressl to openssl
+* They do not sandbox their packages with MAC/Namespaces by default. Only xbps-src which is the package builder but not for sandboxing packages within their distro.
 
 ==== SubgraphOS ====
 
@@ -168,30 +164,39 @@ There are several reasons why {{project_name_long}} has decided not to use the [
 
 '''Table:''' ''{{project_name_long}} Rationale''
 
+<div class="scroll-table">
 {| class="wikitable"
 |-
 ! scope="col"| '''Domain'''
 ! scope="col"| '''Reasoning'''
 |-
+
 ! scope="row"| Development
 |
-* <u>Future Roadmap:</u> Basing {{project_name_long}} on Subgraph would tie our future to the viability of another project. It is not ideal to rely on an OS in alpha status, particularly when the Debian alternative is rock solid and has decades of development behind it. <br />
-* <u>Features:</u> Subgraph has some [[Comparison_with_Others/SubgraphOS|undesirable feature additions]] that add no value. {{project_name_long}} cannot benefit from Subgraph's manpower if the goals for the development roadmap are fundamentally different.<br />
-* <u>Bugs:</u> The plentiful [https://github.com/subgraph/subgraph-os-issues/issues Subgraph bugs] would become {{project_name_long}} bugs and developers would depend on them for fixes.<br />
-* <u>Programming Language:</u> Subgraph chose different programming languages (like Golang) that are unfamiliar to lead {{project_name_long}} developers, making customization or modification very difficult.<br />
-* <u>Desktop Environment:</u> {{project_name_long}} Developer HulaHoop has noted that Subgraph features completely rely on the GNOME desktop environment. This is undesirable because it is visually unappealing, has an over-simplified interface and would require any "cloud integration" elements to be removed. Configuring GNOME to approach the specifications already achieved in {{project_name_long}} would require a lot of effort. <ref>Previously, the future availability of Wayland and Flatpak in KDE was listed as a {{project_name_long}} advantage, however XFCE is now the default desktop environment.</ref>
+* <u>Future Roadmap:</u> Basing {{project_name_long}} on Subgraph would tie our future to the viability of another project. It is not ideal to rely on an OS in alpha status, particularly when the Debian alternative is rock solid and has decades of development behind it.
+* <u>Features:</u> Subgraph has some [[Comparison_with_Others/SubgraphOS|undesirable feature additions]] that add no value. {{project_name_long}} cannot benefit from Subgraph's manpower if the goals for the development roadmap are fundamentally different.
+* <u>Bugs:</u> The plentiful [https://github.com/subgraph/subgraph-os-issues/issues Subgraph bugs] would become {{project_name_long}} bugs and developers would depend on them for fixes.
+* <u>Programming Language:</u> Subgraph chose different programming languages (like Golang) that are unfamiliar to lead {{project_name_long}} developers, making customization or modification very difficult.
+* <u>Desktop Environment:</u> {{project_name_long}} Developer HulaHoop has noted that Subgraph features completely rely on the GNOME desktop environment. This is undesirable because it is visually unappealing, has an over-simplified interface and would require any "cloud integration" elements to be removed. Configuring GNOME to approach the specifications already achieved in {{project_name_long}} would require a lot of effort.
 |-
+
 ! scope="row"| Source Code / Software
 |
-* <u>Code Availability:</u> No full source code release to date (mid-2019). <ref>https://github.com/subgraph/subgraph-os-issues/issues/153</ref> <ref>https://github.com/subgraph/subgraph-os-issues/issues/250</ref><br />
-* <u>Packaging:</u> The publicly available software exists in a form that is not easily packaged. This would pose a significant maintenance burden for the {{project_name_long}} team.<br />
-* <u>Constraints:</u> Arbitrary limitations are in place, such as repository choices. This can of course be changed, but it is an example of wasted effort in patching the base OS to adapt to our vision.<br />
-* <u>Meta-packages:</u> There is no Subgraph meta package that can be installed using [https://github.com/subgraph/subgraph-os-issues/issues/239 "<code>sudo apt install subgraph-os</code>" / "<code>debootstrap</code> Subgraph OS"] in order to convert vanilla Debian into Subgraph OS. <ref>Subgraph is a Debian derivative.</ref>
+* <u>Code Availability:</u> No full source code release to date (mid-2019). <ref>https://github.com/subgraph/subgraph-os-issues/issues/153</ref> <ref>https://github.com/subgraph/subgraph-os-issues/issues/250</ref>
+* <u>Packaging:</u> The publicly available software exists in a form that is not easily packaged. This would pose a significant maintenance burden for the {{project_name_long}} team.
+* <u>Constraints:</u> Arbitrary limitations are in place, such as repository choices. This can of course be changed, but it is an example of wasted effort in patching the base OS to adapt to our vision.
+* <u>Meta-packages:</u> There is no Subgraph meta package that can be installed using [https://github.com/subgraph/subgraph-os-issues/issues/239 "<code>sudo apt install subgraph-os</code>" / "<code>debootstrap</code> Subgraph OS"] in order to convert vanilla Debian into Subgraph OS. <ref>Subgraph is a Debian derivative.</ref> (Similar to {{kicksecure_wiki
+|wikipage=chroot
+|text=Install {{kicksecure}} inside a folder (chroot)
+}} or [[Dev/Installation_from_Repository|{{project_name_long}} Installation from {{project_name_long}} APT Repository]].)
 |-
+
 ! scope="row"| Collaboration
 | To date, there has been no cooperation from the Subgraph project developers to correct any of the issues outlined in this section.
-|}
+|-
 
+|}
+</div>
 {{Anchor|Why aren't you using OpenBSD, it is the most secure OS ever!!!1!}}
 
 ==== OpenBSD ====
@@ -289,61 +294,80 @@ Further examples are outlined in the table below. Note that some of these items 
 
 '''Table:''' ''{{project_name_long}} and Tails Design and Functionality Comparison''
 
+<div class="scroll-table">
 {|   class="wikitable"
 !  align="left" | <b>Tails Issue Tracker (TODO)</b>
 !  align="left" | <b>{{project_name_long}} Design / Instructions</b>
 |-  class="odd"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5551 Remember installed packages]
 |  align="left" | By design, everything persists <ref>This is actually a disadvantage for anonymity because it is the opposite of an amnesic system, which many users prefer.</ref>
+
 |-  class="even"
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5769 Applications Audit]
 |  align="left" | By design, protocol leaks cannot lead to deanonymization
 |-  class="odd"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5748 Two-layered, virtualized system]
 |  align="left" | By design, this is achieved by either software compartmentalization (VMs) or [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]]
 |-  class="even"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5858 VPN support]
 |  align="left" | [[Features#Tunnel_Support|VPN / Tunnel support]]
 |-  class="odd"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/6071 JonDo] over Tor
 |  align="left" | [[JonDonym]]
 |-  class="even"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/6078 Freenet] over Tor
 |  align="left" | [[Freenet]]
 |-  class="odd"
+
 |  align="left" | [https://tails.boum.org/doc/anonymous_internet/tor/index.en.html obfsproxy] <ref>Bridges were not natively supported by Tails when {{project_name_long}} was founded.</ref>
 |  align="left" | [[Bridges]]
+
 |-  class="even"
 |  align="left" | [https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html#fingerprint Can I hide the fact that I am using Tails?]
 |  align="left" | [[Hide Tor from your Internet Service Provider|Hide Tor and {{project_name_long}} from your ISP]]
 |-  class="odd"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/12264 I2P over Tor] <ref>The I2P feature was [https://tails.boum.org/news/version_2.11/ removed in Tails 2.11] due to the developer effort required.</ref>
 |  align="left" | [[I2P]]
 |-  class="even"
+
 |  align="left" | [https://tails.boum.org/contribute/design/Tor_enforcement/ Transparent Proxy as a fallback mechanism]
 |  align="left" | By design, everything not configured to use a SocksPort will automatically use Tor's TransPort
 |-  class="odd"
+
 |  align="left" | [https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html Use Tor Browser]
 |  align="left" | [[Tor Browser]]
 |-  class="odd"
+
 |  align="left" | [https://tails.boum.org/contribute/design/stream_isolation/ Stream Isolation] <ref>Tails has basic stream isolation functionality compared to {{project_name_long}}.</ref>
 |  align="left" | [[Stream Isolation]]
 |-  class="even"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5362 Evaluate web fingerprint] <ref>See also:  https://tails.boum.org/contribute/design/#index19h2 The bundling of uncommon extensions in Tor Browser like ''uBlock Origin'' increase the likelihood of fingerprinting Tails users specifically.</ref>
 |  align="left" | Same as Tor Browser
 |-  class="odd"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5412 Unsafe browser fingerprint]
 |  align="left" | [[Logging in to captive portals]]
 |-  class="even"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/blueprints/-/wikis/tails_server/ Location Hidden/IP Hidden Servers]
 |  align="left" | [[Hosting Location Hidden Services|Location/IP Hidden Servers]]
 |-  class="odd"
+
 |  align="left" | [https://gitlab.tails.boum.org/tails/tails/-/issues/5709 VoIP]
 |  align="left" | [[VoIP|VoIP]]
+
 |-  class="even"
 |  align="left" | ...
 |  align="left" | ...
 |}
+</div>
 
 ===== Political and Design Considerations =====
 
@@ -468,6 +492,7 @@ https://forums.whonix.org/t/disable-newly-all-installed-services-by-default/9381
 
 The following list is not sorted by any priorities or otherwise.
 
+<div class="scroll-table">
 {| class="wikitable" style="background-color: #fff;text-align: center; .Systemd: red;"
 
 !
@@ -770,8 +795,6 @@ https://forums.whonix.org/t/switching-to-alsa/10535
 | {{No}}
 |-
 
-
-
 ! [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942303 Weak Dependencies] (to avoid [[Debian_Packages#Technical_Information|the metapackage issue]])
 | {{No}}
 | {{No}}
@@ -801,6 +824,7 @@ https://forums.whonix.org/t/switching-to-alsa/10535
 |-
 
 |}
+</div>
 
 == ToDo List for Porting to another Base Distribution ==
 Depending on base distribution:
