@@ -12,13 +12,15 @@ Anonymize any operating system such as Debian, Ubuntu, Microsoft Windows or othe
 {{Community_Support2}}
 [[image:Board-832155640.jpg|thumb]]
 = Introduction =
-{{project_name_gateway_long}} supports torification of any operating system, including Microsoft Windows and others.
+{{project_name_gateway_long}} supports torification of any operating system, such Debian, Kicksecure, Ubuntu, Android or even Microsoft Windows and others by setting up a {{project_name_customworkstation_long}}.
+
+A {{project_name_customworkstation_long}} is a VM that does not run the recommended, "normal" Whonix-"Default"-Workstation but instead runs a custom operating system such as Debian, Kicksecure, Ubuntu, Android or even Microsoft Windows.
 
 {{Community_Support}}
 
 '''''Using a default workstation is easier and provides more Security out of the box!''''' It is the user's responsibility to get the same security features for a {{project_name_customworkstation_long}}, see [[Other_Operating_Systems#Security_Comparison:_{{project_name_long}}-Download-Workstation_vs._{{project_name_customworkstation_long}}|Security Comparison: {{project_name_long}}-Download-Workstation vs. {{project_name_customworkstation_long}}]] at the bottom of the page for details.
 
-Also note that it's strongly discouraged to anonymize VMs that have once connected to the clearnet. It could be the case that they might have leaked an identifier or created some network fingerprint that is still recognizable even when running it with Tor. Using it would unmask your traffic.
+Also note that it's strongly discouraged to anonymize VMs that have ever been connected to the clearnet, meaning without Tor. It is conceivable that the custom operating system creates unique identifiers or another unique fingerprint such as network or browser fingerprint. Such fingerprints can lead to de-anonymization even if a VM that was used over clearnet at least once is later used over Tor. In other words, it is highly recommended to configure custom operating systems to use {{project_name_gateway_long}} to ensure that Tor is always consistently used.
 
 = Windows-{{project_name_workstation_long}} =
 == Introduction ==
@@ -645,7 +647,6 @@ TorPort 9050
 </div>
 
 = {{project_name_long}}-GNU/Linux-Workstation =
-== Easy ==
 {{VM_Settings_Easy_Common}}
 
 '''Configure network.'''
@@ -657,6 +658,28 @@ TorPort 9050
 <div class="mw-collapsible-content">
 In your Custom-Workstation.
 
+=== Linux Network Management Software ===
+Linux has many applications able to configure networking. To name a few:
+
+* ifupdown
+* NetworkManager
+* systemd-networkd
+
+See also https://wiki.debian.org/NetworkConfiguration
+
+This is therefore dependent on the Linux distribution being used. Generally, the required settings are the following:
+
+* Static networking, meaning not using DHCP.
+* gateway: {{CodeSelect|code=10.152.152.10}}
+** This is the IP address of Whonix-Gateway.
+* address: {{CodeSelect|code=10.152.152.12}}
+** The VMs self-assigned own local LAN IP address.
+** Increment last octet of IP address on additional workstations.
+* netmask: {{CodeSelect|code=255.255.192.0}}
+
+The following instructions are for ifupdown only. Other network management software is currently [[undocumented]].
+
+=== ifupdown ===
 {{Open with root rights|filename=
 /etc/network/interfaces
 }}
