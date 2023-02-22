@@ -1,11 +1,44 @@
-Complete the following steps to add the [[Signing Key|{{project_name_long}} Signing Key]] to the system's APT keyring.
+<noinclude>{{Header}}</noinclude>Complete the following steps to add the [[Signing Key|{{project_name_long}} Signing Key]] to the system's APT keyring.
 
 Open a terminal.
 
-Package <code>curl</code> needs to be installed.
+'''1.''' Package <code>curl</code> needs to be installed.
 
 {{Install Package|package=
 curl
 }}
 
-{{W-APT-Repository-Key-Download}}
+'''2.''' Download [[Signing Key|{{project_name_long}} Signing Key]]. <ref>
+See [[Secure_Downloads|Secure Downloads]] to understand why <code>curl</code> and the parameters <code>--tlsv1.3</code> are used instead of <code>wget</code>.<br />
+<br />
+Placing an additional signing key into folder <code>/usr/share/keyrings</code> by itself alone has no impact on security as this folder is not automatically used by Debian's APT by default. Only when an APT sources list configuration file points to folder <code>/usr/share/keyrings</code> using the <code>signed-by</code> keyword the signing key will be actually used. Therefore deleting keys in <code>/usr/share/keyrings</code> is optional if intending to disable an APT repository. See also [[Dev/APT|APT Signing Key Folders]].
+</ref>
+<div class="tab-content-controller" data-tcc-id="os-repository-choice"></div>
+<div class="info-box" data-tcc-id="os-repository-choice" data-tcc-title="A : Debian">
+<u>'''If''' you are using Debian</u>, run.
+
+{{signing_key_main_download_command_line
+|idplaceholder=debian
+|curl_extra_args=
+}}
+</div>
+
+<div class="info-box" data-tcc-id="os-repository-choice" data-tcc-title="B : Qubes">
+<u>'''If''' you are using a ''Qubes'' '''Debian''' Template</u>, run.
+
+{{signing_key_main_download_command_line
+|idplaceholder=qubes
+|curl_extra_args=--proxy http://127.0.0.1:8082/
+}}
+</div>
+
+'''3.''' Users can [[Signing Key|<u>check</u> {{project_name_long}} Signing Key]] for better security.
+
+'''4.''' Done.
+
+The procedure of adding the {{project_name_long}} signing key is now complete.<noinclude>
+= Footnotes =
+<references />
+[[Category:MultiWiki]]
+{{Footer}}
+</noinclude>

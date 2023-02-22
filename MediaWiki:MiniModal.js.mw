@@ -6,16 +6,30 @@ deferrable:NO -- Because a other scripts are dependent on it
 
 (function() {
 	
-	let urlObj = window.mwDev.data.app.url.obj;
-	let baseUrl = window.mwDev.data.app.url.baseUrl;
+	let baseUrl = window.mwDev.data.app.baseUrl;
 	
 	// Functions
 	
+	// Helper Function for getting URL parts
+	function getUrlParts() {
+		let urlObj = new URL(window.location);
+		let query = urlObj.searchParams.toString();
+		return {
+			hash: urlObj.hash.substring(1),
+			hasHash: !! urlObj.hash.substring(1),
+			searchString: ( query ? '?' + query : '' ),
+		};
+	}
+	
 	// Check if the current state of the URL matches with potential url hash Modals
 	function checkForModalsCalledByHash() {
-		let potentialModalSelector = `.mini-modal[data-url-hash=${urlObj.hash.substring(1)}]`;
-		if( ! urlObj.hash ) $('.mini-modal.active').miniModal('hide');
-		else if( $(potentialModalSelector).length ) $(potentialModalSelector).miniModal('show');
+		let urlObj = new URL(window.location);
+		if( ! urlObj.hash ) {
+			if( $('.mini-modal.active').length ) hide( $('.mini-modal.active') );
+		} else {
+			let potentialModal = $('.mini-modal[data-url-hash=' + urlObj.hash.substring(1) + ']');
+			if( potentialModal.length && ! potentialModal.hasClass('active') ) show( potentialModal );
+		}
 	}
 
 	// Init a selection of MiniModals
@@ -25,7 +39,7 @@ deferrable:NO -- Because a other scripts are dependent on it
 
 			$this.addClass('init-complete');
 
-			let temp = $(`<div style="display: none;" id="mini-modal-temp-container-${Math.random().toString().substr(2)}"></div>`);
+			let temp = $(`<div style="display: none;" id="mini-modal-temp-container-${Math.random().toString().substring(2)}"></div>`);
 			$('body').append(temp);
 			temp.append($this.children());
 
@@ -46,17 +60,23 @@ deferrable:NO -- Because a other scripts are dependent on it
 		});
 	}
 	
-	function show( $this, preventPushState ) {
+	function show( $this ) {
 		init( $this );
 		$this.addClass('active');
-		if( ! preventPushState ) window.history.pushState( { info: 'js pushState' }, '[Param deprecated]', baseUrl + '#' + ( $this.attr('data-url-hash') || '' ) );
+		let urlParts = getUrlParts();
+		if( urlParts.hash != $this.attr('data-url-hash') ) window.history.pushState(
+			{ info: 'js pushState' },
+			'[Param deprecated]',
+			baseUrl + urlParts.searchString + '#' + ( $this.attr('data-url-hash') || '' ) 
+		);
 		$this.trigger( 'shown.miniModal' );
 	}
 	
-	function hide( $this, preventPushState ) {
+	function hide( $this ) {
 		init( $this );
 		$this.removeClass('active');
-		if( ! preventPushState ) window.history.pushState( { info: 'js pushState' }, '[Param deprecated]', baseUrl );
+		let urlParts = getUrlParts();
+		if( urlParts.hasHash ) window.history.pushState( { info: 'js pushState' }, '[Param deprecated]', baseUrl + urlParts.searchString );
 		$this.trigger( 'hidden.miniModal' );
 	}
 	

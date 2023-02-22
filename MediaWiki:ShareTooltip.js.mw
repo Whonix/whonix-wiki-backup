@@ -46,6 +46,7 @@ deferrable:NO -- Because other scripts are dependent on it
 							<span class="headline-clipboard">Click below = Copy to Clipboard</span>
 							
 							<span class="code-select" data-social="copy-plain" data-button-image-src="/w/images/thumb/0/00/Plainlink-logo.png/180px-Plainlink-logo.png"></span>
+							<span class="code-select" data-social="copy-mediawiki" data-button-image-src="/w/images/7/74/MediaWiki-2020-logo-%28black%29.svg"></span>
 							<span class="code-select" data-social="copy-markdown" data-button-image-src="/w/images/thumb/0/07/Markdown-logo.png/180px-Markdown-logo.png"></span>
 							<span class="code-select" data-social="copy-phpbb" data-button-image-src="/w/images/thumb/c/c1/Phpbb-logo.png/180px-Phpbb-logo.png"></span>
 							
@@ -80,6 +81,7 @@ deferrable:NO -- Because other scripts are dependent on it
 		'mastodon': ['https://fosstodon.org/share?message=','[data-page]','[if-data-page] ','[data-url]','&t=','[data-title]'],
 		'email': ['mailto:?subject=','[data-title]','&body=','[data-url]'],
 		'copy-plain': ['[data-url]'],
+		'copy-mediawiki': ['[[', '[data-page]', '[if-data-chapter]#','[data-anchor]', '|', '[data-title]', '[if-data-chapter] chapter ', '[data-chapter]', ']]'],
 		'copy-markdown': ['[','[data-title]','[if-data-chapter] chapter ','[data-chapter]',' in ','[data-project]',' wiki](','[data-url]',')'],
 		'copy-phpbb': ['[url=','[data-url]',']','[data-title]','[if-data-chapter] chapter ','[data-chapter]',' in ','[data-project]',' wiki[/url]'],
 	};
@@ -108,6 +110,7 @@ deferrable:NO -- Because other scripts are dependent on it
 			let data = {};
 			
 			if( share.attr('data-anchor') ) {
+				data['anchor'] = share.attr('data-anchor');
 				data['chapter'] = share.attr('data-anchor');
 				
 				// Correcting the selector by escaping common document.querySelector-unfriendly characters
@@ -127,7 +130,7 @@ deferrable:NO -- Because other scripts are dependent on it
 				}
 			}
 			
-			data['url'] = window.mwDev.data.app.url.baseUrl + ( share.attr('data-anchor') ? '#' + share.attr('data-anchor') : '' );
+			data['url'] = window.mwDev.data.app.baseUrl + ( share.attr('data-anchor') ? '#' + share.attr('data-anchor') : '' );
 			data['page'] = ( window.location.href.match(/(?<=\/wiki\/)[^\/#?]+/g) || [''] )[0];
 			data['title'] = $('html head title').text();
 			
