@@ -1,11 +1,16 @@
-{{Title|title={{project_name_long}} Virtualization Platforms}}
+{{Title|title=
+{{project_name_long}} Virtualization Platforms
+}}
 {{Header}}
 {{#seo:
-|description=Development Notes about existing and new Virtualizers supported by {{project_name_long}}... VirtualBox, Qemu, KVM, VMware etc...
+|description=Development Notes about existing Virtualizers Support by {{project_name_long}} as well as ports to new Virtualizers. VirtualBox, QEMU, KVM, VMware, etc.
 |image=Background-1126047640.jpg
 }}
+{{ports_mininav}}
+{{intro|
+Development Notes about existing Virtualizers Support by {{project_name_long}} as well as ports to new Virtualizers. VirtualBox, QEMU, KVM, VMware, etc.
+}}
 [[image:Background-1126047640.jpg|thumb]]
-{{forkme}}
 = Introduction =
 {{project_name_long}} is officially supported on the following platforms:
 
@@ -36,21 +41,67 @@ In an ideal world {{project_name_long}} would support all virtualization platfor
 = Other Virtualization Platforms =
 Theoretically, {{project_name_long}} could run inside any virtualizer because its build scripts are very modular and extensible. In reality, {{project_name_long}} does not have sufficient developer resources to test other virtualizers. If additional contributors join the project and become maintainers for other virtualizers, then support for those might be officially added.
 
+== Simplicity of Ports to Other Virtualizers ==
+In short: Very doable.
+
+Quote [https://www.whonix.org/#explain-respect Whonix homepage]:
+
+<blockquote>[[Reasons_for_Freedom_Software#No_Intentional_User_Freedom_Restrictions|There are no artificial restrictions imposed on possible system configurations in Whonix.]]</blockquote>
+
+And there really are none. There is no special code in Whonix which prevents software forks of Whonix being made compatible with VMware or any other virtualizers. [[Reasons_for_Freedom_Software#Software_Fork_Friendly|Whonix is even Software Fork Friendly.]] Even the possibility to use [[Dev/Installation_from_Repository|distro-morphing]] is made for developers to simplify the process of porting Whonix to other virtualizers and/or architectures.
+
+As an analogy, the Whonix port to other virtualizers is "95%" done. All of Whonix is in theory already perfectly compatible with any virtualizer. Only a [[#Support_Plan|Support Plan]] and a "plugin" (build step) for the specific virtualizer is required. This is being elaborated below.
+{{kicksecure_wiki
+|wikipage=Derivative-Maker
+|text=Derivative-Maker
+}} is the build script which is used to build Whonix from source code. It very feature rich (can create images for VirtualBox, KVM, various architectures such as Intel/AMD64, arm64, ppc64el and so much more), very customizeable and easily extensible by other developers.
+
+The lack of Whonix's derivative-maker for other virtualizer support is because nobody who accomplished to research, document and/or Whonix with a different virtualizers decided to go the extra mile and contribute a build steps for that virtualizer to the build script and/or fork Whonix, keep maintaining a fork of Whonix for that virtualizer.
+
+Whonix's build script is "plugin" based. There are [https://github.com/Whonix/derivative-maker/tree/master/build-steps.d build-steps]. It is easy for developers to add additional build steps such as to perform steps required to support other virtualizers.
+
+All that's missing for other virtualizer support are some bits and pieces. By comparison example, to accomplish VirtualBox support, there's two build major steps:
+
+* convert the raw image to vdi for VirtualBox
+* create the VirtualBox settings files
+* optionally for example for redistributable builds it makes sense to have a [https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/dm-prepare-release export VirtualBox VMs as ova and upload script]
+
+For example, some users already managed to write documentation how to use Whonix in [[VMware]] or [[QEMU]] and there are various [[Dev/Porting|ports of Whonix to other architectures]] in various development stages.
+
+Related: [[Dev#Porting_Simplicity|Existing Ports of and Porting Whonix ™ to other Architectures chapter Porting Simplicity]]
+
+== Whonix-Host ISO versus Virtualizer Support ==
+Note, that the upcoming [[Whonix-Host]] ISO will cannot simplify ports of Whonix to other virtualizers. This is because the Whonix-Host ISO is "designed" to be run on host operating systems and not inside VMs. "Designed" is written in quotes because that is not an intentional user freedom restriction. It is because Whonix-Host is a host operating system which comes with a virtualizer installed by default that runs the Whonix-Gateway and Whonix-Workstation VMs.
+
+Running Whonix-Host in a VM would result in {{kicksecure_wiki
+|wikipage=Nested_Virtualization
+|text=Nested Virtualization
+}}. There are performance and reliability issues with that. Specifically when mixing virtualizers such as when attempting to run a Whonix-Host ISO that comes with VirtualBox inside VMware. These are general limitations by all all virtualizers and [[unspecific|unspecific to {{project name long}}]].
+
 == Support Plan ==
 
 As outlined above, {{project_name_long}} needs dedicated [[Contribute#Contributor|contributors]] to support other virtualization platforms. Essential contributor responsibilities include:
 
 * [[Essential Tests]]
 * running [[Test|new security feature tests]]
-* performing [[Dev/Leak Tests|Leak Tests]] and relevant [[Protocol-Leak-Protection and Fingerprinting-Protection|Protocol Leak and Fingerprinting Protection‎]] tests
+* performing [[Dev/Leak Tests|Leak Tests]] and relevant [[Protocol-Leak-Protection and Fingerprinting-Protection|Protocol Leak and Fingerprinting Protection]] tests
 * conducting other miscellaneous security and performance tests to confirm the platform has full functionality and is fit for purpose
 
-Ideally, a dedicated contributor would also create, sign and upload <code>.ova</code> images for the alternative virtualization platform (such as VMware, QEMU, etc.).
+Ideally, a dedicated contributor would also create, sign and upload native images for the alternative virtualization platform (such as [[VMware]], [[QEMU]], etc.).
+
+== Virtualizers Support Feature Requests ==
+On one hand, there is already a number of [[Download|officially supported Whonix platforms]] maintained by the current [[contributors]]. On the other hand, there is a plethora of [[unsupported]] virtualizers, architectures and related applications. In the history of Whonix, there have been feature requests to add support for OpenVZ, docker, QEMU, Bochs, VMware, Xen, Proxmox, Kubernetes and more.
+
+While in theory, adding support for other platforms would be feasible for new contributors (see above chapter [[Dev/Virtualization_Platform#Other_Virtualization_Platforms|Other Virtualization Platforms]]), the existing contributors most likely will not be able to take this on because of time restraints due to the maintenance workload required for existing platform support.
+
+See also [[Reporting_Bugs#Community_Feedback|Bug Reports, Software Development and Feature Requests chapter Community Feedback]].
 
 == Partially Finished Attempts ==
 
 * [[QEMU]]
 * [[VMware]]
+* [[MacOS#M1|Mac M1 / M2]]
+* See also: [[Dev/Porting|Ports of {{project name short}} to other architectures]]
 
 = See Also =
 * [[Dev/VirtualBox]]
