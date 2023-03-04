@@ -17,19 +17,7 @@ See detailed documentation in Dev/mediawiki
 	
 	// Check if there is an active banner that is not blocked by the user, if so append Close-Button
 	
-	let activeBannerCount = 0;
-	$('#siteNotice .banner.active').each( function() {
-		if( ! $('body').hasClass( bannerIdToBodyCookieName( $(this).attr( 'data-banner-id' ) ) + '_true' ) ) activeBannerCount++
-	});
-	
-	if( activeBannerCount > 0 ) {
-		// Check if not expired
-		let expirationDate = $('#siteNotice .banner.active').eq(0).attr('data-banner-expires');
-		if( expirationDate && parseInt( expirationDate ) < Date.now() ) {
-			$('#siteNotice').hide();
-			$.cookie( 'ctbc_sitenotice-banner-expired', true, { expires: 1, path: '/' } );
-		}
-		
+	if( $('#siteNotice .banner').length > 0 ) {
 		$('#siteNotice .sitenotice-body').prepend( $( `
 			<div class="sitenotice-close" title="Hide this notice for me">
 				<img src="/w/images/thumb/0/0b/End-of-year-times.png/28px-End-of-year-times.png" with="14" height="14" alt="close" />
@@ -42,8 +30,8 @@ See detailed documentation in Dev/mediawiki
 	// Events
 
 	$('#siteNotice .sitenotice-close').on( 'click', function() {
-		if( $('#siteNotice .banner.active').length > 0 ) {
-			$.cookie( bannerIdToBodyCookieName( $('#siteNotice .banner.active').attr( 'data-banner-id' ) ), 'true', { expires: 30, path: '/' });
+		if( $('#siteNotice .banner').length > 0 ) {
+			$.cookie( 'ctbc_hide-sitenotice-' + $('#siteNotice .sitenotice-body').attr( 'data-sitenotice-id' ), 'true', { expires: 30, path: '/' } );
 			$('#siteNotice').hide();
 		}
 	});
