@@ -935,17 +935,33 @@ Done!
 {{Community_Support2}}
 == With Static IP ==
 '''Preferred!'''
-
-VM settings are the same: attach the network adapter to the internal network named <code>Whonix</code>.
-
-Configure Android x86 to use a static IP. On the Android VM run the following in the Terminal Emulator (tested on Nougat):
+<br>
+Configure Android x86 to use a static IP (based on [https://forums.whonix.org/t/whonix-android-x86-enviroment-help-needed/8756/12 this post]).
+<br><br>
+Tested on:
+* [https://www.android-x86.org/releases/releasenote-8-1-r6.html Android-x86 8.1-r6 (Oreo)]
+* [https://www.virtualbox.org/wiki/Download_Old_Builds_6_1 VirtualBox 6.1]
+VM settings: 
+[Network] tab -> Adapter 1:
+* Check "Enable Network Adapter"
+* "Attached to:" -> <code>Internal Network</code>
+* "Name:" -> <code>Whonix</code>
+<br>
+<hr>
+1. On Android VM disable Wi-Fi in "Settings" -> "Network & Internet"
+<br>2. On Android VM in the Terminal Emulator: 
+{{CodeSelect|code=
+ip a
+}}
+make sure that wlan0 is "DOWN"
+<br>3. On the Android VM run the following in the Terminal Emulator:
 
 {{CodeSelect|code=
 su
 }}
 
 {{CodeSelect|code=
-ifconfig eth0 10.152.152.12 netmask 255.255.192.0
+ifconfig wlan0 10.152.152.12 netmask 255.255.192.0
 }}
 
 {{CodeSelect|code=
@@ -960,7 +976,24 @@ busybox route add default gw 10.152.152.10
 ndc resolver setnetdns 100 localdomain 10.152.152.10
 }}
 
+<br>4. Enable Wi-Fi in "Settings" -> "Network & Internet"
+<br>5. Go to Wi-Fi network selection screen and long tap on "VirtWifi" -> "Modify Network" -> tap on "Advanced options"
+* "IP settings" -> <code>Static</code>
+* "IP Address" - <code>10.152.152.12</code>
+* "Gateway" - <code>10.152.152.10</code>
+* "Network prefix length" -> <code>18</code>
+* "DNS 1" -> <code>10.152.152.10</code>
+* tap "Save"
+<br>6. Restart (turn off and then on) Wi-Fi
+
+<hr>
+
 Static IP routing and DNS should now be working. Note that [[Tor#ICMP|ping uses ICMP and therefore is unsupported]], so open the browser to check your connection.
+
+'''Do not forget''' that ''Whonix-Gateway'' must be running ;-)
+
+'''If chrome is crashing''' (once you type something in the address bar) - use any browser BUT chrome :-)
+<br>If you insist on using it - change search engine to anything other than google.
 
 == With DHCP ==
 <div class="toccolours mw-collapsible mw-collapsed">
