@@ -1,18 +1,896 @@
-__NOINDEX__
-{{Header}}
+{{Header}} __NOINDEX__
 {{#seo:
-|description={{project_name_long}} Release Notes, {{project_name_long}} 15 and earlier versions. {{project_name_long}} 15
-|image=Releasenots.png
+|description={{project_name_long}} Release Notes, {{project_name_long}} 15 and earlier versions.
+|image=Old-books-436498640.jpg
 }}
-{{Contributor|
-|status=stable
-|about=About this {{Code2|{{PAGENAME}}}} Page
-|difficulty=easy
-|contributor=[https://forums.whonix.org/users/torjunkie torjunkie]
-|support=[[Support]]
-|image=Oldstablewhonix.jpg
+[[File:Old-books-436498640.jpg|thumb]]
+{{intro|
+{{project_name_long}} Release Notes, {{project_name_long}} 15 and earlier versions.
 }}
-[[image:Oldstablewhonix.jpg|thumb]]
+= 115adretemp =
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* Better comment on the top for .d style configuration folders/files as contributed by @JasonJAyalaP
+* [[Desktop#RAM Adjusted Desktop Starter|RAM Adjusted Desktop Starter]]: now easier to use other display managers. It simply starts whatever the default display manager is.
+* whonixcheck version check ({{project_name_long}} News), now supports - checking {{project_name_long}} Build Version and {{project_name_long}} Deb Version separately - having multiple up to date versions (for example for stable, testers and developers) - having separate news per build or deb version
+* whonixcheck: Deactivated checking status of bootclockrandomization, timesanitycheck and timesync. Its already tested every time, timesync runs. Leaving it enabled in whonixcheck could make some users believe, that whonixcheck runs timesync, which it does not.
+* whonixcheck, timesync: To get rid of the confusing line "/usr/lib/whonix/systemcheck/help_output: line 348:  9404 Killed [...]" at the end, added disown "$ZENITY_PROGRESS_PID".
+* whonixcheck: prefixed all messages with the name of each test.
+* whonixcheck: New WHONIXCHECK_DISABLE_TRANS_PORT_TEST configuration variable. When set to 1, skips whonixchecks test for Tor's TransPort. Useful in case you deactivated Tor's TransPort.; Separate help messages for {{project_name_gateway_long}} and {{project_name_workstation_long}} in case network connection (whonixcheck's SocksPort test) failed.; Better help messages for {{project_name_gateway_long}} and {{project_name_workstation_long}} in case network connection (whonixcheck's SocksPort test) failed.; New additional help text in case Tor is not detected "You could try to find out if this IP is/was a Tor exit relay using a search engine or ExoneraTor: https://metrics.torproject.org/exonerator.html". Lets see if we keep that in the final.; Different help messages if Tor detection on Tor's SocksPort failed vs Tor detection on Tor's TransPort failed.
+* improved many messages in whonixcheck, timesync, whonixsetup
+* no longer hardcoding MAC addresses, no longer sharing MAC addresses among all {{project_name_long}} versions, was very little gain, while it can confuse complex setups
+* whonixcheck: - added option to skip SocksPort test for [https://github.com/Whonix/Whonix/issues/57 #57] - no longer delete temporary folder, gets automatically deleted only makes debugging/auditing harder
+* converting {{project_name_long}} News Blogs to plain text, so no external links to wordpress.com get loaded
+* added pandoc (required for whonixcheck as html2text converter)
+* whonix_shared/etc/apt/sources.list.whonix: changed from Debian stable (wheezy) to Debian testing (jessi) for [https://github.com/Whonix/Whonix/issues/60 #60] (installation of python-stem)
+* whonixcheck: now also checks Tor's bootstrap status using Tor's control port using [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]]
+* added hint to read [[Computer Security Education]] to VirtualBox license files ([https://github.com/Whonix/Whonix/issues/64 #64])
+* quick and dirty hack to make AppArmor play well with tor, obfsproxy and flashproxy for [https://github.com/Whonix/Whonix/issues/67 #67]
+* added log viewer ksystemlog to whonix-shared-desktop-kde
+* moved whonixcheck zenity progress bar and result message to the top left, so it does not overlap with sdwdate's progress bar or result message
+* replaced tails_htp with sdwdate
+* AppArmor: added global /etc/hosts.whonix r, /etc/resolv.conf.whonix r, On {{project_name_workstation_long}} this file does not contain anything interesting (except some special configuration) and {{project_name_gateway_long}} is not supposed to have applications reading those files. Closes [https://github.com/Whonix/Whonix/issues/66 #66]
+* added apparmor-notify to whonix-shared-packages-recommended: Notification with passive popups when AppArmor restricts something. There are no profiles activated by default (except Tor, which gets loaded by its default init script), but still useful to prevent confusion just in case.
+* No longer abort whonixcheck if Tor's SocksPort is not reachable ([https://github.com/Whonix/Whonix/issues/49 #49]). Now directly checking Tor's bootstrap status through Tor's control port ([https://github.com/Whonix/Whonix/issues/57 #57]).
+* whonix_shared/usr/bin/uwt: Ignoring -t server_type and therefore defaulting to 4. 5 does not work well with the torsocks version from Debian testing. (Things like dget and update-command-not-found are broken.) Reporting a bug against torsocks is not worth it, since torsocks is currently being rewritten anyway.
+
+{{project_name_gateway_short}}
+
+* whonixsetup: Working around another bug in Tor. When starting Tor fails, it does not return a non-zero return code.
+* added apper to whonix-gateway-packages-recommend
+* Added RAM Adjusted Desktop Starter info message to {{project_name_gateway_long}} wallpaper.
+* {{project_name_gateway_long}} firewall: added settings for an optional Tor relay
+* whonix_gateway/usr/bin/whonix_firewall: Fix. When GATEWAY_ALLOW_INCOMING_FLASHPROXY is set to 1, iptables does not support -p all --dport. See https://serverfault.com/questions/279361/iptables-p-all-dport. Changed to -p tcp, which is sufficient, according to https://trac.torproject.org/projects/tor/wiki/FlashProxyHowto
+
+{{project_name_workstation_long}}
+
+* added pinentry-qt4 to whonix-workstation-default-applications, required to make KGpg symmetric encryption (and gnupg-agent) work out of the box
+* No longer add Tor Browser default icon to the Desktop (already existing icons won't be touched, so this will appear in the next build version), the Tor Browser Recommend icon is still on the desktop and the default one can still be created from the start menu, closes [https://github.com/Whonix/Whonix/issues/58 #58]
+* {{project_name_long}} torbrowser update check and download script: has now a working progress bar.
+* {{project_name_long}} torbrowser update check and download script: fixed zenity cancel button, cancel now effectively terminates still running curl instances and can therefore prevent endless data attacks or bugs.
+
+Source Code
+
+* new bash pseudo GUI toolkit /usr/lib/whonix/doutput
+* whonix_shared/usr/share/whonix/postinst.d/70_create_swap_file: fixed support for re-running
+* radically shortened readme
+* added libfile-fcntllock-perl to build dependencies: - required to silence dpkg-gencontrol:   warning: File::FcntlLock not available; using floc
+* renamed whonix_workstation/etc/systemcheck.d/30_torbrowser to whonix_workstation/etc/systemcheck.d/30_torbrowser_default
+* new maintainer script: release/resign_repository, Refreshes repository. OpenPGP Resignes and updates valid-until field.
+* Got rid of time consuming "chown --recursive user:user /home/user/" while updating by running the required commands as user in the first place
+* debian/rules-helper.bsh: added --no-start to dh_installinit. Restarting the init scripts while updating is not required. All init scripts are su
+* postinst.d scripts: better error message in case a postinst.d script ever fails
+* postinst.d scripts: hide "set -x" debug output, unless WHONIX_DEB_DEBUG=1
+* added whonix_shared/usr/share/whonix/postinst.d/pre.bsh, a script supposed to be sourced by all postinst.d scripts
+* uwtwrapper: renamed variable ip to uwtwrapper_gateway_ip to avoid conflicts
+* Fix: Skipping to source config.d files such as .dpkg-old and .dpkg-dist.
+* {{project_name_long}} News v2: changed location to https://sourceforge.net/projects/whonixdevelopermetafiles/
+* whonix_shared/usr/bin/whonix_repository: moved repository to https://sourceforge.net/projects/whonixdevelopermetafiles/
+* whonix_shared/usr/lib/whonix/systemcheck/50_check-whonix-news: added --fail to curl, so it returns non-zero when sourceforge replies 404 (in case the file has been forgotten to upload). Otherwise we would end up with the error html page and throw a OpenPGP verification failure message.
+* added debug-steps/locally-upgrade-whonix-debian-packages, a script to manually update from source code, closed [https://github.com/Whonix/Whonix/issues/52 #52]
+* apply our apt preferences.d settings (apt pinning) while building {{project_name_long}} from source code and while updating {{project_name_long}} from source code
+* Added python-stem to whonix-shared-packages-dependencies.
+* explicitly define /etc/apt/sources.list for grml-debootstrap to ensure grml-debootstrap won't fetch non-freedom software
+* `displace`ed /etc/apparmor.d/local/system_tor
+* added dh-apparmor to build dependencies
+* Revised the way how the temporary local apt repository is created and removed.
+* Fixed a bug when an own signing key was used to sign the local apt repository. No longer copying the whole pubring.gpg to /etc/apt/trusted.gpg.d/, only copying the specific signing key.
+* Fixed a failure bug when dist_build_apt_codename was not set to local (now also works for stable, testers and developers).
+* Reduced code duplication.
+
+= 101adretemp (uploaded to {{project_name_long}} developers apt repository) =
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* whonixcheck, timesync: cleaner locking mechanism, no longer using pgrep, thus fixing a confusing message while booting
+* whonixsetup: starting whonixcheck after enabling Tor ([https://github.com/Whonix/Whonix/issues/56 #56])
+
+
+{{project_name_gateway_short}}
+
+* improved whonixsetup output
+* added icons for {{project_name_gateway_long}} desktop
+
+{{project_name_workstation_long}}
+
+* whonix_workstation/usr/bin/torbrowser: updated links to important and feature blog
+* Deactivating kmix autostart. Workaround to fix Klipper (and others?) autostart. Working around [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=630617 bug]
+* torbrowser: added --clearnet option. Uses torproject.org clearnet domain instead of torprojects Tor onion service (hs). Useful in case the hs
+* Tor Browser Update and Start script: Will no longer show a browser error when whonixcheck (rawdog) hasn't fetched {{project_name_long}} News blog already. Wil
+* {{project_name_long}} torbrowser Start and Update script now reads /etc/systemcheck.d/30_torbrowser_default which can contain the language setting
+* torbrowser: updated forum link to [[Special:AWCforum]]
+
+
+Source Code
+
+* whonix_gateway/usr/lib/whonix/cpf-tcpserver: better escaping (now produces no more strange output when telneting it or accessing it with tor-ct
+* FIX: added QUIT to control port filter proxy white list, otherwise after 40 connections tcpserver wouldn't accept any more connections
+* whonix_gateway/usr/lib/whonix/cpf-tcpserver: exit and therefore terminate connection when getting QUIT
+* {{project_name_gateway_long}}: added uuid-runtime, contains uuidgen, required for Control Port Filter Proxy
+* new release/maketorrent, maintainer script for creation of torrent downloads for {{project_name_long}} * updated links from sourceforge.net to whonix.org
+* build-steps.d/2600_export-vbox-vm: add version number to final .ova file
+* new chroot post script: Storing from which {{project_name_long}} version a build was created in /usr/share/whonix/build_version.
+* /etc/fstab: Fix. Removed "UUID=26ada0c0-1165-4098-884d-aafd2220c2c6 /               ext4    noatime,errors=remount-ro 0       1" since we are no longer modifying the uuid of the virtual hdd
+* deleted whonix_shared/etc/fstab.whonix, this is now handled by whonix_shared/usr/share/whonix/postinst.d/70_create_swap_file, which is better
+* added reprepro to build dependencies, since required for creating (local) APT repository
+* build-steps.d/1100_prepare-build-machine: allow running without --torgateway or --torworkstation
+
+= 97adretemp (uploaded as testers-only VM build version, uploaded to {{project_name_long}} stable apt repository) =
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* only disable powersaving if a virtual machine can be detected
+* new whonixdesktop_autostart_decision_feature variable, for easy deactivation of that feature
+* VirtualBox import license text: added license text with some help, disclaimer and license
+* removed hardware modifications, very little gain, while it breaks enabling uefi and confuses other things as well
+* added aptitude stream isolation wrapper
+* whonixcheck, timesync --showcli: added "End of "$SCRIPTNAME". Feel free to press <enter> to return back to your normal prompt."
+* moved blog to wordpress.com, better than sourceforge, because wordpress.com supports SSL, closed [https://github.com/Whonix/Whonix/issues/23 #23]
+
+{{project_name_workstation_long}}
+
+* deactivate the kgpg tray icon by default ([https://github.com/Whonix/Whonix/issues/10 #10]), not perfect, but less confusing, since it will now hopefully start in foreground
+
+Source Code
+
+* timesanitycheck: fixed, since version file does not exist anymore, using newly created build_timestamp by whonix_shared/usr/share/whonix/postinst.d/70_build_timestamp
+* whonix_gateway/usr/lib/whonix/whonixsetup/ft_m_1: working around a bug in Tor
+* fixed modification of {{project_name_short}} modified /home/user/.bashrc
+* updated shortcuts
+* whonix_shared/usr/bin/backgroundd: revised
+* added gsfonts, required for backgroundd (desktop background image manipulation)
+* whonix_gateway/usr/bin/controlportfilt: add "-l host" to disable local hostname lookup to prevent timeouts (since there is on purpose no functional /etc/resolv.conf on {{project_name_gateway_long}})
+* whonix_gateway/usr/bin/controlportfilt: more debugging
+* fixed firewall rules for control port filter proxy; comments; refactoring
+* gateway controlportfilt: added -H to tcpserver, so it doesn't hang if /etc/resolv.conf is not configured, which is the case on {{project_name_gateway_long}}
+* gateway controlportfilt: added debugging to tcpserver
+* gateway controlportfilt: fix, let tcpserver listen on all interfaces, not just 127.0.0.1, so {{project_name_workstation_long}} can reach it. It is filtered from outside due to whonix_firewall.
+* added ucspi-tcp, contains tcpserver, required for Control Port Filter Proxy
+* renamed whonix_shared/usr/share/whonix/keys/tpoarchive-keys.d/readme to whonix_shared/usr/share/whonix/keys/tpoarchive-keys.d/.readme so apt-key ignores it and doesn't throw an error
+* renamed build-steps folder to build-steps.d
+* added virt-what
+* reorganized updating tpo package list, installing deb.torproject.org-keyring also on {{project_name_workstation_long}}, installing torsocks and tor in case the version in tpo repository is newer
+* whonixcheck, timesync: fix, don't delete temporary folder too early
+* whonixsetup: made it more robust, fix, enabled debugging
+* whonix_workstation/usr/bin/torbrowser: fix mkdir when run from non-home folder
+* {{project_name_gateway_long}}: only update debian (/etc/apt/sources.list) and torproject.org (/etc/apt/sources.list.d/torproject.list) package lists for eventually installing newer Tor, torsocks, obfsproxy from torproject.org. (Only in case it is newer in torproject.org repository.)
+* no longer store backups of grub.cfg in /boot/grub/, store it in /var/lib/whonix/grub-backup instead, so it can not confuse grub, if they change something some day
+* added git to build dependencies
+* new whonix_build_both script: small hack to build both virtual machines, as long as whonix_build does not support --all.
+* not re-creating the packages, if nothing changed
+* get version number from latest git tag while building from source code
+* automatically add to debian changelog from which git head it was build
+* new way to find out locally using {{project_name_long}} version (now using dpkg-query); automatically bumping upstream version of {{project_name_long}}, no longer bumping deb revision; deleted whonix_shared/usr/share/whonix/version (no longer required)
+* build-steps/1200_create-debian-packages: Only purge local repository before adding new packages, do not purge remote (production) repository.
+* .gitignore: added debian/patches; added .pc
+* build-steps/1200_create-debian-packages: allow without root and without --torgateway or --torworkstation switch
+* Makefile: create lintian.log not in source folder but in its parent folder
+* using git archive instead of tar for tarball creation
+* new internal (repository) folder readme; new signature folder readme; new main folder readme; and upload scripts
+* output
+
+(adretemp82)
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* whonix_shared/etc/apt/sources.list.whonix:
+** out commented sources (deb-src)
+** only using: "deb https://deb.debian.org/debian-security stable/updates main contrib non-free" and
+** deb "https://deb.debian.org/debian stable main contrib non-free"
+** added comment: "#deb https://deb.debian.org/debian/ stable-updates main contrib non-free"
+** technical comments
+* If bare BARE_METAL is set to 1 (when using whonix_build with --bare-metal), skip scripts, which are not required for creating {{project_name_long}} with physical isolation, so physical isolation users can also use the whonix_build script.
+* added tor-ctrl
+* new man page: tor-ctrl
+* whonixcheck, timsync: inform at cli, if we are still waiting for whonixcheck and/or timesync's results
+
+{{project_name_gateway_short}}
+
+* Control Port Filter Proxy: [[Dev/onion-grater|onion-grater, a Tor Control Port Filter Proxy, design documentation]]
+* new man page: controlportfilt
+* added tor-ctrl
+* added firewall rules for Control Port Filter Proxy
+* Control Port Filter Proxy: Lie when we are asked "GETINFO net/listeners/socks".
+
+Source Code
+
+* removed dependency for bc, no longer required for whonixcheck/timesync (using expr instead)
+* added imagemagick, because it is required for /usr/bin/backgroundd
+* whonix_workstation/usr/share/whonix/postinst.d/70_gpgconf: added sanity test "sudo -u user gpg --gpgconf-test"
+* build source code: better way to parse command line options
+* deleted obsolete file whonix_shared/usr/share/whonix/postinst.d/70_grub (now solved in chroot.d post script)
+* deleted obsolete and neglected TODO file, see https://github.com/Whonix/Whonix/issues for TODO
+* installing from separate local apt repository when building from source code
+* build-steps/1100_prepare-build-machine and development/{{project_name_short}}-Shared_packages: added haveged to build depends
+* build-steps/1200_create-debian-packages: create local signing key for local APT repository, yes a signing key is also required for local installation from local package repository, see script comments
+* help-steps/pre: added some colorful output
+* added colored outputs to the build scripts debian/control: set priority of whonix-x-(packages|files|postinst) and (dummy)tor to important and made the other ones optional. This has the advantage, that if the user tries to remove an essential package, APT will loudly complain, while less important packages can be removed.
+* debug-steps/interactive-chroot-img: mounting local APT repository, if already available (will fail open, if not)
+* new variable dist_build_apt_codename
+* added buildconfig.d configuration folder
+* Extracted code for packaging {{project_name_long}} in debian/rules and made a rules-helper.bsh script, which I can maintain better.
+* dummytor: renamed package tor to dummytor and use Provides: tor. This prevents {{project_name_gateway_long}} from fetching dummytor.
+* renamed whonix_shared/usr/share/whonix/chroot-scripts-post.d/70_sources to whonix_shared/usr/share/whonix/chroot-scripts-post.d/75_sources, so it runs after all apt install actions
+* renamed skip_scripts variable to WHONIX_BUILD_SKIP_SCRIPTS
+* added WHONIX_BUILD_SKIP_SCRIPTS support to build-steps
+* converted native debian package into non-native debian package; new help-steps/make-tarball for creating debian orig tarball
+* added debian/watch
+* whonix_gateway/usr/lib/whonix/whonixsetup/ft_m_1: no longer try to reload a Tor which is eventually not started
+* renamed VERSION variable to WHONIX_BUILD_WHONIX_VERSION
+* whonix_shared/usr/bin/whonix_repository: - support adding multiple keys in /usr/share/whonix/keys/whonix-keys.d/* - more simple and robust code for revoke_keys - tested everything
+* now using debuild - now also signing packages - (local repository was already signed)
+* moved local apt repository to whonix_binary folder so it is no longer in the source folder and won't get included in the source tarball
+* added debug-steps/reprepro-wrapper
+* new variable WHONIX_BUILD_UPGRADE_BUILD_MACHINE to turn off apt update and apt full-upgrade and setting dpkg --force-confold during build step "prepare build machine"
+* clean up /etc/apt/apt.conf.d/90whonix-build-confold at the end
+* deleted whonix_shared/etc/apt/apt.conf.d/20whonix-oldconfig, no longer required since we now have proper packaging
+* debian/rules: also parse /etc/init.d folders for gateway and workstation
+* add {{project_name_long}} apt repository to /etc/sources.list.d/whonix.list using the whonix_repository tool renamed variable DISTRUST_WHONIX_APT_REPO to WHONIX_APT_REPOSITORY_DISTRUST_ENV renamed variable WHONIX_APT_REPOSITORY_DISTRUST to WHONIX_APT_REPOSITORY_DISTRUST_CONFIG
+* if the builder provides its own signing key in buildconfig.d WHONIX_LOCAL_SIGNING_KEY_FOLDER variable, use that key, otherwise use an automatically created signing key
+* added repository upload script
+
+(adretemp68)
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* much work on an auto updater and packaging {{project_name_long}} for Debian
+* added KDE Lowfat Settings
+* improved many script output messages
+* whonixcheck: code simplification; more robust progress_bar in corner cases.
+* htpdate: 180 seconds for curl timeout as per https://mailman.boum.org/pipermail/tails-dev/2013-February/002635.html
+* <s>An anonymous user suggested, that MAC addresses used by {{project_name_long}} starting with vendor prefix 080027 are too uncommon.; Used https://github.com/EtiennePerot/macchiato/tree/master/oui/wireless_laptop.sh (Integrated wireless interfaces in laptop computers) to find more popular MAC vendor ids.; Changed MAC addresses:</s>
+** <s>{{project_name_gateway_long}} eth0 '00:26:82:47:5c:e1' (Gemtek Technology Co., Ltd. - HP Laptop)</s>
+** <s>{{project_name_gateway_long}} eth1 '00:13:02:9c:f1:91' (Intel Corporate - Fujitsu Amilo Pi 1556 Notebook, Intel Corporation PRO/Wireless 3945ABG Network Adapter)</s>
+** <s>{{project_name_workstation_long}} eth0 '00:21:00:4d:8f:08' (GemTek Technology Co., Ltd. - HP Pavilion TX2510EA)</s>
+* Added Time Sanity Check init script.
+* /etc/apt/preferences.d/50_banned-packages
+* Let htpdate wait for bootclockrandomization.
+* whonixcheck and timesync: Warn if bootclockrandomization and/or timesanitycheck failed.
+* Time Sanity Check before and after htpdate
+* configuration folder /etc/systemcheck.d for .d-style configuration files
+* added khelpcenter4 package
+* added faketime package
+* added timeprivacy script
+* new man pages:
+** uwt
+** timesync
+** time_privacy
+** scurl
+* /etc/kde4/kdm/kdmrc: Working around a rare bug, where kdm did not start because of a timeout by using higher timeout. https://forums.debian.net/viewtopic.php?f=6&t=45648
+* new generic uwt/timeprivacy wrapper
+* deleted old uwt wrappers
+* using new generic uwt master wrapper /usr/bin/uwtwrapper instead of many copies of the same script
+* fixed the bug where the uwt wrappers gave wrong arguments to curl and therefore broke applications dependent on curl, such as apt-file, update-flashplugin
+* added libgl1-mesa-dri to prevent error (EE) AIGLX error: dlopen of /usr/lib/i386-linux-gnu/dri/swrast_dri.so failed (/usr/lib/i386-linux-gnu/dri/swrast_dri.so: cannot open shared object file: No such file or directory) in /var/log/Xorg.0.log
+* Removed xdg-utils, since we do not need them to create desktop icons and start menu entries.
+* Check total RAM. If more than 512 MB &rarr; start KDE. If less (like 128 MB) &rarr; do not start KDE. This should be quite convenient, because users with low RAM could reduce ({{project_name_gateway_short}}) RAM to 128 MB and even if they sometimes wanted to configure/check something, they could assign 512 RAM and automagically boot into the graphical KDE desktop. There are also many settings in /etc/systemcheck.d/ to configure this feature, so if you want you can also add much RAM and still don't boot a desktop environment, use different display managers and so on.
+* whonixcheck: now reading /etc/systemcheck.d/ configuration folder
+* whonixcheck: added option WHONIXCHECK_NO_EXIT_ON_TRANS_PORT_DETECTION_FAILURE
+* whonixcheck, timesync: bugfix: will now kill the process, if the cancel button in zenity is pressed
+* added apparmor-profiles (but didn't enable enforce mode or added any useful profiles)
+* added apparmor-utils (but didn't enable enforce mode or added any useful profiles)
+* added /etc/default/grub
+* higher console resolution 1024x768 (without X)
+* enable "apparmor=1 security=apparmor" by default (but didn't enable enforce mode or added any useful profiles)
+* more verbose output while booting, since on slow machines it may look like there is no progress otherwise
+* reduced timeout from 300 to 180 to be on par with Tails
+* added /usr/bin/whonix_repository which can be used to easily disable {{project_name_long}} APT repository
+
+{{project_name_gateway_short}}
+
+* first time connection wizard
+* graphical {{project_name_gateway_long}} (got a KDE desktop now), wallpaper with most important information
+* /etc/whonix_firewall.d/ for .d-style configuration files
+* added option for Flash Proxy to firewall config in /etc/whonix_firewall.d/
+* /etc/apt/sources.list.d/torproject.list: Activated torproject.org Debian Wheezy repository, so obfs3 can be downloaded.
+* added support for obfs3 out of the box
+* new man pages:
+** leaktest
+** armwrapper
+** {{project_name_short}} ** whonixsetup
+* /usr/local/bin/whonix_firewall: comment for using Custom Open Ports on external interface
+* added SocksPorts separate for KDE and GNOME wide applications
+* /usr/bin/whonix_firewall: Port 9150 is no longer a custom port. It is now SOCKS_PORT_TBB_DEFAULT, supposed to be used by stock TBB running unmodified inside {{project_name_workstation_long}}.
+* /usr/local/etc/torrc.d/50_user.conf: added 127.0.0.1:9150 for consistency
+* increased {{project_name_gateway_long}} RAM from 128 MB to 768 MB, because {{project_name_gateway_long}} becomes graphical
+* arm wrapper to start arm without a password now passing command line arguments to arm
+* arm wrapper also announces its existence when run because "set -x" is now set to avoid confusion
+* Removed custom socks port 9151, because this is TBB's default Tor Control Port. Therefore we shouldn't train users to use it as custom socks port to avoid confusion.
+
+{{project_name_workstation_long}}
+
+* Added Boot Clock Randomization. This is useful before timesync succeeded, naturally timesync runs before timesync succeded, to make sure that the host clock and {{project_name_workstation_long}} clock differ.; Open for arguments if that should be added to {{project_name_gateway_long}} as well. See TimeSync design.
+* added kmix
+* added graphical alternatives manager, galternatives
+* torbrowser: Deactivate tor-launcher, a Vidalia replacement as browser extension, to prevent running Tor over Tor. https://gitlab.torproject.org/legacy/trac/-/issues/6009 https://gitweb.torproject.org/tor-launcher.git TOR_SKIP_LAUNCH=1
+* XChat: No longer moving XChat plugins into a new folder. Using dpkg-divert instead to deactivate them. User documentation explains how to re-enable them.
+* new man pages:
+** xchat-reset
+** torbrowser
+** leaktest
+** {{project_name_short}} ** whonix_firewall
+* added proxy settings for KDE wide application
+* torbrowser new --lang "language" command line option, see man torbrowser
+* torbrowser: new option for advanced users --nokilltb
+
+Source Code
+
+* whonix_gateway/usr/local/bin/leaktest: using true instead of echo, since we set -x anyway
+* whonix_gateway/usr/local/bin/leaktest: added comment in/out for "FascistFirewall 1".
+* improved error handling
+* code refactoring
+* help-steps/pre: fewer useless debug output
+* Gateway and Workstation: /etc/X0.hosts Add xhost exception, as required for zenity, since cron starts as root and whonixcheck (zenity) starts as user.
+* better documented package lists
+* shared: added debsums to package selection. Added a sanity check using debsums to the chroot-script 30_internal-checks.
+* chroot-scripts-pre.d
+* chroot-scripts-post.d
+* postinst.d
+* added skip_scripts variable
+* No longer setting KDEDIRS in whonix_workstation/etc/environment. Using whonix_shared/etc/X11/Xsession.d/50whonix instead.
+* WHONIX_TARGET_ARCH can now be set in build configuration
+* {{project_name_gateway_long}} and {{project_name_workstation_long}}: Deleted /etc/sudoers.d/whonix and created multiple small files instead.
+* new file release/list_source_files
+* new build-step 32_verify_copied_files: checks if everything from the whonix_gateway/whonix_workstation and whonix_shared actually was correctly copied using diff.
+* Added Tor Project Archive (0x886DDD89) key, which signs the deb.torproject.org repositories and archives as chroot script. It later gets updated by torproject keyring package.
+* no longer required to mess with /etc/rc.local and /etc/environment so the user can easly edit without any conflicts with {{project_name_long}} configuration files (moved to /etc/profile.d/ instead)
+* {{project_name_gateway_long}}, new chroot script, whonix_shared/usr/local/share/whonix/chroot-scripts-post.d/70_tor: downloading tor related software from Torprojects repository in case it contains newer software. At time of writing obfsproxy in Torprojects repository already contained obfs3 while Debian repository had only obfs2.
+* whonix_shared/etc/apt/sources.list: changed from wheezy to stable, because wheezy became stable.
+* gateway and workstation, package selection: Removed virtuoso-minimal, which was installed as workaround in 0787deb78d24678d87ef704ed206dd0b6b4d7e3e as dependency for nepomuk (nepomuk comes with kde-workspace). Since nepomuk now gets disabled, virtuoso is no longer required.
+* deleted defunct chroot-script whonix_shared/usr/local/share/whonix/chroot-scripts/40_variables, it never worked, variables set by it were ignored by following chroot-scripts. Those variables get set in /home/user/{{project_name_short}}/help-steps/variables.
+* Disable uwt while building {{project_name_long}}, because it is not functional while building {{project_name_long}} from source code. Instead of doing this in every build and chroot script, do it in a central place, the help-steps/variables script.
+* mass rename whonix_(gateway|workstation|shared)/usr/local/... to whonix_(gateway|workstation|shared)/usr/... ; mass rename /usr/local/... to /usr/...
+* Removed line for changing partition uuid from build-steps/35_run-chroot-scripts-img, because it didn't really belong there and made it its own step build-steps/34_change_partition_uuid.
+* We no longer place uwt wrappers into /usr/local/bin/<uwt-wrapped-application>. Therefore we now use dpkg-divert /usr/bin/<uwt-wrapped-application> to /usr/bin/<uwt-wrapped-application> and symlink /usr/bin/<uwt-wrapped-application> to /usr/bin/uwtwrapper.
+* whonix_shared/usr/bin/scurl: better way to forward extra arguments, using <math>{1+"</math>@"} instead of $*
+* whonix_shared/usr/share/whonix/chroot-scripts-pre.d/70_banned_packages: Removed code 'echo "package-name hold" | dpkg --set-selections', because it is no longer necessary, we're now using /etc/apt/preferences.d/ instead.
+* build-steps/10_prepare-build-machine: added ruby-ronn to build dependencies (required for creating man pages)
+* whonixcheck, timesync: better handling of short and long options; -help &rarr; --help -autostart &rarr; --autostart -cron &rarr; --cron
+* whonixcheck: now using whonix-keys.d folder
+* whonixcheck, timesync: output and startup functions are now the same on {{project_name_gateway_long}} and {{project_name_workstation_long}}, since {{project_name_gateway_long}} is now graphical as well
+* DummyTor now gets created along with the other packages in debian/control
+* added two new help-steps prevent-daemons-from-starting and unprevent-daemons-from-starting, because the (un)chroot are ignored for bare-metal and preventing daemons from starting is still recommended for bare-metal.
+* whonix_shared/usr/share/whonix/apt.conf: changed ip from 192.168.0.11 to 127.0.0.1 to make it independent from host network configuration
+* got rid of whonix_shared/usr/share/whonix/apt.conf, using APT command line rather
+* build-steps: using http_proxy variable for setting up apt-cacher-ng as proxy for grml-debootstrap
+* build-steps/2600_export-vbox-vm: added --manifest (hashes which can be used to determine if the appliance components arrived intact)
+* build-steps/2600_export-vbox-vm: also added --manifest, --product, --vendor, --vendorurl, --version (Not yet using: --producturl)
+* Using config-package-dev to solve conflicts when {{project_name_long}} deb packages overwrite files owned by other packages.
+* build-steps/2000_install-common-packages: prevent mounting /etc/resolv.conf from the host inside the chroot, /etc/resolv.conf from {{project_name_long}} source folder can get installed.;
+* deleted whonix_workstation/etc/polipo/config (not installed, not in use)
+* build-steps/1100_prepare-build-machine: - no longer installing dependencies for creating virtual machines for bare metal builds - no longer installing dependencies for bare metal builds for virtual machine builds - removed debootstrap as build dependency, because grml-debootstrap Depends on it and therefore automatically fetches it - removed git as build dependency, git is only required to download the source code but anyone who has the source code, doesn't need git (if not planing to contribute) - replaced qemu with qemu-utils, because that includes the required tools - code refactoring -
+* build-steps/1300_create-debian-img: removed unneeded --keep_src_list option from grml-debootstrap#
+* build-steps/2500_create-vbox-vm: removed hardware modifications, very little gain, while it breaks enabling uefi
+* run update-grub while building {{project_name_long}} and fix /boot/grub/grub.cfg due to a known bug in grub
+* new WHONIX_DEB_DEBUG variable
+* install from local APT repository, no longer required to copy packages manually into the image
+* update-rc.d $display_manager remove as dpkg post invoke hook, otherwise as soon as a display manager (kdm by default) get upgraded, its postinst script will revert {{project_name_long}} post chroot script and {{project_name_long}} feature, which deactivated the /etc/init.d/ autostart mechanism, what would break {{project_name_long}} feature to decide to start a display manager depending on free RAM and other configurable settings
+* build-steps/1100_prepare-build-machine: speed up apt update
+* help-steps/variables: removed deprecated SNAPSHOT_DESCRIPTION variable
+* adding {{project_name_long}} APT repository signing key with apt-key while building {{project_name_long}}
+(adretemp40)
+
+{{project_name_workstation_long}}
+
+* longer installing polipo by default. It is not required for anything.
+* torbrowser: Added a meaningful error message, if the Tor Browser folder does not exist and recommend to run the updater in that case.
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* Added /etc/hostname with content "host". Even though grml-debootstrap already creates /etc/hostname with content "host build-steps/35_run-chroot-scripts-img: added support for bare metal users.
+
+Source Code
+
+* torbrowser: merged tb_start function into tb_start_new_tab.
+
+(0.6.1)
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* timesync: added autostart status notification
+* Added /etc/apt.conf.d/20oldconfig: never ask if a configuration file should get updated by dpkg. Always keep the locally installed one.
+* Running whonixcheck after a random amount of time (minimum 60 seconds + a random number between 0 and 500) to make the network fingerprint less predictable.
+
+{{project_name_gateway_short}}
+
+* torrc, firewall: added port 9050
+
+{{project_name_workstation_long}}
+
+* workstation: Disable Apper's mechanism to automatically check for updates, to work around upstream bugs: - https://bugs.freedesktop.org/show_bug.cgi?id=62575 and https://bugs.freedesktop.org/show_bug.cgi?id=62576
+* timesync: When timesync is run by cron.hourly (/usr/local/bin/htpdate_hourly), and there is nothing important to tell, say nothing. Otherwise there would be such a popup every hour.
+* timesync: When timesync is automatically started and nothing important has to be reported, use kdialog --passivepopup, because that is non-intrusive and will automatically fade out. When timesync is manually started, always use zenity.
+* timesync: No need for flashing a progress meter, if htpdate already succeeded.
+* whonix_workstation/home/user/.bashrc: Do not "cat /etc/motd" on {{project_name_workstation_long}} login shell, only in virtual console. (Konsole)
+* Workstation: Graphical notify-send notification that start of whonixcheck gets delayed.
+* Workstation package selection: added libnotify-bin for whonixcheck.
+* whonixcheck: Removed transitional popup, that whonixcheck is no longer autostarted at every boot of {{project_name_workstation_long}}.
+* torbrowser: Downloading Tor Browser and signature from http://idnxcnkne4qt76tg.onion/dist/torbrowser/linux instead from https://www.torproject.org/dist/torbrowser for better security when run inside {{project_name_long}}.
+* torbrowser: Added --max-time 300 to signature download to defeat a endless data or slow retrieval attack.
+* torbrowser: downloading signature file before Tor Browser itself. - Would be a pity to download Tor Browser (takes long) only to recognize, that the signature download (takes very little time) fails.
+* whonix_workstation/usr/local/share/whonix/kde/share/applications/whonix-whonixcheck.desktop: improved icon description.
+* torbrowser: Removed tb_create_user_js, since no longer required to change Tor Browser's proxy settings. (Now using rinetd.)
+* torbrowser: Always starting Tor Browser with cd ~/tor-browser_"<math>TB_LANG"/ ~/tor-browser_"</math>TB_LANG"/App/Firefox/firefox --profile Data/profile instead of cd ~/tor-browser_"<math>TB_LANG"/ ~/tor-browser_"</math>TB_LANG"/start-tor-browser and therefore not starting Vidalia/Tor when the user manually downloaded or updated TBB.
+* Workstation: Added rinetd. It prevents Tor over Tor by just installing Tor or by using the complete Tor Browser Bundle, which starts Vidalia and Tor.; This is because, it listens on port 9050 and 9150 and therefore lets a default Tor or TBB fail to start.; Fowards port 127.0.0.1:9050 (Workstation) to 192.168.0.10:9050 (Gateway). Fowards port 127.0.0.1:9150 (Workstation) to 192.168.0.10:9150 (Gateway).
+
+Source Code
+
+* whonix_shared/usr/local/share/whonix/chroot-scripts/50_adduser-user: Not re-creating user "user", and therefore perhaps changing an existing password. That should support re-running the script and bare metal better.
+* gateway firewall: renamed variable, GATEWAY_ALLOW_INCOMMING_SSH &rarr; GATEWAY_ALLOW_INCOMING_SSH; typo fixes
+* renamed: whonix_shared/etc/profile.d/whonixcheck.sh &rarr; whonix_shared/etc/profile.d/20_whonixcheck.sh
+* whonix_shared/usr/local/bin/delay: added small help file. It is required to prevent getting the logins sparred.
+* whonix_shared/usr/local/bin/whonixcheck-scripts/15_kill-old-instances fixed
+* whonixcheck: load help_output module earlier so it also works for the check_autostart module whonix_shared/usr/local/bin/whonixcheck-scripts/25_autostart: disable debugging
+* build-steps/30_copy-into-img: Remove symlink /etc/localtime before copying to prevent "cp: <code>/usr/share/zoneinfo/UTC' and</code>/etc/localtime' are the same file" error.
+* whonixcheck: better way to autostart
+* timesync: added option for -autostart
+* chown --recursive user:user &rarr; chown --recursive "<math>USERNAME":"</math>USERNAME"
+* build-steps/15_prepare-build-machine: using "$USERNAME" instead of user
+* chown --recursive user:user &rarr; chown --recursive "<math>USERNAME":"</math>USERNAME"
+* more consistency: /home/"<math>USERNAME" &rarr; "</math>HOMEVAR"
+* build-steps/15_prepare-build-machine: added creation of user "user".
+* build-steps/20_create-debian-img: arch as variable $ARCH; comments for alternative architectures for custom builds
+* help-steps/variables: added "export DEBIAN_FRONTEND=noninteractive "
+* Added new build step 15_prepare-build-machine to ease building from source.
+* whonixcheck: removed redundant variable COUNTER
+* torbrowser: using general trap; reduced code duplication by sourcing the tbbversion function
+* whonixcheck: split the script, which had grown too big over time into many smaller scripts
+* timesync: using whonixcheck error handler, reduced code duplication
+* timesync: split timesync script into many smaller scripts and reduced code duplication comments
+* help-steps/variables: Variable WHONIX_SOURCE_FOLDER supports now being used by different user than "user".
+* whonix_build: Removed "chmod +x "$WHONIX_SOURCE_FOLDER"/build-steps/20_create-debian-img" - no longer required, no longer using the executable bit to decide which steps to run. This is now done using command line switches and variables.
+* Fix: build script when not using as user "user" - deactivate trap before running the id command.
+* release/whonix_release: Added --armor to gpg --detach-sign. .asc files look better (look like plain text) than .sig (look like binary).
+* release/whonix_news: No longer required to update the version manually.; It is now read from whonix_shared/usr/local/share/whonix/version.;
+* release/upload_whonix_news: added automatic signing and verification to upload script.; deleted release/whonix_news.asc, since no longer required.
+* upload_download_readme: Added automatic sign, verify to upload script.; release/README.asc deleted, since no longer required. release/whonix_release: comments
+* release/upload_download_readme: Read version from /whonix_shared/usr/local/share/whonix/version. No longer required to manually edit version.
+* whonixcheck: more modular, own function for get_local_whonix_version.
+* whonixcheck: No longer hardcoding architecture variable ARCH. Now using uname.
+* torbrowser: made the script more modular
+* Not trying to creating any users (and thus changing their passwords), if these user accounts already exist. This should support (physical isolation) users better, who changed these passwords already. gateway torrc: using bridge for obfs bridge comment instead of Bridge - both work (tested), but since regular bridges are also already written in lowercase, it is more consistant. (bridges.torproject.org also uses "bridges" in lowercase.)
+
+(0.6.0)
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* Run update-command-not-found while building to prevent prompting the user "Please run update-command-not-found.".
+* Prevent from installing: popularity-contest (privacy); geoclue (privacy); resolvconf (can mess up /etc/resolv.conf); ufw (can mess up firewall); and also for custom builds: canonical-census, unity-lens-shopping, unity-scope-video-remote, unity-scope-musicstores, geoclue-ubuntu-geoip; using dpkg hold; users who wish can overwrite those default banned packages which shouldn't be necessary for anyone but experts
+
+{{project_name_gateway_short}}
+
+* torrc: Added comment for mumble server onion service.
+
+{{project_name_workstation_long}}
+
+* Disable xchat plugins no longer with xchat-reset, only disable while building so the user is free to re-enable them.
+* Removed redundant hiddenserver-install. No longer required. {{project_name_long}} documentation explains how to install it a hidden server.
+
+Source Code
+
+* Now easier to understand. More modular. New step based layout.
+* Got rid of unclear whonix_internal_install_script. Chroot-Scripts are now in whonix_.../usr/local/share/whonix/chroot-scripts/.
+* whonix_build -all -tg -tw -fast -tg-fast -fw-fast -clean -clean-tg -clean-tw
+* Running whonix_build_clean "<math>MACHINE" before whonix_build_clean "</math>MACHINE", i.e. when running whonix_build -all/tg(-fast)/tw(-fast) won't break anymore if running whonix_build -clean(-tg/-tw) has been forgotten beforehand.
+* Moved workstation specific icons to workstation folder.; Moved icons to /usr/local/share/whonix/icons/.; Moved gpg public keys to /usr/local/share/whonix/gpg-pubkeys/.
+* chmod -x whonix_workstation/home/user/.bashrc
+* Removed whonix_workstation/usr/local/share/whonix/chroot-scripts/70_audio, redundant on Debian/KDE, audio will work out of the box.
+* torbrowser: No longer adding additional extensions.torbutton.banned_ports, it was always redundant.
+* added /etc/apt/apt.conf.d/99timeout to handle APT timeouts better
+* workstation: added failsafe mechanism to {{project_name_long}} second, optional, extra firewall
+* workstation: Creating the dummytor package while building {{project_name_long}}.
+* Gateway: No longer required to set +i on /etc/resolv.conf. Removed. DHCP is configured to prevent overwriting it and resolvconf is a banned package.
+* gateway: added /etc/dhcp/dhclient-enter-hooks.d/nodnsupdate to prevent showing an error message while booting
+
+= {{project_name_long}} 0.5.6 Changelog =
+
+{{project_name_gateway_short}}
+
+* Fixed a time zone bug, which prevented Tor to connect in some cases.
+
+= {{project_name_long}} 0.5.5 Changelog =
+
+{{project_name_gateway_long}} and {{project_name_workstation_long}}
+
+* Fixed htpdate_hourly.
+* whonixcheck: improved messages.
+* whonixcheck: better method for Tor Browser local and remote version phrasing.
+* uwt: Fixed a bug: "''libtorsocks(18790): Could not open socks configuration file (/tmp/tmp.pKSaitLYTN) errno (13), assuming sensible defaults for Tor.''"
+* Deactivate automatic update check in /etc/apt/apt.conf.d/10periodic. It is handled by whonixcheck. This makes fingerprinting {{project_name_long}} users harder.
+* whonix_createvm: Disable clipboard sharing at build time. Only matters if guest additions are installed which is recommended against. Just in case.
+* whonix_release: Removed sha sums. New versions will no longer contain sha sums. A more secure method, gpg signatures are provided.
+* Enabled auto login on tty1 for {{project_name_gateway_long}} and {{project_name_workstation_long}}.
+* Added haveged, which is an entropy gathering daemon.
+* adrelanos.asc: changed e-mail address from proper at secure-mail dot biz to adrelanos@[outdated, redacted]. Key otherwise unchanged. Fingerprint remains the same. There is no need to update. Just mail to the my current riseup e-mail address.
+* Installing command-not-found.<br />
+* Removed redundant mdadm and lvm2 from package selection. Physical Isolation and other advanced users most likely know if they need those packages.
+
+{{project_name_workstation_long}}
+
+* easier to install [[Chat#TorChat|TorChat]]
+* pre-installed [[Mixmaster]], a tool to send e-mail without registering e-mail accounts
+* easier to install [[E-Mail#Mozilla_Thunderbird_with_TorBirdy|TorBirdy]]
+* pre-installed rawdog, an rss reader to read {{project_name_long}} News Blogs
+* autologin for kde user
+* added [[Dev/Dummy Tor|Dummy Tor]] package
+* whonixcheck: runs once a day.
+* Leaktest script fixed.
+* Added icons for {{project_name_short}} online readme, torbrowser, whonixcheck and timesync.
+* installing kde-baseapps-bin package. It is required for KDE applications proxy settings. (Only for stream isolation, manually installed applications.)
+* MAT, the [[Metadata]] Anonymisation Toolkit, now fully installed and therefore easier to use
+* added GnuPG frontend: KGpg
+* install accessibility tools
+* install process manager: ksysguard
+* {{project_name_workstation_long}} KDE settings:
+** double click instead of single click
+** kgpg settings hide user id and keyservers
+** KGpg settings: Decided not to set hkp://2eghzlv2wwcq7u7y.onion as keyserver, because it was offline.
+** Dolphin show menu bar
+** Konsole unlimited scrollbag
+** plasma-widget-folderview, which allows to show the content of the ~/Desktop folder on the desktop.
+** kde desktop set to folderview by default to show desktop icons.
+** set default wallpaper to /usr/share/wallpapers/stripes.png
+** New icons and desktop shortcuts.
+** {{project_name_long}} specifc start menu default icons.
+* new /home/user/.bashrc - adds displaying /etc/motd (contains password and help) and bash completion.
+* removed leafpad and kate. added kwrite as editor.
+* whonixcheck: show "apt update && apt full-upgrade" again even if apper is available because apper has bugs. (unsigned package warning)
+* torbrowser:
+** wrapper script supports now -new-tab link.com, for example: torbrowser -new-tab https://www.startpage.com
+** the script may no longer be run as root.
+** can now be run as any user, not just as "user", but this is untested. Only tested for user "user".
+** new -lang switch for language help.
+** better error message if network is down and curl fails.
+** more help if network is down or script is broken.
+** added Tor Browser Updater icon
+** added graphical progress meter.
+** graphical user interface
+** removed gpg key download code and move it to deprecated_code. Downloading the keys at Tor Browser update time from the keyservers was a relict from TorBOX times, where a build script created TorBOX. It was due to trust and space reasons to include only the gpg fingerprint and the gpg keyserver commands to download the key. Anyone using {{project_name_long}} binary builds or source code without audit already trusts {{project_name_long}}. Deploying the gpg public keys for Tor Browser download instead of downloading them from them keyservers adds no additional trust problem. Auditors can instead of comparing the gpg fingerprint, download they keys and compare them with the ones shipped with {{project_name_long}}. Not relying on the keyservers will make the Tor Browser update script much more robust.
+** better and less scaring error message if torbrowser script bug is ever caught.
+** Creating tor-browser_"$TB_LANG"/Docs/version. Tor Browser changelog has been forgotten to update by upstream. https://sourceforge.net/projects/whonix/discussion/general/thread/6122990d/ To play it safe and having a chance of finding out the installed version, we create a file ourselves to remember it.
+** Fixed profile not found bug, in case Tor Browser wasn't fully loaded by hard coding to wait 30 seconds before trying to open extra tabs
+* whonixcheck, torbrowser, htpdate: Notice Endless data attacks and Slow retrieval attacks by adding --max-time 300 to curl.
+
+{{project_name_gateway_short}}
+
+* package selection: installing tor-geooipdb. arm needs it to show countries.
+* 0.4.5 undocumented: added settings to whonix_firewall, these were and are documented on the applications page
+* whonixcheck
+** now runs automatically at least every 24 hour on {{project_name_gateway_long}} as well.
+** On {{project_name_gateway_long}}. Will now display the results when automatically run to all logged in users using the wall command.
+** Also download {{project_name_short}} version and news file on the gateway for users using custom workstations.
+* Fixed whonix_gateway/usr/local/bin/leaktest.
+* Usability: arm can now be run without password.
+* whonixcheck:
+
+Source Code
+
+* You can now just drop files inside the whonix_gateway, whonix_workstation or whonix_shared folders and don't need to add every single file inside int_copy_*.
+* Faster debugging.
+** new switch: whonix_createvm -t"$MACHINE"-copyimg required for building from source code...
+** This eases debugging. Before we created the img using grml-debootstrap and directly copied into it and directly run the chroot script inside it. Creating a clean modification required to re-create the whole img using grml-debootstrap which always took a long time, even though using apt-cacher-ng. From now, only a copy of the img is modified. Using whonix_createvm -tg-copyimg (or -tw-copyimg) will copy the original img created by grml-debootstrap from /home/user/whonix_binary/"<math>VMNAME".img  to /home/"</math>USERNAME"/whonix_binary/"<math>VMNAME"_copy.img. Only/home/"</math>USERNAME"/whonix_binary/"$VMNAME"_copy.img gets modified from now.;
+** whonix_build: added -fast switch, which skips the -createimg step
+* whonix_createvm:
+** only set Workstation hardware clock to UTC.
+** No longer setting Gateway hardware clock to UTC.
+*** This is because Tor leaks it to entry guards (and bridges?).
+*** torproject.org #7277: timestamp leaked in TLS client hello https://gitlab.torproject.org/legacy/trac/-/issues/7277
+*** torproject.org #4852: Clients send NETINFO with time https://gitlab.torproject.org/legacy/trac/-/issues/4852
+** {{project_name_gateway_long}} is therefore less fingerprintable.
+* removed comment, pae is now documented in the faq
+* added release folder, whonix_release file are still just notes, not a automatic script.
+* new switches for mounting and unmounting images are tX-(un)mountimg and tX-(un)mountvdi
+* start-tor-browser: comment fix. Added export in front of the TOR_TRANSPROXY, TOR_SOCKS_HOST, TOR_SOCKS_PORT variables. Fixes https://github.com/adrelanos/tbb-scripts/issues/1 Thanks to scruloose for reporting!
+* torbrowser: found zenity workaround, therefore removed kdialog.
+* whonixcheck: found zenity workaround, therefore removed kdialog.
+* whonixcheck: removed old wget/uwt comments.
+* htpdate: changed curl to /usr/bin/curl to circumvent uwt wrapper.
+* /usr/local/bin/htpdate_hourly more comments for debugging.
+* apt-get-update: small fix. Now returning return code of apt update.
+* whonixcheck: better error handling if apt-get-update fails.
+* added backup of documentation
+* License file: Added sources of icons and their licenses. Reformatting.
+* torbrowser: Removed old comments.
+* torbrowser: i686 to "$ARCH"
+* torbrowser: en-US to "$LANG"
+* torbrowser: Check if TB_LANG exists and is not empty. If it is empty, set to default en-US. Otherwise leave it untouched.
+* torbrowser: Improved comments.
+* torbrowser: Easier readable version phrasing.
+* torbrowser: #for commented out commands; ## for comments
+* torbrowser: code refactoring. Removed redundancy of downloading the update information twice. Improved comments and echos.
+* torbrowser: No longer deleting Tor/Vidalia from the downloaded TBB package. No longer trying to safe space. The wasted space is minimal, while this could have unforeseen consequences.
+* torbrowser: gpg fingerprints are now inside variables. Fingerprints and how to verify them is now noted in echos.
+* torbrowser: use more variables for download links. Now just one comment has to be removed to download from .onion instead.
+* torbrowser: removed old out commented code for deleting stuff.
+* torbrowser: simpler startup script creation method and fixed a quote bug.
+* torbrowser: using rm --force to suppress error messages.
+* torbrowser: deleting TorBrowser_installation_FAILED in case it was created earlier.
+* torbrowser: ed editor startup script modification method comment removed.
+* torbrowser: many changes. Added a graphical user interface
+* torbrowser: comments; echos.
+* torbrowser: new startup script creation method and fixes a quote bug.
+* torbrowser: using rm --force to suppress error messages.
+* torbrowser: deleting TorBrowser_installation_FAILED in case it was created earlier.
+* whonixcheck: better method for Tor Browser local and remote version phrasing, same as in the torbrowser script.
+* whonixcheck: moved news file location from sf project web to sf file release system due to traffic limits for sf project web.
+* moved /home/user/.local/share/applications to /etc/skel/.local/share/applications
+* torbrowser: no progress bar, if -force-install is used.
+* torbrowser: updated extensions.torbutton.banned_ports
+* torbrowser: Workaround for the "The proxy server is refusing connections" bug introduced in latest Tor Browser. https://gitlab.torproject.org/legacy/trac/-/issues/8336
+* torbrowser: Removed redundant misc settings from user.js... user_pref("extensions.torbutton.prompt_torbrowser", false); user_pref("general.autoScroll", true);
+* added /etc/dpkg/origins/whonix to honor Debian policy
+* package selection: added debian-keyring (40 MB) as comment. Currently not required. Just to keep it in mind and for discussion.
+* many code simplifications and code refactoring
+* added /etc/environment for Tor Browser
+* {{project_name_workstation_long}}_packages: marked non essential packages, which are safe to remove and which could make a complete operating system with ## LITE; shuffle; revised comments.
+* Workstation package selection: added and unfortunately commented out software-center due to too many bugs which make it unusable https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=software-center
+* {{project_name_gateway_long}}_packages, {{project_name_workstation_long}}_packages: added sysvinit-utils and bsdutils. Dependencies for whonixcheck.
+* LICENSE
+** Moved picture licenses to {{project_name_long}}-documentation repository.;
+** "Except in this file or in files where otherwise noted, content in this the {{project_name_long}} source package is licensed under {{project_name_long}} source code license."
+** improved formatting
+** added links to webcitation.org
+* removed doc backup, created extra repository https://github.com/adrelanos/{{project_name_short}}-documentation
+* Renamed start-torbrowser to start-tor-browser. The {{project_name_long}} specific name start-torbrowser was too confusing.
+* /etc/inittab: using getty instead of login. getty does not break {{project_name_short}} | more.
+* gateway/workstation packages: explicitly installing util-linux because it contains getty.
+* Copying temporary apt.conf into {{project_name_long}}-G/W instead of only into {{project_name_long}}-G.
+* Using apt-cacher-ng for downloading source code.
+* added damngpl
+* Append "127.0.0.1 host.localdomain host" to /etc/hosts as per [https://mailman.boum.org/pipermail/tails-dev/2013-January/002457.html Let's share username, /etc/hostname and /etc/host among all anonymity distributions]
+* new debug build option: -tX-interactive
+* deleted adrelanos.asc from the untested_adre branch. It continues to life in the master branch.
+* {{project_name_workstation_long}}_packages: removed dhcp3-client since not required
+* moved whonix_workstation/etc/apt/apt.conf to whonix_workstation/etc/apt/apt.conf.d/99whonix
+* whonix_shared/etc/apt/sources.list: added security non-free
+* whonixcheck: If it was run by cron and there is nothing to tell, say nothing.; comments; echos; output
+* int_copy_workstation: chattr -i on resolv.conf removed because it was redundant
+* renamed whonix_shared/etc/apt/apt.conf.d/10periodic to whonix_shared/etc/apt/apt.conf.d/20noperiodic
+* 20noperiodic takes precedence over 10periodic
+** no longer required to backup /etc/apt/apt.conf.d/10periodic
+** no longer required to replace /etc/apt/apt.conf.d/10periodic
+* whonixcheck; timesync: overwrite all instances of let with || true because let throws an error when the result is 0
+* whonix_createvm: added -tw-bare-metal-pre and -tw-bare-metal-post
+* gateway: new, out commented by default, /etc/apt/sources.list.d/torproject.list
+* package selection: explicitly installing bash-completion, less, more
+
+= {{project_name_long}} 0.4.5-fix2 =
+
+[0.4.5-fix] for testers.
+
+This is just a hotfix for torbrowser and whonixcheck. The Tor Browser locally installed version check was broken, because The Tor Project forgot to update the changelog and because the keyserver was offline. The torbrowser and the whonixcheck scripts now use a more robust method. ([https://sourceforge.net/projects/whonix/discussion/general/thread/6122990d/ Bug report and discussion])
+
+* fixes torbrowser udpate script
+* fixes whonixcheck
+* fixes timesync command
+
+= {{project_name_long}} 0.4.5-fix1 =
+
+Testers release with same goals as {{project_name_long}} 0.4.5-fix2, but didn't work.
+
+= {{project_name_long}} 0.4.5 Changelog =
+
+* {{project_name_gateway_long}} and {{project_name_workstation_long}}
+** added gnupg-curl package
+** shared partition uuid
+** new apt-cacher-ng_uwt helper script
+** whonixcheck: stream isolation fix when not using Tor, which should really only happen if the user manually added a VPN or transproxy.
+** whonixcheck: improved possible reasons help message if Tor is not detected (VPN, transproxy, false positive).
+** whonixcheck: now uses mktemp
+** whonixcheck: Suggestions for "Your Internet connection appears to be down.".
+** whonixcheck: using curl instead of wget for download
+** whonixcheck: enforcing tlsv1
+** whonixcheck: uwt no longer required in whonixcheck
+** package selection: added curl and bc for whonixcheck
+** timesync and whonixcheck: check_htpdate now checks if htpdate pid file exists.
+** timesync can now also be run when zenity is installed but X window system not started
+** timesync now fails faster if done file exists but no success file
+** Hacked the htpdate init script to work with Wheezy and fixed disabling of VirtualBox additions time sync (if installed).
+** timesync: Waiting longer for htpdate result.
+** fixed help messages in whonixcheck and timesync
+** motd fix
+* {{project_name_gateway_long}}
+** pre-installing obfsproxy
+** Renamed user unsafe to clearnet.
+** torrc: Shuffle settings in torrc. Moved more important things, which might be subject to change are to the top.
+** torrc: Added table of contents as comment.
+** Expanded nslookup help in gateway help file whonix.
+* {{project_name_workstation_long}}
+** Experimental set workstation image size to 50 GB, only space which really is in use should be filled up.
+** running whonixcheck daily at random time on workstation
+** Keyserver choice comment in gpg.conf.
+** Installing image viewer gwenview.
+** Installing virtuoso-minimal as dependency for nepomuk (nepomuk came with kde-workspace). Perhaps not best solution.
+** Deleting /usr/share/applications/kde4/knetattach.desktop.
+* Source Code
+** Mounting .img images instead of .vdi images. This makes it easier to add support other virtualizers.
+** ./whonix_createvm -createvm renamed to ./whonix_createvm -createvboxvm
+** switch -convertfromraw renamed to -converttovdi
+** switch -tX-delete renamed to -tX-vboxdelete
+** switch -tX-delete renamed to -tX-vboxdelete
+** /usr/share/whonix moved to /usr/local/share/whonix
+** moved whonix_internal_install_script(s) to (tg/ws)/usr/share/whonix/
+** {{project_name_short}} news format moved to [[Dev/News]]
+
+= {{project_name_long}} 0.4.4 Changelog =
+
+* {{project_name_gateway_long}} and {{project_name_workstation_long}}
+** Switched to Debian Wheezy.
+** Added Secure Distributed Network Time Synchronization. Thanks to the Tails developers for their fine, free and Open Source tails_htp!
+** Added timesync gui.
+** Deactivated VirtualBox time synchronization.
+** Deactivating VirtualBox guest additions time synchronization if they are installed.
+** Creating a snapshots by default
+** Rebranding, the project is now called {{project_name_long}}.
+** Spoofing virtual hardware information.
+** Added BitCoin address for donations.
+** Added adrelanos's gpg key. key for integrated {{project_name_long}} Version and News notification (whonixcheck).
+** Improved GPG verification mechanism.
+** torcheck renamed to whonixcheck
+** Greatly improved whonixcheck, now checks {{project_name_long}} version, SocksPort, TransPort, stream isolation, Tor Browser version, operating system version and network time synchronization.
+** Improved uwt, uwt -t server_type -i ip -p port ....
+** Deactivated whonix_config_uuids_fstab. Regression.
+** Deactivated autologin.
+** gpg.conf improvements
+** Installed ca-certificates Debian package.
+** Boots faster because of "VBoxManage storagectl --sataportcount 4".
+** No longer removing friendly-recovery.
+** Added selectively IsolateDestAddr and IsolateDestPort.
+** Expanded and revised whole documentation.
+** Gateway and Workstation IPs changed to avoid confusion.
+* {{project_name_gateway_long}}
+** No longer uses transparent proxying. {{project_name_workstation_long}} can still use transparent proxying. {{project_name_gateway_long}} now uses uwt for apt-get, gpg, ssh, (tails_)htpdate
+** Improved help file: {{project_name_long}}.
+** Added unsafe user account, which can connect without Tor. Not used, unless user logs in as unsafe user.
+** Optional feature for /usr/local/bin/whonix_firewall, when activated (disabled by default), root user can connect without Tor.
+** Now using stream isolation and uwt.
+** Revised helpfile whonix.
+** Installing Tor from Debian repositories.
+** Allow starting Tor Controller arm without password.
+** Now longer opening port 22 on external interface by default. We no longer install over ssh.
+* {{project_name_workstation_long}}
+** KDE is the new desktop environment. KDM the desktop manager. It is a minimal KDE with very few KDE applications.
+** Removed Openbox.
+** Running every day Whonixcheck
+** Greatly improved Whonixcheck, cron job hopefully fixed.
+** Installed MAT (Metadata Anonymization Toolkit).
+** new commands:
+*** xchat-reset (Deletes XChat configuration files and recreates the {{project_name_long}} original ones, which are tweaked for privacy.)
+*** hiddenserver-install (Installs and configures lighttpd)
+** Increased RAM for {{project_name_workstation_long}} to 768 MB.
+** Two shortcuts for Tor Browser. One with default homepage check.torproject.org and one with check.torproject.org and {{project_name_long}} readme
+** New help file whonix.
+** Changed {{project_name_long}} readme url.
+** Tor Browser Start and Update script:
+** Better error handling.
+** Better gpg verification.
+** Uses now checks {{project_name_long}} version, SocksPort, TransPort, stream isolation, Tor Browser version, completely (from the rest of the system) separate streams for GPG and wget.
+** Running every day Whonixcheck cron job hopefully fixed.
+** Partially fixed gnome-terminal black on black bug. Uses ugly colors and users are hopefully motivated to change the colors.
+** new commands:
+*** xchat-reset (Deletes XChat configuration files and recreates the {{project_name_long}} original ones, which are tweaked for privacy.)
+*** hiddenserver-install (Installs and configures lighttpd)
+* Source Code
+** Now building with grml-debootstrap and chroot instead of building inside VirtualBox.<br />
+** Now hosted on github, https://github.com/{{project_name_short}}/derivative-maker/ and therefore safe against malicious edits by random people.
+** All files are now inside their own files and no longer in single big scripts.
+** Much more comments.
+** Deprecated onevm (no maintainer).
+** Deprecated uninstall and uninstall-vm (would require rewrite, was less tested, no users, we don't install the operating system version manually anymore).
+** Error handling for everything.
+** Uwt
+*** wrappers share now most code.
+*** New option: -force-install-uwt-dev-passthrough.
+*** No longer requires sudo.
+*** Added uwt patch from anonym. Thanks! Other unrelated fixes. Updated uwt wrappers for latest uwt.
+*** Now using mktemp for torsocks temporary configuration file. Thanks to intrigeri for suggesting it.
+*** Some fixes as per https://mailman.boum.org/pipermail/tails-dev/2012-September/001575.html
+** torsocks patch deactivated, since no longer required for Debian Wheezy.
+** Many fixes, more robustness, step based build system.
+** Reduce cpu and network time synchronization.
+** Improved uwt, uwt -t server_type -i ip -p port ....
+** {{project_name_gateway_long}}
+** Lowest and cpu disk priority while building.
+** import_tpo_archive_key import torproject.org gpg key no longer used. No longer required since switch to Debian Wheezy. Now using Debian repos.
+** Added developers-only clearnet traffic passthrough script.
+** Bare metal:
+*** (untested/unfinished) sudo ./whonix_createvm -tg-bare-metal-pre
+*** (untested/unfinished) sudo ./whonix_createvm -tg-bare-metal-pre
+** Firewall has now uses uwt for apt-get, gpg, ssh, (tails_)htpdate
+** Improved help file: {{project_name_long}}.
+** Optional feature for /usr/local/bin/whonix_firewall, when commented out (disabled by default), root user can connect without Tor.
+** Now using stream isolation and uwt.
+** Firewall has now an error handler.
+
+= {{project_name_long}} 0.2.1 Changelog =
+
+<pre>***2012-07-16 0.2.1***
+* Download Version
+ * Changes
+  * You need to make a clean install for both {{project_name_gateway_long}} and {{project_name_workstation_long}}, incremental update from 0.1 is not supported!
+  * Updated to Ubuntu 12.04.
+  * Solves "Identity correlation through circuit sharing" by separating streams through different SocksPorts.
+  * Integrated leaktest script.
+  * Improved {{project_name_long}} network fingerprint.
+   * All TCP and DNS traffic originating from {{project_name_workstation_long}} and {{project_name_gateway_long}} gets routed through Tor. In the past, {{project_name_gateway_long}} send in the clear and an adversary could have found out, that you are using {{project_name_long}}.
+  * Improved hardware fingerprinting resistance.
+   * {{project_name_workstation_long}} disc uuids are now the same among all {{project_name_long}} users.
+   * MAC addresses are now the same among all {{project_name_long}} users.
+   * CPU model and capabilities are now hidden. (VirtualBox --synthcpu on)
+  * Improved support for (obfuscated) bridges.
+  * {{project_name_gateway_long}} greeting help file.
+  * Optionally downloading the alpha version of Tor is easy.
+  * Optionally downloading obfsproxy from the Tor alpha repository is easy.
+  * Tor Controller**arm** now preinstalled on {{project_name_gateway_long}}.
+  * Firewall updates.
+   * {{project_name_gateway_long}} and {{project_name_workstation_long}} have now a IPv6 firewall for defense in     depth.
+   * {{project_name_workstation_long}} has now also an**optional** firewall for defense in depth.
+  * Critical issue were an old Tor consensus and entry guards from our build machine was fixed, because we no longer start services while installing them.
+  * Powersaving, which is default in Ubuntu, has been disabled for the virtual machines. Screen no longer blacks out.
+  * {{project_name_workstation_long}} GPG no longer spills operating system and version information, added other privacy and security improving options to gpg.conf as well.
+  * torcheck bash script, combined graphical and console version, starts on boot and every 24 hour. It checks Tor Browser version, Tor Socks- and TransPort IPs and if stream isolation is functional.
+ * Open issues
+  * CPU with PAE required, since Ubuntu Precise no longer ships a non-PAE kernel. We consider switching to Debian once Wheezy is out.
+  * torcheck does not work on {{project_name_gateway_long}}.
+  * Gnome Terminal is black on black. Please change colors manually.
+  * More open issues on Whonix/Dev.
+
+* New shell script features
+ * Build documentation has been greatly revised and fully automated builds are now supported.
+ * The Virtual Machines are now created by command line, ensuring that no step can be forgotten.
+ * You need to make a clean install for both {{project_name_gateway_long}} and {{project_name_workstation_long}}, incremental update from 0.1 is not supported!
+ * More comments, which explain almost everything.
+ * Huge stylistic improvements.
+ * The scripts are now modular. (Consist of functions.)
+ * It is now easier to maintain, understand, bugfix and add new features.
+ * Scripts can now be run over SSH.
+ * Automatic GPG key download for required software and verification.
+ * obfsproxy supported out of the box after minor update (commenting in feature).
+ * Install torsocks and uwt.
+ * Building {{project_name_long}} inside {{project_name_long}} (VirtualBox inside VirtualBox) is supported.
+ * Deleting all logs to prevent leaking information about your system.
+ * Fixed a leak, where the host's DNS settings could leak into the {{project_name_gateway_long}}.
+ * {{project_name_gateway_long}} script
+  * new switches
+   * -install
+   * -uninstall
+  * Reverting changes, in case the script fails.
+  * Optional features are clearly marked.
+   * Onion Services.
+   * Even more restrictive firewall rules.
+   * More Socks Ports.
+   * Best possible protection against Identity correlation through circuit sharing. (Removes Trans and DnsPort)
+   * Leak Testing.
+ * {{project_name_workstation_long}} script
+  * -install
+  * -xchat resets XChat.
+  * -update-torbrowser updates TorBrowser.
+  * -hiddenserver
+  * -uwt
+  * -update
+  * -uninstall</pre>
+
+= older =
+
+<pre>
+Changelog:
+2012-03-25 0.1.3
+* improve fingerprint resistance
+* introduce stream isolation features (will be automatically enabled when Tor 0.2.3 becomes stable)
+* significantly reduce image sizes
+* upgrade TB to current latest stable (2.2.35-9)
+2012-03-07 0.1.2
+* Internal release, script clean up.
+2012-03-03 0.1.1-alpha
+* Different default selection of client applications
+2012-02-29 0.1-alpha
+* Initial Release
+</pre>
+
+{{Footer}}
+
+[[Category:Development]]
 
 = {{project_name_long}} 13 Changelog =
 
@@ -1289,9 +2167,10 @@ Other security enhancements:
 * Considered [[Dev/About_Infrastructure#Hide_Server_IP|Hide Server IP]].
 * Set up a dedicated server for Kicksecure, with dedicated domain kicksecure.com, homepage, wiki and soon forums. <ref>This website is not yet public; a significant effort is required to rewrite the wiki for Kicksecure.</ref>
 
+= See Also =
+* [[History]]
+
 = Footnotes =
 {{reflist|close=1}}
-
 {{Footer}}
-
 [[Category:Documentation]]
