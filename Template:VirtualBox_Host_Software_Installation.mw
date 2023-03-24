@@ -51,7 +51,7 @@ sudo apt update
 '''3.''' Install VirtualBox and Linux kernel headers.
 
 {{CodeSelect|code=
-sudo apt install {{{virtualbox_package_debian}}} linux-headers-generic
+sudo apt install --no-install-recommends {{{virtualbox_package_debian}}} linux-headers-generic
 }}
 
 '''4.''' Add your current user to group <code>vboxusers</code>. <ref name=vboxusersgroupadd />
@@ -101,7 +101,7 @@ sudo apt update
 Install the Debian <code>fasttrack</code> signing key.
 
 {{CodeSelect|code=
-sudo apt install fasttrack-archive-keyring
+sudo apt install --no-install-recommends fasttrack-archive-keyring
 }}
 
 Add the Debian <code>fasttrack</code> repository.
@@ -110,7 +110,15 @@ Add the Debian <code>fasttrack</code> repository.
 echo 'deb https://fasttrack.debian.net/debian/ {{Stable_project_version_based_on_Debian_codename}}-fasttrack main contrib non-free' {{!}} sudo tee /etc/apt/sources.list.d/fasttrack.list
 }}
 
-'''3.''' Update the package lists again. <ref>
+'''3.''' Add Debian the <code>backports</code> repository. <ref>
+This is required because the Debian <code>fasttrack</code> repository depends on the Debian the <code>backports</code> repository.
+</ref>
+
+{{CodeSelect|code=
+echo 'deb https://deb.debian.org/debian {{Stable_project_version_based_on_Debian_codename}}-backports main contrib non-free' {{!}} sudo tee /etc/apt/sources.list.d/backports.list
+}}
+
+'''4.''' Update the package lists again. <ref>
 This is to acquire the Debian <code>fasttrack</code> repository package sources.
 </ref>
 
@@ -118,13 +126,13 @@ This is to acquire the Debian <code>fasttrack</code> repository package sources.
 sudo apt update
 }}
 
-'''4.''' Install VirtualBox and Linux kernel headers.
+'''5.''' Install VirtualBox and Linux kernel headers.
 
 {{CodeSelect|code=
-sudo apt install {{{virtualbox_package_debian}}} linux-headers-$(dpkg --print-architecture)
+sudo apt install --no-install-recommends {{{virtualbox_package_debian}}} linux-headers-$(dpkg --print-architecture)
 }}
 
-'''5.''' Add your current user to group <code>vboxusers</code>. <ref name=vboxusersgroupadd>
+'''6.''' Add your current user to group <code>vboxusers</code>. <ref name=vboxusersgroupadd>
 Optional: See: https://www.virtualbox.org/manual/ch02.html#install-linux-vboxusers
 
 Also spams <code>~/.config/VirtualBox/VBoxSVC.log</code> log if not done.
@@ -134,7 +142,7 @@ Also spams <code>~/.config/VirtualBox/VBoxSVC.log</code> log if not done.
 sudo adduser $(whoami) vboxusers
 }}
 
-'''6.''' Done.
+'''7.''' Done.
 
 The procedure of installing the VirtualBox host software is complete.
 }}
@@ -146,7 +154,8 @@ The procedure of installing the VirtualBox host software is complete.
 Instructions for {{Kicksecure}} are simpler than instructions for Debian. <ref>
 This is because by {{Kicksecure}} default:
 
-* The Debian fasttrack repository is already enabled.
+* The Debian <code>fasttrack</code> repository is already enabled.
+* The Debian <code>backports</code> repository is already enabled.
 * Kernel headers package "<code>linux-headers-$(dpkg --print-architecture)</code> is already installed.
 ** Debian feature request: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1022746 please provide linux-image-generic / linux-headers-generic]
 </ref>
@@ -164,7 +173,7 @@ sudo apt update
 '''3.''' Install VirtualBox and Linux kernel headers.
 
 {{CodeSelect|code=
-sudo apt install {{{virtualbox_package_debian}}}
+sudo apt install --no-install-recommends {{{virtualbox_package_debian}}}
 }}
 
 '''4.''' Add your current user to group <code>vboxusers</code>. <ref name=vboxusersgroupadd />
@@ -173,7 +182,7 @@ sudo apt install {{{virtualbox_package_debian}}}
 sudo adduser $(whoami) vboxusers
 }}
 
-'''6.''' Done.
+'''5.''' Done.
 
 The procedure of installing the VirtualBox host software is complete.
 }}
