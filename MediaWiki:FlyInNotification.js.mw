@@ -8,75 +8,31 @@ deferrable:YES -- This is basically a standalone gadget
 
 	// Settings
 
-	let currentCookieId = 1; // only increment integers
-	let waitInSeconds = 300; // integer
-
+	let waitInSeconds = 120; // integer
+	let cookieDays = 7; // Life span of dismiss cookie, after that notification will be shown again
+	let cookieName = 'flyInBannerIdDismissed';
+	
 	// Globals
-
-	let localCurrentCookieId;
-
-	// DOM
 
 	let panel = $('#fly-in-notification-panel');
 
-	let dataContent = panel.attr('data-content');
-	let content = dataContent ? dataContent.split('|') : ['','',''];
-	let contentDom = ( `
-		<div class="robots-nocontent">
-			<!--googleoff: index-->
-				<!--noindex-->
-					<div class="image"><img src="/w/images/0/0b/Grow-symbol.png" alt="grow symbol" /></div>
-					<div class="content">
-						<h4>${content[0]}</h4>
-						<p>
-							${content[1]}
-							<a href="/wiki/Donate" target="_blank">${content[2]}</a>
-						</p>
-					</div>
-				<!--/noindex-->
-			<!--googleon: index-->
-		</div>
-	`);
-
-	// Functions
-
-	function dismiss() {
-		if( currentCookieId == localCurrentCookieId ) return;
-
-		document.cookie = 'flyInBannerIdDismissed=' + currentCookieId
-			+ '; SameSite=Lax'
-			+ '; Expires=' + new Date((Date.now() + 1000 * 3600 * 24 * 365 )).toUTCString()
-			+ '; Path=/;';
-	}
-
-	function readLocal() {
-		let row = document.cookie.split('; ').find(row => row.startsWith('flyInBannerIdDismissed='));
-		if( row ) localCurrentCookieId = parseInt( row.split('=')[1] );
-	}
-
 	// Setup
-
+	
 	// If notification is disabled, stop here
-	if( panel.css('visibility') == 'hidden' ) return;
+	if( $.cookie( cookieName ) ) return;
 
-	readLocal();
-
-	if( dataContent && ( ! localCurrentCookieId || localCurrentCookieId != currentCookieId ) ) {
-		panel.children('.inner-wrapper').append( contentDom );
-		window.setTimeout( function() {
-			let w = panel.width();
-			panel.css({ width: 0, display: 'block' });
-			panel.animate({ width: w });
-		}, waitInSeconds * 1000 );
-	}
+	setTimeout( function() {
+		panel.css( 'display', 'block' );
+		let w = panel.width();
+		panel.find( '.inner-wrapper' ).css( 'width', w + 'px' );
+		panel.css( 'width', 0 ).animate({ width: w }, () => panel.css( 'width', '' ));
+	}, waitInSeconds * 1000 );
 
 	// Events
-
+	
 	panel.find('.close-panel').on( 'click', function() {
-		dismiss();
-		panel.animate({ width: 0 }, function() {
-			panel.css('display', 'none');
-		});
+		$.cookie( cookieName, 'true', { expires: cookieDays, path: '/' });
+		panel.animate( { width: 0 }, () => panel.css( { display: 'none', width: '' } ) );
 	});
 
 })();
