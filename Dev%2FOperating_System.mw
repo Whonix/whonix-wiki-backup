@@ -82,6 +82,12 @@ phone home issue (says closed but is unfixed):
 
 https://github.com/QubesOS/qubes-issues/issues/1814
 
+https://github.com/QubesOS/qubes-issues/issues/1919#issuecomment-691545936
+
+https://github.com/QubesOS/qubes-issues/issues/1919#issuecomment-689245921
+
+https://arstechnica.com/information-technology/2016/12/how-to-make-linux-more-trustworthy/
+
 ==== Qubes ====
 Implemented as [[{{q_project_name_short}}|{{q_project_name}}]].
 
@@ -451,6 +457,31 @@ Related:
 === Debian Security ===
 Debian isn't (a | the most) security-focused Linux distribution. Under some threat models, Debian is judged insecure. Issues with Debian then would have to be considered deeper than technical, i.e. architectural, organizational, ideological issues. To put it another way (a lot | many | most) (?) Debian Developers don't prioritize security over everything else readily compromising other things such as package availability, features, usability, etc. That shouldn't come to a surprise. Debian slogan is "the universal operating system". Not "attempting to be the most secure operating system" and therefore Debian didn't attract that mindset. Debian consists of mostly volunteers that need to attend to day jobs which might arguably not be the best for security either.
 
+=== Debian Signed Packages ===
+prerequisite knowledge:
+
+* https://blog.packagecloud.io/eng/2014/10/28/howto-gpg-sign-verify-deb-packages-apt-repositories/
+* http://unix.stackexchange.com/questions/285635/how-is-the-authenticity-of-debian-packages-guaranteed
+
+summary:
+
+* Debian build servers signs repository metadata.
+* Debian maintainers must sign their source packages. Otherwise uploads are automatically rejected.
+* Individual <code>.deb</code> packages are not signed by Debian maintainers.
+
+tools:
+
+* <code>debsign</code>: Signs the <code>.changes</code> before upload. Does not sign packages. Always used in Debian.
+* <code>debsig</code>: embeds signatures into <code>.deb</code> packages. Not commonly used.
+* <code>dpkg-sig</code>: embeds signatures into <code>.deb</code> packages. Not commonly used.
+
+[https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=762153 steps toward making dpkg-sig sign all packages]
+
+There was once a bounty [https://web.archive.org/web/20201214130930/https://github.com/Whonix/Whonix/issues/400 Build Debian Packages from Source Code] worth $ 3000 USD but no implementation was ever contributed.
+
+forum discussion:<br />
+https://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446
+
 === Why is {{project_name_long}} based on Debian Stable, not Debian Testing? ===
 * Sometimes severe bugs are introduced in Debian testing, such as the AppArmor [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=732578 bug], which prevented Tor from starting for everyone until a workaround was applied.
 * Sometimes bugs are introduced which break {{project_name_long}} build script, such as [https://web.archive.org/web/20220322233757/https://ml.grml.org/pipermail/grml/2014-January/011546.html this] bug related to mount, which breaks grml-debootstrap and therefore {{project_name_long}} build script or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=734794 this] kpartx bug.
@@ -496,6 +527,9 @@ https://forums.whonix.org/t/disable-newly-all-installed-services-by-default/9381
 * This is is non-exhaustive. What else?
 
 The following list is not sorted by any priorities or otherwise.
+
+* transactional upgrades (ostree)
+* easy table update?
 
 <div class="scroll-table">
 {| class="wikitable" style="background-color: #fff;text-align: center; .Systemd: red;"

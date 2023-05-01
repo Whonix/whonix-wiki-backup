@@ -54,7 +54,7 @@ deferrable:YES -- Because it's a gadget and is not a needed dependency
 	let modal = $(
 		`<div class="mini-modal" id="debug-via-url-modal">
 			<h2>Disable server cache for this browser</h2>
-			<span class="activate-nocache-cookie-for-server${ $.cookie && $.cookie( 'nocache' ) ? ' active' : '' }">Activate <b>nocache (true)</b> server cookie for my browser</span>
+			<span class="activate-nocache-cookie-for-server${ Cookies.get( 'nocache' ) ? ' active' : '' }">Activate <b>nocache (true)</b> server cookie for my browser</span>
 			<h2>Debug vis URL</h2>
 			<div class="code-select">${initialUrl}</div>
 			<a class="direct-link" target="_blank" href="${initialUrl}"></a>
@@ -133,8 +133,8 @@ deferrable:YES -- Because it's a gadget and is not a needed dependency
 	
 	modal.find('.activate-nocache-cookie-for-server').on( 'click', function() {
 		$(this).toggleClass('active');
-		if( $(this).hasClass('active') ) $.cookie( 'nocache', true, { expires: 365, path: '/' } );
-		else $.removeCookie('nocache', { path: '/' });
+		if( $(this).hasClass('active') ) Cookies.set( 'nocache', true, { expires: 365 } );
+		else Cookies.remove( 'nocache' );
 	});
 
 })();

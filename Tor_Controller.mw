@@ -1,15 +1,16 @@
 {{Header}}
 {{#seo:
-|description=Using a Tor Controller with {{project_name_long}}. Onion Circuits. Nyx. Vidalia. View or change your Tor circuits. Monitor Tor and inspect logs.
-|image=Screenshot_arm_page1_cropped.png
+|description=Using a Tor Controller with {{project_name_long}}. Onion Circuits. Nyx. View or change your Tor circuits. Monitor Tor and inspect logs.
+|image=onioncircuits.png
 }}
 {{Title|
 title=Control and Monitor Tor
 }}
-__FORCETOC__
 [[File:onioncircuits.png|onioncircuits - View Tor Circuits|thumb]]
-[[image:0brand_Arm_Controller-1.png|Nyx Tor Controller|thumb]]
-
+{{intro|
+Using a Tor Controller with {{project_name_long}}. Onion Circuits. Nyx. View or change your Tor circuits. Monitor Tor and inspect logs.
+}}
+[[File:0brand_Arm_Controller-1.png|Nyx Tor Controller|thumb]]
 = Introduction =
 
 [[#Nyx|nyx]] is the primary Tor Controller option that comes pre-installed in {{project_name_long}}.
@@ -132,6 +133,67 @@ Onion Circuits is a GTK+ application to display Tor circuits and streams. It all
 
 [https://packages.debian.org/{{Stable project version based on Debian codename}}/onioncircuits Onion Circuits] is installed by default, but is not a full Tor controller; only Tor circuits are shown. It can be launched from the start menu.
 
+= New Identity and Tor Circuits =
+
+The behavior of "New Identity" in the context of Tor Browser and <code>nyx</code> is often misunderstood. First of all, there are various ways to issue a "New Identity" (this list is not exhaustive):
+
+* [[Tor_Browser#New_Identity_Function|Tor Browser New Identity Function]]
+* [[#Nyx|nyx]]
+* [[#tor-ctrl|tor-ctrl]]
+* [[#netcat|netcat]]
+
+In all cases, the "New Identity" function sends the protocol command <code>SIGNAL newnym</code> to Tor's <code>ControlPort</code>.
+
+[[Tor Browser]]'s new identity function clears the browser state, closes tabs and obtains a fresh Tor circuit for future requests. <ref>
+https://blog.torproject.org/torbutton-141-released
+</ref>
+
+Other Tor controllers such as <code>nyx</code> run only <code>SIGNAL newnym</code>.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = '''Warning:''' The New Identity feature will ''likely'' create a new circuit with a different Tor exit relay and IP address, but this is not guaranteed.
+}}
+
+The impact of "signal newnym" on Tor circuit lifetimes is often misunderstood. "signal newnym" uses a fresh circuit for ''new'' connections. Sometimes Tor only replaces the middle relay while using the same Tor exit relay. This is by design and the Tor default. Further, "signal newnym" does not interfere with long-lived connections like an SSH or IRC connection.
+
+Interested readers can verify the effect of "signal newnym" as follows:
+
+# Open https://check.torproject.org in Tor Browser.
+# Issue "signal newnym" using [[#Nyx|nyx]].
+# Reload https://check.torproject.org.
+# In some cases it will still show the same IP address, probably because the browser did not close the connection to https://check.torproject.org in the first place.
+
+Now repeat this experiment with a small modification which should result in a new Tor exit IP address:
+
+# Open https://check.torproject.org in Tor Browser.
+# Issue "signal newnym" using [[#Nyx|nyx]].
+# Close Tor Browser, then restart it.
+# Open https://check.torproject.org again and a new Tor exit relay IP address is (likely) visible.
+
+== tor-ctrl ==
+[https://github.com/Kicksecure/tor-ctrl tor-ctrl] is installed by default.
+
+For example, to get a new circuit, run.
+
+{{CodeSelect|code=
+tor-ctrl signal NEWNYM
+}}
+
+The output should show:
+
+<pre>
+250 OK
+</pre>
+
+Repeat this command every time a new circuit is desired.
+
+See also:
+
+{{CodeSelect|code=
+man tor-ctrl
+}}
+
 = Alternatives =
 
 {{mbox
@@ -203,6 +265,7 @@ Will do nothing after this, but when you start using Tor (i.e. by running Tor Br
 
 
 == netcat ==
+netcat is no longer required. [[#tor-ctrl|tor-ctrl]] is recommended instead.
 
 netcat provides an easy way to send Tor protocol commands to Tor's <code>ControlPort</code> form inside {{project_name_workstation_long}}. Actually for security reasons to onion-grater, the [[Dev/onion-grater|Tor Control Protocol Filter Proxy]].
 
@@ -288,67 +351,6 @@ Should show something similar to.
   250-version=0.2.5.1-alpha-dev (git-245ecfff36c0cecc)
   250 OK
 </pre>
-
-= New Identity and Tor Circuits =
-
-The behavior of "New Identity" in the context of Tor Browser and <code>nyx</code> is often misunderstood. First of all, there are various ways to issue a "New Identity" (this list is not exhaustive):
-
-* [[Tor_Browser#New_Identity_Function|Tor Browser New Identity Function]]
-* [[#Nyx|nyx]]
-* [[#tor-ctrl|tor-ctrl]]
-* [[#netcat|netcat]]
-
-In all cases, the "New Identity" function sends the protocol command <code>SIGNAL newnym</code> to Tor's <code>ControlPort</code>.
-
-[[Tor Browser]]'s new identity function clears the browser state, closes tabs and obtains a fresh Tor circuit for future requests. <ref>
-https://blog.torproject.org/torbutton-141-released
-</ref>
-
-Other Tor controllers such as <code>nyx</code> run only <code>SIGNAL newnym</code>.
-
-{{mbox
-| image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    = '''Warning:''' The New Identity feature will ''likely'' create a new circuit with a different Tor exit relay and IP address, but this is not guaranteed.
-}}
-
-The impact of "signal newnym" on Tor circuit lifetimes is often misunderstood. "signal newnym" uses a fresh circuit for ''new'' connections. Sometimes Tor only replaces the middle relay while using the same Tor exit relay. This is by design and the Tor default. Further, "signal newnym" does not interfere with long-lived connections like an SSH or IRC connection.
-
-Interested readers can verify the effect of "signal newnym" as follows:
-
-# Open https://check.torproject.org in Tor Browser.
-# Issue "signal newnym" using [[#Nyx|nyx]].
-# Reload https://check.torproject.org.
-# In some cases it will still show the same IP address, probably because the browser did not close the connection to https://check.torproject.org in the first place.
-
-Now repeat this experiment with a small modification which should result in a new Tor exit IP address:
-
-# Open https://check.torproject.org in Tor Browser.
-# Issue "signal newnym" using [[#Nyx|nyx]].
-# Close Tor Browser, then restart it.
-# Open https://check.torproject.org again and a new Tor exit relay IP address is (likely) visible.
-
-== tor-ctrl ==
-[https://github.com/Kicksecure/tor-ctrl tor-ctrl] is installed by default.
-
-For example, to get a new circuit, run.
-
-{{CodeSelect|code=
-tor-ctrl signal NEWNYM
-}}
-
-The output should show:
-
-<pre>
-250 OK
-</pre>
-
-Repeat this command every time a new circuit is desired.
-
-See also:
-
-{{CodeSelect|code=
-man tor-ctrl
-}}
 
 = Deprecated =
 

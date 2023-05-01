@@ -16,6 +16,7 @@ deferrable:YES -- This is a standalone gadget / augmentation
 		if( action != 'init' ) return;
 		
 		$(this).each( function() {
+			
 			// Prevent double initialization
 			if( $(this).hasClass('js-fully-loaded') ) return;
 			
@@ -24,35 +25,66 @@ deferrable:YES -- This is a standalone gadget / augmentation
 			
 			// Setup
 
-			let tc = $(this);
-			tc.append( '<div class="mininav"><ul></ul></div><div class="content"></div>' );
+			let tcid = $(this).attr( 'data-tcc-id' );
+
+			let tc = $();
 			
-			tc.children('.content').append( $('[data-tcc-id=' + tc.attr('data-tcc-id') + ']:not(.tab-content-controller') );
+			// Traversing possibly multiple linked controllers with the same ID and their content
 			
-			let tablist = tc.find('.mininav > ul');
-			
-			function chooseTab( tab, content ) {
-				tablist.find('li > *').removeClass('active');
-				tab.children().addClass('active');
-				tc.children('.content').children().removeClass('active');
-				content.addClass('active');
-			}
-			
-			// If no element is active make the first one active
-			if( ! tc.children('.content').children().hasClass('active') ) chooseTab( tablist.find('li > *').eq(0), tc.children('.content').children().eq(0) );
-			
-			tc.children('.content').children().each( function() {
-				let content = $(this);
-				let tab = $('<li><span></span></li>');
-				tablist.append( tab );
-				tab.children().eq(0).text( content.attr('data-tcc-title') );
-				if( content.hasClass('active') ) tab.children().addClass('active');
-				if( content.attr('data-tcc-image') ) tab.children().prepend( '<img class="pos-1px-up" src="' + content.attr('data-tcc-image') + '">');
-				
-				tab.click( function() { chooseTab( $(this), content ); });
+			$(`[data-tcc-id="${tcid}"]`).each( function() {
+				let $this = $(this);
+				if( $this.hasClass('tab-content-controller') ) {
+					$this.append( '<div class="mininav"><ul></ul></div><div class="content"></div>' );
+					tc = tc.add( $this );
+				}
+				else if( tc.length > 0 ) {
+					tc.last().children('.content').append( $(this) );
+				}
 			});
 			
-			tc.addClass('js-fully-loaded');
+			// Traversing possibly multiple linked controllers individually
+			
+			$(`.tab-content-controller[data-tcc-id="${tcid}"]`).each( function() {
+				if( $(this).hasClass('tcc-dark') ) $(this).children('.mininav').addClass('mn-dark');
+				
+				let tablist = $(this).find('.mininav > ul');
+				
+				$(this).children('.content').children().each( function() {
+					let content = $(this);
+					let contentTitle = content.attr('data-tcc-title');
+					let tab = $( '<li><span></span></li>' );
+					if( content.attr('data-tcc-url') ) tab = $( `<li class="is-link"><a href="${content.attr('data-tcc-url')}"></a></li>` );
+					let tabchild = tab.children();
+
+					let contentId = 'id-' + Math.random().toString().substr(2);
+					let existingContent = $(`[data-tcc-id="${tcid}"][data-tcc-title="${contentTitle}"][data-tcc-contentId]`);
+					if( existingContent.length > 0 ) contentId = existingContent.eq(0).attr('data-tcc-contentId');
+					tabchild.attr( 'data-tcc-contentId', contentId );
+					content.attr( 'data-tcc-contentId', contentId );
+
+					tablist.append( tab );
+					tabchild.text( contentTitle );
+					if( content.hasClass('active') ) tabchild.addClass('active');
+					if( content.attr('data-tcc-image') ) tabchild.prepend( '<img class="pos-1px-up" src="' + content.attr('data-tcc-image') + '">');
+					
+					// Event : Click
+					if( ! content.attr('data-tcc-url') ) tab.on( 'click', () => chooseTab( tabchild.attr('data-tcc-contentId') ) );
+				});
+				
+				// If no element is active make the first one active that is not a link
+				if( ! $(this).children('.content').children().hasClass('active') ) {
+					chooseTab( tablist.find('li:not(.is-link)').eq(0).children().attr('data-tcc-contentId') );
+				}
+				
+				$(this).addClass('js-fully-loaded');
+			});
+			
+			function chooseTab( contentId ) {
+				tc.find('> .mininav > ul > li > *').removeClass('active');
+				tc.children('.content').children().removeClass('active');
+				tc.find(`[data-tcc-contentId="${contentId}"]`).addClass('active');
+			}
+
 		});
 		
 	};
@@ -62,8 +94,6 @@ deferrable:YES -- This is a standalone gadget / augmentation
 	$('.tab-content-controller[data-tcc-id]').tabContentController('init');
 	
 })();
-
-
 
 /*
 [[Category:MultiWiki]]

@@ -44,11 +44,11 @@ deferrable:YES -- This is just an augmentation
 
 			let highestLevel = $(this).attr('data-level');
 			
-			$('body').removeClass( cookieName + '_' + $.cookie( cookieName ) );
+			$('body').removeClass( cookieName + '_' + Cookies.get( cookieName ) );
 			if( highestLevel == 'all' ) {
-				$.removeCookie( cookieName );
+				Cookies.remove( cookieName );
 			} else {
-				$.cookie( cookieName, highestLevel );
+				Cookies.set( cookieName, highestLevel );
 				$( 'body' ).addClass( cookieName + '_' + highestLevel );
 			}
 
@@ -98,7 +98,7 @@ deferrable:YES -- This is just an augmentation
 		
 		// Execute at startup
 
-		let cookieValue = $.cookie( cookieName );
+		let cookieValue = Cookies.get( cookieName );
 		if( cookieValue ) $( `#toc-level-switcher > span[data-level=${ cookieValue }]` )[0].click();
 
 	}

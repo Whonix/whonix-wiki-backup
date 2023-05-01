@@ -640,7 +640,7 @@ Quote [https://gitweb.torproject.org/tor-browser-spec.git/tree/proposals/100-oni
    help those websites and also pave the way forward for future auto-redirect
 techniques.</blockquote></ref>
 
-For security improvement it might help to force connections to onions for websites that are reachable over clearnet and onion. This is currently only documented for [[Forcing .onion on Project]] but [[Unsupported|undocumented]] for arbitrary websites. Doing so would be possible as per [[Support#Free_Support_Principle|Free Support Principle]].
+For security improvement it might help to force connections to onions for websites that are reachable over clearnet and onion. This is currently only documented for [[Forcing .onion on Project]] but [[Unsupported|undocumented]] for arbitrary websites. Doing so would be possible as per [[Self_Support_First_Policy|Self Support First Policy]].
 
 == Onion Client Authorization ==
 There are two options to setup Onion Service Client Authentication. Chose <u>either</u> option '''A)''' <u>or</u> '''B)'''.
@@ -1481,9 +1481,9 @@ https://www.mail-archive.com/qubes-users@googlegroups.com/msg29573.html
 
 As noted in the [[#Tor Browser Bundle versus {{project_name_long}} Tor Browser|{{project_name_long}} Tor Browser Differences]] entry, {{project_name_long}} does <u>not</u>:
 
-* change Tor Browser's internal updater checking mechanism;
-* change or remove proxy settings by default; or
-* modify Tor Browser's startup script, default settings and so on.
+* Apply file system level changes to the Tor Browser folder. In other words, there are no modifications of any files inside Tor Browser's data folder. Files such as startup script, default settings and so on are untouched.
+* Change Tor Browser's internal updater checking mechanism;
+* Change or remove proxy settings by default; or
 
 In fact, the NoScript URL bar change was a conscious decision by Tor developers which became part of a recent release: <ref>
 [https://gitlab.torproject.org/legacy/trac/-/issues/30600 Tor Bug 30600: Restore NoScript control widget icon to the Tor Browser toolbar]
@@ -1511,10 +1511,11 @@ The main {{project_name_long}} Tor Browser differences can be summarized as foll
 https://gitlab.torproject.org/legacy/trac/-/issues/19652
 </ref>
 
-* Environmental variable adjustments. <ref>
+* All changes are done through global environmental variable adjustments. <ref>
 * [https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/etc/X11/Xsession.d/20torbrowser <code>/etc/X11/Xsession.d/20torbrowser</code>]
 * [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh <code>/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh</code>]
-</ref> Despite environmental variable adjustments, the network and browser fingerprint remain the same.
+</ref>
+* Despite environmental variable adjustments, the network and browser fingerprint remain the same.
 * [[Tor_Browser/Advanced_Users#tor-launcher|tor-launcher]] (Tor connection wizard) will not be shown in {{project_name_workstation_long}} Tor Browser. Instead, [[Anon Connection Wizard]] is available in {{project_name_gateway_long}}.
 * The Tor Circuit View and Open Network Settings functions have been [[Tor_Browser/Advanced_Users#Disabled_Tor_Browser_Functions|disabled]]. The former is [[unsupported]] for security reasons, <ref>This is so {{project_name_workstation_long}} does not have access to the information about which Tor middle relay or Tor entry guard or [[Bridges]] are in use. See also: [[Dev/onion-grater#Indicator_for_current_Circuit_Status_and_Exit_IP|Indicator for current Circuit Status and Exit IP]].</ref> while the latter would have no effect since Tor must be configured in {{project_name_gateway_long}}.
 * The default landing page after Tor Browser starts is set to a local {{project_name_long}} resource through an environment variable. <ref>
@@ -1530,8 +1531,10 @@ https://gitlab.torproject.org/legacy/trac/-/issues/19652
 
 {{project_name_long}} <u>does not</u>:
 
-* Change Tor Browser's [[#Tor_Browser_Internal_Updater|Internal Updater checking mechanism]].
-* Modify Tor Browser's startup script, default settings and so on. <ref>In {{project_name_workstation_long}}, [https://github.com/Whonix/anon-ws-disable-stacked-tor anon-ws-disable-stacked-tor] listens on {{Code2|127.0.0.1}} {{Code2|9150}} and {{Code2|9151}} (Tor Browser's default ports) and forwards them to {{project_name_gateway_long}} {{Code2|10.152.152.10 9150}} (where a Tor SocksPort is listening) and {{Code2|9151}} (where [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] is listening). Tor does not get started by the {{Code2|[https://gitweb.torproject.org/tor-launcher.git tor-launcher]}} Firefox add-on because the {{Code2|[https://gitlab.torproject.org/legacy/trac/-/issues/6009 TOR_SKIP_LAUNCH]}} environment variable has been set set to {{Code2|1}}. See also: [[Dev/anon-ws-disable-stacked-tor]].</ref>
+* Apply file system level changes to the Tor Browser folder. In other words, there are no modifications of any files inside Tor Browser's data folder. Files such as startup script, default settings and so on are untouched.; <ref>
+In {{project_name_workstation_long}}, [https://github.com/Whonix/anon-ws-disable-stacked-tor anon-ws-disable-stacked-tor] listens on {{Code2|127.0.0.1}} {{Code2|9150}} and {{Code2|9151}} (Tor Browser's default ports) and forwards them to {{project_name_gateway_long}} {{Code2|10.152.152.10 9150}} (where a Tor SocksPort is listening) and {{Code2|9151}} (where [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] is listening). Tor does not get started by the {{Code2|[https://gitweb.torproject.org/tor-launcher.git tor-launcher]}} Firefox add-on because the {{Code2|[https://gitlab.torproject.org/legacy/trac/-/issues/6009 TOR_SKIP_LAUNCH]}} environment variable has been set set to {{Code2|1}}. See also: [[Dev/anon-ws-disable-stacked-tor]].
+</ref>
+* Change Tor Browser's [[#Tor_Browser_Internal_Updater|Internal Updater checking mechanism]];
 * [[Tor_Browser/Advanced_Users#Proxy_Settings|Change or remove proxy settings]] by default.
 
 == Tor Browser Functionality on Different Platforms ==
