@@ -12,6 +12,15 @@ deferrable:YES -- This is basically a standalone gadget
 	let cookieDays = 7; // Life span of dismiss cookie, after that notification will be shown again
 	let cookieName = 'flyInBannerIdDismissed';
 	
+	// Only for testing purposes on /wiki/TestpageForFlyInNotification
+	if( $('body').hasClass('page-TestpageForFlyInNotification') ) {
+		let altData = (varname,originalValue) => $('.fly-in-notification-data').attr("data-"+varname.toLowerCase()) || originalValue;
+		waitInSeconds = parseInt( altData( 'waitInSeconds', waitInSeconds ) );
+		cookieDays = parseInt( altData( 'cookieDays', cookieDays ) );
+		cookieName = altData( 'cookieName', cookieName );
+		console.info(waitInSeconds,cookieDays,cookieName)
+	}
+	
 	// Globals
 
 	let panel = $('#fly-in-notification-panel');
@@ -31,7 +40,7 @@ deferrable:YES -- This is basically a standalone gadget
 	// Events
 	
 	panel.find('.close-panel').on( 'click', function() {
-		Cookies.set( cookieName, { expires: cookieDays } );
+		Cookies.set( cookieName, true, { expires: cookieDays, sameSite: 'strict' } );
 		panel.animate( { width: 0 }, () => panel.css( { display: 'none', width: '' } ) );
 	});
 

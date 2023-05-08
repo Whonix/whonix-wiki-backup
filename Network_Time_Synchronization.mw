@@ -4,7 +4,9 @@
 |image=TineSynchronization2134234.jpg
 }}
 [[image:TineSynchronization2134234.jpg|thumb]]
-
+{{intro|
+A reasonably accurate host clock is required for many general security properties. An inaccurate clock can lead to broken internet connectivity and time related security issues.
+}}
 = Introduction =
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
@@ -23,16 +25,158 @@ Due to invalid (not yet or no longer valid) TLS certificates.
 
 Follow the platform-specific recommendations below to avoid Tor connectivity problems and to limit possible adverse anonymity impacts.
 
+= Host Clock =
+
+Your computer's host clock must have an accuracy of at least ±30 minutes, ideally better. Otherwise, connectivity can be broken. A minutes range of accuracy is more than enough for {{project name long}}. No need for seconds or let alone nanoseconds accuracy resolution.
+
+* '''Prerequisite knowledge:''' time formats, 12 hours AM/PM, 24 hours format, timezones. (Common knowledge. Not specific to computers.)
+* '''Generic task:''' Check your computer's time and make sure it is reasonably correct.
+* '''Operating system specific.'''
+
+{{Tab
+|type=controller
+|addToClass=tcc-indent
+|id=host-clock-setting
+}}
+{{Tab
+|addToClass=margin-top-20 active
+|id=host-clock-setting
+|title=Linux
+|image=/w/images/thumb/d/d9/Logo-linux-variety-500x500.png/60px-Logo-linux-variety-500x500.png
+|content=
+'''1.''' Host timezone.
+
+The host timezone can stay as is. There is no need at all to change the host timezone for the sake of a functional {{project name long}} connectivity.
+
+'''2''' Notice.
+
+This is [[Unspecific|unspecific to {{project name long}}]]. This wiki chapter is only about making sure the host clock is reasonably correct. There is no need to specifically follow these steps, unless difficulties are being experienced.
+
+In case of issues, contact the support of your host operating system.
+
+'''3.''' Find out the time in UTC.
+
+Any website or device can be used.
+
+'''4.''' Show the current system time in UTC using GNU <code>date</code>.
+
+This is useful:
+
+* To find out the current system time of your computer in UTC timezone format.
+* To learn the text output format of GNU <code>date</code>.
+
+{{CodeSelect|code=
+date --utc
+}}
+
+Sample output:
+
+<pre>
+Fri 05 May 2023 08:10:30 AM UTC
+</pre>
+
+'''5.''' Fix the clock, if necessary.
+
+Choose either option '''A)''' <u>or</u> '''B)'''.
+
+<u>NOTE:</u> For the following command, use the current time. Adjust the time to the actual time. Do not use the example time used below.
+
+* '''A)''' Using any method supported by your host operating system.
+* '''B)''' Using command line with GNU <code>date</code>: {{CodeSelect|code=
+sudo date --utc --set "Fri 05 May 2023 11:30:50 AM UTC"
+}}
+
+'''6.''' Update the hardware clock.
+
+{{CodeSelect|code=
+sudo hwclock --utc --systohc
+}}
+
+(<code>--systohc</code> stands for system to hardware clock.)
+
+'''7.''' Show the current system time in UTC using GNU <code>date</code>.
+
+{{CodeSelect|code=
+date --utc
+}}
+
+'''8.''' Compare the system clock with the hardware clock.
+
+Time formats might be different, but the time should be the same or very similar.
+
+{{CodeSelect|code=
+sudo date --utc && sudo hwclock --utc
+}}
+
+'''9.''' Reboot.
+
+Optional.
+
+Reboot and recheck if the clock is correct. Usually should be. Only in rare cases of broken hardware clocks, the time might be wrong.
+
+'''9.''' Done.
+
+The process of correcting the host clock has been completed.
+}}
+
+{{Tab
+|addToClass=margin-top-20
+|id=host-clock-setting
+|title=Qubes
+|image=/w/images/5/55/Qubes-logo-icon.png
+|content=
+<u>Related Qubes upstream bugs:</u>
+
+* [https://github.com/QubesOS/qubes-issues/issues/8173 Qubes dom0 clock fix difficult, ClockVM does not fix its own clock]
+
+<u>Instructions:</u>
+
+'''1.''' [[Unspecific|Unspecific to {{project name long}}]]. [[Undocumented]].
+
+'''2.''' Same instructions as under the 'Linux' tab can be used.
+
+'''3.''' Use [https://www.qubes-os.org/support/ Qubes support].
+
+'''4.''' Done.
+}}
+
+{{Tab
+|addToClass=margin-top-20
+|id=host-clock-setting
+|title=Windows
+|image=/w/images/thumb/d/dc/Logo-windows-500x500.png/25px-Logo-windows-500x500.png
+|content=
+[[Unspecific|Unspecific to {{project name long}}]]. [[Undocumented]].
+
+Contact the support of your host operating system.
+}}
+
 = All Platforms =
 To protect against time zone leaks, the system clock inside {{project_name_long}} is set to UTC. This means it may be a few hours before or ahead of your host system clock. <u>Do not change this setting!</u>
 
-If the host clock (in UTC! <ref>
-To view the system time in UTC on Linux platforms, run.
+'''If''' the host clock (in UTC! <ref>
+To view the system time in UTC on Linux platforms, run:
+
 {{CodeSelect|code=
 date --utc
 }}
 </ref> <ref>
-TODO: [https://phabricator.whonix.org/T71 Show desktop clock in local time; keep system in UTC]</ref>) is more than 1 hour in the past or more than 3 hours in the future, Tor cannot connect. In this case, manually fix the host clock by right-clicking on it, and also check for an empty battery. Then, power off and power on the {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) and Tor should be able to reconnect.
+TODO: [https://phabricator.whonix.org/T71 Show desktop clock in local time; keep system in UTC]
+</ref>) <u>is more than 1 hour in the past or more than 3 hours in the future</u>, '''Tor cannot connect'''. <u>In this case,</u>
+
+'''1.''' Manually fix the host clock by right-clicking on it,
+
+See detailed instructions [[#Host_Clock|Host Clock]],
+
+'''2.''' and also check for an empty battery. Then,
+
+'''3.''' power off and
+
+'''4.''' power on the {{project_name_gateway_long}} and
+
+'''5.''' done.
+
+Tor should be able to reconnect.
 
 = Clock Accuracy =
 A number of things influences clock accuracy inside {{project name long}} VMs.
@@ -113,7 +257,7 @@ The first step should be completed on the host to ensure the host clock is set t
 '''1.''' On the host ([[{{q_project_name_short}}|{{q_project_name}}]]: <code>dom0</code>), run the following command to report the time in UTC.
 
 {{CodeSelect|code=
-date -u
+date --utc
 }}
 
 The output should be similar to the following. <ref>

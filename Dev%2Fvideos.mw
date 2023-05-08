@@ -1,7 +1,15 @@
 {{Header}}
 {{#seo:
 |description=Video Drafts for {{project name long}}
-}} {{#css:
+}}
+<div class="mininav">
+* [[Image:Kicksecure-text-logo.svg|100px|link=https://www.kicksecure.com/wiki/Dev/videos|Kicksecure Video Drafts]]
+* [[Image:Whonix-logo-text.svg|100px|link=Dev/videos|Whonix Video Drafts]]
+</div>
+{{intro|
+Video Drafts for {{project name long}}
+}}
+{{#css:
 .mw-collapsible {
  background-color: white;
 }
@@ -11,6 +19,8 @@
  font-weight: normal !important;
 }
 }}
+== Upstream ==
+{{upstream_wiki}}
 
 = Open Drafts =
 '''What does Open Drafts mean?''' - These are scripts for videos which have not been produced yet. Therefore any feedback (edit suggestions) are more likely to make it in the video which is due to be produced soon.
@@ -20,6 +30,81 @@ There may be some inaccuracies in the Open Drafts.
 Open Drafts should not be considered [[Documentation]] or factual statements until finalized.
 
 {{stub}}
+
+== Kloak ==
+
+=== Problem ===
+Being anonymous on the internet is not easy, there are many way to fingerprint
+web users.  Today we will cover web fingerprinting via keystroke biometrics
+and defenses against this sort of attack.
+
+Your typing manner is unique to you, it shows:
+* Keystroke rhythm, typing speed
+* Keystroke duration until a key is released
+* The duration pauses between keystrokes
+* Most common errors
+* Whether you are likely right or left-handed
+* Rapidity of letter sequencing, indicating user's likely native language
+* Keyboard layout
+
+The way you type is one of the fingerprints you leave on the internet when
+using online platforms. This print you leave can be a way to track you.
+
+With the rise of web applications over local applications, you have to interact
+with a Browser, to fill a form, write an e-mail. Those actions were not common
+to be made in a browser in the past, so the attack surface was smaller. If you
+are using browser based e-mail, you are typing to a web interface that responds
+to your inputs immediately to provide you with features such as word suggestion,
+but might be used to identify you.
+
+=== Poor-man solution ===
+You can circumvent keystroke fingerprinting by not using the web interface for
+typing, use a text editor, preferably on a offline machine. This is rather
+inconvenient, as you will need to paste back the text to the web interface
+later on.
+
+=== Kloak ===
+Whonix provides Kloak, a Keystroke-level online anonymization kernel, its
+primary objective: obfuscate typing behavior at the device level. Kloak is a
+cloak for your typing behavior.
+
+Kloak is a privacy tool that makes keystroke biometrics less effective. This
+is accomplished by obfuscating the time intervals between key press and
+release events, which are typically used for identification.
+
+Kloak obfuscate key press and release events time intervals by introducing a
+random delay between the physical key events and the arrival of key events at
+the application, for example, a web browser.
+
+==== Technical explanation ====
+Kloak grabs the input device and writes delayed key events to the output
+device. Grabbing the device disables any other application from reading the
+events. Events are scheduled to be released in a separate thread, where a
+random delay is introduced before they are written to a user-level input device
+
+==== What Kloak is not ====
+Kloak does not protect against all forms of keystroke biometrics that can be
+used for identification:
+* If the user sets Kloak delay option too small, Kloak is not effective
+* Key press repetition when keys are held down are not obfuscated. If your system has a unique rate, it may be used to identify you
+* Writing style (stylometry) is still apparent
+* Mouse movement, editing style.
+
+==== Demonstration ====
+[Kloak demo](https://github.com/vmonaco/kloak#try-it-out)
+
+Now, to the part you have been waiting for, the demonstration.
+
+Navigate to a keystroke biometrics analysis platform such as
+[keytract.net](https://www.keytract.net/en/tryout).
+
+We will be using three testing methods:
+* Train without Kloak, test without Kloak
+* Train without Kloak, test with Kloak
+* Train with Kloak, test with Kloak
+
+TODO: Find key tracking site as the one mentioned above is down (2023-05-01).
+
 
 = Finalized Drafts =
 '''What does Finalized Drafts mean?''' - These drafts are not very useful to modify because the video has already been produced, pending upload. Unless there are critical issues, no changes will be recorded.
