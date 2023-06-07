@@ -260,11 +260,11 @@ Performance is markedly degraded on 3rd generation Intel CPUs as reported by a u
 In order to be able to manage virtual machines as a regular (non-root) user, that user must be added to the <code>libvirt</code> and the <code>kvm</code> groups. The following command will work in Debian and assumes the simple scenario whereby KVM will be utilized with the current logged in user. For older Ubuntu versions, note that the group names vary and ''libvirt'' may be called ''libvirtd'' instead. For Ubuntu 20.04, ''libvirt'' works.
 
 {{CodeSelect|code=
-sudo addgroup "$(whoami)" libvirt
+sudo adduser "$(whoami)" libvirt
 }}
 
 {{CodeSelect|code=
-sudo addgroup "$(whoami)" kvm
+sudo adduser "$(whoami)" kvm
 }}
 
 Equivalent commands for Arch:
@@ -1016,8 +1016,14 @@ The thumbdrive should be automatically seen in the guest only.
 == Editing an Imported Machine's XML Configuration ==
 Choose either option '''A)''' <u>or</u> '''B)'''.
 
-{{Tab|type=controller|id=xml-edit}}
-{{Tab|id=xml-edit|title=A) With an Editor|addToClass=info-box active|content=
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= === A) With an Editor ===
+|active=true
+|addToClass=info-box
+|content=
 '''1.''' Choose your favorite editor.
 
 Optional.
@@ -1032,33 +1038,45 @@ export VISUAL=kwrite
 
 Use the <code>virsh</code> command to open the configuration file.
 
-{{Tab|type=controller|id=edit-xml-vm-type}}
-{{Tab|id=edit-xml-vm-type|title={{project_name_gateway_short}}|addToClass=info-box active|content=
+{{Tab
+|type=controller
+|content=
+{{Tab
+|active=true
+|title= ==== {{project_name_gateway_short}} ====
+|addToClass=info-box
+|content=
 {{CodeSelect|code=
 sudo -E virsh -c qemu:///system edit {{project_name_gateway_short}}
 }}
-}}<!-- edit-xml-vm-type -->
-
-{{Tab|id=edit-xml-vm-type|title={{project_name_workstation_short}}|addToClass=info-box|content=
+}}<!-- close tab: gateway -->
+{{Tab
+|title= ==== {{project_name_workstation_short}} ====
+|addToClass=info-box
+|content=
 {{CodeSelect|code=
 sudo -E virsh -c qemu:///system edit {{project_name_workstation_short}}
 }}
-}}<!-- edit-xml-vm-type -->
+}}<!-- close tab : workstation -->
+}} <!-- close controller : edit-xml-vm-type -->
 
 '''3.''' Save.
 
 '''4.''' Done.
 
 Editing an Imported Machine's XML Configuration has been completed.
-}}<!-- xml-edit -->
-
-{{Tab|id=xml-edit|title=B) Using virt-manager|addToClass=info-box|content=
+}}<!-- close tab : A xml-edit -->
+{{Tab
+|title= === B) Using virt-manager ===
+|addToClass=info-box
+|content=
 In more recent versions of virt-manager, there is a second way available:
 
 <code>Virtual Machine Manager</code> -> <code>Edit</code> -> <code>Preferences</code> -> <code>General</code> -> <code>Enable XML Editing</code>
 
 Under the <code>Details</code> view for a VM, a new XML tab in the GUI is visible, allowing editing and saving directly from the VM viewer.
-}}
+}} <!-- close tab : B virt manager -->
+}} <!-- close controller : xml-edit -->
 
 == Enable Microphone Input ==
 

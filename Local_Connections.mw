@@ -1,0 +1,47 @@
+{{Header}}
+{{#seo:
+|description=Connect to Localhost from inside {{project name workstation long}}. This might be useful for the use case of Hosting Location Hidden Services and Onion Services.
+|image=local
+}}
+<div class="mininav">
+* [[Local Connections|Local Connections]]
+* [[Access_Local_Network_or_Host_or_Clearnet_Internet_from_VM|Access Local Network, Host or Clearnet Internet from VM]]
+</div>
+{{intro|
+This wiki page documents how to connect to localhost from inside {{project name workstation long}}. This might be useful for the use case of [[Hosting Location Hidden Services]] and [[Onion Services]].
+}}
+= Local Connections =
+Local connections are often dysfunctional default. ([[#Why|Why?]])
+
+* [[Tor Browser]] cannot connect to localhost by default.
+** See chapter [[Tor_Browser#Local_Connections|Local Connections]] on how to accomplish connections to localhost.
+** How to connect to <code>10.152.152.11</code> ({{project name workstation long}} default internal IP address) using Tor Browser is [[undocumented]], however [[unspecific]] to {{project name long}} and should be researched as per [[Reporting_Bugs#Generic_Bug_Reproduction|Generic Bug Reproduction]]. This is because {{project name long}} does not develop Tor Browser. Upstream, The Tor Project does.
+** If connecting to your very own server running in your own VM which is completely self-hosted, since there is no risk of browser fingerprinting, an easy workaround would be to use a browser other than Tor Browser such as for example [[Chromium]].
+* <code>curl</code>, <code>scurl</code>, <code>wget</code> might not be able to connect to localhost by default.
+** This is because these are wrapped by <code>uwt</code> by default for the purpose of [[Stream_Isolation/Easy|stream isolation]]. See [[Stream_Isolation#Deactivate uwt Stream Isolation Wrapper|Deactivate uwt Stream Isolation Wrapper]].
+** This is possibly no longer required thanks to the {{project_name_long}} default [https://github.com/Whonix/uwt/blob/master/etc/tor/torsocks.conf.anondist <code>/etc/tor/torsocks.conf</code>] configuration file which sets <code>AllowOutboundLocalhost 1</code>. <ref>
+
+<pre>
+# Set Torsocks to allow outbound connections to the loopback interface.
+# If set to 1, connect() will be allowed to be used to the loopback interface
+# bypassing Tor. If set to 2, in addition to TCP connect(), UDP operations to
+# the loopback interface will also be allowed, bypassing Tor. This option
+# should not be used by most users. (Default: 0)
+AllowOutboundLocalhost 1
+</pre>
+</ref>
+* [[Whonix-Workstation_Firewall|Whonix-Workstation Firewall]] might be interfering.
+** If that is suspected, consider (temporarily) disabling it. For higher security, this could be done while offline and inside a dedicated VM using for testing purposes only.
+
+= Why =
+Local connections are often dysfunctional default, because:
+
+* most applications installed by default are pre-configured from a client (not server) perspective.
+* These are pre-configured for [[Stream Isolation]].
+
+= References =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

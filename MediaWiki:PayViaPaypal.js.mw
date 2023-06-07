@@ -152,9 +152,11 @@ deferrable:YES -- This script needs a little bit to load anyways
 	
 			root.find('.interval span').on('click', function() {
 				if( ! root.hasClass('interval-selected') ) {
+					let amountEl = root.find('.amount');
+					let heightBefore = amountEl.outerHeight();
 					root.addClass('interval-selected');
-					let h = root.find('.amount').outerHeight();
-					root.find('.amount').css( 'height', 0 ).animate( { height: h + 'px' }, 200, function() { $(this).css( 'height', '' ) } );
+					let heightAfter = amountEl.outerHeight();
+					amountEl.css( 'height', heightBefore ).animate( { height: heightAfter + 'px' }, 200, () => amountEl.css( 'height', '' ) );
 				}
 				
 				let t = $(this).text();
@@ -192,7 +194,7 @@ deferrable:YES -- This script needs a little bit to load anyways
 				root.removeClass('paypal-interval-error');
 			});
 	
-			form.on( 'submit', function(event) {
+			form.on( 'submit', function() {
 				if( ! inputCmd.val() ) {
 					root.addClass('paypal-interval-error');
 					return false;
@@ -214,12 +216,7 @@ deferrable:YES -- This script needs a little bit to load anyways
 			root.find('.amount .error .min').text( standards.minimumDollars );
 	
 			root.addClass('js-fully-loaded');
-	
-			if( root.hasClass('smooth') ) {
-				root.css({ height: 0, overflow: 'hidden' });
-				root.animate( { height: root.prop('scrollHeight') }, function() { root.css({ overflow: '', height: '' }); });
-			}
-	
+			root.animate( { opacity: 1 } );
 		});
 		
 	};

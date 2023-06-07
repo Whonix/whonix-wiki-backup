@@ -49,8 +49,9 @@ EDITORS NOTE: The following host preparation text is duplicated on 3 pages.
 When making changes here, please consider also making changes there.
 (Not using a template, because it would probably require a version specific template.)
 -->
-{{Expand_or_Collapse_All}}
 == Host Preparation Notices ==
+{{Expand_or_Collapse_All}}
+<div class="toccolours mw-collapsible mw-collapsed">
 * <u>operating system:</u> You need to build on '''Debian''' <u><code>{{Stable project version based on Debian codename}}</code></u>, such as {{project_name_workstation_long}} <code>{{VersionShort}}</code> or a Debian <code>{{Stable project version based on Debian codename}}</code> VM.
 * <u>disk space:</u> You need ~ <code>30</code> GB free disk space.
 * <u>RAM:</u> You need ~ <code>4</code> GB free RAM.
@@ -59,26 +60,30 @@ When making changes here, please consider also making changes there.
 * <u>linux user account:</u> Do not build under user <code>root</code>. Login regular as user <code>user</code>. Do not use <code>sudo</code> to run <code>derivative-maker</code> because this is handled by the build script.
 * <u>build place notice:</u> You cannot build on {{project_name_gateway_long}} (due to networking issues).
 * <u>build logs:</u> Build logs: If using a GUI (graphical user interface) it is recommended to set your terminal (for example <code>xfce4-terminal</code>) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
-* <u>private files in source code warning:</u> Do not add private files to {{project_name_long}} source code folder! [...]
+<div class="mw-collapsible-content">
+...
+</div>
+</div>
 <div class="toccolours mw-collapsible mw-collapsed">
+* <u>private files in source code warning:</u> Do not add private files to {{project_name_long}} source code folder! [...]
 <div class="mw-collapsible-content">
 Unless you know what you are doing. Technically, it would work. This is recommended against. Those files would get managed by the respective package. When you later update {{project_name_long}} debian packages, your files would get deleted by the package manager. Also adding private files to {{project_name_long}} source code folder, later contributing to {{project_name_long}} development and accidentally pushing the wrong git branch would be a disaster. Better add your private files to {{project_name_long}} after building {{project_name_long}}. Or add a custom build step adding your files, which then get copied from a folder outside of {{project_name_long}} source folder. See "Source Code Changes" in "Optional Build Configuration" below.
 </div>
 </div>
-* <u>Exiting VMs name collision warning:</u> Make sure there aren't any VMs in VirtualBox (inside your build machine) already called {{project_name_gateway_long}} or {{project_name_workstation_long}}!
 <div class="toccolours mw-collapsible mw-collapsed">
+* <u>Exiting VMs name collision warning:</u> Make sure there aren't any VMs in VirtualBox (inside your build machine) already called {{project_name_gateway_long}} or {{project_name_workstation_long}}!
 <div class="mw-collapsible-content">
 Because the build script would fail, because it tries to create VMs either named {{project_name_gateway_long}} or {{project_name_workstation_long}}. Running the clean script between builds will prevent this error.
 </div>
 </div>
+<div class="toccolours mw-collapsible mw-collapsed">
 * <u>Parallel builds unsupported warning:</u> Do not try to build {{project_name_gateway_long}} and {{project_name_workstation_long}} at the same time!
-<div class="toccolours mw-collapsible mw-collapsed">
 <div class="mw-collapsible-content">
-Building {{project_name_gateway_long}} and {{project_name_workstation_long}} at the same time is not supported due to limitations in the build script. In other words, do not try to run for example {{Code|~/{{project name short}}/derivative-maker --flavor whonix-gateway -- --build --target virtualbox}} and {{Code|~/{{project name short}}/derivative-maker --flavor whonix-workstation -- --build --target virtualbox}} at the same time. The build would probably fail.
+Building {{project_name_gateway_long}} and {{project_name_workstation_long}} at the same time is not supported due to limitations in the build script. In other words, do not try to run for example {{Code|~/derivative-maker/derivative-maker --flavor whonix-gateway -- --build --target virtualbox}} and {{Code|~/derivative-maker/derivative-maker --flavor whonix-workstation -- --build --target virtualbox}} at the same time. The build would probably fail.
 </div>
 </div>
-* <u>CI warning:</u> Do not use images created inside Continuous Integration (CI) environments for anything besides testing!
 <div class="toccolours mw-collapsible mw-collapsed">
+* <u>CI warning:</u> Do not use images created inside Continuous Integration (CI) environments for anything besides testing!
 <div class="mw-collapsible-content">
 Usually you are not using [https://en.wikipedia.org/wiki/Continuous_integration CI] environments without knowing.
 
@@ -239,7 +244,8 @@ I am not sure it is a great idea to first tell builders how to build {{project_n
 '''1.''' Build target selection.
 
 <u>Mandatory</u> The following build targets are available.
-Probably only useful for developers. Choose a <code>--target</code>. Either option '''A)''', '''B)''', '''C)''' <u>or</u> '''D)'''. <ref>
+
+Choose a <code>--target</code>. Either option '''A)''', '''B)''', '''C)''' <u>or</u> '''D)'''. <ref>
 Multiple build targets at the same time are also possible.
 
 {{CodeSelect|code=
@@ -404,7 +410,7 @@ export DERIVATIVE_APT_REPOSITORY_OPTS
 '''Warning''': This will delete any virtual machine named {{project_name_gateway_long}} from VirtualBox installed on your build machine!
 
 {{CodeSelect|code=
-~/{{project name short}}/derivative-maker --flavor {{project_name_short_lowercase}}-gateway-xfce --target virtualbox --clean
+~/derivative-maker/derivative-maker --flavor {{project_name_short_lowercase}}-gateway-xfce --target virtualbox --clean
 }}
 
 '''8.''' Delete any existing {{project_name_workstation_long}} virtual machine with the following command.
@@ -412,7 +418,7 @@ export DERIVATIVE_APT_REPOSITORY_OPTS
 '''Warning''': This will delete any virtual machine named {{project_name_workstation_long}} from VirtualBox installed on your build machine!
 
 {{CodeSelect|code=
-~/{{project name short}}/derivative-maker --flavor {{project_name_short_lowercase}}-workstation-xfce --target virtualbox --clean
+~/derivative-maker/derivative-maker --flavor {{project_name_short_lowercase}}-workstation-xfce --target virtualbox --clean
 }}
 
 ----
@@ -420,13 +426,13 @@ export DERIVATIVE_APT_REPOSITORY_OPTS
 '''9.''' Build a {{project_name_gateway_long}} virtual machine image. {{Code2|build command}}:
 
 {{CodeSelect|code=
-~/{{project name short}}/derivative-maker --flavor {{project_name_short_lowercase}}-gateway-xfce --target virtualbox --build
+~/derivative-maker/derivative-maker --flavor {{project_name_short_lowercase}}-gateway-xfce --target virtualbox --build
 }}
 
 '''10.''' Build a {{project_name_workstation_long}} virtual machine image. {{Code2|build command}}:
 
 {{CodeSelect|code=
-~/{{project name short}}/derivative-maker --flavor {{project_name_short_lowercase}}-workstation-xfce --target virtualbox --build
+~/derivative-maker/derivative-maker --flavor {{project_name_short_lowercase}}-workstation-xfce --target virtualbox --build
 }}
 
 ----
@@ -440,8 +446,8 @@ Mostly useful in case of build issues where sharing the build log is necessary f
 
 If using:
 
-* '''A)''' GUI (graphical user interface): It is recommended to set your terminal (for example xfce4-terminal) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
-* '''B)''' CLI (command line user interface): In case there are build issues, it is recommended to redirect the build log to a text file. To do that, for example {{CodeSelect|code=
+* '''A)''' <u>GUI (graphical user interface):</u> It is recommended to set your terminal (for example xfce4-terminal) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
+* '''B)''' <u>CLI (command line user interface):</u> In case there are build issues, it is recommended to redirect the build log to a text file. To do that, for example {{CodeSelect|code=
 >> ~/build-log 2>&1
 }} could be appended to the very end of the {{Code2|build command}} to redirect the build output to {{Code2|build log file}} <code>~/build-log</code>.
 ** Note: when using that command there will be no output in the terminal until the build is completed. This is as per Linux default and [[unspecific|unspecific to {{project name long}}]]. The build might not complete. In that case, that command would hang forever. To see if the build is stuck, it would be possible to open the {{Code2|build log file}} with a text editor. In that case, the file would have to be re-opened or refreshed to with F5 key to see new build output appended to the build log file. Or by using for example {{CodeSelect|code=
@@ -456,21 +462,23 @@ tail -n 100 -f ~/build-log 2>&1
 Most users have completed the build process at this point, can start using {{project_name_long}} and skip the rest of this page.
 
 = Unified Images =
-Optional: Creation of ([https://forums.whonix.org/t/whonix-virtualbox-14-0-1-4-4-unified-ova-downloads-point-release/6996 unified]) <code>.ova</code> image(s) for {{project_name_long}} VirtualBox or <code>libvirt.xz</code> archives for {{project_name_long}} KVM. This might only be interesting if the goal is [[Dev/Redistribution|Redistribution]] of images to third parties such as the public.
+<u>Optional.</u>
+
+Creation of ([https://forums.whonix.org/t/whonix-virtualbox-14-0-1-4-4-unified-ova-downloads-point-release/6996 unified]) <code>.ova</code> image(s) for {{project_name_long}} VirtualBox or <code>libvirt.xz</code> archives for {{project_name_long}} KVM. This might only be interesting if the goal is [[Dev/Redistribution|Redistribution]] of images to third parties such as the public.
 
 There are two options.
 
-* '''A''') Automated, a bit difficult (since it expects preexisting signing keys), using [[#Prepare Release|prepare_release]] script, <u>OR</u>
-* '''B''') Manually.
-** VirtualBox: Using the VirtualBox graphical or command line interface VM export feature could be used. <ref>
+* '''A''') <u>Automated:</u> A bit difficult (since it expects preexisting signing keys), using [[#Prepare Release|dm-prepare-release]] script, <u>OR</u>
+* '''B''') <u>Manually:</u>
+** <u>VirtualBox:</u> Using the VirtualBox graphical or command line interface VM export feature could be used. <ref>
 This is sane since important VM settings were already configured in https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/2600_create-vbox-vm.
 
-<code>prepare_release</code> VM export does nothing special/important for privately used builds.
+<code>dm-prepare-release</code> VM export does nothing special/important for privately used builds.
 </ref>
-** KVM: Manually.
+** <u>KVM:</u> Manually.
 
 = Prepare Release =
-[https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/dm-prepare-release prepare_release] is useful for:
+[https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/dm-prepare-release dm-prepare-release] is useful for:
 
 * Creation of a [https://forums.whonix.org/t/whonix-virtualbox-14-0-1-4-4-unified-ova-downloads-point-release/6996 unified] <code>.ova</code> image or <code>libvirt.xz</code> archive
 * Creation of torrent files.
@@ -486,7 +494,7 @@ This is sane since important VM settings were already configured in https://gith
 * Adding the disclaimer.
 * [[Dev/Redistribution|Redistribution]].
 * Example: {{CodeSelect|code=
-sudo -E /home/user/derivative-maker/packages/kicksecure/developer-meta-files/release/prepare_release --build --target virtualbox --flavor whonix-workstation-xfce
+dm-prepare-release --build --target virtualbox --flavor whonix-workstation-xfce
 }}
 
 For private builds, i.e. for builds which are not supposed to be redistributed to others, none of this is important. If any of this was important, it could also be done manually.

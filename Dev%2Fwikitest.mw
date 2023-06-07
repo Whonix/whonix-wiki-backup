@@ -6,21 +6,199 @@ test title via title2 template
 |description=test
 }}
 {{devwiki}}
+{{Contributor|
+|status=testing
+|about=About this {{PAGENAME}} Page
+|difficulty=medium
+|contributor=testing
+|support=[[Dev/website]]
+}}
 {{intro|
 This is the intro template.
 }}
 This is the first line of the content text outside the intro template.
-{{#css:/src-copy/Archive_link.css}}
-= Variables =
-* <code>SITENAME</code>: <code>{{SITENAME}}</code>
-* <code>SERVER</code>: <code>{{SERVER}}</code>
-* <code>SERVERNAME</code>: <code>{{SERVERNAME}}</code>
-* <code>fullurl:page_name</code>: <code>{{fullurl:page_name}}</code>
-* <code>canonicalurl:FULLPAGENAME</code>: {{canonicalurl:{{FULLPAGENAME}}}}
-* [{{canonicalurl:{{FULLPAGENAME}}|action=history&feed=atom}} atom feed]
-* <code>FULLPAGENAME</code>: {{FULLPAGENAME}}
-* <code>NAMESPACE</code>: {{NAMESPACE}}
 
+= Tab Controller =
+
+== Tab Controller versus Content Shift Test ==
+{{Tab
+|type=controller
+|content=
+{{Tab
+|addToClass=info-box
+|title= === Number 1 ===
+|content=test1
+}}
+{{Tab
+|active=true
+|addToClass=info-box
+|title= === Number 2 ===
+|content=test2
+}}
+{{Tab
+|addToClass=info-box
+|title= === Number 3 ===
+|image=[[File:Logo-linux-500x500.png|25px]]
+|content=test3
+}}
+{{Tab
+|addToClass=info-box
+|title= === A link ===
+|content=[[Donate]]
+}}
+}}
+
+== Tab Controller Link test ==
+
+All link tabs below (not Title 01 and Title 02) should be actual links for js users
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= === Title 01 ===
+|content=Title 01
+}}
+{{Tab
+|title= === Title 02 ===
+|content=Title 02
+}}
+{{Tab
+|title= === Link Type 1 ===
+|content=[https://www.whonix.org]
+}}
+{{Tab
+|title= === Link Type 2 ===
+|content=[[Testpage2]]
+}}
+{{Tab
+|title= === Link Type 3 ===
+|content=[https://www.whonix.org]
+}}
+{{Tab
+|title= === Link Type 4 ===
+|content=[https://www.whonix.org Whonix]
+}}
+{{Tab
+|title= === Link Type 5 ===
+|content=[[Testpage2|The Testpage 2]]
+}}
+}}
+
+== Tab Controller : Linked Controllers Test ==
+
+The following controllers will switch in unison. In case of link-tabs (tabs which are pure links) they will not be switched on. Also important: Section 1 and 6 are asynchronously pre-selected. But once you select a tab they will synchronize and stay synchronize (no common use cases but good to know this behavior)
+
+{{Tab
+|type=controller
+|addToClass=tcc-indent tcc-dark
+|linkid=link1
+|content=
+{{Tab
+|active=true
+|title= ==Section 1==
+|type=section
+|image=[[File:Logo-linux-500x500.png|25px]]
+|addToClass=special-look
+|content=Section 1 content
+}}
+{{Tab
+|title= ==Section 2==
+|content=Section 2 content
+}}
+{{Tab
+|title===Section 3==
+|content= Section 3 content
+}}
+{{Tab
+|title===Section 4==
+|content=Section 4 content
+}}
+}} <!-- end of tab controller 1 -->
+
+{{Tab
+|type=controller
+|linkid=link1
+|content=
+{{Tab
+|title===Section 5==
+|content=Section 5 content
+}}
+{{Tab
+|title===Section 6==
+|active=true
+|content=Section 6 content
+}}
+{{Tab
+|title===Section 7 Link==
+|content=[[Donate]]
+}}
+}} <!-- end of tab controller 2 -->
+
+== Nested Tab Test : JS / NOJS ==
+
+If you open this page in a normal way then Test2 is pre-selected and if you click tab 3 than Test 3.2 will be pre-selected. However if you open this page with the following link (emphasis on the hash) then Test3 will open and Test3.2 will open as well. And it will scroll to the right position. This link can also be otained by right-clicking the tab and clicking "Save link address"
+
+https://www.kicksecure.com/wiki/Dev/wikitest#Test3.3_Auto-Open
+
+If you deactive Javascript (NOJS) then the above link will send you directly to the selected section
+
+{{Tab
+|type=controller
+|addToClass=tcc-indent
+|content=
+{{Tab
+|title= === Test1 ===
+|content= Test 1 Content
+}}
+{{Tab
+|title= === Test2 Selected ===
+|active=true
+|content= Test 2 Content
+}}
+{{Tab
+|title= === Test3 Auto-Open ===
+|content=
+{{Tab
+|type=controller
+|addToClass=tcc-indent
+|content=
+{{Tab
+|title= ==== Test3.1 ====
+|content= Test 3.1 Content
+}}
+{{Tab
+|title= ==== Test3.2 Selected ====
+|active=true
+|content= Test 3.2 Content
+}}
+{{Tab
+|title= ==== Test3.3 Auto-Open ====
+|content= Test 3.3 Content
+}}
+}}
+}}
+}}
+
+= Expand Button versus Content Shift Test =
+<div class="mw-collapsible mw-collapsed toccolours">
+Expand
+<div class="mw-collapsible-content">
+Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+Why do we use it?
+It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+
+
+Where does it come from?
+Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+
+The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+
+Where can I get some?
+There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
+</div>
+</div>
 = HTML Symbol =
 <pre>
 &#10077;
@@ -50,9 +228,10 @@ def
 ghi123
 asölfkasjdölfkajdöslkjasdfölkfjaölksdjaslökdjfaöslkjfaöslkjfdsalökdjfalöksjfaklösjfaslökjfasölkjfasölkjfadsölkjafdsklöfjlköasdjflkösajdfsölkjadsölkjfdaslksafjfkl
 }}
-* Including pipe symbol ("<code>|</code>") (encoded as <code>{{!}}</code>: {{CodeSelect|code=
-echo test {{!}} | xargs echo
+* Including pipe symbol ("<code>|</code>") (encoded as <code><nowiki>{{!}}</nowiki></code>): {{CodeSelect|code=
+echo test {{!}} xargs echo
 }}
+* test: {{CodeSelect|code=abc}}
 
 = List use-3-columns =
 <div class="use-3-columns">
@@ -195,20 +374,6 @@ Primary key fingerprint: 2133 BC60 0AB1 33E1 D826  D173 FE43 009C 4607 B1FB
 
 Potential bug: Between line <code>Primary key fingerprint: 2133 BC60 0AB1 33E1 D826  D173 FE43 009C 4607 B1FB</code> and line <code>Subkey fingerprint: 7A02 B352 1DC7 5C54 2BA0  1545 6AFE E6D4 9E92 B601</code> there is no newline in the wiki markup and there should be none in the resulting mediawiki auto generated HTML. Some CSS issue probably?
 
-== pre-alternative tag ==
-legend:
-
-* <code>___</code> means white space
-
-wishlist:
-
-* variables are supported
-* opening <code>pre-alternative</code> keyword newline is ignored (similar to pre tag)
-* new line before closing keyword <code>pre-alternative</code> is ignored (similar to pre tag)
-* new line inside <code>pre-alternative</code> tag results in new line
-* <code>___leading</code> white space is honored
-* white space in the middle for example <code>word1_____word2</code> is honored
-
 == new test blockquote ==
 <blockquote>
 <pre>
@@ -220,7 +385,18 @@ line4
 </pre>
 </blockquote>
 
-== new blockquote element ==
+== blockquote in bullet point ==
+
+As the first child
+
+* <blockquote>test</blockquote>
+
+As not the first child after a text (or other) node
+
+* 1 <blockquote>test</blockquote>
+
+== div class pre blockquote ==
+real <code>pre</code> tag:
 
 <pre>
 gpg: assuming signed data in 'tor-{{Tor_upstream_version}}.tar.gz'
@@ -236,6 +412,8 @@ Primary key fingerprint: 2133 BC60 0AB1 33E1 D826  D173 FE43 009C 4607 B1FB
      Subkey fingerprint: 7A02 B352 1DC7 5C54 2BA0  1545 6AFE E6D4 9E92 B601
 </pre>
 
+<code>div class="pre"</code>
+
 <div class="pre">gpg: assuming signed data in 'tor-{{Tor_upstream_version}}.tar.gz'
 gpg: Signature made Mon 09 Dec 2019 06:21:51 PM UTC
 gpg:                using RSA key 7A02B3521DC75C542BA015456AFEE6D49E92B601
@@ -247,6 +425,81 @@ gpg: WARNING: This key is not certified with a trusted signature!
 gpg:          There is no indication that the signature belongs to the owner.
 Primary key fingerprint: 2133 BC60 0AB1 33E1 D826  D173 FE43 009C 4607 B1FB
      Subkey fingerprint: 7A02 B352 1DC7 5C54 2BA0  1545 6AFE E6D4 9E92 B601</div>
+
+== Quotation Template Tests ==
+=== Functional ===
+Quotation without anything - should show <nowiki>{{{quote}}}</nowiki>
+
+{{Quotation}}
+
+'''Quotation Two Line Test'''
+
+{{Quotation|quote=
+Quotation with 2 lines.
+
+Should show 2 lines.
+}}
+
+'''Quotation with 2 Lines and Context Test'''
+
+{{Quotation
+|context=Author,Date,https://www.whonix.org
+|quote=
+abc
+
+def}}
+
+'''Simple Quotation with 2 Lines, Context and Image Test
+'''
+
+{{Quotation
+|image=Deep-web-1106648640.jpg
+|context=Author,Date,https://www.whonix.org
+|quote=With an image.
+
+123
+
+456}}
+
+'''Simple Quotation with 2 Lines, Context and Image Test, special style
+'''
+
+{{Quotation
+|special=1
+|image=Deep-web-1106648640.jpg
+|context=Author,Date,https://www.whonix.org
+|quote=With an image.
+
+123
+
+456}}
+
+=== Broken ===
+'''Bullet Point Quotation with 2 Lines, Context and Image Test
+'''
+
+Same as above but below a bullet point. '''NOTE''': This does not work as expected but it acceptable right now because this is caused by a bug in MediaWiki that has been reported.
+
+<pre>
+* bullet point with colon: {{Quotation
+|image=Deep-web-1106648640.jpg
+|context=Author,Date,https://www.whonix.org
+|quote=With an image.
+
+abc
+
+def}}
+</pre>
+
+'''Bullet Point Multiple Lines Quotation Test''' (currently broken)
+
+* 1 {{Quotation|quote=
+Same as above but below a list item. 
+
+Without an image.
+
+'''NOTE''': This does not work as expected but it acceptable right now because this is caused by a bug in MediaWiki that has been reported
+}}
 
 = Ordered Lists Test =
 # first
@@ -269,17 +522,117 @@ text 1
 text 2
 </pre>
 
+= overlength tag test =
+pre tag
+
+<pre>
+long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test
+</pre>
+
+{{CodeSelect|code=
+long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test
+}}
+
+code tag
+
+<code>long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test</code>
+
+= overlength table test =
+{| class="wikitable"
+| Title 
+| This is a test
+|-
+
+| no tag
+| long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test
+|-
+
+| pre tag
+| <pre>
+long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test
+</pre>
+|-
+
+| CodeSelect tag
+| {{CodeSelect|code=
+long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test
+}}
+|-
+
+| code tag
+| <code>long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test</code>
+|-
+
+|}
+
+== Overlength table hidden inside mw-collapsible test == 
+
+<div class="mw-collapsible mw-collapsed toccolours">
+See Overlength table
+<div class="mw-collapsible-content">
+{| class="wikitable"
+| Title 
+| This is a test
+|-
+
+| no tag
+| long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test
+|-
+
+| pre tag
+| <pre>
+long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test
+</pre>
+|-
+
+| CodeSelect tag
+| {{CodeSelect|code=
+long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test
+}}
+|-
+
+| code tag
+| <code>long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test</code>
+|-
+
+|}
+</div>
+</div>
+
 = mbox test =
 {{mbox|text=
 mbox text test
 }}
 
-= Image Resize Test =
-== original ==
+= Images =
+
+== Image Resize Test ==
+
+original
 [[File:P lkrg2.png]]
 
-== resized  ==
+resized 
 [[File:P lkrg2.png|500x300px]]
+
+== Image wrapper ContentImage template for over-wide images ==
+
+Normal over-wide image without wrapper. Expected: Image is too wide on the right
+<pre>
+[[File:Image-too-wide-demonstration.jpg]]
+</pre>
+
+The same over-wide image inside wrapper. Expected: Image has 100% width of the content and is not too wide
+{{ContentImage|[[File:Image-too-wide-demonstration.jpg]]}}
+
+= Variables =
+* <code>SITENAME</code>: <code>{{SITENAME}}</code>
+* <code>SERVER</code>: <code>{{SERVER}}</code>
+* <code>SERVERNAME</code>: <code>{{SERVERNAME}}</code>
+* <code>fullurl:page_name</code>: <code>{{fullurl:page_name}}</code>
+* <code>canonicalurl:FULLPAGENAME</code>: {{canonicalurl:{{FULLPAGENAME}}}}
+* [{{canonicalurl:{{FULLPAGENAME}}|action=history&feed=atom}} atom feed]
+* <code>FULLPAGENAME</code>: {{FULLPAGENAME}}
+* <code>NAMESPACE</code>: {{NAMESPACE}}
 
 = Footnotes =
 [[Category:MultiWiki]]

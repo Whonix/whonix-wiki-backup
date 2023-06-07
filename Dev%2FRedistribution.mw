@@ -1,8 +1,10 @@
 {{Header}}
 {{#seo:
-|description=Design Documentation about Redistribution of {{project_name_long}}
+|description=Design and Developer Documentation about Redistribution of {{project_name_long}}.
 }}
-
+{{intro|
+Design and Developer Documentation about Redistribution of {{project_name_long}}.
+}}
 == Introduction ==
 Developers only!
 
@@ -49,7 +51,7 @@ find ./ -name '*~' {{!}} xargs trash-put
 * Check that all packages point to a signed git commit and signed git tag.
 
 {{CodeSelect|code=
-~/derivative-maker/packages/kicksecure/developer-meta-files/debug-steps/packaging-helper-script pkg_verify_signed_commit_and_tag
+dm-packaging-helper-script pkg_verify_signed_commit_and_tag
 }}
 
 * push the source code to github
@@ -104,13 +106,13 @@ git push origin version
 '''1.''' Build {{project_name_gateway_long}}. For example {{project_name_gateway_long}} with Xfce for VirtualBox.
 
 {{CodeSelect|code=
-sudo ./derivative-maker --build --repo true --target virtualbox --flavor whonix-gateway-xfce --repo true
+./derivative-maker --build --repo true --target virtualbox --flavor whonix-gateway-xfce --repo true
 }}
 
 '''2.''' Build {{project_name_workstation_long}}. For example {{project_name_workstation_long}} with Xfce for VirtualBox.
 
 {{CodeSelect|code=
-sudo ./derivative-maker --build --repo true --target virtualbox --flavor whonix-workstation-xfce --repo true
+./derivative-maker --build --repo true --target virtualbox --flavor whonix-workstation-xfce --repo true
 }}
 
 == Post Building ==
@@ -124,7 +126,7 @@ sudo ./derivative-maker --build --repo true --target virtualbox --flavor whonix-
 * OpenPGP sign the images.
 
 {{CodeSelect|code=
-~/derivative-maker/packages/kicksecure/developer-meta-files/release/prepare_release --flavor whonix-workstation --target virtualbox --build
+dm-packaging-helper-script --flavor whonix-workstation --target virtualbox --build
 }}
 }}
 }}
@@ -136,7 +138,7 @@ sudo ./derivative-maker --build --repo true --target virtualbox --flavor whonix-
 * Upload the images.
 
 {{CodeSelect|code=
-~/derivative-maker/packages/kicksecure/developer-meta-files/release/upload_images
+dm-upload-images
 }}
 }}
 
@@ -170,7 +172,7 @@ Create <code>-testers-only</code> or <code>-stable</code> git tag.
 Create Changelog and Announcement.
 
 {{CodeSelect|code=
-./debug-steps/packaging-helper-script pkg_git_packages_git_log_writer
+dm-packaging-helper-script pkg_git_packages_git_log_writer
 }}
 
 === Wiki Page Updates ===

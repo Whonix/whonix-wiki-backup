@@ -9,7 +9,7 @@ deferrable:NO -- Because other scripts are dependent on it
 	// --------
 	// Settings
 
-	var targetPadding = 15; // only relevant for use with target
+	var targetPadding = 5; // only relevant for use with target. Distance from target borders right and top
 	var defaultLang = 'bash'; // other option: 'none'. Or languages which are supported for highlighting (see documentation)
 	
 	// Additional function names that should also be highlighted for bash (currently outsourced to MediaWiki:CodeSelectHighlightList)
@@ -19,12 +19,11 @@ deferrable:NO -- Because other scripts are dependent on it
 	// Global
 
 	var innerContent = $( `
-		<i class="far fa-clone fa-rotate-90 cbutton">
-		</i>
+		<i class="fa-regular fa-clone fa-rotate-90 cbutton"></i>
 		<span class="tooltip2">
 			<span class="hover">Click = Copy</span>
 			<span class="copied">
-				<i class="fa fa-check-square-o"></i>
+				<i class="fa-solid fa-check"></i>
 				Copied to clipboard!
 			</span>
 		</span>
@@ -40,7 +39,7 @@ deferrable:NO -- Because other scripts are dependent on it
 			let bashFnPattern = Prism.languages.bash.function.pattern;
 			// We're using apt as a fixpoint, because it's very common and it's surrounded by pipes |
 			let newBashFnPattern = new RegExp( bashFnPattern.source.replace( '|apt|', '|' + ['apt', ...highlightBashAdditionalFunctionNames].join('|') + '|' ), bashFnPattern.flags );
-			Prism.languages['bash'] = Prism.languages.extend('bash', { 'function': { lookbehind: true, pattern: newBashFnPattern }});
+			Prism.languages.bash = Prism.languages.extend( 'bash', { 'function': { lookbehind: true, pattern: newBashFnPattern }} );
 			highlightLangBashIsExtended = true;
 		}
 	}
@@ -82,15 +81,21 @@ deferrable:NO -- Because other scripts are dependent on it
 				target = $(target).eq(0);
 				// If we have a target and no content (only white space) was given, copy target's content
 				if( ! content.match(/\S/) ) codeSelect.find('.code').text( target.text() );
-				// Position over target
 				let helper = $('<div class="code-select-target-helper"></div>');
 				helper.append( codeSelect );
-				helper.insertAfter( target );
+				// Position over target
 				codeSelect.css( {
 					position: 'absolute',
 					top: targetPadding - target.outerHeight() - ( parseInt( target.css('marginBottom') ) || 0 ),
 					right: targetPadding,
 				});
+				helper.insertAfter( target );
+				
+				// Fixate styles from the target to prevent content shift
+				let targetStyles = window.getComputedStyle( target[0] );
+				let getStyle = (name) => targetStyles.getPropertyValue(name);
+				target.css( { margin: getStyle('margin'), lineHeight: getStyle('line-height'), padding: getStyle('padding'), fontSize: getStyle('font-size') } );
+				
 				if( ! codeSelect.attr('data-button-image-src' ) ) codeSelect.attr('data-button-image-src','');
 			}
 			else target = null;
@@ -125,7 +130,7 @@ deferrable:NO -- Because other scripts are dependent on it
 					target.addClass( 'language-' + lang );
 				}
 				
-				function highlight() {
+				const highlight = function() {
 					extendHighlightLangBash();
 					// Execute highlight
 					if( syntaxElement ) Prism.highlightElement( syntaxElement );

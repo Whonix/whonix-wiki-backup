@@ -12,53 +12,319 @@
 {{intro|
 Work in progress.
 }}
-= Implementation =
-* https://github.com/Whonix/misc/blob/main/ppcross_install
+= Design / Features =
+* <s>https://github.com/Whonix/misc</s>
 * https://github.com/Whonix/Whonix-Installer
 * https://github.com/Whonix/Whonix-Starter
 * https://github.com/Whonix/Whonix-Starter-Binary
 * https://gitlab.com/whonix/virtualbox-windows-installer-binary
 
-= Design =
-generally:
+WhonixStarter(.exe):
 
-* no sub folder with company name
-* whonix msi installer install nicht mehr virtualbox installer
-* whonix.exe starts virtualbox installer
-* rewrite whonix.exe in lazarus (without NET framework)
-* add start menu entry whonix.exe
-* add desktop shortcut whonix.exe
-* do not add version number to start menu entry
-* license: same as https://www.whonix.org/wiki/File:Whonix_windows_installer_license_agreement.png
+* new implementation of whonix.exe in lazarus (without NET framework)
+* platform independent ( later linux/mac version possible )
+* ui consists of two forms ( main & error )
+* main form has two buttons for start/stop and manage Whonix VMs
+* error form pops up if virtualbox is missing
 
-conditionals
+WhonixStarterSetup.msi:
 
-* KISS always run vbox install command
-* vbox user installed
-* do not do virtualbox version check
+* installs windows version of WhonixStarter
+* adds start menu entry
+* adds desktop shortcut
+* uninstall over Windows "Programs and Features" tool
 
-whonix de-install:
+WhonixSetup(.exe):
 
-* do not uninstall virtualbox
-* do not delete any Whonix VMs
-* delete whonix.exe
-* delete start menu entry whonix.exe
-* delete desktop shortcut whonix.exe
+* ui consists of a main form with several pages guiding the user through the installation process
+* platform independent ( later linux/mac version possible )
+* installs VirtualBox and WhonixOVA
+* executes WhonixStarterSetup.msi (Windows only)
+* checks installed and only reinstall missing components
+* does not uninstall or delete any component
+
+Challenges:
+
+* Whonix <code>.ova</code> is bigger than 2 GB.
+* Windows <code>.cab</code> files have a hardcoded 2 GB maximum file size.
+
+Requirements:
+
+* cross compile on Debian (source) for Windows (target)
+* building does not require Windows
+
+Build limitations:
+
+* needs Debian bookworm or above because of minimal wixl and lazarus version
+
+= flow chart =
+(1) Whonix-Starter:
+
+* <code>lazbuild</code> &rarr; <code>WhonixStarter.lpr</code> &rarr; <code>WhonixStarter.exe</code>
+* <code>wixl</code> &rarr; <code>WhonixStarterSetup.wxs</code> &rarr; <code>WhonixStarter.exe</code>, <code>WhonixStarterSetup.wxs</code> &rarr; <code>WhonixStarterSetup.msi</code>
+
+(2) Whonix-Installer:
+
+* <code>lazbuild</code> &rarr; <code>WhonixSetup.lpr</code> &rarr; <code>WhonixSetup.exe</code>
+* <code>WhonixSetup.exe</code> + append + <code>Whonix.ova</code> &rarr; <code>WhonixSetup-XFCE.exe</code>
+
+= CI =
+Whonix-Starter:
+
+* https://github.com/einsiedler90/Whonix-Starter/actions
+* https://github.com/Whonix/Whonix-Starter/actions
+
+Whonix-Installer:
+
+* https://github.com/einsiedler90/Whonix-Installer/actions
+* https://github.com/Whonix/Whonix-Installer/actions
 
 = code signing =
-https://learn.microsoft.com/en-us/windows/win32/seccrypto/using-signtool-to-sign-a-file
+== Introduction ==
+EV (extended validation) certificate required to avoid Microsoft SmartScreen Filter warning message.
 
-https://stackoverflow.com/questions/18287960/signing-windows-application-on-linux-based-distros
+* https://learn.microsoft.com/en-us/windows/win32/seccrypto/using-signtool-to-sign-a-file
+* https://stackoverflow.com/questions/18287960/signing-windows-application-on-linux-based-distros
+* https://packages.debian.org/bullseye/osslsigncode
+* https://issuetracker.google.com/issues/130343741
+* https://www.ssl.com/guide/supported-cloud-hsms-document-signing-ev-code-signing/
+* https://github.com/mtrojnar/osslsigncode/issues/34
 
-https://packages.debian.org/bullseye/osslsigncode
+== requirements ==
+* EV code signing for Windows authenticode to avoid Microsoft SmartScreen Filter warning message.
+* cross signing
+* build scripts running on Debian Linux
+* build result (program) running on Windows 64 bit
+* avoid running proprietary closed source software on local build machine
+* can be fully automated using build scripts
+* avoid hardware token (compatibility, hassle)
+* avoid proprietary closed source device drivers
+* ideally avoid non-mainline Linux kernel drivers
+* supports signing big files
 
-https://issuetracker.google.com/issues/130343741
+== providers ==
+thalesgroup:
 
-https://www.ssl.com/guide/supported-cloud-hsms-document-signing-ev-code-signing/
+* asked
 
-https://github.com/mtrojnar/osslsigncode/issues/34
+Certum:
+
+* https://shop.certum.eu/open-source-code-signing.html Certum Open Source developer certificate - EV extended validation?
+* https://www.certum.ng/product/ev-code-signing-in-the-cloud/
+* https://shop.certum.eu/ev-code-signing-in-the-cloud.html
+* SimplySign cloud-based solution eliminates the need for a physical card and a reader
+* https://www.files.certum.eu/software/SimplySignDesktop/Linux-Ubuntu/2.9.8-9.1.6.0/SimplySignDesktop-2.9.8-9.1.6.0-x86_64-prod-ubuntu.bin
+* €379.00
+
+sectigo:
+
+* https://sectigostore.com/code-signing/sectigo-ev-code-signing-certificate
+* cloud hsm supported?
+* $410
+
+certerassl:
+
+* https://certerassl.com/certera-ev-code-signing-certificate
+* use existing token
+* no cloud hsm
+* $309
+
+ssl.com:
+
+* https://www.ssl.com/ev/
+* $239
+* A) optional proprietary eSigner CodeSignTool
+** eSigner uses ssl.com's own Cloud HSM
+** actual file needs to be present to be signed
+** https://www.ssl.com/guide/esigner-pricing-for-code-signing/
+** When using for example Google Cloud HSM then eSigner is optional.
+** minimum price for eSigner:
+*** $20.00 / month (= $240 / year) or $180.00 / year
+* B) optional Google Cloud HSM compatibility
+** https://www.ssl.com/guide/supported-cloud-hsms-document-signing-ev-code-signing/
+** <blockquote>SSL.com’s fee for Google Cloud HSM attestation is $500.00 USD.</blockquote>
+
+Google Cloud HSM;
+
+* https://github.com/GoogleCloudPlatform/kms-integrations/blob/master/kmsp11/docs/user_guide.md 
+* https://github.com/GoogleCloudPlatform/kms-integrations
+* https://cloud.google.com/kms/docs/reference/pkcs11-tool
+* ( https://cloud.google.com/kms/docs/reference/pkcs11-nginx )
+* [https://github.com/GoogleCloudPlatform/kms-integrations/blob/master/kmsp11/docs/user_guide.md <code>libkmsp11.so</code>]
+
+= TODO =
+== merge ==
+Reminder: Always please merge first before developing further.
+
+== new file location - FYI ==
+ppcross_install has been moved.
+
+https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/ppcross_install
+
+FYI (for your interest) only. This ticket (wiki chapter) can be deleted after reading.
+
+Feel free to use this wiki page as a notepad for developers too by making notes somewhere else outside the TODO chapter.
+
+== avoid use of lazarus - replace with free pascal compiler ==
+lazarus is an IDE, but not a compiler, right?
+
+Can use of lazarus on command line be avoided?
+
+(It can stay in the script as comment but out commented by default.)
+
+Reason: Simplification; avoid dependency installation
+
+Can the command be replaced with the free pascal compiler instead?
+
+einsiedler90:
+
+no, we need the binary lazbuild to compile a lazarus project from cmd, which is part of lazarus.
+fpc is the compiler, thats right, but it has not all the dependencies of WhonixStarter/Installer.
+it is impossible to compile this project without the LCL.
+
+== document ppcross_install ==
+Why is [https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/ppcross_install ppcross_install] needed even on Debian bookworm?
+
+Is it because Debian doesn't compile with "make crossinstall"?
+
+The fp-compiler (fpc) [https://manpages.debian.org/bullseye/fp-compiler-3.2.0/fpc.1.en.html manpage] states:
+
+{{Quotation|
+quote=
+-sh
+Tells the compiler to generate a script that can be used to assemble and link on the host system, not on the target system. Use this when cross-compiling.
+}}
+
+{{Quotation|
+quote=
+-st
+Tells the compiler to generate a script that can be used to assemble and link on the target system, not on the host system. Use this when cross-compiling.
+}}
+
+Does that help?
+
+Otherwise can this be reported against Debian as a question, a bug or feature request? If yes, please write a draft for a feature request. (Patrick will review and post it.)
+
+Bug report probably already exists:
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845498
+
+Does this help...? https://gist.github.com/o11c/cf98115ba716ebdd1dc2cc75b290f321
+
+einsiedler90:
+
+fpc is a kind of wrapper that redirects to the cross/compiler.
+we could use ppcx64 to compile from linux 64bit to windows 64bit,
+but it cannot found the windows system units without the install_ppcross() steps in the script.
+it generates the needed precompiled windows units in /usr/lib/fpc/X.X.X/units/x86_64-win64
+
+if a debian package with this files exists somewhere in the wild we could use this instead.
+
+== avoid use of git clone ==
+ppcross_install
+
+abolish need to fetch from https://gitlab.com/freepascal.org/fpc/source.git
+
+=== just use the existing compiler from Debian ===
+
+{{CodeSelect|code=
+fpc -Twin64 -Fi/usr/share/fpcsrc/3.2.2/rtl/win64 -Fi/usr/share/fpcsrc/3.2.2/rtl/win -Fi/usr/share/fpcsrc/3.2.2/rtl/inc -Fi/usr/share/fpcsrc/3.2.2/rtl/x86_64 -Fu/usr/share/fpcsrc/3.2.2/rtl/win64 -Fu/usr/share/fpcsrc/3.2.2/rtl/inc -FU/tmp/rtl -FE/tmp test
+}}
+
+=== based on fpc source package ===
+Could it be based on apt-get source?
+
+{{CodeSelect|code=
+apt-get source fpc
+}}
+
+Contains same contents as https://salsa.debian.org/pascal-team/fpc? No. [https://salsa.debian.org/pascal-team/fpc/-/blob/master/debian/orig-tar.sh Debian does some modifications.] Lacks <code>Makefile.fpc</code>, which can be re-generated.
+
+Can we edit https://salsa.debian.org/pascal-team/fpc/-/blob/master/debian/rules to add cross compilation? Maybe not even needed.
+
+debian/rules is a makefile.
+
+{{CodeSelect|code=
+make -f debian/rules
+}}
+
+It supports ifdef (similar to an environment variable) <code>CROSSOPT</code>. On Debian source packages are usually built using dpkg-buildpackage. It might be as simple as setting the correct environment variables. Here's an untested attempt.
+
+{{CodeSelect|code=
+sudo apt build-dep fpc
+}}
+
+{{CodeSelect|code=
+CROSSINSTALL=1 CROSSOPT="OS_TARGET=x86_64 CPU_TARGET=win64" dpkg-buildpackage
+}}
+
+Setting the environment variable might be more complicated than initially editing debian/rules manually.
+
+maybe helpful:
+https://wiki.debian.org/PortsDocs/BootstrappingFPC
+
+regenerate Makefile.fpc
+
+https://wiki.freepascal.org/Fpcmake
+
+{{CodeSelect|code=
+fpcmake -w -Tall
+}}
+
+{{CodeSelect|code=
+fpcmake -w -Tx86_64-win64
+}}
+
+=== based on fpc-source binary package ===
+Less promising approach.
+
+{{CodeSelect|code=
+sudo apt install fpc-source
+}}
+
+{{CodeSelect|code=
+sudo apt install fpc-source -t bullseye-backports
+}}
+
+{{CodeSelect|code=
+cd /usr/share/fpcsrc
+}}
+
+{{CodeSelect|code=
+cd /usr/share/fpcsrc/3.2.2/compiler/
+}}
+
+{{CodeSelect|code=
+fpcmake
+}}
+
+== building on Debian stable - bullseye ==
+=== building Whonix-Installer on Debian stable - bullseye ===
+Whonix-Installer
+
+<pre>
++ lazbuild -B WhonixSetup.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+CopySecondaryConfigFile /etc/lazarus/environmentoptions.xml -> /home/user/.lazarus/environmentoptions.xml
+Error: (lazbuild) project has no main unit
+Error: Process completed with exit code 2.
+</pre>
+
+Unfixable?
+
+=== building Whonix-Starter on Debian stable - bullseye ===
+Whonix-Starter
+
+<pre>
++ lazbuild -B Whonix.lpr --cpu=x86_64 --os=win64 --compiler=/usr/bin/ppcrossx64
+CopySecondaryConfigFile /etc/lazarus/environmentoptions.xml -> /home/user/.lazarus/environmentoptions.xml
+Error: (lazbuild) project has no main unit
+Error: Process completed with exit code 2.
+</pre>
+
+Unfixable?
 
 = See Also =
 * [[Dev/Windows Installer/OLD|previous, deprecated Whonix Windows Installer]]
+* [[Dev/Windows_User_Interface]] (TODO: update)
+* [[Verify the Project Windows Installer|Verify the {{project_name_long}} Windows Installer]]
 
 {{Footer}}

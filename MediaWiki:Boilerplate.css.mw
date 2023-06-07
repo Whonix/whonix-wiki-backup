@@ -185,10 +185,39 @@ div.pre p {
 	width: 100%;
 }
 
+#mw-content-text h1 {
+	font-size: 26px;
+	border-bottom-color: black;
+}
+
+#mw-content-text h2 {
+	font-size: 21px;
+	border-bottom-color: #333;
+	padding-bottom: 3px;
+}
+
+#mw-content-text h3 {
+	border-bottom: 1px solid #888;
+	padding-bottom: 0;
+	font-size: 18px;
+	color: #666;
+}
+
+#mw-content-text h4 {
+	font-size: 18px;
+}
+
+#mw-content-text h5 {
+	font-size: 16px;
+	font-weight: bold;
+}
+
 #mw-content-text .mw-headline {
 	background-color: transparent !important;
 	display: inline-block;
 }
+
+/* 4.1.1. mw edit section (headlines) */
 
 #mw-content-text .mw-editsection {
 	font-size: inherit;
@@ -215,33 +244,6 @@ div.pre p {
 
 #mw-content-text .mw-editsection-bracket {
 	display: none;
-}
-
-#mw-content-text h1 {
-	font-size: 26px;
-	border-bottom-color: black;
-}
-
-#mw-content-text h2 {
-	font-size: 21px;
-	border-bottom-color: #333;
-	padding-bottom: 3px;
-}
-
-#mw-content-text h3 {
-	border-bottom: 1px solid #888;
-	padding-bottom: 0;
-	font-size: 18px;
-	color: #666;
-}
-
-#mw-content-text h4 {
-	font-size: 18px;
-}
-
-#mw-content-text h5 {
-	font-size: 16px;
-	font-weight: bold;
 }
 
 /* 4.2. Text structure elements */
@@ -296,25 +298,106 @@ div.pre p {
 /* 4.3. Blockquote */
 
 #mw-content-text blockquote {
-	padding: 11px 22px;
-	border-left: 7px solid #ddd ;
+	--normal: #ddd;
+	--special: #44a9ff;
+	
+	display: flow-root;
+	border: 1px solid var(--normal) !important;
+    border-left-width: 6px !important;
+    margin-left: 8px !important;
+    position: relative;
+    border-radius: 13px;
+    margin-right: 0;
+    padding: 10px 20px !important;
 }
 
-#mw-content-text blockquote *:first-child {
+#mw-content-text blockquote.quotation {
+    background: white;
+    box-shadow: 2px 2px 4px 1px rgb( 0 0 0 / 7% );
+    border: none !important;
+    border-left: 6px solid var(--special) !important;
+    padding: 18px 25px !important;
+}
+
+#mw-content-text blockquote::before {
+    content: ' ';
+    background-color: #f3f3f3;
+	background-image: url("/w/images/thumb/5/55/Quotes-gray.png/50px-Quotes-gray.png");
+	background-size: 55%;
+	background-position: center;
+	background-repeat: no-repeat;
+    display: block;
+    position: absolute;
+    left: -18px;
+    top: calc( 50% - 16px );
+    height: 30px;
+    width: 30px;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 48px;
+    line-height: 52px;
+    border: 1px solid var(--normal);
+}
+
+#mw-content-text blockquote.quotation:before {
+	background-image: url("/w/images/thumb/d/dd/Quotes-blue.png/50px-Quotes-blue.png");
+	border-color: var(--special);
+    background-color: white;
+}
+
+#mw-content-text blockquote > * {
+    color: #636363;
+}
+
+#mw-content-text blockquote > :first-child {
 	margin-top: 0 !important;
 }
-#mw-content-text blockquote *:last-child {
-	margin-bottom: 0 !important;
+
+#mw-content-text blockquote > :last-child,
+#mw-content-text blockquote.quotation > :nth-last-child(2) {
+	margin-bottom: 0 !important;	
 }
 
-#mw-content-text a.image img {
-	max-width: 100%;
-	height: auto;
+#mw-content-text blockquote .blockquote-context {
+	position: relative;
+	padding-left: 40px;
+	display: block;
+	margin-top: 20px;
+	margin-bottom: 10px !important;
+	color: black;
 }
 
-#mw-content-text li blockquote {
-	margin-left: 0;
-	padding-left: 15px;
+#mw-content-text blockquote .blockquote-context:before {
+	content: ' ';
+	border-top: 2px solid black;
+	width: 30px;
+	height: 0;
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 50%;
+}
+
+#mw-content-text blockquote .blockquote-context * {
+	color: black;
+}
+
+#mw-content-text blockquote .blockquote-context a:not(.image) {
+	text-decoration: underline;
+}
+
+#mw-content-text blockquote .blockquote-context a:not(.image):hover {
+	color: #056ec7;
+}
+
+#mw-content-text blockquote .blockquote-context img.author-image {
+	height: 40px;
+	width: auto;
+	margin-right: 8px;
+	display: block;
+	float: left;
+	position: relative;
+	top: -9px;
 }
 
 /* 4.4. Expand/ Collapse Button */
@@ -327,7 +410,19 @@ div.pre p {
 	border-color: #ccc;
 }
 
-#mw-content-text .mw-collapsible .mw-collapsible-toggle, .expand-or-collapse-all-button {
+#mw-content-text .mw-collapsible .mw-collapsible-toggle,
+#mw-content-text .mw-collapsible:before,
+.expand-or-collapse-all-button {
+	height: 40px;
+}
+
+html.client-js #mw-content-text .mw-collapsible:before {
+	opacity: 0;
+	margin: 5px 0;
+}
+
+#mw-content-text .mw-collapsible .mw-collapsible-toggle,
+.expand-or-collapse-all-button {
 	padding: 4px 17px 5px 10px;
 	border-radius: 5px;
 	line-height: 30px;
@@ -343,7 +438,8 @@ div.pre p {
 	margin-left: 5px;
 }
 
-#mw-content-text .mw-collapsible .mw-collapsible-toggle:hover, .expand-or-collapse-all-button:hover {
+#mw-content-text .mw-collapsible .mw-collapsible-toggle:hover,
+.expand-or-collapse-all-button:hover {
 	background-color: #2f6ebf;
 }
 
@@ -362,13 +458,15 @@ div.pre p {
 	text-decoration: none;
 }
 
-#mw-content-text .mw-collapsible .mw-collapsible-toggle:before, .expand-or-collapse-all-button.all-expanded:before {
+#mw-content-text .mw-collapsible .mw-collapsible-toggle:before,
+.expand-or-collapse-all-button.all-expanded:before {
 	content: '▲';
 	margin-right: 5px;
 	font-size: 16px;
 }
 
-#mw-content-text .mw-collapsible.mw-collapsed .mw-collapsible-toggle:before, .expand-or-collapse-all-button:not(.all-expanded):before {
+#mw-content-text .mw-collapsible.mw-collapsed .mw-collapsible-toggle:before,
+.expand-or-collapse-all-button:not(.all-expanded):before {
 	content: '▼';
 }
 
@@ -376,32 +474,36 @@ div.pre p {
 	content: '';
 }
 
+.expand-or-collapse-all-button {
+	cursor: pointer;
+}
+
 .expand-or-collapse-all-button:not(.all-expanded) .collapse-text { display: none; }
 .expand-or-collapse-all-button.all-expanded .expand-text { display: none; }
 
 /* 4.5. Table */
 
-#mw-content-text .wikitable {
+.wikitable {
 	background: transparent;
 	border-collapse: separate;
 	border: none;
 	border-spacing: 3px;
-	margin-left: -4px !important;
+	margin: 16px 0 24px -4px !important;
 }
 
-#mw-content-text .wikitable th, #mw-content-text .wikitable td {
+.wikitable th, #mw-content-text .wikitable td {
 	border: none;
 	border-radius: 4px;
 	box-shadow: 0 0 3px rgba(255,255,255,.3);
 	padding: 10px 15px;
 }
 
-#mw-content-text .wikitable th {
+.wikitable th {
 	background: #dfdfdf;
 	vertical-align: top;
 }
 
-#mw-content-text .wikitable td {
+.wikitable td {
 	background: #ebebeb;
 }
 
@@ -487,7 +589,6 @@ div.pre p {
 	margin-bottom: 0;
 	display: table;
 	table-layout: fixed;
-	width: fit-content;
 }
 
 #toc ul ul {
