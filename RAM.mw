@@ -1,41 +1,84 @@
 {{Header}}
-{{Title|title=Advice for Systems with Low RAM}}
-{{#seo:
- |description=How to use {{project_name_long}} with 4 GB RAM or less RAM.
- |image=Lowram13241324.png
+{{Title|title=
+{{project name short}} RAM System Requirements and Advice for Systems with Low RAM
 }}
+{{#seo:
+|description=How much RAM does {{project name short}} need? 8 GB of RAM would be ideal for best usability and performance, but {{project name short}} can also be used with a lot less RAM. 4 GB of RAM or even less is enough.
+|image=Lowram13241324.png
+}}
+<div class="mininav">
+* [[System Requirements|System Requirements]]
+* [[RAM|RAM System Requirements and Advice for Systems with Low RAM]]
+</div>
 [[File:Lowram13241324.png|thumb|200px|Low RAM]]
 {{intro|
-This wiki page provides advice on how to reduce RAM usage when using low-end systems with {{project_name_long}}, such as those with 4 GB RAM or less. It includes instructions for reducing RAM and VRAM assignments, running {{project_name_gateway_long}} in CLI mode, and using graphical administration mode.
-}}
-= Introduction =
-{{project_name_short}} CLI is recommended for advanced users only. However, it is possible to reduce the RAM and VRAM (video RAM) assignment of {{project_name_gateway_short}} even in {{project_name_long}} with the Xfce {{gui}} without requiring any other configuration changes such as package installation or configuration file modifications. It is important to note that more RAM is required for upgrades.
+How much RAM does {{project name short}} need? 8 GB of RAM would be ideal for best usablity and performance to run {{project name short}}. However, {{project name short}} can also be used with a lot with less RAM. 4 GB of RAM is enough.
 
-While {{project_name_gateway_long}} can function with as little as 256 MB RAM, resource-intensive operations like upgrades can cause the virtual machine to freeze. <ref name=kernel-upgrade>
+This wiki page provides advice on how to reduce RAM usage when using low-end systems with {{project_name_long}}, such as those with 4 GB of RAM or less. It includes instructions for reducing RAM and VRAM assignments, running {{project_name_gateway_long}} in CLI mode, and using graphical administration mode.
+}}
+
+= Introduction =
+{{project_name_short}} {{cli}} is normally recommended for advanced users only. However, it is possible to reduce the RAM and VRAM (video RAM) assignment of {{project_name_gateway_short}} without requiring any other configuration changes such as package de-installation or configuration file modifications.
+
+It is important to note that more RAM is required for upgrades.
+
+{{project_name_gateway_long}} can function with as little as 256 MB RAM, resource-intensive operations like upgrades can cause the virtual machine to freeze. <ref name=kernel-upgrade>
 For instance, kernel package upgrades that rebuild the initrd.
-</ref> Assigning less than 512 MB RAM to a {{project_name_long}} VM will result in [[RAM_Adjusted_Desktop_Starter|RAM Adjusted Desktop Starter]] launching the {{cli}} only, without Xfce. There are several options available, as described below.
+</ref>
+
+Assigning less than 512 MB RAM to a {{project_name_long}} VM will result in [[RAM_Adjusted_Desktop_Starter|RAM Adjusted Desktop Starter]] launching the {{cli}} only, without Xfce {{gui}}.
+
+Users with 4 GB or less RAM can temporarily assign 256 MB RAM to {{project_name_gateway_long}}. This is sufficient for the normal operation of {{project_name_gateway_long}} serving {{project_name_workstation_long}}. This process is described in detail below.
 
 = {{project_name_long}} RAM and VRAM Defaults =
+{{Tab
+|type=controller
+|addToClass=tcc-indent
+|content=
+{{Tab
+|active=true
+|title= == GUI ==
+|image=[[File:Clipart-gui.svg]]
+|content=
+[[File:Gui-preview.jpg|{{project_name_long}} Xfce in VirtualBox|thumb|240px]]
 * {{project_name_long}} Xfce:
 ** {{project_name_gateway_short}} Xfce - 1280 MB RAM and 128 MB VRAM.
 ** {{project_name_workstation_long}} Xfce - 2048 MB RAM and 128 MB VRAM.
+}}
+{{Tab
+|title= == CLI ==
+|image=[[File:Utilities-terminal.png|50px]]
+|content=
+[[image:Cli-preview.jpg|{{project_name_long}} CLI in VirtualBox|thumb|240px]]
+
 * {{project_name_long}} CLI:
 ** {{project_name_gateway_short}} CLI - 512 MB RAM and 16 MB VRAM.
 ** {{project_name_workstation_long}} CLI - 512 MB RAM and 16 MB VRAM.
+}}
+}}
 
 = Advice for Systems with Low RAM =
 
 == {{project_name_gateway_long}} CLI RAM Saving Mode ==
 {{Box|text=
+{{project_name_gateway_short}} initial first boot setup:
+# Run {{project_name_gateway_short}} Xfce normally.
+# Do not start {{project_name_workstation_short}} if you are low on RAM.
+# Complete the initial {{project_name_gateway_short}} setup.
+# Perform the system upgrade.
+# Then, you can enable {{project_name_gateway_long}} CLI RAM Saving Mode to save RAM.
+}}
+
+{{Box|text=
 To run {{project_name_gateway_short}} after its initial first boot setup or after upgrades:
 
 # Shutdown {{project_name_gateway_short}}.
-# Assign less RAM to {{project_name_gateway_short}}: <code>Virtual machine</code> &rarr; <code>Menu</code> &rarr; <code>Settings</code> &rarr; <code><i>Adjust</i></code> <code>Memory slider to 256</code> &rarr; <code><i>Hit:</i> OK</code>
-# Assign less VRAM to {{project_name_gateway_short}}: <code>VirtualBox</code> &rarr; <code>click a VM</code> &rarr; <code>Settings</code> &rarr; <code>Display</code> &rarr; <code>Graphics Controller</code> &rarr; <code><i>Adjust</i></code> <code>slider for Video Memory to 16</code> &rarr; <code>OK</code>
+# Allocate less RAM to {{project_name_gateway_short}}: <code>Virtual machine</code> &rarr; <code>Menu</code> &rarr; <code>Settings</code> &rarr; <code><i>Adjust</i></code> <code>Memory slider to 256</code> &rarr; <code><i>Click:</i> OK</code>.
+# Assign less VRAM to {{project_name_gateway_short}}: <code>VirtualBox</code> &rarr; <code>click a VM</code> &rarr; <code>Settings</code> &rarr; <code>Display</code> &rarr; <code>Graphics Controller</code> &rarr; <code><i>Adjust</i></code> <code>slider for Video Memory to 16</code> &rarr; <code>OK</code>.
 # Restart {{project_name_gateway_short}}.
 # Start {{project_name_workstation_long}}.
-
-{{project_name_gateway_short}} is now serving {{project_name_workstation_long}} but operates with less RAM.
+# {{project_name_gateway_short}} is now serving {{project_name_workstation_long}} but operating with less RAM.
+# To reconfigure or upgrade {{project_name_gateway_long}} later, use {{project_name_gateway_long}} Graphical Administration Mode as documented below.
 }}
 
 == {{project_name_gateway_long}} Graphical Administration Mode ==
@@ -44,32 +87,31 @@ To run {{project_name_gateway_short}} after its initial first boot setup or afte
 Follow these steps in order to upgrade {{project_name_long}} or change Tor settings:
 
 # Shut down all VMs.
-# Assign default RAM to {{project_name_gateway_short}}. ([[Post_Install_Advice#Increase_Virtual_Machine_RAM|Increase Virtual Machine RAM]])
-# Assign default VRAM to {{project_name_gateway_short}}.
+# Allocate default RAM to {{project_name_gateway_short}}. ([[Post_Install_Advice#Increase_Virtual_Machine_RAM|Increase Virtual Machine RAM]])
+# Allocate default VRAM to {{project_name_gateway_short}}.
 # Start {{project_name_gateway_short}}.
-# The user will now have access to a graphical {{project_name_gateway_short}} with Xfce.
-# Perform administrative tasks such as upgrades and/or change Tor settings.
+# The user will now have access to a graphical interface of {{project_name_gateway_short}} with Xfce.
+# Perform administrative tasks such as upgrades and/or changing Tor settings.
 # Shutdown {{project_name_gateway_short}}.
 # Apply RAM Saving Mode as described above.
 
-Done. The user upgraded or changed settings using a graphical {{project_name_gateway_short}} with Xfce.
+Done. The user has successfully upgraded or changed settings using a graphical interface of {{project_name_gateway_short}} with Xfce.
 }}
 
 == {{project_name_workstation_long}} CLI RAM Saving Mode ==
 
-{{project_name_workstation_long}} CLI can be run with as little as 256 MB RAM when the Xfce desktop environment is not used. However, resource-intensive operations like upgrades can leave the virtual machine in a frozen state. <ref name=kernel-upgrade /> Assign more RAM during upgrades; 450 MB RAM should be more than enough.
+{{project_name_workstation_long}} CLI can be run with as little as 256 MB of RAM when the Xfce desktop environment is not used. However, resource-intensive operations like upgrades can cause the virtual machine to freeze.<ref name=kernel-upgrade /> It is recommended to allocate more RAM, around 450 MB, during upgrades, which should be more than sufficient.
 
 == {{project_name_workstation_long}} Xfce RAM Saving Mode ==
 
-{{project_name_workstation_long}} Xfce can be run with as little as 512 MB RAM, but resource-intensive operations like upgrades can leave the virtual machine in a frozen state. <ref name=kernel-upgrade /> Assign more RAM during upgrades; 1280 MB RAM should be more than enough. In this configuration, the VM might freeze due to low RAM, or some applications might have reduced performance - this is especially true for browsers ([[Tor Browser]]), particularly when too many open browser tabs are open at the same time.
+{{project_name_workstation_long}} Xfce can be run with as little as 512 MB of RAM. However, resource-intensive operations like upgrades can cause the virtual machine to freeze.<ref name=kernel-upgrade /> During upgrades, it is recommended to allocate more RAM, around 1280 MB, which should be more than sufficient. It's important to note that in this configuration, the VM might freeze due to low RAM, and certain applications, especially browsers like [[Tor Browser]], may experience reduced performance, particularly when numerous browser tabs are open simultaneously.
 
 == Alternatives ==
 
-* <u>{{project_name_gateway_long}} Xfce RAM Saving Mode</u>: {{project_name_gateway_long}} Xfce can run with as little as 512 MB RAM, but resource intensive operations like upgrades can leave the virtual machine in a frozen state. <ref name=kernel-upgrade /> For upgrading, increase RAM/VRAM as described above for {{project_name_gateway_long}} Graphical Administration Mode.
-* <u>{{project_name_long}} with CLI</u>: Advanced users who are comfortable utilizing {{project_name_long}} with CLI can permanently set this option.
-* <u>Experiments</u>: Users can experiment with RAM assignments lower than 256 MB; please share your results.
-
-See also: [[Troubleshooting#Low_RAM_Issues|Troubleshooting, Low RAM Issues]].
+* <u>RAM Saving Tips:</u> '''[[Troubleshooting#Low_RAM_Issues|Troubleshooting, Low RAM Issues]]'''
+* <u>{{project_name_gateway_long}} Xfce RAM Saving Mode</u>: {{project_name_gateway_long}} Xfce can run with as little as 512 MB of RAM. However, resource-intensive operations like upgrades can cause the virtual machine to freeze.<ref name=kernel-upgrade /> For upgrading, you can increase the RAM/VRAM as described in the instructions for {{project_name_gateway_long}} Graphical Administration Mode.
+* <u>{{project_name_long}} with CLI</u>: Advanced users who are comfortable using {{project_name_long}} with the command-line interface (CLI) can choose to permanently set this option.
+* <u>Experiments</u>: Users can experiment with RAM assignments lower than 256 MB. We encourage you to share your results.
 
 = See Also =
 * [[Troubleshooting#Low_RAM_Issues|Troubleshooting, Low RAM Issues]]
