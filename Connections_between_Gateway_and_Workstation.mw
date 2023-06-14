@@ -1,6 +1,6 @@
 {{Header}}
 {{#seo:
-|description=Authenticated / Encrypted Connections between {{project_name_gateway_long}} and {{project_name_workstation_long}}, ARP spoofing defense, SSH, OpenVPN, Using additional (isolated) network interfaces
+|description=Authenticated / Encrypted Connections between {{project_name_gateway_long}} and {{project_name_workstation_long}}, ARP spoofing defense, SSH, OpenVPN, Using additional (isolated) network interfaces. Remote {{project name gateway long}}.
 |image=Binary-503583640.jpg
 }}
 {{Title|title=
@@ -8,16 +8,17 @@ Connections between {{project_name_gateway_long}} and {{project_name_workstation
 }}
 [[image:Binary-503583640.jpg|thumb]]
 {{intro|
-Authenticated / Encrypted Connections between {{project_name_gateway_long}} and {{project_name_workstation_long}}, ARP spoofing defense, SSH, OpenVPN, Using additional (isolated) network interfaces
+Authenticated / Encrypted Connections between {{project_name_gateway_long}} and {{project_name_workstation_long}}, ARP spoofing defense, SSH, OpenVPN, Using additional (isolated) network interfaces. Remote {{project name gateway long}}.
 }}
 = Introduction =
 
 * This chapter does not apply to [[{{q_project_name_short}}|{{q_project_name}}]]. <ref name=qubes_network_isolated>Because by Qubes default, AppVMs behind the same ProxyVM [or NetVM] are prevented from connecting to each other.</ref>
 * This chapter applies to [[{{non_q_project_name_short}}|{{non_q_project_name}}]] using [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]].
 * This chapter applies to [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]] (using [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]]).
+* Remote {{project name gateway long}}: If you want to connect to a {{project name gateway long}} over insecure, untrusted, or unknown foreign networks (internet).
 * You should read it if using any custom, non-stock, configurations.
 
-TODO: document that an open port in Whonix-Workstation can be accessed by other Whonix-Workstation in Non-Qubes-Whonix which is often unwanted.
+Related: [[Ports|Opening ports in {{project_name short}}]]
 
 == Essentials ==
 
@@ -44,21 +45,6 @@ If you want to connect to a {{project_name_gateway_long}} over insecure, untrust
 '''Only applies to ''non-stock'' configurations''': If you run [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] simultaneously or want to connect to {{project_name_gateway_long}} over insecure or untrusted networks (internet):
 
 A compromised {{project_name_workstation_long}} can impersonate the {{project_name_gateway_long}}, or any other {{project_name_workstation_long}}, within the same (virtual) LAN, perform active MITM attacks, or passively eavesdrop.
-
-== Libvirt Isolated Ports ==
-
-Isolated ports are a Libvirt feature supported since 6.1.0. <ref>https://libvirt.org/formatdomain.html#isolating-guests-network-traffic-from-each-other</ref>
-
-The <code>port</code> element property <code>isolated</code>, when set to <code>yes</code> (default setting is <code>no</code>) is used to isolate this interface's network traffic from that of other guest interfaces connected to the same network that also have <code><port isolated='yes'/></code>. This setting is only supported for emulated interface devices that use a standard tap device to connect to the network via a Linux host bridge. This property can be inherited from a libvirt network, so if all guests that will be connected to the network should be isolated, it is better to put the setting in the network configuration. (NB: this only prevents guests that have isolated='yes' from communicating with each other; if there is a guest on the same bridge that doesn't have <code>isolated='yes'</code>, even the isolated guests will be able to communicate with it.)
-
-<pre style="white-space: pre-wrap;">
-<devices>
-  <interface type='network'>
-    <source network='default'/>
-    <port isolated='yes'/>
-  </interface>
-</devices>
-</pre>
 
 == OpenVPN vs SSH ==
 
@@ -174,18 +160,36 @@ It will now loudly complain, that Tor is listening on all IPs that that may not 
 {{project_name_customworkstation_long}} should work.
 </div>
 </div>
-<br />
+== Libvirt Isolated Ports ==
+
+Isolated ports are a Libvirt feature supported since 6.1.0. <ref>
+https://libvirt.org/formatdomain.html#isolating-guests-network-traffic-from-each-other
+</ref>
+
+The <code>port</code> element property <code>isolated</code>, when set to <code>yes</code> (default setting is <code>no</code>) is used to isolate this interface's network traffic from that of other guest interfaces connected to the same network that also have <code><port isolated='yes'/></code>. This setting is only supported for emulated interface devices that use a standard tap device to connect to the network via a Linux host bridge. This property can be inherited from a libvirt network, so if all guests that will be connected to the network should be isolated, it is better to put the setting in the network configuration. (NB: this only prevents guests that have <code>isolated='yes'</code> from communicating with each other; if there is a guest on the same bridge that doesn't have <code>isolated='yes'</code>, even the isolated guests will be able to communicate with it.)
+
+<pre style="white-space: pre-wrap;">
+<devices>
+  <interface type='network'>
+    <source network='default'/>
+    <port isolated='yes'/>
+  </interface>
+</devices>
+</pre>
 
 = Encrypted and authenticated connections between {{project_name_gateway_long}} and {{project_name_workstation_long}} =
 
 == Using SSH (not tested/recommended) ==
 
-&#42; DO NOT ALLOW SSH LOGINS!<ref>See: [https://serverfault.com/questions/56566/ssh-tunneling-only-access ssh login]</ref>
+Each Gateway and Workstation should have its own SSH account and certificate distributed to each machine to which it will connect. <ref>
+Internet search How to set up ssh keys, for example, for instructions.
+</ref>  Each Gateway and Workstations will need  ssh installed and the service started. Workstations need to be configured to automatically reconnect - in case {{project_name_workstation_long}} starts before the Gateway, or restarts. <ref>Consider: autossh</ref> Workstations need to use the tunnel IP to connect to the Gateway. The {{project_name_gateway_long}} should only accept certificate authentication, and only forward or answer to Tor over the SSH tunnel. All Workstations must use the established SSH tunnel to the Gateway, redirect such network access to socks via tranSOCKS_ev or similar. The {{project_name_gateway_long}} firewall may need corresponding changes. Not impossible to use SSH for this - but intricate.
 
-Each Gateway and Workstation should have its own SSH account and certificate distributed to each machine to which it will connect. <ref>Internet search How to set up ssh keys, for example, for instructions.</ref>  Each Gateway and Workstations will need  ssh installed and the service started. Workstations need to be configured to automatically reconnect - in case {{project_name_workstation_long}} starts before the Gateway, or restarts. <ref>Consider: autossh</ref> Workstations need to use the tunnel IP to connect to the Gateway. The {{project_name_gateway_long}} should only accept certificate authentication, and only forward or answer to Tor over the SSH tunnel. All Workstations must use the established SSH tunnel to the Gateway, redirect such network access to socks via tranSOCKS_ev or similar. The {{project_name_gateway_long}} firewall may need corresponding changes. Not impossible to use SSH for this - but intricate.
+Do not allow SSH logins! <ref>
+See: [https://serverfault.com/questions/56566/ssh-tunneling-only-access ssh login]
+</ref>
 
 You may be better off using OpenVPN. ''However - OpenVPN is a full machine to machine connection, while ssh is easily port restricted.''
-<br />
 
 == Using OpenVPN ==
 <div class="toccolours mw-collapsible mw-collapsed">
@@ -321,6 +325,33 @@ chattr +i /etc/resolv.conf
 }}
 </div>
 </div>
+
+= Remote {{project_name_gateway_long}} =
+Development considerations.
+
+Setting up a remote {{project_name_gateway_long}} would involve the following considerations:
+
+* 1) Authenticated and encrypted connections between {{project_name_gateway_long}} and {{project_name_workstation_long}} would be necessary. This can be achieved using tools like OpenSSH or WireGuard.
+* 2) An open port on the host operating system would need to be forwarded to {{project_name_gateway_long}} to make it accessible from the internet. Prior knowledge about ports is required. [[Ports]]
+
+However, it's important to note that a remote setup would not utilize the (virtual) isolated network that {{project_name_long}} typically employs when used locally. Therefore this would be less secure.
+
+To address this, it may be more suitable to implement this functionality at the virtualizer level rather than modifying the {{project_name_long}} VMs extensively. If {{project_name_long}} is running within a virtualizer that can securely connect two VMs with authentication and encryption, there would be no need for complex modifications to the {{project_name_long}} configuration.
+
+As of the author's current knowledge:
+
+* [[VirtualBox]] does not have a built-in feature that enables encrypted connections between VMs.
+* [[KVM]] does not have such a feature.
+* Xen does not have such a feature.
+* [[Qubes]] (based on Xen) does not have such a feature.
+
+Other virtualizers might have this feature but {{project_name_long}} is unavailable for these platforms at the time of writing.
+
+Readers are encouraged to consider submitting a generic feature request to any of these virtualizers. The request should focus on the generic need for encrypted connections between VMs and does not necessarily have to mention {{project_name_long}} explicitly.
+
+Realistically, it's important to acknowledge that a feature request may not lead to immediate implementation. The realization of such a feature might only get implemented if someone pays for it.
+
+forum discussion: [https://forums.whonix.org/t/remote-whonix-gateway-access-to-whonix-gateway-from-an-external-computer/16785 Remote Whonix-Gateway - Access to Whonix-Gateway from an external Computer]
 
 = See Also =
 * [[{{project_name_workstation_short}}_Firewall|{{project_name_workstation_long}} Firewall]]
