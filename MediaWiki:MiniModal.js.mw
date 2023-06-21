@@ -6,95 +6,65 @@ deferrable:NO -- Because a other scripts are dependent on it
 
 (function() {
 	
-	let baseUrl = window.mwDev.data.app.baseUrl;
-	
-	// Functions
-	
-	// Helper Function for getting URL parts
-	function getUrlParts() {
-		let urlObj = new URL(window.location);
-		let query = urlObj.searchParams.toString();
-		return {
-			hash: urlObj.hash.substring(1),
-			hasHash: !! urlObj.hash.substring(1),
-			searchString: ( query ? '?' + query : '' ),
-		};
-	}
-	
-	// Check if the current state of the URL matches with potential url hash Modals
-	function checkForModalsCalledByHash() {
-		let urlObj = new URL(window.location);
-		if( ! urlObj.hash ) {
-			if( $('.mini-modal.active').length ) hide( $('.mini-modal.active') );
-		} else {
-			let potentialModal = $('.mini-modal[data-url-hash=' + urlObj.hash.substring(1) + ']');
-			if( potentialModal.length && ! potentialModal.hasClass('active') ) show( potentialModal );
-		}
-	}
-
 	// Init a selection of MiniModals
-	function init( $this ) {
-		$this.each( function() {
-			if( ! $this.hasClass('mini-modal') || ! $this.attr('id') || $this.hasClass('init-complete') ) return;
-
-			$this.addClass('init-complete');
+	
+	function init( modal ) {
+		
+		modal.each( function() {
+			if( ! modal.hasClass('mini-modal') || ! modal.attr('id') || modal.hasClass('init-complete') ) return;
+			else modal.addClass('init-complete');
 
 			let temp = $(`<div style="display: none;" id="mini-modal-temp-container-${Math.random().toString().substring(2)}"></div>`);
-			$('body').append(temp);
-			temp.append($this.children());
+			$('body').append( temp );
+			temp.append( modal.children() );
 
-			$this.empty().append(''
+			modal.empty().append(''
 				+ '<div class="underlay"></div>'
 				+ '<i class="fas fa-times mm-close"></i>'
 				+ '<div class="content"></div>'
 			);
 			
-			$this.children('.content').append(temp.children());
+			modal.children( '.content' ).append( temp.children() );
 			temp.remove();
 
 			// Events
 
-			$this.children('.underlay, .mm-close').on( 'click', function() {
-				$this.miniModal('hide');
-			});
+			// Event : Click close or underlay
+			modal.children('.underlay, .mm-close').on( 'click', () => hide( modal ) );
 		});
 	}
 	
-	function show( $this ) {
-		init( $this );
-		$this.addClass('active');
-		let urlParts = getUrlParts();
-		if( urlParts.hash != $this.attr('data-url-hash') ) window.history.pushState(
-			{ info: 'js pushState' },
-			'[Param deprecated]',
-			baseUrl + urlParts.searchString + '#' + ( $this.attr('data-url-hash') || '' ) 
-		);
-		$this.trigger( 'shown.miniModal' );
+	function show( modal ) {
+		init( modal );
+		modal.addClass('active');
+		if( modal.attr('data-url-hash') ) mwDev.tools.hashControl.set( modal.attr('data-url-hash') );
+		modal.trigger( 'shown.miniModal' );
 	}
 	
-	function hide( $this ) {
-		init( $this );
-		$this.removeClass('active');
-		let urlParts = getUrlParts();
-		if( urlParts.hasHash ) window.history.pushState( { info: 'js pushState' }, '[Param deprecated]', baseUrl + urlParts.searchString );
-		$this.trigger( 'hidden.miniModal' );
+	function hide( modal ) {
+		init( modal );
+		modal.removeClass('active');
+		if( modal.attr('data-url-hash') ) mwDev.tools.hashControl.set( '' );
+		modal.trigger( 'hidden.miniModal' );
 	}
 	
-	// Events
-	
-	// Global event: If user navigates back via back button, close modal if active
-	$(window).on( 'popstate', checkForModalsCalledByHash );
-
 	// JQUERY extension
 
 	$.fn.miniModal = function(command) {
 		switch( command ) {
-			case 'checkForModalsCalledByHash': checkForModalsCalledByHash(); break;
-			case 'init': init($(this)); break;
+			case 'init': init( $(this) ); break;
 			case 'show': show( $(this) ); break;
 			case 'hide': hide( $(this) ); break;
+			case 'checkForModalsCalledByHash' :
+				let hashModal = $( `.mini-modal[data-url-hash="${ mwDev.tools.hashControl.get() }"]` );
+				if( hashModal.length ) show( hashModal );
+			break;
 		}
 	};
+	
+	// Event : URL popstate. With no hash close all modals that are active
+	
+	mwDev.tools.hashControl.register( '', () => $( '.mini-modal.active' ).each( (index,modal) => hide( modal ) ) );
 	
 })();
 

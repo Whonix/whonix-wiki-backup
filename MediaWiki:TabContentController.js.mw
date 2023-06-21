@@ -20,6 +20,8 @@ content = meta concept meaning both section and the corresponding tab
 
 (function() {
 	
+	let doScroll = true;
+	
 	// ---------------------------------------
 	// jQuery extension : tabContentController
 	
@@ -55,9 +57,10 @@ content = meta concept meaning both section and the corresponding tab
 				$(this).find('> .tcc-content > .tcc-section').each( function( index, element ) {
 					
 					let section = $(this);
+					let sectionHeadlineId = section.find('.tcc-title .mw-headline').attr('id');
 					
 					// Create tab. All are links but disabled. If only link given in section then create direct link-tab (with .is-link class)
-					let tabContainer = $( `<li><a href="${ window.location.href.split('#')[0] + '#' + section.find('.tcc-title .mw-headline').attr('id') }"></a></li>` );
+					let tabContainer = $( `<li><a href="${ window.location.href.split('#')[0] + '#' + sectionHeadlineId }"></a></li>` );
 					// If the section's content has exactly 1 child, that is a p, and that p has 1 child (and no text nodes) that is an a. Whitespaces are trimmed for caparison
 					if( section.find('> .tcc-content > p > a').length == 1 && section.find('> .tcc-content > p').text().trim() == section.find('> .tcc-content > p > a').text() ) {
 						tabContainer = $( `<li><a class="is-link" href="${section.find('> .tcc-content > p > a').attr('href')}"></a></li>` );
@@ -65,6 +68,7 @@ content = meta concept meaning both section and the corresponding tab
 					}
 					let tab = tabContainer.children().first();
 					
+					tab.addClass( 'tcc-tab' );
 					tab.text( section.find('> .tcc-title .mw-headline').text() );
 					if( section.hasClass('active') ) tab.addClass('active');
 					if( section.find('> .tcc-image img').length > 0 ) tab.prepend( section.find('> .tcc-image img') );
@@ -78,13 +82,26 @@ content = meta concept meaning both section and the corresponding tab
 					
 					tabList.append( tabContainer );
 					
-					// Event : Click
-					if( ! tab.hasClass('is-link') ) tabContainer.on( 'click', (e) => {
-						e.preventDefault();
-						chooseTab( tab.attr('data-tcc-contentId') );
-						return false;
-					});
+					// Event : Click Tab
+					if( ! tab.hasClass('is-link') ) tabContainer.on( 'click', () => { doScroll = false; });
 					
+					// Register Tab Controller with Hash Controller
+					
+					mwDev.tools.hashControl.register( sectionHeadlineId, function() {
+						let selectedHeadline = $( `.tab-content-controller .tcc-title .mw-headline[id="${mwDev.tools.hashControl.get()}"]` );
+						// If section with hash as headline ID is found open this section/tab and all parent sections/tabs
+						if( selectedHeadline.length > 0 ) {
+							selectedHeadline.parents('.tcc-section').each( function() {
+								chooseTab( $(this).attr('data-tcc-contentid') );
+							});
+							// And scroll to the position of the direct content controller parent in the document
+							if( doScroll ) {
+								$('html, body').animate( { scrollTop: selectedHeadline.parents('.tab-content-controller')[0].getBoundingClientRect().top + window.pageYOffset - 70  }, 500 );
+								doScroll = true;
+							}
+						}
+					}, true );
+
 				});
 					
 				// If no element is active make the first one active that is not a link
@@ -96,9 +113,10 @@ content = meta concept meaning both section and the corresponding tab
 			});
 			
 			function chooseTab( contentId ) {
-				tcLinkedGroup.find('> .mininav > ul > li > *').removeClass('active');
-				tcLinkedGroup.find('> .tcc-content > .tcc-section').removeClass('active');
-				tcLinkedGroup.find(`[data-tcc-contentId="${contentId}"]`).filter( (index,element) => ! $(element).hasClass('is-link') ).addClass('active');
+				let selector = `[data-tcc-contentId="${contentId}"]`;
+				$( '.tcc-tab' + selector ).parent().siblings().children().removeClass('active');
+				$( '.tcc-section' + selector ).siblings().removeClass('active');
+				$( selector + ':not(.is-link)' ).addClass('active');
 			}
 	
 		});
@@ -111,18 +129,8 @@ content = meta concept meaning both section and the corresponding tab
 	// Automatic initialization for all tab controllers
 	$('.tab-content-controller').tabContentController('init');
 	
-	// Using Hash to control tabs
-	let hash = window.location.hash.substring(1);
-	let selectedHeadline = $( `.tab-content-controller .tcc-title .mw-headline[id="${hash}"]` );
-	// If section with hash as headline ID is found open this section/tab and all parent sections/tabs
-	if( selectedHeadline.length > 0 ) {
-		selectedHeadline.parents('.tcc-section').each( (index,sectionDom) => {
-			let selectedId = $(sectionDom).attr('data-tcc-contentid');
-			$(sectionDom).parents('.tab-content-controller').eq(0).find( `.mininav [data-tcc-contentid="${selectedId}"]` )[0].click();
-		});
-		// And scroll to the position of the direct content controller parent in the document
-		$('html, body').animate( { scrollTop: selectedHeadline.parents('.tab-content-controller')[0].getBoundingClientRect().top - 70  }, 500 );
-	}
+	// Event : Click TOC
+	if( $( '#toc' ).length ) $( '#toc a' ).on( 'click', () => { doScroll = true; });
 	
 })();
 

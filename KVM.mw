@@ -1,16 +1,19 @@
-{{Header}} {{hide_all_banners}} {{Title|title=
+{{Header}} {{hide_all_banners}}
+{{Title|title=
 {{project_name_long}} for KVM
-}}{{#seo:
+}}
+{{#seo:
 |description=Using {{project_name_long}} with KVM (Kernel Virtual Machine)
 |image=Kvm-new-logo.png
-}}{{Contributor|
+}}
+{{Contributor|
 |status=stable
 |about=About this {{PAGENAME}} Page
 |difficulty=medium
 |contributor=[https://forums.whonix.org/users/hulahoop HulaHoop]
 |support=[[KVM/Support]]
 }}
-[[File:Kvm-new-logo.png|<code>Unofficial logo re-creation for the [https://www.linux-kvm.org KVM] virtualizer</code>|thumb]]
+[[File:Kvm-new-logo.png|250px|<code>Unofficial logo re-creation for the [https://www.linux-kvm.org KVM] virtualizer</code>|thumb]]
 {{intro|
 Using {{project_name_long}} with KVM (Kernel Virtual Machine)
 }}
@@ -126,7 +129,7 @@ If you are using Fedora, click on Expand on the right.
 
 As KVM requires a CPU with virtualization extensions, check whether the system has either Intel VT or AMD-V. If the following command prints nothing, the system does not support the relevant virtualization extensions.
 
-<code>egrep '^flags.*(vmx|svm)' /proc/cpuinfo</code>
+<code>egrep -E'^flags.*(vmx|svm)' /proc/cpuinfo</code>
 
 '''Install Dependencies'''
 
@@ -448,13 +451,26 @@ sudo virsh -c qemu:///system define {{project_name_workstation_short}}*.xml
 }}
 }}
 
-== Moving {{project_name_long}} Image Files ==
+== Image File Installation ==
+The XML files are configured to point to the default storage location of <code>/var/lib/libvirt/images</code>. It is recommended to move the image files instead of copying them.
 
-The XML files are configured to point to the default storage location of <code>/var/lib/libvirt/images</code>. The following steps move the images there so the machines can boot.
+<u>Notes:</u>
 
-<u>Note:</u> Changing the default location may cause conflicts with SELinux, which will prevent the machines from booting.
+* Changing the default location may cause conflicts with SELinux, which will prevent the machines from booting.
+* Administrative rights (<code>sudo</code>) are required because the copying is to a privileged location in the system.
 
-It is recommended to move the image files instead of copying them.
+The following steps move or copy the images there so the machines can boot.
+
+Either move <u>or</u> copy.
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= === Moving {{project_name_long}} Image Files ===
+|type=section
+|active=true
+|content=
+Move.
 
 {{CodeSelect|code=
 sudo mv {{project_name_gateway_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_gateway_short}}.qcow2
@@ -463,11 +479,16 @@ sudo mv {{project_name_gateway_short}}*.qcow2 /var/lib/libvirt/images/{{project_
 {{CodeSelect|code=
 sudo mv {{project_name_workstation_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_workstation_short}}.qcow2
 }}
+}}
+{{Tab
+|title= === Copying {{project_name_long}} Image Files ===
+|content=
+Copy. {{Anchor|sparse files}}
 
-{{Anchor|sparse files}}
-== Copying {{project_name_long}} Image Files ==
-
-{{project_name_long}} disk images are [[sparse files]], meaning they expand when filled rather than allocating their entire size (100GB outright). Sparse files require special commands when they are copied to ensure they do not lose this property, otherwise they will occupy all of the actual space. Higher privileges (sudo) are required because the copying is to a privileged location in the system.
+{{project_name_long}} disk images are {{kicksecure_wiki
+|wikipage=sparse files
+|text=sparse files
+}}, meaning they expand when filled rather than allocating their entire size (100GB outright). Sparse files require special commands when they are copied to ensure they do not lose this property, otherwise they will occupy all of the actual space.
 
 {{CodeSelect|code=
 sudo cp --sparse=always {{project_name_gateway_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_gateway_short}}.qcow2
@@ -475,7 +496,9 @@ sudo cp --sparse=always {{project_name_gateway_short}}*.qcow2 /var/lib/libvirt/i
 
 {{CodeSelect|code=
 sudo cp --sparse=always {{project_name_workstation_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_workstation_short}}.qcow2
-}}
+}}<!-- close CodeSelect -->
+}}<!-- close tab -->
+}}<!-- close controller -->
 
 == Manipulating QCOW2 Images ==
 
