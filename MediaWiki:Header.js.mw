@@ -1,4 +1,8 @@
-/* Header.js depends on MediaWiki:SearchModal.js, see Dev/mediawiki for documentation */
+/*
+Custom Header - JS Initialisation, Setup, Events
+See detailed documentation in Dev/mediawiki
+deferrable:YES -- It needs time for loading anyways
+*/
 
 (function() {
 	
@@ -17,5 +21,15 @@
 	if( $('#ca-unwatch').length != 0 ) {
 		$('body').addClass('page-is-watched');
 	}
-
+	
+	// If no oldid was given in the search params, remove oldid from edit link
+	let q = new URLSearchParams( window.location.search.substring(1) );
+	$('#custom-header .super-menu .edit').attr( 'href', function( index, href ) {
+		if( ! q.get('oldid') ) return href.replace( /&oldid=[^&$]+/, '' );
+	});
+	
 })();
+
+/*
+[[Category:MultiWiki]]
+*/

@@ -159,8 +159,13 @@ See [[KVM#Shared_Folders|KVM: Shared Folders]].
 This method works when {{project_name_long}} is able to start normally. If {{project_name_long}} does not start properly, then another option like [[#Mount Disk Image|Mount Disk Image]] is required. Refer to the  [[VirtualBox/Guest_Additions#Shared_Folder|VirtualBox Shared Folder]] entry for further details.
 
 == Mount Disk Image ==
-
 The following steps are all performed inside the host operating system.
+
+===New ===
+[[Unspecific|unspecific to {{project name long}}]]. Use <code>vboximg-mount</code> as per upstream documentation https://www.virtualbox.org/manual/ch05.html#vboximg-mount
+
+=== Old ===
+Maybe not needed anymore. Try above method.
 
 {{Box|text=
 '''1.''' Shut down any running {{project_name_long}} virtual machines.
@@ -554,193 +559,6 @@ sshfs -p 2222 user@127.0.0.1:/ ~/mountworkstation
 
 If these instructions did not work, try the alternative standalone instructions [[Sshfs into {{project_name_workstation_short}}|SSHFS into Whonix-Workstation]].
 }}
-
-== Mount and Inspect Images ==
-
-=== Introduction ===
-
-{{mbox
-| type    = critical
-| image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    = <br />
-* Developers / experts only! Only for debugging!
-* '''Warning:''' If a guest image file is mounted and the image is compromised by malware, the system can be infected. <ref>https://www.berrange.com/posts/2013/02/20/a-reminder-why-you-should-never-mount-guest-disk-images-on-the-host-os/</ref>
-}}
-
-Required knowledge:
-
-* This method is not compulsory. Standard ''vdi'' (or ''raw'') images are used, but the user can mount them with another preferred method.
-* The mounting and inspecting of images has only been researched for Linux hosts. It may be possible on Windows, but it is undocumented.
-* The purpose and use of ''raw'' and ''vdi'' images must be understood, which is explained on the [[Dev/Source Code Intro]] page.
-* The {{project_name_long}} source code is required; see chapter [[Dev/Build_Documentation|Build and Update {{project_name_long}} from Source Code]].
-* {{project_name_long}} source code should be verified with OpenPGP, although this is not compulsory.
-* Several dependencies are required and can be installed using the {{Code|build-steps.d/1100_prepare-build-machine}} script.
-
-=== VDI Images ===
-
-==== Mount {{project_name_gateway_long}} VDI Images ====
-
-{{CodeSelect|code=
-sudo ./help-steps/mount-vdi --target virtualbox --build --flavor whonix-gateway
-}}
-
-{{CodeSelect|code=
-cd "/home/user/whonix_binary/{{project_name_gateway_short}}_image"
-}}
-
-Inspect.
-
-{{CodeSelect|code=
-cd ~
-}}
-
-{{CodeSelect|code=
-sudo ./help-steps/unmount-vdi --target virtualbox --build  --flavor whonix-gateway
-}}
-
-==== Mount {{project_name_workstation_long}} VDI Images ====
-
-{{CodeSelect|code=
-sudo ./help-steps/mount-vdi --target virtualbox --build --flavor whonix-workstation
-}}
-
-{{CodeSelect|code=
-cd "/home/user/whonix_binary/{{project_name_gateway_short}}_image"
-}}
-
-Inspect.
-
-{{CodeSelect|code=
-cd ~
-}}
-
-{{CodeSelect|code=
-sudo ./help-steps/unmount-vdi --target virtualbox --build --flavor whonix-workstation
-}}
-
-=== Raw Images ===
-
-==== Mount {{project_name_gateway_long}} Raw Images ====
-
-{{CodeSelect|code=
-sudo ./help-steps/mount-raw --target virtualbox --build --flavor whonix-gateway
-}}
-
-{{CodeSelect|code=
-cd "/home/user/whonix_binary/{{project_name_gateway_short}}_image"
-}}
-
-Inspect.
-
-{{CodeSelect|code=
-cd ~
-}}
-
-{{CodeSelect|code=
-sudo ./help-steps/unmount-raw --target virtualbox --build --flavor whonix-gateway
-}}
-
-==== Mount {{project_name_workstation_long}} Raw Images ====
-
-{{CodeSelect|code=
-sudo ./help-steps/mount-raw --target virtualbox --build --flavor whonix-workstation
-}}
-
-{{CodeSelect|code=
-cd "/home/user/whonix_binary/{{project_name_gateway_short}}_image"
-}}
-
-Inspect.
-
-{{CodeSelect|code=
-cd ~
-}}
-
-{{CodeSelect|code=
-sudo ./help-steps/unmount-raw --target virtualbox --build --flavor whonix-workstation
-}}
-
-=== VMDK Images ===
-
-==== Mount {{project_name_workstation_long}} VDMK Images ====
-
-{{mbox
-| type    = notice
-| image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = These instructions are broken because the <code>virtualbox-fuse</code> package is no longer available in Debian <code>jessie</code> and above. <ref>https://unix.stackexchange.com/questions/99044/running-debian-jessie-missing-some-packages</ref> They have been kept in case the situation changes.
-}}
-
-Use this method to mount any VirtualBox file type (VMDK, VDI, VHD, or raw) on a Linux host. It utilizes a VirtualBox utility named "vdfuse" <ref> Broken link: [https://packages.debian.org/wheezy/virtualbox-fuse virtualbox-fuse package]</ref> and the VirtualBox access library to open a VirtualBox supported image file and mount it as a Fuse file system.
-
-{{Box|text=
-'''1.''' ''Optional'': Update the system.
-
-{{CodeSelect|code=
-sudo apt update
-}}
-
-'''2.''' Install the VirtualBox vdfuse utility. <ref>
-This only works up to Debian <code>wheezy</code>.
-</ref>
-
-{{CodeSelect|code=
-sudo apt install virtualbox-fuse
-}}
-
-'''3.''' Edit the <code>/etc/fuse.conf</code> file.
-
-{{CodeSelect|code=
-sudo vi /etc/fuse.conf
-}}
-
-Uncomment the line ''#user_allow_other'' and then save the file.
-
-'''4.''' Set the permissions on <code>/etc/fuse.conf</code>.
-
-{{CodeSelect|code=
-sudo chmod 644 /etc/fuse.conf
-}}
-
-'''5.''' Create a mount point and mount the {{project_name_long}} Workstation image.
-
-This example shows a <code>.vmdk</code> file type, but any VirtualBox file type should work (VMDK, VDI, VHD, or raw).
-
-{{CodeSelect|code=
-mkdir /mnt/whonix
-}}
-
-{{CodeSelect|code=
-vdfuse -f /path/to/{{project_name_workstation_short}}/{{project_name_workstation_short}}-disk1.vmdk /mnt/whonix
-}}
-
-The path <code>/mnt/whonix/</code> will now contain files like EntireDisk, Partition1, etc.
-
-'''6.''' Mount Partition1 at a second mount point.
-
-{{CodeSelect|code=
-mkdir /mnt/workstation
-}}
-
-{{CodeSelect|code=
-sudo mount -o loop /mnt/whonix/Partition1 /mnt/workstation
-}}
-
-'''7.''' Copy files to/from the {{project_name_long}} workstation disk image.
-
-'''8.''' Unmount each of the mount points.
-
-{{CodeSelect|code=
-sudo umount /mnt/workstation
-}}
-
-{{CodeSelect|code=
-sudo umount /mnt/whonix
-}}
-}}
-
-=== See Also ===
-
-* [[Dev/Source Code Intro|{{project_name_long}} Source Code Introduction]]
 
 == Usability Development Tickets ==
 
