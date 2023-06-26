@@ -1,4 +1,8 @@
-/* On this page there is functionality for specific pages. This is seldomly needed */
+/*
+MultiWiki: On this page there is functionality for specific pages.
+See detailed documentation in Dev/mediawiki
+deferrable:YES -- It comes later in the rendering process anyways
+*/
 
 (function() {
 	
@@ -8,8 +12,6 @@
 	if( $('body').hasClass('page-Homepage') ) {
 		
 		let scrollMargin = 70;
-		let urlObj = new URL(window.location);
-		let baseUrl = window.mwDev.data.app.baseUrl;
 		
 		// Section Competition
 		
@@ -17,16 +19,6 @@
 			$(this).remove();
 			$('.section-competition .show-for-nojs-only').removeClass('show-for-nojs-only');
 		});
-		
-		// Section Features and Section Values
-		
-		if( urlObj.hash && urlObj.hash.match( /^#explain-/ ) ) {
-			// Open extendable box containing card
-			let collapseContainer = $( urlObj.hash ).parents('.mw-collapsed')
-			if( collapseContainer.length ) collapseContainer.find('.mw-collapsible-toggle')[0].click();
-			// Scroll to card and open Modal
-			$('html, body').stop().animate( { 'scrollTop': $( urlObj.hash ).offset().top - scrollMargin }, 800, 'swing', () => $(window).miniModal('checkForModalsCalledByHash') );
-		}
 		
 		$('.section-features, .section-values').find('.col-container .card-wrapper').each( function() {
 			
@@ -40,7 +32,7 @@
 			$(this).children().replaceWith( linkReplacement );
 			
 			// Add share link to modal
-			let shareButtonForModal = $( `<span class="code-select" data-button-image-src="/w/images/thumb/9/9f/Share-icon.png/40px-Share-icon.png">${baseUrl}#${id}</span>` );
+			let shareButtonForModal = $( `<span class="code-select" data-button-image-src="/w/images/thumb/9/9f/Share-icon.png/40px-Share-icon.png">${ window.mwDev.data.app.baseUrl }#${id}</span>` );
 			$( '#modal-' + id ).append( shareButtonForModal );
 			shareButtonForModal.codeSelect('init');
 			
@@ -53,7 +45,7 @@
 			// Events
 			
 			// If there's no text selection, open modal and change url
-			linkReplacement.on( 'click', function(e) {
+			linkReplacement.on( 'click', function() {
 				let sel = window.getSelection();
 				if( sel && sel.type != 'None' && ! sel.isCollapsed ) return;
 				$( '#modal-' + id ).miniModal('show');
@@ -61,20 +53,20 @@
 			
 		});
 		
-		// Events
+		// Section Features and Section Values
 		
-		// Click to start playing video
-
-		$('.section-banner #hide-overview-image').on('click', () => {
-			let handle = setInterval( () => {
-				if( document.querySelector('.section-banner .overview-image-and-video-player video').readyState < 1 ) return;
-				
-				clearInterval( handle );
-				$('.section-banner .overview-image-and-video-player video').css('display','block');
-				$('.section-banner .overview-image-and-video-player video')[0].play()
-			}, 500 );
-		});
+		let urlHash = mwDev.tools.hashControl.get();
+		if( urlHash && urlHash.match( /^explain-/ ) ) {
+			// Open extendable box containing card
+			let collapseContainer = $( urlHash ).parents('.mw-collapsed');
+			if( collapseContainer.length ) collapseContainer.find('.mw-collapsible-toggle')[0].click();
+			$('html, body').stop().animate( { 'scrollTop': $( '#' + urlHash ).offset().top - scrollMargin }, 800, 'swing', () => $(window).miniModal('checkForModalsCalledByHash') );
+		}
 		
 	}
 	
 })();
+
+/*
+[[Category:MultiWiki]]
+*/
