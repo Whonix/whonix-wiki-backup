@@ -20,7 +20,7 @@ deferrable:NO -- Because a other scripts are dependent on it
 	let triggerFn = () => {
 		let hash = get();
 		if( hash && allHashCallbacks[ hash ] ) allHashCallbacks[ hash ]();
-		else emptyHashCallbacks.forEach( element => element() );
+		if( ! hash ) emptyHashCallbacks.forEach( element => element() );
 	};
 	
 	// Register with our dev tools

@@ -6,6 +6,11 @@ deferrable:NO -- Because other scripts are dependent on it
 
 (function() {
 	
+	
+	// -----
+	// Setup
+	
+	
 	const innerDom = $( `
 		<span class="robots-nocontent">
 			<!--googleoff: index-->
@@ -92,6 +97,23 @@ deferrable:NO -- Because other scripts are dependent on it
 		kicksecure: 'Kicksecure',
 		whonix: 'Whonix',
 	};
+	
+	let urlBaseData = {};
+	if( window.location.href.match(/\/w\/index\.php/) ) {
+		let search = new URLSearchParams( window.location.search );
+		search.delete( 'title' );
+		search.delete( 'stable' );
+		let searchString = ( Array.from(search.values()).length ? '?' + search.toString() : '' );
+		urlBaseData.route = ( window.location.href.match(/(?<=title\=)[^#&$]+/g) || [''] )[0];
+		urlBaseData.url = window.mwDev.data.app.baseUrl.match( /https:\/\/[^\/]+/g ) + '/wiki/' + urlBaseData.route + searchString;
+	} else {
+		urlBaseData.route = ( window.location.href.match(/(?<=\/wiki\/)[^#?$]+/g) || [''] )[0];
+		urlBaseData.url = window.mwDev.data.app.baseUrl;
+	}
+	
+	// ----------------
+	// JQuery extension
+
 
 	$.fn.shareTooltip = function( action ) {
 		// Only allow 'init' at the moment (extendable later)
@@ -132,8 +154,9 @@ deferrable:NO -- Because other scripts are dependent on it
 				}
 			}
 			
-			data.url = window.mwDev.data.app.baseUrl + ( share.attr('data-anchor') ? '#' + share.attr('data-anchor') : '' );
-			data.route = ( window.location.href.match(/(?<=\/wiki\/)[^#?$]+/g) || [''] )[0];
+			data.url = urlBaseData.url + ( share.attr('data-anchor') ? '#' + share.attr('data-anchor') : '' );
+			data.route = urlBaseData.route;
+			
 			data.title = $('html head title').text();
 			
 			data.project = window.location.href.match(/[^:\/.]+\.[^\/#?]+/g)[0].match(/[^.]+\.[^.]+$/g)[0].match(/^[^.]+/g)[0];

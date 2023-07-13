@@ -11,21 +11,21 @@ of $os to create an $os-array to loop over. See /Dev/mediawiki#Widgets
 
 <a
  rel="noreferrer"
- href="<!--{$url}-->"
- class="download-button-v2 <!--{if isset($addToClass)}--><!--{$addToClass|escape:'html'}--><!--{/if}-->"
+ href="<!--{$url|default:''}-->"
+ class="download-button-v2 <!--{$addToClass|escape:'html'|default:''}-->"
  <!--{if isset($targetBlank) && $targetBlank|validate:boolean}-->target="_blank"<!--{/if}-->
- <!--{if ! empty($redirectUrl) }-->data-redirect="<!--{$redirectUrl}-->,<!--{if ! empty($redirectDilay) }--><!--{$redirectDelay}--><!--{else}-->1000<!--{/if}-->"<!--{/if}-->
+ <!--{if isset($redirectUrl) }-->data-redirect="<!--{$redirectUrl}-->,1000"<!--{/if}-->
  <!--{if isset($fontsize) }-->style="font-size: <!--{$fontsize}-->;"<!--{/if}-->
 >
  <span class="dbutton">
   <i class="fa fa-download"></i>
-  <span><!--{$text|escape:'html'}--></span>
+  <span><!--{$text|escape:'html'|default:''}--></span>
  </span>
 
- <!--{if ! empty($os) }-->
+ <!--{if isset($os) }-->
   <span class="op-sys">
    <!--{foreach from=$os item=$o }-->
-    <!--{if $imgSrc[$o] }-->
+    <!--{if isset( $imgSrc[$o] ) }-->
      <img
       src="/w/images/thumb/<!--{$imgSrc[$o][0]}-->/Logo-<!--{$o}-->.png/<!--{$imgSrc[$o][1]}-->px-Logo-<!--{$o}-->.png"
       alt="<!--{$o|upper}-->"
@@ -37,7 +37,7 @@ of $os to create an $os-array to loop over. See /Dev/mediawiki#Widgets
   </span>
  <!--{/if}-->
 
- <!--{if ! empty($onion) }-->
+ <!--{if isset($onion) }-->
   <a href="<!--{$onion}-->" class="onion-download" title="Onion link"></a>
  <!--{/if}-->
 </a><noinclude>
