@@ -7,6 +7,7 @@ Uninstall {{q_project_name}}
 |image=Qubesunintall123123.png
 }}
 [[image:Qubesunintall123123.png|250px|thumb]]
+{{qubes_mininav}}
 <div class="mininav">
 * [[Uninstall|Uninstall {{non_q_project_name}}]]
 * [[Qubes/Uninstall|Uninstall {{q_project_name}}]]
@@ -22,17 +23,13 @@ Alternatively, it is possible to [[Qubes/Reinstall|Reinstall {{q_project_name}} 
 
 In any case, these procedures are [[unspecific|unspecific to {{project_name_long}}]].
 
-* Qubes R4.<u>0</u>: Before {{q_project_name}} Template packages can be uninstalled, the Template must not be used as the underlying template by any VMs (otherwise Qubes prohibits removal). Therefore, either delete the VMs as documented below or follow the step to: [[#Stop using {{project_name_long}} Templates in VM Template Settings|Stop using {{project_name_long}} Templates in VM Template Settings]].
-* Qubes R4.<u>1</u>: Similar to above but in some situations [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html <code>qvm-template</code>] with the [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#purge <code>purge</code>] instead of the [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#purge <code>remove</code>] [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#subcommands subcommand] might be simpler.
+* In some situations [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html <code>qvm-template</code>] with the [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#purge <code>purge</code>] instead of the [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#remove <code>remove</code>] [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-template.html#subcommands subcommand] might be simpler.
 ** <code>remove</code>: <blockquote>Remove installed templates.</blockquote>
 ** <code>purge</code>: <blockquote>Remove installed templates and associated VMs.</blockquote>
 
-Users can replace {{project_name_long}} version <code>16</code> with <code>15</code> or any other version number if that is the goal.
+Users can replace {{project_name_long}} version <code>16</code> with <code>17</code> or any other version number if that is the goal.
 
 = Purge =
-* Qubes R4.<u>0</u> <code>qvm-template purge</code> unsupported. Other method as document in following chapters can be considered.
-* Qubes R4.<u>1</u> <code>qvm-template purge</code> supported.
-
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
 | text    = Data loss possible if used wrong! Before proceeding with the <code>qvm-template purge</code> the user should carefully review the output of the <code>qvm-template</code> command before confirming. In doubt, a different method as document in other chapters should be used.
@@ -58,13 +55,13 @@ qvm-template purge whonix-gw-{{VersionShort}}
 
 Sample output:
 
-<div class="pre"><nowiki>This will completely remove the selected VM(s)...
+<div class="pre">This will completely remove the selected VM(s)...
   {{project_name_gateway_template}}
   sys-whonix
   anon-whonix
   {{whonix-ws-dvm}}
   custom-vm-using-{{project_name_workstation_template}}-template
-Are you sure? [y/N]</nowiki></div>
+Are you sure? [y/N]</div>
 
 '''5.''' Confirm or abort.
 
@@ -294,13 +291,9 @@ can remain. These will not have any effect once Qubes Templates are removed sinc
 == {{project_name_gateway_long}} ==
 
 # Open a <code>dom0</code> terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
-# Uninstall <u>all</u> {{q_project_name}} {{project_name_gateway_long}} template packages matching <code>qubes-template-whonix-gw*</code>: <ref name=matching>
-Note the matching syntax below and the effect of running <code>qubes-template-whonix-gw'''*'''</code> or <code>qubes-template-whonix-ws<u>*</u></code>. Also note the asterisk <code>*</code> wildcard at the end. Depending on the {{project_name_long}} version, this leads to multiple template packages being uninstalled if they are present:
+# Uninstall <u>all</u> {{q_project_name}} {{project_name_gateway_long}} template packages matching <code>qubes-template-whonix-g*</code>: <ref name=matching>
+Note the matching syntax below and the effect of running <code>qubes-template-whonix-gw'''*'''</code> or <code>qubes-template-whonix-w*<u>*</u></code>. Also note the asterisk <code>*</code> wildcard at the end. Depending on the {{project_name_long}} version, this leads to multiple template packages being uninstalled if they are present:
 
-* <code>qubes-template-whonix-gw</code> (deprecated {{project_name_long}} <code>13</code> release)
-* <code>qubes-template-whonix-ws</code> (deprecated {{project_name_long}} <code>13</code> release)
-* <code>qubes-template-whonix-gw-14</code> (deprecated {{project_name_long}} release)
-* <code>qubes-template-whonix-ws-14</code> (deprecated {{project_name_long}} release)
 * <code>qubes-template-whonix-gw-15</code> (deprecated {{project_name_long}} release)
 * <code>qubes-template-whonix-ws-15</code> (deprecated {{project_name_long}} release)
 * <code>qubes-template-whonix-gw-16</code> (stable {{project_name_long}} release)
@@ -311,11 +304,8 @@ Note the matching syntax below and the effect of running <code>qubes-template-wh
 Wildcards are used so these instructions are valid for all old and future versions of {{project_name_long}}. Alternatively, the asterisk <code>*</code> syntax could be replaced with a specific template package listed above.
 </ref>
 
-* R4.0: {{CodeSelect|code=
-sudo dnf remove qubes-template-whonix-gw*
-}}
-* R4.1: {{CodeSelect|code=
-sudo qvm-template remove qubes-template-whonix-gw*
+{{CodeSelect|code=
+sudo qvm-template remove qubes-template-whonix-g*
 }}
 
 Review the output of the command before confirming to proceed.
@@ -325,10 +315,7 @@ Review the output of the command before confirming to proceed.
 # Open a <code>dom0</code> terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
 # Uninstall <u>all</u> Qubes-{{project_name_workstation_long}} template packages matching <code>qubes-template-whonix-ws*</code>: <ref name=matching />
 
-* R4.0: {{CodeSelect|code=
-sudo dnf remove qubes-template-whonix-ws*
-}}
-* R4.1: {{CodeSelect|code=
+{{CodeSelect|code=
 sudo qvm-template remove qubes-template-whonix-ws*
 }}
 
@@ -339,10 +326,7 @@ Review the output of the command before confirming to proceed.
 # Open a <code>dom0</code> terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
 # Uninstall <u>all</u> {{q_project_name}} template packages matching <code>qubes-template-whonix*</code>: <ref name=matching />
 
-* R4.0: {{CodeSelect|code=
-sudo dnf remove qubes-template-whonix*
-}}
-* R4.1:{{CodeSelect|code=
+{{CodeSelect|code=
 sudo qvm-template remove qubes-template-whonix*
 }}
 

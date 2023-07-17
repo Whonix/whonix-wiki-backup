@@ -190,7 +190,7 @@ Before configuring this tunnel link, it is recommended to read the following rel
 |download_command=scurl-download --tlsv1.2 https://geti2p.net/_static/i2p-archive-keyring.gpg
 |source_filename=i2p-archive-keyring.gpg
 |target_filename=/usr/share/keyrings/i2p-archive-keyring.gpg
-|download_command_qubes_templatevm=scurl-download --proxy http://127.0.0.1:8082 --tlsv1.2 https://geti2p.net/_static/i2p-archive-keyring.gpg
+|download_command_qubes_templatevm=http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 scurl-download --tlsv1.2 https://geti2p.net/_static/i2p-archive-keyring.gpg
 |gpg_fingerprint=7840 E761 0F28 B904 7535  49D7 67EC E560 5BCF 1346
 }}
 
@@ -199,7 +199,7 @@ Before configuring this tunnel link, it is recommended to read the following rel
 ([[Qubes|{{q_project_name}}]]: <code>{{project name workstation template}}-clone-1</code> Template).
 
 {{CodeSelect|code=
-echo "deb [signed-by=/usr/share/keyrings/i2p-archive-keyring.gpg] tor+https://deb.i2p2.de/ {{Stable project version based on Debian codename}} main" {{!}} sudo tee /etc/apt/sources.list.d/i2p.list
+echo "deb [signed-by=/usr/share/keyrings/i2p-archive-keyring.gpg] tor+https://deb.i2p2.de/ $(lsb_release -sc) main" \ {{!}} sudo tee /etc/apt/sources.list.d/i2p.list
 }}
 
 '''3.''' I2P installation.
@@ -210,22 +210,12 @@ echo "deb [signed-by=/usr/share/keyrings/i2p-archive-keyring.gpg] tor+https://de
 package=i2p i2p-keyring
 }}
 
-'''4.''' Configure I2P service to start automatically upon boot and as well it will use I2P apparmor profile.
-
-([[Qubes|{{q_project_name}}]]: <code>{{project name workstation template}}-clone-1</code> Template).
-
-{{CodeSelect|code=
-sudo dpkg-reconfigure i2p
-}}
-
-'''5.''' Platform specific notices.
+'''4.''' Platform specific notices.
 
 * Non-Qubes-Whonix: No special notices.
 * Qubes-Whonix: Shutdown <code>{{project name workstation template}}-clone-1</code> Template.
 
-'''6.''' Configure [[Tor Browser]] to allow connections to I2P.
-
-([[Qubes|{{q_project_name}}]]: <code>{{project_name_workstation_vm}}-I2P</code> App Qube)
+'''5.''' Create <code>{{project_name_workstation_vm}}-I2P</code> based on <code>{{project name workstation template}}-clone-1</code> Template and Configure [[Tor Browser]] in <code>{{project_name_workstation_vm}}-I2P</code> App Qube to allow connections to I2P by following the instructions below.
 
 {{Box|text=
 <u>Note</u>: The following steps will no longer be required once {{project_name_long}} releases a custom Tor Browser for connecting to alternative networks. <ref>Except in the case of [[YaCy]], which needs internet access.</ref>
@@ -235,6 +225,7 @@ sudo dpkg-reconfigure i2p
 | text    =
 '''Warning:'''
 * This step changes the [[Fingerprint#web_fingerprint|web fingerprint]] of Tor Browser!
+* Onion services [https://forums.whonix.org/t/i2p-integration/4981/369 wont connect to Tor within Whonix]
 * Leave all other settings as is!
 }}
 
@@ -247,83 +238,121 @@ extensions.torbutton.use_nontor_proxy
 }} &rarr; set to <code>true</code>
 
 '''C.''' Search for and modify: {{CodeSelect|code=
-network.proxy.share_proxy_settings
-}} &rarr; set to <code>true</code>
-
-'''D.''' Search for and modify: {{CodeSelect|code=
 network.proxy.http
 }} &rarr; set to {{CodeSelect|code=
-127.0.0.2
+127.0.0.1
 }}
 
-'''E.''' Search for and modify: {{CodeSelect|code=
+'''D.''' Search for and modify: {{CodeSelect|code=
 network.proxy.http_port
 }} &rarr; set to 
 {{CodeSelect|code=
 4444
 }}
 
-'''F.''' Search for and modify: {{CodeSelect|code=
+'''E.''' Search for and modify: {{CodeSelect|code=
 network.proxy.no_proxies_on
 }} &rarr; set to {{CodeSelect|code=
-127.0.0.2
+127.0.0.1
 }}
 
-'''G.''' Search for and modify: {{CodeSelect|code=
-network.proxy.socks_remote_dns
-}} &rarr; set to <code>false</code>
-
-'''H.''' Search for and modify: {{CodeSelect|code=
+'''F.''' Search for and modify: {{CodeSelect|code=
 dom.security.https_first_pbm
 }} &rarr; set to <code>false</code>
 
-'''I.''' Search for and modify: {{CodeSelect|code=
+'''G.''' Search for and modify: {{CodeSelect|code=
 dom.security.https_only_mode
 }} &rarr; set to <code>false</code>
 
-'''J.''' Done.
+'''H.''' Search for and modify: {{CodeSelect|code=
+dom.security.https_only_mode_pbm
+}} &rarr; set to <code>false</code>
 
-Tor Browser configuration has been completed.
 }}
 
-'''7.''' Done.
+'''6.''' Done.
 
 The process of installing I2P has been completed.
 
-=== Usage ===
-Open [http://127.0.0.2:7657 I2P Console] in Tor Browser
+=== Steps for I2P Configuration and Usage After Installation ===
 
-([[Qubes|{{q_project_name}}]]: <code>{{project_name_workstation_vm}}-I2P</code> App Qube).
+1. Open xfce-terminal in <code>{{project_name_workstation_vm}}-I2P</code> App Qube
+
+2. Start I2P
 
 {{CodeSelect|code=
-http://127.0.0.2:7657
+i2prouter start
 }}
+
+[[File:i2p.png|400px]]
+
+3. A popup going to ask you to open [http://127.0.0.1:7657 I2P Console] in Tor Browser, Press on Yes
+
+[[File:i2p1.png|400px]]
+
+4. A setup wizard will show up. Complete it and then proceed to the I2P Console.
+
+5. Go to Settings by either going to [http://127.0.0.1:7657/config  I2P Console config]
+
+[[File:i2p2.png|480px]]
+
+'''OR'''
+
+Press on <code>Settings</code>
+
+[[File:i2p2s.png|400px]]
+
+6. Press on <code>Network</code>
+
+[[File:i2p3.png|480px]]
+
+7. Change the network settings according to the images below (click on <code>Save Changes</code> once you finished)
+
+[[File:i2p4.png|450px]]
+
+[[File:i2p5.png|450px]]
+
+8. Go to <code>Reseeding</code>
+
+[[File:i2p6.png|480px]]
+
+9. Change the reseeding settings according to the image below (click on <code>Save Changes</code> once you have finished)
+
+[[File:i2p7.png|450px]]
+
+10. It is preferable to restart I2P from the XFCE Terminal using the following command
+
+{{CodeSelect|code=
+i2prouter restart
+}}
+
+11. Done! Now you can browse eepsites with I2P and access clearnet websites connected directly to Tor separately.
 
 === Notes ===
 
 * <u>Known Error Messages:</u> If errors appear like: "Network: ERR-UDP Disabled and Inbound TCP host/port not set" or "ERR-Clock Skew of X min" or "WARN [Timestamper] .router.time.RouterTimestamper: Unable to reach any of the NTP servers ...", they can be safely ignored.
-* <u>Network Bootstrap Waiting Time:</u> Once the Local Tunnels (shared clients) section shows a green connection, I2P should be fully functional and it is possible to browse eepsites like <code>zzz.i2p</code>. Some users report this process can be sorta lengthy and can take more than 10 minutes before the tunnels are stable/available.
+* <u>Network Bootstrap Waiting Time:</u> Once the Local Tunnels (shared clients) section shows a green connection, I2P should be fully functional and it is possible to browse eepsites like <code>http://idk.i2p</code>. Some users report this process can be sorta lengthy and can take more than 10 minutes before the tunnels are stable/available.
 * <u>I2P over Tor viewpoint by I2P upstream developers:</u> I2P is functional over Tor but user should be aware that I2P developers do not really support it nor recommending it to be used over Tor. Just because it is functional does not mean it is supported. In other words I2P upstream developers will not change any I2P behavior just for the sake of connectivity issues of I2P over Tor because I2P is not designed to be running over Tor.
 * <u>Whonix pre-configuration:</u> settings for I2P (because its over Tor) can be viewed here: https://github.com/Whonix/anon-apps-config/tree/master/var/lib/i2p/i2p-config
-* <u>i2prouter start:</u> Note: '''Do not''' use <code>i2prouter start</code> command as it will not use I2P apparmor profile.
-* <u>Broken Onion Services:</u> Setting <code>network.proxy.http</code> &rarr; set to <code>127.0.0.2</code> will break the connection to onion. services. Read more [https://forums.whonix.org/t/i2p-integration/4981/347 here]. There is no known way to avoid this issue.
+* <u>Broken Onion Services:</u> Setting <code>network.proxy.http</code> &rarr; set to <code>127.0.0.1</code> will break the connection to onion. services. Read more [https://forums.whonix.org/t/i2p-integration/4981/347 here]. There is no known way to avoid this issue.
 
 == I2P Eepsites (I2P websites) ==
 *search engine example:
 Ahmia which is onion service search engine now supports I2P eepsites https://ahmia.fi/i2p/ and Tor2Web plans on adding I2P support. <ref>https://lists.torproject.org/pipermail/tor-talk/2016-January/039814.html</ref> <ref>https://github.com/tor2web/Tor2web/issues/82</ref>
 
 * Eepsites (I2P services) lists:
-** http://stats.i2p
 ** http://identiguy.i2p 
 ** http://planeta.i2p
 ** http://notbob.i2p 
-** http://scanner.linuxfarm.i2p
-** http://reg.i2p
+** http://skank.i2p/
+** http://bote.i2p/
 ** http://inr.i2p
 
 '''Figure:''' ''I2P Browsing in {{project_name_long}}''
 
+{{ContentImage|
 [[Image:I2Pbrowsing.png]]
+}}
 
 = Services =
 
@@ -353,15 +382,15 @@ For documentation about default port numbers of I2P plugins, see [https://geti2p
 
 I2P has ready irc tunnel to be used and connect to their official irc servers go to: 
 
-http://127.0.0.2:7657/help#faq
+http://127.0.0.1:7657/help#faq
 
 If you scroll down you will find: 
 
 <blockquote> How do I connect to IRC within I2P?
 
-A tunnel to the main IRC server network within I2P, Irc2P, is automatically started when the I2P router starts. To connect to it, tell your IRC client to connect to server: 127.0.0.2 port: 6668.
+A tunnel to the main IRC server network within I2P, Irc2P, is automatically started when the I2P router starts. To connect to it, tell your IRC client to connect to server: 127.0.0.1 port: 6668.
 
-HexChat-like client users can create a new network with the server 127.0.0.2/6668, or you can connect with the command /server 127.0.0.2 6668. Different IRC clients may require a different command, consult the client documentation.</blockquote>
+HexChat-like client users can create a new network with the server 127.0.0.1/6668, or you can connect with the command /server 127.0.0.1 6668. Different IRC clients may require a different command, consult the client documentation.</blockquote>
 
 '''Practical practice:'''
 
@@ -385,7 +414,7 @@ HexChat-like client users can create a new network with the server 127.0.0.2/666
 
 [[File:HexchatI2P5.png|400px]]
 
-* Double click the top field to change it or press on it then press on Edit button then change the value to <code>127.0.0.2/6668</code> then hit Enter and press on close
+* Double click the top field to change it or press on it then press on Edit button then change the value to <code>127.0.0.1/6668</code> then hit Enter and press on close
 
 [[File:HexchatI2P6.png|400px]]
 

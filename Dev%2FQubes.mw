@@ -1078,7 +1078,7 @@ Should include <code>whonix-ws 1</code>.
 In Qubes Template.
 
 {{CodeSelect|code=
-curl.anondist-orig --proxy https://127.0.0.1:8082 https://check.torproject.org
+http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 curl.anondist-orig https://check.torproject.org
 }}
 
 = Testing Automated =
@@ -1310,6 +1310,29 @@ qvm-volume info vmname:root
 
 {{CodeSelect|code=
 qvm-volume info vmname:root {{!}} tail -1
+}}
+
+= Qubes EFI Fallback Bootloader =
+
+* https://github.com/QubesOS/qubes-issues/issues/8363
+* https://forum.qubes-os.org/t/grubx64-efi-does-not-exist/18144/4
+
+Copy files from /boot/efi/EFI/qubes/ to /boot/efi/EFI/BOOT/
+
+{{CodeSelect|code=
+sudo cp -r /boot/efi/EFI/qubes/* /boot/efi/EFI/BOOT/
+}}
+
+Change filename grubx64.efi → BOOTX64.efi
+
+{{CodeSelect|code=
+sudo mv /boot/efi/EFI/BOOT/grubx64.efi /boot/efi/EFI/BOOT/BOOTX64.efi
+}}
+
+Change filename grub.cfg → BOOTX64.cfg
+
+{{CodeSelect|code=
+sudo mv /boot/efi/EFI/BOOT/grub.cfg /boot/efi/EFI/BOOT/BOOTX64.cfg
 }}
 
 = See Also =

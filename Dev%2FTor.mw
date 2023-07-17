@@ -9,6 +9,13 @@ Tor integration in {{project_name_long}} Development Notes
 Tor Version, Package source (Debian, backports, Tor Project package repository), Config Files, Miscellaneous
 }}
 = Tor Version =
+There are two implementations of Tor.
+
+* C Tor - Originally just called "Tor". This original implementation of Tor written in the C programming language.
+* Arti - New rust based implementation of Tor.
+
+Both are developed by its upstream developer, The Tor Project.
+
 According to the [https://gitlab.torproject.org/legacy/trac/-/wikis/org/teams/NetworkTeam/CoreTorReleases#list-of-releases Tor release note], there are usually several different major versions of Tor supported by the Tor project. However, due to the the limited time the Tor packager has, only a few major versions are packaged and ready to be used.
 
 For example, in December, 2017, five major versions of Tor were supported. Specifically:
@@ -25,7 +32,13 @@ There are three primary Tor options for {{project_name_long}} developers and eac
 '''1. Use the Tor LTS version from the official Debian package repository: <code>packages.debian.org</code>'''
 
 * Advantages: Minimal effort is required in {{project_name_long}}.
-* Disadvantages: Misses the advantages of later versions (see below).
+* Disadvantages: Might miss the advantages of later versions (see below).
+** While this was true in past, development of C Tor has slowed down because its replacement Arti is now the development focus of the Tor developers. <ref>
+* https://gitlab.torproject.org/tpo/core/arti/-/blob/main/doc/FAQ.md
+* https://blog.torproject.org/arti_100_released/
+* https://gitlab.torproject.org/tpo/core/tor/-/merge_requests/496
+</ref>
+*** Related: Whonix forum discussion [https://forums.whonix.org/t/keep-an-eye-on-arti-tor/15815 Keep an eye on Arti (Tor)]
 
 '''2. Use latest stable in TPO repository and allow testers to use the Tor nightly build in {{project_name_long}}, with bug reporting bug to TPO'''
 
@@ -51,9 +64,11 @@ Patrick: "Historically when there was a botnet starting to use Tor, the LTS vers
 ** A few testers are needed, manual uploads are required, and {{project_name_long}} touches Tor.
 ** Other issues from 2. above equally apply.
 
-{{project_name_long}} developers have chosen the third method for now. <ref>
-Relative {{project_name_long}} Forum discussion: https://forums.whonix.org/t/tor-releases-discussion/4578</ref> However, the comparison above suggests better security and compatibility is afforded by the second option. This approach requires a lot of active testers who can use the Tor nightly build and report bugs to the Tor project or {{project_name_long}}. <ref>Please contact us if you would like to be a Tor nightly build tester for {{project_name_long}}.
-</ref>
+{{project_name_long}} developers have chosen the third method for Whonix 16. <ref>
+Relative {{project_name_long}} Forum discussion: https://forums.whonix.org/t/tor-releases-discussion/4578
+</ref> However, the comparison above suggests better security and compatibility is afforded by the second option. This approach however would requires a lot of active testers who can use the Tor nightly build and report bugs to the Tor project or {{project_name_long}}, which are unavailable.
+
+{{project_name_long}} developers have chosen the first method for Whonix 17 because development of C Tor has slowed down in favor or Arti as mentioned above.
 
 = Tor Config Files =
 == Rationale for Tor Drop-In Configuration Folder ==
