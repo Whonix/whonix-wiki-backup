@@ -17,6 +17,9 @@
 * [https://github.com/QubesOS/qubes-issues/issues/7586 document how to route all traffic over Tor / how to disable Qubes default clearnet traffic #7586]
 * [https://github.com/QubesOS/qubes-issues/issues/7801 Qubes should keep IP forwarding in VMs with the provides network (Net Qube) disabled by default #7801]
 
+=== Important Security Disadvantages ===
+* [https://forums.whonix.org/t/qubes-whonix-security-disadvantages-help-wanted/8581 Qubes-Whonix Security Disadvantages - Help Wanted!]
+
 === Important General Issues ===
 * [[Qubes/Update#Warnings|Qubes Updater Issues]], [https://github.com/QubesOS/qubes-issues/labels/C%3A%20updates Qubes Updater Issues], most notably such as:
 ** [https://github.com/QubesOS/qubes-issues/issues/7254 qubes-dom0-update shows <code>No updates available</code> in case of network is down / <code>qubes-dom0-update</code> fails to notice if repositories are unreachable / network is down],
@@ -57,6 +60,13 @@
 issue reports:
 
 * https://forum.qubes-os.org/t/backup-qubes-failing-write-error-read-only-file-system/2926
+
+=== Info ===
+https://github.com/QubesOS/qubes-issues/issues/4794#issuecomment-466721775
+
+Can somehow the number of the VM vm80 be used to deduce the VM name so I can check/try again?
+
+it is QID, try <code>qvm-ls -O name,qid</code>
 
 = Write Qubes ISO Installer Image to USB =
 When using an App Qube such as <code>iso-download</code>.
@@ -738,7 +748,7 @@ AppVM
 
 StandaloneVM
 TemplateBasedVM
-DisposableVM
+Disposable
 
 HVM
 HVM Template
@@ -989,8 +999,6 @@ sudo cat /srv/formulas/base/virtual-machines-formula/qvm/whonix.jinja
 
 = qvm-tags =
 == Introduction ==
-Qubes R4.0 and above only.
-
 Qubes dom0 package [https://github.com/QubesOS/qubes-core-admin-addon-whonix <code>qubes-core-admin-addon-whonix</code>] ([https://github.com/marmarek/qubes-core-admin-addon-whonix/blob/master/qubeswhonix/__init__.py <code>__init__.py</code>]) ([https://forums.whonix.org/t/qubes-core-admin-addon-whonix-for-qubes-r4-testers-wanted forum discussion]) is responsible for:
 
 * set NetVM to <code>{{project_name_gateway_vm}}</code> [...]
@@ -1023,15 +1031,26 @@ Tags are not reliably set yet. TODO: https://github.com/QubesOS/qubes-issues/iss
 <code>anon-gateway</code> tag will be used in future by sdwdate-gui-qubes.
 
 == whonix-updatevm tag ==
-<code>whonix-updatevm</code> tag gets set by [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/blob/master/qvm/template-whonix-ws.sls#L33 salt template-whonix-ws.sls] as well as by [https://github.com/QubesOS/qubes-core-admin-addon-whonix/blob/master/qubeswhonix/__init__.py qubes-core-admin-addon-whonix __init__.py]. TODO: <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code>
+<code>whonix-updatevm</code> tag gets set by [https://github.com/QubesOS/qubes-mgmt-salt-dom0-virtual-machines/blob/master/qvm/template-whonix-workstation.sls salt template-whonix-ws.sls] as well as by [https://github.com/QubesOS/qubes-core-admin-addon-whonix/blob/master/qubeswhonix/__init__.py qubes-core-admin-addon-whonix __init__.py].
 
-{{CodeSelect|code=
-      - $tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
-      - $tag:whonix-updatevm $anyvm deny
+By Qubes default, a VM with tag <code>whonix-updatevm</code> may only use <code>target=</code> <code>sys-whonix</code> as <code>qubes.UpdatesProxy</code>. Related user documentation: [[Multiple Qubes-Whonix Templates]]
+
+TODO:
+
+* old:
+** <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code>
+*** {{CodeSelect|code=
+- $tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
+- $tag:whonix-updatevm $anyvm deny
+}}
+* new:
+** <code>/etc/qubes/policy.d/90-default.policy</code>
+** <code>/etc/qubes/policy.d/50-config-updates.policy</code>
+** {{CodeSelect|code=
+sudo grep -r -i --color updatesproxy /etc
 }}
 
 == view tags ==
-See also Qubes [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-tags.html <code>qvm-tags</code> man page].
 
 To view tags.
 
@@ -1051,7 +1070,12 @@ qvm-tags {{project_name_workstation_vm}} list
 qvm-tags {{project_name_gateway_vm}} list
 }}
 
-= tags inheritance =
+See also:
+
+* [[Qubes/Troubleshooting#qvm-tags_verification|<code>qvm-tags</code> verification]]
+* Qubes [https://dev.qubes-os.org/projects/core-admin-client/en/latest/manpages/qvm-tags.html <code>qvm-tags</code> man page].
+
+== tags inheritance ==
 <blockquote>
 Tags are not inherited. Generally settings are not inherited from Template by TemplateBasedVM. Where needed, core-admin-addon can be made to copy selected settings from Template to TemplateBasedVM.
 </blockquote>
@@ -1059,20 +1083,52 @@ Tags are not inherited. Generally settings are not inherited from Template by Te
 https://github.com/QubesOS/qubes-core-admin/pull/214#issuecomment-399698122
 </ref>
 
+== qvm tags issues ==
+Users are instructed to manually add qvm-tags in user documentation on these wiki page:
+
+* [[Multiple_Whonix-Gateway]]
+* [[Multiple Whonix-Workstation]]
+
+This is because in corner cases qvm-tags are missing and resulting in sdwdate-gui issues. This is non-ideal usability wise.
+
+Sparing users from needing to change this setting requires upstream Qubes feature request [https://github.com/QubesOS/qubes-issues/issues/4117 way to find out the name of gateway from inside the VM - qubesdb-read /qubes-gateway-name] or [https://github.com/QubesOS/qubes-issues/issues/5253 qrexec feature request: send this over qrexec to the net qube I am connected to / {{project_name_gateway_vm}} hardcoded / {{project_name_gateway_vm}} unexpected autostart] to get implemented.
+
+Technical improvement proposals:
+
+* https://phabricator.whonix.org/T930
+
+https://forums.whonix.org/t/sys-whonix-starting-spontaneously-after-update/8123
+
 = qvm-features =
 To view VM features.
 
 {{CodeSelect|code=
-qvm-features {{{{project_name_gateway_template}}}}
+qvm-features vm-name
 }}
 
-Should include <code>{{project_name_gateway_template}} 1</code>.
+Check {{project_name_gateway_template}} important <code>qvm-features</code>..
 
 {{CodeSelect|code=
-qvm-features {{project_name_workstation_template}}
+qvm-features {{project_name_gateway_template}} {{!}} grep whonix-gw
 }}
 
-Should include <code>whonix-ws 1</code>.
+Should should:
+
+<pre>
+whonix-gw 1
+</pre>
+
+Check {{project_name_workstation_template}} important <code>qvm-features</code>.
+
+{{CodeSelect|code=
+qvm-features {{project_name_workstation_template}} {{!}} grep whonix-ws
+}}
+
+Should should:
+
+<pre>
+whonix-ws 1
+</pre>
 
 = Connection through Qubes Updates Proxy =
 In Qubes Template.

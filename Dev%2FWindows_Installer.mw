@@ -13,7 +13,6 @@
 Work in progress.
 }}
 = Design / Features =
-* <s>https://github.com/Whonix/misc</s>
 * https://github.com/Whonix/Whonix-Installer
 * https://github.com/Whonix/Whonix-Starter
 * https://github.com/Whonix/Whonix-Starter-Binary
@@ -105,7 +104,7 @@ EV (extended validation) certificate required to avoid Microsoft SmartScreen Fil
 == providers ==
 thalesgroup:
 
-* asked
+* asked. does not have Linux tools.
 
 Certum:
 
@@ -143,6 +142,7 @@ ssl.com:
 ** bug reports:
 *** [https://github.com/SSLcom/esigner-codesign/issues/4 eSigner demo missing CREDENTIAL_ID]
 *** [https://github.com/SSLcom/esigner-codesign/issues/7 java.io.IOException: DOS header signature not found]
+*** [https://github.com/SSLcom/esigner-codesign/issues/8 provide demo certificate authority file (CAfile)]
 * B) optional Google Cloud HSM compatibility
 ** https://www.ssl.com/guide/supported-cloud-hsms-document-signing-ev-code-signing/
 ** <blockquote>SSL.com’s fee for Google Cloud HSM attestation is $500.00 USD.</blockquote>
@@ -155,150 +155,97 @@ Google Cloud HSM;
 * ( https://cloud.google.com/kms/docs/reference/pkcs11-nginx )
 * [https://github.com/GoogleCloudPlatform/kms-integrations/blob/master/kmsp11/docs/user_guide.md <code>libkmsp11.so</code>]
 
+== Verification of Code Signing Process ==
+=== Verification of VirtualBox ===
+VirtualBox for Windows is signed using Microsoft Authenticode signatures ("<code>signtool</code>").
+
+VirtualBox's digital signature can be verified on the Linux platform using <code>osslsigncode</code>. Example:
+
+{{CodeSelect|code=
+osslsigncode verify -in VirtualBox-*.exe
+}}
+
+A script [https://gitlab.com/whonix/virtualbox-windows-installer-binary/-/blob/master/verify <code>verify</code>] has been added to the <code>virtualbox-windows-installer-binary</code> repository as a reminder and example how to verify the digital software signatures on the Linux platform.
+
+=== Signing Whonix Windows Installer ===
+This document is based on a case where an executable (<code>hello.exe</code>) is signed using GitHub Actions (CI) and CodeSigner.
+
+For more details on the test, please refer to this GitHub repository: https://github.com/adrelanos/codesigner-test
+
+When a file (<code>hello.exe</code>) is signed, creating <code>hello_signed.exe</code>, the goal is to ensure that no additional modifications, beyond the signing process, have occurred. These could potentially include the insertion of malicious code.
+
+Overview:
+
+* Original file: <code>hello.exe</code>
+* Signed file: <code>hello_signed.exe</code>
+* Extracted signature file: <code>hello_signature.pem</code>
+* File with reattached signature: <code>hello_with_signature.exe</code>
+* File with reattached signature and reset PE header: <code>hello_with_signature_reset_PE.exe</code>
+* File with removed signature: <code>hello_without_signature.exe</code>
+* File with removed signature and reset PE header: <code>hello_without_signature_reset_PE.exe</code>
+* [https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/pe-header-to-zero <code>pe-header-to-zero</code>]
+
+To achieve this, the original file is compared with the signed file in various stages and through different methods. The key stages are as follows:
+
+1. Extract the signature from the signed file using <code>osslsigncode</code>:
+
+{{CodeSelect|code=
+osslsigncode extract-signature -in hello_signed.exe -out hello_signature.pem
+}}
+
+2. The original file (<code>hello.exe</code>) is then re-signed using this extracted signature to create a new file (<code>hello_with_signature.exe</code>):
+
+{{CodeSelect|code=
+osslsigncode attach-signature -sigin hello_signature.pem -in hello.exe -out hello_with_signature.exe
+}}
+
+At this point, one would expect <code>hello_signed.exe</code> to be identical to <code>hello_with_signature.exe</code>. However, it was discovered that the signing process (<code>osslsigncode attach-signature</code>) modified the PE header of the file by adding a PE checksum, thus resulting in a difference between these two files.
+
+To analyze and understand these differences, a set of tools were used, including <code>diff</code>, <code>vbindiff</code>, <code>diffoscope</code>, and <code>readpe</code>. These comparisons brought to light the change in the PE checksum.
+
+3. In order to make a direct comparison, the PE checksum in <code>hello_with_signature.exe</code> was reset to <code>0</code>, mirroring its original state in <code>hello.exe</code> and <code>hello_signed.exe</code>. This was achieved using a Python script named <code>pe-header-to-zero</code>:
+
+{{CodeSelect|code=
+pe-header-to-zero hello_with_signature.exe hello_with_signature_reset_PE.exe
+}}
+
+After running this script, the newly created file <code>hello_with_signature_reset_PE.exe</code> was found to be an exact match to <code>hello_signed.exe</code>.
+
+4. The script <code>pe-header-to-zero</code> was also used on <code>hello_without_signature.exe</code> to create <code>hello_without_signature_reset_PE.exe</code>:
+
+{{CodeSelect|code=
+pe-header-to-zero hello_without_signature.exe hello_without_signature_reset_PE.exe
+}}
+
+It was found that <code>hello_without_signature_reset_PE.exe</code> was an exact match to the original <code>hello.exe</code>, further validating the process.
+
+Following this thorough examination, it can be reasonably stated that the signing process did not introduce any unwanted or malicious modifications to the original executable file.
+
+All operations were performed using the <code>osslsigncode</code> tool.
+
+To install and examine PE headers, the <code>pev</code> tool was used:
+
+{{CodeSelect|code=
+sudo apt install pev
+}}
+
+To view the PE checksum, the <code>readpe</code> utility was used:
+
+{{CodeSelect|code=
+readpe hello_signed.exe
+}}
+
+{{CodeSelect|code=
+readpe hello_with_signature_reset_PE.exe
+}}
+
+{{CodeSelect|code=
+readpe hello_without_signature_reset_PE.exe
+}}
+
 = TODO =
 == merge ==
 Reminder: Always please merge first before developing further.
-
-== new file location - FYI ==
-ppcross_install has been moved.
-
-https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/ppcross_install
-
-FYI (for your interest) only. This ticket (wiki chapter) can be deleted after reading.
-
-Feel free to use this wiki page as a notepad for developers too by making notes somewhere else outside the TODO chapter.
-
-== avoid use of lazarus - replace with free pascal compiler ==
-lazarus is an IDE, but not a compiler, right?
-
-Can use of lazarus on command line be avoided?
-
-(It can stay in the script as comment but out commented by default.)
-
-Reason: Simplification; avoid dependency installation
-
-Can the command be replaced with the free pascal compiler instead?
-
-einsiedler90:
-
-no, we need the binary lazbuild to compile a lazarus project from cmd, which is part of lazarus.
-fpc is the compiler, thats right, but it has not all the dependencies of WhonixStarter/Installer.
-it is impossible to compile this project without the LCL.
-
-== document ppcross_install ==
-Why is [https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/ppcross_install ppcross_install] needed even on Debian bookworm?
-
-Is it because Debian doesn't compile with "make crossinstall"?
-
-The fp-compiler (fpc) [https://manpages.debian.org/bullseye/fp-compiler-3.2.0/fpc.1.en.html manpage] states:
-
-{{Quotation|
-quote=
--sh
-Tells the compiler to generate a script that can be used to assemble and link on the host system, not on the target system. Use this when cross-compiling.
-}}
-
-{{Quotation|
-quote=
--st
-Tells the compiler to generate a script that can be used to assemble and link on the target system, not on the host system. Use this when cross-compiling.
-}}
-
-Does that help?
-
-Otherwise can this be reported against Debian as a question, a bug or feature request? If yes, please write a draft for a feature request. (Patrick will review and post it.)
-
-Bug report probably already exists:
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=845498
-
-Does this help...? https://gist.github.com/o11c/cf98115ba716ebdd1dc2cc75b290f321
-
-einsiedler90:
-
-fpc is a kind of wrapper that redirects to the cross/compiler.
-we could use ppcx64 to compile from linux 64bit to windows 64bit,
-but it cannot found the windows system units without the install_ppcross() steps in the script.
-it generates the needed precompiled windows units in /usr/lib/fpc/X.X.X/units/x86_64-win64
-
-if a debian package with this files exists somewhere in the wild we could use this instead.
-
-== avoid use of git clone ==
-ppcross_install
-
-abolish need to fetch from https://gitlab.com/freepascal.org/fpc/source.git
-
-=== just use the existing compiler from Debian ===
-
-{{CodeSelect|code=
-fpc -Twin64 -Fi/usr/share/fpcsrc/3.2.2/rtl/win64 -Fi/usr/share/fpcsrc/3.2.2/rtl/win -Fi/usr/share/fpcsrc/3.2.2/rtl/inc -Fi/usr/share/fpcsrc/3.2.2/rtl/x86_64 -Fu/usr/share/fpcsrc/3.2.2/rtl/win64 -Fu/usr/share/fpcsrc/3.2.2/rtl/inc -FU/tmp/rtl -FE/tmp test
-}}
-
-=== based on fpc source package ===
-Could it be based on apt-get source?
-
-{{CodeSelect|code=
-apt-get source fpc
-}}
-
-Contains same contents as https://salsa.debian.org/pascal-team/fpc? No. [https://salsa.debian.org/pascal-team/fpc/-/blob/master/debian/orig-tar.sh Debian does some modifications.] Lacks <code>Makefile.fpc</code>, which can be re-generated.
-
-Can we edit https://salsa.debian.org/pascal-team/fpc/-/blob/master/debian/rules to add cross compilation? Maybe not even needed.
-
-debian/rules is a makefile.
-
-{{CodeSelect|code=
-make -f debian/rules
-}}
-
-It supports ifdef (similar to an environment variable) <code>CROSSOPT</code>. On Debian source packages are usually built using dpkg-buildpackage. It might be as simple as setting the correct environment variables. Here's an untested attempt.
-
-{{CodeSelect|code=
-sudo apt build-dep fpc
-}}
-
-{{CodeSelect|code=
-CROSSINSTALL=1 CROSSOPT="OS_TARGET=x86_64 CPU_TARGET=win64" dpkg-buildpackage
-}}
-
-Setting the environment variable might be more complicated than initially editing debian/rules manually.
-
-maybe helpful:
-https://wiki.debian.org/PortsDocs/BootstrappingFPC
-
-regenerate Makefile.fpc
-
-https://wiki.freepascal.org/Fpcmake
-
-{{CodeSelect|code=
-fpcmake -w -Tall
-}}
-
-{{CodeSelect|code=
-fpcmake -w -Tx86_64-win64
-}}
-
-=== based on fpc-source binary package ===
-Less promising approach.
-
-{{CodeSelect|code=
-sudo apt install fpc-source
-}}
-
-{{CodeSelect|code=
-sudo apt install fpc-source -t bullseye-backports
-}}
-
-{{CodeSelect|code=
-cd /usr/share/fpcsrc
-}}
-
-{{CodeSelect|code=
-cd /usr/share/fpcsrc/3.2.2/compiler/
-}}
-
-{{CodeSelect|code=
-fpcmake
-}}
 
 = See Also =
 * [[Dev/Windows Installer/OLD|previous, deprecated Whonix Windows Installer]]

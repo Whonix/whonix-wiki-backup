@@ -118,11 +118,15 @@ If using multiple {{Q project name}} VMs, the user should make sure to have foll
 
 On the [[Multiple Qubes-Whonix Templates]] wiki page take special note of the warning box in the [[Multiple_Qubes-Whonix_Templates#UpdatesProxy|UpdatesProxy]] chapter.
 
+Related:
+
+* [[Dev/Qubes#qvm-tags|Developer documentation about <code>qvm-tags</code>]]
+* [[Dev/Qubes#qvm_tags_issues|<code>qvm-tags</code> issues]]
+
 == sdwdate-gui qrexec settings ==
 === sdwdate-gui qrexec settings fix ===
-This wiki chapter is valid as of July 2022. It might be expired by August 2022.
-
-A fully updated Qubes should not require any of the following steps.
+* A) New installation of Qubes R4.2: These steps are very most likely not required.
+* B) A fully updated Qubes should not require any of the following steps.
 
 '''1.''' [https://github.com/QubesOS/qubes-core-admin-addon-whonix/blob/master/qubes-rpc-policy/80-whonix.policy <code>80-whonix.policy</code> on github] ([https://raw.githubusercontent.com/QubesOS/qubes-core-admin-addon-whonix/master/qubes-rpc-policy/80-whonix.policy raw]) should look same as <code>/etc/qubes/policy.d/80-whonix.policy</code> in dom0.
 
@@ -141,6 +145,51 @@ sudo rm /etc/qubes-rpc/policy/whonix.SdwdateStatus
 }}
 
 === sdwdate-gui qrexec debugging ===
+==== dom0 journal log file reading ====
+Check, follow dom0 journal log file while reproducing sdwdate-gui qrexec messages.
+
+Look for <code>denied:</code> messages.
+
+In dom0.
+
+{{CodeSelect|code=
+sudo journalctl | grep denied:
+}}
+
+Or.
+
+{{CodeSelect|code=
+sudo journalctl -f
+}}
+
+==== sdwdate-watcher debugging ====
+'''1.''' Inside the Whonix-Workstation App Qube.
+
+'''2.''' Kill sdwdate-watcher.
+
+sdwdate-watcher is the part of sdwdate-gui which watches sdwdate events from /var/run/sdwdate folder and notifies the <code>gateway</code> configured in <code>/usr/local/etc/sdwdate-gui.d/50_user.conf</code>.
+
+{{CodeSelect|code=
+killall sdwdate-watcher
+}}
+
+'''3.''' Start sdwdate-watcher.
+
+{{CodeSelect|code=
+/usr/libexec/sdwdate-gui/start-maybe
+}}
+
+'''4.''' Restart sdwdate.
+
+This is to produce new sdwdate activity that sdwdate-watcher can observe.
+
+{{CodeSelect|code=
+sudo systemctl restart sdwdate
+}}
+
+'''5.''' See if there are any error messages.
+
+==== qvm-tags verification ====
 Debugging Qubes qrexec is largely [[unspecific|unspecific to {{Q project name}}]]. Qubes qrexec debugging instructions from other resources such as perhaps the Qubes website should equally apply.
 
 Note: Any commands that follow must be run inside Qube dom0.
@@ -150,6 +199,8 @@ Note: Any commands that follow must be run inside Qube dom0.
 See if you can make head or tail of [[Dev/Qubes#qvm-tags|qvm-tags developer notes]]. If not, skip this step.
 
 '''2.''' Check qvm-tags of {{project name gateway long}} net qube.
+
+Note: Replace <code>sys-whonix</code> with the actual name of the Whonix-Gateway you are using.
 
 {{CodeSelect|code=
 qvm-tags sys-whonix
@@ -163,6 +214,8 @@ anon-gateway
 
 '''3.''' Check qvm-tags of {{project name workstation long}} App Qube.
 
+Note: Replace <code>sys-whonix</code> with the actual name of the Whonix-Workstation you are using.
+
 {{CodeSelect|code=
 qvm-tags anon-whonix
 }}
@@ -175,8 +228,10 @@ anon-vm
 
 '''4.''' Check qvm-tags of {{project name gateway long}} Template.
 
+Note: Replace <code>{{project name gateway template}}</code> with the actual name of the Whonix-Gateway Template you are using.
+
 {{CodeSelect|code=
-qvm-tags {{project name gateway template}}-{{VersionShort}}
+qvm-tags {{project name gateway template}}
 }}
 
 Expected printout should include:
@@ -187,8 +242,10 @@ whonix-updatevm
 
 '''5.''' Check qvm-tags of {{project name workstation long}} Template.
 
+Note: Replace <code>{{project name gateway template}}</code> with the actual name of the Whonix-Workstation Template you are using.
+
 {{CodeSelect|code=
-qvm-tags {{project name workstation template}}-{{VersionShort}}
+qvm-tags {{project name workstation template}}
 }}
 
 Expected printout should include:
@@ -196,14 +253,6 @@ Expected printout should include:
 <pre>
 whonix-updatevm
 </pre>
-
-'''6.''' In dom0, check, follow journallog while reproducing sdwdate-gui qrexec messages.
-
-Look for <code>DENIED</code> messages.
-
-{{CodeSelect|code=
-sudo journalctl -f
-}}
 
 = See Also =
 * [[Troubleshooting#Connectivity Troubleshooting|Connectivity Troubleshooting]]

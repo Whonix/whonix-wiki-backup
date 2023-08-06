@@ -7,9 +7,9 @@ Download and install VirtualBox for your operating system.
 |title= === Windows ===
 |image=[[File:Logo-windows-500x500.png|50px]]
 |active=true
-|addToClass=infobox
+|addToClass=info-box
 |content=
-{{#widget:Download_Button|text=Download VirtualBox for Windows (FREE!)|os=windows|fontsize=18px|addToClass=margin-top-10 margin-bottom-10|url=https://download.virtualbox.org/virtualbox/7.0.8/VirtualBox-7.0.8-156879-Win.exe}}
+{{#widget:Download_Button|text=Download VirtualBox for Windows (FREE!)|os=windows|fontsize=18px|addToClass=margin-top-10 margin-bottom-10|url=https://download.virtualbox.org/virtualbox/7.0.10/VirtualBox-7.0.10-158379-Win.exe}}
 
 <div class="toccolours mw-collapsible mw-collapsed">
 Optional: Digital signature verification.
@@ -30,9 +30,9 @@ After downloading the VirtualBox installer exe and starting it, the user should 
 {{Tab
 |title= === macOS ===
 |image=[[File:Logo-apple-500x500.png|50px]]
-|addToClass=infobox
+|addToClass=info-box
 |content=
-{{#widget:Download_Button|text=Download VirtualBox for macOS (FREE!)|os=osx|fontsize=18px|addToClass=margin-top-10 margin-bottom-10|url=https://download.virtualbox.org/virtualbox/7.0.8/VirtualBox-7.0.8-156879-OSX.dmg}}
+{{#widget:Download_Button|text=Download VirtualBox for macOS (FREE!)|os=osx|fontsize=18px|addToClass=margin-top-10 margin-bottom-10|url=https://download.virtualbox.org/virtualbox/7.0.10/VirtualBox-7.0.10a-158379-OSX.dmg}}
 <div class="toccolours mw-collapsible mw-collapsed">
 Optional: Digital signature verification.
 <div class="mw-collapsible-content">
@@ -44,9 +44,8 @@ VirtualBox for macOS is not signed with OpenPGP / gpg. It is notarized for macOS
 {{Tab
 |title= === Ubuntu ===
 |image=[[File:Logo-ubuntusvg.png|50px]]
-|addToClass=infobox
+|addToClass=info-box
 |content=
-{{Box|text=
 <u>Ubuntu host operating systems:</u>
 
 {{VirtualBox_Host_Software_Installation_Option
@@ -62,7 +61,7 @@ VirtualBox for macOS is not signed with OpenPGP / gpg. It is notarized for macOS
 |title= ==== Command Line (All Users) ====
 |image=[[File:Utilities-terminal.png|50px]]
 |active=true
-|addToclass=infobox
+|addToclass=info-box
 |content=
 '''1.''' On the host.
 
@@ -93,101 +92,25 @@ The procedure of installing the VirtualBox host software is complete.
 {{Tab
 |title= ==== Software Center (only if not using SecureBoot) ====
 |image=[[File:Ubuntu_software_icon.png|50px]]
-|addToClass=infobox
+|addToClass=info-box
 |content=
 {{VirtualBox Host Software Installation Ubuntu Software Center}}
 }}<!-- close tab : Ubuntu software center -->
 }}<!-- close tab controller : Command Live vs Software Center -->
-}}<!-- close Box : Ubuntu box -->
 }}<!-- close Tab : Ubuntu -->
 {{Tab
 |title= === Debian ===
 |image=[[File:Logo-debian-500x500.png|50px]]
-|addToClass=infobox
+|addToClass=info-box
 |content=
-{{Box|text=
-<u>Debian host operating systems:</u>
+.
+{{VirtualBox_Host_Software_Installation_Debian}}
 
-{{VirtualBox_Host_Software_Installation_Option
-|who=Debian users
-}}
-
-* These instructions are for host operating systems running Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code>, which is recommended.
-* Other Debian releases might work, but this is [[untested]]. In case of other Debian release:{{virtualbox_host_software_installation_see_also_linux}}
-* To acquire the [[VirtualBox/Recommended_Version|Recommended VirtualBox version]] tested with {{project_name_long}}, package <code>{{{virtualbox_package_debian}}}</code> should be installed from Debian [https://fasttrack.debian.net/ <code>fasttrack</code> repository] according to the following instructions. <ref>
-This is {{kicksecure_wiki
-|wikipage=Install_Software#Best_Practices
-|text=non-ideal
-}} but required since VirtualBox in unavailable in official Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> repository and difficult to install due to [[Dev/VirtualBox#VirtualBox_Installation_Challenges|VirtualBox Installation Challenges]].
-
-Alternatively you could install VirtualBox from the [[VirtualBox/Other_Versions#Install_from_Oracle_Repository|Oracle (virtualbox.org) Repository]], but this comes with different [[Install_Software#Foreign_Sources|risks]]. VirtualBox might be updated by VirtualBox developers before being tested with {{project_name_long}} which could then lead to issues. (Described in footnote [[VirtualBox/Recommended_Version|here]].)
-</ref>
-
-'''1.''' On the host.
-
-Open a terminal.
-
-'''2.''' Add Debian the <code>fasttrack</code> repository.
-
-Update the package lists.
-
-{{CodeSelect|code=
-sudo apt update
-}}
-
-Install the Debian <code>fasttrack</code> signing key.
-
-{{CodeSelect|code=
-sudo apt install --no-install-recommends fasttrack-archive-keyring
-}}
-
-Add the Debian <code>fasttrack</code> repository.
-
-{{CodeSelect|code=
-echo 'deb https://fasttrack.debian.net/debian/ {{Stable_project_version_based_on_Debian_codename}}-fasttrack main contrib non-free' {{!}} sudo tee /etc/apt/sources.list.d/fasttrack.list
-}}
-
-'''3.''' Add Debian the <code>backports</code> repository. <ref>
-This is required because the Debian <code>fasttrack</code> repository depends on the Debian the <code>backports</code> repository.
-</ref>
-
-{{CodeSelect|code=
-echo 'deb https://deb.debian.org/debian {{Stable_project_version_based_on_Debian_codename}}-backports main contrib non-free' {{!}} sudo tee /etc/apt/sources.list.d/backports.list
-}}
-
-'''4.''' Update the package lists again. <ref>
-This is to acquire the Debian <code>fasttrack</code> repository package sources.
-</ref>
-
-{{CodeSelect|code=
-sudo apt update
-}}
-
-'''5.''' Install VirtualBox and Linux kernel headers.
-
-{{CodeSelect|code=
-sudo apt install --no-install-recommends {{{virtualbox_package_debian}}} linux-headers-$(dpkg --print-architecture)
-}}
-
-'''6.''' Add your current user to group <code>vboxusers</code>. <ref name=vboxusersgroupadd>
-Optional: See: https://www.virtualbox.org/manual/ch02.html#install-linux-vboxusers
-
-Also spams <code>~/.config/VirtualBox/VBoxSVC.log</code> log if not done.
-</ref>
-
-{{CodeSelect|code=
-sudo adduser $(whoami) vboxusers
-}}
-
-'''7.''' Done.
-
-The procedure of installing the VirtualBox host software is complete.
-}}
 }}<!-- close tab : Debian -->
 {{Tab
 |title= === Kicksecure ===
 |image=[[File:Kicksecure-basic-logo.png|50px]]
-|addToClass=infobox
+|addToClass=info-box
 |content=
 {{Box|text=
 <u>{{Kicksecure}} host operating systems:</u>
@@ -235,7 +158,7 @@ The procedure of installing the VirtualBox host software is complete.
 {{Tab
 |title= === Linux ===
 |image=[[File:Logo-linux-500x500.png|50px]]
-|addToClass=infobox
+|addToClass=info-box
 |content=
 {{Box|text=
 <u>Hosts using a non-Debian operating system:</u>

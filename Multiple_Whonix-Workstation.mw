@@ -113,8 +113,19 @@ Multiple {{project_name_workstation_long}} are supposed to have different intern
 |}
 
 = How-to: Use more than One {{project_name_workstation_long}} - Easy =
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= =={{non_q_project_name}}==
+|type=section
+|image=
+|addToClass=info-box
+|active=true
+|content=
+
 {{Anchor|qubes}}
-== {{non_q_project_name}} ==
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=info]]
@@ -165,7 +176,7 @@ That should show for example:
 
 <pre>
 auto lo
-iface lo inet loopback
+iface lo inet loopbackg
 
 auto eth0
 iface eth0 inet static
@@ -186,7 +197,11 @@ sudo service networking restart
 
 '''6.''' Done.
 
-== {{q_project_name}} ==
+}} <!-- close tab: {{non_q_project_name}} --> 
+{{Tab
+|title= =={{q_project_name}}==
+|content=
+
 '''1.''' Create an additional App Qube based on the {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>) and give it a distinctive name such as for example <code>{{project_name_workstation_vm}}2</code>. (A more distinctive name is desirable.)
 
 '''2.''' Confirm the new {{project_name_workstation_long}} App Qube is using a {{project_name_gateway_long}} (such as for example the default <code>{{project_name_gateway_vm}}</code>) as its [https://www.qubes-os.org/doc/glossary/#net-qube <code>net qube</code>].
@@ -195,11 +210,15 @@ If creating a new App Qube is unfamiliar, follow this step-by-step instructions:
 
 {{box|text=
 
-[[Image:Create_Qubes-Whonix-Workstation_AppVM.png]]
+'''Figure:''' ''App Qube Creation using Qubes VM Manager (QVMM)''
+
+{{ContentImage|
+[[Image:Create_Qubes-Whonix-Workstation_AppVM.png|App Qube Creation using Qubes VM Manager (QVMM)]]
+}}
 
 '''A.)''' Create Qubes-{{project_name_workstation_long}} App Qube
 
-'''B.)''' Name and label: Name the App Qube. Don't include any personal information (if the App Qube is compromised, the attacker could run <code>qubesdb-read /name</code> to reveal the VM name). Name the App Qube something generic, for example: <code>{{project_name_workstation_vm}}</code>.
+'''B.)''' Name and label: Name the App Qube. Don't include any personal information (if the App Qube is compromised, the attacker could run <code>qubesdb-read /name</code> to reveal the VM name). Name the App Qube something generic, for example: <code>{{project_name_workstation_vm}}<u>-2</u></code>.
 
 '''C.)''' Color: Choose a color label for the {{project_name_workstation_long}} App Qube.
 
@@ -213,22 +232,43 @@ If creating a new App Qube is unfamiliar, follow this step-by-step instructions:
 
 '''H.)''' Press: <code>OK</code>.
 
+'''I.)''' Open a dom0 terminal.
+
+'''J.)''' Add qvm-tag <code>anon-vm</code> to the newly created App Qube. <ref>
+[[Dev/Qubes#qvm-tags|Developer documentation about <code>qvm-tags</code>]]
+</ref>
+
+<u>Note:</u> Replace <code>{{project_name_workstation_vm}}<u>-2</u></code> with the actual name of the VM.
+
+{{CodeSelect|code=
+qvm-tags anon-whonix-2 add anon-vm
 }}
+
+'''M.)''' Done.
+}} <!-- close tab: {{q_project_name}} --> 
 
 '''3.''' Depending on the <code>net qube</code> setting.
 
-* '''A)''' If the {{project_name_workstation_long}} App Qube <u>is connected to <code>{{project_name_gateway_vm}}</code></u></u>: No special instructions required.
-* '''B)''' If the {{project_name_workstation_long}} App Qube <u>is connected to any {{project_name_gateway_long}} other than <code>{{project_name_gateway_vm}}</code></u>, apply the following instructions: <ref>
-This is non-ideal usability wise.
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= ===If you are using the default sys-whonix as gateway===
+|type=section
+|addToClass=info-box
+|active=true
+|content=
 
-Sparing users from needing to change this setting requires upstream Qubes feature request [https://github.com/QubesOS/qubes-issues/issues/4117 way to find out the name of gateway from inside the VM - qubesdb-read /qubes-gateway-name] or [https://github.com/QubesOS/qubes-issues/issues/5253 qrexec feature request: send this over qrexec to the net qube I am connected to / {{project_name_gateway_vm}} hardcoded / {{project_name_gateway_vm}} unexpected autostart] to get implemented.
+If the {{project_name_workstation_long}} App Qube <u>is connected to <code>{{project_name_gateway_vm}}</code></u></u>: No special instructions required.
 
-Technical improvement proposals:
+}} <!-- close tab A -->
+{{Tab
+|title= ===If you are using a gateway other than sys-whonix===
+|content=
 
-* https://phabricator.whonix.org/T930
+If the {{project_name_workstation_long}} App Qube <u>is connected to any {{project_name_gateway_long}} other than <code>{{project_name_gateway_vm}}</code></u>, apply the following instructions:
 
-https://forums.whonix.org/t/sys-whonix-starting-spontaneously-after-update/8123
-</ref>
+The other gateway should be set up according to the instructions on the [[Multiple Whonix-Gateway]] wiki page.
 
 {{box|text=
 <u>Note:</u> Inside the {{project_name_workstation_long}} App Qube.
@@ -248,22 +288,40 @@ sudoedit /usr/local/etc/sdwdate-gui.d/50_user.conf
 
 '''C.)''' Add the following text.
 
-Note: The following example uses <code>{{project_name_gateway_vm}}2</code> as an example. Replace <code>{{project_name_gateway_vm}}2</code> with the name of the VM of {{project_name_gateway_long}} which this {{project_name_workstation_long}} App Qube uses as its <code>net qube</code>. For example, <code>{{project_name_gateway_vm}}3</code>.
+Note: The following example uses <code>{{project_name_gateway_vm}}<u>-2</u></code> as an example. Replace <code>{{project_name_gateway_vm}}<u>-2</u></code> with the name of the VM of {{project_name_gateway_long}} which this {{project_name_workstation_long}} App Qube uses as its <code>net qube</code>. For example, <code>{{project_name_gateway_vm}}<u>-3</u></code>.
 
 {{CodeSelect|code=
-gateway={{project_name_gateway_vm}}2
+gateway={{project_name_gateway_vm}}-2
 }}
 
 '''D.)''' Save the file.
 
-'''E.)''' In case of issues.
+'''E.)''' Restart the VM. <ref>
+Or restart sdwdate-watcher (sdwdate-gui).
+
+{{CodeSelect|code=
+killall sdwdate-watcher
+}}
+
+{{CodeSelect|code=
+/usr/libexec/sdwdate-gui/start-maybe
+}}
+</ref>
+
+'''F.)''' In case of issues.
 
 sdwdate-gui qrexec denied messages? See [[Qubes/Troubleshooting#sdwdate-gui_qrexec_settings|{{q project name}} troubleshooting, sdwdate-gui qrexec]].
-}}
+}} <!-- close box -->
+
+}} <!-- close tab: Qubes-Whonix B -->
 
 '''4.''' Done.
 
 The process of setting up an additional {{project_name_workstation_long}} App Qube has been completed.
+
+}} <!-- close tab: Qubes-Whonix -->
+}} <!-- close tab controller: Qubes-Whonix A B -->
+}} <!-- close tab controller: platform selection -->
 
 = How-to: Use more than One {{project_name_workstation_long}} - More Security =
 
@@ -278,6 +336,7 @@ By default, App Qubes which are behind the same <code>net qube</code> are preven
 {{multiple-vms-mininav}}
 
 * [[Whonix-Workstation]]
+* [[Whonix-Workstation_to_Whonix-Workstation_Connections|Connections between two different Whonix-Workstations]]
 
 = Footnotes =
 {{reflist|close=1}}

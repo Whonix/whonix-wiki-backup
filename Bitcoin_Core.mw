@@ -89,7 +89,11 @@ Another way to do this activities are likely possible, but are [[Unsupported|und
 Perform these steps inside {{project_name_workstation_long}} ({{Q_project_name}}: <code>{{project_name_workstation_vm}}</code> App Qube).
 
 {{Box|text=
-'''1.''' Retrieve, verify and add a signing key or multiple signing keys.
+'''1.''' Note.
+
+The installation process is [[unspecific|unspecific to {{project name long}}]].
+
+'''2.''' Retrieve, verify and add a signing key or multiple signing keys.
 
 Note: Any alternative method could be used. This is [[unspecific|unspecific to {{project name long}}]]. The following method is available for convenience. <ref>
 Thanks to [https://github.com/JKAbrams JKAbrams] for [https://github.com/Kicksecure/gpg-bash-lib/pull/2 Add example showcasing how multiple signatures can be checked]!
@@ -99,25 +103,32 @@ Thanks to [https://github.com/JKAbrams JKAbrams] for [https://github.com/Kicksec
 gpg --import /usr/share/gpg-bash-lib/misc/bitcoind-pub-keys.d/*
 }}
 
-'''2.''' Download the signed hash sum file.
+'''3.''' Check version number.
+
+24.0.1 is used below. Was up to date at time of writing. Might be a different version now. Adjust the commands below accordingly. Useful resources to read:
+
+* https://bitcoin.stackexchange.com/questions/116386/bitcoincore-22-1-or-24-0-1
+* https://bitcoincore.org/en/blog/
+
+'''4.''' Download the signed hash sum file.
 
 {{CodeSelect|code=
 scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMS
 }}
 
-'''3.''' Download the signed hash sum signature.
+'''5.''' Download the signed hash sum signature.
 
 {{CodeSelect|code=
 scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMS.asc
 }}
 
-'''4.''' Download Bitcoin.
+'''6.''' Download Bitcoin.
 
 {{CodeSelect|code=
 scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/bitcoin-24.0.1-x86_64-linux-gnu.tar.gz
 }}
 
-'''5.''' Verify the hash sum digital signature.
+'''7.''' Verify the hash sum digital signature.
 
 {{CodeSelect|code=
 gpg --verify SHA256SUMS.asc
@@ -133,7 +144,7 @@ This output might be followed by a warning as follows.
 
 {{Template:GnuPG-Warning}}
 
-'''6.''' Perform a hash sum check.
+'''8.''' Perform a hash sum check.
 
 {{CodeSelect|code=
 sha256sum --check --ignore-missing SHA256SUMS
@@ -145,13 +156,13 @@ Expected output.
 bitcoin-24.0.1-x86_64-linux-gnu.tar.gz: OK
 </pre>
 
-'''7.''' Extract the tar file.
+'''9.''' Extract the tar file.
 
 {{CodeSelect|code=
 tar xvf bitcoin-24.0.1-x86_64-linux-gnu.tar.gz
 }}
 
-'''8.''' Done.
+'''10.''' Done.
 
 Download, digital signature verification and extraction of Bitcoin Core is complete.
 }}
@@ -272,6 +283,40 @@ Note: replace <code>address</code> with the actual address to be watched.
 
 {{CodeSelect|code=
 importaddress address
+}}
+
+== Tor Control Protocol ==
+{{Community Support}}
+
+TODO: document what this is useful for
+
+Tor control protocol access to Bitcoin Core can be optionally enabled.
+
+{{box|text=
+'''1.''' Note.
+
+'''Optional.''' It is not mandatory to use this. Bitcoin Core works without this.
+
+'''2.''' Warning.
+
+If using this, see [[Onion-grater#onion-grater_Warning|onion-grater: a Tor Control Port Filter Proxy chapter onion-grater Warning]].
+
+'''3.''' Enable.
+
+{{Control_Port_Filter_Python_Profile_Add
+|filename_new=40_bitcoind.yml
+}}
+
+'''4.''' Additional information.
+
+Probably only needed in case of issues.
+
+* forum discussion: [https://forums.whonix.org/t/bitcoin-core-onion-grater-profile/6216 Bitcoin Core onion-grater profile]
+* for developers: [https://github.com/Whonix/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_bitcoind.yml <code>/usr/share/doc/onion-grater-merger/examples/40_bitcoind.yml</code>]
+
+'''5.''' Done.
+
+The process of enabling Tor control protocol access to Bitcoin Core has been completed.
 }}
 
 = See Also =

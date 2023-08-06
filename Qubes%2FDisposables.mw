@@ -1,4 +1,6 @@
-{{Title|title=Qubes Disposables}}
+{{Title|title=
+Qubes Disposables
+}}
 {{Header}}
 {{#seo:
 |description=How to use Disposables in {{q_project_name}}.
@@ -10,10 +12,7 @@ How to use Disposables in {{q_project_name}}.
 }}
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    = Version Warning:
-
-This wiki page needs to be updated. Meanwhile the user could consider this [[unspecific|unspecific to {{Q project name}}]] and refer to Qubes upstream documentation on Disposables.
------
+| text    =
 A [[#Warnings|few usability issues]] in Disposables affect anonymity. If the risks are unknown to the user, then first carefully read this page.
 }}
 = What are Disposables? =
@@ -86,10 +85,10 @@ qvm-open-in-dvm
 * If the calling VM is connected to {{project_name_gateway_long}}, this step is not necessary and the Disposable's traffic will be routed over Tor. See: [https://github.com/QubesOS/qubes-issues/issues/1954 {{project_name_long}} default NetVM settings fixes].
 |-
 ! scope="row"| Tor Browser in a Disposable Template
-| Do not start Tor Browser in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]]. Only start Tor Browser in App Qubes or Disposables, see: [[Disposables#Tor_Browser_in_Disposable_Template|Start Tor Browser in a Disposable]].
+| Do not start Tor Browser in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]]. Only start Tor Browser in App Qubes or Disposables, see: [[Qubes/Disposables#Start_Tor_Browser_in_a_Disposable|Start Tor Browser in a Disposable]].
 |-
 ! scope="row"| Tor Browser Updater in a Disposable Template
-| Do not start Tor Browser Updater in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#tb-updater_in_Qubes_DisposableVM_Template|tb-updater in Qubes Disposable Template]]. Instead, run [[#Keep Tor Browser Up-to-date|Tor Browser Downloader]] by {{project_name_long}} developers in {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>).
+| Do not start Tor Browser Updater in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#tb-updater_in_Qubes_Disposable_Template|tb-updater in Qubes Disposable Template]]. Instead, run [[#Keep Tor Browser Up-to-date|Tor Browser Downloader]] by {{project_name_long}} developers in {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>).
 |-
 ! scope="row"| Tor Browser Version
 |
@@ -99,38 +98,51 @@ qvm-open-in-dvm
 ! scope="row"| Verify Disposable Status
 |
 * Use caution when spawning a Disposable for the first time when it is based on a freshly created Disposable Template. This [https://github.com/QubesOS/qubes-issues/issues/3574 Qubes bug] can lead to the Disposable Template starting instead of the Disposable. <ref>https://forums.whonix.org/t/whonix-14-starting-a-whonix-14-dispvm-actually-starts-the-templatebasedvm-instead/5579</ref> <ref>After creation of a new Disposable Template, all VMs spawned from the Disposable Template should be Disposables by design. This includes the first start and all subsequent starts thereafter. While this is expected behavior, it is safest to confirm the Disposable was correctly spawned on each occasion it is used.</ref> There could be serious consequences if an application like Tor Browser was started in a Disposable Template and used extensively for web browsing. Compromise of the Disposable Template would mean all Disposables spawned from it would be similarly compromised; see [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]]. <br />
-* To check the freshly started VM is a Disposable, verify it is named <i>[disp xxxx]</i> where <i>xxxx</i> is the number assigned to that Disposable. If the Disposable Template was started instead, then it should be shut down immediately. If the Disposable Template is ever inadvertently used for a dangerous activity like web browsing, then delete it and create a new one.
+* To check the freshly started VM is a Disposable, verify it is named <i>[disp xxxx]</i> where <i>xxxx</i> is the number assigned to that Disposable. If the Disposable Template was started instead, then it should be shut down immediately. If the Disposable Template is ever inadvertently used for a dangerous activity like web browsing, then delete it and create a new one. This issue might be fixed in Qubes R4.2.
 |-
 ! scope="row"| {{project_name_gateway_long}} Linkability
 | The Tor Project developer Teor has stated that [[Tor]] caches {{Code|DNS, HS descriptors, pre-emptive circuits, etc.}} <ref>https://lists.torproject.org/pipermail/tor-dev/2016-October/011591.html</ref> which may lead to linkage between App Qubes and Disposables sharing the same {{project_name_gateway_long}}. The extent to which this is a threat for {{project_name_long}} users has now been documented; see [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]].
 |}
 
 = Setup =
-<u>Note:</u> Examples below reference GUI steps whenever possible, but Qube Manager configuration options in R4 are limited in comparison to earlier releases. <ref>For instance, Dispoable networking can no longer be set from Qube Manager.</ref> Where relevant, additional command line commands are listed in the footnotes.
+<u>Note:</u> Examples below reference GUI steps whenever possible.
 
 == Create a {{project_name_long}} Default Disposable Template based on {{project_name_workstation_long}} ==
 
-# [[Qubes/Update|Update]] [[Qubes|{{q_project_name}}]].
-# Open a dom0 terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
-# Create <code>{{whonix-ws-dvm}}</code> Disposable Template.
+'''1.''' [[Qubes/Update|Update]] [[Qubes|{{q_project_name}}]].
+
+'''2.''' Open a dom0 terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
+
+'''3.''' Create <code>{{whonix-ws-dvm}}</code> Disposable Template.
 
 {{CodeSelect|code=
 sudo qubesctl state.sls qvm.whonix-ws-dvm
 }}
+
+'''4.''' Done.
 
 [[Qubes|{{q_project_name}}]] Dispoables are now ready for use.
 
 == Create a Named {{project_name_long}} Disposable based on {{project_name_workstation_long}} ==
 
 {{mbox
-| type      = notice
+| type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = Nearly all users can skip steps 1 and 2 below. A specific use case for Disposable naming conventions has not (yet) been identified.
+| text    = Optional.
+
+Nearly all users can skip steps 1 and 2 below. A specific use case for Disposable naming conventions has not (yet) been identified.
 }}
 
-Do ''not'' include <code>-dvm</code> when naming Disposables! Tor Browser will not be inherited from {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>) if this advice is ignored.
+A named Disposable is a 
+Disposable with a fixed name.
 
-Before creating named Disposables, familiarize yourself with their behavior and read all relevant [[Qubes/DisposableVM#Warnings|warnings]]. Failure to do so could lead to unwanted behavior which occurs without the user's knowledge.
+A named Disposable is not a Disposable Template.
+
+Therefore when selecting a name for a named Disposable, do ''not'' include <code>-dvm</code> when naming Disposables! This is because dvm has a different meaning. The meaning of dvm is Disposable Template. A named Disposable with dvm in it's name would be a contradiction.
+
+Tor Browser will not be inherited from {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>) if this advice is ignored.
+
+Before creating named Disposables, familiarize yourself with their behavior and read all relevant [[Qubes/Disposables#Warnings|warnings]]. Failure to do so could lead to unwanted behavior which occurs without the user's knowledge.
 {{Box|text=
 '''1.''' Create a Disposable called <code>{{project_name_workstation_vm}}-disp</code> based on the <code>{{whonix-ws-dvm}}</code> Template.
 
@@ -163,7 +175,7 @@ Extra caution must be exercised when customizing a Disposable Template. <ref>Qub
 
 Always keep in mind the Disposable will likely be exposed to the greatest Internet threats.
 
-Tor Browser is specifically designed to prevent website fingerprinting or identification based on the user's browser [[Fingerprint|fingerprint]]. It is safest to run Tor Browser in its stock configuration so the fingerprint is [[Data_Collection_Techniques#Fingerprinting_and_Anonymity|less unique]], due to commonality with the larger Tor Browser user pool. Each individual browser change can significantly worsen the fingerprint because of the associated entropy, <ref>33 bits of entropy will identify one individual out of several billion.</ref> so only make alterations if the impacts are known. See also: [[Tor_Browser/Advanced_Users#tb-updater_in_Qubes_DisposableVM_Template|tb-updater in Qubes Disposable Template]].
+Tor Browser is specifically designed to prevent website fingerprinting or identification based on the user's browser [[Fingerprint|fingerprint]]. It is safest to run Tor Browser in its stock configuration so the fingerprint is [[Data_Collection_Techniques#Fingerprinting_and_Anonymity|less unique]], due to commonality with the larger Tor Browser user pool. Each individual browser change can significantly worsen the fingerprint because of the associated entropy, <ref>33 bits of entropy will identify one individual out of several billion.</ref> so only make alterations if the impacts are known. See also: [[Tor_Browser/Advanced_Users#tb-updater_in_Qubes_Disposable_Template|tb-updater in Qubes Disposable Template]].
 
 A decision must be made in advance whether to disable JavaScript by default. There is a [[Tor_Browser#Security_vs_Usability_Trade-off|usability-security trade-off]] to consider: fingerprinting and usability is worsened by disabled JavaScript, but this provides better protection against vulnerabilities. Conversely, enabled JavaScript improves usability and increases the risk of exploitation, but the browser fingerprint is (likely) more common.
 
@@ -218,13 +230,15 @@ The changes will be available when the Disposable is restarted.
 
 If a Disposable Template has been customized and it is necessary to revert these changes, a Disposable Template can be deleted the same way as any other VM.
 
-Note the Disposable Template cannot be deleted while it is the default Disposable of another VM, otherwise an error message appears. In that case, follow tips found [https://github.com/QubesOS/qubes-issues/issues/3993 here] on how to manually change the default Disposable of VMs to another setting, then repeat the procedure.
+Note the Disposable Template cannot be deleted while it is the default Disposable of another VM, otherwise an error message appears. In that case, follow tips found [https://www.qubes-os.org/doc/disposable-customization/#deleting-disposables here] on how to manually change the default Disposable of VMs to another setting.
 
 <code>dom0</code> &rarr; <code>Qube Manager</code> &rarr; <code>right-click '{{whonix-ws-dvm}}'</code> &rarr; <code>left-click 'Delete qube'</code>
 <ref>Or on the command line (dom0), run. {{CodeSelect|code=qvm-remove <vmname>}}</ref>
 
 == Keep Tor Browser Up-to-date ==
 To obtain the latest Tor Browser, the simplest method is to use {{project_name_long}} built-in Tor Browser downloader functionality. Simply update using [[Tor_Browser#Tor_Browser_Downloader_by_{{project_name_long}}|Tor Browser Downloader by {{project_name_long}} (tb-updater)]] in {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>) when performing your usual maintenance [[Qubes/Update|updating]]:
+
+'''1.''' Qubes App Launcher
 
 <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>{{project_name_workstation_template}}</code> &rarr; <code>Xfce Terminal</code> <ref>
 <code>dom0</code> &rarr; <code>Qube Manager</code> &rarr; <code>right-click on '{{project_name_workstation_template}}'</code> &rarr; <code>click 'Run command in qube'</code> &rarr; <code>type 'xfce4-terminal'</code>
@@ -234,19 +248,23 @@ On the command line (dom0), run.
 qvm-run -a {{project_name_workstation_template}} xfce4-terminal
 }}</ref>
 
+'''2.''' Update the package lists.
+
 {{Update}}
 
 {{CodeSelect|code=
 sudo apt update
 }}
 
-Upgrade.
+'''3.''' System upgrade.
 
 {{CodeSelect|code=
 sudo apt full-upgrade
 }}
 
-If Tor Browser is not upgraded, use {{Code2|update-torbrowser}} to download a new copy.
+'''4.''' Tor Browser upgrade.
+
+If Tor Browser has an issue and has not been upgraded, use {{Code2|update-torbrowser}} to download a new copy.
 
 Launch Tor Browser Downloader by {{project_name_long}} and follow the instructions. <ref>
 {{CodeSelect|code=
@@ -258,7 +276,7 @@ update-torbrowser
 update-torbrowser --input gui
 }}
 
-Shutdown the Disposable Template: <ref>
+'''5.''' Shutdown the Disposable Template: <ref>
 On the command line (dom0), run.
 {{CodeSelect|code=
 qvm-shutdown {{whonix-ws-dvm}}
@@ -269,7 +287,13 @@ sudo poweroff
 }}
 </ref>
 
+If running.
+
 <code>dom0</code> &rarr; <code>Qube Manager</code> &rarr; <code>right-click on '{{whonix-ws-dvm}}'</code> &rarr; <code>click 'Shutdown qube'</code>
+
+'''6.''' Shutdown the Template.
+
+'''7.''' Done.
 
 == Update a Disposable Template ==
 Changes to the underlying Template (<code>{{project_name_workstation_template}}</code>) are detected automatically and the Disposable Template is updated without user intervention. That means package updates that are applied to <code>{{project_name_workstation_template}}</code> are also applied to the <code>{{whonix-ws-dvm}}</code>.
@@ -278,7 +302,7 @@ Changes to the underlying Template (<code>{{project_name_workstation_template}}<
 
 Disposables are well-suited for risky and largely independent activities, like web browsing or opening untrusted files. In contrast, App Qubes might be better suited for activities necessitating file persistence, like email clients with local email storage.
 
-With either kind of VM, Qubes' VM integration tools like [https://www.qubes-os.org/doc/how-to-copy-and-move-files/ secure file copy] and [https://www.qubes-os.org/doc/copy-paste secure clipboard] ensure that clean, trusted files and text can be easily and safely transferred to trusted VMs (if necessary).
+With either kind of VM, Qubes' VM integration tools like [https://www.qubes-os.org/doc/how-to-copy-and-move-files/ secure file copy] and [https://www.qubes-os.org/doc/how-to-copy-and-paste-text/ secure clipboard] ensure that clean, trusted files and text can be easily and safely transferred to trusted VMs (if necessary).
 
 == User Tips ==
 
@@ -314,8 +338,7 @@ With either kind of VM, Qubes' VM integration tools like [https://www.qubes-os.o
 * The most commonly used methods to spawn Disposables from App Qubes are listed below. It is recommended to read the [[#Warnings|"Spawning Disposables" warning]] detailing Disposable network settings before proceeding: <br />
 # Context-menu <br />
 # Thunar file manager - open file in Disposable: <code>File</code> &rarr; <code>Actions</code> &rarr; <code>Edit/View in Disposable</code> <br />
-# Nautilus file manager - open file in Disposable: <code>File</code> &rarr; <code>Edit/View in Disposable</code> <br />
-# Nautilus file manager- sanitize PDF: <code>PDF</code> &rarr; <code>Convert to Trusted PDF</code> <br />
+# Thunar file manager - open file in Disposable: <code>File</code> &rarr; <code>Edit/View in Disposable</code> <br />
 # [[Encrypted_Email_with_Thunderbird|Thunderbird]] E-[[E-Mail|mail]] client - open email attachment in Disposable: <code>Email</code> &rarr; <code>Attachments</code> &rarr; <code>Open in Disposable</code> <br />
 # Command line interface - open file in Disposable:{{CodeSelect|code=
 qvm-open-in-dvm <file_name>
@@ -337,11 +360,11 @@ From the Qubes application menu, drag and drop the menu item onto the panel.
 Tor Browser can be started via the GUI or on the command line.
 
 {{Box|text=
-<u>If you are using a GUI</u>, complete the following steps.
+<u>If you are using a GUI</u>.
 
 <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>Disposable: {{whonix-ws-dvm}}</code> &rarr; <code>Tor Browser (AnonDist)</code>
 
-<u>If you are using a terminal</u>, complete the following steps.
+<u>If you are using a terminal</u>.
 
 {{CodeSelect|code=
 qvm-run --dispvm={{whonix-ws-dvm}} torbrowser
@@ -352,7 +375,9 @@ After launch, ''always'' first [[#Warnings|check the Tor Browser version]]!
 
 '''Figure:''' ''Tor Browser in {{q_project_name}} Disposable''
 
+{{ContentImage|
 [[Image:QubesDispVM.png|border]]
+}}
 
 == Start Terminal Emulator in a Disposable ==
 
