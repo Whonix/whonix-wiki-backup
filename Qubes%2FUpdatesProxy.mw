@@ -6,6 +6,7 @@
 |description=Qubes dom0 {{q_project_name}} UpdatesProxy Settings.
 |image=Qubesupdateproxy31231235.png
 }}
+{{qubes_troubleshooting_mininav}}
 [[image:Qubesupdateproxy31231235.png|250px|thumb]]
 {{intro|
 Qubes dom0 {{q_project_name}} UpdatesProxy Settings.
@@ -14,13 +15,18 @@ Qubes dom0 {{q_project_name}} UpdatesProxy Settings.
 https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/share/uwt/qubes_torfied_dom0.txt links to this wiki page.
 -->
 
-= Qubes R4.2 =
-TODO: updated needed
+= Introduction =
 
-* check folder /etc/qubes/policy.d/
-* check file /etc/qubes/policy.d/50-config-updates.policy
+{{box|text=
+The following wiki pages have been updated in August 2023 for Qubes R4.1 and R4.2 and contain documentation on how to configure Qubes UpdatesProxy:
+
+{{multiple-vms-mininav}}
+
+By following above wiki pages, there is no need to follow any steps on this wiki page. This wiki page is only needed for troubleshooting or when looking for additional information.
+}}
 
 = Qubes UpdatesProxy Setting =
+== Qubes R4.1 ==
 {{Box|text=
 Note: In Qubes '''<code>dom0</code>'''.
 
@@ -38,15 +44,13 @@ cat /etc/qubes-rpc/policy/qubes.UpdatesProxy
 
 At the very top of that file, the following text should appear.
 
-{{CodeSelect|code=
-$tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
-}}
+<div class="pre">$tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}</div>
 
 If that line is not there, add it.
 
 '''4.''' Example.
 
-To view the Qubes default [https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.UpdatesProxy.policy <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code>] file ([https://raw.githubusercontent.com/QubesOS/qubes-core-admin/master/qubes-rpc-policy/qubes.UpdatesProxy.policy raw]).
+To view the Qubes R4.1 default [https://github.com/QubesOS/qubes-core-admin/blob/release4.1/qubes-rpc-policy/qubes.UpdatesProxy.policy <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code>] file ([https://raw.githubusercontent.com/QubesOS/qubes-core-admin/release4.1/qubes-rpc-policy/qubes.UpdatesProxy.policy raw]).
 
 {{CodeSelect|code=
 ## Note that policy parsing stops at the first match,
@@ -70,19 +74,16 @@ $anyvm $anyvm deny
 }}
 }}
 
-= Multiple {{q_project_name}} Templates =
+<u>If [[Multiple_Qubes-Whonix_Templates|Multiple {{q_project_name}} Templates]] are configured,</u> like when the {{project_name_long}} Template is cloned, follow instructions below.
 
-If [[Multiple_Qubes-Whonix_Templates|Multiple {{q_project_name}} Templates]] are configured -- like when the {{project_name_long}} Template is cloned, follow instructions below.
-
+{{box|text=
 '''1.''' Syntax.
 
 Have a look at the syntax. Looks only. No editing.
 
-{{CodeSelect|code=
-Name-Of-{{project_name_short}}-Template $default allow,target={{project_name_gateway_short}}-TemplateBased-ProxyVM
-}}
+<div class=pre>Name-Of-{{project_name_short}}-Template $default allow,target={{project_name_gateway_short}}-TemplateBased-ProxyVM</div>
 
-'''X.''' Examples.
+'''2.''' Examples.
 
 * Example line entry for the {{project_name_gateway_long}} Template.
 ** {{CodeSelect|code=
@@ -92,6 +93,33 @@ Name-Of-{{project_name_short}}-Template $default allow,target={{project_name_gat
 ** {{CodeSelect|code=
 {{project_name_workstation_template}} $default allow,target={{project_name_gateway_vm}}
 }}
+}}
+
+== Qubes R4.2 ==
+{{Box|text=
+Note: In Qubes '''<code>dom0</code>'''.
+
+'''1.''' Locating the settings file.
+
+In '''<code>dom0</code>''' check file <code>/etc/qubes/policy.d/50-config-updates.policy</code> settings.
+
+'''2.''' View its contents.
+
+{{CodeSelect|code=
+cat /etc/qubes/policy.d/50-config-updates.policy
+}}
+
+'''3.''' Verify its default entries.
+
+At the very top of that file, the following text should appear.
+
+<div class="pre">qubes.UpdatesProxy * @tag:whonix-updatevm @default allow target=sys-whonix
+qubes.UpdatesProxy * @tag:whonix-updatevm @anyvm deny</div>
+
+If these lines are not there, add it.
+}}
+
+{{stub}}
 
 = Qubes dom0 UpdateVM Setting =
 
@@ -103,9 +131,8 @@ For completeness sake, see below on how to configure the Qubes <code>dom0</code>
 
 {{Qubes dom0 Updates over Tor}}
 
-= Issues =
-== no torified Qubes updates proxy found warning ==
-How to fix "WARNING: Execution of /usr/bin/apt-get prevented by /etc/uwt.d/40_qubes.conf because no torified Qubes updates proxy found."
+= no torified Qubes updates proxy found warning =
+How to fix {{Code2|WARNING: Execution of /usr/bin/apt-get prevented by /etc/uwt.d/40_qubes.conf because no torified Qubes updates proxy found.}}?
 
 If the following warning appears.
 
@@ -113,56 +140,71 @@ If the following warning appears.
 WARNING: Execution of /usr/bin/apt-get prevented by /etc/uwt.d/40_qubes.conf because no torified Qubes updates proxy found.
 </pre>
 
-If the warning message is transient, it can be safely ignored. Otherwise, try one of the fixes below.
+If the warning message is transient, it can be safely ignored. Otherwise, try the following fix.
 
-== Error Resolution Methods ==
+Works for both, Qubes R4.1 and Qubes R4.2.
 
-The following fixes are listed in order of preference.
-
-=== Salt Fix ===
+{{box|text=
 In <code>dom0</code>.
 
-Use <code>qubesctl</code> to setup <code>dom0</code> settings. <ref>
+'''1.''' Open a terminal.
+
+'''2.''' Use <code>qubesctl</code> (Qubes salt) to setup <code>dom0</code> settings. <ref>
 [[Dev/Qubes#salt]]
 </ref>
 
 {{CodeSelect|code=
 sudo qubesctl state.sls qvm.{{project_name_workstation_vm}}
 }}
+}}
 
-Next, check if the problem has been corrected. Run the following command in {{project_name_long}} Template.
+{{box|text=
+In {{project_name_long}} Template.
+
+'''3.''' Next, check if the problem has been corrected.
+
+Run the following command in {{project_name_long}} Template.
 
 {{CodeSelect|code=
 sudo systemctl restart qubes-whonix-torified-updates-proxy-check
 }}
 
-Then try to update / use <code>apt</code> again.
-
-If there are still problems, try the manual fix below.
-
-=== Manual Fix ===
-TODO
-
-'''4.''' To test if it is fixed, run the following command in {{project_name_long}} Template.
+'''4.''' Then try to update / use <code>apt</code> again.
 
 {{CodeSelect|code=
-sudo systemctl restart qubes-whonix-torified-updates-proxy-check
+sudo apt update
 }}
 
-'''5.''' Then try to update / use <code>apt</code> again.
+'''5.''' <u>If there are still problems,</u> try re-installation of Qubes-Whonix.
 
-=== Reinstallation Fix ===
+* [[Qubes/Reinstall|Reinstall {{q_project_name}} Templates]].
+* If re-installation also fails, then ask for support in the [https://forums.{{project_clearnet}} {{project_name_long}} forums].
+}}
 
-If the salt and manual fix attempts both fail, then follow the steps to [[Qubes/Reinstall|Reinstall {{q_project_name}} Templates]]. If reinstallation also fails, then ask for support in the [https://forums.{{project_clearnet}} {{project_name_long}} forums].
-
-= Development =
-
+= Additional Information for Advanced Users =
+== Generally ==
 The following {{q_project_name}} and {{project_name_long}} GitHub development resources are recommended for interested readers:
-* [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/etc/uwt.d/40_qubes.conf 40_qubes.conf]
-* [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-whonix-torified-updates-proxy-check.service qubes-whonix-torified-updates-proxy-check.service]
-* [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/init/torified-updates-proxy-check torified-updates-proxy-check]
-* [https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.UpdatesProxy.policy qubes.UpdatesProxy.policy]
+
+* [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/etc/uwt.d/40_qubes.conf <code>/etc/uwt.d/40_qubes.conf</code>]
+* [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-whonix-torified-updates-proxy-check.service <code>/lib/systemd/system/qubes-whonix-torified-updates-proxy-check.service</code>]
+* [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/init/torified-updates-proxy-check <code>/usr/lib/qubes-whonix/init/torified-updates-proxy-check</code>]
 * [https://github.com/{{project_name_short}}/uwt uwt]
+
+== Qubes R4.1 ==
+* Qubes R4.1 [https://github.com/QubesOS/qubes-core-admin/blob/release4.1/qubes-rpc-policy/qubes.UpdatesProxy.policy <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code>] file ([https://raw.githubusercontent.com/QubesOS/qubes-core-admin/release4.1/qubes-rpc-policy/qubes.UpdatesProxy.policy raw])
+
+== Qubes R4.2 ==
+* Qubes R4.2 qrexec policy is configuration can be found in folder <code>/etc/qubes/policy.d/</code>.
+* Qubes defaults are configured in file [https://github.com/QubesOS/qubes-core-admin/blob/main/qubes-rpc-policy/90-default.policy <code>/etc/qubes/policy.d/90-default.policy</code>].
+** Search this file for lines starting with: {{CodeSelect|code=
+qubes.UpdatesProxy
+}}
+** The following comment on the top of this file explains the general principle. {{CodeSelect|code=## Do not modify this file, create a new policy file with a lower number in the
+## filename instead. For example `30-user.policy`.}}
+* Check file <code>/etc/qubes/policy.d/50-config-updates.policy</code>
+* As per Qubes default, file <code>/etc/qubes/policy.d/50-config-updates.policy</code> is parsed before <code>/etc/qubes/policy.d/90-default.policy</code>.
+* In case of issues, see also [[Qubes/Troubleshooting#qvm-tags_verification|<code>qvm-tags</code> verification]].
+** See if you can make head or tail of [[Dev/Qubes#qvm-tags|qvm-tags developer notes]]. If not, skip this step.
 
 = Footnotes =
 {{reflist|close=1}}
