@@ -3,13 +3,13 @@
 {{project name long}} Threat Model
 }}
 {{#seo:
-|description=Technical Design Documentation about {{project_name_long}} Threat Model. Attacker Capabilities. Goals. Attack Surface.
+|description=Technical Design Documentation about {{project_name_long}} Threat Model. This document covers aspects like Attacker Capabilities, Goals, and Attack Surface.
 }}
 {{tech_intro_mininav}}
 {{intro|
-Technical Design Documentation about {{project_name_long}} Threat Model. Attacker Capabilities. Goals. Attack Surface.
+Technical Design Documentation about {{project_name_long}} Threat Model. This document covers aspects like Attacker Capabilities, Goals, and Attack Surface.
 }}
-= Threat Model =
+== Classification of Threats ==
 
 == Note ==
 
@@ -17,87 +17,147 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 == The Threats ==
 
-First let's quickly consider all the possible threats we could face. We can put threats against computer systems into five categories:
+First, let's quickly consider all the possible threats we could face. We can categorize threats against computer systems into five categories:
 
-# Non-technical/non-computer-based and legal attacks E.g. "rubber hose cryptanalysis", mandatory key disclosure, subpoena, real detective work/espionage (done by real humans, not bots), bugs, surveillance cameras...
-# Hardware attacks through physical access. RAM and Hard disk Forensics, keylogger, TEMPEST, Evil Maid attack...
-# Backdoors Intentional weaknesses or additional hidden "functionality" put into your system by a manufacturer, vendor or distributor (hardware or software) allowing remote access<sup>1</sup> Can be put in anywhere between design/source code, manufacturing/compilation or distribution.
-# Vulnerabilities Coding or hardware design errors that can be exploited to gain remote access<sup>1</sup> Vulnerabilities and Backdoors in practice can look exactly the same, only the way they are created differ.
-# Design flaws Even in a backdoors-free, error-free system with perfect physical and legal protection (no such thing in reality) perfect security may still be impossible. This is especially true for anonymity systems. While with cryptography a perfect design exists (the one time pad) anonymity is not binary. You are not either anonymous or not, you only have some non-zero but not-perfect degree of anonymity. Your anonymity depends on hiding amongst others. Anonymity networks require trust and a large and diverse userbase. A perfect security system wouldn't require trusting other parties or depending on such extraneous factors. Any design of a complex (but still usable) system (all computer systems are complex) needs to make tradeoffs. That's why pretty much everything uses non-perfect cryptography instead of the one-time-pad...
+; 1. '''Non-technical/non-computer-based and legal attacks'''
+:* Examples include: 
+::* "Rubber hose cryptanalysis"
+::* Mandatory key disclosure
+::* Subpoenas
+::* Real detective work/espionage (done by real humans, not bots)
+::* Bugs
+::* Surveillance cameras
 
-Bug [https://gitlab.torproject.org/legacy/trac/-/issues/5928 Research: IP discovery through Tor behind isolated network] seems to only be about learning the IP address which a Tor client connects to the Internet through. It doesn't mention other information leaks.
+; 2. '''Hardware attacks through physical access'''
+:* Examples include:
+::* RAM and Hard disk Forensics
+::* Keyloggers
+::* TEMPEST
+::* Evil Maid attacks
 
-Footnotes:
+; 3. '''Backdoors'''
+:* Intentional weaknesses or additional hidden "functionality" inserted into your system by a manufacturer, vendor, or distributor (hardware or software) allowing remote access<sup>1</sup>.
+:* These can be introduced anywhere from:
+::* Design/source code
+::* Manufacturing/compilation
+::* Distribution
 
-<sup>1</sup> Used in the broadest sense, can be classic remote code execution, privilege escalation, DoS... Essentially they all allow remote parties to send your system instructions that diverge from the allowed security policy
+; 4. '''Vulnerabilities'''
+:* Coding or hardware design errors that can be exploited to gain remote access.<ref>Used in the broadest sense, vulnerabilities can manifest as remote code execution, privilege escalation, DoS, etc. Essentially, they all allow remote parties to send your system instructions that diverge from the established security policy.</ref>
+:* In practice, vulnerabilities and backdoors can appear identical; only their creation methods differ.
+
+; 5. '''Design flaws'''
+:* Even in a system free of backdoors and errors, with perfect physical and legal protection (which doesn't exist in reality), achieving perfect security may still be elusive. 
+:* This is particularly true for anonymity systems. 
+::* While perfect cryptographic design exists (the one-time pad), anonymity isn't binary.
+::* You're not simply anonymous or not; you possess some non-zero but imperfect degree of anonymity. 
+::* Your anonymity hinges on blending in with others.
+::* Anonymity networks necessitate trust and a sizable, diverse user base. 
+::* A perfectly secure system wouldn't rely on trust in others or on such external factors.
+::* Every complex (yet still usable) system design (all computer systems are complex) involves trade-offs. That's why the majority employ imperfect cryptography instead of the one-time-pad...
+
+Lastly, it's worth noting that the bug mentioned in [https://gitlab.torproject.org/legacy/trac/-/issues/5928 Research: IP discovery through Tor behind isolated network] seems to primarily concern determining the IP address a Tor client uses to connect to the Internet. It does not touch upon other types of information leakage.
 
 == Attacker capabilities ==
 
-* Legal/Non-technical "attacks" and physical access is expensive Anything that requires real humans to do work instead of letting computers and algorithms do it is prohibitively expensive against more than a small target group.
-* Backdoors (hardware or software) are expensive It is hard to make one and it is risky. The more you use it the more likely it is it will be caught and closed. Adversaries are not going to waste it on anything but high profile targets. However, well hidden passive "backdoors" are of a concern, they can practically be impossible to detect and remain functional for years. Imagine a backdoor in a compiler affecting the PRNG. The cost for such backdoor is high (for this example an attacker need patience, non-trivial coding and social engineering as well as some crypto skills) but the "ROI" would be great too...
-* Software attacks are cheap A good 0day can still cost a lot and is not useful for very long once you start using it. But new vulnerabilities are found all the time, new exploits can be written. Compared to physical access and backdoors it is cheap. It can be fully automated against a large target set. If you are wondering how realistic or important the client application 0day threat is consider pwn2own 2012. A semi-legal but most certainly immoral and reckless company demonstrated how they can exploit every web browser circumventing all state of the art security features (MAC, Sandbox, ASRL, NX, etc). This is not too surprising, we already established how big code bases always have bugs and a subset of those bugs will always be exploitable. The noteworthy news here is that this company doesn't report their findings to the developers, they sell it to governments (and/or the highest bidder) as offensive "cyber weapons" (naturally not their term). It is only likely that also Tor vulnerabilities are sold behind closed doors. You MUST act accordingly and never rely on Tor alone if your threat model demands "reasonably strong anonymity" even from not-nearly-global but well funded adversaries.
-* Crypto-attacks are enormously expensive If you know how to break currently used crypto you will try keep this a secret at all costs. Most crypto attacks will most likely require enormous computing power.
-* Attacking design flaws: it depends... The costs can vary greatly but in every case, once you attack a design flaw and it becomes publicly known the target will fix the flaw and will become harder to attack in the future. This can result in an arms race and often neither party wants to go that way. A grave problem for the defender side can be that some systems are so widely used that it becomes almost impossible to mitigate away to a more secure design. The best example for that is the certificate authority system. Its design is flawed on so many levels yet it is relied upon, often solely for all authentication and confidentiality, to this day by pretty much everyone who's ever used a computer. Similarly, a lack of crypto and hash agility in many applications results in a dependence on weak and broken algorithms, not because we don't know any better but because backwards compatibility and some bad apples spoil it for everyone. There's certainly a threshold, were, if an attacker plays it slow and carefully, he can stay just below the radar for a long time and let everyone believe that it is not "that bad yet". For example, a [https://en.wikipedia.org/wiki/Collision_attack#Attack_scenarios collision attack] against SHA-1 (which would affect software updates, version control systems as well as Tor, GPG, TLS and pretty much everything that uses public key crypto) is known to be "within the reach of a powerful adversary" since 2005, with Moore's Law and Schneier's Law ("Attacks always get better; they never get worse") in play the range of potential adversaries only got larger. SHA-1 will probably be relied on pretty universally until someone publicly demonstrates a collision. Not because we don't know any better, but because to cost of switching are so high.
+=== Legal/Non-technical "attacks" and physical access ===
+* Legal/Non-technical "attacks" and physical access are expensive. Anything that requires real humans to work, rather than relying on computers and algorithms, is prohibitively expensive for more than a small target group.
+
+=== Backdoors ===
+* Both hardware and software backdoors are costly to implement. Creating one is difficult and comes with risks.
+* The more frequently a backdoor is used, the more likely it will be detected and closed. Adversaries are unlikely to waste such tools on anything but high-profile targets.
+* Well-hidden passive "backdoors" are concerning as they can be nearly impossible to detect and may remain functional for years.
+* Consider a backdoor in a compiler affecting the PRNG. The cost of implementing such a backdoor is high, requiring patience, sophisticated coding, social engineering, and cryptography skills. However, the potential return on investment could be significant.
+
+=== Software attacks ===
+* Software attacks are economical. While a good 0-day exploit can be expensive and loses its usefulness once deployed, new vulnerabilities emerge regularly, and new exploits can be developed.
+* Compared to physical access and backdoors, software attacks are more cost-effective and can be automated for a broad target set.
+* If you question the significance or realism of the threat from client application 0-days, consider pwn2own 2012. A semi-legal, albeit questionable company, demonstrated their ability to exploit every web browser, bypassing all advanced security features (MAC, Sandbox, ASLR, NX, etc.).
+* Such findings are not shocking, given that large codebases will always contain bugs, some of which are exploitable. What stands out is that this company doesn't disclose their findings to the software developers; instead, they sell this information to governments (or the highest bidder) as offensive "cyber weapons" (though they wouldn't term it as such). 
+* It is plausible that vulnerabilities in Tor are also being sold discreetly. Therefore, one should never rely solely on Tor, especially when requiring robust anonymity from well-funded adversaries.
+
+=== Crypto-attacks ===
+* Crypto-attacks are extremely expensive. If one discovers a method to break the currently used encryption, they will likely keep it a secret.
+* Most cryptographic attacks probably necessitate vast computing resources.
+
+=== Attacking design flaws ===
+* Attacking design flaws varies in cost. The expenses can differ significantly, but in every instance, once a design flaw is attacked and it becomes public knowledge, the target will rectify the flaw, making it tougher to exploit in the future.
+* This dynamic could lead to an arms race, which neither party may desire.
+* A significant issue for the defending party is that some systems have become so ubiquitous that transitioning to a more secure design is nearly impossible.
+* A prime example is the certificate authority system. Its design has numerous flaws, but nearly every computer user relies on it for authentication and confidentiality.
+* Similarly, the lack of crypto and hash agility in many applications results in dependence on fragile and compromised algorithms. This isn't due to ignorance but because of the demands of backward compatibility and the problems a few malicious actors can cause.
+* There's a threshold where, if an attacker remains discreet, they can operate undetected for an extended period, giving everyone the impression that the situation isn't "that bad yet."
+* For instance, a [https://en.wikipedia.org/wiki/Collision_attack#Attack_scenarios collision attack] against SHA-1, affecting various applications, including Tor, GPG, and TLS, has been deemed feasible for a potent adversary since 2005. With advances in technology and attack methods, the number of potential adversaries has only grown. SHA-1 will likely remain in widespread use until a collision is publicly demonstrated — not because we lack alternatives, but because the costs of transitioning are so steep.
 
 == Our Goals ==
 
-* Hiding our Location and Identity when transmitting information
-* Confidentiality, Integrity, Authenticity and Availability of transmitted data
+* '''Hiding our Location and Identity when transmitting information''': Ensuring that our physical location and personal or organizational identity remain anonymous when sending or receiving information. 
+
+* '''Confidentiality, Integrity, Authenticity, and Availability of transmitted data''': 
+** '''Confidentiality''': Ensuring that the data remains private and is only accessible to those intended to have access.
+** '''Integrity''': Guaranteeing that the data remains unchanged during transmission, and no unauthorized alterations occur.
+** '''Authenticity''': Verifying the source and destination of the data, confirming that it's coming from and going to legitimate entities.
+** '''Availability''': Making sure that data remains accessible and retrievable when needed, especially during crucial moments.
 
 == Our Attack Surface ==
 
-Basically any part used by us to achieve our goals can be attacked:
+Every component we utilize to achieve our goals presents a potential attack vector:
 
-* We REQUIRE physical security and privacy. It is obvious that anonymity and confidentiality is difficult or impossible to achieve otherwise.
-* Tor, the code, the design, the whole network (see [[Dev/Anonymity Network]] for more) We also can't look at Tor as an isolated piece of software, we SHOULD consider its whole TCB because if any part of a TCB can be subverted the Tor process can be subverted. The attack surface in case of backdoors is the full TCB, in case of vulnerabilities "only" the network facing parts of the TCB.
-** The {{project_name_gateway_long}} Hardware
-** GNU/Linux/OS: kernel, essential userland, APT and all software update packages provided by the OS distributor/vendor
-** Tor itself
-** The build system (gcc...) Using Virtualization (instead of Physical Isolation) increases the TCB significantly. In addition to the above:
-** Host Kernel
-** Host applications
-** Host software updater
-** Virtualization software
-* We REQUIRE software we use doesn't do more than absolutely necessary to reduce our anonymity set through protocol leaks, identity correlation through Tor circuit sharing and fingerprinting. For that we also have to rely on the {{project_name_workstation_long}} and the TCB of the applications we use. (for more see [{{project_name_long}} Protocol-Leak-Protection and Fingerprinting-Protection]).
+; '''Physical Security and Privacy''':
+: Physical security and privacy are IMPERATIVE. Without them, achieving anonymity and confidentiality becomes challenging, if not impossible.
 
-For Confidentiality, Integrity and Authenticity we (we all, not just {{project_name_long}}...) are still way too heavily dependent on TLS (Transport Layer Security, the "s" in https). Further we depend on:
+; '''Tor & Its Components''':
+: When considering Tor — its code, design, and the entire network (refer to [[Dev/Anonymity Network]] for details) — it's essential not to view Tor in isolation. We MUST consider its entire TCB ([https://en.wikipedia.org/wiki/Trusted_computing_base Trusted Computing Base]). If any component of the TCB is compromised, the Tor process can be undermined. For backdoor threats, the entire TCB is the attack surface, while for vulnerabilities, only the network-facing components of the TCB are.
+:* '''{{project_name_gateway_long}} Hardware'''
+:* '''GNU/Linux/OS''': The kernel, essential userland, APT, and all software update packages provided by the OS distributor/vendor.
+:* '''Tor itself'''
+:* '''Build System & Virtualization''': The build system (e.g., gcc). Using Virtualization (as opposed to Physical Isolation) enlarges the TCB significantly. This includes:
+:: Host Kernel
+:: Host applications
+:: Host software updater
+:: Virtualization software
 
-* The complete Host (Hardware and Software)
-* all software in {{project_name_workstation_long}}
-* TLS/PKI infrastructure
-* In case of onion services: The full location/identity TCB.
-* The "other end", the security of whoever you are communicating with, unless it is symmetric key crypto and you got the only key.
+; '''Software Dependencies & Functions''':
+: It's CRUCIAL that the software we employ doesn't exceed its necessary functions, as this might compromise our anonymity through protocol leaks, identity correlation via Tor circuit sharing, and fingerprinting. To ensure this, we also depend on the {{project_name_workstation_long}} and the TCB of the applications we utilize. (For more details, see [{{project_name_long}} Protocol-Leak-Protection and Fingerprinting-Protection]).
 
-To achieve Availability of information we depend on:
+; '''Confidentiality, Integrity, and Authenticity''':
+: To guarantee these, we (and this includes everyone, not just {{project_name_long}}) rely far too heavily on TLS (Transport Layer Security, the "s" in https). We also depend on:
+:* The entire Host (both Hardware and Software)
+:* All software within {{project_name_workstation_long}}
+:* TLS/PKI infrastructure
+:* For onion services: The full location/identity TCB.
+:* The security of the entity you're communicating with, unless employing symmetric key cryptography where you possess the exclusive key.
 
-* the upstream internet provider, uptime and connectivity
-* Tor network resilience against DoS
-* resilience of webservers you connect to against DoS
-* Your own system's resilience against DoS
+; '''Availability of Information''':
+: Our dependencies include:
+:* The reliability and connectivity of the upstream internet provider
+:* The Tor network's ability to withstand DoS attacks
+:* The resistance of the webservers you access to DoS assaults
+:* Your system's capability to resist DoS attacks.
 
 == Applying the threat model to {{project_name_long}} ==
 
-First of all, you don't want to end up in the "high profile target" list of any of your resourceful adversaries. Because, if you do, neither {{project_name_long}} nor any other computer based system can protect you.
+First, you don't want to be on the "high profile target" list of any resourceful adversaries. If you are, neither {{project_name_long}} nor any other computer-based system can protect you.
 
-{{project_name_long}} is mostly a software project. There is not a lot we can do on the hardware and physical side of things. Hardware security would be a much smaller problem if we weren't using monolithic systems where dozens of parts have full system access through DRM (or indirectly though hardware drivers that all run in kernel space). Have a look at Qubes OS for state of the art hardware deprivileging. It requires modern hardware, <s>software support still needs to catch up</s> and a bigger user base, therefore this is not available in {{project_name_long}} yet, although it shouldn't be hard to port {{project_name_long}} to Qubes OS if anyone were willing to do it.
+{{project_name_long}} is primarily a software project. Our scope for hardware and physical aspects is limited. Hardware security wouldn't be as significant an issue if we weren't dealing with monolithic systems where multiple parts have full system access through DRM or indirectly via hardware drivers that run in kernel space. Consider examining Qubes OS for cutting-edge hardware deprivileging. While it requires modern hardware and a larger user base, integrating {{project_name_long}} with Qubes OS was done in form of [[Qubes-Whonix]].
 
-We assume the hardware is trustworthy, we assume the physical location is not compromised. We RECOMMENDED to use "clean" computers made of parts manufactured by reputable companies and to pay in cash so as to not have hardware IDs leak our identity.
+Assuming the hardware is trustworthy and the physical location uncompromised, it's RECOMMENDED to use "clean" computers with parts from reputable manufacturers and to make purchases in cash to prevent hardware IDs from revealing our identity.
 
-To protect against forensic analysis we SHOULD on the host use full disk encryption and wipe the RAM on shutdown.
+For forensic analysis protection, full disk encryption SHOULD be used on the host, and RAM should be wiped upon shutdown.
 
-* Implementation status: Because {{project_name_long}} doesn't include a host operating system yet, we RECOMMEND users to do that themselves in {{project_name_long}} documentation.
+* Implementation status: Since {{project_name_long}} doesn't yet include a host operating system, we RECOMMEND users follow the guidelines provided in the {{project_name_long}} documentation.
 
-Further some pointers:
+Some additional pointers:
 
-* DMA is bad, IOMMU is good, avoid attaching untrusted (or any for that matter) devices on FireWire and PCI* interfaces.
-* Use open source hardware or at least open source friendly that makes specifications public. Open source means that multiple companies can implement the hardware, the Linus law of "many eyeballs and all bugs are shallow" applies, backdoors are harder to hide.
-* Simple is beautiful, complexity is the enemy Nr.1 of security. {{project_name_gateway_long}} could run on very simple hardware like the Raspberry Pi.
+* Favor IOMMU over DMA, and avoid attaching untrusted devices to FireWire and PCI* interfaces.
+* Opt for open-source hardware or at least hardware that's open-source friendly, meaning they make specifications public. With open source, multiple companies can produce the hardware, making backdoors more challenging to introduce.
+* Embrace simplicity. Complexity is security's primary adversary. {{project_name_gateway_long}} could operate on straightforward hardware like the Raspberry Pi.
 
-Crypto is even worse, the only thing we can do is to use [https://en.wikipedia.org/wiki/Multiple_encryption cascades] of different cipher and hash families. This is slightly more complicated than it sounds and we don't know of any software that does it right.
+Regarding cryptography, the approach we can take is to use [https://en.wikipedia.org/wiki/Multiple_encryption cascades] of varying cipher and hash families. However, it's more intricate than it seems, and no known software achieves this correctly.
 
-As established above in "Attacker capabilities" the main attack vector we need to concern (and we can actually do something about) is software attacks.
+As mentioned in the "Attacker capabilities" section, our main area of focus should be software attacks.
 
-To protect against software backdoors and vulnerabilities:
+To defend against software backdoors and vulnerabilities:
 
 * The source needs to be audited, preferably by yourself and many others and should ideally be bug free. Popular open source projects are your best bet. {{project_name_long}} is fully open source, anyone can audit and patch.<br />
 * If you rely on others (you do), you need to make sure that you get the same code as everyone else Hash sums + signatures, the more public they are, the better. If completely transparent signing is used (as common in proprietary systems) it is much more difficult to determine that you get the same files as everybody else. By default signing is only concerned with making sure that you get code by someone with access to the key. This protects against 3rd parties but not insiders. Checksums and signatures of {{project_name_long}} and updates are publicly available.
@@ -117,7 +177,7 @@ To protect against software attacks (vulnerabilities) in particular:
 
 To mitigate Design flaws, the primary strategy is eliminating single points of failure. You SHOULD NOT rely on Tor alone, use wifi or tunnel through another system running VPN. You SHOULD NOT rely on TLS alone, use GPG as well (and vice versa). You SHOULD NOT rely on a software monoculture, you SHOULD NOT have to rely on Debian infrastructure to never be compromised. We are currently guilty of not following this advice. To lessen the impact of a potential compromise of the update infrastructure (which includes developer machines, build systems, key security and cryptographic primitives like PRNG - remember openssl or Flame?) we do not enable automatic software updates. After all, they are essentially remote root level backdoors (although with some checks in place).
 
-=== Notes about securing Confidentiality, Integrity and Authenticity ===
+== Notes about securing Confidentiality, Integrity and Authenticity ==
 
 This is no different than in any other computer system without Tor. You MUST use end to end public key encryption, there is not really an alternative to that. But there are alternative implementations: TLS, SSH, GPG... End-to-End means, both ends need to be secure, one end is the {{project_name_workstation_long}}, which you can control and secure. In case of onion services, the {{project_name_gateway_long}} is ALSO part of the TCB!
 
@@ -125,7 +185,7 @@ This is no different than in any other computer system without Tor. You MUST use
 
 About Availability: The most resilient approach is probably a distributed data store, like Tahoe-LAFS or Freenet. I2P offers multi-homing built in. For Tor we don't know of any solutions ready for general usage.
 
-==== Notes about End-to-end security of Onion Services ====
+== Notes about End-to-end security of Onion Services ==
 
 Moved to [[Onion_Services#Notes_about_End-to-end_Security_of_Onion_Services|Notes about End to end Security of Onion Services]]
 
@@ -177,6 +237,9 @@ While we read real papers, like the [https://svn.torproject.org/svn/projects/des
 Like Mike Perry, developer of Tor Browser [https://lists.torproject.org/pipermail/tor-talk/2012-May/024405.html said] "''I find the pdf format heavy and unnerving from a security perspective.''". That also goes for us and we also find the pdf format inconvenient. It would also take us some time to learn latex, pdf creation, formatting etiquette and so on. Time, which we rather invest into improving the design, developing and so on. The "Onion routing design paper" is now also outdated and we rather have an editable, often updated and revised website compared to a paper/pdf.
 
 Tails does also not have a design paper as pdf and still lots of users and developers. Also TrueCrypt had not design paper about plausible deniability and still got reviewed by Bruce Schneier et al. Therefore we really don't see the benefits of having the threat model available as pdf, but if we have overlooked something, please don't hesitate telling us.
+
+= Footnotes =
+<references />
 
 {{Footer}}
 
