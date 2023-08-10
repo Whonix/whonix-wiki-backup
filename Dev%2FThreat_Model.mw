@@ -41,6 +41,10 @@ First, let's quickly consider all the possible threats we could face. We can cat
 ::* Design/source code
 ::* Manufacturing/compilation
 ::* Distribution
+;;* Learn more about {{kicksecure_wiki
+|wikipage=Malware_and_Firmware_Trojans#Backdoors
+|text=Backdoors
+}}.
 
 ; 4. '''Vulnerabilities'''
 :* Coding or hardware design errors that can be exploited to gain remote access.<ref>Used in the broadest sense, vulnerabilities can manifest as remote code execution, privilege escalation, DoS, etc. Essentially, they all allow remote parties to send your system instructions that diverge from the established security policy.</ref>
@@ -109,7 +113,7 @@ Every component we utilize to achieve our goals presents a potential attack vect
 ; '''Tor & Its Components''':
 : When considering Tor — its code, design, and the entire network (refer to [[Dev/Anonymity Network]] for details) — it's essential not to view Tor in isolation. We MUST consider its entire TCB ([https://en.wikipedia.org/wiki/Trusted_computing_base Trusted Computing Base]). If any component of the TCB is compromised, the Tor process can be undermined. For backdoor threats, the entire TCB is the attack surface, while for vulnerabilities, only the network-facing components of the TCB are.
 :* '''{{project_name_gateway_long}} Hardware'''
-:* '''GNU/Linux/OS''': The kernel, essential userland, APT, and all software update packages provided by the OS distributor/vendor.
+:* '''GNU/Linux/OS''': The kernel, essential userland, APT, and all software update packages provided by the {{os}} distributor/vendor.
 :* '''Tor itself'''
 :* '''Build System & Virtualization''': The build system (e.g., gcc). Using Virtualization (as opposed to Physical Isolation) enlarges the TCB significantly. This includes:
 :: Host Kernel
@@ -186,7 +190,13 @@ To protect specifically against software attacks (vulnerabilities):
 * Make the software challenging to attack with tools like ASLR, canaries, NX, and kernel hardening. (See the Debian section [[Dev/Operating_System#Debian|About Debian]].) It's essential to understand that this makes attacks "harder" but not impossible. Hardening is not a substitute for fixing bugs. In a genuinely trustworthy system, hardening wouldn't be necessary.
 
 === Design Flaws and Single Points of Failure ===
-To mitigate Design flaws, the primary strategy is eliminating single points of failure. You SHOULD NOT rely on Tor alone, use wifi or tunnel through another system running VPN. You SHOULD NOT rely on TLS alone, use GPG as well (and vice versa). You SHOULD NOT rely on a software monoculture, you SHOULD NOT have to rely on Debian infrastructure to never be compromised. We are currently guilty of not following this advice. To lessen the impact of a potential compromise of the update infrastructure (which includes developer machines, build systems, key security and cryptographic primitives like PRNG - remember openssl or Flame?) we do not enable automatic software updates. After all, they are essentially remote root level backdoors (although with some checks in place).
+To mitigate design flaws, the primary strategy is to eliminate single points of failure:
+
+* You SHOULD NOT rely solely on Tor; use WiFi or tunnel through [[Dev/Anonymity Network|anonymity network]] if available. (Not really.) [[Why_does_Whonix_use_Tor|Why does Whonix use Tor]]
+* You SHOULD NOT rely solely on TLS; also use GPG (and vice versa).
+* You SHOULD NOT rely on a software monoculture.
+* You SHOULD NOT expect the Debian infrastructure to remain uncompromised forever. We currently do not adhere this advice.
+* To lessen the impact of a potential compromise of the update infrastructure, which includes developer machines, build systems, and key security and cryptographic primitives like PRNG (remember OpenSSL or Flame?), we do not enable automatic software updates. After all, these are essentially remote root-level backdoors, albeit with some checks in place.
 
 == Notes about securing Confidentiality, Integrity and Authenticity ==
 
@@ -204,50 +214,50 @@ Moved to [[Onion_Services#Notes_about_End-to-end_Security_of_Onion_Services|Note
 
 There is a comparison of Tor Browser, Tails, {{project_name_long}} Standard/Download version (host+VM+VM) and {{project_name_long}} with Physical Isolation in chapter [[Comparison_with_Others#Attacks|Attacks against {{project_name_long}}]].
 
-== Design Document, innovations and research ==
+== Design Document, Innovations, and Research ==
 
-{{project_name_long}} developer adrelanos is also interested in serious design documents. There is only one design documents with respect to Tor, transparent/isolated proxying, isolation and Virtual Machines. Adrelanos has read the old design paper "A Tor Virtual Machine Design and Implementation" from 2009. After reading, adrelanos forked that paper, removed non-essential, non-security relevant stuff and made sure, all considerations from the old design paper, were implemented into {{project_name_long}}.
+The {{project_name_long}} developer, Adrelanos, has a keen interest in serious design documents. Currently, there exists only one design document pertaining to Tor, transparent/isolated proxying, isolation, and Virtual Machines. Adrelanos has reviewed the old design paper titled "A Tor Virtual Machine Design and Implementation" from 2009. After reviewing, Adrelanos refined that paper by removing non-essential, non-security-relevant content, ensuring all considerations from the old design paper were incorporated into {{project_name_long}}.
 
-The whole {{project_name_long}} [[Documentation]] and [[Design]] supersede the old design document. Also the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO TorifyHOWTO] is co-maintained by adrelanos.
+The entirety of {{project_name_long}} [[Documentation]] and [[Design]] supersedes the old design document.
 
-Also the following documents are being monitored.
+Adrelanos also monitors the following documents:
 
 * [https://tails.boum.org/contribute/index.en.html Tails Design]
-* [https://tails.boum.org/contribute/design/ Tails Design: specification and implementation]
+* [https://tails.boum.org/contribute/design/ Tails Design: Specification and Implementation]
 * [https://dee.su/liberte-security Security and Anonymity in Liberté Linux] ([https://archive.ph/srdCd archive.ph])
 * [https://dee.su/liberte-motivation Liberté Linux Motivation and Philosophy] ([https://archive.ph/https://dee.su/liberte-motivation archive.ph])
 
-If there are any security/privacy/anonymity updates they will be considered for {{project_name_long}}.
+Any security/privacy/anonymity updates will be considered for inclusion in {{project_name_long}}.
 
-The {{project_name_long}} project also enjoys asking good questions, providing useful suggestions and creating useful things.
+The {{project_name_long}} project is committed to asking pertinent questions, offering valuable suggestions, and creating useful tools. -> [[What we do]]
 
-The following list is to keep track of all discussions and to review them in the future again, to see if something has changed.
+The following list helps track all discussions and periodically review them to discern any changes:
 
-* Smarm created serious [[Dev/Leak Tests Old]], which have been scripted by adrealanos (see [[Dev/Leak Tests]]) and which are potentially useful for other projects as well.
-* [https://web.archive.org/web/20170222032855/https://mailman.boum.org/pipermail/tails-dev/2012-June/001245.html Tails-dev Removing SSL CA dependency for HTP]
-* [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/torsocks Modified usewithtor to support setting ip and port by command line parameter by adrelanos]
-* [https://gitlab.torproject.org/legacy/trac/-/issues/5928 Research: IP discovery through Tor behind isolated network]
-* [https://gitlab.torproject.org/legacy/trac/-/issues/5611 Enhance "Transparent Torification (Requires custom transproxy or Tor router)" in Tor Button.]
-* Read [[Dev/Archived Discussions]] and also read the archives. We don't just do things. Everyone is invited to add some points and then we try to make the best decision.
-* [https://lists.torproject.org/pipermail/tor-talk/2012-May/024227.html tor-talk Tor Browser disabling Javascript anonymity set reduction]
-* [https://lists.torproject.org/pipermail/tor-talk/2012-March/023535.html tor-talk Awareness for identity correlation through circuit sharing is almost zero.]; [https://gitlab.torproject.org/legacy/trac/-/issues/6102 Add warning related to Identity correlation through circuit sharing]
-* [https://lists.torproject.org/pipermail/tor-talk/2012-March/023486.html tor-talk Operating system updates / software installation behind Tor Transparent Proxy]
+* Smarm initiated a serious discussion on [[Dev/Leak Tests Old]], which was subsequently scripted by Adrelanos (see [[Dev/Leak Tests]]). This discussion may be of value to other projects as well.
+* [https://web.archive.org/web/20170222032855/https://mailman.boum.org/pipermail/tails-dev/2012-June/001245.html Tails-dev Removing SSL CA Dependency for HTP]
+* [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/torsocks Modified usewithtor to Support Setting IP and Port by Command Line Parameter by Adrelanos]
+* [https://gitlab.torproject.org/legacy/trac/-/issues/5928 Research: IP Discovery through Tor behind Isolated Network]
+* [https://gitlab.torproject.org/legacy/trac/-/issues/5611 Enhance "Transparent Torification (Requires Custom transproxy or Tor Router)" in Tor Button.]
+* For further discussions, consult [[Dev/Archived Discussions]] and the associated archives. Our approach is always considered; everyone is welcome to contribute, and we strive to make informed decisions.
+* [https://lists.torproject.org/pipermail/tor-talk/2012-May/024227.html tor-talk Tor Browser Disabling Javascript Anonymity Set Reduction]
+* [https://lists.torproject.org/pipermail/tor-talk/2012-March/023535.html tor-talk Awareness for Identity Correlation through Circuit Sharing is Almost Zero.]; [https://gitlab.torproject.org/legacy/trac/-/issues/6102 Add Warning Related to Identity Correlation through Circuit Sharing]
+* [https://lists.torproject.org/pipermail/tor-talk/2012-March/023486.html tor-talk Operating System Updates / Software Installation behind Tor Transparent Proxy]
 * [https://lists.torproject.org/pipermail/tor-talk/2012-August/025128.html tor-talk Attack against Tor: Statistic Manipulation Attack]
-* [https://web.archive.org/web/20170222032804/https://mailman.boum.org/pipermail/tails-dev/2012-July/001394.html Tails-dev tails_htp: exit relay can fingerprint Tails users until exit relay is changed]; [https://web.archive.org/web/20170222032556/https://mailman.boum.org/pipermail/tails-dev/2012-August/001421.html 2]
-* [https://web.archive.org/web/20170222032726/https://mailman.boum.org/pipermail/tails-dev/2012-August/001436.html Tails-dev better IRC client, include HexChat]
-* [https://web.archive.org/web/20141005211329/https://mailman.boum.org/pipermail/tails-dev/2012-August/001422.html Tails-dev separate Tor streams]
+* [https://web.archive.org/web/20170222032804/https://mailman.boum.org/pipermail/tails-dev/2012-July/001394.html Tails-dev tails_htp: Exit Relay can Fingerprint Tails Users until Exit Relay is Changed]; [https://web.archive.org/web/20170222032556/https://mailman.boum.org/pipermail/tails-dev/2012-August/001421.html 2]
+* [https://web.archive.org/web/20170222032726/https://mailman.boum.org/pipermail/tails-dev/2012-August/001436.html Tails-dev Better IRC Client, Include HexChat]
+* [https://web.archive.org/web/20141005211329/https://mailman.boum.org/pipermail/tails-dev/2012-August/001422.html Tails-dev Separate Tor Streams]
 * ...
 
-This list is incomplete...
+This list is not exhaustive...
 
-== {{project_name_long}} Threat Model not available as pdf or paper version ==
+== {{project_name_long}} Threat Model not available as PDF or paper version ==
 You may skip this optional chapter.
 
-While we read real papers, like the [https://svn.torproject.org/svn/projects/design-paper/tor-design.pdf Onion routing design paper] and many others, we can't be coerced into creating a paper "Designing an anonymous operating system" with latex as pdf.
+While we read actual papers, such as the [https://svn.torproject.org/svn/projects/design-paper/tor-design.pdf Onion routing design paper] and many others, we cannot be compelled to create a paper titled "Designing an anonymous operating system" using LaTeX for PDF output.
 
-Like Mike Perry, developer of Tor Browser [https://lists.torproject.org/pipermail/tor-talk/2012-May/024405.html said] "''I find the pdf format heavy and unnerving from a security perspective.''". That also goes for us and we also find the pdf format inconvenient. It would also take us some time to learn latex, pdf creation, formatting etiquette and so on. Time, which we rather invest into improving the design, developing and so on. The "Onion routing design paper" is now also outdated and we rather have an editable, often updated and revised website compared to a paper/pdf.
+As Mike Perry, a developer of the Tor Browser, [https://lists.torproject.org/pipermail/tor-talk/2012-May/024405.html stated], "''I find the PDF format heavy and unnerving from a security perspective.''". We share this sentiment and also find the PDF format inconvenient. Learning LaTeX, mastering PDF creation, and understanding formatting etiquette would consume considerable time. Time we would prefer to allocate to design enhancements, development, and other endeavors. The "Onion routing design paper" is now outdated, and we prefer an editable, frequently updated, and revised website over a static paper or PDF.
 
-Tails does also not have a design paper as pdf and still lots of users and developers. Also TrueCrypt had not design paper about plausible deniability and still got reviewed by Bruce Schneier et al. Therefore we really don't see the benefits of having the threat model available as pdf, but if we have overlooked something, please don't hesitate telling us.
+Tails does not offer a design paper in PDF format either, yet it has garnered significant attention from both users and developers. Similarly, TrueCrypt did not have a design paper on plausible deniability, but it still underwent a review by Bruce Schneier and others. Hence, we do not see the inherent benefits of making our threat model available in PDF. However, if we have missed any advantages, please do not hesitate to inform us.
 
 = Footnotes =
 <references />
