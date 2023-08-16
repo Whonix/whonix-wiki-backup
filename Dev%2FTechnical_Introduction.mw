@@ -260,24 +260,50 @@ Using full disk encryption is still useful to protect against forensic analysis,
 
 == Anti-forensic Claims ==
 
-The reader should always be cautious regarding claims made about the ability to defeat disk forensics. For example, the {{project_name_long}} team are not experts in matters related to:
+Readers are urged to exercise caution when encountering claims about the capability to defeat disk forensics. For instance, the {{project_name_long}} team does not possess expertise in areas such as:
 
 * HDD/SSD swap space.
-* [https://en.wikipedia.org/wiki/Computer_forensics Computer forensics]. <ref>Developers have a basic understanding and just know to be cautious.</ref>
-* Data remaining on USBs and SSDs after [https://web.archive.org/web/20201201150503/http://www.infosecisland.com/blogview/12153-Data-Remains-on-USB-and-SSDs-After-Secure-Erase.html "secure" erasing].
+* [https://en.wikipedia.org/wiki/Computer_forensics Computer forensics].<ref>While the developers have a foundational understanding, they primarily advocate caution.</ref>
+* Residual data on USBs and SSDs post [https://web.archive.org/web/20201201150503/http://www.infosecisland.com/blogview/12153-Data-Remains-on-USB-and-SSDs-After-Secure-Erase.html "secure" erasure].
 * [https://en.wikipedia.org/wiki/Wear_leveling Wear leveling].
-* The possibility of ordinary hard disks sometimes marking sectors as bad and never releasing their data. <ref>This issue requires further investigation.</ref>
-* Data traces that may be [https://research.torproject.org/techreports/tbb-forensic-analysis-2013-06-28.pdf left on disk by Tor Browser] on the macOS, Linux and Windows platforms.
-* Other related [https://web.archive.org/web/20170911205814/http://www.forensicswiki.org/wiki/Main_Page forensic capabilities].
+* Occasional tendencies of conventional hard drives to flag sectors as defective, retaining their data indefinitely.<ref>This phenomenon warrants further research.</ref>
+* Data remnants potentially [https://research.torproject.org/techreports/tbb-forensic-analysis-2013-06-28.pdf left behind by Tor Browser] across macOS, Linux, and Windows.
+* Other associated [https://web.archive.org/web/20170911205814/http://www.forensicswiki.org/wiki/Main_Page forensic competencies].
 
-Even carefully designed setups fail to approach the efficiency of an amnesic system. At a bare minimum, before any strong claims can be made about anti-forensics, the following steps should be undertaken:
+Even meticulously crafted systems struggle to match the effectiveness of an amnesic setup. To confidently assert anti-forensic capabilities, the following procedures are fundamental:
 
-# Make an image of the HDD/SSD.
-# Run {{project_name_long}} and perform a range of normal user activities.
-# Make another image of the HDD/SSD.
-# Compare the images.
+# Create an image of the HDD/SSD.
+# Operate {{project_name_long}} and engage in a variety of typical user actions.
+# Produce a subsequent image of the HDD/SSD.
+# Compare the two images.
 
-Unless these essential steps are performed, the setup may seem ingenious but fail against contemporary forensic tools. Users concerned about local forensics should at least use full disk encryption. When established open source encryption solutions like Linux dmcrypt are used correctly, they live up to their promises. However, always remember this approach is inferior, particularly if the user can be forced to surrender their password under certain circumstances. Use [[Live Mode]] instead.
+Elaborating on the process:
+
+# Boot using an alternate system, an external Live DVD or Live USB.
+# {{kicksecure_wiki
+|wikipage=Raw_Disk_Backup
+|text=Create a raw disk backup image of the internal storage.
+}}
+# Shutdown.
+# Boot into live mode from the internal storage.
+# Launch {{project_name_long}} and carry out a spectrum of regular user tasks.
+# Shutdown.
+# Construct a second raw disk backup image of the internal storage.
+# Compare the images checksums utilizing tools like <code>sha512sum</code> or its equivalents.
+# Conclusion:
+
+* <u>If both images have the same checksum:</u> Excellent, the system demonstrates amnesia.
+* <u>Otherwise:</u> There is an issue.
+
+Without executing these critical steps, a system might seem amnesic yet fail against modern forensic instruments. Those anxious about local forensic threats should consider {{kicksecure_wiki
+|wikipage=Full_Disk_Encryption
+|text=full disk encryption
+}}. Leveraging reputable open-source encryption methods like Linux dmcrypt, when used appropriately, generally delivers on its assurances. Nonetheless, be mindful that this strategy has its limitations, especially when users might be compelled to disclose their passwords. Opting for [[Live Mode]] is a preferable alternative.
+
+Related:
+
+* development task: [https://phabricator.whonix.org/T910 anti-forensics / amnesia testing of Whonix-Host in Live mode]
+* [https://www.reddit.com/r/Whonix/comments/15q7vcs/have_the_dev_team_tested_the_antiforensic/ Have the dev team tested the anti-forensic capability of Whonix-live mode and grub live?]
 
 = Images =
 === Why are {{project_name_long}} Images so Large? ===
