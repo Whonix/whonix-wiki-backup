@@ -13,7 +13,10 @@ deferrable:YES -- This is basically a standalone gadget
 	let cookieName = 'flyInBannerIdDismissed';
 	
 	// Only for testing purposes on /wiki/TestpageForFlyInNotification
-	if( $('body').hasClass('page-TestpageForFlyInNotification') ) {
+	
+	let isTestpage = $('body').hasClass('page-TestpageForFlyInNotification')
+	
+	if( isTestpage ) {
 		let altData = (varname,originalValue) => $('.fly-in-notification-data').attr("data-"+varname.toLowerCase()) || originalValue;
 		waitInSeconds = parseInt( altData( 'waitInSeconds', waitInSeconds ) );
 		cookieDays = parseInt( altData( 'cookieDays', cookieDays ) );
@@ -27,7 +30,7 @@ deferrable:YES -- This is basically a standalone gadget
 	// Setup
 	
 	// If notification is disabled, stop here
-	if( Cookies.get( cookieName ) ) return;
+	if( Cookies.get( cookieName ) && ! isTestpage ) return;
 
 	setTimeout( function() {
 		panel.css( 'display', 'block' );

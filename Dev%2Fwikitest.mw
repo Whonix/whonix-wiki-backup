@@ -293,6 +293,17 @@ example 1
 $ sudo apt "example1"
 </pre>
 
+== Community Support Template ==
+
+Below are 3 tests. The first without the paramter scope, it should show the page version. The second is the page version (scope=page) and the third one is the chapter version (scope=chapter)
+
+{{Community Support}}
+
+{{Community Support|scope=page}}
+
+{{Community Support|scope=chapter}}
+
+
 == ContentImage - Image resize test / Image wrapper template for over-wide images ==
 
 Normal over-wide image without wrapper. Expected: Image is too wide on the right
@@ -303,11 +314,46 @@ Normal over-wide image without wrapper. Expected: Image is too wide on the right
 The same over-wide image inside wrapper. Expected: Image has 100% width of the content and is not too wide
 {{ContentImage|[[File:Image-too-wide-demonstration.jpg]]}}
 
+== DiscoverHiddenElements ==
+
+# Below are hidden elements. Each should open when you click its link
+# One is a headline hidden inside a mw-collapsible [[#DiscoverHiddenElements_Hidden_Headline]]
+# The other is a headline hidden inside an mw-collapsible, hidden inside a tab content controller [[#DiscoverHiddenElements_Hidden_Headline_2]]
+# Reference to hidden Footnotes <ref group="discover-he-1">Discover ref1</ref>- show open Footnotes
+
+<div class="info-box mw-collapsible mw-collapsed">
+Hidden Headline
+<div class="mw-collapsible-content">
+=== DiscoverHiddenElements Hidden Headline ===
+Test text
+</div>
+</div>
+
+{{Tab
+|type=controller
+|content=
+{{Tab|title= ===DiscoverHE section1===|addToClass=info-box|content=Section 1 content <ref group="discover-he-2">Discover ref 2</ref>}}
+{{Tab|title= ===DiscoverHE section2===|addToClass=info-box|content=Section 2 content <ref group="discover-he-2">Discover ref 3</ref>}}
+{{Tab|title= ===DiscoverHE section3===|addToClass=info-box|content=
+Section 3 content
+<div class="info-box mw-collapsible mw-collapsed">
+Hidden Headline 2
+<div class="mw-collapsible-content">
+==== DiscoverHiddenElements Hidden Headline 2 ====
+Test text
+</div>
+</div>
+{{reflist|group=discover-he-1}}
+}}
+}}
+
+Reflist to hidden footnotes {{reflist|group=discover-he-2}}
+
 == DonorCard (Template) ==
 
 There is a whole page for tests of the DonorCard [[Testpage_Donors]]
 
-== Download_Button (Template) ==
+== Download_Button (Widget) ==
 
 text, url, redirectUrl=VirtualBox
 
@@ -352,6 +398,50 @@ Example with text, url, os, onion, addToClass=text-class, fontsize=20px, targetB
 |targetBlank=true
 |redirectUrl=/wiki/About
 }}
+
+Example with signature icon, text and url
+
+{{#widget:Download_Button
+|icon=sig
+|text=Signature test
+|url=/wiki/Download
+}}
+
+Example with sha icon, text and url
+
+{{#widget:Download_Button
+|icon=sha
+|text=Sha test
+|url=/wiki/Download
+}}
+
+Example with signify icon, text and url
+
+{{#widget:Download_Button
+|icon=sigf
+|text=Signify test
+|url=/wiki/Download
+}}
+
+== Expand Button different labels ==
+
+Learn more Label
+
+<div class="mw-collapsible mw-collapsed toccolours mwc-label-learn-more">
+Click to find out
+<div class="mw-collapsible-content">
+Hidden Content
+</div>
+</div>
+
+Show / Hide Label
+
+<div class="mw-collapsible mw-collapsed toccolours mwc-label-show-hide">
+Click to find out
+<div class="mw-collapsible-content">
+Hidden Content
+</div>
+</div>
 
 == Expand Button versus Content Shift Test ==
 
@@ -531,9 +621,33 @@ Mini Modal test content
 </div>
 </div>
 
-== Mini Navigation ==
+== Mini Navigation / Mininav ==
 
-This is demonstrated at the very top of the page
+This is a mininav with one standard field, one field with an image icon, one field with an image icon that is too small and one field with an image icon that does not have link=[emptystring]
+
+<div class="mininav">
+* [[Download]]
+* [[File:Tux.png|50px|link=]] [[Verify the virtual machine images using Linux|Linux using gpg]]
+* [[File:Windows_logo_-_2012.svg.png|5px|link=]] [[Verify_the_virtual_machine_images_using_Windows|Windows using Gpg4win]]
+* [[File:rsz_osx.png|50px]] [[Verify_the_virtual_machine_images_using_macOS|macOS using GPGTools]]
+</div>
+
+Below is a mininav with the class for 2 lines and with the special dark look class mn-dark, wrapped in an info box
+
+<div class="info-box">
+<div class="mininav mn-dark mn-2-lines">
+* [[Download]]
+* [[Download]]
+* [[Download]]
+* [[Download]]
+* [[Download]]
+* [[Download]]
+* [[Download]]
+* [[Download]]
+* [[Download]]
+* [[Download]]
+</div>
+</div>
 
 == PayViaPaypal ==
 
@@ -705,6 +819,43 @@ The following controllers will switch in unison. In case of link-tabs (tabs whic
 {{Tab
 |title=====Section 7 Link====
 |content=[[Donate]]
+}}
+}} <!-- end of tab controller 2 -->
+
+=== Tab Controller : Linked Controller with nested Controller ===
+TODO: description
+
+{{Tab
+|type=controller
+|addToClass=tcc-indent tcc-dark
+|linkid=link1
+|content=
+{{Tab
+|active=true
+|title= ====Section 1====
+|type=section
+|image=[[File:Logo-linux-500x500.png|25px]]
+|addToClass=special-look
+|content=Section 1 content
+}}
+{{Tab
+|title= ====Section 2====
+|content=Section 2 content
+}}
+}} <!-- end of tab controller 1 -->
+
+{{Tab
+|type=controller
+|linkid=link1
+|content=
+{{Tab
+|title=====Section 5====
+|content=Section 5 content
+}}
+{{Tab
+|title=====Section 6====
+|active=true
+|content=Section 6 content
 }}
 }} <!-- end of tab controller 2 -->
 
@@ -1054,6 +1205,30 @@ TODO: broken test
 * [{{canonicalurl:{{FULLPAGENAME}}|action=history&feed=atom}} atom feed]
 * <code>FULLPAGENAME</code>: {{FULLPAGENAME}}
 * <code>NAMESPACE</code>: {{NAMESPACE}}
+
+= H1 =
+
+Test text
+
+== H2 ==
+
+Test text
+
+=== H3 ===
+
+Test text
+
+==== H4 ====
+
+Test text
+
+===== H5 =====
+
+Test text
+
+====== H6 ======
+
+Test text
 
 = Footnotes =
 [[Category:MultiWiki]]
