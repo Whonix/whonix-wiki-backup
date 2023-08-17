@@ -1,0 +1,38 @@
+* '''Script Name Verification''': The installer checks for valid script names, such as <code>installer-dist</code>, [[VirtualBox/Installer|<code>virtualbox-installer</code>]], <code>{{project_name_short_lowercase}}-installer-cli</code>, and <code>{{project_name_short_lowercase}}-installer-xfce</code>.
+* '''Command-Line Parsing''': It parses any command-line options provided.
+* '''System Requirements Check''': The installer assesses if the system meets prerequisites like adequate disk space, RAM, and virtualization support. Users are informed if any of these criteria aren't met.
+* '''Package Installation''': Necessary packages for the script's operation, like <code>signify</code>, <code>curl</code>, <code>rsync</code>, and <code>vboxmanage</code> (for VirtualBox users) are installed using the distribution's package manager (APT or DNF).
+
+* '''Repository Settings''':
+** <u>Debian and Derivatives</u>:
+*** For <code>bullseye</code> (oldstable): Enables the Debian backports and fasttrack repositories.
+*** For <code>bookworm</code> (stable): Enables the {{Kicksecure}} repository. (Debian feature request: [https://salsa.debian.org/fasttrack-team/support/-/issues/51 please add VirtualBox to bookworm-fasttrack])
+*** For <code>trixie</code> (testing): Same as above.
+** <u>Fedora and Derivatives</u>: Enables the <code>virtualbox.org</code> (Oracle) repository.
+** <u>Updates</u>: The preferred repository for VirtualBox installation may vary in the future based on availability. Updated installers might fetch VirtualBox from the Debian fasttrack repository, <code>virtualbox.org</code> (Oracle) repository, or the {{Kicksecure}} repository. ({{project name long}} development discussion: [https://forums.whonix.org/t/whonix-virtualbox-integration-and-upgrades/11705 VirtualBox Integration and Upgrades])
+* '''Version Querying''': If no version is specified via command line, the {{project name long}} version number is fetched using the [[API]].
+* '''Virtual Machine Handling''': 
+** <u>For previously imported VMs,</u> users are prompted to boot the virtual system(s).
+** <u>For previously downloaded VM files,</u> authenticity and integrity checks are run.
+** <u>For first-time users,</u> the installer downloads the required files, conducts authenticity and integrity checks, imports the system(s), and then attempts to start the Virtual Machine(s).
+
+'''Additional Features:'''
+
+* '''Download Resumption''': Utilizes <code>rsync</code> internally to enable download resumption capabilities.
+* '''Integrity Checking''': Offers a streamlined integrity verification process, facilitated by <code>rsync</code>.
+* '''Onion Support''': Allows for downloads from onion sources with the <code>--onion</code> command line option.
+* '''Default Download Directory''': Files are saved in the <code>~/installer-dist-download</code> folder.
+* '''Logging Mechanics''': For transparency, every command executed is logged in the download directory, accompanied by the specific script version used at the time.
+* '''Transparent System Modifications''': The installer’s operations are evident to the user. All persistent system alterations, especially those executed with administrative ("root") privileges, are prominently detailed in the installer's output.
+* '''Documentation''': Comprehensive details can be found in the [https://github.com/Kicksecure/usability-misc/blob/master/man/installer-dist.1.ronn <code>installer-dist</code> man page].
+
+'''Developer Information:'''
+
+* '''Source Code''': [https://github.com/Kicksecure/usability-misc/blob/master/usr/bin/installer-dist <code>/usr/bin/installer-dist</code>], [https://github.com/Kicksecure/usability-misc/blob/master/.github/workflows/builds.yml Continuous Integration Testing <code>.github/workflows/builds.yml</code>]
+* [https://forums.whonix.org/t/whonix-linux-installer-development-discussion/15917 development discussion]
+* '''Security''': The <code>installer-dist</code> script is not intended for curl bash piping. However, for a comprehensive discussion on security concerns related to this topic, see [https://www.whonix.org/wiki/Dev/curl_bash_pipe here].
+<noinclude>
+{{header}}
+{{footer}}
+[[Category:MultiWiki]]
+</noinclude>

@@ -62,6 +62,7 @@ EDITORS NOTES:
 - Not recommending curl: Because it may not be installed on their host. Perhaps Windows users are looking at these instructions.
 - Instructions target regular users. Not from-source-builders.
 -->
+[[File:GnuPG-Logo.svg|thumb|100px|GnuPG logo]]
 
 {{Box|text=
 {{gpg_init}}
@@ -75,6 +76,7 @@ Select your operating system.
 |content=
 {{Tab|active=true
 |title= == Windows, macOS, Linux ==
+|image=[[File:Any12312.png|25px]]
 |content=
 '''1.''' [[Secure_Downloads|Securely]] download [[Patrick Schleizer]]'s (adrelanos') [[OpenPGP]] key. <ref>
 <!--
@@ -151,10 +153,14 @@ This extra message does not relate to the {{project_name_long}} signing key itse
 
 Analyze the other messages as usual.
 
-'''6.''' Advanced users can check [[#Web of Trust|Web of Trust]] further below for better security.
-}}
+'''6.''' Web of trust.
+
+Advanced users can check [[#Web of Trust|Web of Trust]] further below for better security.
+}} <!-- close tab: Windows, Linux, Mac -->
+
 {{Tab
 |title= == Kicksecure or Whonix ==
+|image=[[File:Kicksecure-icon-logo.svg|25px]]
 |content=
 '''1.''' Import the key.
 
@@ -168,17 +174,48 @@ The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to m
 
 '''2.''' Skip a few steps.
 
-Steps '''2.''' to '''6.''' (which would be require for Windows, macOS and other Linux) can be skipped here. Proceed to step '''7.''' below.
+Steps '''2.''' to '''6.''' (which would be required for Windows, macOS and other Linux) can be skipped here. Proceed to step '''7.''' below.
+}} <!-- close tab: Kicksecure or Whonix -->
+
+{{Tab
+|title= == Debian and Derivatives ==
+|image=[[File:Debian.png|25px]]
+|content=
+'''1.''' Install <code>extrepo-offline-data</code>.
+
+Because it contains the signing key.
+
+{{Install Package|package=
+extrepo-offline-data
 }}
-}} <!-- End Tab Controller -->
+
+'''2.''' Import the key.
+
+Thanks to the <code>extrepo-offline-data</code> package, the key is already available on the local file system and can be imported into the user's keyring. <ref>
+Note to wiki editors:
+
+* Hardcoded to <code>whonix.asc</code>.
+* This is because at the time <code>kicksecure.asc</code> was not yet included in package <code>extrepo-offline-data</code>.
+* https://packages.debian.org/bullseye-backports/all/extrepo-offline-data/filelist
+</ref>
+
+{{CodeSelect|code=
+gpg --import /usr/share/extrepo/offline-data/debian/bullseye/whonix.asc
+}}
+
+'''3.''' Skip a few steps.
+
+Proceed to step '''7.''' below.
+}} <!-- close tab: Debian and Derivatives -->
+}} <!-- close tab controller: operating system selection -->
 
 '''7.'''  Complete the {{project_name_long}} verification steps.
 
 If verifying {{project_name_long}} images, navigate to the relevant verification page below to finish the process:
 
-* [[Verify the_virtual_machine_images_using_the_command line|In Linux on the Command Line]]
-* [[Verify_the_virtual_machine_images_using_Windows|In Windows]]
-* [[Verify_the_virtual_machine_images_using_macOS|In macOS]]
+* [[File:Tux.png|15px|link=]] [[Verify the_virtual_machine_images_using_the_command line|In Linux]]
+* [[File:Logo-windows-500x500.png|15px|link=]] [[Verify_the_virtual_machine_images_using_Windows|In Windows]]
+* [[File:logo-apple-500x500.png|15px]] [[Verify_the_virtual_machine_images_using_macOS|In macOS]]
 }}
 
 = OpenPGP Key Features =
@@ -230,6 +267,8 @@ The output of the above command should show signatures on Patrick's key, which s
 }}
 
 == Download the signify Key ==
+[[File:OpenBSD_Logo.svg|thumb|100px|signify]]
+
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]

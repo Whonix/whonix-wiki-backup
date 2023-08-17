@@ -353,12 +353,44 @@ Note: apt already warns that another process is holding the lock and tells the u
 </pre>
 
 = Graphical Installer =
-Ideas:
+== toolkit ideas ==
 
 * makeself - in Debian
 * appiamge - build dependencies not in Debian - https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=854902
-* Nuitka - only in unstable, will be in testing, long term candidate
-* https://packages.debian.org/bookworm/pex
+* Nuitka - Python compiler - only in Debian unstable, will be in testing, long term candidate
+* https://packages.debian.org/bookworm/pex - Python compiler
+* https://github.com/icculus/mojosetup - not in Debian
+* freepascal
+
+== requirements ==
+* all build dependencies available from packages.debian.org (but this can be discussed if impossible to do so)
+* standalone installer, this means:
+** self-contained
+** no dependency installation such as "sudo apt install zenity" required by the user
+* compatible with the most popular stable Linux distributions such as Debian, Ubuntu and Fedora
+** no need to be compatible with oldstable, old Linux distributions
+
+== implementation details ==
+* show a logo (similar to Whonix Windows Installer)
+** Kicksecure
+** Whonix
+** VirtualBox Installer (placeholder, logo does not exist yet)
+* parse man page, if possible
+** or parse <code>--help</code>
+** in case of man page or <code>--help</code> issues: Fix or discuss the underlying issues at the root cause of the issue. Do not add workarounds to the installer GUI. Not need for workarounds as man page / <code>--help</code> can be adjusted as needed as long as that makes sense.
+** man page and/or <code>--help</code> can be modified for a machine (freepascal) readable format
+** Why? To avoid installer GUI "learning" all the same options.
+** use long option names such as <code>--log-level=info</code> instead of <code>-l</code>
+** Parse what?
+*** option name such as
+*** option type:
+**** checkbox
+***** example: <code>--onion</code>
+**** radio option
+***** example: <code>--log-level=debug</code>, <code>info</code>, <code>notice</code> (default), <code>warn</code>, <code>error</code>
+**** free text option
+***** example: <code>--socks-proxy=<proxy></code>
+* if installer-dist-gui is given a command line option such as <code>installer-dist-gui --dev</code> then preselect that option in the GUI and pass it on to <code>installer-dist</code>.
 
 = Forum Discussion =
 [https://forums.whonix.org/t/whonix-linux-installer/15917 Forum discussion]
