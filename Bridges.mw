@@ -180,49 +180,33 @@ Two options. Chose either option '''A)''' <u>or</u> '''B)'''.
 
 = Experimental Bridges =
 == Snowflake ==
-
+=== Introduction of Snowflake ===
 Snowflake is: <ref>
 https://gitlab.torproject.org/legacy/trac/-/wikis/doc/Snowflake
 </ref>
 <blockquote>...a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/PluggableTransports pluggable transport] that proxies traffic through temporary proxies using ​[https://webrtc.org/ WebRTC], a peer-to-peer protocol with built-in NAT punching. It aims to work kind of like flash proxy, but without flash proxy's problems with NAT.</blockquote>
 
-Snowflake configuration in {{project_name_long}} is only recommended for advanced users because it is difficult to move the <code>snowflake-client</code> into {{project_name_gateway_long}} ([[Qubes|Qubes-Whonix]]: <code>{{project_name_gateway_template}}</code> Template).
+=== Setup Snowflake ===
+Snowflake configuration in {{project_name_long}} is only recommended for advanced users because it is difficult to move the <code>snowflake-client</code> into {{project_name_gateway_long}} ([[Qubes|Qubes-Whonix]]: <code>{{project_name_gateway_template}}</code> Template). See old version: https://www.whonix.org/w/index.php?title=Bridges&oldid=93224
+
+This will improve in next {{project name long}} version. There is no estimated time of arrival (ETA).
 
 {{Box|text=
-'''1.''' Locate the <code>snowflake-client</code> client.
+On Whonix-Gateway.
 
-The binary <code>snowflake-client</code> can be found in various places. Examples include:
+'''1.''' Install snowflake.
 
-* '''A)''' in {{project_name_workstation_long}} <ref>
-<code>/home/user/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/snowflake-client</code>
-</ref>: {{CodeSelect|code=
-/var/cache/tb-binary/.tb/tor-browser/Browser/TorBrowser/Tor/PluggableTransports/snowflake-client
-}} <u>or</u> alternatively,
-* '''B)''' in the Tor Browser alpha download for Linux from torproject.org <ref>
-https://gitlab.torproject.org/legacy/trac/-/issues/19001
-</ref> -- once extracted it is found in the <code>tor-browser</code> folder in sub folder <code>./Browser/TorBrowser/Tor/PluggableTransports/snowflake-client</code>.
+Will be installed by default in {{project name long}} 17.0.3.6 (unreleased) and above. Not yet available installed by default at time of writing.
 
-'''2.''' Move the <code>snowflake-client</code> client.
-
-Move the <code>snowflake-client</code> to a location in {{project_name_gateway_long}}. Afterward it needs to be copied to <code>/usr/bin/snowflake-client</code>.
-
-The following command assumes the user is directly inside the home folder <code>/home/user</code> (which is the default when starting a terminal emulator) on {{project_name_gateway_long}}, and already has the file <code>/home/user/snowflake-client</code>. The path to <code>snowflake-client</code> might need to be adjusted.
-
-{{CodeSelect|code=
-sudo cp snowflake-client /usr/bin/snowflake-client
+{{Install Package|package=
+snowflake-client
 }}
 
-'''3.''' Make <code>snowflake-client</code> readable and executable.
-
-{{CodeSelect|code=
-sudo chmod og+rx /usr/bin/snowflake-client
-}}
-
-'''4.''' Edit the Tor configuration file.
+'''2.''' Edit the Tor configuration file.
 
 {{Open /usr/local/etc/torrc.d/50_user.conf}}
 
-'''5.''' Paste the following setting. <ref>
+'''3.''' Paste the following setting. <ref>
 The line starting with <code>ClientTransportPlugin</code> was taken from the Tor Browser folder file.
 
 <code>
@@ -246,54 +230,40 @@ Bridge snowflake 0.0.3.0:1 2B280B23E1107BB62ABFC40DDCC8824814F80A72
 </pre>
 </ref>
 
-We remove the unnecessary fingerprint <code>2B280B23E1107BB62ABFC40DDCC8824814F80A72</code> because Tor will find it automatically.
-
 {{CodeSelect|code=
 UseBridges 1
-ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net.global.prod.fastly.net/ -front cdn.sstatic.net -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478
-Bridge snowflake 192.0.2.3:1
+ClientTransportPlugin snowflake exec /usr/bin/snowflake-client
+Bridge snowflake 192.0.2.4:80 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://snowflake-broker.torproject.net.global.prod.fastly.net/ front=cdn.sstatic.net ice=stun:stun.l.google.com:19302,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.net:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://snowflake-broker.torproject.net.global.prod.fastly.net/ front=cdn.sstatic.net ice=stun:stun.l.google.com:19302,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478 utls-imitate=hellorandomizedalpn
 }}
 
-'''6.''' Workaround DNS resolving in Whonix-gateway.
+'''4.''' DNS resolving in Whonix-Gateway.
 
 Snowflake-client needs to resolve the <code>-front</code> domain to an IP address, in order to connect to the server; however, this DNS resolving will fail with [[Whonix-Gateway_System_DNS|the default Whonix gateway DNS configuration]].
 
-We thus workaround it by resolving the domain manually and then put it into <code>/etc/hosts</code> in {{project name gateway long}}. In the example above, we have <code>-front cdn.sstatic.net</code>. We thus resolve the domain <code>cdn.sstatic.net</code> manually in a machine that allows DNS resolving by:
-
-{{CodeSelect|code=
-dig +short cdn.sstatic.net
+{{box|text=
+{{Whonix-Gateway_System_DNS_over_Clearnet}}
 }}
 
-At time of writing it showed the following IP address:
+'''5.''' {{Restart_Tor}}
 
-<code>151.101.193.69</code>
-
-Now, we append the following line to the <code>/etc/hosts</code> file in {{project name gateway long}}:
-
-{{Open with root rights|filename=
-/etc/hosts
-}}
-
-Append.
-
-{{CodeSelect|code=
-151.101.193.69 cdn.sstatic.net
-}}
-
-'''7.''' Save the file and have the changes take effect.
-
-{{Restart_Tor}}
+'''6.''' Done.
 
 The procedure is complete.
+}}
 
-'''8.''' (Optional) Make sure Tor is using snowflake.
+<ref>
+AppArmor has appropriate permissions for Snowflake operation. [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist /etc/apparmor.d/local/system_tor] already contains <code>/usr/bin/snowflake-client ix,</code>.
+</ref>
 
-To check if Tor is indeed using snowflake, we use <code>nyx</code> or <code>onioncircuits</code>. We are connecting to the Tor network through snowflake if:
+Snowflake forum discussion:
 
-* In <code>nyx</code>, the guard node is a local address, like 192.168.0.1;
-* or in <code>onioncircuits</code>, the guard node IP is Unknown.
+* https://forums.whonix.org/t/replacing-meek-snowflake/5190
+* https://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441
 
-'''9.''' (Optional)  Use AMP cache rendezvous for Snowflake.
+=== Optional Snowflake Configuration ===
+==== Use AMP cache rendezvous for Snowflake ====
+Optional.
 
 wkrp [https://github.com/net4people/bbs/issues/109 stated in a post]:
 
@@ -301,51 +271,35 @@ wkrp [https://github.com/net4people/bbs/issues/109 stated in a post]:
 by default in Tor Browser, Snowflake does rendezvous using a domain-fronted HTTPS request. Now there is an alternative (backup) to domain fronting rendezvous: AMP cache rendezvous. If one rendezvous method is blocked, there is a chance the other will work.
 </blockquote>
 
-In short, two steps are required to use AMP cache rendezvous:
+Replace the second line in <code>/usr/local/etc/torrc.d/50_user.conf</code> with:
 
-1) First, replace the second line in <code>/usr/local/etc/torrc.d/50_user.conf</code> with:
+[[Undocumented]].
 
-{{CodeSelect|code=
-ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net/ -ampcache https://cdn.ampproject.org/ -front www.google.com -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478
-}}
+=== Debugging Snowflake ===
+==== Snowflake Usage Verification ====
+Optional.
 
-2) Second, note that the <code>-front</code> in the line above is now <code>www.google.com</code>. So we have to put the IP address of <code>www.google.com</code> to <code>/etc/hosts</code>:
+Make sure Tor is using snowflake.
 
-Still we resolve the IP manually with
+To check if Tor is indeed using snowflake, we use <code>nyx</code> or <code>onioncircuits</code>. We are connecting to the Tor network through snowflake if:
 
-{{CodeSelect|code=
-dig +short www.google.com
-}}
+* In [[Tor_Controller#Nyx|<code>nyx</code>]], the guard node is a local address, like <code>192.168.0.1</code>;
+* or in [[Tor_Controller#Onion_Circuits|<code>onioncircuits</code>]], the guard node IP is Unknown.
 
-At time of writing it showed the following IP address:
+==== Snowflake log analysis ====
+Optional.
 
-<code>get 142.251.46.164</code>
+'''1.''' Enable and view Snowflake log.
 
-We then append the following line with:
+We can enable the snowflake log for debugging purposes by appending <code>-log snowflake.log -log-to-state-dir</code> to the <code>ClientTransportPlugin snowflake...</code> line in <code>/usr/local/etc/torrc.d/50_user.conf</code>.
 
-{{Open with root rights|filename=
-/etc/hosts
-}}
-
-Append.
-
-{{CodeSelect|code=
-142.251.32.36 www.google.com
-}}
-
-'''9.''' (Optional) Enable and view Snowflake log.
-
-We can enable the snowflake log for bebugging purposes by appending <code>-log snowflake.log -log-to-state-dir</code> to the <code>ClientTransportPlugin snowflake...</code> line in <code>/usr/local/etc/torrc.d/50_user.conf</code>. The complete line looks like this:
-
-{{CodeSelect|code=
-ClientTransportPlugin snowflake exec /usr/bin/snowflake-client -url https://snowflake-broker.torproject.net.global.prod.fastly.net/ -front cdn.sstatic.net -ice stun:stun.l.google.com:19302,stun:stun.voip.blackberry.com:3478,stun:stun.altar.com.pl:3478,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.sonetel.net:3478,stun:stun.stunprotocol.org:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478 -log snowflake.log -log-to-state-dir
-}}
-
-We can view the snowflake log with:
+'''2.''' We can view the snowflake log with:
 
 {{CodeSelect|code=
 sudo less /var/lib/tor/pt_state/snowflake.log
 }}
+
+'''3.''' Tor data directory.
 
 Note that we can always find the Tor DataDirectory with the following command:
 
@@ -354,18 +308,6 @@ anon-verify -v | grep DataDirectory
 }}
 
 <code>DataDirectory /var/lib/tor</code>
-
-Snowflake forum discussion:
-
-* https://forums.whonix.org/t/replacing-meek-snowflake/5190>
-* https://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441
-
-<ref>
-Fortunately <code>snowflake-client</code> is a standalone binary that can be easily copied.
-
-AppArmor has appropriate permissions for Snowflake operation. [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist /etc/apparmor.d/local/system_tor] already contains <code>/usr/bin/snowflake-client ix,</code>.
-</ref>
-}}
 
 = Troubleshooting =
 == Check Tor Network Connection is Using a Tor Bridge ==

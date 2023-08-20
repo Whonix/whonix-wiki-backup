@@ -1,23 +1,23 @@
 {{Header}}
 {{#seo:
-|description=Information about {{project_name_gateway_long}} System DNS, /etc/resolv.conf and nslookup. Getting System DNS working on {{project_name_gateway_long}}.
+|description=Information about {{project_name_gateway_long}} System DNS, /etc/resolv.conf, and nslookup. Getting System DNS working on {{project_name_gateway_long}}.
 |image=Robot-162087640.png
 }}
 [[image:Robot-162087640.png|200px|thumb]]
 {{intro|
-Information about {{project_name_gateway_long}} System DNS, /etc/resolv.conf and nslookup. Getting System DNS working on {{project_name_gateway_long}}.
+Information about {{project_name_gateway_long}} System DNS, <code>/etc/resolv.conf</code>, and <code>nslookup</code>. Getting System DNS working on {{project_name_gateway_long}}.
 }}
 = Introduction =
 {{Box|text=
-System DNS here is defined as:
+System DNS is defined as:
 
-* resolving DNS,
-** without use of a socksifier such as <code>torsocks</code>,
-** without application proxy settings,
-** without a Tor <code>SocksPort</code>.
-* using the usual mechanisms on Linux for resolving DNS.
-* that are usually configured through configuration file <code>/etc/resolv.conf</code>.
-* that would happen when running <code>nslookup</code>.
+* Resolving DNS:
+** Without the use of a socksifier such as <code>torsocks</code>,
+** Without application proxy settings,
+** Without a Tor <code>SocksPort</code>.
+* Using the standard mechanisms on Linux for DNS resolution.
+* Typically configured through the configuration file <code>/etc/resolv.conf</code>.
+* The process that occurs when running <code>nslookup</code>.
 }}
 
 {{Box|text=
@@ -25,93 +25,94 @@ System DNS here is defined as:
 }}
 
 {{Box|text=
-{{project_name_workstation_long}} is configured to use various [https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort <code>SocksPort</code>s], [https://2019.www.torproject.org/docs/tor-manual.html.en#DNSPort <code>DNSPort</code>] and [https://2019.www.torproject.org/docs/tor-manual.html.en#TransPort <code>TransPort</code>], see also [[Stream Isolation]]. Using system DNS on {{project_name_workstation_long}} by default does not require {{project_name_gateway_long}} system DNS. <ref>
-That is because DNS traffic originating from {{project_name_workstation_long}} gets redirected to Tor's <code>DNSPort</code> running on {{project_name_gateway_long}} by [[Whonix-Gateway Firewall]].
-</ref> Modifications of <code>/etc/resolv.conf</code> on {{project_name_gateway_long}} have no effect on {{project_name_workstation_long}}.
+{{project_name_workstation_long}} is configured to use various [https://2019.www.torproject.org/docs/tor-manual.html.en#SocksPort <code>SocksPort</code>s], [https://2019.www.torproject.org/docs/tor-manual.html.en#DNSPort <code>DNSPort</code>], and [https://2019.www.torproject.org/docs/tor-manual.html.en#TransPort <code>TransPort</code>]. See also [[Stream Isolation]]. By default, using system DNS on {{project_name_workstation_long}} does not require {{project_name_gateway_long}} system DNS. <ref>
+This is because DNS traffic originating from {{project_name_workstation_long}} is redirected to Tor's <code>DNSPort</code> running on {{project_name_gateway_long}} by the [[Whonix-Gateway Firewall]].
+</ref> Modifications to <code>/etc/resolv.conf</code> on {{project_name_gateway_long}} do not affect {{project_name_workstation_long}}.
 }}
 
 {{Box|text=
-{{project_name_gateway_long}} is only configured to use various <code>SocksPort</code>s. A global system DNS resolver to resolve DNS originating from applications running on {{project_name_gateway_long}} is not required for any common use case to justify enabling it by default. Use cases where this could be useful include:
+{{project_name_gateway_long}} is only configured to use various <code>SocksPort</code>s. A global system DNS resolver for resolving DNS requests from applications running on {{project_name_gateway_long}} isn't necessary for most common use cases, so it isn't enabled by default. Potential use cases where this could be beneficial include:
 
-* resolving the hostname of a proxy used in <code>/usr/local/etc/torrc.d/50_user.conf</code> through Tor would be useful ([https://sourceforge.net/projects/whonix/discussion/general/thread/41116dda/ technical explanation])
-* resolving the hostname of a VPN. But then using a VPN configuration using IPs only would be better.
-* Perhaps we could use <code>/etc/hosts</code> for such use cases rather than enabling system DNS?
+* Resolving the hostname of a proxy specified in <code>/usr/local/etc/torrc.d/50_user.conf</code> via Tor ([https://sourceforge.net/projects/whonix/discussion/general/thread/41116dda/ technical explanation]).
+* Resolving the hostname of a VPN. However, a VPN configuration using only IPs would be more suitable.
+* One could consider using <code>/etc/hosts</code> for such scenarios instead of enabling system DNS.
 }}
 
-= Whonix-Gateway System DNS over Clearnet =
-== Setup ==
-'''Usually recommended against and unnecessary.'''
+= Whonix-Gateway Default System DNS Setting =
+As of this writing, no DNS server is pre-configured.
 
-Clearnet Whonix-Gateway System DNS.
+To verify this, users can run the command below. This command will display all lines in the system DNS configuration file <code>/etc/resolv.conf</code> except those that are commented out (lines starting with a hash ("<code>#</code>")).
 
-'''1.''' Make the following modifications to {{project_name_gateway_long}}.
-
-{{Open with root rights
-|filename=/etc/resolv.conf
+{{CodeSelect|code=
+cat /etc/resolv.conf {{!}} grep --invert-match \#
 }}
 
-'''2.''' Uncomment <code>#nameserver 10.0.2.3</code>.
+Modifying this configuration may be safe, beneficial, and necessary for certain use cases such as [[Bridges]], pluggable transports, simplified meek and [[Bridges#Snowflake|snowflake]] support. <ref>
+https://forums.whonix.org/t/censorship-circumvention-tor-pluggable-transports/2601/40
+</ref>
 
-Remove the hash ("<code>#</code>") in front of <code>nameserver</code>. In other words, replace <code>#nameserver 10.0.2.3</code> with <code>nameserver 10.0.2.3</code>.
+= Whonix-Gateway System DNS Configuration =
+{{Tab
+|type=controller
+|addToClass=info-box
+|content=
+{{Tab
+|title= == Whonix-Gateway System DNS over Clearnet ==
+|type=section
+|addToClass=info-box
+|active=true
+|content=
+=== Setup ===
+<u>Notes:</u>
 
-'''3.''' Platform specific steps.
+* '''This is generally not recommended and is often unnecessary.'''
+* However, it simplifies the setup when using [[Bridges]] with [[Bridges#Snowflake|Snowflake]].
 
-* [[{{non_q_project_name_short}}|{{Non_q_project_name}}]]: Done.
-* [[{{Q_project_name_short}}|{{Q_project_name}}]]: Replace <code>10.0.2.3</code>.
-** To find out that IP to replace it with, run the following command.
-** {{CodeSelect|code=
-qubesdb-read /qubes-netvm-primary-dns
-}}
-** Should show for example:
-** <blockquote>10.139.1.1</blockquote>
-** Replace <code>10.0.2.3</code> with <code>10.139.1.1</code>. Note: Replace it with the actual IP, the output of above <code>qubesdb-read /qubes-netvm-primary-dns</code> command.
+{{Whonix-Gateway System DNS over Clearnet}}
 
-'''4.''' Done.
+=== Test ===
+<u>Notes:</u>
 
-The {{project_name_gateway_short}} System DNS has been completed.
+* If you're using [[Bridges#Snowflake|Snowflake]], testing this is typically unnecessary.
 
-== Test ==
-Using {{project_name_gateway_long}} user <code>clearnet</code>.
+To test, use the {{project_name_gateway_long}} user named <code>clearnet</code>.
 
 {{mbox
 | type    = critical
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    = Using the <code>clearnet</code> user account, traffic will be sent over normal internet! Not over Tor! Will not be anonymous!
+| text    = Be cautious: When using the <code>clearnet</code> user account, traffic will bypass Tor and use the standard internet, compromising anonymity!
 }}
 
-Start <code>bash</code> under user <code>clearnet</code>.
+Run <code>bash</code> as user <code>clearnet</code>.
 
 <ref>
-Similar to login as user <code>clearnet</code>.
+This is analogous to logging in as the user <code>clearnet</code>.
 </ref>
 
 {{CodeSelect|code=
 sudo -u clearnet bash
 }}
 
-Test it, for example using ping.
+To verify, you can use a tool like ping:
 
 {{CodeSelect|code=
 ping google.com
 }}
+}} <!-- end of tab -->
 
-= Whonix-Gateway System DNS over Tor =
-'''Usually recommended against and unnecessary.'''
+{{Tab
+|title= == Whonix-Gateway System DNS over Tor ==
+|type=section
+|addToClass=info-box
+|active=false
+|content=
+'''This approach is generally not recommended and is often unnecessary.'''
 
 Torified Whonix-Gateway System DNS.
 
 [[Undocumented]].
-
-= Whonix-Gateway Default System DNS Setting =
-At time of writing, none configured. Too verify, the following command all lines in the system DNS configuration file file <code>/etc/resolv.conf</code> except commented out files, those starting with a hash ("<code>#</code>").
-
-{{CodeSelect|code=
-cat /etc/resolv.conf {{!}} grep --invert-match \#
 }}
-
-Changing this might be safe, useful and required for [[Bridges]], pluggable transport, meek and easier [[Bridges#Snowflake|snowflake]] support:
-
-https://forums.whonix.org/t/censorship-circumvention-tor-pluggable-transports/2601/40
+}} <!-- end of tab controller -->
 
 = See Also =
 * [[{{project_name_gateway_short}}_Own_Traffic_Transparent_Proxy|Enable Transparent Proxying for {{project_name_gateway_long}} own traffic]]
