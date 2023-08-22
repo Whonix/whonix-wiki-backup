@@ -214,9 +214,6 @@ Newer discussion:
 * https://forums.whonix.org/t/multiple-whonix-workstations-that-can-communicate-with-each-other
 * https://tor.stackexchange.com/questions/13522/how-to-configure-whonix-gateway-for-communication-between-two-local-workstations/13546#13546
 
-= Forum Discussion =
-[https://forums.whonix.org/t/qubes-whonix/374 Qubes + {{project_name_long}}]
-
 = IP =
 == grep -r 10.152.152.10 * ==
 <pre>
@@ -460,19 +457,6 @@ packages/anon-torchat/usr/share/anon-torchat/.torchat/torchat.ini:listen_interfa
 </pre>
 Same comment as for packages/anon-torchat/usr/share/anon-torchat/.torchat/torchat.ini above.
 
-= Misc =
-Random facts.
-
-* {{Code2|AdminVM}} is a synonym for {{Code2|dom0}} <ref>https://github.com/QubesOS/qubes-issues/issues/1015</ref>.
-* {{Code2|AdminVM}} is not based on Fedora Template VM. More like a standalone VM.
-* Qubes Q3 RC1 {{Code2|AdminVM}} is based on Fedora 20. <ref>
-https://groups.google.com/g/qubes-users/c/zHdY6Oe58t0/m/qSFkLZdpng4J
-<blockquote>
-Actually you need rpmfusion-free-release-20.noarch.rpm, as Qubes dom0 is based on Fedora 20.
-</blockquote>
-</ref>
-* Qubes Q3 RC1 {{Code2|Fedora Template VM}} is based on Fedora 21.
-
 = Time =
 <pre>
 sudo mv /etc/qubes-rpc/qubes.SetDateTime /etc/qubes-rpc/qubes.SetDateTime.disabled
@@ -520,16 +504,6 @@ Newly created Qubes-{{project_name_workstation_long}} AppVMs inherit the TBB ver
 == Forum Discussion ==
 * https://forums.whonix.org/t/what-should-tor-browser-updater-whonix-do-in-a-templatevm
 * https://forums.whonix.org/t/idea-for-aqrexec-service-to-install-new-versions-of-tor-browser-to-a-list-of-vms
-
-= Upgrade through Clearnet =
-== Qubes R3.2 ==
-Just a note about upgrading a {{project_name_gateway_long}} Template through Clearnet. Untorified! This is easily possible by setting the following environment variable.
-
-<pre>
-export UWT_DEV_PASSTHROUGH="1"
-</pre>
-== Qubes R4 ==
-Undocumented.
 
 = Build =
 == Build Single Qubes Package ==
@@ -675,57 +649,14 @@ Building R3 vs R3.1. Comments on which branch / config to build.
 
 https://github.com/QubesOS/qubes-issues/issues/1318#issuecomment-147133115
 
-= Handling of file system in Templates vs TemplateBasedVMs =
-== Qubes R3 ==
-{| class="wikitable" style="background-color: #fff;text-align: center"
-
-|
-| root
-| home
-
-|-
-| create new AppVM
-| {{Yes}}
-| {{Yes}}
-
-|-
-| modifications in TemmplateVMs for existing AppVMs
-| {{Yes}}
-| {{No}}
-
-|}
-
-* when you create a new AppVM, it inherits the Templates root and home folder
-* when you make changes in your Template root such as installing new packages, those will be available to existing AppVMs after Template shutdown + AppVM (re)start
-* when you make changes in your Template home, those will be not be available to existing AppVMs
-
-== Qubes Proposal ==
-{| class="wikitable" style="background-color: #fff;text-align: center"
-
-|
-| root
-| home
-
-|-
-| create new AppVM
-| {{Yes}}
-| {{No}}
-
-|-
-| modifications in TemmplateVMs for existing AppVMs
-| {{Yes}}
-| {{No}}
-
-|}
-
 = Split GPG =
 See [[Dev/Split_GPG]].
 
 = {{project_name_gateway_vm}} as Qubes FirewallVM =
 Goals:<br/>
 
-* any Template behind {{project_name_gateway_vm}} should be restricted to torified updates proxy only
-* {{project_name_long}} Templates behind {{project_name_gateway_vm}} should be restricted to torified updates proxy only
+* any Template behind {{project_name_gateway_vm}} should be restricted to torified UpdatesProxy only
+* {{project_name_long}} Templates behind {{project_name_gateway_vm}} should be restricted to torified UpdatesProxy only
 * {{project_name_long}} Templates connected to a ProxyVM other than {{project_name_gateway_vm}} should refuse to connect and show a warning [done]
 
 Qubes tickets:<br/>
@@ -740,6 +671,7 @@ Tickets:<br/>
 
 = Connection Issues =
 * icmp mtu connection issues?
+* Template upgrade issues? -> https://github.com/QubesOS/qubes-issues/issues/8388
 
 = Matrix of Qubes VM Types =
 ProxyVM
@@ -756,9 +688,16 @@ HVM Template
 = Network in Templates =
 As default setting, any Template (including {{project_name_long}}) in Qubes R4.0 and above have their NetVM set to <code>none</code>.
 
-Networking and [[update]] of Templates is possible through Qubes Updates Proxy.
+Networking and [[update]] of Templates is possible through Qubes UpdatesProxy.
 
-= Torified Updates Proxy =
+= Torified UpdatesProxy =
+== Connection through Qubes UpdatesProxy ==
+In Qubes Template.
+
+{{CodeSelect|code=
+http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 curl.anondist-orig https://check.torproject.org
+}}
+
 == {{project_name_gateway_vm}} ==
 File /usr/share/tinyproxy/default.html gets [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/init/qubes-whonix-sysinit modified]. The following is the original.
 
@@ -849,11 +788,6 @@ UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://127.0.0.1:808
 * [https://github.com/QubesOS/qubes-issues/issues/1957 Cache updates #1957, qubes-updates-cache, qubes-updates-proxy]
 * design decision: [https://github.com/QubesOS/qubes-issues/issues/1880 Difficulty to upgrade {{project_name_long}} Templates over clearnet considered a bug or feature?]
 * bug: [https://forums.whonix.org/t/templates-incorrectly-think-theyre-not-connected-to-a-whonix-gateway Templates incorrectly think they're not connected to a {{project_name_long}} gateway.]
-
-= Updates Proxy Debugging =
-
-* qubes-updates-proxy (and its deprecated name: qubes-yum-proxy) - a service providing a proxy for templates - by default enabled in NetVMs (especially: sys-net)
-* updates-proxy-setup (and its deprecated name: yum-proxy-setup) - use a proxy provided by another VM (instead of downloading updates directly), enabled by default in all templates
 
 = Troubleshooting =
 See [[Qubes/Troubleshooting|Troubleshooting Qubes specific]].
@@ -1129,13 +1063,6 @@ Should should:
 <pre>
 whonix-ws 1
 </pre>
-
-= Connection through Qubes Updates Proxy =
-In Qubes Template.
-
-{{CodeSelect|code=
-http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 curl.anondist-orig https://check.torproject.org
-}}
 
 = Testing Automated =
 * https://github.com/marmarek/openqa-tests-qubesos/blob/master/tests/whonix_firstrun.pm

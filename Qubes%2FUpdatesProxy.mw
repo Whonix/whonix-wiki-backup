@@ -206,6 +206,131 @@ qubes.UpdatesProxy
 * In case of issues, see also [[Qubes/Troubleshooting#qvm-tags_verification|<code>qvm-tags</code> verification]].
 ** See if you can make head or tail of [[Dev/Qubes#qvm-tags|qvm-tags developer notes]]. If not, skip this step.
 
+== Simulate torified UpdatsProxy check failed ==
+Developers only.
+
+Simulate Qubes-Whonix UpdatesProxy check failed.
+
+{{CodeSelect|code=
+sudo rm /run/updatesproxycheck/whonix-secure-proxy
+}}
+
+Run apt.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+Result:
+
+<pre>
+WARNING: Execution of /usr/bin/apt prevented by /etc/uwt.d/40_qubes.conf because no torified Qubes updates proxy found.
+Please make sure Whonix-Gateway (commonly called sys-whonix) is running.
+
+Check your _dom0_ settings in the /etc/qubes/policy.d/ folder.
+
+To see if it is fixed, try running in Whonix Template:
+
+sudo systemctl restart qubes-whonix-torified-updates-proxy-check
+
+Then try to update / use apt-get again.
+
+For more help on this subject see:
+[https://www.whonix.org/wiki/Qubes/UpdatesProxy https://www.whonix.org/wiki/Qubes/UpdatesProxy]
+
+If this warning message is transient, it can be safely ignored.
+</pre>
+
+Thanks to [https://github.com/Whonix/qubes-whonix/blob/master/etc/uwt.d/40_qubes.conf /etc/uwt.d/40_qubes.conf] which checks if <code>/run/updatesproxycheck/whonix-secure-proxy</code> exists which only exist does if Qubes UpdatesProxy was reachable and the output of the test included <code>tor proxy</code>.
+
+== Invalid response from proxy: HTTP/1.1 500 Unable to connect Server: tinyproxy ==
+Understanding Tinyproxy Error Messages
+
+The objective of this documentation is to understand and interpret error messages from Tinyproxy.
+
+The error message: 
+
+<pre>
+HTTP/1.0 500 Unable to connect Server: tinyproxy/1.10.0 Content-Type: text/html Connection: close
+</pre>
+
+is not necessarily indicative of a Tor connectivity issue or issue caused by Whonix.
+
+=== reproduce that tinyproxy error by stopping Tor ===
+Developers only. For demonstration purposes.
+
+To reproduce and test the origin of this error message:
+
+'''1.''' Stop Tor.
+
+In `sys-whonix`, execute: 
+
+<pre>
+sudo systemctl stop tor@default
+</pre>
+
+'''2.''' Confirm in the journal log that the Tor service has indeed stopped.
+
+'''3.''' Attempt an update.
+
+Run the update command in `whonix-gateway-17` Template:
+
+<source lang="bash">
+sudo apt update
+</source>
+
+'''4.''' Result.
+
+Now Tor is stopped while attempting to run an apt update in the Template.
+
+The expected result is:
+
+<pre>
+Invalid response from proxy: HTTP/1.1 500 Unable to connect  Server: tinyproxy/1.11.1  Content-Type: text/html  Connection: close [IP: 127.0.0.1 8082]
+</pre>
+
+'''5.''' Restart Tor.
+
+Optional.
+
+'''6.''' Done.
+
+=== reproduce the tinyproxy error by adding a Blocked Repository ===
+Developers only. For demonstration purposes.
+
+'''1.''' Mess up APT sources on purpose.
+
+Add a blocked APT source to <code>/etc/apt/sources.list.d/blocked.list</code>.
+
+<pre>
+deb tor+https://deb.blocked.com bookworm main
+</pre>
+
+'''2.''' Update.
+
+<pre>
+sudo apt update
+</pre>
+
+'''3.''' Result.
+
+When running an update, all APT sources will function except for `blocked.com`. The output will be:
+
+<pre>
+Ign:1 tor+https://deb.blocked.com bookworm InRelease                                                                                                         
+Invalid response from proxy: HTTP/1.1 500 Unable to connect  Server: tinyproxy/1.11.1  Content-Type: text/html  Connection: close [IP: 127.0.0.1 8082]
+Reading package lists... Done
+E: Failed to fetch tor+https://deb.blocked.com/dists/bookworm/InRelease  Invalid response from proxy: HTTP/1.1 500 Unable to connect  Server: tinyproxy/1.11.1  Content-Type: text/html  Connection: close [IP: 127.0.0.1 8082]
+</pre>
+
+=== tinyproxy Error interpretation ===
+From the output provided by `apt` in the Template, based on the message from Tinyproxy, it is challenging to differentiate between:
+
+* '''A)''' <u>Local connectivity issue:</u> Tinyproxy's inability to connect to the destination domain name.
+* '''B)''' <u>Blocked by remote server issue:</u> A connection being blocked by a remote APT server.
+
+The symptoms and output from both scenarios are identical.
+
 = Footnotes =
 {{reflist|close=1}}
 
