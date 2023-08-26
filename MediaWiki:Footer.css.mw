@@ -3,15 +3,19 @@ CSS styling for our custom footer
 See detailed documentation in Dev/mediawiki
 */
 
+
 /* -------------- */
 /* 0. Boilerplate */
+
 
 .mw-footer-container {
 	display: none;
 }
 
+
 /* ----------------- */
 /* 1. Footer General */
+
 
 #custom-footer {
 	background: linear-gradient( 90deg, #333, #5a5a5a, #5a5a5a, #333);
@@ -26,277 +30,227 @@ See detailed documentation in Dev/mediawiki
 	display: none;
 }
 
+/* 1.1. Structure */
+
 #custom-footer .content-wrapper {
 	max-width: 960px;
 	margin: auto;
-	padding: 30px 20px 0;
+	padding: 30px 20px;
+	display: flex;
 }
 
-#custom-footer .content-wrapper-2 {
-	width: 100%;
-	background: #d2d2d2;
-	padding: 44px 20px;
-	overflow: auto;
+#custom-footer > .content-wrapper > .left { width: calc( 24% - 20px ); }
+#custom-footer > .content-wrapper > .middle { width: calc( 38% - 20px ); }
+#custom-footer > .content-wrapper > .right { width: calc( 38% - 20px ); }
+
+#custom-footer > .content-wrapper > :not(:last-child) {
+	margin-right: 30px;	
 }
 
-#custom-footer .divider-border {
-	border-bottom: 3px solid #555;
-	border-image: linear-gradient(to right, transparent 20%, #b3b3b3, transparent 80%) 1;
+@media ( max-width: 750px ) {
+	#custom-footer > .content-wrapper {
+		display: block;
+	}
+	
+	#custom-footer > .content-wrapper > * {
+		width: 80% !important;
+		margin: auto !important;
+	}
 }
 
-#custom-footer .expand-button-50 {
+/* 1.2. Icon Link */
+
+#custom-footer .icon-link {
 	display: inline-block;
-	height: 50px;
-	width: 50px;
 	position: relative;
-	margin: 0 15px 15px 0;
+	width: 28px;
+	height: 28px;
+	margin: 0 5px 5px 0;
 }
 
-#custom-footer .expand-button-50:last-child {
+#custom-footer .icon-link:last-child {
 	margin-right: 0;
 }
 
-#custom-footer .expand-button-50 img {
-	position: absolute;
-	width: 50px;
-	height: 50px;
-	left: 0;
-	top: 0;
-	max-width: none;
-	transition: width .2s, height .2s, left .2s, top .2s;
+#custom-footer .icon-link img {
 	box-shadow: 2px 2px 3px rgba(0,0,0,.3);
 	border-radius: 50%;
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
 }
 
-#custom-footer .expand-button-50:hover img {
-	width: 60px;
-	height: 60px;
-	left: -5px;
-	top: -5px;
+#custom-footer .icon-link:hover img {
+	transform: scale(1.2);
 }
+
+/* 1.3. Sub Headlines */
+
+#custom-footer > .content-wrapper :not(.main-claim ) > .headline {
+	font-weight: bold;
+	border-bottom: 1px solid white;
+	margin-bottom: 14px;
+	padding-bottom: 9px;
+}
+
+@media ( max-width: 750px ) {
+	#custom-footer > .content-wrapper :not(.main-claim ) > .headline {
+		margin-top: 14px;
+	}
+}
+
 
 /* -------- */
 /* 2. Claim */
 
+
 #custom-footer .main-claim {
-	margin-bottom: 36px;
 	padding-bottom: 23px;
 }
 
-#custom-footer .main-claim, #custom-footer .main-claim > * {
+#custom-footer .main-claim,
+#custom-footer .main-claim > * {
 	width: 100%;
 	display: block;
-	text-align: center;
 }
 
 #custom-footer .main-claim > .headline {
-	font-size: 40px;
+	font-size: 25px;
 	font-weight: bold;
 	line-height: 1em;
 	margin-bottom: 8px;
 }
 
 #custom-footer .main-claim .headline .share-tooltip > * {
-	font-size: 26px !important;
+	font-size: 16px !important;
 }
 
-#custom-footer .main-claim .headline .share-tooltip > .button {
+#custom-footer .main-claim .headline .share-tooltip .button {
 	filter: brightness(2);
+	border-radius: 0;
+	background-position: left;
+	margin-top: 5px;
 }
 
-/* --------- */
-/* 3. Donate */
 
-#custom-footer .donate {
-	text-align: center;
-	padding-bottom: 17px;
-	margin-bottom: 23px;
+/* ------------------- */
+/* 3. Dark Mode switch */
+
+
+#custom-footer .dark-mode-switch {
+    border: 1px solid #ccc;
+    padding: 8px;
+    width: fit-content;
+    border-radius: 6px;
+    color: #ccc;
 }
 
-#custom-footer .donate > * {
-	margin-right: 15px;
-	display: inline-block;
-	vertical-align: top;
-	margin-bottom: 20px;
+@media ( max-width: 750px ) {
+	#custom-footer .dark-mode-switch {
+		position: relative;
+		top: -6px;
+	}
 }
 
-#custom-footer .donate > a > img, #custom-footer .donate .donate-button div {
-	box-shadow: 2px 2px 5px rgba(0,0,0,.6);
-	height: 100px;
-	cursor: pointer;
-	transition: transform .3s;
+#custom-footer .dark-mode-switch:hover {
+	background: #7f7f7f;
 }
 
-#custom-footer .donate-button {
+#custom-footer .dark-mode-switch .ext-darkmode-link {
+	color: #ccc;
+	font-size: 14px;
+	padding-left: 25px;
+	position: relative;
 	text-decoration: none;
-	height: 100px;
 }
 
-#custom-footer .donate-button div {
-	background: radial-gradient( #ddd, #aaa );
-	border-radius: 10px;
-	overflow: hidden;
-	width: 285px;
+#custom-footer .dark-mode-switch .ext-darkmode-link:before {
+    position: absolute;
+    left: 4px;
+    font-size: 22px;
+    top: -8px;
 }
 
-#custom-footer .donate-button:hover div, #custom-footer .donate > a:hover > img {
-	transform: scale(1.1);
+html.client-darkmode #custom-footer .dark-mode-switch .ext-darkmode-link:before {
+	left: 1px;
+	font-size: 25px;
+	top: -13px;
 }
 
-#custom-footer .donate-button span.text {
-	background: white;
-	display: block;
-	text-align: center;
-	font-size: 24px;
-	padding: 9px 0 8px;
-	color: #f97425;
-}
-
-#custom-footer .donate-button span.image {
-	width: calc( 100% - 30px);
-	display: block;
-	margin: auto;
-	padding: 10px 22px;
-	max-width: 285px;
-}
-
-#custom-footer .donate-button span.image img {
-	margin: 0;
-	width: 100%;
-}
 
 /* --------------- */
 /* 4. Social Media */
 
+
 #custom-footer .social {
-	text-align: center;
 	padding-bottom: 15px;
-	margin-bottom: 25px;
 }
 
 #custom-footer .social .text {
 	margin-bottom: 15px;
 }
 
-/* ---------- */
-/* 5. Support */
-
-#custom-footer .support {
-	text-align: center;
-	padding-bottom: 15px;
-}
-
-#custom-footer .support .text {
-	margin-bottom: 15px;
-}
-
-/* ------------------- */
-/* 6. Dark Mode switch */
-
-#custom-footer .dark-mode-switch {
-	text-align: center;
-	margin-bottom: 37px;
-	padding-bottom: 20px;
-}
-
-#custom-footer .dark-mode-switch a {
-	color: white;
-	font-size: 14px;
-	text-decoration: none;
-}
 
 /* -------------- */
-/* 7. Open Source */
+/* 5. Open Source */
+
 
 #custom-footer .opensource {
-    max-width: 620px;
-    margin: 0 auto 30px;
-    padding: 0 0 20px 132px;
-    position: relative;
+	font-size: 12px;
 }
 
-#custom-footer .opensource > img {
+@media ( max-width: 750px ) {
+	#custom-footer .opensource {
+		margin-top: 20px;
+	}
+}
+
+#custom-footer .opensource:after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+#custom-footer .opensource .images {
+	display: inline-block;
+	float: left;
+	margin-right: 12px
+}
+
+#custom-footer .opensource > .images a {
+	border: none;
+	display: inline-block;
+}
+
+#custom-footer .opensource > .images img {
+	height: 55px;
 	background: white;
 	border-radius: 5px;
-	position: absolute;
-	top: 0;
-	height: 57px;
+	padding: 3px 7px;
 }
 
-#custom-footer .opensource > img:first-child {
-	left: 0;
-	padding: 7px 5px;
+#custom-footer .opensource > .imagess img:first-child {
+	margin-right: 5px;	
 }
 
-#custom-footer .opensource > img:nth-child(2) {
-	left: 64px;
-	padding: 3px;
+#custom-footer .opensource > .images img:hover {
+	transform: scale(1.2);
+	box-shadow: 0px 0px 6px 3px rgb( 0 0 0 / 20% );
 }
 
-#custom-footer .opensource a {
-	color: #6ab9ff !important;
-}
-
-/* --------------- */
-/* 8. Endorsements */
-
-#custom-footer .endorsements {
-	overflow: auto;
-	text-align: center;
-}
-
-#custom-footer .endorsements > * {
-	opacity: 0.8;
-	margin: 0 20px 20px 0;
-	display: inline-block;
-	vertical-align: top;
-	border-radius: 8px;
-	width: 200px;
-	height: 100px;
-	position: relative;
-	background: radial-gradient(#fafafa 20%, #eaeaea);
-	color: #333;
-	text-decoration: none;
-	font-size: 13px;
-	line-height: 1.5em;
-	text-align: left;
-	overflow: auto;
-}
-
-#custom-footer .endorsements > *:hover {
-	opacity: 1;
-}
-
-#custom-footer .endorsements > .evohost {
-	padding: 11px 0 0 23px;
-}
-
-#custom-footer .endorsements > .evohost img {
-	float: left;
-	margin: 0 10px 0 -3px;
-}
-
-#custom-footer .endorsements > .kicksecure > a {	
-	position: absolute;	
-	top: 0;	
-	left: 0;	
-	width: 100%;	
-	padding-top: 16px;	
-	text-align: center;
-}
 
 /* -------- */
-/* 9. Legal */
+/* 6. Legal */
+
 
 #custom-footer .legal {
-	color: #808080;
+	color: #ababab;
 	margin: 18px auto 0;
 	max-width: 750px;
 }
 
 #custom-footer .legal > span {
 	display: block;
-	text-align: center;
 	font-size: 12px;
 }
 
@@ -310,7 +264,7 @@ See detailed documentation in Dev/mediawiki
 }
 
 #custom-footer .legal .rights {
-	color: #555;
+	color: #ababab;
 	font-size: 14px;
 }
 
@@ -324,37 +278,6 @@ See detailed documentation in Dev/mediawiki
 	transform: scale(1.3);
 }
 
-/* ----------------- */
-/* 10. Payment Modal */
-
-#footer-show-qr-codes-modal {
-	color: #333;
-}
-
-#footer-show-qr-codes-modal .content {
-	background: #eee;
-	padding: 50px;
-}
-
-#footer-show-qr-codes-modal h5 {
-	margin: -50px -50px 20px -50px;
-	background: white;
-	padding: 20px 50px;
-	font-size: 16px;
-}
-
-#footer-show-qr-codes-modal img {
-	float: left;
-	margin: 0 20px 20px 0;
-}
-
-#footer-show-qr-codes-modal .qr-area {
-	font-size: 16px;
-}
-
-#footer-show-qr-codes-modal .code-select:not(:hover) {
-	background: white;
-}
 
 /*
 [[Category:MultiWiki]]
