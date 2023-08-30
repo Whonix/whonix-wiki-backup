@@ -53,6 +53,7 @@ See detailed documentation in Dev/mediawiki
 	height: 50px;
 	position: absolute;
 	opacity: 0;
+	z-index: 10;
 }
 
 #custom-header .menu-trigger-image {
@@ -195,7 +196,7 @@ See detailed documentation in Dev/mediawiki
 	position: relative;
 }
 
-#custom-header .menu-title {
+#custom-header .super-menu .menu-title {
 	width: 100%;
 	height: 52px;
 	display: inline-block;
@@ -203,15 +204,33 @@ See detailed documentation in Dev/mediawiki
 	text-align: center;
 }
 
-#custom-header .super-menu .menu-title > img {
+#custom-header .super-menu .menu-trigger {
+	cursor: pointer;
+}
+
+#custom-header .menu-title > img {
+	display: none;
+}
+
+#custom-header .super-menu .menu-title > img.off {
 	width: 27px;
 	position: relative;
 	top: 13px;
 	height: auto;
 }
 
-#custom-header .menu-title:hover img {
+#custom-header .super-menu .menu-title > img.on {
+	margin-top: 12px;	
+}
+
+#custom-header .super-menu .menu-trigger:hover + .menu-title > img {
 	filter: brightness(0);
+	transform: scale( 1.2 );
+}
+
+#custom-header .super-menu > .menu-trigger:not(:checked) + .menu-title img.off,
+#custom-header .super-menu > .menu-trigger:checked + .menu-title img.on {
+	display: inline-block;
 }
 
 #custom-header .super-menu .submenus {
@@ -226,7 +245,7 @@ See detailed documentation in Dev/mediawiki
 	display: none;
 }
 
-#custom-header .super-menu:hover .submenus {
+#custom-header .super-menu > .menu-trigger:checked ~ .submenus {
 	display: block;
 }
 
