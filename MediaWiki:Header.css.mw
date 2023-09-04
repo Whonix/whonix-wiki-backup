@@ -44,11 +44,10 @@ See detailed documentation in Dev/mediawiki
 }
 
 
-/* ---------------------------- */
-/* 2. Mobile Menu and Logo left */
+/* 1.2. Header Menu (nav-menu and super-menu) */
 
 
-#custom-header .menu-trigger {
+#custom-header .header-menu > .menu-trigger {
 	width: 50px;
 	height: 50px;
 	position: absolute;
@@ -56,7 +55,7 @@ See detailed documentation in Dev/mediawiki
 	z-index: 10;
 }
 
-#custom-header .menu-trigger-image {
+#custom-header .header-menu > .menu-button > img {
 	display: none;
     width: 36px;
     height: 53px;
@@ -66,16 +65,59 @@ See detailed documentation in Dev/mediawiki
     object-position: 0 12px;
 }
 
-#custom-header .menu-trigger-image:hover {
+#custom-header .header-menu > .menu-button > img:hover {
 	filter: brightness(0);
 }
 
-/* 2.1. Logo left */
+#custom-header .header-menu {
+	display: inline-block;
+}
+
+#custom-header .header-menu > .menu-content {
+	display: inline;
+	vertical-align: top;
+	position: relative;
+}
+
+
+#custom-header .super-menu .menu-trigger {
+	cursor: pointer;
+}
+
+/* For JS: NO menu trigger checkbox used */
+
+html.client-js #custom-header .header-menu .menu-trigger {
+	display: none;
+}
+
+html.client-nojs #custom-header .header-menu .menu-trigger:hover + .menu-button > img,
+html.client-js #custom-header .header-menu .menu-button:hover > img {
+	filter: brightness(0);
+	transform: scale( 1.2 );
+}
+
+html.client-nojs #custom-header .header-menu > .menu-trigger:not(:checked) + .menu-button img.off,
+html.client-nojs #custom-header .header-menu > .menu-trigger:checked + .menu-button img.on,
+html.client-js #custom-header .header-menu:not(.active) .menu-button img.off,
+html.client-js #custom-header .header-menu.active .menu-button img.on {
+	display: inline-block;
+}
+
+html.client-nojs #custom-header .header-menu > .menu-trigger:checked ~ .menu-content,
+html.client-js #custom-header .header-menu.active .menu-content {
+	display: block;
+}
+
+
+/* ------------ */
+/* 2. Logo left */
+
 
 #custom-header a.home {
 	position: relative;
 	height: 50px;
 	display: inline-block;
+	vertical-align: top;
 }
 
 #custom-header a.home:hover {
@@ -86,23 +128,21 @@ See detailed documentation in Dev/mediawiki
 /* ------------ */
 /* 3. Menu left */
 
+#custom-header .nav-menu > .menu-button {
+	display: none;
+}
 
-#custom-header .nav-menu {
+#custom-header .nav-menu .menu-content > div {
 	display: inline-block;
-	vertical-align: top;
 	position: relative;
 }
 
-#custom-header .nav-menu > div {
-	display: inline-block;
-}
-
-#custom-header .nav-menu > div > .button {
+#custom-header .nav-menu .menu-content > div > .button {
 	height: 53px;
 	cursor: pointer;
 }
 
-#custom-header .nav-menu > div > .menu {
+#custom-header .nav-menu .menu-content > div > .menu {
 	display: none;
 	position: absolute;
 	top: 50px;
@@ -118,12 +158,12 @@ See detailed documentation in Dev/mediawiki
 	max-width: 450px;
 }
 
-#custom-header .nav-menu > div > .button:hover + .menu,
-#custom-header .nav-menu > div > .menu:hover {
+#custom-header .nav-menu .menu-content > div > .button:hover + .menu,
+#custom-header .nav-menu .menu-content > div > .menu:hover {
 	display: block;
 }
 
-#custom-header .nav-menu > div > .menu > a {
+#custom-header .nav-menu .menu-content > div > .menu > a {
 	display: flex;
 	align-items: flex-start;
 	font-size: 16px;
@@ -133,14 +173,14 @@ See detailed documentation in Dev/mediawiki
 	text-decoration: none;
 }
 
-#custom-header .nav-menu > div > .menu > a > i {
+#custom-header .nav-menu .menu-content > div > .menu > a > i {
     width: 1em;
     height: 1em;
     margin-right: 1em;
     flex-shrink: 0
 }
 
-#custom-header .nav-menu > div > .menu > a:hover {
+#custom-header .nav-menu .menu-content > div > .menu > a:hover {
 	background: #eee;	
 }
 
@@ -164,7 +204,7 @@ See detailed documentation in Dev/mediawiki
 /* 5. Search */
 
 
-#custom-header .search {
+#custom-header .search {FONT-WEIGHT
 	width: 30px;
 	height: 50px;
 	display: inline-block;
@@ -196,44 +236,8 @@ See detailed documentation in Dev/mediawiki
 	position: relative;
 }
 
-#custom-header .super-menu .menu-title {
-	width: 100%;
-	height: 52px;
-	display: inline-block;
-	cursor: pointer;
-	text-align: center;
-}
 
-#custom-header .super-menu .menu-trigger {
-	cursor: pointer;
-}
-
-#custom-header .menu-title > img {
-	display: none;
-}
-
-#custom-header .super-menu .menu-title > img.off {
-	width: 27px;
-	position: relative;
-	top: 13px;
-	height: auto;
-}
-
-#custom-header .super-menu .menu-title > img.on {
-	margin-top: 12px;	
-}
-
-#custom-header .super-menu .menu-trigger:hover + .menu-title > img {
-	filter: brightness(0);
-	transform: scale( 1.2 );
-}
-
-#custom-header .super-menu > .menu-trigger:not(:checked) + .menu-title img.off,
-#custom-header .super-menu > .menu-trigger:checked + .menu-title img.on {
-	display: inline-block;
-}
-
-#custom-header .super-menu .submenus {
+#custom-header .super-menu .menu-content {
 	padding: 0 10px 20px;
 	width: max-content;
 	position: absolute;
@@ -245,17 +249,13 @@ See detailed documentation in Dev/mediawiki
 	display: none;
 }
 
-#custom-header .super-menu > .menu-trigger:checked ~ .submenus {
-	display: block;
-}
-
-#custom-header .super-menu .submenus > * {
+#custom-header .super-menu .menu-content > * {
 	display: inline-block;
 	vertical-align: top;
 	padding: 0 3px;
 }
 
-#custom-header .super-menu .submenus > * > * {
+#custom-header .super-menu .menu-content > * > * {
 	display: block;
 	padding: 4px 8px 3px 30px;
 	text-decoration: none;
@@ -263,7 +263,7 @@ See detailed documentation in Dev/mediawiki
 	position: relative;
 }
 
-#custom-header .super-menu .submenus > * > *:before {
+#custom-header .super-menu .menu-content > * > *:before {
 	position: absolute;
 	font-family: "Font Awesome 6 Free";
 	font-weight: 900;
@@ -273,7 +273,7 @@ See detailed documentation in Dev/mediawiki
 	text-align: center;
 }
 
-#custom-header .super-menu .submenus > * > .headline {
+#custom-header .super-menu .menu-content > * > .headline {
     background: #f0f0f0;
     border-radius: 4px;
     cursor: default;
@@ -283,14 +283,14 @@ See detailed documentation in Dev/mediawiki
     text-align: center;
 }
 
-#custom-header .super-menu .submenus .headline.user {
+#custom-header .super-menu .menu-content .headline.user {
 	max-width: 150px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: pre;
 }
 
-#custom-header .super-menu .submenus > * > *:not(.headline):hover {
+#custom-header .super-menu .menu-content > * > *:not(.headline):hover {
 	color: black;
 }
 
@@ -358,13 +358,11 @@ body:not(.page-is-watched) #custom-header .super-menu .unwatch { display: none; 
 }
 
 @media (max-width: 700px) {
-	#custom-header .menu-trigger,
-	#custom-header .menu-trigger:not(:checked) + .menu-trigger-image.off-image,
-	#custom-header .menu-trigger:checked + * + .menu-trigger-image.on-image {
-		display: inline-block;
+	#custom-header .nav-menu > .menu-button {
+		display: inline-block;	
 	}
 	
-	#custom-header .nav-menu {
+	#custom-header .nav-menu > .menu-content {
 		position: fixed;
 		left: 0;
 		top: 50px;
@@ -375,27 +373,22 @@ body:not(.page-is-watched) #custom-header .super-menu .unwatch { display: none; 
 		border-width: 0 1px 1px;
 		height: calc(100% - 50px);
 	}
-
-	#custom-header .menu-trigger:checked + .menu-trigger-image + .menu-trigger-image + .home + .nav-menu,
-	#custom-header .nav-menu:hover {
-		display: block;
-	}
-
-	#custom-header .nav-menu > div {
+	
+	#custom-header .nav-menu > .menu-content > div {
 	    padding: 0 15px;
 	    width: 100%;
 	    display: block;
 	    margin: 0;
 	}
 	
-	#custom-header .nav-menu > div > .button {
+	#custom-header .nav-menu > .menu-content > div > .button {
 		border-bottom: 1px solid #858585;
 		font-weight: bold;
 		height: 30px;
 		padding: 0 0 0 4px;
 	}
 	
-	#custom-header .nav-menu > div > .menu {
+	#custom-header .nav-menu > .menu-content > div > .menu {
 		max-width: unset;
 		display: block;
 		width: 100%;
@@ -403,10 +396,9 @@ body:not(.page-is-watched) #custom-header .super-menu .unwatch { display: none; 
 		border: none;
 	}
 	
-	#custom-header .nav-menu > div > .menu > a {
+	#custom-header .nav-menu > .menu-content > div > .menu > a {
 		padding: .3em .4em;
 	}
-	
 }
 
 @media (max-width: 460px) {
@@ -422,19 +414,19 @@ body:not(.page-is-watched) #custom-header .super-menu .unwatch { display: none; 
 		width: 34px;
 	}
 
-	#custom-header div.super-menu .menu-title {
+	#custom-header div.super-menu .menu-button {
 		background-position: 4px 17px;
 	}
 	
-	#custom-header .super-menu .submenus {
+	#custom-header .super-menu .menu-content {
 		right: -114px;
 	}
 
-	#custom-header .super-menu .submenus > * {
+	#custom-header .super-menu .menu-content > * {
 		padding: 0 !important;
 	}
 
-	#custom-header .super-menu .submenus > * > * {
+	#custom-header .super-menu .menu-content > * > * {
 		font-size: 13px;
 		margin-top: 7px;
 		margin-bottom: 7px;

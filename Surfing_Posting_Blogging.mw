@@ -45,7 +45,7 @@ A digital watermark is said to be robust if it remains intact even if modificati
 
 According to a talk by Sarah Harrison from WikiLeaks, <ref>Missing footnote.</ref> source tracing can also happen through much simpler techniques such as inspecting the access lists for the materials that have been leaked. For example, if only three people have access to a set of documents then the hunt is narrowed down considerably.
 
-Redacting identifying information in electronic documents by means of image transformation (blurring or pixelization) has proven inadequate for concealing the intended text; the words can be reconstructed by machine learning algorithms. Solid bars are sufficient but they must be large enough to fully cover the original text. Otherwise, clues are left about the length of underlying word(s) which makes it easier to infer the censored text based on the sentence remainder. <ref>[https://cseweb.ucsd.edu/~saul/papers/pets16-redact.pdf On the (In)effectiveness of Mosaicing and Blurring as Tools for Document Redaction]</ref>
+Redacting identifying information in electronic documents by means of image transformation (blurring or pixelization) has proven inadequate for concealing the intended text; the words can be reconstructed by machine learning algorithms. Solid bars are sufficient but they must be large enough to fully cover the original text. Otherwise, clues are left about the length of underlying word(s) which makes it easier to infer the censored text based on the sentence remainder. <ref>[https://cseweb.ucsd.edu/~saul/papers/pets16-redact.pdf On the (In)effectiveness of Mosaicing and Blurring as Tools for Document Redaction]</ref> Only digital redaction bars are recommended as manual  Sharpie ones can be insufficient, leading to leaks when documents are scanned.<ref>https://www.schneier.com/blog/archives/2023/06/redacting-documents-with-a-black-sharpie-doesnt-work.html</ref>
 
 == Photographs ==
 
@@ -161,6 +161,13 @@ While kloak makes it hard for adversaries to identify individuals or to replicat
 * Repeated (held-down) key presses that repeat at a unique rate can lead to identification.
 
 === Testing and Interpretation ===
+NOTE: The test website documented below (keytrac.net) seems to be permanently down. This wiki page needs yet to be updated to using one or multiple of the following tests. Help welcome!
+
+* https://vmonaco.com/device-fingerprinting/
+* https://www.typingdna.com/demo-sametext.html
+* https://www.biochec.com/
+* TODO: research https://github.com/topics/keystroke-dynamics
+** https://forums.whonix.org/t/current-state-of-kloak/5605/60
 
 It is recommended to test that kloak is actually working by trying an [https://www.keytrac.net/en/tryout online keystroke biometrics demo]. Three different scenarios are available, but "Train normal" (without kloak running) is <u>not</u> recommended for anonymity reasons:
 
@@ -174,33 +181,40 @@ The KeyTrac demo allows the entering of a username and password on the enrollmen
 
 {| class="wikitable"
 |-
-! scope="col"| '''kloak Configuration'''
-! scope="col"| '''Results and Interpretation'''
+! '''kloak Configuration'''
+! '''Results and Interpretation'''
 |-
-! scope="row"| Train normal, test normal
+
+! Train normal, test normal
 |
 * trial 1: 94% accuracy identified
 * trial 2: 92% accuracy
 * trial 3: 94% ..
 |-
-! scope="row"| Train normal, test kloak
+
+! Train normal, test kloak
 |
 * trial 1: 18%
 * trial 2: 15%
 * trial 3: 19%
 |-
-! scope="row"| Train kloak, test kloak
+
+! Train kloak, test kloak
 |
 * trial 1: 40%
 * trial 2: 42%
 * trial 3 36%
+|-
+
 |}
 
 From the first test set it is evident that without kloak, users can be identified with a high degree of certainty. The second test set demonstrates that kloak definitely obfuscates typing behavior, making it difficult to authenticate or identify a particular user. Finally, the third set evidences that users who run kloak may look "similar" to one another. That is, it might be possible to identify kloak users from non-kloak users; if this is true, then the anonymity set will increase as more users start running kloak.
 
 = Mouse Fingerprinting =
 
-Mouse or cursor tracking occurs when software collects the positions of the mouse cursor and click data on the computer. While this can have benefits for web designers, it also poses a privacy (profiling) threat. Without explicit user consent or awareness, a range of data can be leaked via JavaScript, plug-ins or other software: <ref name=mouse_tracking>https://en.wikipedia.org/wiki/Mouse_tracking</ref>
+Mouse or cursor tracking occurs when software collects the positions of the mouse cursor and click data on the computer. While this can have benefits for web designers, it also poses a privacy (profiling) threat. Without explicit user consent or awareness, a range of data can be leaked via JavaScript, plug-ins or other software: <ref name=mouse_tracking>
+https://en.wikipedia.org/wiki/Mouse_tracking
+</ref>
 
 * JavaScript and Cascading Style Sheets (CSS) <ref>https://en.wikipedia.org/wiki/CSS</ref> readily allow developers to track users' mouse movements by simply entering relevant code on the webpage. This has already been employed on high-traffic websites, such as search engines.
 * Similar to JavaScript, installed and enabled software modules (plug-ins) can track mouse movements.
@@ -212,11 +226,25 @@ Mouse or cursor tracking occurs when software collects the positions of the mous
 ** the amount of time spent in certain webpage areas
 ** heat maps
 ** full playbacks which retrace the mouse's trajectory
-** mouse wheel tracking <ref>https://web.archive.org/web/20221022104548/http://jcarlosnorte.com/assets/fingerprint/</ref> <ref>https://web.archive.org/web/20221114004700/http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html</ref>
+** mouse wheel tracking <ref>
+https://web.archive.org/web/20221022104548/http://jcarlosnorte.com/assets/fingerprint/
+</ref> <ref>
+https://web.archive.org/web/20221114004700/http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html
+</ref>
 
-For a practical example of deanonymization, consider someone who regularly uses both clearnet and Tor with JavaScript enabled. Individuals have distinctly unique characteristics associated with mouse movements and mouse clicks. Therefore, if these research methods are used in the public domain, supervised learning methods are likely to "learn" the typical behavior of individuals. Over time, it may be possible to link "anonymous" activities with the known profile of a clearnet user with a high degree of probability. <ref name=mouse_tracking /> <ref>This deanonymization technique is likely to succeed, since it is already used to lock persons out of secure accounts (pending identity verification) when their monitored behavior significantly deviates from behavior that has been learned.</ref>
+For a practical example of deanonymization, consider someone who regularly uses both clearnet and Tor with JavaScript enabled. Individuals have distinctly unique characteristics associated with mouse movements and mouse clicks. Therefore, if these research methods are used in the public domain, supervised learning methods are likely to "learn" the typical behavior of individuals. Over time, it may be possible to link "anonymous" activities with the known profile of a clearnet user with a high degree of probability. <ref name=mouse_tracking /> <ref>
+This deanonymization technique is likely to succeed, since it is already used to lock persons out of secure accounts (pending identity verification) when their monitored behavior significantly deviates from behavior that has been learned.
+</ref>
 
-Disabling JavaScript cannot mitigate this as it can also be done with just CSS. <ref>https://web.archive.org/web/20190510191716if_/https://twitter.com/davywtf/status/1124146339259002881</ref> The author of the [[Keystroke_Deanonymization#mouse|kloak]] software tool has noted high accuracy device fingerprinting can be performed with DOM event timestamps and this affects both keyboard and mouse events. A potential solution is being tested which involves slights delays of mouse events to throw off phase estimation. <ref>https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507</ref> <ref>8-16ms should be enough for this purpose.</ref>
+Disabling JavaScript cannot mitigate this as it can also be done with just CSS. <ref>
+https://web.archive.org/web/20190510191716if_/https://twitter.com/davywtf/status/1124146339259002881
+</ref> The author of the [[Keystroke_Deanonymization#mouse|kloak]] software tool has noted high accuracy device fingerprinting can be performed with DOM event timestamps and this affects both keyboard and mouse events.
+
+A potential solution is being tested which involves slights delays of mouse events to throw off phase estimation. <ref>
+https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507
+</ref> <ref>
+8-16ms should be enough for this purpose.
+</ref>
 
 = Covert Impairments in Human Computer Interaction =
 
@@ -351,7 +379,8 @@ While somewhat outside the scope of browser fingerprinting, for completeness it 
 ! scope="row"| Side-channel Attacks
 | This class of attacks depend on eavesdropping on the passively leaked signals by a trusted process which a surveilling entity can use to reconstruct the sensitive data on the computer. These are more dangerous than covert-channels discussed below.
 * Energy leaks that reveal sensitive information are a long studied area of cryptography research; see footnotes. <ref>[https://www.tau.ac.il/~tromer/radioexp/ Stealing Keys from PCs using a Radio: Cheap Electromagnetic Attacks on Windowed Exponentiation]: Extraction of secret decryption keys from laptop computers, by non-intrusively measuring electromagnetic emanations for a few seconds from a distance of 50 cm. The attack can be executed using cheap and readily-available equipment: a consumer-grade radio receiver or a Software Defined Radio USB dongle.</ref> <ref> Another attack involves measuring acoustic emanations: [https://www.tau.ac.il/~tromer/papers/acoustic-20131218.pdf RSA Key Extraction via Low-Bandwidth Acoustic Cryptanalysis].</ref> <ref>A poor man's implementation of TEMPEST attacks (recovering cryptographic keys by measuring electromagnetic emissions) using $3000 worth of equipment was proven possible from an adjacent room across a 15cm wall. These attacks were only possible for adversaries with nation-state resources for the past 50 years. See: [https://eprint.iacr.org/2016/129.pdf CDH Key-Extraction via Low-Bandwidth Electromagnetic Attacks on PCs]</ref> These attacks were mitigated by software countermeasures in cryptographic libraries such as GPG.
-* There is a very crude proof-of-concept attack that remotely controls touchscreen devices via electromagnetic, with the caveat of it requiring close proximity to an antenna. This shows the possibility of manipulating devices using TEMPEST like attacks and not just spying on them <ref>https://invisiblefinger.click/assets/notrandompath/SP2021_EMI.pdf</ref> <ref>https://www.schneier.com/blog/archives/2022/08/remotely-controlling-touchscreens-2.html</ref>
+* There is a very crude proof-of-concept attack that remotely controls touchscreen devices via electromagnetic fields, with the caveat of it requiring close proximity to an antenna. This shows the possibility of manipulating devices using TEMPEST like attacks and not just spying on them <ref>https://invisiblefinger.click/assets/notrandompath/SP2021_EMI.pdf</ref> <ref>https://www.schneier.com/blog/archives/2022/08/remotely-controlling-touchscreens-2.html</ref>
+* Power LED Side-Channel Attack: A surveillance camera captures high-speed footage of the power LED on a smart card reader­—or of an attached peripheral device—­during cryptographic operations.<ref>https://www.schneier.com/blog/archives/2023/06/power-led-side-channel-attack.html</ref> A simple mitigation is covering LED lights with electrical tape.
 |-
 
 ! scope="row"| Covert-channel Attacks

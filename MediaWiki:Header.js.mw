@@ -8,8 +8,10 @@ deferrable:YES -- It needs time for loading anyways
 	
 	if( $('#custom-header').length == 0 ) return;
 	
+	
 	// -----
 	// Setup
+
 
 	// Setup of super menu by current user status and watching status
 
@@ -27,6 +29,35 @@ deferrable:YES -- It needs time for loading anyways
 	$('#custom-header .super-menu .edit').attr( 'href', function( index, href ) {
 		if( ! q.get('oldid') ) return href.replace( /&oldid=[^&$]+/, '' );
 	});
+	
+	
+	// ------
+	// Events
+	
+	
+	// Make MouseIn over header menu (nav menu and super menu) activate header menu
+	
+	
+	let headerMenus = $('#custom-header .header-menu');
+	let headerMenuLocked;
+	
+	headerMenus.each( (i,headerMenu) => $(headerMenu).on( 'mouseleave', () => { $(headerMenu).removeClass('active'); console.log(headerMenu) } ) );
+	
+	headerMenus.each( (i,headerMenu) => $(headerMenu).children('.menu-button').on( 'mouseenter click', () => {
+		if( $(headerMenu).hasClass('active') || headerMenuLocked ) return;
+		
+		headerMenuLocked = true;
+		$(headerMenu).addClass('active');
+		setTimeout( () => { headerMenuLocked = false; }, 50 );
+	}));
+	
+	headerMenus.each( (i,headerMenu) => $(headerMenu).children('.menu-button').on( 'click', function() {
+		if( ! $(headerMenu).hasClass('active') || headerMenuLocked ) return;
+		
+		headerMenuLocked = true;
+		$(headerMenu).removeClass('active');
+		setTimeout( () => { headerMenuLocked = false; }, 50 );
+	}));
 	
 })();
 
