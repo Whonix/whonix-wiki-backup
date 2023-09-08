@@ -206,22 +206,24 @@ qubes.UpdatesProxy
 * In case of issues, see also [[Qubes/Troubleshooting#qvm-tags_verification|<code>qvm-tags</code> verification]].
 ** See if you can make head or tail of [[Dev/Qubes#qvm-tags|qvm-tags developer notes]]. If not, skip this step.
 
-== Simulate torified UpdatsProxy check failed ==
+== Simulate torified UpdatesProxy check failed ==
 Developers only.
 
-Simulate Qubes-Whonix UpdatesProxy check failed.
+<u>In Template.</u>
+
+'''1.''' Simulate Qubes-Whonix UpdatesProxy check failed.
 
 {{CodeSelect|code=
 sudo rm /run/updatesproxycheck/whonix-secure-proxy
 }}
 
-Run apt.
+'''2.''' Run APT.
 
 {{CodeSelect|code=
 sudo apt update
 }}
 
-Result:
+'''3.''' Result.
 
 <pre>
 WARNING: Execution of /usr/bin/apt prevented by /etc/uwt.d/40_qubes.conf because no torified Qubes updates proxy found.
@@ -243,12 +245,31 @@ If this warning message is transient, it can be safely ignored.
 
 Thanks to [https://github.com/Whonix/qubes-whonix/blob/master/etc/uwt.d/40_qubes.conf /etc/uwt.d/40_qubes.conf] which checks if <code>/run/updatesproxycheck/whonix-secure-proxy</code> exists which only exist does if Qubes UpdatesProxy was reachable and the output of the test included <code>tor proxy</code>.
 
+== Simulate Broken Connectivity ==
+'''1.''' Break networking.
+
+Unplug the network cable, disable WiFi or power of the modem or router.
+
+'''2.''' View <code>qubes-updates-proxy.service</code> logs.
+
+<u>In sys-whonix.</u>
+
+{{CodeSelect|code=
+sudo journalctl --boot -u qubes-updates-proxy.service
+}}
+
+'''3.''' Result.
+
+<pre>
+Sep 05 13:24:22 host tinyproxy[33224]: opensock: Could not retrieve address info for deb.debian.org:443: Temporary failure in name resolution
+</pre>
+
 == Invalid response from proxy: HTTP/1.1 500 Unable to connect Server: tinyproxy ==
 Understanding Tinyproxy Error Messages
 
-The objective of this documentation is to understand and interpret error messages from Tinyproxy.
+The objective of this documentation is to understand and interpret error messages from Tinyproxy seen in APT output.
 
-The error message: 
+The APT error message: 
 
 <pre>
 HTTP/1.0 500 Unable to connect Server: tinyproxy/1.10.0 Content-Type: text/html Connection: close
@@ -263,11 +284,11 @@ To reproduce and test the origin of this error message:
 
 '''1.''' Stop Tor.
 
-In `sys-whonix`, execute: 
+In <code>sys-whonix</code>, execute: 
 
-<pre>
+{{CodeSelect|code=
 sudo systemctl stop tor@default
-</pre>
+}}
 
 '''2.''' Confirm in the journal log that the Tor service has indeed stopped.
 
@@ -275,9 +296,9 @@ sudo systemctl stop tor@default
 
 Run the update command in `whonix-gateway-17` Template:
 
-<source lang="bash">
+{{CodeSelect|code=
 sudo apt update
-</source>
+}}
 
 '''4.''' Result.
 

@@ -15,6 +15,7 @@ deferrable:YES -- It needs time for loading anyways
 
 	// Setup of super menu by current user status and watching status
 
+
 	if( $('#pt-userpage').length > 0 ) {
 		$('#custom-header .super-menu .headline.user').text('User: ' + $('#pt-userpage > a').text() );
 	}
@@ -28,6 +29,17 @@ deferrable:YES -- It needs time for loading anyways
 	let q = new URLSearchParams( window.location.search.substring(1) );
 	$('#custom-header .super-menu .edit').attr( 'href', function( index, href ) {
 		if( ! q.get('oldid') ) return href.replace( /&oldid=[^&$]+/, '' );
+	});
+	
+	
+	// Make Menu Buttons Links if it's NOT a JS active touch device
+	
+	
+	$( '#custom-header .nav-menu .button[data-link]' ).each( function() {
+		if( ( 'ontouchstart' in window ) || ( navigator.maxTouchPoints > 0 ) || ( navigator.msMaxTouchPoints > 0 ) ) return;
+		
+		$( `<a class="button" href="${$(this).attr('data-link')}">${$(this).text()}</a>` ).insertAfter( $(this) );
+		$(this).remove();
 	});
 	
 	
