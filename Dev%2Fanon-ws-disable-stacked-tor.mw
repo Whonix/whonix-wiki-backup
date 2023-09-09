@@ -1,10 +1,20 @@
 {{Header}}
+{{title|title=
+anon-ws-disable-stacked-tor
+}}
 {{#seo:
 |description=Preventing Tor over Tor for Tor Browser, TorChat and others.
 }}
 {{intro|
 Preventing Tor over Tor for Tor Browser, TorChat and others.
 }}
+= Introduction =
+There is only 1 Tor daemon (long running process, program) running on {{project name gateway long}}.
+
+When starting Tor Browser in {{project name workstation long}}, the integrated Tor which comes with the Tor Browser Bundle will not be started.
+
+Therefore, there are no duplicate Tor daemons running in {{project name long}} by default except in case of [[#Limitations|some corner cases]]..
+
 = Why? =
 See [[Tips_on_Remaining_Anonymous#Prevent_Tor_over_Tor_scenarios|Prevent Tor over Tor Scenarios]].
 
@@ -174,15 +184,12 @@ Trying to use <code>curl</code> rather than <code>curl.anondist-org</code> is a 
 
 <code>curl</code> is a symlink to <code>curl.anondist-orig</code>. In turn, this symlinks to <code>uwtwrapper</code> which runs <code>curl</code> under <code>torsocks</code>. <code>torsocks</code> then forces Tor to run on <code>localhost</code> for stream isolation.
 
-==== To use curl ====
-
 * The <code>uwt</code> steam isolation wrapper must be circumvented or disabled.
 * The command must be run under user <code>clearnet</code>
 
-
 In {{project_name_gateway_long}} or <code>{{project_name_gateway_vm}}</code> [[Qubes|{{q_project_name}}]]
 
-'''1.''' Change to user <code>clearnet</code>
+'''1.''' Switch to user <code>clearnet</code>
 
 {{CodeSelect|code=
 sudo -su clearnet
@@ -193,8 +200,6 @@ sudo -su clearnet
 {{CodeSelect|code=
 curl.anondist-orig <your_url>
 }}
-
-==== Using curl in {{project_name_long}} 14 ====
 
 In the following examples, the <code>exec</code> calls from the command output shows the difference between running <code>curl</code> with the <code>uwtwrapper</code> both enabled and disabled.
 
@@ -208,8 +213,10 @@ uwtwrapper_verbose=1 curl <your_url>
 
 This results in the following <code>exec</code> calls. Only the latest (most recent) call matters which shows <code>torsocks</code> is prepended before running <code>curl</code>.
 
- exec torsocks /usr/lib/uwtexec something <your_url>
- exec -a /usr/bin/curl /usr/bin/curl.anondist-orig <your_url>
+<pre>
+exec torsocks /usr/lib/uwtexec something <your_url>
+exec -a /usr/bin/curl /usr/bin/curl.anondist-orig <your_url>
+</pre>
 
 '''<i>Example 2</i>'''
 
@@ -221,15 +228,15 @@ uwtwrapper_verbose=1 UWT_DEV_PASSTHROUGH=1 curl <your_url>
 
 This command results in the following <code>exec</code> calls which show <code>torsocks</code> does not get prepended before <code>curl</code>. Since <code>curl</code> does not run under <code>torsocks</code>, local connections are not hindered and there is no stream isolation.
 
-  exec /usr/lib/uwtexec <your_url>
-  exec -a /usr/bin/curl /usr/bin/curl.anondist-orig <your_url>
+<pre>
+exec /usr/lib/uwtexec <your_url>
+exec -a /usr/bin/curl /usr/bin/curl.anondist-orig <your_url>
+</pre>
 
-'''The output from the previous commands establish the following'''.
+'''The output from the previous commands establishes the following'''.
 
 * <code>/usr/bin/curl</code> is symbolically linked to <code>/usr/bin/curl.anondist-orig</code>. This demonstrates <code>/usr/bin/curl.anondist-orig</code> is the actual (real) <code>curl</code> binary.
-
 * When <code>/usr/bin/curl.anondist-orig</code> is run with the <code>uwtwrapper</code> disabled all <code>uwt</code> logic is circumvented.
-
 
 Users can either circumvent the <code>uwt</code> stream isolation wrapper or disabled it either permanently or temporary.
 
@@ -237,8 +244,6 @@ Links:
 
 * [[Stream_Isolation|Stream Isolation]]
 * [[Stream_Isolation/Disable_Easy|Stream Isolation/Disable Easy]]
-
------
 
 = Application Developers =
 * [[Dev/Project_friendly_applications_best_practices|{{project_name_long}} friendly applications best practices]]
