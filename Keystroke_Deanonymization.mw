@@ -11,7 +11,7 @@ Deanonymization using user keystrokes, keystroke deanonymization, keystroke fing
 = Keystroke Dynamics =
 Keystroke biometric algorithms have advanced to the point where it is viable to fingerprint users based on soft biometric traits. This is a privacy risk because masking spatial information -- such as the IP address via Tor -- is insufficient to anonymize users. <ref>
 https://github.com/vmonaco/keystroke-obfuscation
-</ref>
+</ref> 
 
 Users can be uniquely fingerprinted based on: <ref name=keystroke_dynamics>
 https://en.wikipedia.org/wiki/Keystroke_dynamics
@@ -58,6 +58,58 @@ Kloak has the added benefit of foiling attacks that identify search queries in e
 </ref> <ref>
 https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slides_monaco.pdf
 </ref>
+
+=== Kloak Debug Mode ===
+Notes:
+
+* Only in enable in case of issues when needing a log file to share.
+* '''Warning: Privacy implications of log sharing are unknown!'''
+
+'''1.''' {{Open with root rights|filename=
+/lib/systemd/system/kloak.service
+}}
+
+'''2.''' Search for:
+
+<pre>
+ExecStart=/usr/sbin/kloak
+</pre>
+
+'''3.''' Replace with:
+
+(Simply append a <code>-v</code>.)
+
+{{CodeSelect|code=
+ExecStart=/usr/sbin/kloak -v
+}}
+
+'''4.''' Save.
+
+'''5.''' Reload systemd manager configuration.
+
+{{CodeSelect|code=
+sudo systemctl daemon-reload
+}}
+
+'''6.''' Restart kloak.
+
+{{CodeSelect|code=
+sudo systemctl restart kloak
+}}
+
+'''7.''' Done.
+
+Kloak debug mode has been enabled.
+
+'''8.''' Do some activity.
+
+Try something that might be broken such as touchpad keys.
+
+'''9.''' Access kloak log.
+
+{{CodeSelect|code=
+sudo journalctl -u kloak {{!}} cat
+}}
 
 = Defense Testing =
 You can test that kloak actually works by trying a keystroke test website:
