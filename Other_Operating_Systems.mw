@@ -647,18 +647,145 @@ TorPort 9050
 </div>
 
 = {{project_name_long}}-GNU/Linux-Workstation =
-{{VM_Settings_Easy_Common}}
+Select your platform.
+
+{{Tab
+|linkid=1
+|type=controller
+|content=
+{{Tab
+|title= == For [[Qubes|{{q_project_name}}]] ==
+|addToClass=info-box
+|active=true
+|content=
+'''1.''' Create a new VM.
+
+'''2.''' Set {{project_name_gateway_vm}} as your VM's NetVM.
+
+<code>Qube Manager</code> &rarr; <code>right-click</code> <code>vm-name</code> &rarr; <code>NetVM</code> &rarr; <code>{{project_name_gateway_vm}}</code> &rarr; <code>OK</code> <ref>
+{{CodeSelect|code=
+qubes-prefs --set vm-name netvm {{project_name_gateway_vm}}
+}}
+</ref>
+}} <!-- close tab: Qubes|{{q_project_name}} -->
+
+{{Tab
+|title= == [[{{non_q_project_name_short}}|{{non_q_project_name}}]] ==
+|addToClass=info-box
+|content=
+
+'''Download and Use the Default {{project_name_gateway_long}}'''
+
+[[Download]] and [[Download#Install|import]] the {{project_name_gateway_long}} using the same procedure as per the {{project_name_long}}-Default / Download-Version. No other {{project_name_gateway_long}} changes are required in this case!
+
+'''Set up a {{project_name_customworkstation_long}}'''
+
+There are currently two ways to set up a {{project_name_customworkstation_long}}. Either:
+
+* '''A)''' Manually create a VirtualBox VM (established, '''old''' method), <u>or</u>
+* '''B)'''  Download and import a {{project_name_customworkstation_long}} ('''stable''' method).
+
+<div class="toccolours mw-collapsible mw-collapsed">
+'''A)''' Users who want to manually create a VirtualBox VM using the established and '''old''' method, click on Expand on the right.
+<div class="mw-collapsible-content">
+'''1. Create a VirtualBox VM'''
+
+Follow these steps in order:
+
+<code>VirtualBox</code> &rarr; <code>Machine</code> &rarr; <code>New</code> &rarr; <code>Next</code> &rarr; <code>Enter Name (for example, {{Code2|myVM}})</code> &rarr; <code>Enter Operating System and Version</code> &rarr; <code>Next</code> &rarr; <code>Define RAM</code> &rarr; <code>Next</code> &rarr; <code>Create a new HDD (or not)</code>  &rarr; <code>Next</code> &rarr; <code>Disk format doesn't matter (VDI works well)</code> &rarr; <code>Next</code> &rarr; <code>Set dynamically or fixed size preference</code> &rarr; <code>Next</code> &rarr; <code>Set HDD size and location preference</code> &rarr; <code>Next</code> &rarr; <code>Create</code>
+
+'''2. Switch VirtualBox VM Settings'''
+
+Follow these steps in order:
+
+* <code>Choose the newly created VM (for example, {{Code2|myVM}})</code> &rarr; <code>Settings</code> &rarr; <code>System</code> &rarr; <code>Motherboard</code> &rarr; <code>Hardware Clock in UTC</code>
+* <code>System</code> &rarr; <code>Motherboard</code> &rarr; <code>Pointing Device</code> &rarr; <code>PS/2 Mouse (required to disable the USB controller)</code>
+* <code>System</code> &rarr; <code>Processor</code> &rarr; <code>Enable PAE/NX (if available)</code>
+* <code>Network</code> &rarr; <code>Adapter 1</code> &rarr; <code>Attached to Internal Network (important!)</code>
+* <code>Network</code> &rarr; <code>Adapter 1</code> &rarr; <code>Name (of Internal Network) (important!): {{Code|{{project_name_short}}}}</code> <ref>Note: It is '''W'''honix, not whonix. Capital '''W''' case sensitivity matters.</ref>
+* <code>USB</code> &rarr; <code>Uncheck Enable USB controller</code>
+* &rarr; <code>OK</code>
+
+----
+</div>
+</div>
+
+<div class="toccolours mw-collapsible mw-collapsed">
+'''B)''' Users who want to download and import a {{project_name_customworkstation_long}} template using the '''stable''' method, click on Expand on the right.
+<div class="mw-collapsible-content">
+This method's advantage is that there is need to manually create a new VM. The process is greatly simplified; the {{project_name_customworkstation_long}} only needs to be downloaded and imported. This approach has several benefits: it is easier, all security settings are set for the VM, and users don't have to remember and apply necessary settings.
+
+The latest {{project_name_customworkstation_long}} Version is: <span style="color: green">{{Whonix-Custom-Workstation-Version}}</span>
+
+Although the version number for {{project_name_gateway_long}} and {{project_name_long}}-Default / Download-Version might be far higher than the {{project_name_customworkstation_long}} version, this is normal. <ref>A newer {{project_name_customworkstation_long}} only needs to be redistributed if the settings for the VM have changed. For example, these have not changed between Whonix 9 and Whonix 13. Therefore, {{project_name_customworkstation_long}} version {{Whonix-Custom-Workstation-Version}} is recent enough to function, because it comes with an empty virtual hard drive (meaning software cannot be outdated).</ref>
+
+'''1. Download the {{project_name_customworkstation_long}}'''
+
+Download the following image.
+
+{{#widget:Download_Button
+ |text=Download {{project_name_customworkstation_long}} (FREE!)
+ |url=https://download.{{project_clearnet}}/ova/{{Whonix-Custom-Workstation-Version}}/{{project_name_short}}-CUSTOM-{{Whonix-Custom-Workstation-Version}}.ova
+ |os=windows|os=osx|os=linux
+}}
+
+'''2. Download the OpenPGP Signature'''
+
+Download the corresponding OpenPGP signature.
+
+{{#widget:Download_Button
+ |text=Download {{project_name_customworkstation_long}} OpenPGP signature (FREE!)
+ |url=https://download.{{project_clearnet}}/ova/{{Whonix-Custom-Workstation-Version}}/{{project_name_short}}-CUSTOM-{{Whonix-Custom-Workstation-Version}}.ova.asc
+ |os=windows|os=osx|os=linux
+}}
+
+'''3. Verify the Whonix Image'''
+
+Follow these steps to [[Verify the virtual machine images|verify]] the Whonix image.
+
+'''4. Import and Rename the Virtual Machine'''
+
+After importing the image, rename the virtual machine to something else. <ref>It is not strictly necessary to rename the VM at this point, but this prevents potential naming conflicts if another {{project_name_customworkstation_long}} is imported later on.</ref>
+<code>VirtualBox</code> &rarr; <code>Right-click on VM</code> &rarr; <code>Settings</code> &rarr; <code>Name (for example: {{Code2|myVM}})</code>
+
+If this method was used, please report how well it worked in the Whonix forum.
+</div>
+</div>
+}} <!-- close tab: [[{{non_q_project_name_short}}|{{non_q_project_name}}]] -->
+}} <!-- close Controller: [[Qubes|{{q_project_name}}]] and [[{{non_q_project_name_short}}|{{non_q_project_name}}]] -->
+
+------
+
+'''Start VM and Install Operating System'''
+
+# Start the newly created VM (for example: {{Code2|myVM}}).
+# Insert the installation DVD.
+# Updates don't have to installed while installing the OS. Post-install, apply updates after the network has been set up.
+# The username is: {{Code2|user}}. The computer name is: {{Code2|host}}
 
 '''Configure network.'''
 
-<u>For [[Qubes|{{q_project_name}}]]</u>, you do not have to configure the network.
+{{Tab
+|linkid=1
+|type=controller
+|content=
+{{Tab
+|title= == {{q_project_name}} ==
+|addToClass=info-box
+|active=true
+|content=
 
-<div class="toccolours mw-collapsible mw-collapsed">
-<u>For [[{{non_q_project_name_short}}|{{non_q_project_name}}]]</u>, click on expand on the right.
-<div class="mw-collapsible-content">
+No additional network configuration require.
+}}
+
+{{Tab
+|title= == {{non_q_project_name}} ==
+|addToClass=info-box
+|content=
 In your Custom-Workstation.
 
-=== Linux Network Management Software ===
+'''Linux Network Management Software Setup'''
+
 Linux has many applications able to configure networking. To name a few:
 
 * ifupdown
@@ -667,19 +794,33 @@ Linux has many applications able to configure networking. To name a few:
 
 See also https://wiki.debian.org/NetworkConfiguration
 
-This is therefore dependent on the Linux distribution being used. Generally, the required settings are the following:
+This is therefore dependent on the Linux distribution being used.
+
+Chose which inux Network Management Software your custom Linux operating system is using or use the Generic Instructions.
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= === Generic Instructions ===
+|addToClass=info-box
+|content=
+Generally, the required settings are the following:
 
 * Static networking, meaning not using DHCP.
-* gateway: {{CodeSelect|code=10.152.152.10}}
+* <u>gateway</u>: {{CodeSelect|code=10.152.152.10}}
 ** This is the IP address of Whonix-Gateway.
-* address: {{CodeSelect|code=10.152.152.12}}
+* <u>address</u>: {{CodeSelect|code=10.152.152.12}}
 ** The VMs self-assigned own local LAN IP address.
 ** Increment last octet of IP address on additional workstations.
-* netmask: {{CodeSelect|code=255.255.192.0}}
+* <u>netmask</u>: {{CodeSelect|code=255.255.192.0}}
+}}
+{{Tab
+|title= === ifupdown ===
+|addToClass=info-box
+|content=
+In your Custom-Workstation.
 
-The following instructions are for ifupdown only. Other network management software is currently [[undocumented]].
-
-=== ifupdown ===
 {{Open with root rights|filename=
 /etc/network/interfaces
 }}
@@ -711,7 +852,9 @@ iface eth0 inet static
        gateway 10.152.152.10
 }}
 
-In your Custom-Workstation. {{Open with root rights|
+In your Custom-Workstation.
+
+{{Open with root rights|
 filename=/etc/resolv.conf
 }}
 
@@ -719,15 +862,24 @@ and delete everything, then add
 
 {{CodeSelect|code=
 nameserver 10.152.152.10
-}}
-</div>
-</div>
+}}<!-- close CodeSelect-->
+}}<!-- close tab ifupdown-->
+
+{{Tab
+|title= === Others ===
+|addToClass=info-box
+|content=
+Other network management software is currently [[undocumented]].
+}}<!-- close tab others-->
+}}<!-- close tab controller Linux Network Management Software-->
+}}<!-- close tab non-qubes-whonix Network Setup -->
+}}<!-- close tab controller non-qubes-whonix Network Setup -->
 
 '''Download operating system updates.'''
 
 For Debian based Linux, such as Ubuntu, see [[Operating_System_Software_and_Updates|Updates]].
 
-=== Configure Tor Browser Settings ===
+== Configure Tor Browser Settings ==
 <div class="toccolours mw-collapsible mw-collapsed">
 <u>When using Tor Browser,</u> users should prevent [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]], click on Expand on the right.
 <div class="mw-collapsible-content">
@@ -845,7 +997,7 @@ The process is now complete.
 </div>
 </div>
 
-=== Disable system-tor over Tor ===
+== Disable system-tor over Tor ==
 system-tor must also be disabled to prevent Tor over Tor.
 
 In the terminal, run.
@@ -866,7 +1018,7 @@ The process is now complete.
 </div>
 </div>
 
-=== Testing ===
+== Testing ==
 <div class="toccolours mw-collapsible mw-collapsed">
 User must verify that Tor in Tor Browser and system-tor are disabled, click on Expand on the right.
 <div class="mw-collapsible-content">

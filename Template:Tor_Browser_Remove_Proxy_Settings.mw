@@ -16,7 +16,7 @@ If these settings are changed, Tor Button would previously show a red sign and s
 
 This method works for removal of proxy settings but is rather lengthy and complicated. In case the user wants to have a look anyhow, please press on Expand on the right.
 <div class="mw-collapsible-content">
-Since other methods to configure Tor Browser to use system default networking are broken due to Tor Browser changes by upstream, this new local socks proxy method stops [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]] local port <code>9150</code> redirection to {{project name gateway long}} <code>9150</code> (where a Tor <code>SocksPort</code> is listening). As a replacement, a local socks proxy listens on {{project name workstation long}} local port <code>9150</code> which then forwards the traffic using system default networking. In result, if the user is using a VPN inside {{project name workstation long}} or in a VPN-Gateway wretched between {{project name gateway long}} and {{project name workstation long}}, Tor Browser would use the VPN.
+Since other methods to configure Tor Browser to use system default networking are broken due to Tor Browser changes by upstream, this new local socks proxy method stops [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]] local port <code>9150</code> redirection to {{project_name_gateway_long}} <code>9150</code> (where a Tor <code>SocksPort</code> is listening). As a replacement, a local socks proxy listens on {{project_name_workstation_long}} local port <code>9150</code> which then forwards the traffic using system default networking. In result, if the user is using a VPN inside {{project_name_workstation_long}} or in a VPN-Gateway wretched between {{project_name_gateway_long}} and {{project_name_workstation_long}}, Tor Browser would use the VPN.
 
 In this documentation, Dante is used as a local socks proxy. Development notes are kept on [[Dev/Dante]].
 
@@ -32,8 +32,8 @@ A few settings need to be undone.
 
 '''2.''' Stop default anon-ws-disable-stacked-tor service for port 9150.
 
-* Non-Qubes-Whonix: In {{project name workstation long}}.
-* Qubes-Whonix: In <code>{{project name workstation template}}</code> <u>Template</u>.
+* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> <u>Template</u>.
 
 {{CodeSelect|code=
 sudo systemctl stop anon-ws-disable-stacked-tor_autogen_port_9150.socket
@@ -44,8 +44,8 @@ sudo systemctl stop anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-sta
 
 '''3.''' Prevent default anon-ws-disable-stacked-tor systemd unit from starting.
 
-* Non-Qubes-Whonix: In {{project name workstation long}}.
-* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 {{CodeSelect|code=
 sudo systemctl mask anon-ws-disable-stacked-tor_autogen_port_9150.socket
@@ -56,8 +56,8 @@ sudo systemctl mask anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-sta
 
 '''4.''' Install the local socks proxy server.
 
-* Non-Qubes-Whonix: In {{project name workstation long}}.
-* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 {{box|text=
 '''A)''' Add Debian source repository.
@@ -352,8 +352,8 @@ sudo dpkg -i dante-server_1.4.2+dfsg-7_amd64.deb
 
 '''6.''' Local socks proxy configuration.
 
-* Non-Qubes-Whonix: In {{project name workstation long}}.
-* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 Delete all contents from the file and <u>replace</u> it with the following configuration.
 
@@ -387,8 +387,8 @@ socks pass {
 
 This is to apply the changed configuration and to test if the configuration is valid.
 
-* Non-Qubes-Whonix: In {{project name workstation long}}.
-* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 {{CodeSelect|code=
 sudo systemctl restart danted.service
@@ -396,8 +396,8 @@ sudo systemctl restart danted.service
 
 '''8.''' tb-starter Configuration
 
-* Non-Qubes-Whonix: In {{project name workstation long}}.
-* Qubes-Whonix: In <code>{{project name workstation template}}</code> Template.
+* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 Stop Tor from using unix domain socket files for socks so it uses socks on IP 127.0.0.1 port 9150 instead.
 
@@ -420,8 +420,8 @@ Save and exit.
 
 '''10.''' Start Tor Browser.
 
-* Non-Qubes-Whonix: In {{project name workstation long}}.
-* Qubes-Whonix: In <code>{{project name workstation long}}</code> <u>App Qube</u>.
+* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Qubes-Whonix: In <code>{{project_name_workstation_long}}</code> <u>App Qube</u>.
 
 {{CodeSelect|code=
 torbrowser
@@ -452,8 +452,8 @@ Unless this environment variable is manually unset before starting Tor Browser.
 
 '''1.''' Platform specific notice.
 
-* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
-* [[{{q_project_name_short}}|{{q_project_name}}]]: In Template. (<code>{{project name workstation template}}</code>)
+* [[{{Non q project name short}}|{{Non_q_project_name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In Template. (<code>{{project_name_workstation_template}}</code>)
 
 '''2.''' {{Open with root rights|filename=
 /etc/environment
@@ -486,8 +486,8 @@ This step is required since Tor Browser 10. <ref>
 
 '''1.''' Platform specific notice.
 
-* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
-* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project name workstation vm}}</code>)
+* [[{{Non q project name short}}|{{Non_q_project_name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
 
 '''2.''' Tor Browser &rarr; URL bar &rarr; Type: <code>about:config</code> &rarr; Press <code>Enter</code> key. &rarr; search for and modify
 
@@ -503,8 +503,8 @@ Reverting this change is [[Unsupported|undocumented]]. Simply unsetting that env
 
 '''1.''' Platform specific notice:
 
-* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
-* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project name workstation vm}}</code>)
+* [[{{Non q project name short}}|{{Non_q_project_name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
 
 '''2.''' Navigate to the Tor Browser folder.
 
@@ -527,8 +527,8 @@ This only applies to a single instance of the Tor Browser folder that is configu
 
 '''1.''' Platform specific notice:
 
-* [[{{Non q project name short}}|{{Non q project name}}]]: No platform specific notice.
-* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project name workstation vm}}</code>)
+* [[{{Non q project name short}}|{{Non_q_project_name}}]]: No platform specific notice.
+* [[{{q_project_name_short}}|{{q_project_name}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
 
 '''2.''' Find and open {{Code|start-tor-browser}} in the Tor Browser folder with an editor.
 
