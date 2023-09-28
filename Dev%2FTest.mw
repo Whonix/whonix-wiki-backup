@@ -1,37 +1,48 @@
 {{Header}}
-__TOC__
+{{title|title=
+How-to: "Un{{project_name_long}}" - enable clearnet networking
+}}
+{{#seo:
+|description=Enable clearnet networking for Whonix-Gateway and/or Whonix-Workstation / Curl Clearnet Connectivity Test from Whonix-Gateway.
+}}
+{{local_connections_mininav}}
+{{intro|
+Enable clearnet networking for Whonix-Gateway and/or Whonix-Workstation / Curl Clearnet Connectivity Test from Whonix-Gateway.
 
+This is for developers only!
+}}
+__TOC__
 = Curl Clearnet Connectivity Test from Whonix-Gateway =
-Warning: Not anonymous!
+'''Warning:''' <u>Not anonymous!</u>
 
 At time of writing IP <code>{{Check.torproject.org IP}}</code> is <code>check.torproject.org</code>.
 
-Using IP (<code>{{Check.torproject.org IP}}</code>) rather than DNS (<code>check.torproject.org</code>) is requried since {{project_name_gateway_long}} does not have a global DNS resolver enabled by default for its own traffic (details on page [[Whonix-Gateway System DNS]]).
+Using IP (<code>{{Check.torproject.org IP}}</code>) rather than DNS (<code>check.torproject.org</code>) is required since {{project_name_gateway_long}} does not have a global DNS resolver enabled by default for its own traffic (details on page [[Whonix-Gateway System DNS]]).
 
 {{CodeSelect|code=
 sudo -u clearnet {{Curl_Plain}} --silent {{Curl_Secure}} --header 'Host: check.torproject.org' --insecure https://{{Check.torproject.org IP}} | grep IP
 }}
 
-= How to Un{{project_name_long}} - {{project_name_long}} package removal =
-TODO: document
+= Enable Clearnet Networking =
+== restore Whonix-Gateway clearnet networking ==
 
-= How to Un{{project_name_long}} - restore clearnet networking =
 Instructions on how to remove {{project_name_long}} Tor default networking for {{project_name_gateway_long}}. After applying these instructions, {{project_name_gateway_long}} will connect to clearnet.
 
-Warning: Not anonymous!
+This is possible because Whonix-Gateway is simplified "just a set of configurations". (And anything else would technically be pointless and a proprietary obfuscated software instead of a Freedom Software project. By reverting these configurations, it's possible to revert back to the same functionality that Debian has, which Whonix is based on. And Debian of course supports clearnet connectivity. This cannot happen by accident, see [[Dev/Technical_Introduction#Security_Overview]].
 
-Qubes specific!
+'''Warning:''' <u>Not anonymous!</u>
 
+{{Developers-only}}
 
-1) Inside <code>{{project_name_gateway_vm}}</code>: [[Dev/Firewall_Unload|Unload {{project_name_long}} Firewal]].
+'''1.''' Inside <code>{{project_name_gateway_long}}</code>: [[Dev/Firewall_Unload|Unload {{project_name_long}} Firewall]].
 
-2) Inside <code>{{project_name_gateway_vm}}</code>: Check.
+'''2.''' Inside <code>{{project_name_gateway_long}}</code>: Verify that the firewall rules have been unloaded. .
 
 {{CodeSelect|code=
 sudo iptables --list
 }}
 
-Should show.
+Expected output:
 
 <pre>
 Chain INPUT (policy ACCEPT)
@@ -44,29 +55,44 @@ Chain OUTPUT (policy ACCEPT)
 target     prot opt source               destination
 </pre>
 
-3) Inside any other VM, any non-Tor VM that has functional internet: Figure out its <code>/etc/resolv.conf</code> settings.
+'''3.''' Find out DNS server IP address.
+
+Choose either option '''A)''', '''B)''' <u>or</u> '''B)'''.
+
+* '''A)''' Use your router's IP address.
+* '''B)''' Use a public DNS server. (Potential privacy issues!) {{CodeSelect|code=
+## Cloudflare
+nameserver 1.1.1.1
+## Google
+#nameserver 8.8.8.8
+}}
+* '''C)''' Use the IP address provided by the DNS server IP address.
+
+Inside any other VM, any non-Tor VM, any non-Whonix VM. Such as a Debian (based) VM that has functional internet.
+
+Figure out its <code>/etc/resolv.conf</code> settings.
 
 {{CodeSelect|code=
 cat /etc/resolv.conf
 }}
 
-4) Inside <code>{{project_name_gateway_vm}}</code>: Delete <code>/etc/resolv.conf</code>.
+'''4.''' Inside <code>{{project_name_gateway_long}}</code>: Delete <code>/etc/resolv.conf</code>.
 
 {{CodeSelect|code=
 sudo rm /etc/resolv.conf
 }}
 
-5) Inside <code>{{project_name_gateway_vm}}</code>: Use the same settings from the non-Tor VM.
+'''5.''' Inside <code>{{project_name_gateway_long}}</code>: Use the same settings from the non-Tor VM.
 
 {{Open with root rights|
 filename=/etc/resolv.conf
 }}
 
-6) Inside <code>{{project_name_gateway_vm}}</code>: Deactivate all uwt wrappers globally.
+'''6.''' Inside <code>{{project_name_gateway_long}}</code>: Deactivate all uwt wrappers globally.
 
 {{Uwt_wrappers_deactivate_all_permanently}}
 
-7) Inside <code>{{project_name_gateway_vm}}</code>: Download https://check.torproject.org
+'''7.''' Inside <code>{{project_name_gateway_long}}</code>: Download https://check.torproject.org
 
 {{scurl|https://check.torproject.org}}
 
@@ -79,5 +105,35 @@ Should include.
 <pre>
 Sorry. You are not using Tor.
 </pre>
+
+'''8.''' Inside <code>{{project_name_gateway_long}}</code>: Untorify APT sources.
+
+For all files in <code>/etc/apt/sources.list.d</code> folder, remove the {{CodeSelect|inline=true|code=
+tor+
+}} prefix.
+
+{{CodeSelect|code=
+for file_name in /etc/apt/sources.list /etc/apt/sources.list.d/* ; do sudo str_replace "tor+" "" "$file_name" ; done
+}}
+
+'''9.''' Done.
+
+== restore Whonix-Workstation clearnet networking ==
+[[Undocumented]]. It would require at least:
+
+* Configuration of the host virtualization software to use either:
+** A) a different gateway VM <u>or</u>
+** B) changing the network type form internal to "normal" (virtualizer specific, NAT for VirtualBox for example).
+* Disabling Whonix-Workstation firewall.
+* DNS configuration.
+* Network configuration.
+
+Untested but of course possible in theory. This is possible because Whonix-Workstation is also simplified "just a set of configurations". By reverting these configurations, it's possible to revert back to the same functionality that Debian has, which Whonix is based on. And Debian of course supports clearnet connectivity. This cannot happen by accident or malware running inside the VM, see [[Dev/Technical_Introduction#Security_Overview]].
+
+= How to Un{{project_name_long}} - {{project_name_long}} package removal =
+TODO: document
+
+= Footnotes =
+<references />
 
 {{Footer}}

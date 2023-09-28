@@ -38,9 +38,9 @@ onion-grater limits maximum accepted command string length to 128 (configurable)
 Advanced users who do not wish to use onion-grater can disable it, see [[Whonix-Gateway_Security_Hardening#Deactivate_onion-grater|deactivate onion-grater]].
 
 = Directory of choice =
-* Using <code>/usr/local/etc/onion-grater-merger.d/</code> because that onion-grater settings folder is persistent in [[Qubes|{{q_project_name}}]] TemplateBased ProxyVMs i.e. {{project_name_gateway_long}} (commonly called <code>{{project_name_gateway_vm}}</code>).
-* [[{{non_q_project_name_short}}|{{non_q_project_name}}]] users could also utilize <code>/etc/onion-grater-merger.d/</code>.
-* [[Qubes|{{q_project_name}}]] users could also utilize <code>/etc/onion-grater-merger.d/</code> but then <code>/etc/onion-grater-merger.d/</code> must be made persistent, which means doing this procedure inside the {{project_name_gateway_long}} Template (commonly called <code>{{project_name_gateway_template}}</code>) and then restarting the {{project_name_gateway_long}} ProxyVM or using [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs].
+* Using <code>/usr/local/etc/onion-grater-merger.d/</code> because that onion-grater settings folder is persistent in [[Qubes|{{q_project_name_long}}]] TemplateBased ProxyVMs i.e. {{project_name_gateway_long}} (commonly called <code>{{project_name_gateway_vm}}</code>).
+* [[Qubes|{{non_q_project_name_short}}]] users could also utilize <code>/etc/onion-grater-merger.d/</code>.
+* [[Qubes|{{q_project_name_long}}]] users could also utilize <code>/etc/onion-grater-merger.d/</code> but then <code>/etc/onion-grater-merger.d/</code> must be made persistent, which means doing this procedure inside the {{project_name_gateway_long}} Template (commonly called <code>{{project_name_gateway_template}}</code>) and then restarting the {{project_name_gateway_long}} ProxyVM or using [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs].
 
 Both techniques are more complicated than simply using <code>/usr/local/etc/onion-grater-merger.d/</code>, since it is persistent either way. Further, it even allows multiple {{project_name_gateway_long}} ProxyVMs based on the same {{project_name_gateway_long}} Template; for example, one {{project_name_gateway_long}} ProxyVM extending and relaxing onion-grater's whitelist and the other {{project_name_gateway_long}} ProxyVM having the default onion-grater whitelist which is more restrictive.
 
@@ -627,12 +627,12 @@ sudo apparmor-info
 
 == Connect to onion-grater from {{project_name_gateway_long}} ==
 
-To connect to onion-grater from a [[{{non_q_project_name_short}}|{{non_q_project_name}}]]-Gateway:
+To connect to onion-grater from a [[Qubes|{{non_q_project_name_short}}]]-Gateway:
 {{CodeSelect|code=
 tor-ctrl -s 10.152.152.10:9051 GETINFO config-file
 }}
 
-To connect to onion-grater from a [[{{q_project_name_short}}|{{q_project_name}}]]-Gateway:
+To connect to onion-grater from a [[Qubes|{{q_project_name_long}}]]-Gateway:
 {{CodeSelect|code=
 tor-ctrl -s $(qubesdb-read /qubes-ip):9051 GETINFO config-file
 }}
@@ -652,13 +652,13 @@ Only in case of suspected fundamental issues with low level networking.
 
 To see what's being send to onion-grater's port, run this on {{project_name_gateway_long}}.
 
-[[{{non_q_project_name_short}}|{{non_q_project_name}}]]-Gateway:
+[[Qubes|{{non_q_project_name_short}}]]-Gateway:
 
 {{CodeSelect|code=
 sudo tcpdump -i eth1 -l -s0 -w - tcp dst port 9051 | strings
 }}
 
-[[{{q_project_name_short}}|{{q_project_name}}]]-Gateway: (Note: replace <code>vif18.0</code> with the device found with the command <code>ip route</code>.)
+[[Qubes|{{q_project_name_long}}]]-Gateway: (Note: replace <code>vif18.0</code> with the device found with the command <code>ip route</code>.)
 
 {{CodeSelect|code=
 sudo tcpdump -i vif18.0 -l -s0 -w - tcp dst port 9051 | strings

@@ -7,7 +7,9 @@
 VM Fingerprinting
 }}
 [[image:Vmfingerprint123123.jpg|thumb]]
-Linking two or more locally compromised Virtual Machines (VMs) to the same pseudonym
+{{intro|
+Linking two or more locally compromised Virtual Machines (VMs) to the same pseudonym.
+}}
 = Threat Model =
 
 In computing terms, the [https://en.wikipedia.org/wiki/Threat_model threat model] concerns potential threats or structural vulnerabilities that can be exploited by adversaries; in the case of {{project_name_long}} this means possible identifiers leading to full or partial deanonymization.
@@ -36,7 +38,7 @@ Related: [[Dev/Technical_Introduction#Goals_and_Non-Goals|Tor Browser and {{proj
 
 A number of non-deterministic artifacts are present in the various {{project_name_long}} variants - consider the examples below:
 
-* In [[{{q_project_name_short}}|{{q_project_name}}]], the contents of many log files like <code>/var/log/apt/history.log</code> usually contain text such as <code>Start-Date: 2020-04-11  07:20:20</code>. This is  visible in both the Qubes Template and in AppVMs/DispVMs based on that Template due to the usual [https://www.qubes-os.org/intro/#features Qubes root file system sharing]. <ref>
+* In [[Qubes|{{q_project_name_long}}]], the contents of many log files like <code>/var/log/apt/history.log</code> usually contain text such as <code>Start-Date: 2020-04-11  07:20:20</code>. This is  visible in both the Qubes Template and in AppVMs/DispVMs based on that Template due to the usual [https://www.qubes-os.org/intro/#features Qubes root file system sharing]. <ref>
 Qubes debian-{{Stable project version based on Debian version short}} Template
 
 <pre>
@@ -84,21 +86,21 @@ As noted in the [[#Threat_Model|Threat Model]] introduction, non-deterministic l
 
 For the context of this wiki page, in short called, tracking software.
 
-In that case, the impact on {{non_q_project_name}} and {{q_project_name}} users is noted below.
+In that case, the impact on {{non_q_project_name_long}} and {{q_project_name_long}} users is noted below.
 
-=== {{non_q_project_name}} ===
+=== {{non_q_project_name_long}} ===
 
 All VMs are "StandaloneVMs". <ref>[https://www.qubes-os.org/doc/glossary/ Qubes]: <blockquote>In general terms, a VM is described as standalone if and only if it does not depend on any other VM for its root filesystem. (In other words, a VM is standalone if and only if it is not a TemplateBasedVM.)</blockquote></ref> Automatically generated, non-deterministic, local artifacts are "somewhat" unique in every VM. At a minimum, an adversary could use these local artifacts to determine the build version of {{project_name_long}} because these artifacts are shared among all<ref>Or most.</ref> {{project_name_long}} images of that specific version.
 
 Further identifiers then depend on individual behavior as to what kind of user-generated, local, non-deterministic artifacts exist. For example, if users change the keyboard layout to German, set their shell to python, and install an adblocker in every Tor Browser instance inside of a VM, this will very likely create enough uniqueness to permit an adversary that has compromised multiple VMs to link all of these to the same pseudonym.
 
-=== {{q_project_name}} ===
+=== {{q_project_name_long}} ===
 
 * <u>TemplateBased AppVMs / DispVMs</u>: There are a lot of automatically generated, non-deterministic, local artifacts in the root file system which will be shared by all TemplateBased AppVMs based on that Template, as well as in the root file system of every DispVM which is spawned from the Template upon which it is based. These local artifacts are unique to each Template but shared among all AppVMs / DispVMs that are based on that Template. Therefore tracking software (an adversary with access -- which can be via malware of locally installed applications which include anti-features) -- that compromised two VMs based on that Template can link these VMs to the same pseudonym.
 * <u>PVH StandaloneVMs</u>: The impact depends on when the StandaloneVM was cloned from a Template.
-** Right after creation download: Theoretically, this case could be better and might be similar to {{non_q_project_name}}. However, in practice local artifacts are still created since Qubes automatically boots VMs right after download due to Qubes' [https://dev.qubes-os.org/projects/core-admin/en/latest/qubes-features.html qvm-features-request] mechanism.
+** Right after creation download: Theoretically, this case could be better and might be similar to {{non_q_project_name_long}}. However, in practice local artifacts are still created since Qubes automatically boots VMs right after download due to Qubes' [https://dev.qubes-os.org/projects/core-admin/en/latest/qubes-features.html qvm-features-request] mechanism.
 ** Later cloned after starting the Template: A lot of automatically generated, non-deterministic, local artifacts will already exist.
-* <u>HVM StandaloneVMs</u>: Probably very few users are utilizing these. Even if they are in use, these would probably not be based on <code>whonix-ws</code>, which would be even worse. If a <code>whonix-ws</code> based HVM StandaloneVM is utilized, this might be a similar situation to {{non_q_project_name}}.
+* <u>HVM StandaloneVMs</u>: Probably very few users are utilizing these. Even if they are in use, these would probably not be based on <code>whonix-ws</code>, which would be even worse. If a <code>whonix-ws</code> based HVM StandaloneVM is utilized, this might be a similar situation to {{non_q_project_name_long}}.
 
 == Benchmarking ==
 
