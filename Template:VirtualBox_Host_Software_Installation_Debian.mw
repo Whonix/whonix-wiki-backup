@@ -11,65 +11,16 @@ Select your Debian release.
 |type=controller
 |content=
 {{Tab|
-|title= ==== Debian {{Stable_project_version_based_on_Debian_codename}} (stable) ====
-|active=true
+|title= ==== Debian bookworm (stable) or bullseye (oldstable) ====
 |addToClass=info-box
 |content=
-
-These instructions are for host operating systems running Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code>, which is recommended. <ref>
-* Not available from bookworm-fasttrack yet. See [https://salsa.debian.org/fasttrack-team/support/-/issues/51 please add VirtualBox to bookworm-fasttrack].
-* Alternative: [[VirtualBox/Other_Versions#Install_from_VirtualBox.org_Repository|Install VirtualBox from VirtualBox.org Repository]]
-</ref>
-
-'''1.''' On the host.
-
-Open a terminal.
-
-'''2.''' Enable the Kicksecure repository.
-
-Follow the instructions {{Kicksecure_wiki
-|wikipage=Packages_for_Debian_Hosts#Enable_Kicksecure_Repsitory
-|text=Enable the Kicksecure Repsitory
-}}.
-
-'''3.''' Update the package lists.
-
-{{CodeSelect|code=
-sudo apt update
-}}
-
-'''4.''' Install VirtualBox and Linux kernel headers.
-
-{{CodeSelect|code=
-sudo apt install --no-install-recommends {{{virtualbox_package_debian}}} linux-headers-$(dpkg --print-architecture)
-}}
-
-'''5.''' Add your current user to group <code>vboxusers</code>. <ref name=vboxusersgroupadd>
-Optional: See: https://www.virtualbox.org/manual/ch02.html#install-linux-vboxusers
-
-Also spams <code>~/.config/VirtualBox/VBoxSVC.log</code> log if not done.
-</ref>
-
-{{CodeSelect|code=
-sudo adduser $(whoami) vboxusers
-}}
-
-'''6.''' Done.
-
-The procedure of installing the VirtualBox host software is complete.
-}}
-
-{{Tab|
-|title= ==== Debian bullseye (oldstable) ====
-|addToClass=info-box
-|content=
-To acquire the [[VirtualBox/Recommended_Version|Recommended VirtualBox version]] tested with {{project_name_long}}, package <code>{{{virtualbox_package_debian}}}</code> should be installed from Debian [https://fasttrack.debian.net/ <code>fasttrack</code> repository] according to the following instructions. <ref>
+To acquire the [[VirtualBox/Recommended_Version|Recommended VirtualBox version]] tested with {{project_name_short}}, package <code>{{{virtualbox_package_debian}}}</code> should be installed from Debian [https://fasttrack.debian.net/ <code>fasttrack</code> repository] according to the following instructions. <ref>
 This is {{kicksecure_wiki
 |wikipage=Install_Software#Best_Practices
 |text=non-ideal
 }} but required since VirtualBox in unavailable in official Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> repository and difficult to install due to [[Dev/VirtualBox#VirtualBox_Installation_Challenges|VirtualBox Installation Challenges]].
 
-Alternatively you could install VirtualBox from the [[VirtualBox/Other_Versions#Install_from_Oracle_Repository|Oracle (virtualbox.org) Repository]], but this comes with different [[Install_Software#Foreign_Sources|risks]]. VirtualBox might be updated by VirtualBox developers before being tested with {{project_name_long}} which could then lead to issues. (Described in footnote [[VirtualBox/Recommended_Version|here]].)
+Alternatively you could install VirtualBox from the [[VirtualBox/Other_Versions#Install_from_Oracle_Repository|Oracle (virtualbox.org) Repository]], but this comes with different [[Install_Software#Foreign_Sources|risks]]. VirtualBox might be updated by VirtualBox developers before being tested with {{project_name_short}} which could then lead to issues. (Described in footnote [[VirtualBox/Recommended_Version|here]].)
 </ref>
 
 '''1.''' On the host.
@@ -132,6 +83,34 @@ The procedure of installing the VirtualBox host software is complete.
 }}
 
 {{Tab|
+|title= ==== Debian Testing ====
+|addToClass=info-box
+|content=
+VirtualBox can be installed by adding the Debian unstable (<code>sid</code>) repository and APT pinning. The details of this are [[unspecific|unspecific to {{project_name_short}}]] and [[undocumented]].
+}}
+
+{{Tab|
+|title= ==== Debian Unstable ====
+|addToClass=info-box
+|content=
+VirtualBox can be installed by adding the Debian unstable (<code>sid</code>) repository.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends {{{virtualbox_package_debian}}} linux-headers-$(dpkg --print-architecture)
+}}
+
+{{CodeSelect|code=
+sudo adduser $(whoami) vboxusers
+}}
+
+The details of this are [[unspecific|unspecific to {{project_name_short}}]] and [[undocumented]].
+}}
+
+{{Tab|
 |title= ==== Other Debian Releases ====
 |addToClass=info-box
 |content=
@@ -140,6 +119,58 @@ Other Debian releases might work, but this is [[untested]]. In case of other Deb
 
 }}
 <noinclude>
+
+<!--
+{{Tab|
+|title= ==== USING KICKSECURE REPOSITORY - Debian {{Stable_project_version_based_on_Debian_codename}} (stable) ====
+|active=true
+|addToClass=info-box
+|content=
+
+These instructions are for host operating systems running Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code>, which is recommended. <ref>
+* Not available from bookworm-fasttrack yet. See [https://salsa.debian.org/fasttrack-team/support/-/issues/51 please add VirtualBox to bookworm-fasttrack].
+* Alternative: [[VirtualBox/Other_Versions#Install_from_VirtualBox.org_Repository|Install VirtualBox from VirtualBox.org Repository]]
+</ref>
+
+'''1.''' On the host.
+
+Open a terminal.
+
+'''2.''' Enable the Kicksecure repository.
+
+Follow the instructions {{Kicksecure_wiki
+|wikipage=Packages_for_Debian_Hosts#Enable_Kicksecure_Repsitory
+|text=Enable the Kicksecure Repsitory
+}}.
+
+'''3.''' Update the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''4.''' Install VirtualBox and Linux kernel headers.
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends {{{virtualbox_package_debian}}} linux-headers-$(dpkg --print-architecture)
+}}
+
+'''5.''' Add your current user to group <code>vboxusers</code>. <ref name=vboxusersgroupadd>
+Optional: See: https://www.virtualbox.org/manual/ch02.html#install-linux-vboxusers
+
+Also spams <code>~/.config/VirtualBox/VBoxSVC.log</code> log if not done.
+</ref>
+
+{{CodeSelect|code=
+sudo adduser $(whoami) vboxusers
+}}
+
+'''6.''' Done.
+
+The procedure of installing the VirtualBox host software is complete.
+}}
+-->
+
 = Footnotes =
 <references />
 {{Footer}}

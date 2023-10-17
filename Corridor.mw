@@ -9,7 +9,7 @@ title=corridor - Tor traffic whitelisting gateway
 __forcetoc__
 [[image:Corridor.jpg|thumb]]
 {{intro|
-Using corridor, a Tor traffic whitelisting gateway with {{project_name_long}}.
+Using corridor, a Tor traffic whitelisting gateway with {{project_name_short}}.
 }}
 = Introduction =
 [https://github.com/rustybird/corridor corridor] is a Tor traffic whitelisting gateway. It is a filtering gateway, not a proxying gateway and can also be configured as a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/BridgeFirewall BridgeFirewall].
@@ -20,15 +20,15 @@ Using corridor, a Tor traffic whitelisting gateway with {{project_name_long}}.
 {{mbox
 | type      = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = corridor configurations are only possible in [[Qubes|{{q_project_name_long}}]]. [[Qubes|{{non_q_project_name_short}}]] is [[unsupported]] at present. <ref>[https://phabricator.whonix.org/T524 Corridor for {{project_name_long}} KVM ticket].</ref> <ref>Without third party contributions to corridor, [[Qubes|{{non_q_project_name_short}}]] is unlikely to be supported in the near future.</ref>
+| text    = corridor configurations are only possible in [[Qubes|{{q_project_name_long}}]]. [[Qubes|{{non_q_project_name_short}}]] is [[unsupported]] at present. <ref>[https://phabricator.whonix.org/T524 Corridor for {{project_name_short}} KVM ticket].</ref> <ref>Without third party contributions to corridor, [[Qubes|{{non_q_project_name_short}}]] is unlikely to be supported in the near future.</ref>
 }}
 
 It is possible to configure {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) to use corridor as a <u>local</u> proxy to establish the following tunnel:<br />
 <code>User</code> &rarr; <code>corridor</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>
 
-This is not necessarily more anonymous, but it does provide an additional fail-safe -- a Tor traffic whitelisting firewall that helps protect against accidental clearnet leaks (hypothetical clearnet leak bugs in {{project_name_long}}). As [https://github.com/rustybird/corridor corridor's project description] states: "... it cannot prevent malware on a client computer from finding out your clearnet IP address."
+This is not necessarily more anonymous, but it does provide an additional fail-safe -- a Tor traffic whitelisting firewall that helps protect against accidental clearnet leaks (hypothetical clearnet leak bugs in {{project_name_short}}). As [https://github.com/rustybird/corridor corridor's project description] states: "... it cannot prevent malware on a client computer from finding out your clearnet IP address."
 
-corridor is mostly useful for developers and auditors of {{project_name_long}}, along with advanced users who would like to have an additional safety net. Note that it cannot protect from hypothetical bugs affecting Qubes' ProxyVM; a [https://github.com/rustybird/corridor physically-isolated, standalone corridor-Gateway] is necessary to cover that leak vector.
+corridor is mostly useful for developers and auditors of {{project_name_short}}, along with advanced users who would like to have an additional safety net. Note that it cannot protect from hypothetical bugs affecting Qubes' ProxyVM; a [https://github.com/rustybird/corridor physically-isolated, standalone corridor-Gateway] is necessary to cover that leak vector.
 
 corridor does not increase the tunnel length, meaning no more relays are added between a user and the destination. Users interested in this configuration should read [[Tunnels/Introduction]].
 
@@ -42,9 +42,9 @@ By default, the following instructions will result in:
 # Thereby automatically connecting to the [https://www.torproject.org Tor] public network.
 # Downloading of corridor from [[Project-APT-Repository]].
 }}
-This behavior might be dangerous if users need / want to [[Hide Tor from your Internet Service Provider|hide Tor and {{project_name_long}} from the ISP]].
+This behavior might be dangerous if users need / want to [[Hide Tor from your Internet Service Provider|hide Tor and {{project_name_short}} from the ISP]].
 
-If {{project_name_long}} is already in use, then configuring a second running instance of [[Tor]] will ensure that it is independent of the one running inside {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>). From the ISP's perspective, the user will have a different network [[Fingerprint]]. The anonymity impact should be no worse than running Tor Browser, or system-tor and {{project_name_long}} at the same time.
+If {{project_name_short}} is already in use, then configuring a second running instance of [[Tor]] will ensure that it is independent of the one running inside {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>). From the ISP's perspective, the user will have a different network [[Fingerprint]]. The anonymity impact should be no worse than running Tor Browser, or system-tor and {{project_name_short}} at the same time.
 
 == dom0 Setup ==
 Create a new standalone ProxyVM called {{Code2|sys-corridor}} based on the Debian <code>{{Stable project version based on Debian codename}}</code> template:
@@ -83,7 +83,7 @@ TODO: BridgeFirewall corridor configuration is currently [[unsupported|untested]
 | text    = "Bridges are less reliable and tend to have lower performance than other entry points. If you live in a uncensored area, they are not necessarily more secure than entry guards." <ref>[https://lists.torproject.org/pipermail/tor-talk/2012-May/024378.html bridge vs non-bridge users anonymity].</ref>
 }}
 
-In order to use corridor as a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/BridgeFirewall BridgeFirewall], configure Tor to use [https://support.torproject.org/#censorship_censorship-7 bridges] before installing corridor. <ref>The {{project_name_long}} [[Bridges]] page can help, but the steps do not apply one-to-one.</ref>
+In order to use corridor as a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/BridgeFirewall BridgeFirewall], configure Tor to use [https://support.torproject.org/#censorship_censorship-7 bridges] before installing corridor. <ref>The {{project_name_short}} [[Bridges]] page can help, but the steps do not apply one-to-one.</ref>
 {{Box|text=
 '''1.''' Start <code>sys-corridor</code> and open a terminal using Qubes start menu.<br />
 '''2.''' Create folder {{Code2|/etc/corridor.d}} and configuration file {{Code2|/etc/corridor.d/21-bridges-user.conf}} first. <ref>This skip is stepped if [https://support.torproject.org/#about_entry-guards Tor entry guards] are preferred.</ref> <br />
@@ -92,9 +92,9 @@ In order to use corridor as a [https://gitlab.torproject.org/legacy/trac/-/wikis
 /etc/corridor.d/21-bridges-user.conf
 }}
 
-'''4.''' Review {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) [[Bridges|Tor bridge]] settings.
+'''4.''' Review {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) [[Bridges|Tor bridge]] settings.
 
-Depending on how Tor bridges are configured on {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>):
+Depending on how Tor bridges are configured on {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>):
 
 * if [[Anon Connection Wizard]] was used, see configuration file <code>/usr/local/etc/torrc.d/40_tor_control_panel.conf</code>.
 * if [[Tor#Manual_Bridge_Configuration|manual Tor bridge configuration]] was done, see file <code>/usr/local/etc/torrc.d/50_user.conf</code>.
@@ -103,7 +103,7 @@ Depending on how Tor bridges are configured on {{project_name_gateway_long}} (<c
 https://github.com/rustybird/corridor/issues/42
 </ref>
 
-Syntax is similar as Tor configuration as reviewed in previous step. Replace the IPs and ports <code>1.2.3.4:443</code>, <code>2.3.4.5:443</code> with the actual IPs and ports of the bridges in use. All Tor bridges from Tor configuration on {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) need to be added below too.
+Syntax is similar as Tor configuration as reviewed in previous step. Replace the IPs and ports <code>1.2.3.4:443</code>, <code>2.3.4.5:443</code> with the actual IPs and ports of the bridges in use. All Tor bridges from Tor configuration on {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) need to be added below too.
 
 {{CodeSelect|code=
 BRIDGES="\
@@ -202,7 +202,7 @@ Check if the {{Code2|corridor_relays}} ipset gets populated.
 sudo ipset list corridor_relays
 }}
 
-It is recommended to also install the {{Code2|usability-misc}} package from {{project_name_long}} repository, since it provides the {{Code2|iptables-save-deterministic}} command. Alternatively, retrieve the package from [[Dev/Firewall_Refactoring|elsewhere]].
+It is recommended to also install the {{Code2|usability-misc}} package from {{project_name_short}} repository, since it provides the {{Code2|iptables-save-deterministic}} command. Alternatively, retrieve the package from [[Dev/Firewall_Refactoring|elsewhere]].
 
 {{CodeSelect|code=
 sudo apt install usability-misc
@@ -241,7 +241,7 @@ COMMIT
 
 = Credits =
 
-The author of corridor is [https://github.com/rustybird rustybird]. [https://github.com/adrelanos Patrick Schleizer] is the author of the [https://github.com/adrelanos/corridor corridor for Debian] [https://en.wikipedia.org/wiki/Fork_%28software_development%29 fork] used in these {{project_name_long}} instructions.
+The author of corridor is [https://github.com/rustybird rustybird]. [https://github.com/adrelanos Patrick Schleizer] is the author of the [https://github.com/adrelanos/corridor corridor for Debian] [https://en.wikipedia.org/wiki/Fork_%28software_development%29 fork] used in these {{project_name_short}} instructions.
 
 = Footnotes =
 {{reflist|close=1}}

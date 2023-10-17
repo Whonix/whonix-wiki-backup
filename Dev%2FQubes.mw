@@ -3,7 +3,7 @@
 |description={{q_project_name_long}} development notes.
 }}
 {{intro|
-{{q_project_name_long}} development notes.
+{{q_project_name_short}} development notes.
 }}
 = Issues =
 == Important Issues ==
@@ -201,7 +201,7 @@ AppVMs can't spoof each other in Qubes' network.
 Corollary: stream isolation cannot be circumvented.
 
 = Inter-VM Networking =
-<s>Current Qubes + {{project_name_long}} implementation has both the {{project_name_gateway_long}} and {{project_name_workstation_long}} connected to the same backend FirewallVM and iptables forwarding is manually established between the {{project_name_long}} IP addresses. This current method is really just an efficient hack for our initial Qubes + {{project_name_long}} implementation. The native/proper way to network VMs in Qubes is via chaining their networking "backend" together, which is part of Xen networking structure. This is how other VMs in Qubes are networked, including TorVM. According to Qubes devs, these Xen backends provide simple point-to-point networking between VMs. So this would be advantageous for further isolation of inter-VM {{project_name_long}} traffic, since, currently, all inter-VM traffic is routed through the internet-facing FirewallVM, which can also be shared by other VMs. This current implementation with a shared FirewallVM could be somewhat of a security concern for inter-VM traffic, and a reason to move to native/proper isolated point-to-point "backend" networking. Also, in the future, it is desirable to leverage full ProxyVM/ServiceVM networking between {{project_name_gateway_long}} and {{project_name_workstation_long}}, as the TorVM does. ProxyVM utilizes Xen "backend" networking but automates it with transparent Qubes GUI networking, making use of dynamically created virtual networking interfaces. {{project_name_long}} may need to add onto or adjust its internal networking setup to be compatible with such native Qubes networking.</s>
+<s>Current Qubes + {{project_name_short}} implementation has both the {{project_name_gateway_long}} and {{project_name_workstation_long}} connected to the same backend FirewallVM and iptables forwarding is manually established between the {{project_name_short}} IP addresses. This current method is really just an efficient hack for our initial Qubes + {{project_name_short}} implementation. The native/proper way to network VMs in Qubes is via chaining their networking "backend" together, which is part of Xen networking structure. This is how other VMs in Qubes are networked, including TorVM. According to Qubes devs, these Xen backends provide simple point-to-point networking between VMs. So this would be advantageous for further isolation of inter-VM {{project_name_short}} traffic, since, currently, all inter-VM traffic is routed through the internet-facing FirewallVM, which can also be shared by other VMs. This current implementation with a shared FirewallVM could be somewhat of a security concern for inter-VM traffic, and a reason to move to native/proper isolated point-to-point "backend" networking. Also, in the future, it is desirable to leverage full ProxyVM/ServiceVM networking between {{project_name_gateway_long}} and {{project_name_workstation_long}}, as the TorVM does. ProxyVM utilizes Xen "backend" networking but automates it with transparent Qubes GUI networking, making use of dynamically created virtual networking interfaces. {{project_name_short}} may need to add onto or adjust its internal networking setup to be compatible with such native Qubes networking.</s>
 
 Older, perhaps outdated discussions related to this topic:
 
@@ -255,7 +255,7 @@ packages/whonix-ws-firewall/etc/whonix_firewall.d/30_default.conf:GATEWAY_IP="10
 Overrulable. <br />
 File: /etc/whonix_firewall.d/40_qubes <br />
 Content: GATEWAY_IP="<qubes-ip>" <br />
-Note: Keep a possible race condiation in mind. Depending on how that config snippnett is created and when whonix_firewall starts. Should the config change after whonix_firewall was already loaded, reload {{project_name_long}} firewall ("sudo whonix_firewall").
+Note: Keep a possible race condiation in mind. Depending on how that config snippnett is created and when whonix_firewall starts. Should the config change after whonix_firewall was already loaded, reload {{project_name_short}} firewall ("sudo whonix_firewall").
 
 <pre>
 packages/helper-scripts/usr/lib/helper-scripts/tor_bootstrap_check.bsh:            TOR_CONTROL_HOST="10.152.152.10"
@@ -364,7 +364,7 @@ Overrulable. Create a file {{Code|/etc/torbrowser.d/40_qubes}} with content: GAT
 packages/whonix-legacy/debian/whonix-legacy.preinst:         sed -i 's/192.168.0.10/10.152.152.10/g' "/home/user/.torchat/torchat.ini" || true
 packages/whonix-legacy/debian/whonix-legacy.preinst:         sed -i 's/192.168.0.10/10.152.152.10/g' "/home/user/.xchat2/xchat.conf" || true
 </pre>
-No change required here. Only applies to {{project_name_long}} 8.3.
+No change required here. Only applies to {{project_name_short}} 8.3.
 
 <pre>
 packages/{{project_name_gateway_template}}-network-conf/etc/network/interfaces.whonix:       address 10.152.152.10
@@ -394,8 +394,8 @@ packages/sdwdate-plugin-anon-shared-streamiso/README.md:Sets sdwdate's proxy set
 Just documentation strings. Either nevermind or patch documentation.
 
 <pre>
-packages/anon-ws-disable-stacked-tor/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh:##   127.0.0.1:9050 to {{project_name_gateway_long}} 10.152.152.10:9050 and
-packages/anon-ws-disable-stacked-tor/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh:##   127.0.0.1:9150 to {{project_name_gateway_long}} 10.152.152.10:9150.
+packages/anon-ws-disable-stacked-tor/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh:##   127.0.0.1:9050 to {{project_name_gateway_short}} 10.152.152.10:9050 and
+packages/anon-ws-disable-stacked-tor/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh:##   127.0.0.1:9150 to {{project_name_gateway_short}} 10.152.152.10:9150.
 packages/anon-ws-disable-stacked-tor/usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh:#export TOR_SOCKS_HOST="10.152.152.10"
 </pre>
 Just documentation strings. Either nevermind or patch documentation.
@@ -466,11 +466,11 @@ sudo mv /etc/qubes-rpc/qubes.SetDateTime /etc/qubes-rpc/qubes.SetDateTime.disabl
 == prerequisite knowledge ==
 * TPO stands for The Tor Project
 * The /home folder of a Template is copied to a TemplateBasedVM at creation time of the TemplateBasedVM. From then, TemplateBasedVM's /home folder is left untouched. (Source: https://groups.google.com/g/qubes-users/c/WwVJhGA-Xnc)
-* Tor Browser installation path in {{project_name_long}} 12 will change to ~/.tb. (https://phabricator.whonix.org/T338)
-* Since {{q_project_name_long}} 11, Tor Browser gets installed by default for new images. (Not for in place upgrades.)
+* Tor Browser installation path in {{project_name_short}} 12 will change to ~/.tb. (https://phabricator.whonix.org/T338)
+* Since {{q_project_name_short}} 11, Tor Browser gets installed by default for new images. (Not for in place upgrades.)
 * https://github.com/Kicksecure/tb-updater vs
 * [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]]
-* Tor Browser Updater ({{project_name_long}}) is unable to keep user settings (modifications such as bookmarks). It renames the old folder. Adds ".old.$(date)". So nothing is lost. Then installs a fresh one. Something important to know. This limitation can probably not be lifted in tb-updater. Upgrading Tor Browser is hard. (TPO often changed the folder layout in past.) That's what Tor Browser's internal updater is for.
+* Tor Browser Updater ({{project_name_short}}) is unable to keep user settings (modifications such as bookmarks). It renames the old folder. Adds ".old.$(date)". So nothing is lost. Then installs a fresh one. Something important to know. This limitation can probably not be lifted in tb-updater. Upgrading Tor Browser is hard. (TPO often changed the folder layout in past.) That's what Tor Browser's internal updater is for.
 * No one has demonstrated yet, that it is possible to install & run and/or update TBB to either /usr/*, /opt/* or anything of that sort. This is because within the TBB folder, by TPO default, binaries and user data is mixed. (It is a portable application. [Portable with a meaning similar to portableapps.com. Portable on USB drives or similar. Not platform, arm + anything portable.])
 * By TPO default, users are supposed to have TBB in their home folder.
 * It is very unlikely, that TBB will be available as regular deb package anytime soon. <ref>
@@ -480,15 +480,15 @@ sudo mv /etc/qubes-rpc/qubes.SetDateTime /etc/qubes-rpc/qubes.SetDateTime.disabl
 * A quick an dirty packaging of TBB would likely require too much maintenance effort. [Needs keeping up with upstream releases.]
 * Packaging TBB is further complicated, because TBB abuses Firefox's user settings mechanism for configuring anonymity related settings. (Firefox prefs) Therefore separation of binaries and user data is difficult.
 * Once TBB is in user's home folder...  [as TPO wants it] [and it does not work otherwise]... And once the user used it... And once the user stored settings there that the user cares about... [bookmarks, etc...] It gets very difficult for the Template and/or tb-updater to keep the TBB folder up to date. That's what Tor Browser Internal Updater is for.
-** Unfortunately, this means, if a user had for example 5 different Qubes-{{project_name_workstation_long}} based AppVMs where Tor Browser is in use, the user would have to update each of its 5 TBBs using Tor Browser Internal Updater.
+** Unfortunately, this means, if a user had for example 5 different Qubes-{{project_name_workstation_short}} based AppVMs where Tor Browser is in use, the user would have to update each of its 5 TBBs using Tor Browser Internal Updater.
 ** This is an issue, because Qubes updates are already complicated. (Various templates and dom0 needs to be updated.) This adds another layer of complexity. Users also have to care about updating stuff from within their AppVMs, which is counter intuitive.
 ** TBB stable has automatic updates enabled by default. <ref>
 https://blog.torproject.org/tor-browser-50-released
 <blockquote>Starting with this release, Tor Browser will now also download and apply upgrades in the background, to ensure that users upgrade quicker and with less interaction. This behavior is governed by the about:config pref app.update.auto, but we do not recommend disabling it unless you really know what you're doing.</blockquote>
 </ref>
 
-== Implementation as of {{q_project_name_long}} 11 ==
-* As of {{q_project_name_long}} 11 it is confusing. Running tb-updater in the Template and restarting AppVM won't result in up to date TBB's. [Since if the Template modifies /home, this will not propagate to AppVM's /home.]
+== Implementation as of {{q_project_name_short}} 11 ==
+* As of {{q_project_name_short}} 11 it is confusing. Running tb-updater in the Template and restarting AppVM won't result in up to date TBB's. [Since if the Template modifies /home, this will not propagate to AppVM's /home.]
 
 == Brainstorming ==
 === Headless TBB Internal Updater Updates in AppVMs ===
@@ -499,7 +499,7 @@ ship Tor Browser tarballs in Qubes Templates in /var/cache/tb-binary and extract
 https://phabricator.whonix.org/T417
 
 === keep as is ===
-Newly created Qubes-{{project_name_workstation_long}} AppVMs inherit the TBB version that came pre-installed in the Qubes-{{project_name_workstation_long}} Template. From there, TBB's internal updater keeps care of updating it.
+Newly created Qubes-{{project_name_workstation_short}} AppVMs inherit the TBB version that came pre-installed in the Qubes-{{project_name_workstation_short}} Template. From there, TBB's internal updater keeps care of updating it.
 
 == Forum Discussion ==
 * https://forums.whonix.org/t/what-should-tor-browser-updater-whonix-do-in-a-templatevm
@@ -525,7 +525,7 @@ the easiest way is to use qubes-builder, you can build a single by `make mgmt-sa
 * build it with `rpmbuild -bb <path-to-spec>`
 </blockquote>
 
-== Build {{q_project_name_long}} Templates ==
+== Build {{q_project_name_short}} Templates ==
 
 <pre>
 git clone https://github.com/QubesOS/qubes-builder.git
@@ -626,18 +626,18 @@ RELEASE=4.2 REPO_PROXY="" make DISTS_VM="whonix-gateway-17 whonix-workstation-17
 * works as UpdateVM
 * can be used as ProxyVM for Fedora and Debian templates
 * [https://www.kicksecure.com/wiki/Systemcheck systemcheck] (<code>--verbose</code>) in {{project_name_gateway_vm}}, whonix, {{project_name_gateway_template}}, whonix-ws
-* Does qubes {{project_name_long}} network / firewall service run after qubes-sysinit.service? Check full systemd dependency resolution.
+* Does qubes {{project_name_short}} network / firewall service run after qubes-sysinit.service? Check full systemd dependency resolution.
 
 = Qubes VM Manger Firewall Tab Settings =
 ([https://www.qubes-os.org/attachment/doc/r4.0-manager-firewall.png screenshot])
 
 Short:<br />
-Have no effect for {{q_project_name_long}} VMs. Can be ignored.
+Have no effect for {{q_project_name_short}} VMs. Can be ignored.
 
 Long <ref>https://groups.google.com/g/qubes-devel/c/uzgN42uEJpE/m/hymUCMxoCwAJ</ref>:<br />
 All that settings are in separate file in the VM directory - dom0 /var/lib/qubes/appvms/whonix/firewall.xml. If the VM is running, those settings are converted to iptables syntax and loaded into QubesDB of directly connected ProxyVM. The qubes-firewall service in the ProxyVM watch for such changes and applies the rules.
 
-I.e. in case of {{project_name_long}}, the connected ProxyVM is {{project_name_gateway_vm}}. Since in {{project_name_long}} qubes-firewall service is disabled ({{project_name_long}} 12 <ref>https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf</ref>), these settings do not affect {{project_name_long}}. ([https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf qubes-whonix-firewall.service] is what {{project_name_long}} uses.)
+I.e. in case of {{project_name_short}}, the connected ProxyVM is {{project_name_gateway_vm}}. Since in {{project_name_short}} qubes-firewall service is disabled ({{project_name_short}} 12 <ref>https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf</ref>), these settings do not affect {{project_name_short}}. ([https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf qubes-whonix-firewall.service] is what {{project_name_short}} uses.)
 
 = Qubes Upstream Bugs =
 Usability:
@@ -656,8 +656,8 @@ See [[Dev/Split_GPG]].
 Goals:<br/>
 
 * any Template behind {{project_name_gateway_vm}} should be restricted to torified UpdatesProxy only
-* {{project_name_long}} Templates behind {{project_name_gateway_vm}} should be restricted to torified UpdatesProxy only
-* {{project_name_long}} Templates connected to a ProxyVM other than {{project_name_gateway_vm}} should refuse to connect and show a warning [done]
+* {{project_name_short}} Templates behind {{project_name_gateway_vm}} should be restricted to torified UpdatesProxy only
+* {{project_name_short}} Templates connected to a ProxyVM other than {{project_name_gateway_vm}} should refuse to connect and show a warning [done]
 
 Qubes tickets:<br/>
 
@@ -667,7 +667,7 @@ Qubes tickets:<br/>
 
 Tickets:<br/>
 
-* [https://phabricator.whonix.org/T372 {{q_project_name_long}} {{project_name_workstation_long}} Templates block access to (torified) open internet]
+* [https://phabricator.whonix.org/T372 {{q_project_name_short}} {{project_name_workstation_short}} Templates block access to (torified) open internet]
 
 = Connection Issues =
 * icmp mtu connection issues?
@@ -686,7 +686,7 @@ HVM
 HVM Template
 
 = Network in Templates =
-As default setting, any Template (including {{project_name_long}}) in Qubes R4.0 and above have their NetVM set to <code>none</code>.
+As default setting, any Template (including {{project_name_short}}) in Qubes R4.0 and above have their NetVM set to <code>none</code>.
 
 Networking and [[update]] of Templates is possible through Qubes UpdatesProxy.
 
@@ -718,8 +718,8 @@ Modified to the following.
 </head>
 </pre>
 
-== {{project_name_long}} Templates ==
-Inside {{project_name_long}} Templates, [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/utility_functions.sh the following command is run will be run].
+== {{project_name_short}} Templates ==
+Inside {{project_name_short}} Templates, [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/utility_functions.sh the following command is run will be run].
 
 === Qubes R3.2 ===
 <pre>
@@ -786,8 +786,8 @@ UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://127.0.0.1:808
 == Related ==
 
 * [https://github.com/QubesOS/qubes-issues/issues/1957 Cache updates #1957, qubes-updates-cache, qubes-updates-proxy]
-* design decision: [https://github.com/QubesOS/qubes-issues/issues/1880 Difficulty to upgrade {{project_name_long}} Templates over clearnet considered a bug or feature?]
-* bug: [https://forums.whonix.org/t/templates-incorrectly-think-theyre-not-connected-to-a-whonix-gateway Templates incorrectly think they're not connected to a {{project_name_long}} gateway.]
+* design decision: [https://github.com/QubesOS/qubes-issues/issues/1880 Difficulty to upgrade {{project_name_short}} Templates over clearnet considered a bug or feature?]
+* bug: [https://forums.whonix.org/t/templates-incorrectly-think-theyre-not-connected-to-a-whonix-gateway Templates incorrectly think they're not connected to a {{project_name_short}} gateway.]
 
 = Troubleshooting =
 See [[Qubes/Troubleshooting|Troubleshooting Qubes specific]].
@@ -868,7 +868,7 @@ VM type \ Qubes OS version         | 3.2 | 4.0-rc1-3 | 4.0-rc4 |
 Default VMs without PCI devices    | PV  |    HVM    |   PVH   |
 </pre>
 
-Conclusion: Qubes VM debug mode is not the way to go since in Qubes R4 the default for most VMs (that is VMs without PCI devices) (which includes {{project_name_long}}) is PHV, since these don't have emulated VGA.
+Conclusion: Qubes VM debug mode is not the way to go since in Qubes R4 the default for most VMs (that is VMs without PCI devices) (which includes {{project_name_short}}) is PHV, since these don't have emulated VGA.
 
 = salt =
 [https://www.qubes-os.org/doc/salt/ Qubes <code>salt</code> management stack <code>qubesctl</code>]
@@ -940,7 +940,7 @@ The template package [https://github.com/{{project_name_short}}/qubes-whonix <co
 
 As per Marek, <code>qvm-features-request whonix-ws=1</code> should [https://github.com/QubesOS/qubes-issues/issues/3765#issuecomment-386805491 not be set by salt].
 
-Missing {{project_name_long}} tags anon-vm / anon-gateway [https://github.com/QubesOS/qubes-core-admin-addon-whonix/pull/6 will be added].
+Missing {{project_name_short}} tags anon-vm / anon-gateway [https://github.com/QubesOS/qubes-core-admin-addon-whonix/pull/6 will be added].
 
 bug: [https://github.com/QubesOS/qubes-issues/issues/4167 qvm-tags not included in Qubes backups and not re-applied when restoring #4167]
 
@@ -949,9 +949,9 @@ bug: [https://github.com/QubesOS/qubes-issues/issues/4167 qvm-tags not included 
 
 Tags are not reliably set yet. TODO: https://github.com/QubesOS/qubes-issues/issues/4155 - That is something doable. But it's not a big deal for now since Qubes VMs have many ways to ask dom0 for the non-randomized time.
 
-* [https://phabricator.whonix.org/T389 make sure {{q_project_name_long}} has no access to clocksource=xen] (unlikely to be fixed anytime soon without external help) (It matters in context of [[Dev/TimeSync#Clock_Correlation_Attack|Clock Correlation Attack]].
-* [https://phabricator.whonix.org/T440 set random clock offset for {{q_project_name_long}} VMs using mgmt to prevent clock correlation attacks]
-* [https://phabricator.whonix.org/T397 prevent dom0 telling {{q_project_name_long}} VMs the time by using the mgmt stack for that / disable Qubes dom0 /etc/qubes-rpc/qubes.SetDateTime]
+* [https://phabricator.whonix.org/T389 make sure {{q_project_name_short}} has no access to clocksource=xen] (unlikely to be fixed anytime soon without external help) (It matters in context of [[Dev/TimeSync#Clock_Correlation_Attack|Clock Correlation Attack]].
+* [https://phabricator.whonix.org/T440 set random clock offset for {{q_project_name_short}} VMs using mgmt to prevent clock correlation attacks]
+* [https://phabricator.whonix.org/T397 prevent dom0 telling {{q_project_name_short}} VMs the time by using the mgmt stack for that / disable Qubes dom0 /etc/qubes-rpc/qubes.SetDateTime]
 
 [https://github.com/QubesOS/qubes-core-admin-addon-whonix/tree/master/qubes-rpc-policy Tags will be more important in future] for [https://phabricator.whonix.org/T534 sdwdate-gui-qubes] but that is more usability, not security.
 
@@ -1313,7 +1313,7 @@ sudo mv /boot/efi/EFI/BOOT/grub.cfg /boot/efi/EFI/BOOT/BOOTX64.cfg
 }}
 
 = See Also =
-* [[Dev/Test|Dev/Test - How to "UnWhonix" - Instructions on how to remove {{project_name_long}} Tor default networking for {{project_name_gateway_long}}. After applying these instructions, {{project_name_gateway_long}} will connect to clearnet.]]
+* [[Dev/Test|Dev/Test - How to "UnWhonix" - Instructions on how to remove {{project_name_short}} Tor default networking for {{project_name_gateway_short}}. After applying these instructions, {{project_name_gateway_short}} will connect to clearnet.]]
 * [https://forums.whonix.org/t/how-to-add-a-proxyvm-between-{{project_name_workstation_vm}}-and-{{project_name_gateway_vm}}-whonix-ws-email-sys-fw-whonix-{{project_name_gateway_template}}-sys-firewall-sys-net How to add a ProxyVM between {{project_name_workstation_vm}} and {{project_name_gateway_vm}}? (whonix-ws-email &rarr; sys-fw-whonix &rarr; {{project_name_gateway_template}} &rarr; sys-firewall &rarr; sys-net)]
 * [[Dev/Qubes Remote Support]]
 

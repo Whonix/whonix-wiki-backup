@@ -8,12 +8,12 @@ title=Control and Monitor Tor
 }}
 [[File:onioncircuits.png|onioncircuits - View Tor Circuits|thumb]]
 {{intro|
-Using a Tor Controller with {{project_name_long}}. Onion Circuits. Nyx. View or change your Tor circuits. Monitor Tor and inspect logs.
+Using a Tor Controller with {{project_name_short}}. Onion Circuits. Nyx. View or change your Tor circuits. Monitor Tor and inspect logs.
 }}
 [[File:0brand_Arm_Controller-1.png|Nyx Tor Controller|thumb]]
 = Introduction =
 
-[[#Nyx|nyx]] is the primary Tor Controller option that comes pre-installed in {{project_name_long}}.
+[[#Nyx|nyx]] is the primary Tor Controller option that comes pre-installed in {{project_name_short}}.
 
 Note: [[#Vidalia|Vidalia]] has been deprecated and is no longer packaged in Debian.
 
@@ -70,7 +70,7 @@ For leak testing, see [[Dev/Leak_Tests|leak tests]].
 
 |-
 | <u>{{Code2|Nyx sometimes shows my public IP address and other times the internal <code>10.0.2.15</code> and <code>127.0.0.1</code> IPs. Is it normal or dangerous?}}</u> <ref>https://forums.whonix.org/t/strange-nyx-behavior/9514</ref>
-| This is a normal nyx feature. {{project_name_long}} uses a Tor control port filter proxy ([[Onion-grater|onion-grater]]) that prevents abuse of the <code>ControlPort</code>, including blocking dangerous commands like <code>GETINFO address</code>. When the real IP address appears, it is only local and nobody else can see it.
+| This is a normal nyx feature. {{project_name_short}} uses a Tor control port filter proxy ([[Onion-grater|onion-grater]]) that prevents abuse of the <code>ControlPort</code>, including blocking dangerous commands like <code>GETINFO address</code>. When the real IP address appears, it is only local and nobody else can see it.
 
 |-
 
@@ -101,11 +101,11 @@ This is caused by the [https://www.kicksecure.com/wiki/Systemcheck systemcheck] 
 
 |-
 | {{Code2|[WARN] Rejecting request for anonymous connection to private address [scrubbed] on a TransPort or NATDPort.  Possible loop in your NAT rules?}}
-| This happens for example if you run "curl 192.168.0.15". The reason is when you type "curl" in {{project_name_long}}, by default you are not directly using curl, but a uwt-wrapped ([[Stream_Isolation|stream-isolated]]) curl instead. It does not try to directly connect to 192.168.0.15, but rather to connect to 192.168.0.15 through Tor, leading to this Tor message. It really means an operation was attempted that will not work in that way. In this instance, deactivate the curl stream isolation wrapper or use the non-wrapped version - see [[Stream_Isolation|Stream Isolation]].
+| This happens for example if you run "curl 192.168.0.15". The reason is when you type "curl" in {{project_name_short}}, by default you are not directly using curl, but a uwt-wrapped ([[Stream_Isolation|stream-isolated]]) curl instead. It does not try to directly connect to 192.168.0.15, but rather to connect to 192.168.0.15 through Tor, leading to this Tor message. It really means an operation was attempted that will not work in that way. In this instance, deactivate the curl stream isolation wrapper or use the non-wrapped version - see [[Stream_Isolation|Stream Isolation]].
 
 |-
 | {{Code2|[NOTICE] You configured a non-loopback address '10.152.152.10:9179' for SocksPort. This allows everybody on your local network to use your machine as a proxy. Make sure this is what you wanted. [1 duplicate hidden]}} (Or another port number or DnsPort or TransPort.)
-| Tor really listens on that IP/port. It is {{project_name_gateway_long}} network interface and is only available to {{project_name_workstation_long}}. This restriction is enforced by an internal network with {{project_name_workstation_long}}(s) and because {{project_name_gateway_long}} is firewalled; see ''{{W_Firewall}}'' or the {{project_name_long}} source code for more information.
+| Tor really listens on that IP/port. It is {{project_name_gateway_short}} network interface and is only available to {{project_name_workstation_long}}. This restriction is enforced by an internal network with {{project_name_workstation_long}}(s) and because {{project_name_gateway_short}} is firewalled; see ''{{W_Firewall}}'' or the {{project_name_short}} source code for more information.
 
 |-
 | {{Code2|[NOTICE] New control connection opened. [2 duplicates hidden]}} (Or more duplicates.)
@@ -202,9 +202,9 @@ man tor-ctrl
 
 == Talking to the real Tor Controller ==
 
-To talk to the real Tor Controller, you should run the commands on the {{project_name_gateway_long}}, as  the {{project_name_workstation_long}}, the connection goes through the [https://www.whonix.org/wiki/Onion-grater onion-grater controller proxy] and some commands might be filtered.
+To talk to the real Tor Controller, you should run the commands on the {{project_name_gateway_short}}, as  the {{project_name_workstation_short}}, the connection goes through the [https://www.whonix.org/wiki/Onion-grater onion-grater controller proxy] and some commands might be filtered.
 
-On {{project_name_gateway_long}}. {{Code2|test}} is the example password being used. Feel free to use a different/stronger one.
+On {{project_name_gateway_short}}. {{Code2|test}} is the example password being used. Feel free to use a different/stronger one.
 
 <pre>
 tor --hash-password test
@@ -259,16 +259,16 @@ Will do nothing after this, but when you start using Tor (i.e. by running Tor Br
 ...
 </pre>
 
-{{project_name_long}} has a wrapper called <code>tor-ctrl</code> to communicate directly with tor's controller. By using it, you don't have to worry about authentication method, or which program to use to connect to the socket, or which program to use to convert the cookie to base32. As the intent of this section is to teach how to communicate without external programs, this is mentioned at last. If you wish to accomplish the same as above, you can do so with <code>tor-ctrl -w setevents stream</code>.
+{{project_name_short}} has a wrapper called <code>tor-ctrl</code> to communicate directly with tor's controller. By using it, you don't have to worry about authentication method, or which program to use to connect to the socket, or which program to use to convert the cookie to base32. As the intent of this section is to teach how to communicate without external programs, this is mentioned at last. If you wish to accomplish the same as above, you can do so with <code>tor-ctrl -w setevents stream</code>.
 
 
 == netcat ==
 netcat is no longer required. [[#tor-ctrl|tor-ctrl]] is recommended instead.
 
-netcat provides an easy way to send Tor protocol commands to Tor's <code>ControlPort</code> form inside {{project_name_workstation_long}}. Actually for security reasons to onion-grater, the [[Dev/onion-grater|Tor Control Protocol Filter Proxy]].
+netcat provides an easy way to send Tor protocol commands to Tor's <code>ControlPort</code> form inside {{project_name_workstation_short}}. Actually for security reasons to onion-grater, the [[Dev/onion-grater|Tor Control Protocol Filter Proxy]].
 
 {{Box|text=
-Inside {{project_name_workstation_long}}.
+Inside {{project_name_workstation_short}}.
 
 '''1.''' Install netcat.
 
@@ -277,7 +277,7 @@ sudo apt install netcat-openbsd
 }}
 
 '''2.''' Connect to Tor's <code>ControlPort</code>. <ref>
-This works in {{project_name_workstation_long}}, because the [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor anon-ws-disable-stacked-tor] package has set up listening for connections on localhost and forwards them to {{project_name_gateway_long}}, where the [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] is listening.
+This works in {{project_name_workstation_short}}, because the [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor anon-ws-disable-stacked-tor] package has set up listening for connections on localhost and forwards them to {{project_name_gateway_short}}, where the [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] is listening.
 </ref>
 
 {{CodeSelect|code=
@@ -298,7 +298,7 @@ The output should be.
 }}
 
 == tor-prompt ==
-On {{project_name_gateway_long}}, run.
+On {{project_name_gateway_short}}, run.
 
 Example <code>tor-prompt</code> in non-interactive mode.
 
@@ -308,7 +308,7 @@ tor-prompt --no-color --run "getinfo consensus/valid-until"
 
 Example <code>tor-prompt</code> in interactive mode.
 
-On {{project_name_gateway_long}}, run.
+On {{project_name_gateway_short}}, run.
 
 {{CodeSelect|code=
 tor-prompt

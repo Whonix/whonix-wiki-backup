@@ -3,13 +3,13 @@
 {{project_name_long}} friendly applications best practices
 }}
 {{#seo:
-|description=Best practices on writing applications compatible with {{project_name_long}}.
+|description=Best practices on writing applications compatible with {{project_name_short}}.
 }}
 {{intro|
-Best practices on writing applications compatible with {{project_name_long}}.
+Best practices on writing applications compatible with {{project_name_short}}.
 }}
 = config.d support =
-Please parse a configuration directory to apply options to your application, such as parsing <code>/etc/<u>your-application</u><b>.d</b></code> configuration folder (and <code>/usr/local/etc/<u>your-application</u><b>.d</b></code> for better Qubes support) so Linux distributions such as Debian, {{Kicksecure}} and {{project_name_long}} can set defaults (such as proxy / stream isolation configuration). Users are of course free to overrule these defaults using the usual configuration files in the user's home folder.
+Please parse a configuration directory to apply options to your application, such as parsing <code>/etc/<u>your-application</u><b>.d</b></code> configuration folder (and <code>/usr/local/etc/<u>your-application</u><b>.d</b></code> for better Qubes support) so Linux distributions such as Debian, {{Kicksecure}} and {{project_name_short}} can set defaults (such as proxy / stream isolation configuration). Users are of course free to overrule these defaults using the usual configuration files in the user's home folder.
 
 Please parse only configuration files with a defined file extension such as <code>.conf</code> to avoid parsing backup, swap and temporary files. Graphical editors such as <code>kate</code> create backup files such as <code>file-name<b>~</b></code>, vim create <code><b>.</b>file-name<b>.swp</b></code> or APT / dpkg creating files such as <code>file-name<b>.dpkg-old</b></code> which would lead to unexpected results, should be ignored by your parsing logic.
 
@@ -42,9 +42,9 @@ Please set SOCKS user name for [https://www.whonix.org/wiki/Stream_Isolation Str
 
 ephemeral: Means the onion service will be gone after the Tor control connection is closed. It's however possible to retrieve onion service private key and to restore it at next run. It is important for your application to retry <code>ADD_ONION</code> after the Tor control connection is closed so the user does not have to stop and start your application again to retrieve an onion service. If your application uses <code>Flags=Detach</code>, it is important for your program to issue the <code>DEL_ONION</code> controller command to avoid having an onion hanging when your application has already closed.
 
-Tor ephemeral onion services are a lot a lot better for {{project_name_long}} than preconfigued Tor hidden services because it does not require the user to configure onion services manually, therefore a better usability.
+Tor ephemeral onion services are a lot a lot better for {{project_name_short}} than preconfigued Tor hidden services because it does not require the user to configure onion services manually, therefore a better usability.
 
-[https://github.com/micahflee/onionshare OnionShare] by [https://github.com/micahflee @micahflee] has superb Tails and {{project_name_long}} support.
+[https://github.com/micahflee/onionshare OnionShare] by [https://github.com/micahflee @micahflee] has superb Tails and {{project_name_short}} support.
 
 = Listening Interface =
 
@@ -88,7 +88,7 @@ TOR_SOCKS_IPC_PATH=/var/run/anon-ws-disable-stacked-tor/127.0.0.1_9150.sock
 
 These are Unix domain socket files.
 
-Ports works fine for {{project_name_long}} as per design the Workstation is isolated and uses the Gateway as its only source of networking, but nowadays Unix domain socket files are much more advisable since these are less likely to leak for non-isolated systems.
+Ports works fine for {{project_name_short}} as per design the Workstation is isolated and uses the Gateway as its only source of networking, but nowadays Unix domain socket files are much more advisable since these are less likely to leak for non-isolated systems.
 
 = Robustness =
 * The application should <b>not</b> crash if Tor <code>ControlPort</code> replies something unexpected such as <code>510 Command filtered</code>.
@@ -96,9 +96,9 @@ Ports works fine for {{project_name_long}} as per design the Workstation is isol
 If the application does crash, even though it can not get replies from the tor controller by receiving <code>510 Command filtered</code>, the user won't understand why your program is not working and won't try to use it again, that is not a good user experience. The application should have error handling for unexpected tor control replies.
 
 = Usability =
-* Show an error message if {{project_name_long}} is detected and <code>ControlPort</code> receiving <code>510 Command filtered</code> replies. Sample error message:
-** <blockquote>Error talking to the Tor controller, command sent: 'XXX', received reply: 'YYY'. If you're using {{project_name_long}}, check out https://www.whonix.org/wiki/ProgramName to make ProgramName work.</blockquote>
-* onionshare has a [https://cdn.ghacks.net/wp-content/uploads/2017/03/onionshare-password.png Tor settings dialog]. But not really needed in {{project_name_long}}.
+* Show an error message if {{project_name_short}} is detected and <code>ControlPort</code> receiving <code>510 Command filtered</code> replies. Sample error message:
+** <blockquote>Error talking to the Tor controller, command sent: 'XXX', received reply: 'YYY'. If you're using {{project_name_short}}, check out https://www.whonix.org/wiki/ProgramName to make ProgramName work.</blockquote>
+* onionshare has a [https://cdn.ghacks.net/wp-content/uploads/2017/03/onionshare-password.png Tor settings dialog]. But not really needed in {{project_name_short}}.
 
 = Bonus =
 Connections to the controller are passed through a proxy called onion-grater, which only allows basic features by default. After the profile is built for your program, your application should work gracefully.
@@ -106,11 +106,11 @@ Connections to the controller are passed through a proxy called onion-grater, wh
 * Bonus: Make a list of Tor control commands you are using so an onion-grater profile can be written. 
 * Bonus: Write an [https://github.com/{{project_name_short}}/onion-grater/tree/master/usr/share/doc/onion-grater-merger/examples onion-grater profile].
 
-= Programmatically Detecting {{project_name_long}} =
+= Programmatically Detecting {{project_name_short}} =
 Various marker files are available:
 
-* {{project_name_long}} generally: <code>/usr/share/whonix/marker</code>
-* {{project_name_gateway_long}}: <code>/usr/share/anon-gw-base-files/gateway</code>
+* {{project_name_short}} generally: <code>/usr/share/whonix/marker</code>
+* {{project_name_gateway_short}}: <code>/usr/share/anon-gw-base-files/gateway</code>
 * {{project_name_workstation_long}}: <code>/usr/share/anon-ws-base-files/workstation</code>
 
 = See Also =

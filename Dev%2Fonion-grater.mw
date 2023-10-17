@@ -19,52 +19,52 @@ Onion-grater is a filtering proxy for the [[Tor Controller]] listening on {{proj
 According to [https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chroot_local-includes/usr/local/lib/onion-grater#L3 upstream Tails OS documentation], onion-grater is defined as:
 ''This filter proxy allows fine-grained access whitelists of commands (and their arguments) and events on a per-application basis.''
 
-Contrary to Tails, the fields user and per-application (AppArmor profile) are ignored with the wildcard <code>'*'</code> to include everything, that due to {{project_name_long}} design of user space and tor daemon separation, these methods are not possible. Instead of that, what provides greater security to further separate applications and their requests to Tor's Control Protocol is using [[Multiple_Whonix-Workstation]], and you can control per {{project_name_workstation_long}} <code>hosts</code> directive for the onion-grater profile to match the {{project_name_workstation_long}} LAN IP. As using Multiple {{project_name_workstation_long}} requires more work as the {{project_name_gateway_long}} does not know all the {{project_name_workstation_long}} LAN IPs, the hosts defaults to <code>hosts: '*'</code> and if you want to minimize the attack surface of {{project_name_workstation_long}} to the {{project_name_gateway_long}} Tor Controller, you could set the <code>hosts</code> directive to match your chosen {{project_name_workstation_long}}  LAN IP.
+Contrary to Tails, the fields user and per-application (AppArmor profile) are ignored with the wildcard <code>'*'</code> to include everything, that due to {{project_name_long}} design of user space and tor daemon separation, these methods are not possible. Instead of that, what provides greater security to further separate applications and their requests to Tor's Control Protocol is using [[Multiple_Whonix-Workstation]], and you can control per {{project_name_workstation_short}} <code>hosts</code> directive for the onion-grater profile to match the {{project_name_workstation_short}} LAN IP. As using Multiple {{project_name_workstation_short}} requires more work as the {{project_name_gateway_short}} does not know all the {{project_name_workstation_short}} LAN IPs, the hosts defaults to <code>hosts: '*'</code> and if you want to minimize the attack surface of {{project_name_workstation_short}} to the {{project_name_gateway_short}} Tor Controller, you could set the <code>hosts</code> directive to match your chosen {{project_name_workstation_short}}  LAN IP.
 
-Tor's control port has in context of {{project_name_long}}, dangerous features. The answer to the Tor control command <code>GETINFO address</code> will be the real external IP of the Tor client. Other dangerous commands include <code>SETCONF</code>, <code>LOADCONF</code>, <code>GETCONF</code>, <code>GETINFO ns/id/<relay-fingerprint></code>.
+Tor's control port has in context of {{project_name_short}}, dangerous features. The answer to the Tor control command <code>GETINFO address</code> will be the real external IP of the Tor client. Other dangerous commands include <code>SETCONF</code>, <code>LOADCONF</code>, <code>GETCONF</code>, <code>GETINFO ns/id/<relay-fingerprint></code>.
 
 The dangerous commands can only be limited with a proxy, since the feature request [https://gitlab.torproject.org/legacy/trac/-/issues/8369 Option to limit information Tor's control port discloses] against Tor has not been implemented. By the way, this Tor control port feature makes also a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/BridgeFirewall Bridge Firewall] impossible.
 
-Tor Browser [https://gitlab.torproject.org/legacy/trac/-/issues/6546#comment:33 by default performs its own control port verification]. It checks using Tor's control port(!), that the socks port Tor reports, is the same one as Tor Browser is configured to use. If it fails, and it would fail in {{project_name_long}} 0.5.6, Tor Button would look like disabled and show a failure message. (To see how this would look like, see [https://forums.whonix.org/uploads/default/original/1X/c2c9bb5dc7efee7a933dd00d3bf0c30c29c99daa.png this screenshot].) (To see how this generates user confusion, see [https://forums.whonix.org/t/something-went-wrong/2080 this forum thread].) Since {{project_name_long}} 6 this check is disabled using [https://gitlab.torproject.org/legacy/trac/-/issues/13079 environment variable to skip TorButton control port verification] (<code>export TOR_SKIP_CONTROLPORTTEST=1</code>) by package [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh anon-ws-disable-stacked-tor]. <ref>
+Tor Browser [https://gitlab.torproject.org/legacy/trac/-/issues/6546#comment:33 by default performs its own control port verification]. It checks using Tor's control port(!), that the socks port Tor reports, is the same one as Tor Browser is configured to use. If it fails, and it would fail in {{project_name_short}} 0.5.6, Tor Button would look like disabled and show a failure message. (To see how this would look like, see [https://forums.whonix.org/uploads/default/original/1X/c2c9bb5dc7efee7a933dd00d3bf0c30c29c99daa.png this screenshot].) (To see how this generates user confusion, see [https://forums.whonix.org/t/something-went-wrong/2080 this forum thread].) Since {{project_name_short}} 6 this check is disabled using [https://gitlab.torproject.org/legacy/trac/-/issues/13079 environment variable to skip TorButton control port verification] (<code>export TOR_SKIP_CONTROLPORTTEST=1</code>) by package [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh anon-ws-disable-stacked-tor]. <ref>
 https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh
 </ref>
 
-With {{project_name_workstation_long}} having no way of finding its own external IP address, joining Tor Browser's fingerprint for {{project_name_long}} users, having no access for {{project_name_workstation_long}} to Tor's control port with Tor Buttons new requirement to have access to Tor's control port contradicted itself.
+With {{project_name_workstation_short}} having no way of finding its own external IP address, joining Tor Browser's fingerprint for {{project_name_short}} users, having no access for {{project_name_workstation_short}} to Tor's control port with Tor Buttons new requirement to have access to Tor's control port contradicted itself.
 
-onion-grater has been implemented as a solution. It gives {{project_name_workstation_long}} access to a limited selection of Tor's control port commands, using whitelisting (not blacklisting). For example, it allows <code>SIGNAL NEWNYM</code> to make Tor Buttons New Identity feature available for users who use Tor Browser in {{project_name_workstation_long}}.
+onion-grater has been implemented as a solution. It gives {{project_name_workstation_short}} access to a limited selection of Tor's control port commands, using whitelisting (not blacklisting). For example, it allows <code>SIGNAL NEWNYM</code> to make Tor Buttons New Identity feature available for users who use Tor Browser in {{project_name_workstation_short}}.
 
 onion-grater limits maximum accepted command string length to 128 (configurable) (credits: <ref>[https://web.archive.org/web/20170222094246/https://mailman.boum.org/pipermail/tails-dev/2014-February/005041.html As done by Tails.]</ref> <ref>Thanks to HulaHoop for [<nowiki>https://www.whonix.org/old-forum/index.php/topic,342.0.html</nowiki> suggesting this].</ref>) for better security.
 
 Advanced users who do not wish to use onion-grater can disable it, see [[Whonix-Gateway_Security_Hardening#Deactivate_onion-grater|deactivate onion-grater]].
 
 = Directory of choice =
-* Using <code>/usr/local/etc/onion-grater-merger.d/</code> because that onion-grater settings folder is persistent in [[Qubes|{{q_project_name_long}}]] TemplateBased ProxyVMs i.e. {{project_name_gateway_long}} (commonly called <code>{{project_name_gateway_vm}}</code>).
+* Using <code>/usr/local/etc/onion-grater-merger.d/</code> because that onion-grater settings folder is persistent in [[Qubes|{{q_project_name_long}}]] TemplateBased ProxyVMs i.e. {{project_name_gateway_short}} (commonly called <code>{{project_name_gateway_vm}}</code>).
 * [[Qubes|{{non_q_project_name_short}}]] users could also utilize <code>/etc/onion-grater-merger.d/</code>.
-* [[Qubes|{{q_project_name_long}}]] users could also utilize <code>/etc/onion-grater-merger.d/</code> but then <code>/etc/onion-grater-merger.d/</code> must be made persistent, which means doing this procedure inside the {{project_name_gateway_long}} Template (commonly called <code>{{project_name_gateway_template}}</code>) and then restarting the {{project_name_gateway_long}} ProxyVM or using [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs].
+* [[Qubes|{{q_project_name_short}}]] users could also utilize <code>/etc/onion-grater-merger.d/</code> but then <code>/etc/onion-grater-merger.d/</code> must be made persistent, which means doing this procedure inside the {{project_name_gateway_short}} Template (commonly called <code>{{project_name_gateway_template}}</code>) and then restarting the {{project_name_gateway_short}} ProxyVM or using [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs].
 
-Both techniques are more complicated than simply using <code>/usr/local/etc/onion-grater-merger.d/</code>, since it is persistent either way. Further, it even allows multiple {{project_name_gateway_long}} ProxyVMs based on the same {{project_name_gateway_long}} Template; for example, one {{project_name_gateway_long}} ProxyVM extending and relaxing onion-grater's whitelist and the other {{project_name_gateway_long}} ProxyVM having the default onion-grater whitelist which is more restrictive.
+Both techniques are more complicated than simply using <code>/usr/local/etc/onion-grater-merger.d/</code>, since it is persistent either way. Further, it even allows multiple {{project_name_gateway_short}} ProxyVMs based on the same {{project_name_gateway_short}} Template; for example, one {{project_name_gateway_short}} ProxyVM extending and relaxing onion-grater's whitelist and the other {{project_name_gateway_short}} ProxyVM having the default onion-grater whitelist which is more restrictive.
 
 Onion-grater will only evaluate <code>*.yml</code> files.
 
-= {{project_name_long}} connection =
+= {{project_name_short}} connection =
 
-== {{project_name_gateway_long}} ==
-onion-grater listens on {{project_name_long}} internal network interface <ref>
+== {{project_name_gateway_short}} ==
+onion-grater listens on {{project_name_short}} internal network interface <ref>
 https://github.com/{{project_name_short}}/whonix-gw-network-conf/blob/master/lib/systemd/system/onion-grater.service.d/30_cpfpy.conf
-</ref>, port <code>9051</code>, filters (whitelist) incoming control port messages and forwards them to the real Tor Control Port listening on <code>ControlSocket</code> <code>/run/tor/control</code>. onion-grater itself uses cookies authentication to authenticate Tor's control port. The latter is not important, since {{project_name_gateway_long}} only purpose is running Tor, its not a multi user operating system, and if it were compromised, cookie authentication wouldn't be of help anymore either.
+</ref>, port <code>9051</code>, filters (whitelist) incoming control port messages and forwards them to the real Tor Control Port listening on <code>ControlSocket</code> <code>/run/tor/control</code>. onion-grater itself uses cookies authentication to authenticate Tor's control port. The latter is not important, since {{project_name_gateway_short}} only purpose is running Tor, its not a multi user operating system, and if it were compromised, cookie authentication wouldn't be of help anymore either.
 
-== {{project_name_workstation_long}} ==
-{{project_name_long}} sets appropriate environment variables for the controller via unix domain socket <code>TOR_CONTROL_IPC_PATH=/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock</code>, which is the socket Tor Browser uses.
+== {{project_name_workstation_short}} ==
+{{project_name_short}} sets appropriate environment variables for the controller via unix domain socket <code>TOR_CONTROL_IPC_PATH=/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock</code>, which is the socket Tor Browser uses.
 
 This functionality is implemented by the [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor anon-ws-disable-stacked-tor] package. See also [[Dev/anon-ws-disable-stacked-tor]].
 
 = Attack Scenarios =
-Once {{project_name_workstation_long}} has been compromised, the adversary could continuously and/or using a pattern, send whitelisted commands to Tor. At the moment, only {{Code2|NEWNYM}} would be of interest. When the adversary is also an 
+Once {{project_name_workstation_short}} has been compromised, the adversary could continuously and/or using a pattern, send whitelisted commands to Tor. At the moment, only {{Code2|NEWNYM}} would be of interest. When the adversary is also an 
 ISP level adversary, the adversary might be able to see the pattern being produced.
 
 However thinking that an attacker requires access to Tor's Controller to try to deanonymize you is wrong, there are numerous attacks that are possible without needing to extract information and manipulate tor configuration. The attacker can simply download code from any website including his own and begin to run his code. He could also make very unique patterns on the network and through traffic analysis to learn more about the paths the tor client is using.
 
-More worrying is the extended attack surface that allowing commands to be sent from a compromised {{project_name_workstation_long}} to a {{project_name_gateway_long}}, such as an unsafe parsing of commands, daemon C code memory leaks etc.
+More worrying is the extended attack surface that allowing commands to be sent from a compromised {{project_name_workstation_short}} to a {{project_name_gateway_short}}, such as an unsafe parsing of commands, daemon C code memory leaks etc.
 
 Information from this kinda of attacks [https://gitlab.torproject.org/tpo/network-health/metrics/analysis/-/issues/5928 were asked upstream but had no manifestation of interest] ([https://web.archive.org/web/20200922223531/https://trac.torproject.org/projects/tor/ticket/5928 web archive]).
 
@@ -76,20 +76,20 @@ Both real Tor control connection and onion-grater close the connection if comman
 Should Tor authentication fail, this is logged and onion-grater closes client connection.
 
 == Talking to the real Tor Controller ==
-If instead of connecting to onion-grater, you want to talk directly with the Tor Controller, it should be done on the {{project_name_gateway_long}} and using the host <code>127.0.0.1</code>, see [[Tor_Controller#Talking_to_the_real_Tor_Controller|Talking to the real Tor Controller]] for more information.
+If instead of connecting to onion-grater, you want to talk directly with the Tor Controller, it should be done on the {{project_name_gateway_short}} and using the host <code>127.0.0.1</code>, see [[Tor_Controller#Talking_to_the_real_Tor_Controller|Talking to the real Tor Controller]] for more information.
 
 = How to do onion-grater profiles =
-As an exercise, try building a profile for an application already supported by {{project_name_long}}, if you have trouble, you can always learn from the examples available at <code>/usr/share/doc/onion-grater-merger/examples</code> in your {{project_name_gateway_long}}.
+As an exercise, try building a profile for an application already supported by {{project_name_short}}, if you have trouble, you can always learn from the examples available at <code>/usr/share/doc/onion-grater-merger/examples</code> in your {{project_name_gateway_short}}.
 
 == For third-party projects with Tor friendly applications ==
-Please document the controller commands, give hints to the scripts that send Tor commands,  this can greatly increase the chance of your application being included to {{project_name_long}} and used by real users.
+Please document the controller commands, give hints to the scripts that send Tor commands,  this can greatly increase the chance of your application being included to {{project_name_short}} and used by real users.
 
 Make your application handle unexpected replies such as <code>510 Command filtered</code> without crashing, onion-grater is a whitelist filter, not a blacklist, this means that there is a great change the necessary commands your application requires may be filtered if not whitelisted. If your program crashes, that would lead to bad usability.
 
 = Profile format =
-There is no need to explain every directive in details as it is better to read the [https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chroot_local-includes/usr/local/lib/onion-grater#L3 code comments] for more up to date information. The following sections only mentions about differences in directive usage on {{project_name_long}} in comparison with Tails OS.
+There is no need to explain every directive in details as it is better to read the [https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chroot_local-includes/usr/local/lib/onion-grater#L3 code comments] for more up to date information. The following sections only mentions about differences in directive usage on {{project_name_short}} in comparison with Tails OS.
 
-A filter is matched if for each of the relevant qualifiers at least one of the elements match the client, the qualifiers being <code>apparmor-profiles</code>, <code>users</code> and <code>hosts</code>. It is very common for multiple qualifiers to match on {{project_name_long}}, as <code>apparmor-profiles</code> and <code>users</code> can't be set and setting <code>hosts</code> requires user intervention.
+A filter is matched if for each of the relevant qualifiers at least one of the elements match the client, the qualifiers being <code>apparmor-profiles</code>, <code>users</code> and <code>hosts</code>. It is very common for multiple qualifiers to match on {{project_name_short}}, as <code>apparmor-profiles</code> and <code>users</code> can't be set and setting <code>hosts</code> requires user intervention.
 
 == How onion-grater parses files ==
 Parsing stops '''at the first match''', this means that it is not possible to override files by user a name with higher precedence such as <code>50_user.yml</code> over <code>30_whonix.yml</code>, what onion-grater does is sort the files in reverse lexical order, so if <code>50_user.yml</code> matches, it will stop there, else continue to <code>30_whonix.yml</code>.
@@ -100,7 +100,7 @@ We are not using the ''name'' directive because it is optional and the script na
 == apparmor-profiles ==
 For local (loopback) clients.
 
-We can't use  the ''apparmor-profiles'' directive because as per {{project_name_long}} design, the user programs are run on the {{project_name_workstation_long}} and the controller is on the {{project_name_gateway_long}}.
+We can't use  the ''apparmor-profiles'' directive because as per {{project_name_short}} design, the user programs are run on the {{project_name_workstation_short}} and the controller is on the {{project_name_gateway_short}}.
 
 Because of this, we default to:
 <pre>
@@ -111,7 +111,7 @@ Because of this, we default to:
 == users ==
 For local (loopback) clients.
 
-We can't use  the ''users'' directive because as per {{project_name_long}} design, the user programs are run on the {{project_name_workstation_long}} and the controller is on the {{project_name_gateway_long}}.
+We can't use  the ''users'' directive because as per {{project_name_short}} design, the user programs are run on the {{project_name_workstation_short}} and the controller is on the {{project_name_gateway_short}}.
 
 Because of this, we default to:
 <pre>
@@ -122,7 +122,7 @@ Because of this, we default to:
 == hosts ==
 For remote (non-local) clients.
 
-We can use the ''hosts'' directive, but the {{project_name_gateway_long}} doesn't know which of your Multiple {{project_name_workstation_long}} requires the whitelist. 
+We can use the ''hosts'' directive, but the {{project_name_gateway_short}} doesn't know which of your Multiple {{project_name_workstation_short}} requires the whitelist. 
 
 Because of this, we default to:
 <pre>
@@ -130,7 +130,7 @@ Because of this, we default to:
     - '*'
 </pre>
 
-You can optionally change that directive to allow only the IP of your chosen {{project_name_workstation_long}}, therefore you can choose per host the rules you want to be whitelisted.
+You can optionally change that directive to allow only the IP of your chosen {{project_name_workstation_short}}, therefore you can choose per host the rules you want to be whitelisted.
 
 = Application Support =
 Some applications that uses the commands and events whitelisted by default don't need to worry about setting profiles. Some applications might already have profiles for other applications that already cover their usage.
@@ -163,7 +163,7 @@ Some applications that uses the commands and events whitelisted by default don't
 
 * '''Page''': [https://www.kicksecure.com/wiki/Systemcheck systemcheck]
 * '''Profile''': asks onion-grater <code>status/bootstrap-phase</code> <ref>
-Find out what <code>status/bootstrap-phase</code> answers yourself in {{project_name_gateway_long}}.
+Find out what <code>status/bootstrap-phase</code> answers yourself in {{project_name_gateway_short}}.
 {{CodeSelect|code=
 /usr/lib/helper-scripts/tor_bootstrap_check.py 127.0.0.1 9051 1
 }}
@@ -172,7 +172,7 @@ Example answer.
 NOTICE BOOTSTRAP PROGRESS=100 TAG=done SUMMARY="Done"
 }}
 </ref> as well as <code>status/circuit-established</code> <ref>
-Find out what <code>status/circuit-established</code> answers yourself in {{project_name_gateway_long}}.
+Find out what <code>status/circuit-established</code> answers yourself in {{project_name_gateway_short}}.
 {{CodeSelect|code=
 /usr/lib/helper-scripts/tor_circuit_established_check.py 127.0.0.1 9051 1
 }}
@@ -238,16 +238,16 @@ We are [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/bl
 === TorButton issues ===
 Looking for contributor!
 
-* Say hello in the [https://forums.whonix.org/c/development {{project_name_long}} Development Forum].
+* Say hello in the [https://forums.whonix.org/c/development {{project_name_short}} Development Forum].
 ==== Clock skew ====
 In the future, Tor Button will likely also use something like [https://gitlab.torproject.org/legacy/trac/-/issues/3652 <code>GETINFO clockskew</code>]. Tor Browser developer [https://gitlab.torproject.org/legacy/trac/-/issues/8032 rejected] the idea of not adding the statement {{Code2|require no access to Tor's control port}} to Tor Browser's design.
 
-Therefore when onion-grater gets asked <code>GETINFO net/listeners/socks</code>, it lies, and answers <code>250-net/listeners/socks="127.0.0.1:9150"</code>. This makes Tor Button happy and therefore it shows a "Congratulations!" (success) welcome page on its default homepage about:tor and not the failure page, which would confuse users. Since bug [https://gitlab.torproject.org/legacy/trac/-/issues/9224 TorButton about:tor fails when using additional socks listeners] has been fixed by Tor Tor Project, that lie wouldn't be necessary anymore. <font size=-3>We're keeping it, because it is not necessary for Tor Button get a full list of all ports Tor is listening on. If an attacker compromised {{project_name_workstation_long}}, hiding that list has an advantage. The attacker can probe what ports are available to that {{project_name_workstation_long}}, but if the user added extra ports not available to the compromised {{project_name_workstation_long}} (only available to another {{project_name_workstation_long}} listening on another IP), at least those remain secret. (This is a bit theoretical, because a compromised {{project_name_workstation_long}} can spoof its LAN IP and most likely very few users are using ARP spoofing defenses. Should we add ARP spoofing defenses by default at some point, we at least don't have to worry about this point.)</font>
+Therefore when onion-grater gets asked <code>GETINFO net/listeners/socks</code>, it lies, and answers <code>250-net/listeners/socks="127.0.0.1:9150"</code>. This makes Tor Button happy and therefore it shows a "Congratulations!" (success) welcome page on its default homepage about:tor and not the failure page, which would confuse users. Since bug [https://gitlab.torproject.org/legacy/trac/-/issues/9224 TorButton about:tor fails when using additional socks listeners] has been fixed by Tor Tor Project, that lie wouldn't be necessary anymore. <font size=-3>We're keeping it, because it is not necessary for Tor Button get a full list of all ports Tor is listening on. If an attacker compromised {{project_name_workstation_short}}, hiding that list has an advantage. The attacker can probe what ports are available to that {{project_name_workstation_short}}, but if the user added extra ports not available to the compromised {{project_name_workstation_short}} (only available to another {{project_name_workstation_short}} listening on another IP), at least those remain secret. (This is a bit theoretical, because a compromised {{project_name_workstation_short}} can spoof its LAN IP and most likely very few users are using ARP spoofing defenses. Should we add ARP spoofing defenses by default at some point, we at least don't have to worry about this point.)</font>
 
-For further eventual Tor control port access requirements by Tor Button, the configuration file of accepted commands has to be extended. If Tor Button would ever ask for anything which violates {{project_name_long}} design ({{project_name_workstation_long}} has no way of finding out its own external IP address in particular), such as <code>GETINFO address</code>, for example if Tor Button wanted to ensure, that the user is not using its own external IP address, a new lie would have to be added to the onion-grater script. In case many more lies are required, lies should go into the config file as well, for now, hard coding is sufficient.
+For further eventual Tor control port access requirements by Tor Button, the configuration file of accepted commands has to be extended. If Tor Button would ever ask for anything which violates {{project_name_short}} design ({{project_name_workstation_short}} has no way of finding out its own external IP address in particular), such as <code>GETINFO address</code>, for example if Tor Button wanted to ensure, that the user is not using its own external IP address, a new lie would have to be added to the onion-grater script. In case many more lies are required, lies should go into the config file as well, for now, hard coding is sufficient.
 
 ==== Circuit View ====
-TODO: Make Tor Circuit View [[Tor_Browser/Advanced_Users#Tor_Circuit_View|screenshot]] with redacted IPs, fingerprints, locations work with Tor Browser in {{project_name_long}} through filtered Tor control port access (onion-grater). Purpose: do not confuse Tor Browser to fix onion authentication through Tor Browser.
+TODO: Make Tor Circuit View [[Tor_Browser/Advanced_Users#Tor_Circuit_View|screenshot]] with redacted IPs, fingerprints, locations work with Tor Browser in {{project_name_short}} through filtered Tor control port access (onion-grater). Purpose: do not confuse Tor Browser to fix onion authentication through Tor Browser.
 
 '''Regular Expression RegEx'''
 
@@ -552,7 +552,7 @@ https://gitlab.torproject.org/legacy/trac/-/issues/9675
 = Debugging Inspiration =
 
 == onion-grater debug mode ==
-On {{project_name_gateway_long}}.
+On {{project_name_gateway_short}}.
 
 {{Open with root rights|filename=
 /lib/systemd/system/onion-grater.service.d/50_user.conf
@@ -596,7 +596,7 @@ sudo journalctl -f -u onion-grater
 == onion-grater passthrough mode ==
 This disables filtering (allows all commands) and should be used during development only. Because this mode allows everything, we will not be running as a service, but as a command on the terminal, this means that if the program receives and interrupt signal of the machine reboots, it will enable the standard onion-grater service.
 
-On {{project_name_gateway_long}}.
+On {{project_name_gateway_short}}.
 
 {{CodeSelect|code=
 sudo systemctl stop onion-grater
@@ -610,7 +610,7 @@ sudo /usr/lib/onion-grater-merger
 sudo -u onion-grater /usr/lib/onion-grater --listen-interface eth1 --listen-port 9051 --complain
 }}
 
-On {{project_name_workstation_long}}.
+On {{project_name_workstation_short}}.
 
 {{CodeSelect|code=
 tor-ctrl GETINFO status/bootstrap-phase
@@ -619,27 +619,27 @@ tor-ctrl GETINFO status/bootstrap-phase
 Press <code>Enter</code>.
 
 == AppArmor issues ==
-Watch kern.log for eventual iptables log messages, run this on {{project_name_gateway_long}}.
+Watch kern.log for eventual iptables log messages, run this on {{project_name_gateway_short}}.
 
 {{CodeSelect|code=
 sudo apparmor-info
 }}
 
-== Connect to onion-grater from {{project_name_gateway_long}} ==
+== Connect to onion-grater from {{project_name_gateway_short}} ==
 
 To connect to onion-grater from a [[Qubes|{{non_q_project_name_short}}]]-Gateway:
 {{CodeSelect|code=
 tor-ctrl -s 10.152.152.10:9051 GETINFO config-file
 }}
 
-To connect to onion-grater from a [[Qubes|{{q_project_name_long}}]]-Gateway:
+To connect to onion-grater from a [[Qubes|{{q_project_name_short}}]]-Gateway:
 {{CodeSelect|code=
 tor-ctrl -s $(qubesdb-read /qubes-ip):9051 GETINFO config-file
 }}
 
-== Connect to onion-grater from {{project_name_workstation_long}} ==
+== Connect to onion-grater from {{project_name_workstation_short}} ==
 
-On the {{project_name_workstation_long}} you should be able to run without setting the interface:
+On the {{project_name_workstation_short}} you should be able to run without setting the interface:
 
 {{CodeSelect|code=
 tor-ctrl GETINFO address
@@ -650,7 +650,7 @@ Type <code>GETINFO address</code>. <code>Enter</code>. Should reply <code>510 Co
 == tcpdump - Less Important ==
 Only in case of suspected fundamental issues with low level networking.
 
-To see what's being send to onion-grater's port, run this on {{project_name_gateway_long}}.
+To see what's being send to onion-grater's port, run this on {{project_name_gateway_short}}.
 
 [[Qubes|{{non_q_project_name_short}}]]-Gateway:
 
@@ -658,7 +658,7 @@ To see what's being send to onion-grater's port, run this on {{project_name_gate
 sudo tcpdump -i eth1 -l -s0 -w - tcp dst port 9051 | strings
 }}
 
-[[Qubes|{{q_project_name_long}}]]-Gateway: (Note: replace <code>vif18.0</code> with the device found with the command <code>ip route</code>.)
+[[Qubes|{{q_project_name_short}}]]-Gateway: (Note: replace <code>vif18.0</code> with the device found with the command <code>ip route</code>.)
 
 {{CodeSelect|code=
 sudo tcpdump -i vif18.0 -l -s0 -w - tcp dst port 9051 | strings
@@ -682,13 +682,13 @@ sudo tcpdump -i vif18.0 -l -s0 -w - tcp dst port 9051 | strings
 
 <hr>
 
-== onion-grater by Tails forked by {{project_name_long}} ==
+== onion-grater by Tails forked by {{project_name_short}} ==
 [https://github.com/{{project_name_short}}/onion-grater onion-grater] ([https://github.com/{{project_name_short}}/onion-grater/blob/master/usr/lib/onion-grater-merger config folder]) ([https://github.com/{{project_name_short}}/onion-grater/tree/master/usr/share/doc/onion-grater-merger/examples additional onion-grater-<b>merger</b> example profiles]) ([https://phabricator.whonix.org/project/view/72/ issue tracker])
 
 * mostly same as [[#onion-grater by Tails]]
 * different config parsing mechanism
 ** [[Dev/onion-grater/tor-controlport-filter/config|description]]
-** [[Dev/onion-grater/tor-controlport-filter/config#{{project_name_long}}_fork_commits|commits]]
+** [[Dev/onion-grater/tor-controlport-filter/config#{{project_name_short}}_fork_commits|commits]]
 * Debian packaging
 * systemd unit file
 * systemd-notify support - <nowiki>https://mailman.boum.org/pipermail/tails-dev/2017-March/011327.html</nowiki> submitted patch upstream
@@ -721,8 +721,8 @@ https://phabricator.whonix.org/T631
 
 <hr>
 
-== legacy control-port-filter-python by {{project_name_long}} ==
-legacy <nowiki>[https://github.com/{{project_name_short}}/control-port-filter-python control-port-filter-python] ([https://github.com/{{project_name_short}}/control-port-filter-python/blob/master/usr/sbin/cpfpd main script]) [{{project_name_long}} 10 to {{project_name_long}} 13 ([https://github.com/{{project_name_short}}/control-port-filter-python/releases/tag/1.7-1 version 1.7-1]] (last git commit [https://github.com/{{project_name_short}}/control-port-filter-python/commit/99e8395fbafcb7789c7d1b5cbf7410ed65192e9a up to 99e8395fbafcb7789c7d1b5cbf7410ed65192e9a]) ([https://phabricator.whonix.org/tag/control-port-filter-python/ issue tracker]) [deprecated]</nowiki>
+== legacy control-port-filter-python by {{project_name_short}} ==
+legacy <nowiki>[https://github.com/{{project_name_short}}/control-port-filter-python control-port-filter-python] ([https://github.com/{{project_name_short}}/control-port-filter-python/blob/master/usr/sbin/cpfpd main script]) [{{project_name_short}} 10 to {{project_name_short}} 13 ([https://github.com/{{project_name_short}}/control-port-filter-python/releases/tag/1.7-1 version 1.7-1]] (last git commit [https://github.com/{{project_name_short}}/control-port-filter-python/commit/99e8395fbafcb7789c7d1b5cbf7410ed65192e9a up to 99e8395fbafcb7789c7d1b5cbf7410ed65192e9a]) ([https://phabricator.whonix.org/tag/control-port-filter-python/ issue tracker]) [deprecated]</nowiki>
 
 * A fork of (very early) [<nowiki>https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chroot_local-includes/usr/local/sbin/tor-controlport-filter</nowiki> tor-controlport-filter] by Tails. (See above.)
 * Written in python2.7.
@@ -738,17 +738,17 @@ legacy <nowiki>[https://github.com/{{project_name_short}}/control-port-filter-py
 * Injects workstation IP into <code>add_onion</code>. For example will transform from / to:
 ** <code>add_onion new:best port=80,17600</code>
 ** <code>add_onion new:best port=80,10.137.6.41:17600</code>
-* Support subscribing Tor ControlPort events ({{Code2|setevent}}). ({{project_name_long}} 14 and above.) <ref>
+* Support subscribing Tor ControlPort events ({{Code2|setevent}}). ({{project_name_short}} 14 and above.) <ref>
 https://phabricator.whonix.org/T448
 </ref>
 * Complete systemd unit file.
 * Lintian clean {{Code2|/debian}} packaging folder.
-* Will be deprecated when {{project_name_long}} 14 get released.
+* Will be deprecated when {{project_name_short}} 14 get released.
 
 <hr>
 
-== legacy2 control-port-filter by {{project_name_long}} ==
-legacy^2 control-port-filter [up to {{project_name_long}} 9.x] [deprecated]
+== legacy2 control-port-filter by {{project_name_short}} ==
+legacy^2 control-port-filter [up to {{project_name_short}} 9.x] [deprecated]
 
 * Supports parallel connections.
 * Written in bash. ([https://github.com/adrelanos/control-port-filter github]) (archive only)
@@ -761,7 +761,7 @@ legacy^2 control-port-filter [up to {{project_name_long}} 9.x] [deprecated]
 * Does not support subscribing Tor ControlPort events ({{Code2|setevent}}).
 * Complete sysvinit script.
 * Lintian clean {{Code2|/debian}} packaging folder.
-* Deprecated since the release of {{project_name_long}} 10.
+* Deprecated since the release of {{project_name_short}} 10.
 
 = Old method to manage profiles =
 Previously manual instructions. No longer needed. <code>onion-grater-add</code> automates that.
@@ -796,7 +796,7 @@ sudo unlink /usr/local/etc/onion-grater-merger.d/40_onion_authentication.yml
 sudo service onion-grater restart
 }}
 
-= {{project_name_long}} Forum Discussion =
+= {{project_name_short}} Forum Discussion =
 * [https://forums.whonix.org/t/new-tor-controlport-commands-wanted-by-tbb-4-5-and-above new Tor ControlPort commands wanted by TBB 4.5 and above]
 * [https://forums.whonix.org/t/onion-grater-wiki-improvements onion-grater wiki improvements]
 
@@ -806,7 +806,7 @@ Original upstream by Tails:
 * [https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chroot_local-includes/usr/local/lib/onion-grater /config/chroot_local-includes/usr/local/lib/onion-grater]
 * [https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chroot_local-includes/etc/onion-grater.d/onionshare.yml /config/chroot_local-includes/etc/onion-grater.d/onionshare.yml]
 
-Fork by {{project_name_long}}:
+Fork by {{project_name_short}}:
 
 * [https://github.com/Whonix/onion-grater onion-grater]
 * [https://github.com/Whonix/onion-grater/blob/master/usr/lib/onion-grater /usr/lib/onion-grater]
@@ -814,7 +814,7 @@ Fork by {{project_name_long}}:
 * [https://github.com/Whonix/onion-grater/blob/master/lib/systemd/system/onion-grater.service /lib/systemd/system/onion-grater.service]
 * [https://github.com/{{project_name_short}}/onion-grater/tree/master/usr/share/doc/onion-grater-merger/examples /usr/share/doc/onion-grater-merger/examples]
 
-{{project_name_long}} supplementary:
+{{project_name_short}} supplementary:
 
 * [https://github.com/Whonix/whonix-gw-network-conf/blob/master/lib/systemd/system/onion-grater.service.d/30_cpfpy.conf /lib/systemd/system/onion-grater.service.d/30_cpfpy.conf]
 * [https://github.com/Whonix/qubes-whonix/blob/master/lib/systemd/system/onion-grater.service.d/40_qubes.conf /lib/systemd/system/onion-grater.service.d/40_qubes.conf]

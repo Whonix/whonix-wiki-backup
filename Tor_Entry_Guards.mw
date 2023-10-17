@@ -102,7 +102,7 @@ https://forums.whonix.org/t/persistent-tor-entry-guard-relays-can-make-you-track
 <div class="toccolours mw-collapsible mw-collapsed">
 Usefulness currently being discussed here: https://forums.whonix.org/t/tor-entry-guards/14478
 <div class="mw-collapsible-content">
-{{project_name_long}} developer HulaHoop recently approached Tor researcher, Tariq Elahi, to discuss how exposure to malicious guards in multi-Workstation scenarios could be measured. It was discovered that 1 guard/client per internet-connected program (not identity!) is the safest possible configuration. In fact, the probability of a network adversary observing a user's activities is lower than the default scenario, whereby one Tor Entry Guard is relied upon for all applications. This advice is meant to mitigate the damage from end-to-end correlation attacks that occur when simultaneously using malicious Entry guards + Exits and should not be confused with [[Fingerprint#Website_Traffic_Fingerprinting|Website Fingerprinting attacks]].
+{{project_name_short}} developer HulaHoop recently approached Tor researcher, Tariq Elahi, to discuss how exposure to malicious guards in multi-Workstation scenarios could be measured. It was discovered that 1 guard/client per internet-connected program (not identity!) is the safest possible configuration. In fact, the probability of a network adversary observing a user's activities is lower than the default scenario, whereby one Tor Entry Guard is relied upon for all applications. This advice is meant to mitigate the damage from end-to-end correlation attacks that occur when simultaneously using malicious Entry guards + Exits and should not be confused with [[Fingerprint#Website_Traffic_Fingerprinting|Website Fingerprinting attacks]].
 <ref>
 WF means [[Fingerprint#Website_Traffic_Fingerprinting|Website Fingerprinting]].
 
@@ -127,13 +127,13 @@ Tariq
 
 To apply this Increase Protection from Malicious Entry Guards configuration, follow these steps:
 
-# Import a {{project_name_gateway_long}} into the hypervisor that has never been started.
+# Import a {{project_name_gateway_short}} into the hypervisor that has never been started.
 # Take a snapshot and name it "Original".
-# Start {{project_name_gateway_long}} and wait for Tor to finish bootstrapping (connecting).
-# After Tor has connected, shutdown {{project_name_gateway_long}} and take another snapshot - the naming convention should match the intended activity, such as "Email".
+# Start {{project_name_gateway_short}} and wait for Tor to finish bootstrapping (connecting).
+# After Tor has connected, shutdown {{project_name_gateway_short}} and take another snapshot - the naming convention should match the intended activity, such as "Email".
 # This snapshot should be used with <u>all</u> {{project_name_workstation_long}} snapshots related to/called "Email", whether it is identity "John Doe", "Jane Doe" and so on. Note the Workstations should also be generated separately from a clean baseline.
 
-When a separate activity is required such as IRC, users should revert to the {{project_name_gateway_long}} snapshot (labelled "Original"), then repeat the same steps. That is, allow it to boot and connect to Tor, shut it down, then take a snapshot entitled "IRC". Note that if a webpage IRC chat client is used, then this should be done from "Browsing" snapshot.
+When a separate activity is required such as IRC, users should revert to the {{project_name_gateway_short}} snapshot (labelled "Original"), then repeat the same steps. That is, allow it to boot and connect to Tor, shut it down, then take a snapshot entitled "IRC". Note that if a webpage IRC chat client is used, then this should be done from "Browsing" snapshot.
 
 If you need to run multiple applications at the same time, then consider cloning the VMs.
 <ref>
@@ -195,22 +195,22 @@ https://lists.torproject.org/pipermail/tor-dev/2016-November/011636.html
 
 = Manual Rotation of Tor Guards =
 
-Creating a new {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) will ''likely'' lead to a new set of Tor entry guards, which is [https://blog.torproject.org/improving-tors-anonymity-changing-guard-parameters proven to degrade anonymity].
+Creating a new {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) will ''likely'' lead to a new set of Tor entry guards, which is [https://blog.torproject.org/improving-tors-anonymity-changing-guard-parameters proven to degrade anonymity].
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    ='''Warning:''' Users considering using disposable {{project_name_gateway_long}} ProxyVMs in Qubes R4 are [[Qubes/Disposables#Warnings|warned]] that this technique severely degrades anonymity; <u>new Tor guards are created during each distinct {{project_name_long}} session.</u>
+| text    ='''Warning:''' Users considering using disposable {{project_name_gateway_short}} ProxyVMs in Qubes R4 are [[Qubes/Disposables#Warnings|warned]] that this technique severely degrades anonymity; <u>new Tor guards are created during each distinct {{project_name_short}} session.</u>
 }}
 
 == Anonymity and Performance-related Issues ==
 
-Users may be tempted to create a new {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) in the following circumstances:
+Users may be tempted to create a new {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) in the following circumstances:
 
 * Bootstrapping is slow or regularly fails.
 * Tor logs show warnings suggestive of route manipulation attacks or other oddities.
-* System logs reveal attempted attacks on {{project_name_long}} or Tor processes, for example in AppArmor logs.
+* System logs reveal attempted attacks on {{project_name_short}} or Tor processes, for example in AppArmor logs.
 * Current Tor performance is very slow or unreliable due to collapsing circuits or other factors.
-* The user is concerned about the amount of Tor data that could be revealed if {{project_name_gateway_long}} is infected, particularly after a long period of use.
+* The user is concerned about the amount of Tor data that could be revealed if {{project_name_gateway_short}} is infected, particularly after a long period of use.
 
 == Manual Guard Rotation Threats ==
 
@@ -233,7 +233,7 @@ If users feel compelled in their circumstances to proceed despite the anonymity 
 * One of the fallback primary entry guards.
 * A configured [[Bridges|bridge]].
 * Chaining other [[Tunnels/Introduction|tunnels]] with Tor.
-* Creating a fresh {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) and [[#Copy_Tor_Configuration_files_and_Settings_to_Another_{{project_name_gateway_vm}}_Instance|copying across the Tor state file]].
+* Creating a fresh {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) and [[#Copy_Tor_Configuration_files_and_Settings_to_Another_{{project_name_gateway_vm}}_Instance|copying across the Tor state file]].
 
 The safest decision is to persist with poor performance and wait for normal guard rotation.
 
@@ -241,18 +241,18 @@ The safest decision is to persist with poor performance and wait for normal guar
 
 <u>Note:</u> Weigh the fingerprinting risks outlined earlier before proceeding. In most cases the decision to not rotate guards (even temporarily) is the correct one.
 
-If guard fingerprinting across different locations is a legitimate concern, there are several ways to mitigate the threat. Viable options include: bridges, temporarily rotating guards or cloning {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) with new guards.
+If guard fingerprinting across different locations is a legitimate concern, there are several ways to mitigate the threat. Viable options include: bridges, temporarily rotating guards or cloning {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) with new guards.
 
-== Clone {{project_name_gateway_long}} ({{project_name_gateway_vm}}) with New Entry Guards ==
+== Clone {{project_name_gateway_short}} ({{project_name_gateway_vm}}) with New Entry Guards ==
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    ='''Warning:''' Do not clone the {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) with new guards at your home address. If the Tor client connects through the home network, the new guards might be correlated to the home address.
+| text    ='''Warning:''' Do not clone the {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) with new guards at your home address. If the Tor client connects through the home network, the new guards might be correlated to the home address.
 }}
 
-It is possible to clone the current {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) and regenerate the Tor state file. Once the VM is cloned, it is important that the original is not unintentionally used for any anonymous activities. To negate this threat, disable networking in the original {{project_name_gateway_long}} until returning home.
+It is possible to clone the current {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) and regenerate the Tor state file. Once the VM is cloned, it is important that the original is not unintentionally used for any anonymous activities. To negate this threat, disable networking in the original {{project_name_gateway_short}} until returning home.
 
-Create a {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) clone and name it {{project_name_gateway_long}}-temp (<code>{{project_name_gateway_vm}}-temp</code>):
+Create a {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) clone and name it {{project_name_gateway_short}}-temp (<code>{{project_name_gateway_vm}}-temp</code>):
 
 # <u>VirtualBox:</u> follow [https://dirkstrauss.com/clone-virtualbox-vm/ these instructions] to create a VM snapshot. <br /> <u>{{q_project_name_long}}:</u> In Qube Manager, <code>Right-click on {{project_name_gateway_vm}}</code> &rarr; <code>Clone qube</code>
 # [[#Fresh_Tor_Entry_Guards_by_Regenerating_the_Tor_State_File|Regenerate the Tor State File]].
@@ -265,7 +265,7 @@ Create a {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>
 | text    = [[Qubes|{{non_q_project_name_short}}]] only.
 }}
 
-Before arriving at the remote location, the {{project_name_gateway_long}} Tor state folder is moved to the <code>$HOME</code> directory and the Tor state file is regenerated. Perform all the following steps in {{project_name_gateway_long}} konsole.
+Before arriving at the remote location, the {{project_name_gateway_short}} Tor state folder is moved to the <code>$HOME</code> directory and the Tor state file is regenerated. Perform all the following steps in {{project_name_gateway_short}} konsole.
 {{Box|text=
 '''1.''' Stop Tor.
 
@@ -317,7 +317,7 @@ If [[Bridges|Bridges]] are already configured, alternate bridges are recommended
 
 Wording clarification: There is no such thing as "Alternating-Bridges". It's not it's own word. It means "a bridge to alternate". As in "use different bridges".
 
-Complete the following steps in {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>).
+Complete the following steps in {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>).
 {{Box|text=
 '''1.''' {{Disable_Tor}}
 
@@ -335,14 +335,14 @@ Complete the following steps in {{project_name_gateway_long}} (<code>{{project_n
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = [[Qubes|{{q_project_name_long}}]] only.
+| text    = [[Qubes|{{q_project_name_short}}]] only.
 }}
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    ='''Warning:''' Carefully follow these instructions to avoid unforeseen consequences. <ref>If an alternative command is used to remove the Tor state folder, this can result in broken file persistence across reboots. This relates to the [[Qubes|{{q_project_name_long}}]] design, which uses <code>bind-dirs</code> file persistence for the Tor folder and other select directories. At the very least, users would need to mount and then unmount the Tor folder in the same way as <code>bind-dirs</code> does. This is likely a complicated and time-consuming task.</ref>
+| text    ='''Warning:''' Carefully follow these instructions to avoid unforeseen consequences. <ref>If an alternative command is used to remove the Tor state folder, this can result in broken file persistence across reboots. This relates to the [[Qubes|{{q_project_name_short}}]] design, which uses <code>bind-dirs</code> file persistence for the Tor folder and other select directories. At the very least, users would need to mount and then unmount the Tor folder in the same way as <code>bind-dirs</code> does. This is likely a complicated and time-consuming task.</ref>
 }}
 
-In some circumstances [[Qubes|{{q_project_name_long}}]] users might want to copy the Tor state and custom configuration options from an existing <code>{{project_name_gateway_vm}}</code> ProxyVM to another <code>{{project_name_gateway_vm}}</code> instance. For example, this is useful for testing later {{project_name_long}} releases without aiding deanonymization attempts by advanced adversaries <ref>As the same Tor entry guard is used.</ref> or when creating an identical backup that does not share any other persistent data, except for Tor state and custom torrc options.
+In some circumstances [[Qubes|{{q_project_name_short}}]] users might want to copy the Tor state and custom configuration options from an existing <code>{{project_name_gateway_vm}}</code> ProxyVM to another <code>{{project_name_gateway_vm}}</code> instance. For example, this is useful for testing later {{project_name_short}} releases without aiding deanonymization attempts by advanced adversaries <ref>As the same Tor entry guard is used.</ref> or when creating an identical backup that does not share any other persistent data, except for Tor state and custom torrc options.
 
 === Copy Tor State Files to Another {{project_name_gateway_vm}} Instance ===
 
@@ -426,7 +426,7 @@ whonixcheck
 
 These instructions copy custom Tor configuration options (torrc) from <code>{{project_name_gateway_vm}}-old</code> to <code>{{project_name_gateway_vm}}-new</code>.
 {{Box|text=
-'''1.'''  In <code>{{project_name_gateway_vm}}-old</code>, copy the <i>torrc</i> options across to <code>{{project_name_gateway_vm}}-new</code>. <ref>Note: From {{project_name_long}} 14 onward, all unique Tor configurations (torrc) options must be stored in <code>/usr/local/etc/torrc.d/50_user.conf</code> and nowhere else.</ref>
+'''1.'''  In <code>{{project_name_gateway_vm}}-old</code>, copy the <i>torrc</i> options across to <code>{{project_name_gateway_vm}}-new</code>. <ref>Note: From {{project_name_short}} 14 onward, all unique Tor configurations (torrc) options must be stored in <code>/usr/local/etc/torrc.d/50_user.conf</code> and nowhere else.</ref>
 
 {{CodeSelect|code=
 qvm-copy /usr/local/etc/torrc.d/50_user.conf {{project_name_gateway_vm}}-new
@@ -492,7 +492,7 @@ tor-ctrl DROPGUARDS
 </ref>
 
 {{Box|text=
-Complete the following steps in {{project_name_gateway_long}} ([[Qubes|{{q_project_name_long}}]]: <code>{{project_name_gateway_vm}}</code>).
+Complete the following steps in {{project_name_gateway_short}} ([[Qubes|{{q_project_name_short}}]]: <code>{{project_name_gateway_vm}}</code>).
 
 '''1.''' {{Disable_Tor}}
 
@@ -515,7 +515,7 @@ Some users might consider configuring non-persistent entry guards so they consta
 To proceed in spite of the warning, press on Expand on the right.
 <div class="mw-collapsible-content">
 {{Box|text=
-Complete these steps in {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>).
+Complete these steps in {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>).
 
 '''1.''' {{Disable_Tor}}
 
@@ -542,7 +542,7 @@ Save.
 
 = Notes =
 
-The proposed Tails solutions towards AdvGoalTracking have disadvantages <ref>https://gitlab.tails.boum.org/tails/blueprints/-/wikis/persistent_Tor_state/</ref> <ref>https://blog.torproject.org/tor-weekly-news-june-17th-2015/#A_persistent_Tor_state_for_Tails</ref> and are not suitable options for {{project_name_long}}. The reason is {{project_name_long}} does not connect directly to a user's internet LAN, so trying to remember a network based on its SSID will not work. Unlike wireless access points, physical or virtual wired networks lack SSIDs and cannot be "remembered" that way.
+The proposed Tails solutions towards AdvGoalTracking have disadvantages <ref>https://gitlab.tails.boum.org/tails/blueprints/-/wikis/persistent_Tor_state/</ref> <ref>https://blog.torproject.org/tor-weekly-news-june-17th-2015/#A_persistent_Tor_state_for_Tails</ref> and are not suitable options for {{project_name_short}}. The reason is {{project_name_short}} does not connect directly to a user's internet LAN, so trying to remember a network based on its SSID will not work. Unlike wireless access points, physical or virtual wired networks lack SSIDs and cannot be "remembered" that way.
 
 Even if it were possible, it is best to avoid letting adversaries influence guard changes in any way. Spoofing MAC addresses or SSIDs would trigger the use of the alternative entry guard recorded for another "location profile". Global networks also have generic characteristics that cannot be differentiated from the point of view of a connecting device, resulting in the same guards being used on different networks.
 

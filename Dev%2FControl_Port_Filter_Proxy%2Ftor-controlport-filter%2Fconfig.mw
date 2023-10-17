@@ -10,13 +10,13 @@ __TOC__
 ==== Use Case ====
 {{project_name_long}} by default needs to ship some default config so {{project_name_long}} deployed in its default setup will work out of the box. <code>30_whonix.conf</code>
 
-Now, sometimes users want to modify the config that {{project_name_long}} is provided by default. Either by the user changing the setting themselves or by installing some package that changes the config.
+Now, sometimes users want to modify the config that {{project_name_short}} is provided by default. Either by the user changing the setting themselves or by installing some package that changes the config.
 
-The problem is, we really don't want users to modify <code>30_whonix.conf</code>. This is because, next time {{project_name_long}} is updated, we might need to modify <code>30_whonix.conf</code>. If both, the user and {{project_name_long}} wants to modify that file, it won't work. apt/dpkg will throw an interactive conflict resolution dialog, asking the user to keep its user modified version or the new {{project_name_long}} version or to manually merge these changes. This usually confuses users. If they keep their old file, something might not work. If they install the new config by {{project_name_long}}, they loose their settings. And merging the files is difficult during upgrading for users. Also it makes the upgrade process interactive rather than easy non-interactive.
+The problem is, we really don't want users to modify <code>30_whonix.conf</code>. This is because, next time {{project_name_short}} is updated, we might need to modify <code>30_whonix.conf</code>. If both, the user and {{project_name_short}} wants to modify that file, it won't work. apt/dpkg will throw an interactive conflict resolution dialog, asking the user to keep its user modified version or the new {{project_name_short}} version or to manually merge these changes. This usually confuses users. If they keep their old file, something might not work. If they install the new config by {{project_name_short}}, they loose their settings. And merging the files is difficult during upgrading for users. Also it makes the upgrade process interactive rather than easy non-interactive.
 
-Also other packages who want to extend onion-grater config must not modify <code>30_whonix.conf</code>. dpkg does not allow another package to modify an existing file on the system. (without hacks such as dpkg-divert which should be avoided due to issues) And some echo/sed style replacement by the new package would also throw an interactive dpkg confict resolution dialog when {{project_name_long}} is updated. echo/sed style config file modifications are a Debian policy violation as well.
+Also other packages who want to extend onion-grater config must not modify <code>30_whonix.conf</code>. dpkg does not allow another package to modify an existing file on the system. (without hacks such as dpkg-divert which should be avoided due to issues) And some echo/sed style replacement by the new package would also throw an interactive dpkg confict resolution dialog when {{project_name_short}} is updated. echo/sed style config file modifications are a Debian policy violation as well.
 
-{{project_name_long}} will ship by default a locked down config. Opening as little attack surface as possible. If users want to use other functions such as [[OnionShare]] they need to compromise security. They need to allow additional Tor control protocol commands so their application such as OnionShare can work.
+{{project_name_short}} will ship by default a locked down config. Opening as little attack surface as possible. If users want to use other functions such as [[OnionShare]] they need to compromise security. They need to allow additional Tor control protocol commands so their application such as OnionShare can work.
 
 ----
 
@@ -39,7 +39,7 @@ done
 
 * For <code>/etc/onion-grater-merger.d</code> configuration drop-in folder which is configuration language wise complicated enough, best we can do is merging all config files.
 ** This means, higher priority config files will probably not be able to disable settings my lower priority config files. However, that should not matter. At the moment there is no use case where this would be useful.
-** While <code>30_whonix.conf</code> comes by default, {{project_name_long}} user documentation will explain how to get [[OnionShare]], ricochet etc. to work.
+** While <code>30_whonix.conf</code> comes by default, {{project_name_short}} user documentation will explain how to get [[OnionShare]], ricochet etc. to work.
 ** For OnionShare for example we can just say symlink <code>/usr/share/doc/onion-grater-merger/examples/40_onionshare.yml</code> to <code>/usr/local/etc/onion-grater-merger.d/</code>.
 *** {{CodeSelect|code=
 sudo ln -s /usr/share/doc/onion-grater-merger/examples/40_onionshare.yml /usr/local/etc/onion-grater-merger.d/
@@ -51,7 +51,7 @@ sudo ln -s /usr/share/doc/onion-grater-merger/examples/40_onionshare.yml /usr/lo
 ----
 
 ==== How ====
-onion-grater in {{project_name_long}} cannot filter per application. {{project_name_gateway_long}} does not have access to the program name it is talking to it. Therefore onion-grater in {{project_name_long}} can only have one global whitelist. However, that global whitelist can be split into multiple files.
+onion-grater in {{project_name_short}} cannot filter per application. {{project_name_gateway_long}} does not have access to the program name it is talking to it. Therefore onion-grater in {{project_name_short}} can only have one global whitelist. However, that global whitelist can be split into multiple files.
 
 Configuration drop-in snippets are processes in lexical order.
 
@@ -77,14 +77,14 @@ done
 ----
 
 ==== match-exe-paths ====
-{{project_name_long}} is currently using the following.
+{{project_name_short}} is currently using the following.
 
 <pre>
  match-exe-paths:
    - '*'
 </pre>
 
-This is because that information gets lost during the workstation &rarr; gateway transfer. Hard to have it both ways at the same time. One one hand, fine tuned restricted application white lists (which are great). And at the same time at the other hand the {{project_name_long}} workstation &rarr; gateway split model.
+This is because that information gets lost during the workstation &rarr; gateway transfer. Hard to have it both ways at the same time. One one hand, fine tuned restricted application white lists (which are great). And at the same time at the other hand the {{project_name_short}} workstation &rarr; gateway split model.
 
 ----
 
@@ -99,14 +99,14 @@ Same as above.
 ----
 
 ==== match-hosts ====
-{{project_name_long}} is currently using the following.
+{{project_name_short}} is currently using the following.
 
 <pre>
   match-hosts:
     - '*'
 </pre>
 
-Using something other than <code>*</code> is not possible in {{project_name_long}}. <ref>
+Using something other than <code>*</code> is not possible in {{project_name_short}}. <ref>
 More fine tuned control however would be desirable. A user using multiple {{project_name_workstation_long}} could configure the "default" match host <code>*</code> for Tor Browser / whonixcheck. And then configure another workstation (with IP <code>10.152.152.12</code> with <code>match-hosts '10.152.152.12'</code>.
 </ref>
 
@@ -186,7 +186,7 @@ But in case of #5, what we do with "replacement"s value depends on the value of 
 ----
 
 ==== yml config file merging ====
-Perhaps the following will become {{project_name_long}} minimal config file. It white lists everything required by Tor Browser and whonixcheck. Perhaps we name it [https://github.com/{{project_name_short}}/onion-grater/blob/master/etc/onion-grater-merger.d/30_whonix.yml <code>30_whonix.conf</code>].
+Perhaps the following will become {{project_name_short}} minimal config file. It white lists everything required by Tor Browser and whonixcheck. Perhaps we name it [https://github.com/{{project_name_short}}/onion-grater/blob/master/etc/onion-grater-merger.d/30_whonix.yml <code>30_whonix.conf</code>].
 
 {{CodeSelect|code=
 ---
@@ -302,7 +302,7 @@ Now, ideally, once onion-grater start it would read both (or any number) config 
 
 ----
 
-==== {{project_name_long}} 14 onionshare example log ====
+==== {{project_name_short}} 14 onionshare example log ====
 Using these two config files:
 
 * [https://github.com/{{project_name_short}}/onion-grater/blob/master/etc/onion-grater-merger.d/30_whonix.yml <code>30_whonix.conf</code>]

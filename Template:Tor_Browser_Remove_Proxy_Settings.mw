@@ -16,7 +16,7 @@ If these settings are changed, Tor Button would previously show a red sign and s
 
 This method works for removal of proxy settings but is rather lengthy and complicated. In case the user wants to have a look anyhow, please press on Expand on the right.
 <div class="mw-collapsible-content">
-Since other methods to configure Tor Browser to use system default networking are broken due to Tor Browser changes by upstream, this new local socks proxy method stops [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]] local port <code>9150</code> redirection to {{project_name_gateway_long}} <code>9150</code> (where a Tor <code>SocksPort</code> is listening). As a replacement, a local socks proxy listens on {{project_name_workstation_long}} local port <code>9150</code> which then forwards the traffic using system default networking. In result, if the user is using a VPN inside {{project_name_workstation_long}} or in a VPN-Gateway wretched between {{project_name_gateway_long}} and {{project_name_workstation_long}}, Tor Browser would use the VPN.
+Since other methods to configure Tor Browser to use system default networking are broken due to Tor Browser changes by upstream, this new local socks proxy method stops [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]] local port <code>9150</code> redirection to {{project_name_gateway_long}} <code>9150</code> (where a Tor <code>SocksPort</code> is listening). As a replacement, a local socks proxy listens on {{project_name_workstation_short}} local port <code>9150</code> which then forwards the traffic using system default networking. In result, if the user is using a VPN inside {{project_name_workstation_short}} or in a VPN-Gateway wretched between {{project_name_gateway_long}} and {{project_name_workstation_short}}, Tor Browser would use the VPN.
 
 In this documentation, Dante is used as a local socks proxy. Development notes are kept on [[Dev/Dante]].
 
@@ -32,7 +32,7 @@ A few settings need to be undone.
 
 '''2.''' Stop default anon-ws-disable-stacked-tor service for port 9150.
 
-* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Non-Qubes-Whonix: In {{project_name_workstation_short}}.
 * Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> <u>Template</u>.
 
 {{CodeSelect|code=
@@ -44,7 +44,7 @@ sudo systemctl stop anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-sta
 
 '''3.''' Prevent default anon-ws-disable-stacked-tor systemd unit from starting.
 
-* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Non-Qubes-Whonix: In {{project_name_workstation_short}}.
 * Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 {{CodeSelect|code=
@@ -56,7 +56,7 @@ sudo systemctl mask anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-sta
 
 '''4.''' Install the local socks proxy server.
 
-* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Non-Qubes-Whonix: In {{project_name_workstation_short}}.
 * Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 {{box|text=
@@ -96,7 +96,8 @@ apt-get source dante-server
 mousepad ~/dante-1.4.2+dfsg/sockd/accesscheck.c
 }}
 
-Paste the contents.
+Paste the contents. Here we rewrite the authentication method to always return true.
+For the reasons see [[Dev/Dante]].
 
 {{CodeSelect|code=
 /*
@@ -344,6 +345,13 @@ popd
 sudo dpkg -i dante-server_1.4.2+dfsg-7_amd64.deb
 }}
 
+'''G)''' Block updates of dante-server.
+
+{{CodeSelect|code=
+sudo apt-mark hold dante-server
+}}
+
+
 }}
 
 '''5.''' {{Open with root rights|filename=
@@ -352,13 +360,13 @@ sudo dpkg -i dante-server_1.4.2+dfsg-7_amd64.deb
 
 '''6.''' Local socks proxy configuration.
 
-* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Non-Qubes-Whonix: In {{project_name_workstation_short}}.
 * Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 Delete all contents from the file and <u>replace</u> it with the following configuration.
 
 {{CodeSelect|code=
-debug: 1
+debug: 0
 
 logoutput: stderr
 
@@ -372,10 +380,12 @@ user.privileged: root
 user.notprivileged: root
 user.libwrap: root
 
+# allow connections only from localhost
 client pass {
-        from: 0.0.0.0/0 port 1-65535 to: 0.0.0.0/0
-        log: connect disconnect error
+        from: 127.0.0.1/8 port 1-65535 to: 0.0.0.0/0
+        log: connect disconnect error # comment on some logs if you don't want to keep them
 }
+
 socks pass {
         from: 0.0.0.0/0 to: 0.0.0.0/0
         command: bind connect udpassociate
@@ -387,7 +397,7 @@ socks pass {
 
 This is to apply the changed configuration and to test if the configuration is valid.
 
-* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Non-Qubes-Whonix: In {{project_name_workstation_short}}.
 * Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 {{CodeSelect|code=
@@ -396,7 +406,7 @@ sudo systemctl restart danted.service
 
 '''8.''' tb-starter Configuration
 
-* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
+* Non-Qubes-Whonix: In {{project_name_workstation_short}}.
 * Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 Stop Tor from using unix domain socket files for socks so it uses socks on IP 127.0.0.1 port 9150 instead.
@@ -420,8 +430,8 @@ Save and exit.
 
 '''10.''' Start Tor Browser.
 
-* Non-Qubes-Whonix: In {{project_name_workstation_long}}.
-* Qubes-Whonix: In <code>{{project_name_workstation_long}}</code> <u>App Qube</u>.
+* Non-Qubes-Whonix: In {{project_name_workstation_short}}.
+* Qubes-Whonix: In <code>{{project_name_workstation_short}}</code> <u>App Qube</u>.
 
 {{CodeSelect|code=
 torbrowser
@@ -486,8 +496,8 @@ This step is required since Tor Browser 10. <ref>
 
 '''1.''' Platform specific notice.
 
-* [[{{Non q project name short}}|{{non_q_project_name_long}}]]: No platform specific notice.
-* [[Qubes|{{q_project_name_long}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
+* [[{{Non q project name short}}|{{non_q_project_name_short}}]]: No platform specific notice.
+* [[Qubes|{{q_project_name_short}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
 
 '''2.''' Tor Browser &rarr; URL bar &rarr; Type: <code>about:config</code> &rarr; Press <code>Enter</code> key. &rarr; search for and modify
 
@@ -503,8 +513,8 @@ Reverting this change is [[Unsupported|undocumented]]. Simply unsetting that env
 
 '''1.''' Platform specific notice:
 
-* [[{{Non q project name short}}|{{non_q_project_name_long}}]]: No platform specific notice.
-* [[Qubes|{{q_project_name_long}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
+* [[{{Non q project name short}}|{{non_q_project_name_short}}]]: No platform specific notice.
+* [[Qubes|{{q_project_name_short}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
 
 '''2.''' Navigate to the Tor Browser folder.
 
@@ -527,8 +537,8 @@ This only applies to a single instance of the Tor Browser folder that is configu
 
 '''1.''' Platform specific notice:
 
-* [[{{Non q project name short}}|{{non_q_project_name_long}}]]: No platform specific notice.
-* [[Qubes|{{q_project_name_long}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
+* [[{{Non q project name short}}|{{non_q_project_name_short}}]]: No platform specific notice.
+* [[Qubes|{{q_project_name_short}}]]: In App Qube. (<code>{{project_name_workstation_vm}}</code>)
 
 '''2.''' Find and open {{Code|start-tor-browser}} in the Tor Browser folder with an editor.
 
@@ -551,9 +561,9 @@ export TOR_TRANSPROXY=1
 {{Anchor|Forget about Tor Button's Open Network Settings}}
 '''Ignore Tor Button's Open Network Settings'''
 
-{{project_name_long}} has disabled the <code>Open Network Settings...</code> menu option in Tor Button. Read the footnote for further information. <ref>The regular Tor Browser Bundle from The Tor Project (without {{project_name_long}}) allows networking settings to changed inside Tor via the <code>Open Network Settings</code> menu option. It has the same effect as editing Tor's config file torrc. In {{project_name_long}}, the environment variable <code>export TOR_NO_DISPLAY_NETWORK_SETTINGS=1</code> has been [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh set] to disable the <code>Tor Browser</code> &rarr; <code>Open Network Settings...</code> menu item. It is not useful and confusing to have in the {{project_name_workstation_long}} because:
-* In {{project_name_long}}, there is only limited access to Tor's control port (see [[Dev/onion-grater|onion-grater, a Tor Control Port Filter Proxy, design documentation]] for more information).
-* For security reasons, Tor must be manually configured in <i>/usr/local/etc/torrc.d/50_user.conf</i> on {{project_name_gateway_long}}, and not from {{project_name_workstation_long}} (see [[Features#Tunnel_Support|VPN/Tunnel support]] for more information).
+{{project_name_short}} has disabled the <code>Open Network Settings...</code> menu option in Tor Button. Read the footnote for further information. <ref>The regular Tor Browser Bundle from The Tor Project (without {{project_name_short}}) allows networking settings to changed inside Tor via the <code>Open Network Settings</code> menu option. It has the same effect as editing Tor's config file torrc. In {{project_name_short}}, the environment variable <code>export TOR_NO_DISPLAY_NETWORK_SETTINGS=1</code> has been [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/torbrowser.sh set] to disable the <code>Tor Browser</code> &rarr; <code>Open Network Settings...</code> menu item. It is not useful and confusing to have in the {{project_name_workstation_short}} because:
+* In {{project_name_short}}, there is only limited access to Tor's control port (see [[Dev/onion-grater|onion-grater, a Tor Control Port Filter Proxy, design documentation]] for more information).
+* For security reasons, Tor must be manually configured in <i>/usr/local/etc/torrc.d/50_user.conf</i> on {{project_name_gateway_short}}, and not from {{project_name_workstation_short}} (see [[Features#Tunnel_Support|VPN/Tunnel support]] for more information).
 </ref>
 }}
 <noinclude>

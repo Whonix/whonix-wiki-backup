@@ -169,7 +169,7 @@ https://blog.patternsinthevoid.net/cve-2016-5696-and-its-effects-on-tor.html
 <div class="toccolours mw-collapsible mw-collapsed">
 '''5.''' Application-level mitigation.
 <div class="mw-collapsible-content">
-For application-level leak mitigation, avoid sending any clearnet traffic. Without clock information leaking from the host, network adversaries do not have non-anonymous timestamp sources to match this data with, even if software on {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>) misbehaves.
+For application-level leak mitigation, avoid sending any clearnet traffic. Without clock information leaking from the host, network adversaries do not have non-anonymous timestamp sources to match this data with, even if software on {{project_name_workstation_short}} (<code>{{project_name_workstation_vm}}</code>) misbehaves.
 </div>
 </div>
 }}
@@ -178,11 +178,11 @@ For application-level leak mitigation, avoid sending any clearnet traffic. Witho
 
 == {{project_name_long}} Solutions and Limitations ==
 
-{{project_name_long}} has implemented [[sdwdate]] as a secure time synchronization mechanism to replace NTP. <ref>https://github.com/{{project_name_short}}/sdwdate</ref> sdwdate-gui <ref>https://github.com/{{project_name_short}}/sdwdate-gui</ref> is the GUI front-end. sdwdate was written with safety in mind and to avoid the many security pitfalls in NTP. Furthermore, NTP is UDP-based and cannot work over Tor, and onion services must have an accurate clock to be reachable.
+{{project_name_short}} has implemented [[sdwdate]] as a secure time synchronization mechanism to replace NTP. <ref>https://github.com/{{project_name_short}}/sdwdate</ref> sdwdate-gui <ref>https://github.com/{{project_name_short}}/sdwdate-gui</ref> is the GUI front-end. sdwdate was written with safety in mind and to avoid the many security pitfalls in NTP. Furthermore, NTP is UDP-based and cannot work over Tor, and onion services must have an accurate clock to be reachable.
 
 sdwdate fetches its time exclusively from reputable sources -- whistle-blowing and privacy-friendly onion sites -- that are very likely to be hosted on different hardware. sdwdate also benefits from the security of Tor's end-to-end encryption.
 
-sdwdate can only protect against passive timestamp linkage of data leaking from both the host and {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>). It cannot defend against a skilled adversary that is able to compromise {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>). Via a [[Dev/TimeSync#Clock_Correlation_Attack|clock correlation attack]], the adversary would discover the host clock when the VM is rebooted, and then link the time readings with any host clock leaks. The only way to prevent this and similar attacks is to stop the leaks in the first place.
+sdwdate can only protect against passive timestamp linkage of data leaking from both the host and {{project_name_workstation_short}} (<code>{{project_name_workstation_vm}}</code>). It cannot defend against a skilled adversary that is able to compromise {{project_name_workstation_short}} (<code>{{project_name_workstation_vm}}</code>). Via a [[Dev/TimeSync#Clock_Correlation_Attack|clock correlation attack]], the adversary would discover the host clock when the VM is rebooted, and then link the time readings with any host clock leaks. The only way to prevent this and similar attacks is to stop the leaks in the first place.
 
 In the unlikely event that [[Sdwdate|sdwdate]] fails to properly randomize the system clock, it is possible to manually set a random value, see: [[Boot_Clock_Randomization#Manual_Boot_Clock_Randomization|Manual Boot Clock Randomization]].
 

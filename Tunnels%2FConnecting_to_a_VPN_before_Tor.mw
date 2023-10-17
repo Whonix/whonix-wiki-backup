@@ -22,9 +22,9 @@ Whonix does not "need" a VPN. However, users have the option to use Whonix with 
 == Introduction ==
 
 * [[Qubes|{{q_project_name_long}}]] users have the option to use a [[#Separate VPN-Gateway]] but could also install the VPN software [[#Inside {{project_name_gateway_long}}]].
-* [[Qubes|{{non_q_project_name_short}}]] users could install the VPN software [[#On the Host]] or [[#Inside {{project_name_gateway_long}}]].
+* [[Qubes|{{non_q_project_name_short}}]] users could install the VPN software [[#On the Host]] or [[#Inside {{project_name_gateway_short}}]].
 
-What's the difference of installing a VPN on the host versus installing on {{project_name_gateway_long}}?
+What's the difference of installing a VPN on the host versus installing on {{project_name_gateway_short}}?
 
 {{VPN on the host vs on Project-Gateway}}
 
@@ -38,9 +38,9 @@ https://github.com/leapcode/bitmask_client/issues/1009
 
 ==  Separate VPN-Gateway ==
 
-[[Qubes|{{q_project_name_long}}]] only! [[Qubes|{{non_q_project_name_short}}]] is [[unsupported]]!
+[[Qubes|{{q_project_name_short}}]] only! [[Qubes|{{non_q_project_name_short}}]] is [[unsupported]]!
 
-A separate VPN-Gateway between {{project_name_gateway_long}} and sys-firewall, i.e. {{project_name_workstation_long}} &rarr; {{project_name_gateway_long}} &rarr; sys-vpn &rarr; sys-firewall &rarr; sys-net.
+A separate VPN-Gateway between {{project_name_gateway_short}} and sys-firewall, i.e. {{project_name_workstation_long}} &rarr; {{project_name_gateway_short}} &rarr; sys-vpn &rarr; sys-firewall &rarr; sys-net.
 
 '''User &rarr; VPN &rarr; Tor &rarr; Internet '''
 
@@ -69,16 +69,16 @@ At the time of writing Debian <code>{{Stable_project_version_based_on_Debian_ver
 '''3.''' Setup the VPN-Gateway as per [https://github.com/Qubes-Community/Contents/blob/master/docs/configuration/vpn.md Qubes VPN documentation].  The instructions to configure the [https://github.com/Qubes-Community/Contents/blob/master/docs/configuration/vpn.md#proxyvm VPN gateway using iptables and CLI scripts] is preferred to prevent clearnet leaks when the VPN breaks down.
 
 {{Box|text=
-Without a fail closed configuration, if the VPN breaks down, all traffic (such as DNS queries) originating from {{project_name_gateway_long}} (commonly called <code>{{project_name_gateway_vm}}</code>) would <u>only</u> be forced through Tor.  (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>)
+Without a fail closed configuration, if the VPN breaks down, all traffic (such as DNS queries) originating from {{project_name_gateway_short}} (commonly called <code>{{project_name_gateway_vm}}</code>) would <u>only</u> be forced through Tor.  (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>)
 
-When a failed closed configuration is used and the VPN connection breaks down, no traffic would leave {{project_name_gateway_long}}. This is what you want if you are reading this documentation chapter.
+When a failed closed configuration is used and the VPN connection breaks down, no traffic would leave {{project_name_gateway_short}}. This is what you want if you are reading this documentation chapter.
 }}
 
 '''4.''' Check, that your <code>sys-vpn</code> is fully functional. Test connectivity from inside the <code>sys-vpn</code> as per:
 [https://github.com/Qubes-Community/Contents/blob/master/docs/configuration/vpn.md Qubes VPN Documentation]
 }}
 
-<u>Note:</u> Both TCP and UDP VPN connections should work. System DNS should work out of the box so no DNS configuration is required for {{project_name_gateway_long}}. <ref>Because {{project_name_gateway_long}} does not require any clearnet DNS anyhow.</ref>
+<u>Note:</u> Both TCP and UDP VPN connections should work. System DNS should work out of the box so no DNS configuration is required for {{project_name_gateway_short}}. <ref>Because {{project_name_gateway_short}} does not require any clearnet DNS anyhow.</ref>
 
 Done!
 
@@ -89,14 +89,14 @@ For troubleshooting, see footnote. <ref>
 
 == On the Host ==
 
-[[Qubes|{{non_q_project_name_short}}]] only! (Because in Qubes, the host is non-networked by default. [[Qubes|{{q_project_name_long}}]] users have the option to use a [[#Separate VPN-Gateway]] but could also install the VPN software [[#Inside {{project_name_gateway_long}}]].)
+[[Qubes|{{non_q_project_name_short}}]] only! (Because in Qubes, the host is non-networked by default. [[Qubes|{{q_project_name_short}}]] users have the option to use a [[#Separate VPN-Gateway]] but could also install the VPN software [[#Inside {{project_name_gateway_short}}]].)
 
 '''User &rarr; VPN &rarr; Tor &rarr; Internet '''
 
-When using a {{project_name_gateway_long}} virtual machine, connect to a VPN using software on the host operating system (and not on the {{project_name_workstation_long}} nor {{project_name_gateway_long}}).
+When using a {{project_name_gateway_short}} virtual machine, connect to a VPN using software on the host operating system (and not on the {{project_name_workstation_short}} nor {{project_name_gateway_short}}).
 
-Using software inside the host operating system may be more convenient if your more familiar with the host operating system than {{project_name_long}}. Additionally, your VPN provider might provide custom software with tools for connecting to their servers. However, there are issues that you must consider:
-* A VPN on the host operating system will route all traffic originating from the host through the VPN, as well as {{project_name_long}} traffic. It is up to your preferences, if you like this or not.
+Using software inside the host operating system may be more convenient if your more familiar with the host operating system than {{project_name_short}}. Additionally, your VPN provider might provide custom software with tools for connecting to their servers. However, there are issues that you must consider:
+* A VPN on the host operating system will route all traffic originating from the host through the VPN, as well as {{project_name_short}} traffic. It is up to your preferences, if you like this or not.
 * Your VPN software may not be designed or configured to "fail closed". That is, if your VPN session suddenly disconnects, your Tor connection will be automatically sent through your ISP without going through your VPN service.
 
 ==== How to add the VPN in Host OS ====
@@ -113,13 +113,13 @@ If you want to enforce, that the VPN always gets used, try [https://github.com/a
 
 (Or if that works for you, install the VPN on the gateway instead, because it comes with an integrated TUNNEL_FIREWALL feature, i.e. stay away from the standalone VPN-Firewall when you set up a VPN on the gateway.)
 
-{{Anchor|VPN Software on {{project_name_gateway_long}}}}
+{{Anchor|VPN Software on {{project_name_gateway_short}}}}
 
 ==== KVM VPN Killswitch ====
 <div class="toccolours mw-collapsible mw-collapsed" style="max-width:100%;">
 Platform specific notice:
 
-* KVM: For a simplified option is only available for {{project_name_long}} [[KVM]] users, please press expand on the right side.
+* KVM: For a simplified option is only available for {{project_name_short}} [[KVM]] users, please press expand on the right side.
 * Other platforms (such as VirtualBox or Qubes): Skip this chapter.
 <div class="mw-collapsible-content">
 Optionally KVM users could also skip this chapter and use any of the other documentation on this wiki page.
@@ -128,9 +128,9 @@ Optionally KVM users could also skip this chapter and use any of the other docum
 </div>
 </div>
 
-== Inside {{project_name_gateway_long}} ==
+== Inside {{project_name_gateway_short}} ==
 
-{{project_name_gateway_long}} can be configured to connect to a VPN server before Tor, as well as "fail closed", blocking all Tor traffic if the VPN disconnects.
+{{project_name_gateway_short}} can be configured to connect to a VPN server before Tor, as well as "fail closed", blocking all Tor traffic if the VPN disconnects.
 
 '''User &rarr; VPN &rarr; Tor &rarr; Internet'''
 
@@ -138,17 +138,17 @@ Optionally KVM users could also skip this chapter and use any of the other docum
 
 Use OpenVPN.
 
-Using bitmask inside {{project_name_gateway_long}} for this use case is [[unsupported]]. And discouraged. Because bitmask modifies the firewall. Perhaps that can be configured or is safe. Reaching that and documenting bitmask is TODO, [https://phabricator.whonix.org/T516 help welcome]!
+Using bitmask inside {{project_name_gateway_short}} for this use case is [[unsupported]]. And discouraged. Because bitmask modifies the firewall. Perhaps that can be configured or is safe. Reaching that and documenting bitmask is TODO, [https://phabricator.whonix.org/T516 help welcome]!
 
 Other VPN clients are [[unsupported]].
 
-===== {{project_name_long}} TUNNEL_FIREWALL vs standalone VPN-Firewall =====
+===== {{project_name_short}} TUNNEL_FIREWALL vs standalone VPN-Firewall =====
 
 {{Whonix_TUNNEL_FIREWALL_vs_standalone_VPN-Firewall}}
 
 ===== Setup Time =====
 
-If you are interested in [[Hide Tor from your Internet Service Provider|hide Tor and {{project_name_long}} from the ISP]] (read that page first)... After installing {{project_name_gateway_long}}, do the following steps before activating Tor in {{Code|{{project_name_long}} Setup Wizard}}.
+If you are interested in [[Hide Tor from your Internet Service Provider|hide Tor and {{project_name_short}} from the ISP]] (read that page first)... After installing {{project_name_gateway_short}}, do the following steps before activating Tor in {{Code|{{project_name_short}} Setup Wizard}}.
 
 ===== Preparation =====
 
@@ -189,7 +189,7 @@ Save.
 
 ===== sudoers Configuration =====
 
-Inside {{project_name_gateway_long}}.
+Inside {{project_name_gateway_short}}.
 
 {{VPN/Setup/sudoers_configuration}}
 
@@ -201,25 +201,25 @@ Inside {{project_name_gateway_long}}.
 
 ====== Get VPN Certificate ======
 
-TODO: Documentation bug fix required. Won't work without Tor being enabled. You need to get the certificate elsewhere and then [[File Transfer]] it into {{project_name_gateway_long}}.
+TODO: Documentation bug fix required. Won't work without Tor being enabled. You need to get the certificate elsewhere and then [[File Transfer]] it into {{project_name_gateway_short}}.
 
 {{VPN/Setup/Get VPN Certificate}}
 
 ====== VPN Credentials ======
 
-Inside {{project_name_gateway_long}}.
+Inside {{project_name_gateway_short}}.
 
 {{VPN/Setup/VPN Credentials}}
 
 ====== VPN IP Address ======
 
-This cannot be done inside {{project_name_gateway_long}} since it by default does not system default DNS for its own traffic.
+This cannot be done inside {{project_name_gateway_short}} since it by default does not system default DNS for its own traffic.
 
 {{VPN/Setup/VPN IP Address}}
 
 ====== VPN Configuration File ======
 
-Inside {{project_name_gateway_long}}.
+Inside {{project_name_gateway_short}}.
 
 {{Open with root rights|filename=
 /etc/openvpn/openvpn.conf
@@ -263,7 +263,7 @@ pull-filter ignore "tun-ipv6"
 pull-filter ignore "ifconfig-ipv6"
 </pre>
 
-Do not worry about TCP mode on {{project_name_gateway_long}}. Using the VPN in TCP mode may be possible depending the services provides by your VPN provider, but is not required on {{project_name_gateway_long}}. The VPN in UDP mode should work just fine. <ref>
+Do not worry about TCP mode on {{project_name_gateway_short}}. Using the VPN in TCP mode may be possible depending the services provides by your VPN provider, but is not required on {{project_name_gateway_short}}. The VPN in UDP mode should work just fine. <ref>
 The Tor software cannot transport UDP yet, but it does not have to in this case. (Reference: [[Tor#UDP]].) Since the VPN connects over clearnet, UDP should just work as usual. Once the VPN is functional, Tor will have no issue to connect using it (without "knowing" it is over a VPN).
 </ref> Your pick.
 
@@ -273,29 +273,29 @@ The [https://github.com/{{project_name_short}}/usability-misc/blob/master/usr/bi
 The [https://github.com/{{project_name_short}}/usability-misc/blob/master/etc/sudoers.d/tunnel_unpriv /etc/sudoers.d/tunnel_unpriv] wrapper script is being provided by the [https://github.com/{{project_name_short}}/usability-misc usabilty-misc] package.
 
 The [https://github.com/{{project_name_short}}/usability-misc/blob/master/lib/systemd/system/openvpn%40openvpn.service.d/50_unpriv.conf /lib/systemd/system/openvpn@openvpn.service.d/50_unpriv.conf] wrapper script is being provided by the [https://github.com/{{project_name_short}}/usability-misc usabilty-misc] package.
-</ref> <ref>We must run OpenVPN as user 'tunnel', because that is the only user besides user {{Code2|clearnet}} that will be allowed to establish external connections when using {{project_name_long}} Firewall setting VPN_FIREWALL=1.</ref>
+</ref> <ref>We must run OpenVPN as user 'tunnel', because that is the only user besides user {{Code2|clearnet}} that will be allowed to establish external connections when using {{project_name_short}} Firewall setting VPN_FIREWALL=1.</ref>
 
 Save.
 
 ====== DNS Configuration ======
 
-DNS configuration, resolvconf, update-resolv-conf or similar is not required for {{project_name_gateway_long}}. <ref>
-Because {{project_name_gateway_long}} by default has no and needs no system DNS for its own traffic. See [[{{project_name_gateway_short}} System DNS]] if you would like to read an explanation why that is so.
+DNS configuration, resolvconf, update-resolv-conf or similar is not required for {{project_name_gateway_short}}. <ref>
+Because {{project_name_gateway_short}} by default has no and needs no system DNS for its own traffic. See [[{{project_name_gateway_short}} System DNS]] if you would like to read an explanation why that is so.
 </ref>
 
 ====== Configuration Folder Permissions ======
 
-Inside {{project_name_gateway_long}}.
+Inside {{project_name_gateway_short}}.
 
-({{q_project_name_long}}: In Template)
+({{q_project_name_short}}: In Template)
 
 {{VPN/Setup/Configuration Folder Permissions}}
 
 ===== systemd setup =====
 
-Inside {{project_name_gateway_long}}.
+Inside {{project_name_gateway_short}}.
 
-({{q_project_name_long}}: In Template. <ref>
+({{q_project_name_short}}: In Template. <ref>
 OpenVPN will not actually start there thanks to <code>/lib/systemd/system/openvpn@openvpn.service.d/50_unpriv.conf</code>.
 </ref>)
 
@@ -303,7 +303,7 @@ OpenVPN will not actually start there thanks to <code>/lib/systemd/system/openvp
 
 ===== Enable Tor =====
 
-({{q_project_name_long}}: If using a Template, shut down the Template and restart {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>). )
+({{q_project_name_short}}: If using a Template, shut down the Template and restart {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>). )
 
 Enable Tor using [[Anon Connection Wizard]].
 
@@ -328,7 +328,7 @@ You have may have to manually restart Tor. This is because the VPN may not be re
 
 '''Leak Tests'''
 
-When you shut down the VPN, neither Tor, nor {{project_name_gateway_long}} whonixcheck/apt/etc. nor {{project_name_workstation_long}} should be able to connect anywhere anymore.
+When you shut down the VPN, neither Tor, nor {{project_name_gateway_short}} whonixcheck/apt/etc. nor {{project_name_workstation_short}} should be able to connect anywhere anymore.
 
 ''' Force Tor to wait for OpenVPN '''
 

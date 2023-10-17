@@ -32,7 +32,7 @@ Required knowledge:
 | text    =
 Note that most applications, such as [[Tor Browser]], will '''not''' ''automatically'' profit from setting up an alternative DNS resolver.
 
-* This is because applications in {{project_name_long}} are configured to use <code>SocksPort</code> instead of <code>Trans</code>- or <code>DnsPort</code>, see [[Stream Isolation]] for details.
+* This is because applications in {{project_name_short}} are configured to use <code>SocksPort</code> instead of <code>Trans</code>- or <code>DnsPort</code>, see [[Stream Isolation]] for details.
 * Another reason is, that many applications do not yet make use of authenticated DNS (DNSSEC).
 
 However, you could use alternative DNS revolvers with these applications when [[Stream_Isolation/Disable_Easy|deconfiguring]] socks proxy settings.
@@ -110,7 +110,7 @@ Quote https://github.com/DNSCrypt/dnscrypt-proxy/issues/167#issuecomment-3676893
 These instructions completely replace Tor's DNS resolver with a dnscrypt-enabled resolver for all users and the whole {{Project_name_workstation_long}}. Not recommended for a longer amount of time, see warning above.
 
 == Installation ==
-Apply all instructions inside your {{project_name_workstation_long}}.
+Apply all instructions inside your {{project_name_workstation_short}}.
 
 1) Install the <code>dnscrypt-proxy</code> package.
 
@@ -198,20 +198,20 @@ sudo systemctl restart dnscrypt-proxy.socket
 Test again. Now it is expected to work.
 
 == FAQ ==
-=== Why not Use DNSCrypt by Default in {{project_name_long}}? ===
-[https://dnscrypt.info/ DNSCrypt] may have good use cases for clearnet activities. However, it is not useful in {{project_name_long}} and therefore should not be installed and activated by default for everyone. Although some users may have high expectations, DNSCrypt does not magically solve all DNS-related security issues, nor does it implement end-to-end DNS encryption to the destination server. <ref>Conceptually, end-end DNS encryption is illogical. If the IP address of the destination server was known in advance, then DNS would not be required in the first place.</ref> Most important of all, the server will still see all DNS requests in cleartext. <ref>https://security.stackexchange.com/questions/162601/what-are-the-privacy-advantages-of-a-dns-encryption-service-such-as-dnscrypt</ref>
+=== Why not Use DNSCrypt by Default in {{project_name_short}}? ===
+[https://dnscrypt.info/ DNSCrypt] may have good use cases for clearnet activities. However, it is not useful in {{project_name_short}} and therefore should not be installed and activated by default for everyone. Although some users may have high expectations, DNSCrypt does not magically solve all DNS-related security issues, nor does it implement end-to-end DNS encryption to the destination server. <ref>Conceptually, end-end DNS encryption is illogical. If the IP address of the destination server was known in advance, then DNS would not be required in the first place.</ref> Most important of all, the server will still see all DNS requests in cleartext. <ref>https://security.stackexchange.com/questions/162601/what-are-the-privacy-advantages-of-a-dns-encryption-service-such-as-dnscrypt</ref>
 
 There are several other reasons why DNSCrypt is not activated by default. Firstly, Tor distributes trust because the DNS server changes as circuits are rotated. For pre-installed applications, circuits are also stream-isolated and change every ten minutes by default. Notably, in early 2018 there are [https://github.com/DNSCrypt/dnscrypt-resolvers/blob/0449410030b784334c53006cf043ccba911fb88b/v1/dnscrypt-resolvers.csv 78 open resolvers] that support the protocol.
 
-Public resolvers supporting DNSCrypt have not yet acted in a way to cause mistrust. However, even if the operators were absolutely trustworthy, complete confidence is also needed in their servers - it is unwise to let the DNS security for all {{project_name_long}} users depend on a few servers. Another consideration is load balancing. If {{project_name_long}} relied upon a DNSCrypt supporting server by default, DNS would break for all users if that server ever decided to forbid connections from the Tor network <ref>Due to the Tor network abuse such as DDOS attacks on their servers.</ref> or if the servers went down for maintenance.
+Public resolvers supporting DNSCrypt have not yet acted in a way to cause mistrust. However, even if the operators were absolutely trustworthy, complete confidence is also needed in their servers - it is unwise to let the DNS security for all {{project_name_short}} users depend on a few servers. Another consideration is load balancing. If {{project_name_short}} relied upon a DNSCrypt supporting server by default, DNS would break for all users if that server ever decided to forbid connections from the Tor network <ref>Due to the Tor network abuse such as DDOS attacks on their servers.</ref> or if the servers went down for maintenance.
 
-Would result in a unique [[Fingerprint#Visited_Websites|web fingerprint]], i.e. visited websites can distinguish {{project_name_long}} users using DNSCrypt from other Tor users using Tor to resolve DNS.
+Would result in a unique [[Fingerprint#Visited_Websites|web fingerprint]], i.e. visited websites can distinguish {{project_name_short}} users using DNSCrypt from other Tor users using Tor to resolve DNS.
 
 === Can I Use DNSCrypt on the Host or Router for Clearnet? ===
 This configuration is possible; read the next section before proceeding.
 
-=== Does DNSCrypt on the Host or Router Harm Anonymity when Using Tor / {{project_name_long}}? ===
-The short answer to this question is no. The longer answer is DNSCrypt on the host or in the router only affects clearnet activities. Tor assumes in advance that a user's local network and ISP are completely unsafe and untrustworthy. Tor and {{project_name_long}} are unaffected by DNS settings that are made on the host or in the router.
+=== Does DNSCrypt on the Host or Router Harm Anonymity when Using Tor / {{project_name_short}}? ===
+The short answer to this question is no. The longer answer is DNSCrypt on the host or in the router only affects clearnet activities. Tor assumes in advance that a user's local network and ISP are completely unsafe and untrustworthy. Tor and {{project_name_short}} are unaffected by DNS settings that are made on the host or in the router.
 
 It is debatable whether DNSCrypt is useful or not for clearnet activities since there are various pros and cons. It is useful when using foreign or untrusted Wi-Fi networks that are shared with others, since DNS requests could potentially be modified or read. That said, trust is just shifted from the ISP to a DNSCrypt-supporting DNS server, such as OpenDNS. If the DNS server supporting DNSCrypt leaks a user's network address and/or logs queries as part of their business model, then it might actually be worse than using the ISP! It is hard to mount an argument for which party is more trustworthy, the ISP or a third party provider.
 

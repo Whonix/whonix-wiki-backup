@@ -23,10 +23,10 @@ Tor configuration can also be modified by editing the Tor configuration file(s).
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
 | text    = It is recommended for simplicity for most users that <u>all</u> unique user Tor configurations should be stored in Tor configuration file <code>/usr/local/etc/torrc.d/50_user.conf</code> and nowhere else. <ref>
 <code>/usr/local/etc/torrc.d/40_tor_control_panel.conf</code> is auto generated. It can be examined but changes should only be made to <code>/usr/local/etc/torrc.d/50_user.conf</code>.
-</ref> Note that {{project_name_long}} will <u>not</u> modify <code>/usr/local/etc/torrc.d/50_user.conf</code> once it is created, therefore the user is responsible for adding or removing specific configurations in this file.
+</ref> Note that {{project_name_short}} will <u>not</u> modify <code>/usr/local/etc/torrc.d/50_user.conf</code> once it is created, therefore the user is responsible for adding or removing specific configurations in this file.
 }}
 
-[[Configuration_Files#Configuration_Drop-In_Folders|Configuration Drop-In Folders]] <code>/etc/torrc.d/</code> and <code>/usr/local/etc/torrc.d/</code> are a {{project_name_long}} specific feature. ([[Dev/Tor#Tor_Config_Files|technical details]]) Advanced users and packages specifically supporting {{project_name_long}} are free to use these folders, however other distributions such as Debian do not support it at time of writing. <ref>
+[[Configuration_Files#Configuration_Drop-In_Folders|Configuration Drop-In Folders]] <code>/etc/torrc.d/</code> and <code>/usr/local/etc/torrc.d/</code> are a {{project_name_short}} specific feature. ([[Dev/Tor#Tor_Config_Files|technical details]]) Advanced users and packages specifically supporting {{project_name_short}} are free to use these folders, however other distributions such as Debian do not support it at time of writing. <ref>
 Debian feature request: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=866187 add torrc.d configuration directory]
 </ref>
 
@@ -146,7 +146,7 @@ sudo service tor@default restart
 }}
 
 = Connectivity Troubleshooting =
-To debug, try these commands in {{project_name_gateway_short}} ([[Qubes|{{q_project_name_long}}]]: <code>{{project_name_gateway_vm}}</code>).
+To debug, try these commands in {{project_name_gateway_short}} ([[Qubes|{{q_project_name_short}}]]: <code>{{project_name_gateway_vm}}</code>).
 
 {{Box|text=
 '''1.''' See [[Troubleshooting]].
@@ -177,7 +177,7 @@ sudo anondate-get
 sudo apt update
 }}
 
-If APT fails, it's a "lower level" issue, connectivity issue. ([[Qubes|{{q_project_name_long}}]]: no need to look into Template, tinyproxy.)
+If APT fails, it's a "lower level" issue, connectivity issue. ([[Qubes|{{q_project_name_short}}]]: no need to look into Template, tinyproxy.)
 
 '''7.''' [[Whonix-Workstation_Firewall#Ping|"Forget" about <code>ping</code>.]]
 
@@ -202,11 +202,11 @@ Using Bridges if not really needed can cause connectivity issues. Users not livi
 
 {{Anchor|tor not running}}
 = Tor not running =
-If if it reported that Tor is not running (such as by [https://www.kicksecure.com/wiki/Systemcheck systemcheck] <code>Tor Running Check</code>) then this means only that Tor is not running. This test result should not be over interpreted.
+If it is reported that Tor is not running (such as by [https://www.kicksecure.com/wiki/Systemcheck systemcheck] <code>Tor Running Check</code>) then this means only that Tor is not running. This test result should not be over interpreted.
 
 Tor not running means that the Tor process/program is currently not running indeed. This is completely unrelated to any clock issues. Even if the clock was very wrong, very slow in year 1900 or super fast in year 2100 this would not lead to Tor not running. Connectivity is a different issue. Tor would be running but might be unable to connect. If that was the case, there would be a different error message.
 
-To independently verify that Tor is not running, the following command can be used on {{project_name_gateway_long}}.
+To independently verify that Tor is not running, the following command can be used on {{project_name_gateway_short}}.
 
 {{CodeSelect|code=
 sudo systemctl status tor@default
@@ -274,7 +274,7 @@ This warning is caused by [https://www.kicksecure.com/wiki/Systemcheck systemche
 
 |-
 | {{Code2|[NOTICE] You configured a non-loopback address '10.152.152.10:9179' for SocksPort. This allows everybody on your local network to use your machine as a proxy. Make sure this is what you wanted. [1 duplicate hidden]}} This notice may reference other port numbers, or the DnsPort or TransPort.
-| This notice is not a concern because Tor really listens on that IP/port - it is the internal network interface for {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) that is only available to {{project_name_workstation_long}} because {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) is firewalled. See ''{{W_Firewall}}'' or the {{project_name_long}} source code for further information.
+| This notice is not a concern because Tor really listens on that IP/port - it is the internal network interface for {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) that is only available to {{project_name_workstation_long}} because {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) is firewalled. See ''{{W_Firewall}}'' or the {{project_name_short}} source code for further information.
 
 |-
 | {{Code2|[NOTICE] New control connection opened. [2 duplicates hidden]}} A higher number of duplicate messages may also appear.
@@ -283,7 +283,7 @@ This warning is caused by [https://www.kicksecure.com/wiki/Systemcheck systemche
 |}
 
 = Version Number =
-To discover what Tor version is currently in use, run the following command inside {{project_name_gateway_long}} ([[Qubes|{{q_project_name_long}}]]: <code>{{project_name_gateway_vm}}</code>).
+To discover what Tor version is currently in use, run the following command inside {{project_name_gateway_short}} ([[Qubes|{{q_project_name_short}}]]: <code>{{project_name_gateway_vm}}</code>).
 
 {{CodeSelect|code=
 anon-info
@@ -330,7 +330,7 @@ sudo systemctl restart tor@default
 
 = Advanced Topics =
 == Tuning ==
-{{project_name_gateway_long}} can profit from RAM increase if a large number of circuits are created and Tor is kept busy. See [[RAM]] and [[Tuning]].
+{{project_name_gateway_short}} can profit from RAM increase if a large number of circuits are created and Tor is kept busy. See [[RAM]] and [[Tuning]].
 
 == Additional SocksPorts ==
 Various custom <code>SocksPorts</code> have already been prepared. Those are documented [[Stream_Isolation#How_to_mitigate_identity_correlation|here]].
@@ -355,10 +355,10 @@ https://gitlab.torproject.org/legacy/trac/-/issues/15261#comment:1
 
 <blockquote>So to make sure that the SocksPort in the torrc does what you want, write it as <code>+SocksPort</code>.</blockquote>
 
-After adding custom ports, a user would also have to edit the {{project_name_long}} firewall.
+After adding custom ports, a user would also have to edit the {{project_name_short}} firewall.
 
-# [[Whonix-Gateway_Firewall#For_Connections_Originating_from_Whonix-Workstation|open an incoming port for connections originating from {{project_name_workstation_long}} in {{project_name_gateway_long}} firewall]]
-# [[Whonix-Workstation_Firewall#Open_an_Outgoing_Port|Open an outgoing port for connections to {{project_name_gateway_long}} in {{project_name_workstation_long}} firewall]]
+# [[Whonix-Gateway_Firewall#For_Connections_Originating_from_Whonix-Workstation|open an incoming port for connections originating from {{project_name_workstation_short}} in {{project_name_gateway_short}} firewall]]
+# [[Whonix-Workstation_Firewall#Open_an_Outgoing_Port|Open an outgoing port for connections to {{project_name_gateway_short}} in {{project_name_workstation_short}} firewall]]
 
 {{Anchor|Blacklist Certain Onion Services from Connecting}}
 
@@ -388,7 +388,7 @@ sudo chown --recursive "_tor-extradaemon1:_tor-extradaemon1" "/var/lib/tor-insta
 }}
 
 Firewall settings change required. <ref>
-On {{project_name_gateway_long}}, by default no linux username other than `debian-tor` are permitted to connect using clearnet. The Tor process is by default the only thing running under linux user name `debian-tor`. Therefore the new user under which the additional Tor daemon will run needs the same permission in [[Whonix-Gateway Firewall]].
+On {{project_name_gateway_short}}, by default no linux username other than `debian-tor` are permitted to connect using clearnet. The Tor process is by default the only thing running under linux user name `debian-tor`. Therefore the new user under which the additional Tor daemon will run needs the same permission in [[Whonix-Gateway Firewall]].
 </ref>
 
 {{Box|text=
@@ -487,7 +487,7 @@ The procedure of adding an onion service to the blacklist of outgoing connection
 {{Anchor|Manual Rotation of Tor Guards}}
 {{Anchor|Security and Performance Related Issues}}
 {{Anchor|Mitigate the Threat of Guard Fingerprinting}}
-{{Anchor|Clone {{project_name_gateway_long}} ({{project_name_gateway_vm}}) with New Entry Guards}}
+{{Anchor|Clone {{project_name_gateway_short}} ({{project_name_gateway_vm}}) with New Entry Guards}}
 {{Anchor|Regenerate the Tor State After Saving the Tor State Folder}}
 {{Anchor|Alternating Bridges}}
 {{Anchor|Copy Tor State Files to Another {{project_name_gateway_vm}} Instance}}
@@ -551,13 +551,13 @@ Bridge obfs4 161.217.177.95:10703 B3B8009D01BB7E5FDFAEC cert=4RaIqGiOytEXm6Hw ia
 The sample text for a complete {{Code2|obfs4}} torrc file is below. Check your file is similar, except for the specific bridge entries.
 
 <pre>
-# This file is part of {{project_name_long}} # Copyright (C) 2012 - 2013 adrelanos
+# This file is part of {{project_name_short}} # Copyright (C) 2012 - 2013 adrelanos
 # See the file COPYING for copying conditions.
 
 # Use this file for your user customizations.
 # Please see /usr/local/etc/torrc.d/50_user.conf.examples for help, options, comments etc.
 
-# Anything here will override {{project_name_long}} own Tor config customizations in /usr/share/tor/tor-service-defaults-torrc
+# Anything here will override {{project_name_short}} own Tor config customizations in /usr/share/tor/tor-service-defaults-torrc
 
 # Enable Tor through setup-dist or manually uncomment "DisableNetwork 0" by
 # removing the # in front of it.
@@ -573,7 +573,7 @@ Bridge obfs4 161.217.177.95:10703 B3B8009D01BB7E5FDFAEC cert=4RaIqGiOytEXm6Hw ia
 <ref>
 {{Code2|fte}} example text to add to {{Code2|/usr/local/etc/torrc.d/50_user.conf}}.
 
-fte is supported in {{project_name_long}} 15, but further testing is required; see: https://phabricator.whonix.org/T520
+fte is supported in {{project_name_short}} 15, but further testing is required; see: https://phabricator.whonix.org/T520
 {{CodeSelect|code=
 ClientTransportPlugin fte exec /usr/bin/fteproxy --managed
 Bridge fte 10.200.100.60:95128 4352e58420e68f5e40bf7c74faddccd9d1349413
@@ -659,70 +659,70 @@ Similar to above.
 
 = FAQ =
 
-== {{project_name_long}} is Preventing Tor from Bootstrapping! ==
+== {{project_name_short}} is Preventing Tor from Bootstrapping! ==
 
-Refer to the related [[Why_is_Tor_slow#Whonix_.E2.84.A2_has_Slowed_Tor_Connections_Dramatically.21|{{project_name_long}} has Slowed Tor Connections Dramatically!]] wiki entry. Bootstrapping problems can relate to nation state or ISP censorship of Tor, or relate to the Tor guard in operation. In the latter case, temporarily changing the Tor guard might resolve the issue.
+Refer to the related [[Why_is_Tor_slow#Whonix_has_Slowed_Tor_Connections_Dramatically.21|{{project_name_short}} has Slowed Tor Connections Dramatically!]] wiki entry. Bootstrapping problems can relate to nation state or ISP censorship of Tor, or relate to the Tor guard in operation. In the latter case, temporarily changing the Tor guard might resolve the issue.
 
 If that is ineffective, users can also:
 
-* Confirm [[System_Requirements|minimum system requirements]] have been met for {{project_name_long}}.
+* Confirm [[System_Requirements|minimum system requirements]] have been met for {{project_name_short}}.
 * Confirm the accuracy of the VM clock with [[Sdwdate|sdwdate]].
-* Remove any changes that were made to the {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) torrc configuration, such as [[Bridges|bridges]], pluggable transports, [[{{project_name_gateway_short}}_Security|seccomp, connection padding]] and so on.
+* Remove any changes that were made to the {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) torrc configuration, such as [[Bridges|bridges]], pluggable transports, [[{{project_name_gateway_short}}_Security|seccomp, connection padding]] and so on.
 * Test Tor functionality on the host.
-* In [[Qubes|{{q_project_name_long}}]], [[Install_Tor_Browser_Outside_of_Whonix#Moderate:_{{q_project_name_long}}|test Tor functionality in a non-{{project_name_long}} AppVM]].
-* Increase the amount of RAM available to {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>).
+* In [[Qubes|{{q_project_name_short}}]], [[Install_Tor_Browser_Outside_of_Whonix#Moderate:_{{q_project_name_short}}|test Tor functionality in a non-{{project_name_short}} AppVM]].
+* Increase the amount of RAM available to {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>).
 * Follow other [[Troubleshooting]] advice.
 
-== Can I Speed Up Tor or the {{project_name_gateway_long}}? ==
+== Can I Speed Up Tor or the {{project_name_gateway_short}}? ==
 
 ''Is there a way to configure the number of nodes in a circuit and to allow selection according to their speeds?''
 
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = '''Reminder:''' [[Self_Support_First_Policy|{{project_name_long}} Reliance on Debian (and Tor)]] - ''"{{project_name_long}} is not a stripped down version of Debian; anything possible in "vanilla" Debian GNU/Linux can be replicated in {{project_name_long}}."'' Tor configurations are not limited by using {{project_name_long}}.
+| text    = '''Reminder:''' [[Self_Support_First_Policy|{{project_name_short}} Reliance on Debian (and Tor)]] - ''"{{project_name_short}} is not a stripped down version of Debian; anything possible in "vanilla" Debian GNU/Linux can be replicated in {{project_name_short}}."'' Tor configurations are not limited by using {{project_name_short}}.
 }}
 
-Those who already know how to configure Tor in this way on the command line in vanilla Debian can follow the same procedure in {{project_name_gateway_long}}. This is not an endorsement for making these manual Tor changes because it is not recommended by Tor developers and thus the {{project_name_long}} team. <ref>Deferring to their expertise on the possible adverse anonymity effects.</ref> This is also the reason there are no instructions in the {{project_name_long}} documentation to manipulate Tor nodes in this way.
+Those who already know how to configure Tor in this way on the command line in vanilla Debian can follow the same procedure in {{project_name_gateway_short}}. This is not an endorsement for making these manual Tor changes because it is not recommended by Tor developers and thus the {{project_name_short}} team. <ref>Deferring to their expertise on the possible adverse anonymity effects.</ref> This is also the reason there are no instructions in the {{project_name_short}} documentation to manipulate Tor nodes in this way.
 
-That said, if general instructions were found describing how to achieve this on the host, then the same procedure could simply be repeated in {{project_name_gateway_long}}.
+That said, if general instructions were found describing how to achieve this on the host, then the same procedure could simply be repeated in {{project_name_gateway_short}}.
 
 == Does {{project_name_short}} Modify Tor? ==
 
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = [https://support.torproject.org/about/what-is-tor/ Tor] is an anonymizer developed by The Tor Project. [[Tor Browser]] is a web browser [https://www.torproject.org/ developed by the Tor Project] which is optimized for privacy. Please do not confuse {{Code2|Tor}} with {{Code2|Tor Browser}} when conversing about {{project_name_long}} topics.
+| text    = [https://support.torproject.org/about/what-is-tor/ Tor] is an anonymizer developed by The Tor Project. [[Tor Browser]] is a web browser [https://www.torproject.org/ developed by the Tor Project] which is optimized for privacy. Please do not confuse {{Code2|Tor}} with {{Code2|Tor Browser}} when conversing about {{project_name_short}} topics.
 
-For differences of Tor Browser by Tor Project compared to Tor Browser in {{project_name_long}} see [[Tor_Browser#Whonix_.E2.84.A2_Tor_Browser_Differences|{{project_name_long}} Tor Browser Differences]].
+For differences of Tor Browser by Tor Project compared to Tor Browser in {{project_name_short}} see [[Tor_Browser#Whonix_Tor_Browser_Differences|{{project_name_short}} Tor Browser Differences]].
 }}
 
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = {{project_name_long}} does <u>not </u> modify the Tor package itself.
+| text    = {{project_name_short}} does <u>not </u> modify the Tor package itself.
 }}
 
-Although {{project_name_long}} does not modify Tor, the Tor configuration file ''has'' been adapted for {{project_name_long}}. To inspect the relevant files, check the following on {{project_name_gateway_long}}: <ref>Changes to the configuration file are made by the [https://github.com/{{project_name_short}}/anon-gw-anonymizer-config anon-gw-anonymizer-config] package.</ref>
+Although {{project_name_short}} does not modify Tor, the Tor configuration file ''has'' been adapted for {{project_name_short}}. To inspect the relevant files, check the following on {{project_name_gateway_short}}: <ref>Changes to the configuration file are made by the [https://github.com/{{project_name_short}}/anon-gw-anonymizer-config anon-gw-anonymizer-config] package.</ref>
 
 * <code>/etc/tor/torrc</code> file.
 * <code>/etc/torrc.d</code> folder.
 * <code>/usr/local/etc/torrc.d/</code> folder.
 * <code>/usr/share/tor/tor-service-defaults-torrc</code> file.
 
-Tor is not patched and the normal Tor Debian package and [[vanguards]] is installed by default in {{project_name_long}}. ([[Dev/Tor#Tor_Version|technical details]])
+Tor is not patched and the normal Tor Debian package and [[vanguards]] is installed by default in {{project_name_short}}. ([[Dev/Tor#Tor_Version|technical details]])
 
 Any changes to the Tor routing algorithm should be proposed, discussed and eventually implemented upstream in Tor on torproject.org. <ref>This means changes occur for all Tor users and not a subset relying on a particular distribution.</ref> If proposed changes are not adopted by The Tor Project, then the option to create a Tor fork <ref name=fork>
 https://en.wikipedia.org/wiki/Fork_(software_development)
 </ref> is available. Tor has already been forked at least once.
 
-A general {{project_name_long}} design principle is to keep the Tor process as uniform as possible, in order to simplify any security audits. Diverging from this practice would introduce unnecessary complexity, possibly worsen fingerprinting or degrade anonymity, and limit {{project_name_long}} discussions to the security impacts of the modified routing algorithm. For these reasons, the {{project_name_long}} team is strongly disinclined to make any direct changes to the Tor package.
+A general {{project_name_short}} design principle is to keep the Tor process as uniform as possible, in order to simplify any security audits. Diverging from this practice would introduce unnecessary complexity, possibly worsen fingerprinting or degrade anonymity, and limit {{project_name_short}} discussions to the security impacts of the modified routing algorithm. For these reasons, the {{project_name_short}} team is strongly disinclined to make any direct changes to the Tor package.
 
 == Can {{project_name_short}} Improve Tor? ==
 
-As outlined in the [[Tor#Does_{{project_name_long}}_Modify_Tor?|previous section]], {{project_name_long}} will not implement any changes to Tor directly and any suggested improvements or bug fixes are proposed upstream on torproject.org. This has already [[Dev/Threat_Model#Design_Document,_Innovations,_and_Research|happened]] on occasion. Creating {{project_name_long}} is a difficult and time consuming endeavor, so Tor improvements are better left to dedicated, skilled developers who are more knowledgeable in this area.
+As outlined in the [[Tor#Does_{{project_name_short}}_Modify_Tor?|previous section]], {{project_name_short}} will not implement any changes to Tor directly and any suggested improvements or bug fixes are proposed upstream on torproject.org. This has already [[Dev/Threat_Model#Design_Document,_Innovations,_and_Research|happened]] on occasion. Creating {{project_name_short}} is a difficult and time consuming endeavor, so Tor improvements are better left to dedicated, skilled developers who are more knowledgeable in this area.
 
-Skilled coders can always provide upstream patches to Tor, or as a last resort, fork <ref name=fork /> it. Hypothetically, if a fork <ref name=fork /> developed a greater following than the original project due to proven security / anonymity benefits, then {{project_name_long}} would seriously consider making a switch.
+Skilled coders can always provide upstream patches to Tor, or as a last resort, fork <ref name=fork /> it. Hypothetically, if a fork <ref name=fork /> developed a greater following than the original project due to proven security / anonymity benefits, then {{project_name_short}} would seriously consider making a switch.
 
 == Tor Routing Algorithm ==
 Quote Tor Project FAQ [https://2019.www.torproject.org/docs/faq.html.en#ChooseEntryExit Can I control which nodes (or country) are used for entry/exit?] (bold and underline added)
@@ -740,11 +740,11 @@ To make changes to the Tor routing algorithm which benefit anonymity and not act
 * [https://www.freehaven.net/anonbib/ Anonymity Bibliography - Collection Anonymity Research]
 * Read the [https://blog.torproject.org Tor blog] as there are often blog posts discussing anonymity research such as blog post [https://blog.torproject.org/new-low-cost-traffic-analysis-attacks-mitigations new low cost traffic analysis attacks and mitigations].
 
-The following resources describe the organizational structure of the {{project_name_long}} project in relation to The Tor Project, Debian and other upstream sources.
+The following resources describe the organizational structure of the {{project_name_short}} project in relation to The Tor Project, Debian and other upstream sources.
 
-* [[Dev/Relationship_With_Upstream|{{project_name_long}} Relationship With Upstream]]
-* [[Why_does_{{project_name_short}}_use_Tor|Why does {{project_name_long}} use Tor?]]
-* [[Trust|Placing Trust in {{project_name_long}}]]
+* [[Dev/Relationship_With_Upstream|{{project_name_short}} Relationship With Upstream]]
+* [[Why_does_{{project_name_short}}_use_Tor|Why does {{project_name_short}} use Tor?]]
+* [[Trust|Placing Trust in {{project_name_short}}]]
 * [[Self_Support_First_Policy|Self Support First Policy]]
 * {{kicksecure_wiki
 |wikipage=Linux User Experience versus Commercial Operating Systems
@@ -758,11 +758,11 @@ See also:
 
 == How do I Change Other Tor Settings? ==
 
-Questions are often raised in forums about how other Tor-specific changes can be made in {{project_name_long}}, such as excluding specific exit nodes. <ref>
+Questions are often raised in forums about how other Tor-specific changes can be made in {{project_name_short}}, such as excluding specific exit nodes. <ref>
 https://forums.whonix.org/t/how-to-set-an-exit-node-in-wonix-of-qubesos/9070
 </ref>
 
-In many cases, making such changes is already documented {{project_name_long}} [[Documentation]]. In other cases such changes are discouraged.
+In many cases, making such changes is already documented {{project_name_short}} [[Documentation]]. In other cases such changes are discouraged.
 
 In all instances:
 
@@ -778,13 +778,13 @@ ExcludeExitNodes {us},{au},{ca},{nz},{gb}
 StrictNodes 1
 </pre>
 
-A [[#Configuration Check|Configuration Check]] should be run afterwards inside {{project_name_gateway_long}} ([[Qubes|{{q_project_name_long}}]]: <code>{{project_name_gateway_vm}}</code>) to confirm there are no Tor configuration syntax errors. As these configurations are specific to Tor and [[unspecific|unspecific to {{project_name_long}})]], the [[Free_Support_Principle|Self Support First Policy]] applies.
+A [[#Configuration Check|Configuration Check]] should be run afterwards inside {{project_name_gateway_short}} ([[Qubes|{{q_project_name_short}}]]: <code>{{project_name_gateway_vm}}</code>) to confirm there are no Tor configuration syntax errors. As these configurations are specific to Tor and [[unspecific|unspecific to {{project_name_short}})]], the [[Free_Support_Principle|Self Support First Policy]] applies.
 
 == How do I Install the Latest Tor Version? ==
 
 Follow the instructions [[Tor_Versioning|here]] to install later Tor versions from either:
 
-* the {{project_name_long}} repository; or
+* the {{project_name_short}} repository; or
 * Tor Project APT repositories; or
 * Tor Project source code.
 
@@ -803,7 +803,7 @@ See also:
 = Tor Generic Bug Reproduction =
 Based on [[Reporting_Bugs#Bug_Report_Recommendations|Bug Report Recommendations]], specifically [[Reporting_Bugs#Generic_Bug_Reproduction|Generic Bug Reproduction]]. Similar to [[Troubleshooting]] advice "Try a non-Whonix VM".
 
-The following results in a manual reproduction of the [[Dev/Tor|{{project_name_long}} Tor Integration]] without involving {{project_name_long}}. This enables the user to remove {{project_name_long}} as a possible source of issues and reduces the added complexity of {{project_name_long}}.
+The following results in a manual reproduction of the [[Dev/Tor|{{project_name_short}} Tor Integration]] without involving {{project_name_short}}. This enables the user to remove {{project_name_short}} as a possible source of issues and reduces the added complexity of {{project_name_short}}.
 
 # Install Debian <code>{{Stable project version based on Debian codename}}</code> inside a VM.
 # Install the <code>tor</code> Debian package.
@@ -813,7 +813,7 @@ The following results in a manual reproduction of the [[Dev/Tor|{{project_name_l
 # Install [[vanguards]] from the Debian <code>{{Stable project version based on Debian codename}}</code> repository. If needed, see footnote for installation instructions. <ref>
 {{Install Package|package=vanguards}}
 </ref>
-# Make vanguards work with Tor. [[Unspecific|Unspecific to {{project_name_long}}]]. See footnotes. <ref>
+# Make vanguards work with Tor. [[Unspecific|Unspecific to {{project_name_short}}]]. See footnotes. <ref>
 {{Box|text=
 '''1.''' {{Open with root rights|
 filename=/etc/tor/vanguards.conf
@@ -833,18 +833,18 @@ sudo systemctl restart vanguards
 https://github.com/mikeperry-tor/vanguards/issues/47
 </ref>
 # Attempt to reproduce the original issue.
-# If the issue is reproducible without involving {{project_name_long}} then the issue is unspecific to {{project_name_long}}. This enables the user to utilize upstream (original authors of Tor software, Tor community) resources. [[Please_Use_Search_Engines_And_See_Documentation_First|Please use Search Engines and see Documentation First]]. If needed, submit an upstream support request or bug report. In this case, mentioning {{project_name_long}} is discouraged. Mentioning {{project_name_long}} even though it is an issue unspecific to {{project_name_long}} could add confusion. <ref>
-The reader considering a {{project_name_long}} specific issue while there cannot be one.
+# If the issue is reproducible without involving {{project_name_short}} then the issue is unspecific to {{project_name_short}}. This enables the user to utilize upstream (original authors of Tor software, Tor community) resources. [[Please_Use_Search_Engines_And_See_Documentation_First|Please use Search Engines and see Documentation First]]. If needed, submit an upstream support request or bug report. In this case, mentioning {{project_name_short}} is discouraged. Mentioning {{project_name_short}} even though it is an issue unspecific to {{project_name_short}} could add confusion. <ref>
+The reader considering a {{project_name_short}} specific issue while there cannot be one.
 </ref>
 
 = Further Reading =
 <div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
-* [[Why_does_{{project_name_short}}_use_Tor|Why does {{project_name_long}} use Tor?]]
+* [[Why_does_{{project_name_short}}_use_Tor|Why does {{project_name_short}} use Tor?]]
 * [[Why is Tor slow|Why is Tor slow?]]
 * [[Bridges|Censorship Circumvention - Configure (Private) (Obfuscated) Tor Bridges]]
 * [[Anon_Connection_Wizard|Anon Connection Wizard]]
 * [[Network Obstacle]]
-* [[Hide Tor from your Internet Service Provider|Hide Tor and {{project_name_long}} use from the ISP]]
+* [[Hide Tor from your Internet Service Provider|Hide Tor and {{project_name_short}} use from the ISP]]
 * [[Tor Controller|Tor Controller - Control and Monitor Tor]]
 * [[Onion Services|Hosting Tor Onion Services (<u>any</u> Hidden Webserver)]]
 * [[Comparison Of Tor Proxies CGI proxies Proxy Chains And VPN Services|Comparison of Tor with CGI Proxies, Proxy Chains and VPN Services]]

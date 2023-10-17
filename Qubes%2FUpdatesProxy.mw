@@ -3,13 +3,13 @@
 {{q_project_name_long}} UpdatesProxy Settings
 }}
 {{#seo:
-|description=Qubes dom0 {{q_project_name_long}} UpdatesProxy Settings.
+|description=Qubes dom0 {{q_project_name_short}} UpdatesProxy Settings.
 |image=Qubesupdateproxy31231235.png
 }}
 {{qubes_troubleshooting_mininav}}
 [[image:Qubesupdateproxy31231235.png|250px|thumb]]
 {{intro|
-Qubes dom0 {{q_project_name_long}} UpdatesProxy Settings.
+Qubes dom0 {{q_project_name_short}} UpdatesProxy Settings.
 }}
 <!--EDITORS NOTE:
 https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/share/uwt/qubes_torfied_dom0.txt links to this wiki page.
@@ -64,7 +64,7 @@ To view the Qubes R4.1 default [https://github.com/QubesOS/qubes-core-admin/blob
 # Upgrade {{project_name_long}} Templates through {{project_name_gateway_vm}}.
 $tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
 
-# Deny {{project_name_long}} Templates using UpdatesProxy of any other VM.
+# Deny {{project_name_short}} Templates using UpdatesProxy of any other VM.
 $tag:whonix-updatevm $anyvm deny
 
 # Default rule for all Templates - direct the connection to sys-net
@@ -74,7 +74,7 @@ $anyvm $anyvm deny
 }}
 }}
 
-<u>If [[Multiple_Qubes-Whonix_Templates|Multiple {{q_project_name_long}} Templates]] are configured,</u> like when the {{project_name_long}} Template is cloned, follow instructions below.
+<u>If [[Multiple_Qubes-Whonix_Templates|Multiple {{q_project_name_short}} Templates]] are configured,</u> like when the {{project_name_short}} Template is cloned, follow instructions below.
 
 {{box|text=
 '''1.''' Syntax.
@@ -159,11 +159,11 @@ sudo qubesctl state.sls qvm.{{project_name_workstation_vm}}
 }}
 
 {{box|text=
-In {{project_name_long}} Template.
+In {{project_name_short}} Template.
 
 '''3.''' Next, check if the problem has been corrected.
 
-Run the following command in {{project_name_long}} Template.
+Run the following command in {{project_name_short}} Template.
 
 {{CodeSelect|code=
 sudo systemctl restart qubes-whonix-torified-updates-proxy-check
@@ -177,13 +177,13 @@ sudo apt update
 
 '''5.''' <u>If there are still problems,</u> try re-installation of Qubes-Whonix.
 
-* [[Qubes/Reinstall|Reinstall {{q_project_name_long}} Templates]].
-* If re-installation also fails, then ask for support in the [https://forums.{{project_clearnet}} {{project_name_long}} forums].
+* [[Qubes/Reinstall|Reinstall {{q_project_name_short}} Templates]].
+* If re-installation also fails, then ask for support in the [https://forums.{{project_clearnet}} {{project_name_short}} forums].
 }}
 
 = Additional Information for Advanced Users =
 == Generally ==
-The following {{q_project_name_long}} and {{project_name_long}} GitHub development resources are recommended for interested readers:
+The following {{q_project_name_short}} and {{project_name_short}} GitHub development resources are recommended for interested readers:
 
 * [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/etc/uwt.d/40_qubes.conf <code>/etc/uwt.d/40_qubes.conf</code>]
 * [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/lib/systemd/system/qubes-whonix-torified-updates-proxy-check.service <code>/lib/systemd/system/qubes-whonix-torified-updates-proxy-check.service</code>]
@@ -351,6 +351,21 @@ From the output provided by `apt` in the Template, based on the message from Tin
 * '''B)''' <u>Blocked by remote server issue:</u> A connection being blocked by a remote APT server.
 
 The symptoms and output from both scenarios are identical.
+
+== Proxying refused on filtered domain "127.0.0.1" ==
+In sys-whonix.
+
+<pre>
+Oct 15 15:34:29 host tinyproxy[846]: Proxying refused on filtered domain "127.0.0.1"
+</pre>
+
+This is a non-issue.
+
+File /etc/tinyproxy/updates-blacklist (owned by package qubes-core-agent-networking) contains:
+
+* https://github.com/QubesOS/qubes-core-agent-linux/blob/main/network/updates-blacklist
+
+https://github.com/QubesOS/qubes-issues/issues/8606
 
 = Footnotes =
 {{reflist|close=1}}

@@ -5,7 +5,7 @@
 }}
 [[image:Chaininganon23234.jpg|thumb]]
 {{intro|
-By default, all {{project_name_workstation_long}} traffic is forced through {{project_name_gateway_long}}. Alternatively, a chain of anonymizing gateways can be built, with sample tunnel configurations outlined below.
+By default, all {{project_name_workstation_short}} traffic is forced through {{project_name_gateway_short}}. Alternatively, a chain of anonymizing gateways can be built, with sample tunnel configurations outlined below.
 }}
 = Introduction =
 
@@ -28,7 +28,7 @@ This [[Dev/Inspiration|Inspiration]] resource may also be useful.
 
 {{CodeSelect|code=
 ## chain:
-{{project_name_workstation_long}} -> VPN-Gateway -> {{project_name_gateway_long}} -> clearnet
+{{project_name_workstation_short}} -> VPN-Gateway -> {{project_name_gateway_short}} -> clearnet
 ## connection scheme:
 user -> VPN -> Tor -> Internet
 }}
@@ -39,7 +39,7 @@ For instructions, see [[Tunnels/Connecting_to_a_VPN_before_Tor|here]]. To learn 
 
 {{CodeSelect|code=
 ## chain:
-{{project_name_workstation_long}} -> {{project_name_gateway_long}} -> VPN-Gateway -> clearnet
+{{project_name_workstation_short}} -> {{project_name_gateway_short}} -> VPN-Gateway -> clearnet
 ## connection scheme:
 user -> Tor -> VPN -> Internet
 }}
@@ -50,7 +50,7 @@ For instructions, see [[Tunnels/Connecting_to_Tor_before_a_VPN|here]]. To learn 
 
 {{CodeSelect|code=
 ## chain:
-{{project_name_workstation_long}} -> VPN-Gateway -> {{project_name_gateway_long}} -> VPN-Gateway -> Internet
+{{project_name_workstation_short}} -> VPN-Gateway -> {{project_name_gateway_short}} -> VPN-Gateway -> Internet
 ## connection scheme:
 user -> VPN -> Tor -> VPN -> Internet
 }}
@@ -61,7 +61,7 @@ user -> VPN -> Tor -> VPN -> Internet
 
 {{CodeSelect|code=
 ## chain:
-{{project_name_workstation_long}} -> Proxy-Gateway -> {{project_name_gateway_long}} -> clearnet
+{{project_name_workstation_short}} -> Proxy-Gateway -> {{project_name_gateway_short}} -> clearnet
 ## connection scheme:
 user -> Tor -> Proxy -> Internet
 }}
@@ -76,31 +76,31 @@ Always remember that the connection will be created in reverse order; see the ex
 
 {{CodeSelect|code=
 ## chain:
-{{project_name_workstation_long}} -> Proxy-Gateway -> {{project_name_gateway_long}} -> VPN-Gateway -> clearnet
+{{project_name_workstation_short}} -> Proxy-Gateway -> {{project_name_gateway_short}} -> VPN-Gateway -> clearnet
 ## connection scheme:
 user -> VPN -> Tor -> Proxy -> Internet
 }}
 
 Upon reflection, it becomes clear why the connection happens in reverse order:
 
-* {{project_name_workstation_long}} has no option but to pass through the Proxy-Gateway.
-* The Proxy-Gateway has no option but to pass through {{project_name_gateway_long}}.
+* {{project_name_workstation_short}} has no option but to pass through the Proxy-Gateway.
+* The Proxy-Gateway has no option but to pass through {{project_name_gateway_short}}.
 * In this case, the last element in the chain is the VPN-Gateway, which must obviously connect via [[FAQ#What_is_Clearnet.3F|clearnet]].
 
 In other terms:
 
 * The VPN-Gateway uses clearnet.
-* {{project_name_gateway_long}} uses the VPN-Gateway to connect.
-* The Proxy-Gateway uses {{project_name_gateway_long}} to connect.
-* {{project_name_workstation_long}} uses the Proxy-Gateway to connect.
+* {{project_name_gateway_short}} uses the VPN-Gateway to connect.
+* The Proxy-Gateway uses {{project_name_gateway_short}} to connect.
+* {{project_name_workstation_short}} uses the Proxy-Gateway to connect.
 
-Since the Proxy-Gateway can only pass through {{project_name_gateway_long}} followed by the VPN-Gateway, it is clear why it will be the last hop in front of the destination server.
+Since the Proxy-Gateway can only pass through {{project_name_gateway_short}} followed by the VPN-Gateway, it is clear why it will be the last hop in front of the destination server.
 
 = Other Considerations =
 
-Whether these combinations make sense in terms of security and anonymity is hotly debated and depends on your personal threat model, see [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorPlusVPN Tor plus VPN or Proxy]. Advanced tunneling configurations also require knowledge of how to properly edit ''/etc/network/interfaces'' on {{project_name_gateway_long}} and/or on {{project_name_workstation_long}}. In the case of [[Qubes|{{non_q_project_name_short}}]], this refers to the virtual internal network name in VirtualBox settings.
+Whether these combinations make sense in terms of security and anonymity is hotly debated and depends on your personal threat model, see [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorPlusVPN Tor plus VPN or Proxy]. Advanced tunneling configurations also require knowledge of how to properly edit ''/etc/network/interfaces'' on {{project_name_gateway_short}} and/or on {{project_name_workstation_short}}. In the case of [[Qubes|{{non_q_project_name_short}}]], this refers to the virtual internal network name in VirtualBox settings.
 
-This process is generally difficult because there are no other anonymizing gateways (VPN / JonDo / I2P / Proxy / SSH / VPN) available for download in {{project_name_long}}, just the {{project_name_gateway_long}} which uses Tor to anonymize traffic. This means a search for instructions is often required and/or an anonymizing gateway must be built from scratch. <ref>Instructions for a pfSense based VPN-Gateway can be found with search engines, but it is untested for leaks.</ref>
+This process is generally difficult because there are no other anonymizing gateways (VPN / JonDo / I2P / Proxy / SSH / VPN) available for download in {{project_name_short}}, just the {{project_name_gateway_short}} which uses Tor to anonymize traffic. This means a search for instructions is often required and/or an anonymizing gateway must be built from scratch. <ref>Instructions for a pfSense based VPN-Gateway can be found with search engines, but it is untested for leaks.</ref>
 
 For a VPN-Gateway, see also:
 <br />

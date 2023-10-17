@@ -23,15 +23,15 @@ For example, in December, 2017, five major versions of Tor were supported. Speci
 # Debian <code>stretch</code> repository contained another LTS, which was version <code>0.2.9</code>.
 # <code>deb.torproject.org</code>, also known as Tor, Tor Project or TPO repository, had the latest stable Tor which was version <code>0.3.1.9</code>.
 
-A major consideration in choosing the most suitable Tor version for {{project_name_long}} is that the latest stable found in the TPO repository may lead to network breakage. <ref>https://forums.whonix.org/t/whonix-gateway-tor-0-2-9-9-unrecommended-no-update-unsafe/4240/8</ref> The reason is the "stable" tag indicates it is stable version of Tor, which does not necessarily match the "stable" Debian version that {{project_name_long}} is actually using. <ref>
-The Debian target is usually the stable package, which is currently: {{Stable_project_version_based_on_Debian_codename}}) or {{project_name_long}}.
+A major consideration in choosing the most suitable Tor version for {{project_name_short}} is that the latest stable found in the TPO repository may lead to network breakage. <ref>https://forums.whonix.org/t/whonix-gateway-tor-0-2-9-9-unrecommended-no-update-unsafe/4240/8</ref> The reason is the "stable" tag indicates it is stable version of Tor, which does not necessarily match the "stable" Debian version that {{project_name_short}} is actually using. <ref>
+The Debian target is usually the stable package, which is currently: {{Stable_project_version_based_on_Debian_codename}}) or {{project_name_short}}.
 </ref>
 
-There are three primary Tor options for {{project_name_long}} developers and each of them has pros and cons:
+There are three primary Tor options for {{project_name_short}} developers and each of them has pros and cons:
 
 '''1. Use the Tor LTS version from the official Debian package repository: <code>packages.debian.org</code>'''
 
-* Advantages: Minimal effort is required in {{project_name_long}}.
+* Advantages: Minimal effort is required in {{project_name_short}}.
 * Disadvantages: Might miss the advantages of later versions (see below).
 ** While this was true in past, development of C Tor has slowed down because its replacement Arti is now the development focus of the Tor developers. <ref>
 * https://gitlab.torproject.org/tpo/core/arti/-/blob/main/doc/FAQ.md
@@ -40,35 +40,35 @@ There are three primary Tor options for {{project_name_long}} developers and eac
 </ref>
 *** Related: Whonix forum discussion [https://forums.whonix.org/t/keep-an-eye-on-arti-tor/15815 Keep an eye on Arti (Tor)]
 
-'''2. Use latest stable in TPO repository and allow testers to use the Tor nightly build in {{project_name_long}}, with bug reporting bug to TPO'''
+'''2. Use latest stable in TPO repository and allow testers to use the Tor nightly build in {{project_name_short}}, with bug reporting bug to TPO'''
 
 * Advantages: Latest features, better security, improved Tor Browser compatibility (using <code>SocksPort</code> with flags and even better connectivity performance). <ref>
 Patrick: "Historically when there was a botnet starting to use Tor, the LTS version barely connected while the latest stable had the ntor handshake which worked." See [https://blog.torproject.org/tor-weekly-news-september-4th-2013 tor-weekly-news-september-4th-2013].
 </ref>
 * Disadvantages:
-** From the {{project_name_long}} perspective, these packages are uploaded to <code>deb.torproject.org</code> at random times. These packages are not guaranteed to be compatible with {{project_name_long}}. While there are no security concerns, these packages could break a system's APT package management (due to incompatible dependencies) or connectivity, in case Tor refuses to start. This can arise due to a configuration incompatibility in a newer version of Tor, or for other reasons such as systemd or apparmor related changes.
-** In May 2021 a [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/40436 transient repository issue] [https://forums.whonix.org/t/whonix-on-mac-m1-arm-user-support-still-unsupported-at-time-of-writing/11310/74 broke] {{project_name_long}} build process.
+** From the {{project_name_short}} perspective, these packages are uploaded to <code>deb.torproject.org</code> at random times. These packages are not guaranteed to be compatible with {{project_name_short}}. While there are no security concerns, these packages could break a system's APT package management (due to incompatible dependencies) or connectivity, in case Tor refuses to start. This can arise due to a configuration incompatibility in a newer version of Tor, or for other reasons such as systemd or apparmor related changes.
+** In May 2021 a [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/40436 transient repository issue] [https://forums.whonix.org/t/whonix-on-mac-m1-arm-user-support-still-unsupported-at-time-of-writing/11310/74 broke] {{project_name_short}} build process.
 ** In December 2022, caused issue [https://forums.whonix.org/t/failed-to-start-anonymizing-overlay-network-for-tcp-tor-fails-to-start-a-few-times-before-succeeding-to-start/16289 FAILED to start Anonymizing overlay network for TCP - Tor fails to start a few times before succeeding to start].
 ** In February 2023, might have caused issue [https://forums.whonix.org/t/fresh-whonix-kvm-install-gateway-error/16350 Fresh whonix-kvm install gateway error].
 ** There is nothing similar to <code>snapshot.debian.org</code>. Keeps changing (newer versions being added). Hence, can introduce build issues such as above. Unsuitable for reproducible builds / [[Verifiable Builds]].
 ** [[Dev/Porting|Porting to other architectures]] issues.
 *** Only available for the <code>i386</code>, <code>amd64</code>, <code>arm64</code> architectures.
 *** Introduces differences / issues such as for example for the <code>ppc64el</code> platform. <ref>
-<code>Package: tor-geoipdb</code> <code>Version: 0.4.5.8-1~d10.buster+1</code> is <code>Architecture: all</code> and <code>Depends: tor (>= 0.4.5.8-1~d10.buster+1)</code>. Thereby for example ended up in {{project_name_long}} repository for architecture <code>ppc64el</code>. This did not cause an issue yet.
+<code>Package: tor-geoipdb</code> <code>Version: 0.4.5.8-1~d10.buster+1</code> is <code>Architecture: all</code> and <code>Depends: tor (>= 0.4.5.8-1~d10.buster+1)</code>. Thereby for example ended up in {{project_name_short}} repository for architecture <code>ppc64el</code>. This did not cause an issue yet.
 </ref>
 
 '''3. Versions are downloaded from <code>deb.torproject.org</code>, verified to work, and then migrated to <code>deb.whonix.org</code>'''
 
-* Advantages: Flexibility in version selection, a guaranteed way to confirm that only stable Tor versions which are functional in {{project_name_long}} will be uploaded.
+* Advantages: Flexibility in version selection, a guaranteed way to confirm that only stable Tor versions which are functional in {{project_name_short}} will be uploaded.
 * Disadvantages:
-** A few testers are needed, manual uploads are required, and {{project_name_long}} touches Tor.
+** A few testers are needed, manual uploads are required, and {{project_name_short}} touches Tor.
 ** Other issues from 2. above equally apply.
 
-{{project_name_long}} developers have chosen the third method for Whonix 16. <ref>
-Relative {{project_name_long}} Forum discussion: https://forums.whonix.org/t/tor-releases-discussion/4578
-</ref> However, the comparison above suggests better security and compatibility is afforded by the second option. This approach however would requires a lot of active testers who can use the Tor nightly build and report bugs to the Tor project or {{project_name_long}}, which are unavailable.
+{{project_name_short}} developers have chosen the third method for Whonix 16. <ref>
+Relative {{project_name_short}} Forum discussion: https://forums.whonix.org/t/tor-releases-discussion/4578
+</ref> However, the comparison above suggests better security and compatibility is afforded by the second option. This approach however would requires a lot of active testers who can use the Tor nightly build and report bugs to the Tor project or {{project_name_short}}, which are unavailable.
 
-{{project_name_long}} developers have chosen the first method for Whonix 17 because development of C Tor has slowed down in favor or Arti as mentioned above.
+{{project_name_short}} developers have chosen the first method for Whonix 17 because development of C Tor has slowed down in favor or Arti as mentioned above.
 
 = Tor Config Files =
 == Rationale for Tor Drop-In Configuration Folder ==
@@ -81,7 +81,7 @@ The implementation is as it follows.
 * The lexical high file [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/torrc.d/95_whonix.conf <code>/etc/torrc.d/95_whonix.conf</code>] instructions to <code>%include /usr/local/etc/torrc.d/</code>.
 * Instructions in <code>/etc/tor/torrc</code> and [[Tor|documentation]] instructs users to not edit that file and use use <code>/usr/local/etc/torrc.d/50_user.conf</code> instead.
 * <code>/etc/tor/torrc.examples</code> contains configuration examples.
-* Some {{project_name_long}} Tor settings unfortunately still go into [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/share/tor/tor-service-defaults-torrc.anondist <code>/usr/share/tor/tor-service-defaults-torrc</code>] due to [https://phabricator.whonix.org/T947 Qubes-Whonix eth1 static networking] feature not being implemented yet.
+* Some {{project_name_short}} Tor settings unfortunately still go into [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/share/tor/tor-service-defaults-torrc.anondist <code>/usr/share/tor/tor-service-defaults-torrc</code>] due to [https://phabricator.whonix.org/T947 Qubes-Whonix eth1 static networking] feature not being implemented yet.
 * Most users probably ignore <code>/usr/share/tor/tor-service-defaults-torrc</code>, because this file is barely advertised and barely popular.
 * <code>/usr/share/tor/tor-service-defaults-torrc</code> can be modified by Qubes-Whonix [https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-whonix/replace-ips <code>replace-ips</code>] without any conflicts with user modifications or [[Configuration_Files#dpkg_interactive_conflict_resolution_dialog|<code>dpkg interactive conflict resolution dialog</code>]].
 ** https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/lib/systemd/system/anon-gw-anonymizer-config.service
@@ -99,7 +99,7 @@ The implementation is as it follows.
 
 === Only One Config File ===
 * Using only {{Code2|/etc/tor/torrc}}, leaving {{Code2|/usr/share/tor/tor-service-defaults-torrc}} with defaults (from Debian), not using {{Code2|/etc/tor/torrc.examples}}.
-* Using {{Code2|/etc/tor/torrc}} for user examples, user's own modifications and {{project_name_long}} Tor settings.
+* Using {{Code2|/etc/tor/torrc}} for user examples, user's own modifications and {{project_name_short}} Tor settings.
 * This is bad, because when users have edited {{Code2|/etc/tor/torrc}} and anon-gw-anonymizer-config gets updated, it will throw an [[Configuration_Files#dpkg_interactive_conflict_resolution_dialog|<code>dpkg interactive conflict resolution dialog</code>]]. Users might decide to keep their old config file and will miss (security) improvements.
 
 = Tor Control =
@@ -107,12 +107,12 @@ See [[Dev/onion-grater#Talking_to_the_real_Tor_Controller|Talking to the real To
 
 = Why Waste Network Bandwidth by Downloading Operating System Updates over Tor? =
 
-The short answer is this option was discussed with The Tor Project and {{project_name_long}} was granted permission to do so.
+The short answer is this option was discussed with The Tor Project and {{project_name_short}} was granted permission to do so.
 
 Interested readers who want to learn more should review the following:
 
 * Tor Project thread about this issue; see [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorBOX/Dev/ArchivedDiscussion/DOCUMENTATION#updatesoverTorshouldnotwasteTorbandwidthDOCUMENTATIONSOLVED updates over Tor, should not waste Tor bandwidth].
-* The Tor Project was asked directly, after this issue and possible solutions were discussed thoroughly by the {{project_name_long}} team; see [https://lists.torproject.org/pipermail/tor-talk/2012-March/023486.html tor-talk Operating system updates / software installation behind Tor Transparent Proxy]. <ref>Click [https://lists.torproject.org/pipermail/tor-talk/2012-March/subject.html#23507 here] for an overview of all answers.</ref>
+* The Tor Project was asked directly, after this issue and possible solutions were discussed thoroughly by the {{project_name_short}} team; see [https://lists.torproject.org/pipermail/tor-talk/2012-March/023486.html tor-talk Operating system updates / software installation behind Tor Transparent Proxy]. <ref>Click [https://lists.torproject.org/pipermail/tor-talk/2012-March/subject.html#23507 here] for an overview of all answers.</ref>
 * Andrew Lewman, a former Executive Director, Director and press contact for Tor downloads a lot of updates over the network and [https://lists.torproject.org/pipermail/tor-talk/2012-March/023493.html did not complain].
 
 = Forum Discussion =

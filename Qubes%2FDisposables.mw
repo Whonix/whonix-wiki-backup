@@ -8,7 +8,7 @@ Qubes Disposables
 }}
 [[image:Qubesdisposable123123123.png|190px|thumb]]
 {{intro|
-How to use Disposables in {{q_project_name_long}}.
+How to use Disposables in {{q_project_name_short}}.
 }}
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
@@ -31,17 +31,17 @@ While Disposables ensure that files do not persist without user intervention, th
 
 == The Layered Disposable System ==
 
-Qubes uses a two-layered approach to Disposables. At the core of the system is a [https://www.qubes-os.org/doc/glossary/#template ''Template''] upon which a ''[https://www.qubes-os.org/doc/glossary/#disposable-template Disposable Template]'' is based. Every time a new Disposable is launched it is based on the ''Disposable Template'' - hence, two layers. In a standard [[Qubes|{{q_project_name_long}}]] installation:
+Qubes uses a two-layered approach to Disposables. At the core of the system is a [https://www.qubes-os.org/doc/glossary/#template ''Template''] upon which a ''[https://www.qubes-os.org/doc/glossary/#disposable-template Disposable Template]'' is based. Every time a new Disposable is launched it is based on the ''Disposable Template'' - hence, two layers. In a standard [[Qubes|{{q_project_name_short}}]] installation:
 
 * The {{project_name_workstation_long}} default Template is <code>{{project_name_workstation_template}}</code>.
-* The {{project_name_workstation_long}} default Disposable Template is called <code>{{whonix-ws-dvm}}</code>.
-* Each {{project_name_workstation_long}} default Disposable (<code>disp1, disp2, ...</code>) is based on <code>{{whonix-ws-dvm}}</code>.
+* The {{project_name_workstation_short}} default Disposable Template is called <code>{{whonix-ws-dvm}}</code>.
+* Each {{project_name_workstation_short}} default Disposable (<code>disp1, disp2, ...</code>) is based on <code>{{whonix-ws-dvm}}</code>.
 
 Once a Disposable Template is created, its <i>/home/user/</i> directory can be customized <ref>https://www.qubes-os.org/doc/disposable-customization/</ref> independently of the Template. In this special case, the Disposable Template will continue to inherit changes from the base Template's root filesystem (like package updates), but user files in <i>/home/user/</i> will persist independently.
 
 It is possible to have multiple Disposable Templates and Disposables at the same time. <i>Any</i> App Qube can be enabled for use as a template for Disposables, by setting its [https://www.qubes-os.org/doc/disposable-customization/ <code>template_for_dispvms</code>] property.
 
-In Qubes R4, [[Qubes|{{q_project_name_long}}]] {{VersionShort}}'s default Disposable Template (<code>{{whonix-ws-dvm}}</code>) can be easily created [[#Setup|using salt]] and will have this property set.
+In Qubes R4, [[Qubes|{{q_project_name_short}}]] {{VersionShort}}'s default Disposable Template (<code>{{whonix-ws-dvm}}</code>) can be easily created [[#Setup|using salt]] and will have this property set.
 
 == Disposable Traffic Stream Isolation ==
 
@@ -53,9 +53,11 @@ Disposables work especially well with {{project_name_gateway_long}}. <ref>Becaus
 
 {| class="wikitable"
 |-
+
 ! scope="col"| '''Category'''
 ! scope="col"| '''Warning'''
 |-
+
 ! scope="row"| Amnesic Capability
 |
 * All changes to a Disposable's file system are discarded upon shutdown. However, Disposables are similar to snapshots insofar as they can leave traces of their activity on storage and in memory. <u>These traces may be later recoverable through data forensics.</u> <br />
@@ -63,18 +65,21 @@ Disposables work especially well with {{project_name_gateway_long}}. <ref>Becaus
 [https://github.com/QubesOS/qubes-issues/issues/3037 4.0rc1 dirty shutdown causes disposables to remain persistent #3037]
 </ref>
 |-
-! scope="row"| Ephemeral {{project_name_gateway_long}} ProxyVMs
-| Using Disposables for both the {{project_name_long}} Gateway and Workstation in Qubes <u>does not</u> increase security without any corresponding privacy downside, for the following reasons: <ref>[[#Warnings|Disposables are not Amnesic]].</ref> <ref>https://github.com/QubesOS/qubes-issues/issues/904</ref> <ref>[[Tor_Entry_Guards|Tor Entry Guards]].</ref> <br />
+
+! scope="row"| Ephemeral {{project_name_gateway_short}} ProxyVMs
+| Using Disposables for both the {{project_name_short}} Gateway and Workstation in Qubes <u>does not</u> increase security without any corresponding privacy downside, for the following reasons: <ref>[[#Warnings|Disposables are not Amnesic]].</ref> <ref>https://github.com/QubesOS/qubes-issues/issues/904</ref> <ref>[[Tor_Entry_Guards|Tor Entry Guards]].</ref> <br />
 * Disposables are not amnesic. In practice this means traces of their activity can be left on storage or in memory, making them vulnerable to forensic operations. <ref>This is another reminder of why full disk encryption should always be used on the host.</ref> <br />
-* Using a Disposable for the {{project_name_gateway_long}} results in [[Tor_Entry_Guards#Configure_Non-Persistent_Entry_Guards|non-persistent entry guards]] to the Tor network; behavior unlike the default configurations for {{project_name_long}}, Tor, and the Tor Browser Bundle. Mathematically speaking, end-to-end correlation attacks are ''more'' likely to succeed when a user chooses many random entry and exit points in the Tor network, rather than semi-permanent entry guards which are only rotated every few months. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/8240</ref> <ref>The reason is there are both malicious and benign guards in the Tor network. The more often the user "rolls the dice" (changes guards), the greater the chance of striking out.</ref> <br />
-* See additional footnote. <ref>The solution to the first problem is only allowing [https://github.com/QubesOS/qubes-issues/issues/904 in-RAM execution of Disposables], but this is not planned for implementation in the short-term. There is no perfect solution to the second problem. That said, there is an actual unstated security-privacy trade-off by running this configuration. Theoretically, an ephemeral {{project_name_gateway_long}} ProxyVM is only able to be infected for a single session (via the ''/home'', ''/usr/local'' and ''/rw'' directories), since it is discarded upon shutdown. This provides a counterbalance to the increased threat of malicious guards, as [https://gitlab.tails.boum.org/tails/blueprints/-/wikis/persistent_Tor_state/ {{project_name_long}} becomes more "Tails-like"].</ref>
+* Using a Disposable for the {{project_name_gateway_short}} results in [[Tor_Entry_Guards#Configure_Non-Persistent_Entry_Guards|non-persistent entry guards]] to the Tor network; behavior unlike the default configurations for {{project_name_short}}, Tor, and the Tor Browser Bundle. Mathematically speaking, end-to-end correlation attacks are ''more'' likely to succeed when a user chooses many random entry and exit points in the Tor network, rather than semi-permanent entry guards which are only rotated every few months. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/8240</ref> <ref>The reason is there are both malicious and benign guards in the Tor network. The more often the user "rolls the dice" (changes guards), the greater the chance of striking out.</ref> <br />
+* See additional footnote. <ref>The solution to the first problem is only allowing [https://github.com/QubesOS/qubes-issues/issues/904 in-RAM execution of Disposables], but this is not planned for implementation in the short-term. There is no perfect solution to the second problem. That said, there is an actual unstated security-privacy trade-off by running this configuration. Theoretically, an ephemeral {{project_name_gateway_short}} ProxyVM is only able to be infected for a single session (via the ''/home'', ''/usr/local'' and ''/rw'' directories), since it is discarded upon shutdown. This provides a counterbalance to the increased threat of malicious guards, as [https://gitlab.tails.boum.org/tails/blueprints/-/wikis/persistent_Tor_state/ {{project_name_short}} becomes more "Tails-like"].</ref>
 |-
+
 ! scope="row"| Named Disposables: Manual Shutdown
-| Unlike Disposables spawned from the {{project_name_long}} default Disposable Template,<ref>See [[#User_Tips|Disposable Shutdown]] for more on this.</ref> named Disposables do <u>not</u> automatically shutdown when the first user process is terminated. If a fresh Named Disposable is needed, users must first shutdown the named Disposable and start a new Disposable instance. <ref>This is because named Disposables are created using a similar method to that which is used to create App Qubes. This means that named Disposables -- in <u>some</u> respects -- exhibit behavior similar to that of an App Qube. For example, behavior such as persistent VM settings across restarts; this includes, but is not limited to settings like --netvm, --autostart and --label to name a few. Before starting a new named Disposable instance, first verify in Qube Manager that the VM is fully shutdown.</ref> Failure to do so could lead to session data from previous activities persisting until the Disposable is properly shutdown.
+| Unlike Disposables spawned from the {{project_name_short}} default Disposable Template,<ref>See [[#User_Tips|Disposable Shutdown]] for more on this.</ref> named Disposables do <u>not</u> automatically shutdown when the first user process is terminated. If a fresh Named Disposable is needed, users must first shutdown the named Disposable and start a new Disposable instance. <ref>This is because named Disposables are created using a similar method to that which is used to create App Qubes. This means that named Disposables -- in <u>some</u> respects -- exhibit behavior similar to that of an App Qube. For example, behavior such as persistent VM settings across restarts; this includes, but is not limited to settings like --netvm, --autostart and --label to name a few. Before starting a new named Disposable instance, first verify in Qube Manager that the VM is fully shutdown.</ref> Failure to do so could lead to session data from previous activities persisting until the Disposable is properly shutdown.
 |-
+
 ! scope="row"| Spawning Disposables
 |
-* If a Disposable is spawned from within a VM that is not connected to {{project_name_gateway_long}}, the new Disposable may route its traffic over clearnet. <ref>Disposables are created in one of two ways:
+* If a Disposable is spawned from within a VM that is not connected to {{project_name_gateway_short}}, the new Disposable may route its traffic over clearnet. <ref>Disposables are created in one of two ways:
 <code>Open in Disposable</code>. On the command line (domU), run.
 {{CodeSelect|code=
 qvm-open-in-dvm
@@ -82,34 +87,40 @@ qvm-open-in-dvm
 </pre><code>Edit/View in Disposable</Code>. From the GUI context-menu (domU).
 <code>File</code> &rarr; <code>Actions</code> &rarr; <code>Edit/View in Disposable</code></pre>  </ref> <br />
 * The reason is because Disposables inherit their NetVMs from the calling VM, or the calling VM's <code>dispvm_netvm</code> setting (if different). The <code>dispvm_netvm</code> setting can be configured per VM via: <code>dom0</code> &rarr; <code>Qube Manager</code> &rarr; <code>VM Settings</code> &rarr; <code>Advanced</code> &rarr; <code>NetVM for Disposable</code> <ref>On the command line (dom0), run. {{CodeSelect|code=qvm-prefs -s vmname dispvm_netvm {{project_name_gateway_vm}}}} </ref> <br />
-* If the calling VM is connected to {{project_name_gateway_long}}, this step is not necessary and the Disposable's traffic will be routed over Tor. See: [https://github.com/QubesOS/qubes-issues/issues/1954 {{project_name_long}} default NetVM settings fixes].
+* If the calling VM is connected to {{project_name_gateway_short}}, this step is not necessary and the Disposable's traffic will be routed over Tor. See: [https://github.com/QubesOS/qubes-issues/issues/1954 {{project_name_short}} default NetVM settings fixes].
 |-
+
 ! scope="row"| Tor Browser in a Disposable Template
 | Do not start Tor Browser in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]]. Only start Tor Browser in App Qubes or Disposables, see: [[Qubes/Disposables#Start_Tor_Browser_in_a_Disposable|Start Tor Browser in a Disposable]].
 |-
 ! scope="row"| Tor Browser Updater in a Disposable Template
-| Do not start Tor Browser Updater in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#tb-updater_in_Qubes_Disposable_Template|tb-updater in Qubes Disposable Template]]. Instead, run [[#Keep Tor Browser Up-to-date|Tor Browser Downloader]] by {{project_name_long}} developers in {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>).
+| Do not start Tor Browser Updater in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#tb-updater_in_Qubes_Disposable_Template|tb-updater in Qubes Disposable Template]]. Instead, run [[#Keep Tor Browser Up-to-date|Tor Browser Downloader]] by {{project_name_short}} developers in {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>).
 |-
+
 ! scope="row"| Tor Browser Version
 |
 * When using Disposables, use the [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] daily to check the browser is up-to-date! <br />
 * To learn about recent Tor Browser versions, follow [https://blog.torproject.org The Tor Project blog]. Tor Browser's version number can also be checked manually: <code>Tor Browser</code> &rarr; <code>Menu</code> &rarr; <code><u>H</u>elp</code> &rarr; <code>About Tor Browser</code>. See [[#Keep Tor Browser Up-to-date|Keep Tor Browser Up-to-date]].
 |-
+
 ! scope="row"| Verify Disposable Status
 |
 * Use caution when spawning a Disposable for the first time when it is based on a freshly created Disposable Template. This [https://github.com/QubesOS/qubes-issues/issues/3574 Qubes bug] can lead to the Disposable Template starting instead of the Disposable. <ref>https://forums.whonix.org/t/whonix-14-starting-a-whonix-14-dispvm-actually-starts-the-templatebasedvm-instead/5579</ref> <ref>After creation of a new Disposable Template, all VMs spawned from the Disposable Template should be Disposables by design. This includes the first start and all subsequent starts thereafter. While this is expected behavior, it is safest to confirm the Disposable was correctly spawned on each occasion it is used.</ref> There could be serious consequences if an application like Tor Browser was started in a Disposable Template and used extensively for web browsing. Compromise of the Disposable Template would mean all Disposables spawned from it would be similarly compromised; see [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]]. <br />
-* To check the freshly started VM is a Disposable, verify it is named <i>[disp xxxx]</i> where <i>xxxx</i> is the number assigned to that Disposable. If the Disposable Template was started instead, then it should be shut down immediately. If the Disposable Template is ever inadvertently used for a dangerous activity like web browsing, then delete it and create a new one. This issue might be fixed in Qubes R4.2.
+* To check the freshly started VM is a Disposable, verify it is named <i>[disp xxxx]</i> where <i>xxxx</i> is the number assigned to that Disposable. If the Disposable Template was started instead, then it should be shut down immediately. If the Disposable Template is ever inadvertently used for a dangerous activity like web browsing, then delete it and create a new one. This issue might be fixed in Qubes R4.2. This issue is likely not fixed in Qubes R4.1. Once Qubes-Whonix 16 for Qubes R4.1 has been deprecated, this warning can be removed.
 |-
-! scope="row"| {{project_name_gateway_long}} Linkability
-| The Tor Project developer Teor has stated that [[Tor]] caches {{Code|DNS, HS descriptors, pre-emptive circuits, etc.}} <ref>https://lists.torproject.org/pipermail/tor-dev/2016-October/011591.html</ref> which may lead to linkage between App Qubes and Disposables sharing the same {{project_name_gateway_long}}. The extent to which this is a threat for {{project_name_long}} users has now been documented; see [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]].
+
+! scope="row"| {{project_name_gateway_short}} Linkability
+| The Tor Project developer Teor has stated that [[Tor]] caches {{Code|DNS, HS descriptors, pre-emptive circuits, etc.}} <ref>https://lists.torproject.org/pipermail/tor-dev/2016-October/011591.html</ref> which may lead to linkage between App Qubes and Disposables sharing the same {{project_name_gateway_short}}. The extent to which this is a threat for {{project_name_short}} users has now been documented; see [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_short}}]].
+|-
+
 |}
 
 = Setup =
 <u>Note:</u> Examples below reference GUI steps whenever possible.
 
-== Create a {{project_name_long}} Default Disposable Template based on {{project_name_workstation_long}} ==
+== Create a {{project_name_short}} Default Disposable Template based on {{project_name_workstation_short}} ==
 
-'''1.''' [[Qubes/Update|Update]] [[Qubes|{{q_project_name_long}}]].
+'''1.''' [[Qubes/Update|Update]] [[Qubes|{{q_project_name_short}}]].
 
 '''2.''' Open a dom0 terminal: <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>System Tools</code> &rarr; <code>Xfce Terminal</code>
 
@@ -121,9 +132,9 @@ sudo qubesctl state.sls qvm.whonix-ws-dvm
 
 '''4.''' Done.
 
-[[Qubes|{{q_project_name_long}}]] Dispoables are now ready for use.
+[[Qubes|{{q_project_name_short}}]] Dispoables are now ready for use.
 
-== Create a Named {{project_name_long}} Disposable based on {{project_name_workstation_long}} ==
+== Create a Named {{project_name_short}} Disposable based on {{project_name_workstation_short}} ==
 
 {{mbox
 | type    = notice
@@ -140,7 +151,7 @@ A named Disposable is not a Disposable Template.
 
 Therefore when selecting a name for a named Disposable, do ''not'' include <code>-dvm</code> when naming Disposables! This is because dvm has a different meaning. The meaning of dvm is Disposable Template. A named Disposable with dvm in it's name would be a contradiction.
 
-Tor Browser will not be inherited from {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>) if this advice is ignored.
+Tor Browser will not be inherited from {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>) if this advice is ignored.
 
 Before creating named Disposables, familiarize yourself with their behavior and read all relevant [[Qubes/Disposables#Warnings|warnings]]. Failure to do so could lead to unwanted behavior which occurs without the user's knowledge.
 {{Box|text=
@@ -167,7 +178,7 @@ TODO - Investigate use cases for this procedure:
 
 === Disposable Templates ===
 
-Extra caution must be exercised when customizing a Disposable Template. <ref>Qubes documentation: [https://www.qubes-os.org/doc/disposable-customization/ Disposable Customization].</ref> From a privacy perspective, it is ideal to have a Disposable Template that is indistinguishable from any other {{project_name_workstation_long}}. If changes are made to the Disposable Template, these may link all of the Disposables via a uniquely generated fingerprint should they be compromised independently. Risky changes include, but are not limited to:
+Extra caution must be exercised when customizing a Disposable Template. <ref>Qubes documentation: [https://www.qubes-os.org/doc/disposable-customization/ Disposable Customization].</ref> From a privacy perspective, it is ideal to have a Disposable Template that is indistinguishable from any other {{project_name_workstation_short}}. If changes are made to the Disposable Template, these may link all of the Disposables via a uniquely generated fingerprint should they be compromised independently. Risky changes include, but are not limited to:
 
 * Installation of obscure programs;
 * Uncommon configuration settings; or
@@ -236,7 +247,7 @@ Note the Disposable Template cannot be deleted while it is the default Disposabl
 <ref>Or on the command line (dom0), run. {{CodeSelect|code=qvm-remove <vmname>}}</ref>
 
 == Keep Tor Browser Up-to-date ==
-To obtain the latest Tor Browser, the simplest method is to use {{project_name_long}} built-in Tor Browser downloader functionality. Simply update using [[Tor_Browser#Tor_Browser_Downloader_by_{{project_name_long}}|Tor Browser Downloader by {{project_name_long}} (tb-updater)]] in {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>) when performing your usual maintenance [[Qubes/Update|updating]]:
+To obtain the latest Tor Browser, the simplest method is to use {{project_name_short}} built-in Tor Browser downloader functionality. Simply update using [[Tor_Browser#Tor_Browser_Downloader_by_{{project_name_short}}|Tor Browser Downloader by {{project_name_short}} (tb-updater)]] in {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>) when performing your usual maintenance [[Qubes/Update|updating]]:
 
 '''1.''' Qubes App Launcher
 
@@ -266,7 +277,7 @@ sudo apt full-upgrade
 
 If Tor Browser has an issue and has not been upgraded, use {{Code2|update-torbrowser}} to download a new copy.
 
-Launch Tor Browser Downloader by {{project_name_long}} and follow the instructions. <ref>
+Launch Tor Browser Downloader by {{project_name_short}} and follow the instructions. <ref>
 {{CodeSelect|code=
 update-torbrowser
 }}
@@ -310,28 +321,34 @@ With either kind of VM, Qubes' VM integration tools like [https://www.qubes-os.o
 
 {| class="wikitable"
 |-
+
 ! scope="col"| '''Category'''
 ! scope="col"| '''Recommendation'''
 |-
+
 ! scope="row"| Data Storage
 |
 * In Qubes, it is unrecommended to store any valuable data in an untrusted VM. This perspective is reinforced by the Tor Browser design which similarly does not remember bookmarks or credentials. Best practice is to store sensitive data in an offline vault VM; for instance, when accessing passwords with a password manager. <br />
-* @rustybird has announced a new "split-tor-browser" <ref>[https://github.com/rustybird/qubes-app-split-browser Github: Split Browser]</ref> package that can retrieve urls and credentials from a trusted VM for use in a Disposable's browser. This package is yet to be tested or endorsed by {{project_name_long}}, but it looks promising.
+* @rustybird has announced a new "split-tor-browser" <ref>[https://github.com/rustybird/qubes-app-split-browser Github: Split Browser]</ref> package that can retrieve urls and credentials from a trusted VM for use in a Disposable's browser. This package is yet to be tested or endorsed by {{project_name_short}}, but it looks promising.
 |-
+
 ! scope="row"| Disposable Shutdown
 | A Disposable automatically shuts down when the <u>first</u> user-launched process is terminated. For example, if a new Disposable is created by launching Tor Browser and a user simultaneously starts typing in an editor later on, all this work will be lost after Tor Browser is closed. To avoid this, first launch a terminal in the Disposable and then launch additional applications from the terminal. This way the Disposable is only destroyed after exiting the terminal.
 |-
+
 ! scope="row"| Offline Disposables
 |
 * Use utmost caution if deciding to re-establish network connectivity for off-line Disposables! No mechanism is currently available to prevent connections to a clearnet NetVM. <br />
 * Non-networked Disposables are useful for opening untrusted files that potentially might try to use the network maliciously. Like all Qubes VMs, the NetVM for a Disposable can be changed dynamically while the VM is still running. Simply set the NetVM to "none" using Qube Manager or the command line interface. <ref>On the command line (dom0), run.{{CodeSelect|code=qvm-prefs disp<1 {{!}} 2 {{!}} ...> netvm none}}</ref>
 |-
+
 ! scope="row"| Shortcuts
 |
 * Disposables can be created directly by launching programs from the application menu using shortcuts; [[#Add_a_Desktop_Shortcut|see below for instructions]]. <br />
 * Disposables can also be spawned by using context-menus or the command line interface in other App Qubes. Refer to the [https://www.qubes-os.org/doc/how-to-use-disposables/ Qubes Disposable documentation] for instructions on different methods. <br />
 * Note the [[#Warnings|relevant warning]] concerning shortcuts in this chapter ("Spawning Disposables").
 |-
+
 ! scope="row"| Spawning Disposables from other App Qubes
 |
 * There are several ways to spawn Disposables from App Qubes. In fact, in addition to the dom0 terminal and application menu, users can also spawn Disposables from the App Qube terminal emulator or context-menu. <ref>See: [https://www.qubes-os.org/doc/how-to-use-disposables/ Qubes Disposables].</ref> These tools provide a safe and convenient way to open files and email attachments that could contain malicious code. There is also an option to convert potentially dangerous [https://en.wikipedia.org/wiki/PDF PDFs] into trusted PDFs and open it in a Disposable. <ref>See Micahflee's blog on [https://micahflee.com/2016/07/how-qubes-makes-handling-pdfs-way-safer/ How Qubes makes handling pdfs way safer].</ref> <br />
@@ -343,6 +360,8 @@ With either kind of VM, Qubes' VM integration tools like [https://www.qubes-os.o
 # Command line interface - open file in Disposable:{{CodeSelect|code=
 qvm-open-in-dvm <file_name>
 }}
+|-
+
 |}
 
 == Add a Desktop Shortcut ==
@@ -373,7 +392,7 @@ qvm-run --dispvm={{whonix-ws-dvm}} torbrowser
 
 After launch, ''always'' first [[#Warnings|check the Tor Browser version]]!
 
-'''Figure:''' ''Tor Browser in {{q_project_name_long}} Disposable''
+'''Figure:''' ''Tor Browser in {{q_project_name_short}} Disposable''
 
 {{ContentImage|
 [[Image:QubesDispVM.png|border]]

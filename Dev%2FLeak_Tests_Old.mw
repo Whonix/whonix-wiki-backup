@@ -13,9 +13,9 @@ This leak testing article was written by adrelanos and smarm for {{project_name_
 
 Discussion: “Leak testing” (as defined here), is the process of verifying that the {{project_name_gateway_long}} will not send unencrypted / “in the clear” network traffic. Only Tor traffic should be observed coming from the {{project_name_gateway_long}}.
 
-= Leak through the {{project_name_gateway_long}} =
+= Leak through the {{project_name_gateway_short}} =
 
-Due to misconfiguration of the {{project_name_gateway_long}} the {{project_name_gateway_long}} might forward traffic for {{project_name_workstation_long}} which goes not trough Tor. The following tests are designed to test for such behaviour.
+Due to misconfiguration of the {{project_name_gateway_short}} the {{project_name_gateway_short}} might forward traffic for {{project_name_workstation_long}} which goes not trough Tor. The following tests are designed to test for such behaviour.
 
 == Step 0: restrict Tor outgoing ports while testing ==
 
@@ -52,7 +52,7 @@ Three tools are used during testing:
 
 [https://en.wikipedia.org/wiki/Python_%28programming_language%29 Python]: Used to support Scapy and can be used to easily script Scapy tests.
 
-Install <code>wireshark</code> to the {{project_name_gateway_long}}:
+Install <code>wireshark</code> to the {{project_name_gateway_short}}:
 
 <pre>apt install tshark</pre>
 
@@ -60,7 +60,7 @@ Set capabilities to run wireshark with user privileges
 
 <pre>sudo setcap cap_net_raw,cap_net_admin=eip /usr/bin/dumpcap</pre>
 
-Install <code>scapy</code> to the {{project_name_workstation_long}}:
+Install <code>scapy</code> to the {{project_name_workstation_short}}:
 
 <pre>apt install python-scapy</pre>
 
@@ -68,7 +68,7 @@ Install <code>scapy</code> to the {{project_name_workstation_long}}:
 
 == Step 2: Verify Wireshark is installed and working ==
 
-({{project_name_gateway_long}})
+({{project_name_gateway_short}})
 
 '''Warning''': It is unadvisable to run Wireshark as root. 'su user'
 
@@ -80,7 +80,7 @@ You should see packets begin to scroll down the screen. This indicates you are s
 
 == Step 3: Verify Scapy is installed and working ==
 
-({{project_name_workstation_long}})
+({{project_name_workstation_short}})
 
 Start Scapy with elevated privileges to allow both sending and receiving of packets:
 
@@ -109,9 +109,9 @@ See more information at the official [https://www.secdev.org/projects/scapy/doc/
 
 == Step 4: Do a simple ping test ==
 
-({{project_name_workstation_long}})
+({{project_name_workstation_short}})
 
-Since Scapy is scriptable via Python, we'll use Scapy from within a Python script for our testing. An example script that creates a simple ICMP ping to the {{project_name_gateway_long}} <code>eth1</code> interface:
+Since Scapy is scriptable via Python, we'll use Scapy from within a Python script for our testing. An example script that creates a simple ICMP ping to the {{project_name_gateway_short}} <code>eth1</code> interface:
 
 <pre>nano simple_ping.py</pre>
 
@@ -165,7 +165,7 @@ else:
 # Prints a short report on the packet received (if any).
         test_ping.summary()</pre>
 
-Which will report the first successful ping from <code>eth1</code> on the {{project_name_gateway_long}}.
+Which will report the first successful ping from <code>eth1</code> on the {{project_name_gateway_short}}.
 
 To test, simply:
 
@@ -183,7 +183,7 @@ Received 7 packets, got 1 answers, remaining 0 packets
 
 == Step 5: Setting up a “non-Tor traffic” capture with Wireshark ==
 
-({{project_name_gateway_long}})
+({{project_name_gateway_short}})
 
 The command:
 
@@ -193,7 +193,7 @@ sudo -u user tshark -i eth0 -S -f "ip and src host 10.0.2.15 and not (port 80 or
 
 (if you are not using VirtualBox NAT, you have to change the IP to your eth0 ip address, to find out that address type 'ifconfig') (TODO: make the command independent from the IP, use eth0)
 
-When started wireshark should show NO packet information on the screen, as opposed to above where we capture Everything. To verify it is working correctly (and logging something, as opposed to logging nothing), (open a second SSH session or learn 'screen') from your {{project_name_gateway_long}} attempt to ping google.com. This should show something similar to:
+When started wireshark should show NO packet information on the screen, as opposed to above where we capture Everything. To verify it is working correctly (and logging something, as opposed to logging nothing), (open a second SSH session or learn 'screen') from your {{project_name_gateway_short}} attempt to ping google.com. This should show something similar to:
 
 <pre>
 5.115829 <eth0 IP address>; &rarr;; <nearby Google mirror>; ICMP 98 Echo (ping) request  id#0x1010,</pre>
@@ -218,11 +218,11 @@ The “capture expression” (the bit in quotes above, after the '-f') reads: IP
 
 See the [https://www.wireshark.org/docs/wsug_html_chunked/ChCapCaptureFilterSection.html documentation for the format of the “capture filter” here], for more information.
 
-(Note: This may not cover all valid TOR traffic emiting from your {{project_name_long}}, some Tor nodes may use non-standard ports and was observed during testing. The FAQ above, also covers this.)
+(Note: This may not cover all valid TOR traffic emiting from your {{project_name_short}}, some Tor nodes may use non-standard ports and was observed during testing. The FAQ above, also covers this.)
 
 == Step 6: Scapy traffic testing: IP packets ==
 
-({{project_name_workstation_long}})
+({{project_name_workstation_short}})
 
 Other testing is in the same vein as our ping (above).
 
@@ -258,11 +258,11 @@ Run
 
 <pre>sudo python exhaustive_ip_send.py</pre>
 
-On {{project_name_gateway_long}} you should see NO output from Wireshark. Otherwise you may have discovered a leak. [https://en.wikipedia.org/wiki/IPv4#Packet_structure Documentation on IP packet structure] and [https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers IP Protocol numbers].
+On {{project_name_gateway_short}} you should see NO output from Wireshark. Otherwise you may have discovered a leak. [https://en.wikipedia.org/wiki/IPv4#Packet_structure Documentation on IP packet structure] and [https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers IP Protocol numbers].
 
 == Step 7: Scapy traffic testing: TCP packets and ports ==
 
-({{project_name_workstation_long}})
+({{project_name_workstation_short}})
 
 '''Second''': We'll test TCP packets across all ports: (Note: This may appear as an '''ATTACK''' from some conservative ISP's / sites, use with caution. Google fields many of these types of scan's per day, so testing like this is most likely lost in the noise)
 
@@ -297,11 +297,11 @@ Run
 
 <pre>sudo python tcp_test.py</pre>
 
-Again {{project_name_gateway_long}} should report NO activity, otherwise we've found a leak [https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers TCP / UDP port number documentation].
+Again {{project_name_gateway_short}} should report NO activity, otherwise we've found a leak [https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers TCP / UDP port number documentation].
 
 == Step 8: Scapy traffic testing: UDP packets and ports ==
 
-({{project_name_workstation_long}})
+({{project_name_workstation_short}})
 
 '''Third''': We'll test UDP packets across all ports:
 

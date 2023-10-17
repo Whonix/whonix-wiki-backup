@@ -1,24 +1,31 @@
-{{Box|text=
-* Qubes R4.1: Verify <code>whonix_version</code> is <code>16</code>.
-* Qubes R4.2: Verify <code>whonix_version</code> is <code>17</code>.
+<noinclude>
+{{Header}}
+</noinclude>'''1.''' Introduction.
 
 If the previous <code>sudo qubes-dom0-update</code> was completed, it should not be necessary to verify the version number. However, this is mentioned because many users fail to update <code>dom0</code> packages beforehand.
 
-In <code>dom0</code>. View contents of file <code>/srv/formulas/base/virtual-machines-formula/qvm/whonix.jinja</code>.
+'''2.''' View local salt {{project_name_short}} version number.
+
+In <code>dom0</code>.
+
+View contents of file <code>/srv/formulas/base/virtual-machines-formula/qvm/whonix.jinja</code>.
 
 {{CodeSelect|code=
 sudo cat /srv/formulas/base/virtual-machines-formula/qvm/whonix.jinja
 }}
 
-Example output:
+'''3.''' Example output.
 
-{{CodeSelect|code=
-{% set whonix_version = salt['pillar.get']('qvm:whonix:version', '16') %}
-{% set whonix_repo = salt['pillar.get']('qvm:whonix:repo', '[omitted for brevity]') %}
-}}
+<div class="pre">{% set whonix_version = salt['pillar.get']('qvm:whonix:version', '16') %}
+{% set whonix_repo = salt['pillar.get']('qvm:whonix:repo', '[omitted for brevity]') %}</div>
+
+'''4.''' Interpretation.
+
+* Qubes R4.1: Verify <code>whonix_version</code> is <code>16</code>.
+* Qubes R4.2: Verify <code>whonix_version</code> is <code>17</code>.
 
 If it shows something else, then Qubes <code>dom0</code> is outdated. In that case, it is not possible to continue. <ref>
-It should not be necessary to manually update that file because the Qubes <code>dom0</code> stable package should have updated it already. If it didn't, then the cause is general issues [[unspecific]] to {{project_name_long}}.
+It should not be necessary to manually update that file because the Qubes <code>dom0</code> stable package should have updated it already. If it didn't, then the cause is general issues [[unspecific]] to {{project_name_short}}.
 </ref> <ref>
 This is currently not needed and discouraged:
 {{Box|text=
@@ -39,4 +46,11 @@ The following Qubes issues are for developers understanding, reference only:
 * https://github.com/QubesOS/updates-status/issues/1184
 * https://forums.whonix.org/t/14-15-issues-uninstall-install/7652
 </ref>
-}}
+
+'''5.''' Done.
+
+Version number verification has been completed.<noinclude>
+= Footnotes =
+<references />
+{{Footer}}
+</noinclude>

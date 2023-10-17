@@ -7,7 +7,7 @@
 }}
 {{tech_intro_mininav}}
 {{intro|
-Technical Design Documentation about {{project_name_long}} Threat Model. This document covers aspects like Attacker Capabilities, Goals, and Attack Surface.
+Technical Design Documentation about {{project_name_short}} Threat Model. This document covers aspects like Attacker Capabilities, Goals, and Attack Surface.
 }}
 == Classification of Threats ==
 
@@ -122,12 +122,12 @@ Every component we utilize to achieve our goals presents a potential attack vect
 :: Virtualization software
 
 ; '''Software Dependencies & Functions''':
-: It's CRUCIAL that the software we employ doesn't exceed its necessary functions, as this might compromise our anonymity through protocol leaks, identity correlation via Tor circuit sharing, and fingerprinting. To ensure this, we also depend on the {{project_name_workstation_long}} and the TCB of the applications we utilize. (For more details, see [{{project_name_long}} Protocol-Leak-Protection and Fingerprinting-Protection]).
+: It's CRUCIAL that the software we employ doesn't exceed its necessary functions, as this might compromise our anonymity through protocol leaks, identity correlation via Tor circuit sharing, and fingerprinting. To ensure this, we also depend on the {{project_name_workstation_long}} and the TCB of the applications we utilize. (For more details, see [{{project_name_short}} Protocol-Leak-Protection and Fingerprinting-Protection]).
 
 ; '''Confidentiality, Integrity, and Authenticity''':
-: To guarantee these, we (and this includes everyone, not just {{project_name_long}}) rely far too heavily on TLS (Transport Layer Security, the "s" in https). We also depend on:
+: To guarantee these, we (and this includes everyone, not just {{project_name_short}}) rely far too heavily on TLS (Transport Layer Security, the "s" in https). We also depend on:
 :* The entire Host (both Hardware and Software)
-:* All software within {{project_name_workstation_long}}
+:* All software within {{project_name_workstation_short}}
 :* TLS/PKI infrastructure
 :* For onion services: The full location/identity TCB.
 :* The security of the entity you're communicating with, unless employing symmetric key cryptography where you possess the exclusive key.
@@ -139,27 +139,27 @@ Every component we utilize to achieve our goals presents a potential attack vect
 :* The resistance of the webservers you access to DoS assaults
 :* Your system's capability to resist DoS attacks.
 
-== Applying the threat model to {{project_name_long}} ==
+== Applying the threat model to {{project_name_short}} ==
 === High Profile Target Considerations ===
 
-First, you don't want to be on the "high profile target" list of any resourceful adversaries. If you are, neither {{project_name_long}} nor any other computer-based system can protect you.
+First, you don't want to be on the "high profile target" list of any resourceful adversaries. If you are, neither {{project_name_short}} nor any other computer-based system can protect you.
 
 === Hardware Scope and Limitations ===
-{{project_name_long}} is primarily a software project. Our scope for hardware and physical aspects is limited. Hardware security wouldn't be as significant an issue if we weren't dealing with monolithic systems where multiple parts have full system access through DRM or indirectly via hardware drivers that run in kernel space. Consider examining Qubes OS for cutting-edge hardware deprivileging. While it requires modern hardware and a larger user base, integrating {{project_name_long}} with Qubes OS was done in form of [[Qubes-Whonix]].
+{{project_name_short}} is primarily a software project. Our scope for hardware and physical aspects is limited. Hardware security wouldn't be as significant an issue if we weren't dealing with monolithic systems where multiple parts have full system access through DRM or indirectly via hardware drivers that run in kernel space. Consider examining Qubes OS for cutting-edge hardware deprivileging. While it requires modern hardware and a larger user base, integrating {{project_name_short}} with Qubes OS was done in form of [[Qubes-Whonix]].
 
 === Trustworthy Hardware and Recommendations ===
 Assuming the hardware is trustworthy and the physical location uncompromised, it's RECOMMENDED to use "clean" computers with parts from reputable manufacturers and to make purchases in cash to prevent hardware IDs from revealing our identity.
 
 For forensic analysis protection, full disk encryption SHOULD be used on the host, and RAM should be wiped upon shutdown.
 
-Implementation status: Since {{project_name_long}} doesn't yet include a host operating system, we RECOMMEND users follow the guidelines provided in the {{project_name_long}} documentation.
+Implementation status: Since {{project_name_short}} doesn't yet include a host operating system, we RECOMMEND users follow the guidelines provided in the {{project_name_short}} documentation.
 
 === Hardware Best Practices ===
 Some additional pointers:
 
 * Favor IOMMU over DMA, and avoid attaching untrusted devices to FireWire and PCI* interfaces.
 * Opt for open-source hardware or at least hardware that's open-source friendly, meaning they make specifications public. With open source, multiple companies can produce the hardware, making backdoors more challenging to introduce.
-* Embrace simplicity. Complexity is security's primary adversary. {{project_name_gateway_long}} could operate on straightforward hardware like the Raspberry Pi.
+* Embrace simplicity. Complexity is security's primary adversary. {{project_name_gateway_short}} could operate on straightforward hardware like the Raspberry Pi.
 
 === Cryptographic Considerations ===
 Regarding cryptography, the approach we can take is to use [https://en.wikipedia.org/wiki/Multiple_encryption cascades] of varying cipher and hash families. However, it's more intricate than it seems, and no known software achieves this correctly.
@@ -170,10 +170,10 @@ As mentioned in the "Attacker capabilities" section, our main area of focus shou
 === Software Defense Mechanisms ===
 To defend against software backdoors and vulnerabilities:
 
-* The source should be audited, preferably both by you and numerous others, and should ideally be free of bugs. Popular open source projects are your best bet. As {{project_name_long}} is fully open source, anyone can audit and submit patches. -> [[Reasons for Freedom Software]]
-* If you depend on others (and you do), ensure that you receive the same code as everyone else. Hash sums and signatures, especially when made public, can help verify this. If transparent signing (common in proprietary systems) is used, it becomes harder to confirm that you're receiving the same files as everyone else. By default, signing ensures you're receiving code from someone with access to the signing key, which protects against third parties, but not potential insiders. The checksums and signatures for {{project_name_long}} and its updates are made publicly available.
-* The code you utilize should have a strong track record. -> [[Whonix_against_Real_Attacks|{{project_name_long}} Track Record against Real Cyber Attacks]]
-** Any known issues must be promptly addressed. Code that isn't regularly scrutinized but has no known issues is more concerning than code with many known (but patched) security vulnerabilities that is under continuous review. However, truly trustworthy code should have minimal, if any, security issues despite rigorous audits. It's worth noting that projects requiring frequent security patches are inherently insecure. But it's not just about the quantity of issues; the severity of bugs is also crucial. For instance, while Linux receives many security patches, critical vulnerabilities that could impact {{project_name_long}} (like remote code execution with root privileges) are rare. However, critical flaws in user-facing applications, such as browsers, PDF readers, media players, and IRC, are more common, and such software shouldn't be a part of the TCB (referenced below).
+* The source should be audited, preferably both by you and numerous others, and should ideally be free of bugs. Popular open source projects are your best bet. As {{project_name_short}} is fully open source, anyone can audit and submit patches. -> [[Reasons for Freedom Software]]
+* If you depend on others (and you do), ensure that you receive the same code as everyone else. Hash sums and signatures, especially when made public, can help verify this. If transparent signing (common in proprietary systems) is used, it becomes harder to confirm that you're receiving the same files as everyone else. By default, signing ensures you're receiving code from someone with access to the signing key, which protects against third parties, but not potential insiders. The checksums and signatures for {{project_name_short}} and its updates are made publicly available.
+* The code you utilize should have a strong track record. -> [[Whonix_against_Real_Attacks|{{project_name_short}} Track Record against Real Cyber Attacks]]
+** Any known issues must be promptly addressed. Code that isn't regularly scrutinized but has no known issues is more concerning than code with many known (but patched) security vulnerabilities that is under continuous review. However, truly trustworthy code should have minimal, if any, security issues despite rigorous audits. It's worth noting that projects requiring frequent security patches are inherently insecure. But it's not just about the quantity of issues; the severity of bugs is also crucial. For instance, while Linux receives many security patches, critical vulnerabilities that could impact {{project_name_short}} (like remote code execution with root privileges) are rare. However, critical flaws in user-facing applications, such as browsers, PDF readers, media players, and IRC, are more common, and such software shouldn't be a part of the TCB (referenced below).
 * Merely reviewing the source isn't sufficient; trustworthy binaries are essential. Analyzing binaries is considerably more challenging than scrutinizing source code. If you're dependent on source code auditing, you must have a trustworthy compiler (along with a fully trusted system on which to run it) and utilize [https://dwheeler.com/trusting-trust/ DCC]. In the same vein, a trusted system is imperative for verifying signatures and hashes. This introduces the bootstrapping dilemma often likened to the "chicken and egg" problem. Generally, to circumvent this, you should employ at least two distinct, unrelated systems (including their foundational build systems and compilers). The systems should be configured in a manner that both would need simultaneous compromise by the same adversary, in a compatible manner, to result in a significant security breach.
 
 === Protecting against Software Vulnerabilities ===
@@ -181,9 +181,9 @@ To defend against software backdoors and vulnerabilities:
 If the code base is large and complex, code auditing is not a realistic strategy. Therefore, we need to reduce complexity and the attack surface by:
 
 * Making the TCB small, and
-* Using privilege separation: The TCB for identity/anonymity is as small as it can be on a monolithic general-purpose OS. It could be smaller (e.g., a custom kernel, busybox, uclibc instead of libc, and gnu-utils), but that would increase the cost in terms of maintainability, security updates, and ease of use. (And this still leaves us with a comparably large monolithic kernel and a vast gcc infrastructure.) Linux/Xorg (with DAC or even MAC) does not excel at privilege separation (e.g., no trusted path). The most robust privilege separation is achieved by using multiple physical computers, which we RECOMMEND, as seen in [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]] and [[Multiple Whonix-Workstation|multiple {{project_name_workstation_long}}]]. A more practical, but less secure, alternative is virtualization. For details about privilege separation between IRC/Browser/Clients and Tor, see [[Dev/Technical Introduction]].
+* Using privilege separation: The TCB for identity/anonymity is as small as it can be on a monolithic general-purpose OS. It could be smaller (e.g., a custom kernel, busybox, uclibc instead of libc, and gnu-utils), but that would increase the cost in terms of maintainability, security updates, and ease of use. (And this still leaves us with a comparably large monolithic kernel and a vast gcc infrastructure.) Linux/Xorg (with DAC or even MAC) does not excel at privilege separation (e.g., no trusted path). The most robust privilege separation is achieved by using multiple physical computers, which we RECOMMEND, as seen in [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]] and [[Multiple Whonix-Workstation|multiple {{project_name_workstation_short}}]]. A more practical, but less secure, alternative is virtualization. For details about privilege separation between IRC/Browser/Clients and Tor, see [[Dev/Technical Introduction]].
 
-We've spent considerable time considering ways to make {{project_name_long}} even more secure, but with the (free and open source) tools available today, it doesn't seem feasible. We would require an isolation kernel that offers robust guarantees of isolation between different subsystems and would ideally be verified. This way, concerns about sophisticated backdoors (barring those from the compiler, as discussed in "Trusting trust"/chicken and egg), software vulnerabilities, and even some hardware backdoors and vulnerabilities (through IOMMU and microkernel design one can move hardware and firmware components, aside from the CPU, out of the TCB) would be alleviated. For Fingerprint/Protocol leaks and the [https://en.wikipedia.org/wiki/CIA_triad#Key_concepts CIA Triad], we rely on the {{project_name_workstation_long}} TCB. This presents a dauntingly large TCB/attack surface. Therefore, we employ another strategy, "security through non-persistence". Specifically, you should frequently utilize the clone feature and rollback capabilities of the virtual machine. Instead of enforcing privilege separation within a Tor-Workstation (e.g., by using a Mandatory Access Control framework) which would result in significant usability compromises, we recommend the coarse-grained isolation provided through multiple VMs.
+We've spent considerable time considering ways to make {{project_name_short}} even more secure, but with the (free and open source) tools available today, it doesn't seem feasible. We would require an isolation kernel that offers robust guarantees of isolation between different subsystems and would ideally be verified. This way, concerns about sophisticated backdoors (barring those from the compiler, as discussed in "Trusting trust"/chicken and egg), software vulnerabilities, and even some hardware backdoors and vulnerabilities (through IOMMU and microkernel design one can move hardware and firmware components, aside from the CPU, out of the TCB) would be alleviated. For Fingerprint/Protocol leaks and the [https://en.wikipedia.org/wiki/CIA_triad#Key_concepts CIA Triad], we rely on the {{project_name_workstation_short}} TCB. This presents a dauntingly large TCB/attack surface. Therefore, we employ another strategy, "security through non-persistence". Specifically, you should frequently utilize the clone feature and rollback capabilities of the virtual machine. Instead of enforcing privilege separation within a Tor-Workstation (e.g., by using a Mandatory Access Control framework) which would result in significant usability compromises, we recommend the coarse-grained isolation provided through multiple VMs.
 
 To protect specifically against software attacks (vulnerabilities):
 
@@ -200,9 +200,9 @@ To mitigate design flaws, the primary strategy is to eliminate single points of 
 
 == Notes about securing Confidentiality, Integrity and Authenticity ==
 
-This is no different than in any other computer system without Tor. You MUST use end to end public key encryption, there is not really an alternative to that. But there are alternative implementations: TLS, SSH, GPG... End-to-End means, both ends need to be secure, one end is the {{project_name_workstation_long}}, which you can control and secure. In case of onion services, the {{project_name_gateway_long}} is ALSO part of the TCB!
+This is no different than in any other computer system without Tor. You MUST use end to end public key encryption, there is not really an alternative to that. But there are alternative implementations: TLS, SSH, GPG... End-to-End means, both ends need to be secure, one end is the {{project_name_workstation_short}}, which you can control and secure. In case of onion services, the {{project_name_gateway_short}} is ALSO part of the TCB!
 
-{{project_name_workstation_long}} is not specifically hardened because hardening a Desktop system to a degree that makes it actually secure against a serious adversary makes the system unusable. Instead we follow the nuke and restore approach, see [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]] and [[Security_Guide#Recommendation_to_use_multiple_VM_Snapshots|Recommendation to use multiple Snapshots]].
+{{project_name_workstation_short}} is not specifically hardened because hardening a Desktop system to a degree that makes it actually secure against a serious adversary makes the system unusable. Instead we follow the nuke and restore approach, see [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_short}}]] and [[Security_Guide#Recommendation_to_use_multiple_VM_Snapshots|Recommendation to use multiple Snapshots]].
 
 About Availability: The most resilient approach is probably a distributed data store, like Tahoe-LAFS or Freenet. I2P offers multi-homing built in. For Tor we don't know of any solutions ready for general usage.
 
@@ -210,15 +210,15 @@ About Availability: The most resilient approach is probably a distributed data s
 
 Moved to [[Onion_Services#Notes_about_End-to-end_Security_of_Onion_Services|Notes about End to end Security of Onion Services]]
 
-== Attack on {{project_name_long}} ==
+== Attack on {{project_name_short}} ==
 
-There is a comparison of Tor Browser, Tails, {{project_name_long}} Standard/Download version (host+VM+VM) and {{project_name_long}} with Physical Isolation in chapter [[Comparison_with_Others#Attacks|Attacks against {{project_name_long}}]].
+There is a comparison of Tor Browser, Tails, {{project_name_short}} Standard/Download version (host+VM+VM) and {{project_name_short}} with Physical Isolation in chapter [[Comparison_with_Others#Attacks|Attacks against {{project_name_short}}]].
 
 == Design Document, Innovations, and Research ==
 
-The {{project_name_long}} developer, Adrelanos, has a keen interest in serious design documents. Currently, there exists only one design document pertaining to Tor, transparent/isolated proxying, isolation, and Virtual Machines. Adrelanos has reviewed the old design paper titled "A Tor Virtual Machine Design and Implementation" from 2009. After reviewing, Adrelanos refined that paper by removing non-essential, non-security-relevant content, ensuring all considerations from the old design paper were incorporated into {{project_name_long}}.
+The {{project_name_short}} developer, Adrelanos, has a keen interest in serious design documents. Currently, there exists only one design document pertaining to Tor, transparent/isolated proxying, isolation, and Virtual Machines. Adrelanos has reviewed the old design paper titled "A Tor Virtual Machine Design and Implementation" from 2009. After reviewing, Adrelanos refined that paper by removing non-essential, non-security-relevant content, ensuring all considerations from the old design paper were incorporated into {{project_name_short}}.
 
-The entirety of {{project_name_long}} [[Documentation]] and [[Design]] supersedes the old design document.
+The entirety of {{project_name_short}} [[Documentation]] and [[Design]] supersedes the old design document.
 
 Adrelanos also monitors the following documents:
 
@@ -227,9 +227,9 @@ Adrelanos also monitors the following documents:
 * [https://dee.su/liberte-security Security and Anonymity in Liberté Linux] ([https://archive.ph/srdCd archive.ph])
 * [https://dee.su/liberte-motivation Liberté Linux Motivation and Philosophy] ([https://archive.ph/https://dee.su/liberte-motivation archive.ph])
 
-Any security/privacy/anonymity updates will be considered for inclusion in {{project_name_long}}.
+Any security/privacy/anonymity updates will be considered for inclusion in {{project_name_short}}.
 
-The {{project_name_long}} project is committed to asking pertinent questions, offering valuable suggestions, and creating useful tools. -> [[What we do]]
+The {{project_name_short}} project is committed to asking pertinent questions, offering valuable suggestions, and creating useful tools. -> [[What we do]]
 
 The following list helps track all discussions and periodically review them to discern any changes:
 
@@ -250,7 +250,7 @@ The following list helps track all discussions and periodically review them to d
 
 This list is not exhaustive...
 
-== {{project_name_long}} Threat Model not available as PDF or paper version ==
+== {{project_name_short}} Threat Model not available as PDF or paper version ==
 You may skip this optional chapter.
 
 While we read actual papers, such as the [https://svn.torproject.org/svn/projects/design-paper/tor-design.pdf Onion routing design paper] and many others, we cannot be compelled to create a paper titled "Designing an anonymous operating system" using LaTeX for PDF output.

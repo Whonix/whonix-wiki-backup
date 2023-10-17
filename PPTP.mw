@@ -3,12 +3,12 @@
 title=PPTP (Point-to-Point Tunneling Protocol) and {{project_name_long}}
 }}
 {{#seo:
-|description=PPTP (Point-to-Point Tunneling Protocol) and {{project_name_long}}
+|description=PPTP (Point-to-Point Tunneling Protocol) and {{project_name_short}}
 |image=Bridge-19513640.jpg
 }}
 [[image:Bridge-19513640.jpg|thumb]]
 {{intro|
-PPTP (Point-to-Point Tunneling Protocol) and {{project_name_long}}
+PPTP (Point-to-Point Tunneling Protocol) and {{project_name_short}}
 }}
 = Introduction =
 
@@ -24,7 +24,7 @@ https://search.edwardsnowden.com/docs/IntrototheVPNExploitationProcess2014-12-28
 | type       = critical
 | image      = [[File:Ambox_warning_pn.svg.png|40px|alt=Question mark]]
 | text    =
-Warning: This article has not been checked since the latest {{project_name_long}} release; it may require an update.
+Warning: This article has not been checked since the latest {{project_name_short}} release; it may require an update.
 }}
 In this chapter, PPTP is utilized because it is useful, very easy to configure and well supported by all kind of devices. Compared to a proper set up with a hardware gateway between the internet and the devices you want to torrify it is less secure but doesn't require any kind of hardware or network layout changes.
 
@@ -32,11 +32,11 @@ In this chapter, PPTP is utilized because it is useful, very easy to configure a
 
 A VPN ([https://en.wikipedia.org/wiki/Virtual_private_network Virtual private network]) is a method for users to connect to another network and access resources that can be seen from that network.
 
-In this case, VPN is used to allow other users on your local LAN to connect and use your {{project_name_long}} to connect to Tor with minimal configuration. Unlike Tor-VM where all network connections are forced through Tor or rejected, workstations connected over PPTP are NOT automatically protected against network level leaks and application level exploits.
+In this case, VPN is used to allow other users on your local LAN to connect and use your {{project_name_short}} to connect to Tor with minimal configuration. Unlike Tor-VM where all network connections are forced through Tor or rejected, workstations connected over PPTP are NOT automatically protected against network level leaks and application level exploits.
 
 We use [https://en.wikipedia.org/wiki/Point-to-Point_Tunneling_Protocol PPTP] here due to its wide install base (every installation of Windows since Windows 95 includes a client) and ease of installation. Be aware of the [https://en.wikipedia.org/wiki/Point-to-Point_Tunneling_Protocol#Security enormous security issues with PPTP].
 
-'''Warning''', PPTP should '''NOT''' be used with {{project_name_long}} over the Internet, only for local trusted sources. See below for an OpenVPN implementation that allows use of Tor with minimal client configuration and should be secure enough to allow Internet connections (coming soon).
+'''Warning''', PPTP should '''NOT''' be used with {{project_name_short}} over the Internet, only for local trusted sources. See below for an OpenVPN implementation that allows use of Tor with minimal client configuration and should be secure enough to allow Internet connections (coming soon).
 
 == VPN: Bypassing Censorship and Enabling Free Speech ==
 
@@ -46,19 +46,19 @@ Because VPN services [https://en.wikipedia.org/wiki/IP_tunnel tunnel] all Intern
 
 If the tunnel ends outside the area where the Internet is being restricted, this can be an effective method of circumvention, since the filtering entity/server sees only encrypted data, and has no way of knowing what data is passing through the tunnel. It has the additional effect of making all your different kinds of traffic look similar to an eavesdropper.
 
-We use VPN here for its “tunnel” capabilities, so that others that you allow access, can take advantage of Tor via {{project_name_long}} with a single connection.
+We use VPN here for its “tunnel” capabilities, so that others that you allow access, can take advantage of Tor via {{project_name_short}} with a single connection.
 
 = Install PPTPd =
 
 ({{project_name_gateway_long}})
 
-From your {{project_name_gateway_long}}:
+From your {{project_name_gateway_short}}:
 
 {{CodeSelect|code=
 apt install pptpd
 }}
 
-This will install and start the <code>pptpd</code> daemon on your {{project_name_gateway_long}}. Verify its running:
+This will install and start the <code>pptpd</code> daemon on your {{project_name_gateway_short}}. Verify its running:
 
 {{CodeSelect|code=
 ps aux | grep pptpd
@@ -74,7 +74,7 @@ Stop it for the time being, while we configure it.
 
 = Configure PPTP =
 
-({{project_name_gateway_long}})
+({{project_name_gateway_short}})
 
 Configure PPTP settings:
 
@@ -91,7 +91,7 @@ See the [https://poptop.sourceforge.net/dox/pptpd.conf.txt official documentatio
 
 '''Discussion:'''
 
-This can be potentially confusing, as the documentation in the configuration files are not the best. When you setup a PPTP connection, your {{project_name_gateway_long}} will setup a virtual adapter (e.g. ppp0) which will output traffic sent from your client computer (those that connect to your server from your local LAN) to the {{project_name_gateway_long}} and allow it to be routed through Tor. So if we want to use this virtual adapter just like a real adapter (e.g. eth0), we need to give it an IP address. That's what the <code>localip</code> option is.
+This can be potentially confusing, as the documentation in the configuration files are not the best. When you setup a PPTP connection, your {{project_name_gateway_short}} will setup a virtual adapter (e.g. ppp0) which will output traffic sent from your client computer (those that connect to your server from your local LAN) to the {{project_name_gateway_short}} and allow it to be routed through Tor. So if we want to use this virtual adapter just like a real adapter (e.g. eth0), we need to give it an IP address. That's what the <code>localip</code> option is.
 
 <code>remoteip</code> is a bit simpler. It is the IP address (or addresses) that are assigned to the client's computer when they connect. They get their own virtual adapter, which needs its own IP address.
 
@@ -103,7 +103,7 @@ See the [https://poptop.sourceforge.net/dox/qna.html#19 FAQ here for information
 
 = Configure PPTP Options =
 
-({{project_name_gateway_long}})
+({{project_name_gateway_short}})
 
 {{CodeSelect|code=
 nano /etc/ppp/pptpd-options
@@ -124,7 +124,7 @@ ms-dns <eth1 address></pre>
 
 = Configure IPtables rules for client connect and disconnect =
 
-({{project_name_gateway_long}})
+({{project_name_gateway_short}})
 
 The <code>ip-up</code> script is called on each connection by a PPTP client, so we can put special firewall rules here to help with Torifying the traffic through this interface.
 
@@ -165,7 +165,7 @@ Notice the addition of the '''-D''' instead of '''-A''' to the rule definitions.
 
 = Testing =
 
-({{project_name_gateway_long}})
+({{project_name_gateway_short}})
 
 Start up your PPTP server:
 
@@ -175,13 +175,13 @@ Start up your PPTP server:
 
 (Client)
 
-From a client on your network (preferably one outside of your Tor network, e.g. not your {{project_name_workstation_long}}) connect to your VPN server.
+From a client on your network (preferably one outside of your Tor network, e.g. not your {{project_name_workstation_short}}) connect to your VPN server.
 
 Instructions for a variety of clients:
 
 [https://pptpclient.sourceforge.net/documentation.phtml Linux (many flavors, direct from the pptp-client site)] [https://web.archive.org/web/20120207123212/http://support.microsoft.com/kb/314076 How to configure a connection to a virtual private network (VPN) in Windows XP] [https://help.ubuntu.com/community/VPNClient VPNClient @ Ubuntu Community Documentation] [https://web.archive.org/web/20120825041858/http://www.pcworld.com/article/210562/how_to_set_up_vpn_in_windows_7.html Windows 7 VPN step by step guide]
 
-Now verify the connection on the gateway, after successfully connecting: ({{project_name_gateway_long}})
+Now verify the connection on the gateway, after successfully connecting: ({{project_name_gateway_short}})
 
 {{CodeSelect|code=
 ifconfig
@@ -218,7 +218,7 @@ On the client you should then be able to connect via Tor.
 
 * Browse to <code>check.torproject.org</code> and verify the “congratulations” message
 
-Next disconnect from the VPN. On the server you should see several changes: ({{project_name_gateway_long}})
+Next disconnect from the VPN. On the server you should see several changes: ({{project_name_gateway_short}})
 
 * {{CodeSelect|code=
 ifconfig
