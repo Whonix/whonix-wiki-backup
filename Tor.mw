@@ -295,7 +295,62 @@ The output should be similar to the following.
 INFO: version of the 'tor' package: 0.4.6.9-1~d11.bullseye+1
 </pre>
 
-See also [[Tor_Versioning|Newer Tor Versions]].
+See also {{kicksecure_wiki
+|wikipage=Tor_Versioning
+|text=Newer Tor Versions
+}}.
+
+= Tor Version Downgrade =
+It is usually not required to downgrade the Tor version. This should be only used in very specific cases to work around a bug or for testing.
+
+'''1.''' Platform specific notice.
+
+* non-Qubes users: No special notice.
+* Qubes users: In Whonix-Gateway Template.
+
+'''2.''' Update your package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''3.''' Show available Tor versions.
+
+{{CodeSelect|code=
+apt list tor -a
+}}
+
+Alternatively you could also look up the version number available from [https://packages.debian.org/{{stable_project_version_based_on_Debian_codename}}
+/tor Debian's <code>tor</code> package].
+
+'''4.''' Downgrade for example to Tor version <code>0.4.7.16-1</code>.
+
+Note: The version number was appropriate at time of writing but might need replacement in the future.
+
+{{CodeSelect|code=
+sudo apt install tor=0.4.7.16-1 tor-geoipdb=0.4.7.16-1
+}}
+
+'''5.''' Platform specific notice.
+
+* non-Qubes users: No special notice.
+* Qubes users: Shut down Whonix-Gateway Template.
+
+'''6.''' Reboot.
+
+* non-Qubes users: A reboot of the Whonix-Gateway running Tor is required.
+* Qubes users: A reboot of sys-whonix is required.
+
+'''7.''' Done.
+
+The process of Tor version downgrade has been completed.
+
+<ref>
+wiki editors note: These instructions are similar to {{kicksecure_wiki
+|wikipage=Tor_Versioning#Tor_Version_Downgrade
+|text=Tor Version Downgrade
+}}.
+</ref>
 
 = Tor Consensus Re-Download =
 While this persists [[Tor Entry Guards]], it results in Tor re-downloading the Tor Consensus document. Should usually not be required.
@@ -371,8 +426,6 @@ Extra complexity in Qubes due to non-persistence of root file system in App Qube
 
 [[Unsupported]]!
 
-TODO: explain
-
 The textual string <code>extradaemon1</code> used below is to be understood an example word. It's not a constant. In other words, it's not a hardcoded name. Feel free to replicate/replace with a different name such as <code>extradaemon2</code>.
 
 Create folder <code>/etc/tor/instances/extradaemon1/</code> and folder <code>/var/lib/tor-instances/extradaemon1</code>.
@@ -381,7 +434,15 @@ Create folder <code>/etc/tor/instances/extradaemon1/</code> and folder <code>/va
 sudo tor-instance-create "extradaemon1"
 }}
 
-TODO: explain
+If you do not wish to use tor-instance-create tool, you can do it manually creating the user who will run and own related files to tor's instance.
+
+{{CodeSelect|code=
+adduser --quiet --system --disabled-password --home "/var/lib/tor-instances/extradaemon1" --no-create-home --shell /bin/false --group --force-badname "_tor-extradaemon1"
+install -Z -d -m 02700 -o "_tor-extradaemon1" -g "_tor-extradaemon1" "/var/lib/tor-instances/extradaemon1" # Set SELinux security context, permission mode and ownership to the created user and group to the homedirectory
+install -d "/etc/tor/instances/extradaemon1"
+}}
+
+Change user ownership of the created folder for the new tor instance.
 
 {{CodeSelect|code=
 sudo chown --recursive "_tor-extradaemon1:_tor-extradaemon1" "/var/lib/tor-instances/extradaemon1"
@@ -409,7 +470,7 @@ TOR_USER="$(id -u debian-tor) $(id -u _tor-extradaemon1)"
 The procedure is complete.
 }}
 
-TODO: explain
+As we are creating a new tor instance we must to create a new torrc file inside our new tor instance directory.
 
 {{CodeSelect|code=
 sudoedit /etc/tor/instances/extradaemon1/torrc
@@ -427,19 +488,19 @@ HiddenServiceVersion 3
 
 Save and exit.
 
-TODO: explain
+We create symlinks for auto-launch of the new instance
 
 {{CodeSelect|code=
 sudo systemctl enable "tor@extradaemon1.service"
 }}
 
-TODO: explain
+We start the new tor instance:
 
 {{CodeSelect|code=
 sudo systemctl restart "tor@extradaemon1.service"
 }}
 
-TODO: explain
+And we can check if the new instance is running
 
 {{CodeSelect|code=
 sudo systemctl status --no-block --no-pager "tor@extradaemon1.service"
@@ -692,7 +753,7 @@ That said, if general instructions were found describing how to achieve this on 
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = [https://support.torproject.org/about/what-is-tor/ Tor] is an anonymizer developed by The Tor Project. [[Tor Browser]] is a web browser [https://www.torproject.org/ developed by the Tor Project] which is optimized for privacy. Please do not confuse {{Code2|Tor}} with {{Code2|Tor Browser}} when conversing about {{project_name_short}} topics.
+| text    = Tor is an anonymizer developed by The Tor Project. [[Tor Browser]] is a web browser {{tpo_link||developed by the Tor Project}} which is optimized for privacy. Please do not confuse {{Code2|Tor}} with {{Code2|Tor Browser}} when conversing about {{project_name_short}} topics.
 
 For differences of Tor Browser by Tor Project compared to Tor Browser in {{project_name_short}} see [[Tor_Browser#Whonix_Tor_Browser_Differences|{{project_name_short}} Tor Browser Differences]].
 }}

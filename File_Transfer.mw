@@ -374,11 +374,7 @@ GATEWAY_ALLOW_INCOMING_SSH=1
 
 '''3.''' Restart the firewall.
 
-Make sure this is run on {{project_name_gateway_short}}!
-
-{{CodeSelect|code=
-sudo /usr/bin/whonix_firewall
-}}
+{{Reload Firewall}}
 
 '''4.''' Install <code>openssh-server</code> inside {{project_name_gateway_short}}.
 
@@ -492,9 +488,7 @@ EXTERNAL_OPEN_PORTS+=" 80 "
 
 Save.
 
-'''3.''' Reload the firewall.
-
-{{Reload_Firewall_ws}}
+'''3.''' {{Reload_Firewall_ws}}
 }}
 
 === Setup Workstation ===
@@ -505,15 +499,22 @@ On {{project_name_workstation_short}}, run.
 sudo apt install openssh-server
 }}
 
+Notes if using a {{project_name_customworkstation_short}}:
+
+* Some Linux distributions only install the server service by default but do not enable/start it by default. In that case, it is up to the user to start the service.
+* Make sure it listens not only on localhost. It must listen on the external interface (or all interfaces) too.
+
 === Setup Gateway ===
 
-On {{project_name_gateway_short}}, run.
+On {{project_name_gateway_short}}, run. <ref>
+<code>sudo -u tunnel</code> is required because user <code>user</code> on {{project_name_gateway_short}} is not supposed to be used for (virtual) local LAN activity as per Whonix firewall.
+</ref>
+
+Note: <code>root@</code> can also be substituted for <code>user@</code> or similar in following command.
 
 {{CodeSelect|code=
-/usr/bin/ssh.anondist-orig root@10.152.152.11
+sudo -u tunnel ssh.anondist-orig root@10.152.152.11
 }}
-
-{{Code|user@}} can also be substituted in the above command.
 
 === Setup Host ===
 
@@ -528,7 +529,7 @@ Note:
 <code>host</code> &rarr; <code>{{project_name_gateway_short}}</code>
 
 {{CodeSelect|code=
-ssh -t user@127.0.0.1 -p 2200 "ssh.anondist-orig user@10.152.152.11"
+ssh -t user@127.0.0.1 -p 2200 "sudo -u tunnel ssh.anondist-orig user@10.152.152.11"
 }}
 
 {{Code|root@}} can also be substituted in the above command.

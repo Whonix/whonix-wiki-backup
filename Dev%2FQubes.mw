@@ -591,8 +591,10 @@ SIGN_KEY = 916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA
 GITHUB_BUILD_TARGET = /repos/QubesOS/updates-status/issues/566/comments
 # https://github.com/settings/tokens
 GITHUB_API_KEY = replace-this
-# And if you use splig-gpg:
+# And if you use split-gpg:
 GNUPG = qubes-gpg-client
+## TODO: needs to be updated per Qubes release
+RELEASE = 4.2
 </pre>
 
 * <ref>
@@ -1111,13 +1113,30 @@ ls -la /mnt/disk2/home/user/
 </pre>
 
 = Qubes VM Kernel =
-Required.
+https://www.qubes-os.org/doc/managing-vm-kernels/#distribution-kernel
+
+'''dom0'''
+
+1)
+
+{{CodeSelect|code=
+sudo qubes-dom0-update grub2-xen-pvh
+}}
+
+2) Might need to increase the <code>initial memory</code> in QVMM.
+
+* https://github.com/QubesOS/qubes-issues/issues/8649
+* https://github.com/QubesOS/qubes-issues/issues/8505
+
+'''Inside the VM'''
+
+No longer required?
 
 {{CodeSelect|code=
 sudo mkdir -p /boot/grub
 }}
 
-Required. <ref>
+No longer required? <ref>
 * https://github.com/QubesOS/qubes-issues/issues/5490
 * https://github.com/QubesOS/qubes-doc/pull/905
 * https://github.com/marmarek/qubes-linux-utils/commit/4b55194a1b99618e55b9da48c403973fb1ade90a
@@ -1127,7 +1146,15 @@ Required. <ref>
 sudo apt install --no-install-recommends linux-image-amd64 linux-headers-amd64 grub2-common qubes-kernel-vm-support initramfs-tools busybox
 }}
 
-Required.
+Required?
+
+* https://github.com/QubesOS/qubes-issues/issues/5212#issuecomment-1777269659
+
+{{CodeSelect|code=
+sudo grub-install /dev/xvda
+}}
+
+No longer required?
 
 {{CodeSelect|code=
 sudo update-grub
@@ -1154,6 +1181,18 @@ Not required. Already happening during apt installation step.
 sudo update-initramfs -u
 }}
 </ref>
+
+* <code>qubes-kernel-vm-support</code>: https://github.com/QubesOS/qubes-linux-utils/blob/main/debian/qubes-kernel-vm-support.postinst
+* https://github.com/QubesOS/qubes-issues/issues/5212
+
+= Debug Broken Boot VMs =
+{{CodeSelect|code=
+xl dmesg
+}}
+
+{{CodeSelect|code=
+sudo tail -f /var/log/xen/console/guest-kicksecure-bookworm.log
+}}
 
 = Debian Minimal Template =
 {{CodeSelect|code=

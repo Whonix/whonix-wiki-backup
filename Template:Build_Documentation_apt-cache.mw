@@ -1,5 +1,6 @@
-<noinclude>{{Header}}</noinclude>
-<div class="toccolours mw-collapsible mw-collapsed">
+<noinclude>
+{{Header}}
+</noinclude><div class="toccolours mw-collapsible mw-collapsed">
 Using an apt cache will greatly improve build speed when building several times in a row (e.g. when debugging, during development). {{project_name_short}} build script sets up an apt cache by default.
 
 If you are interested in a torified apt-cacher-ng or host apt-cacher-ng, click on Expand on the right.
@@ -8,7 +9,10 @@ If you are interested in a torified apt-cacher-ng or host apt-cacher-ng, click o
 '''torified apt-cacher-ng'''
 
 {{Box|text=
-The following torified apt-cacher-ng setup only has to be applied, if you are building using onion apt sources using <code>--connection onion</code>. When building inside {{project_name_workstation_long}}, this is not required.
+Notes:
+
+* The following torified apt-cacher-ng setup only has to be applied, if you are building using onion apt sources using <code>--connection onion</code>.
+* When building inside {{project_name_workstation_long}}, this is not required.
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
@@ -16,48 +20,86 @@ The following torified apt-cacher-ng setup only has to be applied, if you are bu
 Note, this neither torifies all of the build script's connections nor hides Tor from your ISP! See [[Dev/Build Anonymity|Build Anonymity]].
 }}
 
-Install <code>apt-cacher-ng</code>, <code>torsocks</code> and <code>tor</code>.
+The goal of this is to torify <code>apt-cacher-ng</code> using <code>torsocks</code> so it will be able to connect to onions.
+
+'''Note:''' <u>This is currently broken.</u> No fix available. [[Undocumented]].
+
+'''1.''' Install <code>apt-cacher-ng</code>, <code>torsocks</code> and <code>tor</code>.
 
 <pre>
 sudo apt install apt-cacher-ng torsocks tor
 </pre>
 
-Create folder apt-cacher-ng systemd drop-in folder <code>/lib/systemd/system/apt-cacher-ng.service.d</code>.
+'''2.''' Create folder apt-cacher-ng systemd drop-in folder <code>/lib/systemd/system/apt-cacher-ng.service.d</code>.
 
 <pre>
 sudo mkdir -p /lib/systemd/system/apt-cacher-ng.service.d
 </pre>
 
-{{Open with root rights|
+'''3.''' {{Open with root rights|
 filename=/lib/systemd/system/apt-cacher-ng.service.d/50_user.conf
 }}
 
-Add.
+'''4.''' Add. <ref>
+* The first {{CodeSelect|code=ExecStart=|inline=true}} is to disable the default <code>ExecStart</code> in <code>/lib/systemd/system/apt-cacher-ng.service</code>.
+* This is based on {{CodeSelect|code=/lib/systemd/system/apt-cacher-ng.service|inline=true}}.
+* Only {{CodeSelect|code=torsocks|inline=true}} is prepended in front of {{CodeSelect|code=/usr/sbin/apt-cacher-ng|inline=true}}
+* No other changes.
+</ref>
 
-<pre>
+{{CodeSelect|code=
 [Service]
 ExecStart=
 ExecStart=torsocks /usr/sbin/apt-cacher-ng SocketPath=/run/apt-cacher-ng/socket -c /etc/apt-cacher-ng ForeGround=1
-</pre>
+}}
 
-Save.
+'''5.''' Save.
 
-Reload systemd.
+'''6.''' Reload systemd.
 
-<pre>
+{{CodeSelect|code=
 sudo systemctl daemon-reload
-</pre>
+}}
 
-Restart apt-cacher-ng.
+'''7.''' Restart apt-cacher-ng.
+
+{{CodeSelect|code=
+sudo systemctl restart apt-cacher-ng
+}}
+
+'''8.''' Done.
+
+The process of torification of apt-cacher-ng has been completed.
+
+'''9.''' Broken!
+
+{{CodeSelect|code=/etc/tor/torsocks.conf}} add:
+
+{{CodeSelect|code=
+AllowInbound 1
+AllowOutboundLocalhost 1
+}}
+
+But this is also insufficient.
+
+{{CodeSelect|code=sudo journalctl -f -u apt-cacher-ng}}
+
+shows errors:
 
 <pre>
-sudo systemctl restart apt-cacher-ng
+WARNING torsocks[17645]: Config file not found: /etc/tor/torsocks.conf. Using default for Tor (in config_file_read() at config-file.c:583)
+Couldn't listen on socket: Operation not permitted
+Error creating socket: Function not implemented
 </pre>
+
+No fix available. Help welcome.
 }}
 }}
 
 {{Box|text=
 '''host apt-cacher-ng'''
+
+This is probably only useful for developers. Most users will not need the complexity of an apt-cacher-ng running outside of the VM which runs derivative-maker or on another computer.
 
 {{Box|text=
 Be sure to have a firewall, so the whole internet cannot use the apt-cacher-ng service.
@@ -74,6 +116,8 @@ sudo REPO_PROXY=http://127.0.0.1:3142 ./derivative-maker ...
 }}
 }}
 </div>
-</div>
-
-<noinclude>{{Footer}}</noinclude>
+</div><noinclude>
+= Footnotes =
+<references />
+{{Footer}}
+</noinclude>

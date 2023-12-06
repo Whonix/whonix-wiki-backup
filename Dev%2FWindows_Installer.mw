@@ -70,6 +70,9 @@ Build limitations:
 * <code>lazbuild</code> &rarr; <code>WhonixSetup.lpr</code> &rarr; <code>WhonixSetup.exe</code>
 * <code>WhonixSetup.exe</code> + append + <code>Whonix.ova</code> &rarr; <code>WhonixSetup-Xfce.exe</code>
 
+= misc =
+* [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1054343 add support for "apt install fp-units-win-rtl" instead of "apt install fp-units-win-rtl-3.2.2"]
+
 = CI =
 Whonix-Starter:
 
@@ -249,6 +252,64 @@ readpe hello_without_signature_reset_PE.exe
 = TODO =
 == merge ==
 Reminder: Always please merge first before developing further.
+
+== document build.sh ==
+Please document / refactor.
+
+<pre>
+mv "WhonixSetup.lpi" "WhonixSetup.lpi.in"
+cp "WhonixSetup.lpi.in" "WhonixSetup.lpi"
+</pre>
+
+== WhonixSetup.lpi ==
+Can these varialbes be improved or removed if not essential?
+
+<pre>
+OriginalFilename="WhonixInstaller-XYZ-1.2.3.4.exe"
+</pre>
+
+<pre>
+OriginalFilename="WhonixInstaller-XYZ-1.2.3.4.exe"
+</pre>
+
+change to...?
+
+<pre>
+OriginalFilename="will_be_replaced_by_build.sh"
+</pre>
+
+<pre>
+      <UseVersionInfo Value="True"/>
+      <MajorVersionNr Value="1"/>
+      <MinorVersionNr Value="2"/>
+      <RevisionNr Value="3"/>
+      <BuildNr Value="4"/>
+</pre>
+
+== WhonixSetup.lpi.in ==
+Add WhonixSetup.lpi.in (WhonixInstaller.lpi.in) to <code>.gitignore</code>?
+
+== rename setup to installer ==
+* Please rename all mentions of textual string <code>setup</code> to <code>installer</code>.
+* Please rename all mentions of textual string <code>Setup</code> to <code>Installer</code>.
+* Please rename all files containing <code>setup</code> (or <code>Setup</code>) to <code>installer</code> (or <code>Installer</code>).
+* Update <code>.gitignore</code>.
+
+== remove minimal installation ==
+Only "full" installation option needed for simplicity.
+
+== document gitignore special files ==
+Please document .gitignore files.
+
+== remove VERSION_MAJOR etc ==
+These ones would be hard to maintain. Maximum 1 version variable please.
+
+<pre>
+export VERSION_MAJOR="0"
+export VERSION_MINOR="0"
+export VERSION_REVISION="0"
+export VERSION_BUILD="0"
+</pre>
 
 = See Also =
 * [[Dev/Windows Installer/OLD|previous, deprecated Whonix Windows Installer]]

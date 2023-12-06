@@ -1,11 +1,13 @@
 {{Header}}
 {{#seo:
-|description=Introduction into {{project_name_long}} source code.
+|description=Introduction into {{project_name_short}} source code.
 |image=Accept-47587640.png
 }}
 {{title|title=
 {{project_name_short}} Source Code Introduction
-}} {{forkme}}
+}} {{intro|
+Introduction into {{project_name_short}} source code.
+}}
 = Introduction =
 This chapter is dedicated to give an introduction into the {{project_name_short}} source code. '''''If you prefer to read and understand the source code just by reading scripts you may skip this optional chapter.''''' It can be quite difficult to get started with hacking existing big complex projects.
 
@@ -13,17 +15,17 @@ This chapter is dedicated to give an introduction into the {{project_name_short}
 
 This is a high level overview. {{project_name_short}}-Example-Implementation can currently be build in nine steps. (There is also a derivative-maker script, which automates these eight steps for your convenience.)
 
-* 1100_prepare-build-machine
-* 1150_export-libvirt-xml
-* 1200_create-debian-packages
-* 1300_create-raw-image
-* 1700_install-packages
-* 2300_run-chroot-scripts-post-d
-* 2400_convert-raw-to-qcow2
-* 2500_convert-raw-to-vdi
-* 2600_create-vbox-vm
-* 2700_export-vbox-vm
-* 2800_create-report
+* *_prepare-build-machine
+* *_export-libvirt-xml
+* *_create-debian-packages
+* *_create-raw-image
+* *_install-packages
+* *_run-chroot-scripts-post-d
+* *_convert-raw-to-qcow2
+* *_convert-raw-to-vdi
+* *_create-vbox-vm
+* *_export-vbox-vm
+* *_create-report
 
 ==help-steps==
 
@@ -63,7 +65,7 @@ Do not get shocked by file sized. Initially the .raw is created with a size of 1
 
 ==Chroot Scripts==
 
-* packages/anon-*-build-*/usr/lib/anon-dist/chroot-scripts-post.d/
+* <code>packages/kicksecure/initializer-dist/usr/libexec/initializer-dist/chroot-scripts-post.d/</code>
 
 ==Summary==
 
@@ -92,51 +94,50 @@ sudo apt install apt-cacher-ng
 cd derivative-maker </pre>
 
 <pre>
-sudo ./build-steps.d/1100_prepare-build-machine --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_prepare-build-machine --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/1150_export-libvirt-xml --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_export-libvirt-xml --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/1200_create-debian-packages --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_create-debian-packages --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/1300_create-raw-image --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_create-raw-image --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/1700_install-packages --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_install-packages --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/2300_run-chroot-scripts-post-d --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_run-chroot-scripts-post-d --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/2400_convert-raw-to-qcow2 --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_convert-raw-to-qcow2 --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/2500_convert-raw-to-vdi --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_convert-raw-to-vdi --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/2600_create-vbox-vm --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_create-vbox-vm --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/2700_export-vbox-vm --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_export-vbox-vm --build --target qcow2 --flavor whonix-gateway
 </pre>
 <pre>
-sudo ./build-steps.d/2800_create-report --build --target qcow2 --flavor whonix-gateway
+sudo ./build-steps.d/*_create-report --build --target qcow2 --flavor whonix-gateway
 </pre>
 
 === optional ===
 For example for a qcow2 build, the following steps can be safely skipped, since these would be doing nothing anyway.
 
-* 2500_convert-raw-to-vdi
-* 2700_export-vbox-vm
-* 2800_create-report (not in use currently)
-
+* *_convert-raw-to-vdi
+* *_export-vbox-vm
+* *_create-report (not in use currently)
 
 When first creating a gateway build and then building a workstation build (or vice versa) the following steps do not need to be repeated:
 
-* 1100_prepare-build-machine
-* 1200_create-debian-packages
+* *_prepare-build-machine
+* *_create-debian-packages
 
 = Mount and inspect images =
 

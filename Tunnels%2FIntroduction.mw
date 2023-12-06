@@ -50,8 +50,8 @@ Anonymity can be negatively affected under some circumstances by using an additi
 |-
 
 ! scope="row"| Qubes Tunnel Configuration
-| It is not recommended to run the tunnel software from within a Template. This is because the <code>{{project_name_gateway_template}}</code> Template acts more like a workstation since it is behind <code>{{project_name_gateway_vm}}</code> and is <u>not</u> <code>{{project_name_gateway_vm}}</code> itself.<br />
-<br />
+| It is not recommended to run the tunnel software from within a Template. This is because the <code>{{project_name_gateway_template}}</code> Template acts more like a workstation since it is behind <code>{{project_name_gateway_vm}}</code> and is <u>not</u> <code>{{project_name_gateway_vm}}</code> itself.
+
 If <code>openvpn</code> is used inside {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) or {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>) as per the {{project_name_short}} documentation, <code>openvpn</code> will not start inside the <code>{{project_name_gateway_template}}</code> or <code>{{project_name_workstation_template}}</code> Template. <ref>This is because file [https://github.com/{{project_name_short}}/usability-misc/blob/master/lib/systemd/system/openvpn%40openvpn.service.d/50_unpriv.conf /lib/systemd/system/openvpn@openvpn.service.d/50_unpriv.conf] checks the following condition:
 <pre>
 ConditionPathExists=!/var/run/qubes-service/whonix-template
@@ -60,8 +60,8 @@ This means if file <code>/var/run/qubes-service/whonix-template</code> exists, w
 |-
 
 ! scope="row"| Tunnel Provider / Configuration
-| Do not use the same tunnel provider / configuration in more than one place at the same time. For example, do not use the same tunnel setup inside {{project_name_gateway_short}} as well as inside {{project_name_workstation_short}}. Also do not use the same tunnel setup on the host and inside a {{project_name_gateway_short}} or {{project_name_workstation_short}} at the same time. <br />
-<br />
+| Do not use the same tunnel provider / configuration in more than one place at the same time. For example, do not use the same tunnel setup inside {{project_name_gateway_short}} as well as inside {{project_name_workstation_short}}. Also do not use the same tunnel setup on the host {{Os}} (outside any {{VM}}) and inside a {{project_name_gateway_short}} or {{project_name_workstation_short}} at the same time.
+
 Example:
 
 In tunnel-chain 1, the ISP-assigned IP address is permanently linked to the tunnel-link. In tunnel-chain 2, the same tunnel-link was reused. Since the user's ISP-assigned IP address was previously linked to that same tunnel-link, the "anonymous" identity can now be linked to the user's actual IP address.
@@ -100,7 +100,7 @@ https://matt.traudt.xyz/posts/2016-11-12-vpn-tor-not-net-gain/
 ! scope="row"| Anonymity
 |
 * In the <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration or <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code> configuration, anonymous payments with Bitcoin, cash and other methods does not improve anonymity because a user is still connecting to the service from their own IP address (which can be logged).
-* In the <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration or <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration the use of shared IP addresses does not confuse modern surveillance systems which have a host of additional [[Data_Collection_Techniques|fingerprinting methods]] (like user agents) to identify persons of interest.
+* In the <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration or <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration the use of shared IP addresses does not confuse modern surveillance systems which have a many additional [[Data_Collection_Techniques|fingerprinting methods]] (like user agents) to identify persons of interest.
 * VPN traffic is sensitive to [https://en.wikipedia.org/wiki/Deep_packet_inspection Deep Packet Inspection (DPI)] and [https://blog.torproject.org/critique-website-traffic-fingerprinting-attacks Website Traffic Fingerprinting], <ref>
 <blockquote>Website traffic fingerprinting is an attack where the adversary attempts to recognize the encrypted traffic patterns of specific web pages without using any other information. In the case of Tor, this attack would take place between the user and the Guard node, or at the Guard node itself.</blockquote>
 </ref> so it is ineffective in hiding use of {{project_name_short}} and Tor from the ISP or skilled adversaries.
@@ -171,7 +171,7 @@ https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes
 
 ! scope="row"| Operator/Network Shared Infrastructure
 |
-* It is possible to host Tor relays -- including bridges, entry, middle or exit relays -- behind VPNs or tunnel-links. For example, there are VPN providers that support [https://proprivacy.com/vpn/guides/vpn-port-forwarding-guide VPN port forwarding]. This is an interesting way to contribute to Tor while not exposing oneself to too much legal risk. This also means in certain situations a VPN or other tunnel-link could be hosted by the same operator providing support to Tor relays, in the same network or even on the same IP address.
+* It is possible to host (run) Tor relays -- including bridges, entry, middle or exit relays -- behind VPNs or tunnel-links. For example, there are VPN providers that support [https://proprivacy.com/vpn/guides/vpn-port-forwarding-guide VPN port forwarding]. This is an interesting way to contribute to Tor while not exposing oneself to too much legal risk. This also means in certain situations a VPN or other tunnel-link could be hosted by the same operator providing support to Tor relays, in the same network or even on the same IP address.
 * In an economy with deep labor division, certain operators are providing a service to host servers (VPS etc.), while others provide VPN and other tunnel-link services and rent such servers. It is therefore not uncommon for diverse customers to run or share the same IP address. This is another situation where a VPN or other tunnel-link could be hosted by the same operator supporting Tor relays, in the same network or even on the same IP address.
 |-
 
@@ -179,7 +179,7 @@ https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes
 |
 * Based on the section immediately above, it follows that adding arbitrary tunnel-links might lead to the same operator/network being used twice in your connection chain. Consider the scenarios below.
 * <u>Scenario 1</u>:
-** A VPN with a fixed IP address is used on the host, thereby it acts as the first relay.
+** A VPN with a fixed IP address is used on the host {{Os}} (outside any {{VM}}), thereby it acts as the first relay.
 ** The same user's Tor client coincidentally selects a Tor exit relay running on the same VPN IP address.
 ** The user is now using the same IP address as the first and last proxy, meaning overall anonymity is reduced in this scenario.
 * <u>Scenario 2</u>:
@@ -208,7 +208,7 @@ https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes
 
 = Comparison Table =
 {| class="wikitable" style="background-color: #fff;text-align: center"
-!
+|
 ! [[#Connecting_to_a_Tunnel-link_(Proxy/VPN/SSH)_before_Tor|<code>User</code> &rarr; <code>Proxy</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>]]
 ! [[#Connecting_to_Tor_before_a_Tunnel-link_(Proxy/VPN/SSH)|<code>User</code> &rarr; <code>VPN / SSH</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>]]
 ! [[#Connecting_to_Tor_before_a_Tunnel-link_(Proxy/VPN/SSH)|<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Proxy / VPN / SSH</code> &rarr; <code>Internet</code>]]
@@ -216,8 +216,14 @@ https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes
 
 ! Modified Configuration Location
 | {{project_name_gateway_short}}
-| {{project_name_gateway_short}} [or host ([[FAQ#Should_I_Set_Up_a_VPN_with_Whonix.3F|FAQ]])]
+| {{project_name_gateway_short}} [or host {{Os}} (outside any {{VM}}) ([[FAQ#Should_I_Set_Up_a_VPN_with_Whonix.3F|FAQ]])]
 | {{project_name_workstation_short}}
+|-
+
+! Changes IP that Destination Websites (such as IP check websites) can see
+| {{No}}
+| {{No}}
+| style="background-color: {{Green}}"| Yes, if correctly configured.
 |-
 
 ! Evade Website Tor Bans
@@ -342,8 +348,6 @@ SSH: [[Tunnel_UDP_over_Tor#SSH_Method|<span style="background:{{Yellow}}">Undocu
 
 [[Tunnels/Connecting to SSH before Tor | How to connect to SSH before Tor]] (<code>User</code> &rarr; <code>SSH</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>)
 
-[[JonDonym#Connecting to JonDonym before Tor|How to connect to JonDonym before Tor]] (<code>User</code> &rarr; <code>[[JonDonym]]</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>)
-
 [[Lantern#Connecting_to_Lantern_before_Tor|How to connect to Lantern before Tor]] (<code>User</code> &rarr; <code>[[Lantern]]</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>)
 
 = Connecting to Tor before a Tunnel-link (Proxy/VPN/SSH) =
@@ -399,8 +403,6 @@ The methods described in the tunnel documentation have all been tested to work. 
 [[Tunnels/Connecting to Tor before SSH|How to connect to Tor before SSH]] (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>SSH</code> &rarr; <code>Internet</code>)
 
 [[I2P#Connecting_to_Tor_before_I2P|How to connect to Tor before I2P]] (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>[[I2P]]</code> &rarr; <code>Internet</code>)
-
-[[JonDonym#Connecting_to_Tor_before_JonDonym|How to connect to Tor before JonDonym]] (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>[[JonDonym]]</code> &rarr; <code>Internet</code>)
 
 = See Also =
 {{other_networks_mininav}}
