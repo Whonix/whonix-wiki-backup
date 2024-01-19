@@ -1,13 +1,54 @@
-Retrieve a list of available git tags.
+'''1.''' Retrieve a list of available git tags.
 
 {{CodeSelect|code=
 git --no-pager tag
 }}
 
-Use <i>git checkout</i> to select the preferred version to build.
+'''2.''' Use <i>git checkout</i> to select the preferred version to build.
 
-Note: Replace <code>{{VersionNew}}-stable</code> with the actual tag you want to build.
+Note: Replace <code>{{{version}}}</code> with the actual version chosen for the build: the stable, testers-only or developers version. Common sense is required when choosing the right version number. For example, the latest available version number is not necessarily the most stable or suitable. Follow the [[Stay Tuned|{{project_name_short}} News Blog]] as it might contain information.
 
 {{CodeSelect|code=
 git checkout {{{extra}}} {{{version}}}
 }}
+
+'''3.''' Digital signature verification.
+
+Optional. If you choose to perform digital signature verification above, you could verify the currently chosen commit ("<code>HEAD</code>") yet again for extra security.
+
+{{CodeSelect|code=
+git verify-commit HEAD
+}}
+
+'''4.''' Verify if you really got the version you want.
+
+{{CodeSelect|code=
+git describe
+}}
+
+Should show:
+
+<code>
+{{{version}}}
+</code>
+
+'''5.''' Check if source folder is pristine.
+
+{{CodeSelect|code=
+git status
+}}
+
+Should show nothing.
+
+<code>
+HEAD detached at {{{version}}}<br />
+nothing to commit, working tree clean
+</code>
+
+If it shows something else, do not continue.
+
+'''6.''' Done.
+
+Version selection has been completed.<noinclude>
+[[Category:MultiWiki]]
+</noinclude>

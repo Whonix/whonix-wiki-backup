@@ -14,25 +14,34 @@ Introduction into {{project_name_short}} Technical Design.
 }}
 = Summary =
 
-{{project_name_short}} aims to be safer than Tor alone. The primary goal is, that no one can find out the user's IP, location, de-anonymize the user.
+{{project_name_short}} aims to be safer than Tor alone. The primary goal is that no one can find out the user's IP, location, or de-anonymize the user.
 
 {{project_name_short}} consists of two Debian ({{Kicksecure_link
 |
 |{{Kicksecure}}
-}}) based (virtual) machines (VMs), which are connected through an isolated network. One machine acts as the client or ''{{project_name_workstation_long}}'', the other as a proxy or ''{{project_name_gateway_short}}'', which will route all of the {{project_name_workstation_long}} traffic through Tor. This setup can be implemented either through virtualization and/or Physical Isolation (explained below).
+}}) based (virtual) machines (VMs), which are connected through an isolated network. 
+
+* A) One machine acts as the client or ''{{project_name_workstation_short}}'', running applications such as a browser; and
+* B) the other as a proxy or ''{{project_name_gateway_short}}'', which runs Tor and routes all {{project_name_workstation_long}} traffic through Tor.
 
 {{TorifiedGateway}}
 
+This setup can be implemented either through virtualization and/or Physical Isolation (explained below).
+
+To visualize this configuration, imagine physically computer A) having no direct internet connection (no Wifi, no modem, no cable, no DSL) and being connected by a LAN cable to a separate physical computer B). In such a setup by default, computer A) has no way to access the internet. Computer B), the proxy, can however opt-in to provide network access to computer A).
+
+In this setup, how could computer A) get access to the internet? One way would be for computer B) to enable IP forwarding. {{project_name_short}} does not do this by design. Another way would be for computer B) to run proxy software that opens port(s) (services) that computer A) can access. This is the core principle of what {{project_name_short}} does.
+
 {{project_name_short}} comes with many [https://www.whonix.org/#security security-enhancing and anonymity-protecting features].
 
-Hiding your identity is harder than just hiding your IP. Just hiding IP addresses is a year 1990 threat model. Only hiding the user's IP address is insufficient. Adversaries are using many other [[Data Collection Techniques]] which do not require IP addresses. There are many [[Browser Tests]] which demonstrate that. For example the [https://fingerprint.com/demo/ Fingerprint.com Demo] because [[The_World_Wide_Web_And_Your_Privacy#Fingerprint.com|"12% of the largest 500 websites use Fingerprint.com"]].
+Hiding your identity is harder than just hiding your IP. Merely hiding IP addresses is an outdated, year 1990 threat model. Simply masking the user's IP address is insufficient, as adversaries employ various [[Data Collection Techniques]] that do not require IP addresses. This is evidenced by numerous [[Browser Tests]], such as the [https://fingerprint.com/demo/ Fingerprint.com Demo], particularly since [[The_World_Wide_Web_And_Your_Privacy#Fingerprint.com|"12% of the largest 500 websites use Fingerprint.com"]].
 
-To keep users anonymous, {{project_name_short}} provides [[About#Full_Spectrum_Anti-Tracking_Protection|Full Spectrum Anti-Tracking Protection]], is [https://www.whonix.org/#vpn much safer than VPNs] (see also the detailed [[Whonix_versus_VPNs|Whonix versus VPNs]] comparison).
+To keep users anonymous, {{project_name_short}} offers [[About#Full_Spectrum_Anti-Tracking_Protection|Full Spectrum Anti-Tracking Protection]] and is [https://www.whonix.org/#vpn much safer than VPNs] (refer to the comprehensive [[Whonix_versus_VPNs|Whonix versus VPNs]] comparison).
 
 [[What_we_do|Project activities]] include:
 
-* [https://github.com/{{project_name_short}} ~ 16 {{project_name_short}} source code repositories].
-* [https://github.com/Kicksecure ~ 56 Kicksecure source code repositories].
+* Maintaining approximately [https://github.com/{{project_name_short}} ~ 16 {{project_name_short}} source code repositories].
+* and [https://github.com/Kicksecure ~ 56 Kicksecure source code repositories].
 
 __TOC__
 
@@ -124,7 +133,7 @@ Goals are restricted not by what developers would ideally want to provide but by
 == In layman's terms ==
 Is {{project_name_short}} safe?
 
-{{project_name_short}} has a solid 11 years [[history]] of providing [[Whonix_against_Real_Attacks|Whonix Track Record against Real Cyber Attacks]]. No data leaks have ever been reported.
+{{project_name_short}} has a solid {{project_age_years}} years [[history]] of providing [[Whonix_against_Real_Attacks|Whonix Track Record against Real Cyber Attacks]]. No data leaks have ever been reported.
 
 It is in the nature of security related software, that there is no 100% safety. Believe it or not, we use it ourselves and we keep maintaining and developing it. We believe that {{project_name_short}} is safer than other tools in some aspects, threat models, and use cases. There is detailed reasoning for such claims on the [https://www.whonix.org/#security {{project_name_short}} Homepage].
 
@@ -164,6 +173,9 @@ There are [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#gen
 {{project_name_short}} uses multiple security layers.
 
 # IP-forwarding is disabled.
+# There is no dependency on routing table modifications. <ref>
+By comparison, when using popular VPN software, networking depends on the state of the VPN software modifying the routing table. This can cause clearnet leaks. See [[Whonix_versus_VPNs#VPN Software is not Designed for Anonymity|VPN Software is not Designed for Anonymity]]. Whonix does not depend on and does not make any routing table modifications.
+</ref>
 # In general terms ([[unspecific|unspecific to {{project_name_short}}]]): if one VM is only connected to another VM through a virtual, internal LAN and has no other network interfaces besides that, it does not easily gain internet access. That requires IP forwarding to be enabled the other VM.
 # In {{project_name_short}} specific terms: Since one VM {{project_name_workstation_short}} is only connected to another VM {{project_name_gateway_short}} through a virtual, internal LAN, {{project_name_workstation_short}} does not easily gain internet access.
 # What application internet traffic originating from {{project_name_workstation_short}} essentially do is attempting to talk to a "service" on {{project_name_gateway_short}}, which is [[Tor]]. However, if Tor refuses connections or Tor isn't even available, there is nothing legitimate that the application traffic can do from within {{project_name_workstation_short}}. <ref>
@@ -191,7 +203,7 @@ Illegitimate example: [[malware]] exploiting the hypervisor and executing code o
 
 {{project_name_short}} was tested for leaks, see [[Dev/Leak Tests]]. All went negative, meaning no leaks have ever been found. Additionally, Skype, which is known for it is ability to punch through firewalls, was not able to establish non-torified connections. Also BitTorrent doesn't leak the IP (there is an online bittorrent leak tester), which of course should never be used through Tor (because it chokes Tor nodes), but for leak testing it was welcome. Right now we don't know of any leak tests which leaks the real IP.
 
-{{project_name_short}} is safe (not affected) from [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#protocol-leaks Protocol leaks], like this the ones listed on [[Security in Real World]], Skype, Flash or BitTorrent. This already justifies to use a "no non-Tor connections possible" approach.
+{{project_name_short}} is safe (not affected) from [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#protocol-leaks Protocol leaks], like this the ones listed on [[Whonix against Real Attacks]], Skype, Flash or BitTorrent. This already justifies to use a "no non-Tor connections possible" approach.
 
 See also [[Security Reviews and Feedback]].
 
@@ -302,14 +314,14 @@ Even meticulously crafted systems struggle to match the effectiveness of an amne
 
 Elaborating on the process:
 
-# Boot using an alternate system, an external Live DVD or Live USB.
+# Boot using an alternate system, an external (Live) DVD or USB.
 # {{kicksecure_wiki
 |wikipage=Raw_Disk_Backup
 |text=Create a raw disk backup image of the internal storage.
 }}
 # Shutdown.
 # Boot into live mode from the internal storage.
-# Launch {{project_name_short}} and carry out a spectrum of regular user tasks.
+# Launch various applications and carry out a spectrum of regular user tasks.
 # Shutdown.
 # Construct a second raw disk backup image of the internal storage.
 # Compare the images checksums utilizing tools like <code>sha512sum</code> or its equivalents.

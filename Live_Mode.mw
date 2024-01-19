@@ -7,7 +7,7 @@ title=Live Mode for {{project_name_long}}
 |image=Whonix-live-mode.jpg
 }}
 {{intro|
-{{project_name_short}} Live Mode is available for {{project_name_short}} if the host {{os}} supports. This means that nothing is saved and {{project_name_short}} forgets everything you've done after your session. This feature has been long requested and is very suitable for use cases involving sensitive data.
+{{project_name_short}} Live Mode is available for {{project_name_short}} if the host {{os}} supports it. This means that nothing is saved and {{project_name_short}} forgets everything you've done after your session. This feature has been long requested and is very suitable for use cases involving sensitive data.
 
 Alternatively, {{project_name_short}} has a Live Mode boot option.
 }}
@@ -26,15 +26,22 @@ Terminology on ton this page:
 
 == Starting Live Mode ==
 
-<div class="fontsize19">1. Boot your {{project_name_short}} VM ('''''VM GUEST''''') or power on the computer ('''''HOST''''')</div>
+'''1.''' Platform specific notice.
+
+* [[{{non_q_project_name_short}}|{{non_q_project_name_short}}]]: No special notice.
+* [[{{q_project_name_short}}|{{q_project_name_short}}]]: Unavailable. <ref>
+Qubes issue: [https://github.com/QubesOS/qubes-issues/issues/4982 implement live boot by porting grub-live to Qubes - amnesia / non-persistent boot / anti-forensics]
+</ref>
+
+'''2.''' Boot your {{project_name_short}} VM ('''''VM GUEST''''') or power on the computer ('''''HOST''''')
 
 Restart / reboot if your system is already running.
 
-<div class="fontsize19">2. Look closely at the Boot Menu</div>
+'''3.''' Look closely at the Boot Menu
 
 The grub boot menu (read more about [[grub|grub bootloader here]]) will show your 3 options, the asterisk symbol [[File:asterisk_symbol.png|20px]] indicates the selected option. Read all options and analyse their meaning on a basic level. The "normal" mode is called '''persistent mode'''.
 
-The three options are
+The three options are:
 
 * [[File:asterisk_symbol.png|20px]] <code>{{project_name_short}} GNU/Linux</code>
 * <code>Advanced options for {{project_name_short}} GNU/Linux</code>
@@ -44,17 +51,31 @@ The three options are
 
 '''Can multiple options be chosen at once?''' No, at a time you can only select on option. The unselected boot options have NO asterisk at the front and a light blue text color.
 
-<div class="fontsize19">3. To choose Live Mode use the arrow keys</div>
+'''4.''' To choose Live Mode use the arrow keys.
 
-'''LIVE mode USER (For daily activities.)''' - to switch to this option zse the arrow keys (up ↑ and down ↓) on the keyboard.
+'''LIVE mode USER (For daily activities.)''' - to switch to this option use the arrow keys (up ↑ and down ↓) on the keyboard.
 
-<div class="fontsize19">4. Press ENTER</div>
+'''5.''' Press ENTER.
 
 Simply press enter after you've selected live mode.
 
-<div class="fontsize19">5. Done</div>
+'''6.''' Done.
 
 Now the system is booting into live mode.
+
+= First Boot =
+'''Applicability:''' These instructions are <u>only necessary for users intending to use live mode</u>. Users who always (or mostly) use persistent mode (the default boot option) can disregard these instructions.
+
+For the very first time {{project_name_gateway_long}} is started, please start it '''in persistent mode''' (the option is simply named "{{project_name_short}}"), NOT in live mode. This will allow [[Tor]] to make use of [[Tor Entry Guards]] for automatic initial setup.
+
+From the second time {{project_name_gateway_short}} is started onwards, it is the user may opt-in to run it in live mode if non-persistence, amnesia is desired.
+
+This should eliminate any Tor-related cached data like DNS requests that could leave traces about web activity. However, be warned that it may make your Tor behavior distinguishable from that of regular Tor users, which could weaken your anonymity somewhat. This applies to:
+
+* '''Consensus files:''' These files will be downloaded or re-downloaded more frequently.
+* '''Tor guards:''' When switching to a new guard after several months have passed. <ref>
+https://forums.whonix.org/t/whonix-live-mode-amnesia-amnesic-non-persistent-anti-forensics/3894/127
+</ref>
 
 = See Also =
 {{upstream_wiki}}

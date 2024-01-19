@@ -1,0 +1,86 @@
+{{Header}}
+{{title|title=
+Torrent Downloads
+}}
+{{#seo:
+|description=Work in progress.
+}}
+{{intro|
+Work in progress.
+
+'''[[Unsupported]]!'''
+}}
+
+At any image download link, simply append <code>.torrent</code>.
+
+ISO example:
+
+* direct download: <code>https://download.{{project_clearnet}}/iso/{{VersionNew}}/{{project_name_short}}-Xfce-17.1.1.3.iso</code>
+* torrent: <code>https://download.{{project_clearnet}}/iso/{{VersionNew}}/{{project_name_short}}-Xfce-17.1.1.3.iso.torrent</code>
+* torrent OpenPGP signature: <code>https://download.{{project_clearnet}}/iso/{{VersionNew}}/{{project_name_short}}-Xfce-17.1.1.3.iso.torrent.asc</code>
+* torrent signify signature: <code>https://download.{{project_clearnet}}/iso/{{VersionNew}}/{{project_name_short}}-Xfce-17.1.1.3.iso.torrent.sig</code>
+
+VirtualBox <code>.ova</code> example:
+
+* direct download: <code>https://download.{{project_clearnet}}/ova/{{VersionNew}}/{{project_name_short}}-Xfce-17.1.1.3.ova</code>
+* torrent: <code>https://download.{{project_clearnet}}/ova/{{VersionNew}}/{{project_name_short}}-Xfce-17.1.0.2.ova.torrent</code>
+* torrent OpenPGP signature: <code>https://download.{{project_clearnet}}/ova/{{VersionNew}}/{{project_name_short}}-Xfce-17.1.1.3.ova.torrent.asc</code>
+* torrent signify signature: <code>https://download.{{project_clearnet}}/ova/{{VersionNew}}/{{project_name_short}}-Xfce-17.1.1.3.ova.torrent.sig</code>
+
+= Debugging =
+{{Install_Package|package=
+transmission-cli
+}}
+
+Use <code>transmission-show</code> to look at the ISO metadata.
+
+{{CodeSelect|code=
+transmission-show {{project_name_short}}-Xfce-{{VersionNew}}.iso.torrent
+}}
+
+Expected output:
+
+<div class="pre">
+Name: {{project_name_short}}-Xfce-17.1.1.3.iso
+File: {{project_name_short}}-Xfce-17.1.1.3.iso.torrent
+
+GENERAL
+
+  Name: {{project_name_short}}-Xfce-17.1.1.3.iso
+  Hash: 379963818d37848464123b379ac5e11038a2899e
+  Created by: mktorrent 1.1
+  Created on: Thu Dec 28 01:55:45 2023
+  Piece Count: 3967
+  Piece Size: 256.0 KiB
+  Total Size: 1.04 GB
+  Privacy: Public torrent
+
+TRACKERS
+
+  Tier #1
+  http://fosstorrents.com:6969/announce
+  udp://fosstorrents.com:6969/announce
+  udp://tracker.opentrackr.org:1337/announce
+  udp://tracker.torrent.eu.org:451
+
+WEBSEEDS
+
+  https://download.{{project_clearnet}}/iso/17.1.1.3/{{project_name_short}}-Xfce-17.1.1.3.iso
+
+FILES
+
+  {{project_name_short}}-Xfce-17.1.1.3.iso (1.04 GB)
+</div>
+
+Checks:
+
+* Check if the link under <code>WEBSEEDS</code> is functional.
+* Check if <code>TRACKERS</code> are up-to-date and functional.
+
+= Development =
+Script that creates the <code>.torrent</code> files:
+
+* https://github.com/{{project_name_short}}/developer-meta-files/blob/master/usr/bin/dm-prepare-release
+
+{{Footer}}
+[[Category:MultiWiki]]

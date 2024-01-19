@@ -352,7 +352,7 @@ Check if other VMs are functional, such as newly created ones or those from a di
 '''11.''' Check [[#System Logs|System Logs]].
 
 * Sometimes crashing or freezing issues are easier to detect by [[#Watch Systemd Journal Log of Current Boot|Watching Systemd Journal Log of <u>Current</u> Boot]].
-* Sometimes it is necessary to [[#Enable Persistent Systemd Journal Log|Enable Persistent Systemd Journal Log]] and to [[#Check Systemd Journal Log of Previous Boot|Check Systemd Journal Log of <u>Previous</u> Boot]].
+* Sometimes it is necessary to [[#Check Systemd Journal Log of Previous Boot|Check Systemd Journal Log of <u>Previous</u> Boot]].
 
 '''12.''' If a graphical environment (where one can use a computer mouse) is unavailable after booting, utilize a virtual console to acquire system logs.
 
@@ -463,49 +463,7 @@ It is possible to to watch the systemd journal log as it is written.
 sudo journalctl -b -f
 }}
 
-== Enable Persistent Systemd Journal Log ==
-By default, a persistent systemd journal log is not enabled in Debian. <ref>
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=801906
-</ref> To enable it, apply the following steps.
-
-Platform specific notes:
-
-* <u>Non-Qubes-Whonix</u>: No special steps are required; follow the steps below.
-* <u>Qubes users</u>: The following changes must be applied in a VM with a persistent root image like a Template or Standalone. It could be confusing if applied in App Qubes since the systemd journal log might be mixed up with boots by the Template, while the App Qube systemd journal logs would not be persistent. [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs] might be helpful, but further research is required.
-
-{{Box|text=
-'''1.''' Create folder <code>/etc/systemd/journald.conf.d</code>.
-
-{{CodeSelect|code=
-sudo mkdir -p /etc/systemd/journald.conf.d
-}}
-
-'''2.''' {{Open with root rights|filename=
-/etc/systemd/journald.conf.d/60_persistent_journal.conf
-}}
-
-'''3.''' Add the following setting.
-
-{{CodeSelect|code=
-[Journal]
-Storage=persistent
-}}
-
-Save.
-
-'''4.''' Restart <code>systemd-journald</code>.
-
-{{CodeSelect|code=
-sudo systemctl restart systemd-journald
-}}
-
-A persistent systemd journal log has now been enabled.
-}}
-
 == Check Systemd Journal Log of Previous Boot ==
-
-After following the [[#Enable Persistent Systemd Journal Log|Enable Persistent Systemd Journal Log]] steps, it is possible to inspect the systemd journal log of the previous boot.
-
 {{CodeSelect|code=
 sudo journalctl -b -1
 }}
@@ -585,7 +543,6 @@ Prerequisite knowledge: [[Desktop#Virtual Consoles|Virtual Consoles]]. Try to lo
 If a virtual console is unavailable:
 
 # Boot into [[Recovery|Recovery Mode]].
-# [[#Enable_Persistent_Systemd_Journal_Log|Enable Persistent Systemd Journal Log]] (if not previously enabled).
 # Reboot into normal mode so a log for the failed boot will be written (if not previously enabled).
 # Boot into recovery mode again.
 # [[#Check_Systemd_Journal_Log_of_Previous_Boot|Check Systemd Journal Log of Previous Boot]].

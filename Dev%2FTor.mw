@@ -23,7 +23,9 @@ For example, in December, 2017, five major versions of Tor were supported. Speci
 # Debian <code>stretch</code> repository contained another LTS, which was version <code>0.2.9</code>.
 # <code>deb.torproject.org</code>, also known as Tor, Tor Project or TPO repository, had the latest stable Tor which was version <code>0.3.1.9</code>.
 
-A major consideration in choosing the most suitable Tor version for {{project_name_short}} is that the latest stable found in the TPO repository may lead to network breakage. <ref>https://forums.whonix.org/t/whonix-gateway-tor-0-2-9-9-unrecommended-no-update-unsafe/4240/8</ref> The reason is the "stable" tag indicates it is stable version of Tor, which does not necessarily match the "stable" Debian version that {{project_name_short}} is actually using. <ref>
+A major consideration in choosing the most suitable Tor version for {{project_name_short}} is that the latest stable found in the TPO repository may lead to network breakage. <ref>
+* https://forums.whonix.org/t/whonix-gateway-tor-0-2-9-9-unrecommended-no-update-unsafe/4240/8
+</ref> The reason is the "stable" tag indicates it is stable version of Tor, which does not necessarily match the "stable" Debian version that {{project_name_short}} is actually using. <ref>
 The Debian target is usually the stable package, which is currently: {{Stable_project_version_based_on_Debian_codename}}) or {{project_name_short}}.
 </ref>
 
@@ -50,6 +52,7 @@ Patrick: "Historically when there was a botnet starting to use Tor, the LTS vers
 ** In May 2021 a [https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/40436 transient repository issue] [https://forums.whonix.org/t/whonix-on-mac-m1-arm-user-support-still-unsupported-at-time-of-writing/11310/74 broke] {{project_name_short}} build process.
 ** In December 2022, caused issue [https://forums.whonix.org/t/failed-to-start-anonymizing-overlay-network-for-tcp-tor-fails-to-start-a-few-times-before-succeeding-to-start/16289 FAILED to start Anonymizing overlay network for TCP - Tor fails to start a few times before succeeding to start].
 ** In February 2023, might have caused issue [https://forums.whonix.org/t/fresh-whonix-kvm-install-gateway-error/16350 Fresh whonix-kvm install gateway error].
+** In December 2023, [https://gitlab.torproject.org/tpo/core/tor/-/issues/40892 Tor 0.4.8.9 broken connectivity in combination with vanguards] / [https://github.com/mikeperry-tor/vanguards/issues/100 vanguards broken with Tor 0.4.8.9] / [https://forums.whonix.org/t/connections-drop-on-tor-0-4-8-9/17702 Connections drop on Tor 0.4.8.9].
 ** There is nothing similar to <code>snapshot.debian.org</code>. Keeps changing (newer versions being added). Hence, can introduce build issues such as above. Unsuitable for reproducible builds / [[Verifiable Builds]].
 ** [[Dev/Porting|Porting to other architectures]] issues.
 *** Only available for the <code>i386</code>, <code>amd64</code>, <code>arm64</code> architectures.
@@ -106,6 +109,13 @@ The implementation is as it follows.
 
 = Tor Control =
 See [[Dev/onion-grater#Talking_to_the_real_Tor_Controller|Talking to the real Tor Control Port]].
+
+= Tor Readiness to Serve Connections API =
+What is the API for "When Tor is ready to serve connections?"
+
+The short answer is: none.
+
+Unfortunately there isn't reliable API for that. There is Tor control protocol <code>status/circuit-established</code> which can return <code>1</code> (yes) but that doesn't mean a connection will succeed. The only way to test it would be to actually test it such as using curl against some clearnet or onion domain(s). But which ones? Avoiding single points of failure.
 
 = Why Waste Network Bandwidth by Downloading Operating System Updates over Tor? =
 

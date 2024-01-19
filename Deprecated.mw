@@ -10,6 +10,7 @@ Outdated, Deprecated, Archived {{project_name_long}} Documentation.
 {{intro|
 Most users can safely ignore this page.
 }}
+{{archived}}
 = ip-check.info =
 Update: The original https://ip-check.info has a new owner and much less anonymity test functionality since JonDonym is shutting down.
 
@@ -404,3 +405,44 @@ sudo rm -f /etc/lightdm/lightdm.conf.d/whonix-autologin.conf
 {{CodeSelect|code=
 sudo rm -f /etc/lightdm/lightdm.conf.d/30_autologin.conf
 }}
+
+== Enable Persistent Systemd Journal Log ==
+By default, a persistent systemd journal log is not enabled in Debian. <ref>
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=801906
+</ref> To enable it, apply the following steps.
+
+Platform specific notes:
+
+* <u>Non-Qubes-Whonix</u>: No special steps are required; follow the steps below.
+* <u>Qubes users</u>: The following changes must be applied in a VM with a persistent root image like a Template or Standalone. It could be confusing if applied in App Qubes since the systemd journal log might be mixed up with boots by the Template, while the App Qube systemd journal logs would not be persistent. [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs] might be helpful, but further research is required.
+
+{{Box|text=
+'''1.''' Create folder <code>/etc/systemd/journald.conf.d</code>.
+
+{{CodeSelect|code=
+sudo mkdir -p /etc/systemd/journald.conf.d
+}}
+
+'''2.''' {{Open with root rights|filename=
+/etc/systemd/journald.conf.d/60_persistent_journal.conf
+}}
+
+'''3.''' Add the following setting.
+
+{{CodeSelect|code=
+[Journal]
+Storage=persistent
+}}
+
+Save.
+
+'''4.''' Restart <code>systemd-journald</code>.
+
+{{CodeSelect|code=
+sudo systemctl restart systemd-journald
+}}
+
+A persistent systemd journal log has now been enabled.
+}}
+
+{{Footer}}

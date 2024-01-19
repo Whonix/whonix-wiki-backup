@@ -93,6 +93,9 @@ https://forums.whonix.org/t/port-whonix-to-fedora-as-base-operating-system/16528
 ==== Qubes ====
 Implemented as [[Qubes|{{q_project_name_long}}]].
 
+==== Debian GNU/Hurd ====
+Not ready for mainstream use, in active development. Microkernel makes device compatibility harder.
+
 ==== Gentoo / Hardened Gentoo ====
 Insecure package manager. Back then bug reports got closed down without much regard.
 
@@ -139,6 +142,17 @@ https://groups.google.com/g/theupdateframework
 
 ==== Arch Linux ====
 [https://forums.whonix.org/t/arch-linux-distro-preview/13387 Arch Linux Distro Preview]
+
+==== Devuan ====
+Whonix is systemd based distribution. Whonix is not anti-systemd.
+
+Whonix lead developer isn't convinced of anti-systemd arguments justifying moving to a non-systemd distribution.
+
+Non-systemd is [[unsupported]] because no contributors support this use case.
+
+https://forums.whonix.org/t/why-whonix-uses-linux-with-systemd/6920
+
+https://linuxiac.com/devuan-forgot-to-renew-the-key-that-signs-system-updates/
 
 ==== NixOS ====
 
@@ -518,6 +532,10 @@ Some privacy considerations and reasons why it is not installed:
 For these reasons it is not a good idea to add popcon to {{project_name_short}}. If you have suggestions or a different view, please get in contact.
 
 == Criteria for Choosing a Base Distribution ==
+=== Previously Compared but Removed ===
+* Devuan: Not useful to compare if the only difference is a different init system.
+
+=== Missing Criteria ===
 The following criteria are not yet part of the following comparison table but should be added.
 
 * Compile time hardening flags.
@@ -533,49 +551,104 @@ For example, derivatives of Debian such as {{project_name_short}} are permitted 
 ** package name changes in the repository required
 * This is is non-exhaustive. What else?
 
-The following list is not sorted by any priorities or otherwise.
+Not applicable, valid, clear or related or suffers from a lack of information in general to be covered in the table yet: 
 
-* transactional upgrades (ostree)
-* easy table update?
+* The user's package manager verifies the package maintainer's and upstream developer's digital signature.
+* End-to-end signed packages
+* Untrusted packages (similar to Debian proposal [https://wiki.debian.org/UntrustedDebs UntrustedDebs])
+* Daemons (systemd units) do not automatically start once package is installed (It is up to the package developer to have it not enabled by default on most all systems)
+
+=== Previous Criteria ===
+* [[Vanguards]] available: dropped because unmaintained upstream
+* Onionbalance available: dropped because not too important, if needed can be manually installed
+
+=== Minimum Criteria ===
+Since most distributions have it, this is considered a minimum criteria. If not available, the distribution does not need to be added below.
+
+* Tor available
+* Wayland available
+* Pipewire available
+
+=== Comparison Table ===
+'''Figure:''' ''Base Operating Systems Criteria Comparison Table''
 
 {| class="wikitable" style="background-color: #fff;text-align: center; .Systemd: red;"
 
 !
-! Debian Linux
-! Devuan Linux (based on Debian)
+! Debian GNU/Linux
 ! Void Linux
 ! Alpine Linux
+! openSUSE Tumbleweed
+! openSUSE MicroOS
+! GNU Guix
 |-
 
-! Usability
-| "good" <ref>
+! Good Usability
+| {{Yes}} <ref>
 Define of usability of "Debian Linux" as "good" since it is a baseline, a starting point since {{project_name_short}} is currently based on it. There are Linux distributions which might have better usability such as Ubuntu, Elementary OS but also distributions which have worse usability by comparison. The definition of "good" here is not the usability of mainstream operating systems such as Android or iOS. See also {{kicksecure_wiki
 |wikipage=Linux User Experience versus Commercial Operating Systems
 |text=Linux User Experience versus Commercial Operating Systems
 }}.
 </ref>
-| As Devuan
-| ?
-| ?
-
+| {{No}}
+| {{No}}
+| {{Yes}} <ref> Stable and brand new, plays along with new hardware without breaking. The default system snapshots and easy rollbacks. Everything can be configured with YaST, arguably the most powerfull installation and configuration tool on GNU/Linux. Being able to configure the system in detail using a GUI very rare and valuable for usability for desktop GNU/Linux.</ref>
+| {{Yes}} <ref> Same as Tumbleweed, but also immutable, so it is really hard for the user to break the system.</ref>
+| {{No}} ?
 |-
+
 ! [https://theupdateframework.io/security/ The Update Framework (TUF) threat model] Pass
 | {{Yes}}
-| {{Yes}} (as Debian)
 | ?
 | ?
+| {{Yes}} ?
+| {{Yes}} ?
+| {{Yes}} ?
 |-
 
 |-
-! end-to-end signed packages (not only repository metadata) (such as [https://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446 end-to-end signed <code>.debs</code>])
+! Minimal Number of Services by Default
 | {{No}}
-| {{No}}
-| ?
-| ?
+| {{Yes}} <ref>Since there is no default per se</ref>
+| {{Yes}} <ref>Since there is no default per se</ref>
+| {{Yes}}
+| {{Yes}}
+| {{Yes}} <ref>Since there is no default per se</ref>
 |-
 
 |-
-! distribution package source code signed by distribution package maintainer
+! Mandatory Access Control Policy Enforced by Default
+| {{Yes}}
+| {{No}}
+| {{No}}
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+|-
+
+|-
+! Transactional updates by default
+| {{No}}
+| {{No}}
+| {{No}}
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+|-
+
+
+|-
+! Option to secure rollback after update by default
+| {{No}}
+| {{No}}
+| {{No}}
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+|-
+
+|-
+! Distribution package source code signed by distribution package maintainer
 | {{Yes}} <ref>
 {{CodeSelect|code=
 apt-get source hello
@@ -597,54 +670,48 @@ Signatures are in <code>.dsc</code> files and can be verified using <code>dscver
 </ref>
 | {{Yes}}
 | ?
+| {{Yes}}
+| {{Yes}}
 | ?
 |-
 
 |-
 ! Package maintainer digital signature is verified by the distribution's build server.
 | {{Yes}}
+| ?
+| ?
+| {{Yes}}
 | {{Yes}}
 | ?
-| ?
 |-
 
-|-
-! The user's package manager verifies the package maintainer's digital signature.
-| {{No}} <ref>https://unix.stackexchange.com/questions/285635/how-is-the-authenticity-of-debian-packages-guaranteed</ref>
-| {{No}}
+! Package Manager Explicitly Uses HTTPS only
+| {{No}} <ref>Can be configured to be this way </ref>
 | ?
 | ?
-|-
-
-|-
-! The user's package manager verifies the upstream developer's digital signature.
-| {{No}} <ref>Same as above.</ref>
-| {{No}}
-| ?
+| {{No}} <ref> Can be configured to be this way </ref>
+| {{Yes}}
 | ?
 |-
 
 ! [https://reproducible-builds.org Reproducible Builds] (deterministic builds)
 | {{No}} <ref>Debian is working on it.</ref>
 | ?
-| ?
 | {{No}} <ref>Alpine was taking action on this from 2019-2020, but https://reproducible-builds.org/citests/ has Alpine currently listed as Disabled due to its continuous testing longer being maintained.</ref>
-|-
-
-! source-based distribution
-| {{No}}
-| {{No}}
+| ? <ref>Is there are reproducible ISO?</ref>
 | ?
 | ?
 |-
 
-! [[Verifiable Builds]]
+! Source-based distribution
 | {{No}}
 | ?
 | ?
-| ?
-
+| {{No}}
+| {{No}}
+| {{Yes}} <ref>Also binary on demand</ref>
 |-
+
 ! {{kicksecure_wiki
 |wikipage=Verified_Boot
 |text=Verified Boot
@@ -652,66 +719,75 @@ Signatures are in <code>.dsc</code> files and can be verified using <code>dscver
 | {{No}}
 | ?
 | ?
-| ?
-|-
-
-! untrusted packages (similar to Debian proposal [https://wiki.debian.org/UntrustedDebs UntrustedDebs])
-| {{No}}
-| {{No}}
-| ?
+| {{Yes}}?
+| {{Yes}}?
 | ?
 |-
 
 ! Non-systemd Init
 | {{No}}
 | {{Yes}}
-| {{Yes}}
 | {{Yes}} <ref>Alpine uses OpenRC, see [https://wiki.alpinelinux.org/wiki/OpenRC the Alpine wiki page]</ref>
+| {{No}}
+| {{No}}
+| {{Yes}}
 |-
 
 ! Musl Libc
 | {{No}}
-| {{No}}
 | {{Yes}}
 | {{Yes}} <ref>Alpine says on their [https://alpinelinux.org/about/ organization home page] that it runs on musl and BusyBox</ref>
+| {{No}}
+| {{No}}
+| {{No}}
 |-
 
 ! Hardened Memory Allocator
 | {{No}}
 | {{No}}
-| {{No}}
 | ?
+| {{No}}
+| {{No}}
+| {{No}}
 |-
 
 ! Hardened Kernel
 | {{No}}
 | {{No}}
 | {{No}}
-| ?
+| {{No}}
+| {{No}}
+| {{No}}
 |-
 
 ! Microkernel
 | {{No}}
 | {{No}}
 | {{No}}
-| ?
+| {{No}}
+| {{No}}
+| {{No}}
 |-
 
 ! Clang CFI
 | {{No}}
 | {{No}}
-| {{No}}
 | ?
+| {{No}}
+| {{No}}
+| {{No}}
 |-
 
 ! Rolling Release
 | {{No}}
-| {{No}}
 | {{Yes}}
 | {{Yes}} <ref>Alpine offers repositories for stable branch as well as their edge rolling release branch, as described in their wiki [https://wiki.alpinelinux.org/wiki/Repositories here]</ref>
+| {{Yes}}
+| {{Yes}}
+| {{Yes}}
 |-
 
-! no packages with many unfixed high severity security issues <ref>
+! No packages with many unfixed high severity security issues <ref>
 For a prolonged amount of time.
 
 https://web.archive.org/web/20201022174657/https://tracker.debian.org/pkg/chromium
@@ -723,12 +799,14 @@ https://web.archive.org/web/20201022174657/https://tracker.debian.org/pkg/chromi
 </blockquote>
 </ref>
 | {{No}}
-| {{No}}
 | ?
-| ?
+| {{Yes}}
+| {{Yes}} <ref>This problem is only relevant for stable release distros, where the trust to keep things secure is on distro maintainers. A rolling release being always upstream does not suffer from such problems. Only way this would be possible is if the distro provides abandoned packages in their repositories, which openSUSE does not.</ref>
+| {{Yes}}
+| {{Yes}}
 |-
 
-! no packages security issues which are exploited in-the-wild <ref>
+! No packages security issues which are exploited in-the-wild <ref>
 For a prolonged amount of time.
 
 Debian version of Chromium reported to be exploited in the wild.
@@ -750,113 +828,88 @@ Debian affected by '''CVE-2020-16009''' at time of writing, see:
 https://forums.whonix.org/t/chromium-browser-for-kicksecure-discussions-not-whonix/10388/49
 </ref>
 | {{No}}
-| {{No}}
 | ?
-| ?
-|-
-
-! Tor available
 | {{Yes}}
 | {{Yes}}
-| {{Yes}} <ref>https://github.com/void-linux/void-packages/tree/master/srcpkgs/tor</ref>
-| {{Yes}} <ref> https://pkgs.alpinelinux.org/package/edge/community/x86_64/tor</ref>
-|-
-
-! [[vanguards]] available
 | {{Yes}}
-| {{Yes}}
-| {{No}}
-| ?
-
-|-
-! onionbalance  available
-| {{Yes}}
-| {{Yes}}
-| {{No}}
-| ?
+| {{No}} <ref>Despite being up-to-date, not having the proprietary firmware blobs and cpu microcode updates means no update can fix some vulnurabilities</ref>
 |-
 
 ! VirtualBox Available
 | {{Yes}}
 | {{Yes}}
+| ?
+| {{Yes}}
 | {{Yes}}
 | ?
-
 |-
+
 ! KVM Available
-| {{Yes}}
 | {{Yes}}
 | {{Yes}} 
 | {{Yes}} <ref> https://wiki.alpinelinux.org/wiki/KVM</ref>
+| {{Yes}}
+| {{Yes}}
+| {{Yes}}
 |-
 
 ! EFI Booting Available
 | {{Yes}}
 | {{Yes}}
-| {{Yes}}
-| {{Yes}} <ref> https://wiki.alpinelinux.org/wiki/Bootloaders</ref>
-
-|-
-! SecureBoot supported <ref>
-for usability / hardware compatibility, not necessarily as a security feature
-</ref>
+| {{Yes}} <ref>https://wiki.alpinelinux.org/wiki/Bootloaders</ref>
 | {{Yes}}
 | {{Yes}}
 | ?
-| {{Yes}} <ref> https://wiki.alpinelinux.org/wiki/UEFI_Secure_Boot</ref>
 |-
 
-! LibreSSL <ref>
+! Secure Boot Compatibility with Firmware Default Keys <ref>
+* for usability / hardware compatibility, not necessarily as a security feature
+* default key: Microsoft key
+</ref>
+| {{Yes}}
+| ?
+| {{No}}
+| {{Yes}}
+| {{Yes}}
+| {{No}}
+|-
+
+! LibreSSL by Default<ref>
 https://forums.whonix.org/t/libressl-by-default/9024
 </ref>
-| {{No}}
 | {{No}}
 | {{No}} <ref>
 https://voidlinux.org/news/2021/02/OpenSSL.html
 </ref>
 | {{No}} <ref> Setting libressl as default is under consideration per [https://gitlab.alpinelinux.org/alpine/tsc/-/issues/28 here] </ref>
-|-
-
-! Wayland Available
-| {{Yes}}
-| {{Yes}}
-| {{Yes}}
-| {{Yes}}
-|-
-
-! ALSA without PulseAudio <ref>
-https://forums.whonix.org/t/switching-to-alsa/10535
-</ref>
-| {{Yes}} (with apulse)
-| {{Yes}} (with apulse)
-| ?
-| {{Yes}} <ref> https://wiki.alpinelinux.org/wiki/ALSA </ref>
-|-
-
-! [[Dev/Stateless|stateless]]
 | {{No}}
 | {{No}}
 | {{No}}
+|-
+
+! [[Dev/Stateless|Stateless/Immutable]]
+| {{No}}
+| {{No}}
+| {{No}}
+| {{No}}
+| {{Yes}}
 | {{No}}
 |-
 
 ! [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942303 Weak Dependencies] (to avoid [[Debian_Packages#Technical_Information|the metapackage issue]])
 | {{No}}
-| {{No}}
 | ?
 | ?
-|-
-
-! daemons (systemd units) do not automatically start once package is installed
-| {{No}}
-| {{No}}
+| {{Yes}} <ref>https://en.opensuse.org/openSUSE:Package_dependencies#Strong_and_Weak_dependencies</ref>
+| {{Yes}}
 | ?
-| ? <ref> Anecdotally, all packages I have used require manually using openrc to begin service and add service </ref>
 |-
 
 ! no legal issues (such as [[#Ubuntu_Legal_Issues|this]])
 | {{Yes}}
+| ?
 | {{Yes}}
+| ?
 | ?
 | {{Yes}}
 |-
@@ -865,7 +918,9 @@ https://forums.whonix.org/t/switching-to-alsa/10535
 | {{No}}
 | {{No}}
 | {{No}}
-| {{No}} <ref> Not on either list </ref>
+| {{No}}
+| {{No}}
+| {{Yes}}
 |-
 
 |}

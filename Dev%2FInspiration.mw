@@ -2,7 +2,9 @@
 {{#seo:
 |description=Inspiration for developing new {{project_name_long}} Features.
 }}
-
+{{intro|
+Inspiration for developing new {{project_name_long}} Features.
+}}
 = WARNING =
 
 '''This page is intended for people interested in developing {{project_name_short}}, NOT for users. It contains only partial-finished attempts adding new features to {{project_name_short}}.'''
@@ -15,42 +17,23 @@ See [[Other Anonymizing Networks]]
 
 {{Anchor|I2PBOX}}
 == Installing I2P on {{project_name_gateway_long}} (I2PBOX) ==
-<s>Development stalled due to lack of interest from {{project_name_short}} developers and ip2 community. See:</s>
+Development stalled due to lack of interest from {{project_name_short}} developers and ip2 community. See:
 
-* <s>Development thread: <nowiki>https://sourceforge.net/projects/whonix/wiki/Dev_old_1/#optionalfeature-I2P-support-waitlooking-for-contributorsmore-mature-upstream</nowiki> Support for I2P WAIT for contributors/more mature upstream]</s>
-* <s><nowiki>http://forum.i2p/viewtopic.php?t=7037</nowiki> I2P thread (<nowiki>http://forum.i2p.re/viewtopic.php?t=7037</nowiki> re)</s>
-* <s>[[Dev/Anonymity Network#I2P]]</s>
-* <s>[[I2P]]</s>
+* Development thread: <nowiki>https://sourceforge.net/projects/whonix/wiki/Dev_old_1/#optionalfeature-I2P-support-waitlooking-for-contributorsmore-mature-upstream</nowiki> Support for I2P WAIT for contributors/more mature upstream]
+* <nowiki>http://forum.i2p/viewtopic.php?t=7037</nowiki> I2P thread (<nowiki>http://forum.i2p.re/viewtopic.php?t=7037</nowiki> re)
+* [[Dev/Anonymity Network#I2P]]
+* [[I2P]]
 
-<s>Anyone feel free it take it.</s>
+Anyone feel free it take it.
 
-<s>Guide by i2p:
+Guide by i2p:
 
-* <s>reachable only when using i2p: <nowiki>http://killyourtv.i2p/howtos/whonix/</nowiki></s> (down...)
-* <s>i2p to clearnet service ".re", reachable over clearnet and Tor: <nowiki>http://killyourtv.i2p.re/howtos/whonix/</nowiki></s> (down, but see below...)
+* reachable only when using i2p: <nowiki>http://killyourtv.i2p/howtos/whonix/</nowiki> (down...)
+* i2p to clearnet service ".re", reachable over clearnet and Tor: <nowiki>http://killyourtv.i2p.re/howtos/whonix/</nowiki> (down, but see below...)
 
 Currently in development by goldstein:
 
 https://forums.whonix.org/t/i2p-running-on-whonix-gateway/2163
-
-= JonDonym =
-
-== JonDonym as Tor replacement (JonDoBOX) ==
-
-'''Development stalled due to non-responsiveness upstream.'''
-
-The sources might contain additional helpful information:
-
-* The [Dev] "SupportforJonDo {{project_name_short}} dev thread about JonDonym"
-* The [https://web.archive.org/web/20210121205650/http://anonymous-proxy-servers.net/forum/viewtopic.php?f=10&t=6680 thread in the JonDonym forum]
-* [https://web.archive.org/web/20230213041239/https://anonymous-proxy-servers.net/en/help/transocks.html JonDonym transocks_ev]
-* [https://web.archive.org/web/20210511011854/https://web.archive.org/web/20210511011854/https://anonymous-proxy-servers.net/en/help/jondodaemon.html JonDoDaemon for Debian]
-
-Depending on your threat model (see [[Design]]), [https://anonymous-proxy-servers.net/ JonDonym] can be potentially used as a replacement for Tor. Prefer the [https://web.archive.org/web/20210511011854/https://web.archive.org/web/20210511011854/https://anonymous-proxy-servers.net/en/help/jondodaemon.html console version] of 'JonDo – the IP changer', otherwise you would have to install a desktop environment, which needs a lot more RAM, CPU and disc space (not possible on most embedded devices).
-
-Free users can [[https://web.archive.org/web/20210415053008/https://shop.anonymous-proxy-servers.net/bin/payment?lang#en#vorteile%7Conly|only only use port 80 (http) and 443 (https)]]. Socks is [https://web.archive.org/web/20200123130536/http://anonymous-proxy-servers.net/en/help/about.html only available for paying premium users]. Therefore free users can only reach services listening on remote port 80 or 443. Normal browsing will work, other stuff, for example IRC on port 6667 will not work. Paying premium users can use all services.
-
-In comparison to Tor, JonDo does not offer a TransPort or DnsPort. For that reason, transocks_ev ([https://web.archive.org/web/20230213041239/https://anonymous-proxy-servers.net/en/help/transocks.html download here]) is needed. Note, that you can not use the firewall rules provided [https://web.archive.org/web/20230213041239/https://anonymous-proxy-servers.net/en/help/transocks.html under transocks_ev]. You need to adjust the {{project_name_short}} firewall ({{W_Firewall}}).
 
 = VPN =
 
@@ -162,25 +145,32 @@ http proxies are not suited, because we would not be able to connect to https pr
 
 === Transparent Proxying Method ===
 
-'''Development stalled.''' '''Not finished.'''
+'''Development stalled. Unfinished.'''
 
-Transparent Proxying (like {{project_name_short}} with Tor's TransPort) is, due to technical limitations, not fully supported by proxies. Proxies do not offer a DnsPort and also do not act as a DNS server. While it is possible to relay TCP and UDP traffic through the proxy on the IP level (using iptables), you would still always require known (you know the IP) DNS server. (i.e. public DNS server such as OpenDNS, Google, httpsdnsd) DNS resolution would look like: Proxy-Workstation &rarr; Proxy-Gateway &rarr; Proxy &rarr; DNS server. It is technically not possible to let the proxy transparently (!) do the DNS resolution (no tools available) - at least not that we know after extended research know of. This is because proxies offer hostname resolution, but not DNS.
+<u>Issue:</u> [[Stream_Isolation#Transparent_Proxy|Transparent Proxying]] (like in {{project_name_short}} thanks to Tor's <code>TransPort</code>) is, due to technical limitations, not fully supported by proxies. Proxies do not offer a feature similar to Tor's <code>DnsPort</code> and also do not act as a DNS resolver. While it is possible to relay TCP and UDP traffic through the proxy on the IP level (using firewalls such as iptables, nftables, ...), the user would still always require known (as in the user knows the IP) DNS resolver. (i.e. public DNS server such as OpenDNS, Google, httpsdnsd)
 
-Future:
-This technical limitation may be lifted if redsocks [https://github.com/darkk/redsocks/issues/23 Feature Request: fake DNS resolver] gets implemented.
+DNS resolution would look like: Proxy-Workstation &rarr; Proxy-Gateway &rarr; Proxy &rarr; DNS server.
 
-Due to the DNS issue, you can't completely hide behind the proxy (using it transparently). You always would have to reveal, that you are using a public (or private) extra DNS resolver. Of course, you would also not only have to trust the proxy, but also the extra DNS server, which can see, log and correlate all your DNS queries.
+It is technically not possible to let the proxy transparently (!) do the DNS resolution (no tools available) - at least not as far as the author knows after extended research. This is because proxies offer hostname resolution, but not DNS resolution. These are different protocols.
+
+redsocks (and probably also transocks_ev) can translate transparently proxyied TCP traffic to proxy protocols (http, https, socks4(a), socks5). There is however no translation available from transparently proxied DNS traffic to hostname resolution as supported by proxies.
+
+Some applications have support for various proxy protocols. This means developers did teach the application how to communicate with the proxy in order to use hostname resolution. No developer is maintaining functionality to translate transparently proxyied TCP traffic to proxy protocols.
+
+This issue is [[unspecific|unspecific to {{project_name_short}}]].
+
+<u>Future:</u> This technical limitation may be lifted if redsocks [https://github.com/darkk/redsocks/issues/23 Feature Request: fake DNS resolver] ever gets implemented. At time of writing the last commit to redsocks was 4 years ago with unmerged pull requests. Redsocks being unmaintained makes this feature even less likely.
+
+<u>Impact:</u> Due to the DNS issue, the user cannot completely hide behind the proxy (using it transparently). The user would always have to reveal, that the user is using a public (or private) extra DNS resolver. Of course, the user would also not only have to trust the proxy, but also the extra DNS server, which can see, log and correlate all DNS queries.
 
 For TCP and UDP: Proxy-Workstation &rarr; Proxy-Gateway &rarr; network layer &rarr; redsocks &rarr; proxy For DNS: Proxy-Workstation &rarr; Proxy-Gateway &rarr; network layer &rarr; redsocks &rarr; proxy &rarr; public DNS server
 
-Sources:
+<u>Sources:</u>
 
 * Leonid Evdokimov (author of [https://github.com/darkk/redsocks redsocks]) on mailing list, [https://web.archive.org/web/20190613215033/http://librelist.com/browser//redsocks/2012/5/15/transparent-proxy-dns-without-public-dns-server/ Transparent Proxy, DNS, without public DNS server]
 * [https://tiggerswelt.net/Ueber%20uns/impressum/ Bernd Holzmüller] (author of [http://oss.tiggerswelt.net/transocks_ev/ transocks_ev]) by e-mail)
 
-Update:
-
-Maybe https://github.com/jtRIPper/dns-tcp-socks-proxy could help?
+<u>Update:</u> Maybe https://github.com/jtRIPper/dns-tcp-socks-proxy could help?
 
 === Proxy Settings Method ===
 

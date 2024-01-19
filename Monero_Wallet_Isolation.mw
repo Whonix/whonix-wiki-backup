@@ -42,6 +42,11 @@ If the end-goal is using an offline (airgap) Monero Wallet, learning how to use 
 
 Wallet creation, receiving funds, spending funds.
 
+= Update Required =
+These instructions were written when monerod and monero-wallet-cli were available in /usr/bin. Nowadays these are not by default.
+
+TODO: rewrite this guide to use Monero from flatpak or by installing these tools to /usr/bin (update [[Monero/Manual Instructions]])
+
 = Setup =
 == Qubes <code>dom0</code> Configuration ==
 === Create App Qubes ===
@@ -281,13 +286,20 @@ Alternatively Monero Wallet GUI can be used.
 
 Start Monero Wallet CLI.
 
-{{CodeSelect|code=
+* Outdated command. Requires monero-wallet-cli in /usr/bin.
+** {{CodeSelect|code=
 monero-wallet-cli
+}}
+* Untested command:
+** {{CodeSelect|code=
+flatpak run --command=monero-wallet-cli org.getmonero.Monero
 }}
 
 Monero Wallet CLI is more "clever" and automatically detects the already available <code>monero<u>d</u></code>. <ref>
 <code>monero-wallet-cli</code> detects that <code>monero<u>d</u></code>'s default port <code>18081</code> is open on localhost. The detection mechanism is port based. Not process based.
-</ref> Therefore as opposed to Monero Wallet GUI, no "remote node" configuration is neccessary.
+</ref> Therefore as opposed to Monero Wallet GUI, no "remote node" configuration is necessary.
+
+This might not easily work with flatpak because the host listening port might not be visible form within the flatpak chroot. This will most likely require additional flatpak options.
 
 = Monitoring =
 '''Note:''' The following instructions should be applied in {{project_name_workstation_short}} ([[Qubes|{{q_project_name_short}}]]: App Qube <code>monero<u>d</u>-ws</code>).

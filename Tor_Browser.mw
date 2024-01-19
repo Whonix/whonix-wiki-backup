@@ -269,26 +269,42 @@ For further information, refer to the [https://noscript.net/ NoScript website] a
 === You should Disable JavaScript by Default! ===
 As noted in the [[#Security vs Usability Trade-off|previous section]], disabling JavaScript by default may worsen fingerprinting. There are several other reasons why {{project_name_short}} has not made any modifications:
 
-* Tor Browser is developed by a different development team, The Tor Project. From {{project_name_short}} (and others) perspective this is often called upstream because {{project_name_short}} as a Linux distribution is downstream from the provider of the software project Tor Browser. For an elaboration of the organisational differences, see {{kicksecure_wiki
+* <u>Different development team:</u> Tor Browser is developed by a different development team, The Tor Project. From {{project_name_short}}'s (and others') perspective, this is often called upstream because {{project_name_short}} as a Linux distribution is downstream from the provider of the software project Tor Browser. For an elaboration of the organisational differences, see {{kicksecure_wiki
 |wikipage=Linux User Experience versus Commercial Operating Systems
 |text=Linux User Experience versus Commercial Operating Systems
 }}.
-* There is no stable application programmable interface (API) to reliably disable JavaScript by default in Tor Browser <ref>
+* <u>Technical challenges:</u> There is no stable application programmable interface (API) to reliably disable JavaScript by default in Tor Browser <ref>
 https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/25391
-</ref> that {{project_name_short}} developers could use and there won’t be <ref>
+</ref> that {{project_name_short}} developers could use, and there won’t be<ref>
 https://gitlab.torproject.org/legacy/trac/-/issues/25391#note_2277828
-</ref> one unless someone contributes this feature to upstream, Tor Browser. <ref>
+</ref> one unless someone contributes this feature to upstream, Tor Browser.<ref>
 {{project_name_short}} for a while shipped a desktop file and menu options which affect the [[#Security Slider|security slider]] setting after first launching Tor Browser but it was removed due to unreliability, see [https://forums.whonix.org/t/ship-an-additional-version-of-tor-browser-with-security-slider-settings-to-high-by-default/7591 this forum thread] for further details.
+</ref> Therefore, making this change by default as a Linux distribution is difficult.<ref>
+It is easier for Tails to change Tor Browser because it is a Live distribution, not a persistent Linux distribution upgradeable through the standard package manager mechanism. Due to Tails spending a lot of effort on Tor Browser customization, Tails might lack [https://www.whonix.org/#security other security features] that were added to Whonix.
 </ref>
-* {{project_name_short}} is not a "secure browser" project - the focus is on creating a stable, reliable anonymity distribution which aligns with best practice security and privacy principles, informed by educated researchers in the field.
-* Possible fingerprinting or security issues with default settings in Tor Browser are the domain of core Tor developers.
-* {{project_name_short}} has limited manpower, meaning the resources do not exist to create a more secure browser, even if it was desirable. <ref>Even if the manpower existed, it would make more sense to establish a new "Privacy Browser" project, rather than merge its development with {{project_name_short}}. At a later stage, the theoretically more secure browser could then be bundled with the {{project_name_short}} platform.</ref>
-* Tor Browser is not significantly modified for the same reasons {{project_name_short}} does not [[Tor#Does_Whonix_Modify_Tor.3F|modify]] or attempt to [[Tor#Can_Whonix_Improve_Tor.3F|improve]] Tor. <ref>{{project_name_short}} includes Tor Browser by default, with only [[Tor_Browser#{{project_name_short}}_Tor_Browser_Differences|minor]] differences.</ref>
-* Having {{project_name_short}} share the [[Fingerprint|fingerprint]] of other Tor Browser users is good for anonymity.
+* <u>Not a browser project:</u> {{project_name_short}} is not a "secure browser" project - the focus is on creating a stable, reliable anonymity distribution which aligns with best practice security and privacy principles, informed by educated researchers in the field, based on other upstream projects as much as possible. Similarly, for example, neither Debian nor Qubes are developing secure browser sub-projects and instead bundle existing upstream projects.
+* <u>User support:</u> As per [[Self Support First Policy]], support requests, bug reports, and feature requests are [[unspecific|unspecific to {{project_name_short}} and can almost always be redirected to upstream, the Tor Browser, a much larger and better funded project.
+* <u>Fingerprinting:</u> Possible fingerprinting or security issues with default settings in Tor Browser are the domain of core Tor developers.
+* <u>Shared fingerprint:</u> Having {{project_name_short}} share the [[Fingerprint|fingerprint]] of other Tor Browser users might be good for anonymity.
+* <u>Limited resources:</u> {{project_name_short}} has limited manpower, meaning the resources do not exist to create a more secure browser, even if it was desirable.<ref>
+Even if the manpower existed, it would make more sense to establish a new "Privacy Browser" project, rather than merge its development with {{project_name_short}}. At a later stage, the theoretically more secure browser could then be bundled with the {{project_name_short}} platform.
+</ref> No suitable, ethical, reliable {{kicksecure_wiki
+|wikipage=Dev/Open_Source_Business_Models
+|text=Open Source Business Model
+}} has been found or developed yet.
+* <u>Simpler security audits:</u> Tor Browser is not significantly modified for the same reasons {{project_name_short}} does not [[Tor#Does_Whonix_Modify_Tor.3F|modify]] or attempt to [[Tor#Can_Whonix_Improve_Tor.3F|improve]] Tor.<ref>
+{{project_name_short}} includes Tor Browser by default, with only [[Tor_Browser#{{project_name_short}}_Tor_Browser_Differences|minor]] differences.
+</ref>
+* <u>Legal:</u> Potential legal, trademark-related issues.<ref>
+Even if Open Source, if Tor Browser was modified except for environment variables, a rebuild from source code might be required to remove the Tor Browser trademarks, which would be a huge effort.
 
-Experienced Tor developer Mike Perry has provided justification for enabling JavaScript by default in a tor-talk mailing list topic; see [https://lists.torproject.org/pipermail/tor-talk/2012-May/024227.html "Tor Browser disabling Javascript anonymity set reduction"]. In summary, Tor Button and Tor Browser patches handle the most serious JavaScript concerns, such as IP address / location bypass problems. <ref>Although there are unresolved [https://gitlab.torproject.org/search?scope=issues&search=tor+browser+fingerprinting&state=opened tbb-fingerprinting] and [https://gitlab.torproject.org/search?scope=issues&search=linkability&state=opened tbb-linkability] issues.</ref>
+* [[Dev/TPO_Trademark]]
+* https://gitlab.torproject.org/legacy/trac/-/issues/19652
+</ref>
 
-Due to the loss in functionality, disabling JavaScript by default might place {{project_name_short}} users in a small subset of the Tor Browser population. The JavaScript behavior of the broader population is an open research question, so it safest to avoid changes which might ''reduce'' the anonymity set. Keep in mind the fingerprinting potential is also dependent on Tor Browser's [https://gitlab.torproject.org/legacy/trac/-/issues/9387 security] [[Tor_Browser#Security_Slider|slider]] settings. Ultimately individuals are free to turn JavaScript on or off, depending on their [https://2019.www.torproject.org/docs/faq#TBBJavaScriptEnabled security, anonymity and usability preferences].
+Experienced Tor developer Mike Perry has provided justification for enabling JavaScript by default in a tor-talk mailing list topic; see [https://lists.torproject.org/pipermail/tor-talk/2012-May/024227.html "Tor Browser disabling Javascript anonymity set reduction"]. In summary, Tor Button and Tor Browser patches handle the most serious JavaScript concerns, such as IP address/location bypass problems.<ref>Although there are unresolved [https://gitlab.torproject.org/search?scope=issues&search=tor+browser+fingerprinting&state=opened tbb-fingerprinting] and [https://gitlab.torproject.org/search?scope=issues&search=linkability&state=opened tbb-linkability] issues.</ref>
+
+Due to the loss in functionality, disabling JavaScript by default might place {{project_name_short}} users in a small subset of the Tor Browser population. The JavaScript behavior of the broader population is an open research question, so it's safest to avoid changes which might ''reduce'' the anonymity set. Keep in mind the fingerprinting potential is also dependent on Tor Browser's [https://gitlab.torproject.org/legacy/trac/-/issues/9387 security] [[Tor_Browser#Security_Slider|slider]] settings. Ultimately, individuals are free to turn JavaScript on or off, depending on their [https://2019.www.torproject.org/docs/faq#TBBJavaScriptEnabled security, anonymity, and usability preferences].
 
 === NoScript Custom Setting Persistence ===
 
@@ -984,9 +1000,16 @@ https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlocking
 <blockquote>To avoid captchas that are sometimes required when visiting YouTube, use hooktube.com/ (behind Cloudflare).<br /> <br />
 imgur.com blocks Tor uploads, to upload images on an imgur domain go to a stackexchange website (for example tor.stackexchange.com), click on Ask a Question, use the image upload tooltip to upload the image, the resulting url will have a i.stack.imgur.com/... form.</blockquote>
 
+== AppArmor Confinement ==
+[[AppArmor|AppArmor]] can help to protect the user's system and data. It confines programs according to a set of rules that specify what files a given program can access, and with what privileges. This also provides some protection against zero-day attacks and exploits via unknown application flaws. An AppArmor profile for Tor Browser is by default nowadays in {{project_name_short}}.
+
+Since package <code>apparmor-profile-torbrowser</code> AppArmor is applied, Tor Browser can only read and write to a limited number of folders. Permission denied errors are quite common, for example when trying to download files directly to the <code>~/home</code> folder.
+
+The workaround for AppArmor denied errors is saving files from Tor Browser to the <code>~/Downloads</code> folder that is located within the <code>~/home</code> folder. In order to upload files with Tor Browser, first copy them to that folder.
+
 == Harden Tor Browser ==
 
-Anonymity and safety can be materially improved via: AppArmor, Firejail confinement, Tor Browser settings, sandboxing, multiple Tor Browser instances, and operation of {{project_name_workstation_short}} Disposables ([[Qubes|{{q_project_name_short}}]]) or multiple {{project_name_workstation_short}}.
+Anonymity and safety can be materially improved via: AppArmor, Tor Browser settings, sandboxing, multiple Tor Browser instances, and operation of multiple {{project_name_workstation_short}} or {{project_name_workstation_short}} Disposables ([[Qubes|{{q_project_name_short}}]]).
 
 Tor Browser provides reasonable security in its stock configuration. However, mitigating the risk of Tor Browser security breaches makes sense, because it is an untrusted application with a huge attack surface; it is frequently  attacked successfully in the wild by adversaries.
 
@@ -996,18 +1019,6 @@ Tor Browser provides reasonable security in its stock configuration. However, mi
 |-
 ! scope="col"| Domain
 ! scope="col"| Recommendations
-|-
-
-! scope="row"| AppArmor Confinement
-|
-* [[{{project_name_gateway_short}}_Security#AppArmor|AppArmor]] can help to protect the user's system and data. <ref>It confines programs according to a set of rules that specify what files a given program can access, and with what privileges. This also provides some protection against zero-day attacks and exploits via unknown application flaws.</ref> <ref>If AppArmor is applied, Tor Browser can only read and write to a limited number of folders. Permission denied errors are quite common, for example when trying to download files directly to the {{Code2|home}} folder.</ref> To mitigate the threat of specific attacks against Tor Browser, the {{project_name_short}} Tor Browser [[AppArmor]] profile can be easily applied -- see the footnote for download workarounds. <ref>The workaround for AppArmor denied errors is saving files from Tor Browser to the {{Code2|~/Downloads}} folder that is located within the {{Code2|home}} folder. In order to upload files with Tor Browser, first copy them to that folder.</ref>
-* {{Update}} Install the {{Code2|apparmor-profile-torbrowser}} package.
-{{CodeSelect|code=
-sudo apt update
-}}
-{{CodeSelect|code=
-sudo apt install apparmor-profile-torbrowser
-}}
 |-
 
 <!--
