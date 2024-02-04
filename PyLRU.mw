@@ -70,6 +70,7 @@ Alternative command:
 git log -1 --show-signature
 }}
 }}
+</ref>
 
 {{CodeSelect|code=
 git verify-commit HEAD
@@ -78,7 +79,6 @@ git verify-commit HEAD
 {{GnuPG-Success}}
 
 {{GnuPG-Warning}}
-
 }}
 
 == Installation ==
@@ -99,6 +99,23 @@ sudo cp ~/pylru/pylru.py /usr/local/lib/python3.11/dist-packages/
 '''3.''' Done.
 
 PyLRU installation is now complete.
+}}
+
+= Troubleshooting =
+<pre>
+electrumx_server[]: PermissionError: [Errno 13] Permission denied: '/usr/local/lib/python3.11/dist-pa...pylru.py'
+</pre>
+
+'''Permission fix.'''
+
+Required in some build versions of {{project_name_long}}. <ref>
+The issue is the read permission for "<code>others</code>" than root were not set during file creation.
+
+Related issue: [https://github.com/Kicksecure/security-misc/issues/185 Restrict umask to 027 except for sudo/root broken]
+</ref>
+
+{{CodeSelect|code=
+sudo chmod --recursive o+r /usr/local/lib/python3.11/dist-packages
 }}
 
 = Footnotes =

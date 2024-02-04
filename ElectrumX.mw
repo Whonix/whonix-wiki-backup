@@ -42,7 +42,12 @@ By design:
 The <code>systemctl --user</code> must be run as normal, non-root user without <code>sudo</code> because these are <code>systemd</code> <u>user</u> units and <u>not</u> <code>systemd</code> <u>system</u> units.
 </ref>
 
+= Warnings =
 {{Testers-Only}}
+
+{{Community_Support}}
+
+{{Third_Party_Software}}
 
 = Installation =
 == Isolating Proxy Setup ==
@@ -144,20 +149,20 @@ cd electrumx
 
 '''5.''' Digital signature verification.
 
-<u>Note:</u> At the time of writing, <code>1.16.0</code> [https://github.com/spesmilo/electrumx/issues/243 was the latest stable release]. Before starting the ElectrumX source code download, browse to [https://github.com/spesmilo/electrumx/tags <code>github.com/spesmilo/electrumx/tags</code>] to verify the version number.
+<u>Note:</u> At the time of writing, <code>1.16.0</code> [https://github.com/spesmilo/electrumx/issues/243 was the latest stable release]. Before starting the ElectrumX source code download, browse to [https://github.com/spesmilo/electrumx/tags <code>github.com/spesmilo/electrumx/tags</code>] to verify the version number. Because there are no newer tags, we are using a recent commit (2024-01-05).
 
 {{CodeSelect|code=
-git tag --verify 1.16.0
+git verify-commit 97a016c9ca9d49b3e5b22a66fd6caab537879340
 }}
 
 {{GnuPG-Success}}
 
 {{GnuPG-Warning}}
 
-'''6.''' Checkout the git tag.
+'''6.''' Checkout the git ref.
 
 {{CodeSelect|code=
-git checkout --quiet 1.16.0
+git checkout --quiet 97a016c9ca9d49b3e5b22a66fd6caab537879340
 }}
 
 '''7.''' Done.
@@ -384,11 +389,15 @@ filename=~/electrumx.conf
 
 '''3.''' Paste the following contents.
 
+The TCP address is used by the Electrum Wallet while the TPC address is used by the ElectrumX daemon and to send commands to the daemon. <ref>
+All environment variables are avaiable in the [https://electrumx.readthedocs.io/en/latest/environment.html#services upstream documentation]. The TCP port 5000 was chosen per the first contributor discretion. The RPC port 8000 is the default.
+</ref>
+
 {{CodeSelect|code=
 COIN=Bitcoin
 DB_DIRECTORY=/home/user/.electrumx
 DAEMON_URL=username:password@127.0.0.1
-SERVICES=tcp://127.0.0.1:5000,rpc://127.0.0.1:2401
+SERVICES=tcp://127.0.0.1:5000,rpc://127.0.0.1:8000
 PEER_DISCOVERY=self
 }}
 
@@ -609,7 +618,7 @@ https://github.com/spesmilo/electrum/issues/7548
 Check the status of the ElectrumX systemd user service.
 
 {{CodeSelect|code=
-systemctl --no-pager --user status electrumx
+systemctl --no-pager --full --user status electrumx
 }}
 
 Follow the log of the ElectrumX systemd user service.
@@ -625,6 +634,8 @@ electrumx_server[7426]: INFO:Prefetcher:new block height 144,270 hash 0000000000
 </pre>
 
 = Store ElectrumX Log to File =
+Write log to file <code>electrumx.log</code>.
+
 {{CodeSelect|code=
 journalctl --boot --user -u electrumx > electrumx.log
 }}

@@ -229,33 +229,6 @@ Readers are welcome to add detailed instructions for other distributions here!
 
 == Notice ==
 
-=== Arch/Ubuntu Users ===
-
-*As of March 2019, it has been reported that the blkio throttling feature appears to be missing/unsupported on the latest Arch version. This causes a failure during VM start up. <ref>https://forums.whonix.org/t/problem-starting-whonix-14-after-upgrade-unable-to-write-to-sys-fs-cgroup-blkio-machine-slice-machine-qemu/6999/5</ref> The VM also fails to start up on Ubuntu 20.04 with a "blkio" error. The current work around is to remove the feature for now.
-
-{{Box|text=
-'''1.''' Edit the configuration file.
-
-{{CodeSelect|code=
-sudo virsh edit {{project_name_gateway_short}}
-}}
-
-'''2.''' Strip out the following setting.
-
-<pre style="white-space: pre-wrap;">
- <blkiotune>
-    <weight>250</weight>
-</blkiotune>
-</pre>
-
-'''3.''' Save and repeat steps 1-2 for {{project_name_workstation_short}}.
-
-'''4.''' Start the VMs.
-}}
-
-* The pvspinlock feature is reported to not be supported and the issue was resolved when edited out of the VM config.
-
-
 === Intel 3rd Gen CPUs ===
 
 Performance is markedly degraded on 3rd generation Intel CPUs as reported by a user on the forums and confirmed and therefore should be avoided. <ref>https://forums.whonix.org/t/poor-performance/13385/6</ref>
@@ -1234,6 +1207,41 @@ Both USB and PCI device passthrough permit advanced attackers to flash the firmw
 For more information on settings, please refer to the [https://libvirt.org/formatdomain.html Libvirt manual].
 
 = Troubleshooting =
+== Request operation not valid: blkio device weight is valid only for bfq or cfq scheduler ==
+<pre>
+Error starting domain: Request operation not valid: blkio device weight is valid only for bfq or cfq scheduler
+</pre>
+
+As of March 2019, it has been reported that the blkio throttling feature appears to be missing/unsupported on some Linux distributions. Among them is the latest Arch version. This causes a failure during VM start up. <ref>
+https://forums.whonix.org/t/problem-starting-whonix-14-after-upgrade-unable-to-write-to-sys-fs-cgroup-blkio-machine-slice-machine-qemu/6999/5
+</ref> The VM also fails to start up on Ubuntu 20.04 with a "blkio" error. The current work around is to remove the feature for now.
+
+{{Box|text=
+'''1.''' Edit the configuration file.
+
+{{CodeSelect|code=
+sudo virsh edit {{project_name_gateway_short}}
+}}
+
+'''2.''' Strip out the following setting.
+
+<pre style="white-space: pre-wrap;">
+ <blkiotune>
+    <weight>250</weight>
+</blkiotune>
+</pre>
+
+'''3.''' Save and repeat steps 1-2 for {{project_name_workstation_short}}.
+
+'''4.''' Start the VMs.
+}}
+
+* The pvspinlock feature is reported to not be supported and the issue was resolved when edited out of the VM config.
+
+forum discussion: [https://forums.whonix.org/t/issues-starting-vms-in-kvm-blkio-device-weight-is-valid-only-for-bfq-or-cfq-scheduler/10160 Issues starting VM's in KVM. - blkio device weight is valid only for bfq or cfq scheduler]
+
+== Arch/Ubuntu Users ==
+See [[KVM#Request_operation_not_valid:_blkio_device_weight_is_valid_only_for_bfq_or_cfq_scheduler|Request operation not valid: blkio device weight is valid only for bfq or cfq scheduler]].
 
 == Reboot? ==
 

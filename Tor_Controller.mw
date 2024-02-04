@@ -140,9 +140,9 @@ The behavior of "New Identity" in the context of Tor Browser and <code>nyx</code
 * [[#tor-ctrl|tor-ctrl]]
 * [[#netcat|netcat]]
 
-In all cases, the "New Identity" function sends the protocol command <code>SIGNAL newnym</code> to Tor's <code>ControlPort</code>.
+In all cases, the "New Identity" function sends the protocol command <code>SIGNAL newnym</code> to [[Tor]]'s <code>ControlPort</code>.
 
-[[Tor Browser]]'s new identity function clears the browser state, closes tabs and obtains a fresh Tor circuit for future requests. <ref>
+[[Tor Browser]]'s new identity function additionally clears the browser state, closes tabs and obtains a fresh Tor circuit for future requests. <ref>
 https://blog.torproject.org/torbutton-141-released
 </ref>
 
@@ -153,7 +153,7 @@ Other Tor controllers such as <code>nyx</code> run only <code>SIGNAL newnym</cod
 | text    = '''Warning:''' The New Identity feature will ''likely'' create a new circuit with a different Tor exit relay and IP address, but this is not guaranteed.
 }}
 
-The impact of "signal newnym" on Tor circuit lifetimes is often misunderstood. "signal newnym" uses a fresh circuit for ''new'' connections. Sometimes Tor only replaces the middle relay while using the same Tor exit relay. This is by design and the Tor default. Further, "signal newnym" does not interfere with long-lived connections like an SSH or IRC connection.
+The impact of "signal newnym" on Tor circuit lifetimes is often misunderstood. "signal newnym" uses a fresh circuit for ''new'' connections. Sometimes Tor only replaces the middle relay while using the same Tor exit relay. This is by design and the Tor default. Further, "signal newnym" does not interfere with long-lived connections like an file downloads, website downloads, SSH or IRC connections.
 
 Interested readers can verify the effect of "signal newnym" as follows:
 
@@ -168,6 +168,10 @@ Now repeat this experiment with a small modification which should result in a ne
 # Issue "signal newnym" using [[#Nyx|nyx]].
 # Close Tor Browser, then restart it.
 # Open https://check.torproject.org again and a new Tor exit relay IP address is (likely) visible.
+
+New identity is not an IP selection or cycling feature. It is a circuit changer. Not an IP changer. Tor replaces your real external IP address with a Tor IP but it does not easily let users pick any specific IP. Tor chooses the IP. Whonix does not influence that. [[unspecific|This is unspecific to Whonix.]]
+
+Forcing an IP change might be possible. This is discouraged as per [[Tor#Tor_Routing_Algorithm|Tor Routing Algorithm]]. By changing Tor configuration, selection of specific IPs might be possible. This is [[unsupported]] and the user would need to [[Tor#Edit_Tor_Configuration|edit the Tor configuration]]. Which settings specifically, the user would need to research as per [[Self Support First Policy]], not by asking in Whonix forums.
 
 == tor-ctrl ==
 [https://github.com/Kicksecure/tor-ctrl tor-ctrl] is installed by default.
