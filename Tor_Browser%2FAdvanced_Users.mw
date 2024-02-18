@@ -1090,6 +1090,44 @@ For tasks requiring different identities and/or additional software, it is recom
 
 This method is less secure than using Tor Browser in a Qubes [[Qubes/Disposables|{{project_name_workstation_short}} Disposable]].
 
+= Tor Browser Filtering =
+== Tor Browser versus /etc/hosts ==
+Tor Browser ignores the system's <code>/etc/hosts</code> file, as per the Tor Browser default configuration set by the upstream, The Tor Project. This issue is [[unspecific|unspecific to {{project_name_short}}]].
+
+The rationale for this behavior includes:
+
+* '''A)''' <u>Anti-Fingerprinting</u>: The user's Tor Browser does not adhere to the same DNS rules as other browsers installed on the system. This could enable the correlation of identities between non-anonymous browsers and the Tor Browser.
+* '''B)''' <u>SocksPort Configuration</u>: By default, Tor Browser is configured to use a Tor <code>SocksPort</code> to leverage [[Stream_Isolation#IsolateSOCKSAuth|Tor's <code>IsolateSOCKSAuth</code>]] feature.
+
+It might be possible to restore the behavior of Tor Browser honoring <code>/etc/hosts</code> file, but this is discouraged, see [[Tor_Browser#Tor_Browser_Transparent_Proxying|Tor Browser Transparent Proxying]].
+
+== Tor Browser versus DNS over HTTPS ==
+At time of writing, Tor Browser does not use DNS over HTTPS (DOH). But if Tor Browser did use DOH, then this would also result in Tor Browser ignoring <code>/etc/hosts</code> file and might as well break DPI based DNS filtering.
+
+related: {{kicksecure_wiki
+|wikipage=DNS_Security
+|text=DNS Security
+}}
+
+== Tor Browser vs Firewalls Based Filtering ==
+As mentioned above, Tor Browser uses a Tor <code>SocksPort</code> by default as per upstream default.
+
+<code>iptables</code> and its successor <code>nftables</code> however does not inherently understand application-layer protocols like SOCKS. This is why <code>nftables</code> firewalls are unable to filter Tor Browser's traffic.
+
+Firewall (IP, DNS) based filtering and would require either:
+
+* '''A)''' <u>Transparent Proxying:</u> Using system default networking, i.e. not using a Tor <code>SocksPort</code> and thereby breaking [[Stream Isolation]].
+* '''B)''' <u>DPI:</u> Deep package inspection in case using a firewall. This is [[undocumented]].
+
+See also: https://forums.whonix.org/t/firewall-implementation-for-qubes-whonix/16726
+
+== Tor Browser Filtering Options ==
+Filtering is discouraged in [https://2019.www.torproject.org/projects/torbrowser/design/ Tor Browser's threat model] in chapter "No filters".
+
+* '''B)''' <u>DPI:</u> Deep package inspection in case using a firewall. This is [[undocumented]].
+** Would require Transparent Proxying, i.e. using system default networking, i.e. not using a Tor <code>SocksPort</code> and thereby breaking [[Stream Isolation]].
+* '''B)''' <u>Browser Add-on:</u> Some browser add-ons perform filtering. Also discouraged, see [[Tor_Browser#Non-default_Add-ons|Non-default Add-ons]].
+
 = See Also =
 * [[Tor Browser|Tor Browser Essentials in {{project_name_short}}]]
 * [[Qubes/Tor_Browser|Using Tor Browser in {{q_project_name_short}}]]

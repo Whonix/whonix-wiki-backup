@@ -52,7 +52,6 @@ Developers have taken care to prevent common applications from leaking informati
 * <u>Browser fingerprinting</u>: {{project_name_short}} [[Tor Browser|includes Tor Browser]] by default. The browser fingerprint is as good (or bad) as using the normal Tor Browser bundle from torproject.org
 * <u>GPG</u>: <code>/home/user/gpg.conf</code> is optimized for privacy; see footnote. <ref>
 Adhering to [https://github.com/ioerror/torbirdy/pull/11 recommendations] as per the [https://github.com/ioerror/torbirdy/blob/master/gpg.conf torbirdy github repository], which prevents leakage of the operating system version (no-emit-version) and other variables ([https://github.com/{{project_name_short}}/security-misc/blob/master/etc/skel/.gnupg/gpg.conf on github]).</ref>
-* <u>HexChat</u>: Secure defaults are utilized as per [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/HexChat TorifyHOWTO/HexChat] ([https://github.com/{{project_name_short}}/anon-apps-config on github]). The identity can be reset using <code>xchat-reset</code> ([https://github.com/{{project_name_short}}/anon-apps-config/blob/master/usr/bin/hexchat-reset on github]) as documented on the [[HexChat]] page.
 * <u>ssh</u>: Without {{project_name_short}}, the syntax for ssh is user@hostname [...]. However, if a specific user is not nominated before @hostname, the operating system user name will be utilized instead. If that value is something identifiable, then anonymity is broken. Since {{project_name_short}} defaults the user name to <code>user</code>, in the worst case only the username <code>user</code> can be leaked, which is harmless. <ref>
 In this case it may appear that the syntax was simply copied from the manpage.</ref> <ref>
 The Tails OS similarly sets the username to <code>amnesia</code>, which is a default value not set by the user and therefore safe.</ref>
@@ -505,7 +504,6 @@ TNT_BOM_BOM generated <code>/proc/cpuinfo</code> output which was posted to the 
 These are the results before running <code>VBoxManage modifyvm {{project_name_workstation_short}} --cpuidremoveall</code>.
 
 <pre>
->
 processor       : 0
 vendor_id       : GenuineIntel
 cpu family      : 6
@@ -541,7 +539,6 @@ power management:
 These are the results after running <code>VBoxManage modifyvm {{project_name_workstation_short}} --cpuidremoveall</code> and shutting down the workstation.
 
 <pre>
->
 processor       : 0
 vendor_id       : GenuineIntel
 cpu family      : 6
@@ -574,7 +571,7 @@ power management:
 
 == KVM {{project_name_workstation_short}} 12 /proc/cpuinfo ==
 <pre>
-> processor       : 0
+processor       : 0
 vendor_id       : GenuineIntel
 cpu family      : 6
 model           : 6
@@ -603,7 +600,7 @@ cache_alignment : 64
 address sizes   : 40 bits physical, 48 bits virtual
 power management:
 
-> processor       : 1
+processor       : 1
 vendor_id       : GenuineIntel
 cpu family      : 6
 model           : 6
@@ -663,7 +660,7 @@ cache_alignment : 32
 address sizes : 40 bits physical, 48 bits virtual
 power management:
 
-processor : 1
+> processor : 1
 vendor_id : GenuineIntel
 cpu family : 6
 model : 6
@@ -692,9 +689,42 @@ address sizes : 40 bits physical, 48 bits virtual
 power management:
 </pre>
 
+== KVM {{project_name_workstation_short}} 17 /proc/cpuinfo ==
+
+<pre>
+[workstation user ~]% cat /proc/cpuinfo
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 37
+model name	: Intel(R) Core(TM) i5 CPU       M 580  @ 2.67GHz
+stepping	: 5
+microcode	: 0x7
+cpu MHz		: 2659.828
+cache size	: 16384 KB
+physical id	: 0
+siblings	: 1
+core id		: 0
+cpu cores	: 1
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 11
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 syscall nx rdtscp lm constant_tsc rep_good nopl xtopology cpuid pni pclmulqdq vmx ssse3 cx16 pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes hypervisor lahf_lm cpuid_fault pti ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid tsc_adjust arat umip flush_l1d arch_capabilities
+vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest shadow_vmcs
+bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs mmio_unknown
+bogomips	: 5319.65
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+</pre>
+
 == from {{project_name_short}} 12 WS - qubes Q3 "cat /proc/cpuinfo" (**different PC**) ==
 <pre>
-> processor    : 0
+processor    : 0
 vendor_id    : GenuineIntel
 cpu family    : 6
 model        : 60

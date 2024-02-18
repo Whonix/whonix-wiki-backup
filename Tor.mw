@@ -410,10 +410,133 @@ https://gitlab.torproject.org/legacy/trac/-/issues/15261#comment:1
 
 <blockquote>So to make sure that the SocksPort in the torrc does what you want, write it as <code>+SocksPort</code>.</blockquote>
 
+{{Box|text=
+<u>Tor configuration for additional <code>SocksPorts</code>s.</u>
+
+'''1.''' [[Tor#Edit_Tor_Configuration|Edit Tor Configuration]]
+
+'''2.''' Learn the syntax.
+
+Only need to read this. No need to copy anything.
+
+<pre>
++SocksPort 127.0.0.1:port-number
++SocksPort 10.152.152.10:port-number
+</pre>
+
+<code>port-number</code> will need to be replaced, which is documented below.
+
+'''3.''' Add.
+
+Here is an example that needs adjustment.
+
+Notes:
+
+* Keep gateway internal IP <code>10.152.152.10</code> as is.
+* Replace port <code>9100</code> with the actual port for the additional <code>SocksPorts</code> you want to add.
+* Adding <code>127.0.0.1</code> might not be strictly necessary but can be useful for testing.
+
+{{CodeSelect|code=
++SocksPort 127.0.0.1:9100
++SocksPort 10.152.152.10:9100
+}}
+
+'''4.''' Save.
+}}
+
 After adding custom ports, a user would also have to edit the {{project_name_short}} firewall.
 
-# [[Whonix-Gateway_Firewall#For_Connections_Originating_from_Whonix-Workstation|open an incoming port for connections originating from {{project_name_workstation_short}} in {{project_name_gateway_short}} firewall]]
-# [[Whonix-Workstation_Firewall#Open_an_Outgoing_Port|Open an outgoing port for connections to {{project_name_gateway_short}} in {{project_name_workstation_short}} firewall]]
+{{Box|text=
+<u>Firewall configuration for additional <code>SocksPorts</code>s.</u>
+
+'''1.''' {{Firewall_Settings_Gateway}}
+
+'''2.''' Learn the syntax.
+
+Only need to read this. No need to copy anything.
+
+<pre>
+INTERNAL_OPEN_PORTS+=" port-number "
+</pre>
+
+<code>port-number</code> will need to be replaced, which is documented below.
+
+'''3.''' Add setting.
+
+Notes:
+
+* Replace port <code>9100</code> with the actual port for the additional <code>SocksPorts</code> you want to add.
+
+{{CodeSelect|code=
+INTERNAL_OPEN_PORTS+=" 9100 "
+}}
+
+'''4.''' Save.
+
+'''5.''' {{Reload_Firewall}}
+}}
+
+Platform specific notice:
+
+* [[Non-Qubes-Whonix]]: No special notice.
+* [[Qubes-Whonix]]: Either a reboot <u>or</u> running <code>replace-ips</code> is required. <ref>
+[https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-whonix/replace-ips <code>/usr/lib/qubes-whonix/replace-ips</code>] is a script that automatically run at boot time in Qubes-Whonix which replaces the hardcoded IP <code>10.152.152.10</code> with Qubes dynamic automatically assigned internal IP.
+</ref>
+** {{CodeSelect|code=
+sudo /usr/lib/qubes-whonix/replace-ips
+}}
+
+Done.
+
+The additional <code>SocksPort</code> should now be functional.
+
+For troubleshooting, see footnote. <ref>
+Show Tor listening ports on Whonix-Gateway. Note: replace <code>9100</code> by the actual port number.
+
+{{CodeSelect|code=
+sudo netstat -tulpen {{!}} grep 9100
+}}
+
+Check if the <code>SocksPort</code> is reachable.
+
+{{CodeSelect|code=
+curl.anondist-orig --head $(qubesdb-read', '/qubes-netvm-gateway):9100
+}}
+
+* Whonix-Gateway localhost:
+** {{CodeSelect|inline=true|code=
+curl.anondist-orig --head 127.0.0.1:9100
+}}
+* Non-Qubes-Whonix-Gateway internal interface: {{CodeSelect|inline=true|code=
+curl.anondist-orig --head 10.152.152.10:9100
+}}
+* Qubes-Whonix-Gateway internal interface: {{CodeSelect|inline=true|code=
+curl.anondist-orig --head $(qubesdb-read /qubes-netvm-gateway):9100
+}}
+
+Expected output:
+
+<pre>
+HTTP/1.0 501 Tor is not an HTTP Proxy
+</pre>
+
+This means the port was reachable.
+
+Or.
+
+* Non-Qubes-Whonix-Workstation: {{CodeSelect|inline=true|code=
+curl.anondist-orig --head 10.152.152.10:9100
+}}
+* Qubes-Whonix-Workstation: {{CodeSelect|inline=true|code=
+curl.anondist-orig --head $(qubesdb-read /qubes-gateway):9100
+}}
+
+Also useful.
+
+{{CodeSelect|code=
+sudo ifconfig
+}}
+</ref>
 
 {{Anchor|Blacklist Certain Onion Services from Connecting}}
 
@@ -516,7 +639,7 @@ forum discussion:
 https://forums.whonix.org/t/what-is-the-best-way-to-have-more-than-one-tor-instance-in-whonix-gateway/14124
 
 == Blacklist Outgoing Connections to Select Domains ==
-Advanced users might for unknown reasons select to blacklist outgoing connections to certain onion services. This can be done by instructing Tor to resolve a domain name to a dysfunctional IP address, in this case <code>127.0.0.1</code> (localhost). Since onion services do not have IP addresses and are only internally resolved by Tor through an IP address internal to Tor only, this blocking should be comprehensive.
+Advanced users might for unknown reasons select to blacklist outgoing connections to certain onion services. This can be done by instructing Tor to resolve a domain name to a dysfunctional, blackhole IP address. Since onion services do not have IP addresses and are only internally resolved by Tor through an IP address internal to Tor only, this blocking should be comprehensive.
 
 This procedure could also be applied for clearnet domain names. However, in case of blacklisting outgoing connections to clearnet domain names, the blocking would be incomplete. Only DNS resolution would be blocked. IP based connections would still be possible.
 
@@ -534,8 +657,10 @@ Add the following configuration text to the file. The following is an example on
 
 Note: Replace <code>eixoaclv7qvnmu5rolbdwba65xpdiditdoyp6edsre3fitad777jr3ad.onion</code> with the actual onion service that should be blacklisted.
 
+TODO: Replace <code>blackhole-address.tld</code> with an actual blackhole address.
+
 {{CodeSelect|code=
-MapAddress eixoaclv7qvnmu5rolbdwba65xpdiditdoyp6edsre3fitad777jr3ad.onion 127.0.0.1
+MapAddress eixoaclv7qvnmu5rolbdwba65xpdiditdoyp6edsre3fitad777jr3ad.onion blackhole-address.tld
 }}
 
 '''3.''' {{Reload_Tor}}

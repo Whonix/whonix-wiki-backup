@@ -37,18 +37,28 @@ Tor's binary was replaced (dpkg-diverted using config-package-dev) with dummy ex
 == systemd-socket-proxyd listening port redirection ==
 [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/systemd-unit-files-generator Listening] using <code>systemd-socket-proxyd</code> on the following listening ports:
 
-** Tor's default listening ports. I.e.:
-*** system [[Tor]]'s {{Code|127.0.0.1:9050}}, {{Code|127.0.0.1:9051}} and,
-*** [[Tor Browser]]'s {{Code|127.0.0.1:9150}}, {{Code|127.0.0.1:9051}},
-*** [[Tor Messenger]]'s {{Code|127.0.0.1:9152}} (<code>SocksPort</code>) -> gateway <code>SocksPort</code> <code>9153</code>, {{Code|127.0.0.1:9153}} <code>ControlPort</code> -> gateway <code>9051</code> <code>ControlPort</code> (actually control port filter proxy, onion-grater)
-** and others, see [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/systemd-unit-files-generator full list]
-** Those listening ports forwarded to {{project_name_gateway_short}}.
-** This prevents the default Tor Browser, Tor Messenger and/or Tor package by The Tor Project from opening these default ports, which will result in Tor failing to open its listening port and therefore exiting, thus preventing Tor over Tor.
+* Tor's default listening ports. I.e.:
+** system [[Tor]]'s <code>SocksPort</code>s {{Code|127.0.0.1:9050}}, {{Code|127.0.0.1:9051}} and,
+** [[Tor Browser]]'s <code>SocksPort</code>s {{Code|127.0.0.1:9150}}, {{Code|127.0.0.1:9051}},
+** [[Tor Messenger]]'s <code>SocksPort</code> {{Code|127.0.0.1:9152}}
+
+are redirected to the gateway.
+
+Also applies to <code>ControlPort</code>s:
+
+* Tor's <code>9051</code> 
+* Tor Browsers's <code>9151</code> 
+
+These are redirected to Tor (actually control port filter proxy ([[onion-grater|onion-grater]]) on the gateway.
+
+* and others, see [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/systemd-unit-files-generator full list]
+* Those listening ports forwarded to {{project_name_gateway_short}}.
+* This prevents the default Tor Browser, Tor Messenger and/or Tor package by The Tor Project from opening these default ports, which will result in Tor failing to open its listening port and therefore exiting, thus preventing Tor over Tor.
 
 TODO: describe
 
 * systemd socket activation
-* https://phabricator.whonix.org/T357
+* https://web.archive.org/web/20221128013446/https://phabricator.whonix.org/T357
 
 == Unix Domain Socket File Redirection ==
 Since Tor Browser, [[OnionShare]] ([https://cloud.githubusercontent.com/assets/156128/21556064/8ead0338-cdd2-11e6-918c-d4ca61724b52.png screenshot]) among more and more other applications require [https://phabricator.whonix.org/T192 SocksSocket] <ref>
