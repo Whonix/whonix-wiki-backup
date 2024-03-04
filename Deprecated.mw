@@ -12,6 +12,82 @@ Most users can safely ignore this page.
 }}
 {{archived}}
 
+= LKRG =
+
+== System Hardening Checklist ==
+
+=== Kernels / Kernel Modules ===
+
+* Consider installing the [[Linux_Kernel_Runtime_Guard_LKRG|Linux Kernel Runtime Guard (LKRG)]] kernel module for improved detection and  protection against common kernel exploits. <ref>
+[https://lkrg.org/ Openwall]: <blockquote>... LKRG attempts to post-detect and hopefully promptly respond to unauthorized modifications to the running Linux kernel (integrity checking) or to credentials (such as user IDs) of the running processes (exploit detection). For process credentials, LKRG attempts to detect the exploit and take action before the kernel would grant the process access (such as open a file) based on the unauthorized credentials.</blockquote>
+</ref>
+
+= Hardened Malloc =
+
+== Dev/Porting ==
+
+=== Hardened Malloc ===
+	
+Hardened Memory Allocator
+
+* maintained by third party: yes
+	
+* compiled: yes
+	
+* language: C
+	
+* compiled when: at package build time / at {{project_name_short}} build time (if it was pre-installed)
+	
+* version number by upstream: yes
+	
+* upstream architecture support: <code>amd64</code> only
+	
+* documentation: [[Hardened Malloc]]
+	
+* upstream: https://github.com/GrapheneOS/hardened_malloc
+	
+* Debian package source code: https://github.com/Kicksecure/hardened_malloc
+	
+* kernel module: no
+	
+* [https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474 Hardened Malloc Development Discussion]
+	
+* <code>arm64</code> issue: ticket says closed but is still an issue as per this comment https://github.com/GrapheneOS/hardened_malloc/issues/149#issuecomment-1010526647
+
+=== lkrg ===
+* maintained by third party: yes
+* compiled: yes
+* compiled when: at package installation time / at {{project_name_short}} build time (if it was pre-installed)
+* language: C
+* version number by upstream: yes
+* upstream architecture support: <code>amd64</code> only
+* documentation: [[Linux_Kernel_Runtime_Guard_LKRG|Linux Kernel Runtime Guard (LKRG)]]
+* upstream: https://lkrg.org/
+* Debian package source code: https://github.com/Kicksecure/lkrg
+* kernel module: yes
+* [https://forums.whonix.org/t/linux-kernel-runtime-guard-lkrg-linux-kernel-runtime-integrity-checking-and-exploit-detection/8477 LKRG Development Discussion]
+
+== Whonix-Workstation Security ==
+
+=== Hardened Malloc ===
+Hardened malloc ('hardened_malloc') is a hardened memory allocator created by security researcher, Daniel Micay.
+
+According to the author's GitHub description: <ref>https://github.com/GrapheneOS/hardened_malloc</ref>
+
+<blockquote>
+This is a security-focused general purpose memory allocator providing the malloc API along with various extensions. It provides substantial hardening against heap corruption vulnerabilities. The security-focused design also leads to much less metadata overhead and memory waste from fragmentation than a more traditional allocator design. It aims to provide decent overall performance with a focus on long-term performance and memory usage rather than allocator micro-benchmarks. It offers scalability via a configurable number of entirely independent arenas, with the internal locking within arenas further divided up per size class.
+</blockquote>
+
+It is possible to use this as the memory allocator for many applications to increase security.
+
+Refer to the dedicated [[Hardened Malloc]] wiki page for further details.
+
+== System Hardening Checklist ==
+
+== Memory Allocator ==
+
+* Consider installing a [[Hardened_Malloc|hardened memory allocator ('Hardened Malloc')]] to launch regularly used applications. <ref>This provides hardening against [https://googleprojectzero.blogspot.com/2015/06/what-is-good-memory-corruption.html heap corruption vulnerabilities] and improves overall memory performance and usage. Note that using Hardened Malloc with Tor Browser or Firefox is difficult and unsupported.</ref>
+
 = Dev/Anonymity =
 
 === JonDonym ===

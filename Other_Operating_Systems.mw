@@ -28,8 +28,6 @@ Also note that it's strongly discouraged to anonymize VMs that have ever been co
 Microsoft Windows XP, Vista, 7, 8, 10 are known to work behind {{project_name_gateway_short}}. While it is possible, it is not recommended and only for advanced users. This is because, there are issues with Windows. Those are not {{project_name_short}} issues. {{project_name_short}} developers cannot fix those issues. One issue is, that Windows is closed source. Rather, Windows is affected by [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxyLeaks Transparent Proxy Leaks] and [[Windows Hosts|other issues]]. For more information and depending on your security requirements, read the following chapters.
 
 == Easy ==
-{{VM_Settings_Easy_Common}}
-
 '''Configure network.'''
 
 * Windows 11: Cannot change networking settings according to the following documentation? Check [https://youtu.be/ZkdWSWMdUmU?t=165 this video]. Then use the settings below.
@@ -292,7 +290,7 @@ Note: '''xxx0''' will be something else instead, '''em0''' or specific to your h
 <u>[[Qubes|{{q_project_name_long}}]]</u>:
 Enter address of the VM (can be viewed in the qube's settings).
 
-<u>[[Qubes|{{non_q_project_name_short}}]]</u>:
+<u>[[Non-Qubes-Whonix|{{non_q_project_name_short}}]]</u>:
 {{CodeSelect|code=
 10.152.152.12
 }}
@@ -304,7 +302,7 @@ Netmask for xxx0? [255.255.255.0]
 <u>[[Qubes|{{q_project_name_short}}]]</u>:
 {{CodeSelect|code=255.255.255.255}}
 
-<u>[[Qubes|{{non_q_project_name_short}}]]</u>:
+<u>[[Non-Qubes-Whonix|{{non_q_project_name_short}}]]</u>:
 {{CodeSelect|code=255.255.192.0}}
 
 {{CodeSelect|code=
@@ -332,7 +330,7 @@ DNS nameservers? (IP address list or 'none') [none]
 <u>[[Qubes|{{q_project_name_short}}]]</u>:
 Enter address of your Whonix-Gateway (can be viewed in the qube's settings).
 
-<u>[[Qubes|{{non_q_project_name_short}}]]</u>:
+<u>[[Non-Qubes-Whonix|{{non_q_project_name_short}}]]</u>:
 {{CodeSelect|code=10.152.152.10}}
 
 {{CodeSelect|code=
@@ -543,7 +541,7 @@ Run {{CodeSelect|code=vi /etc/mygate}}
 
 Press '''a''' to append text and type the address of the Whonix-Gateway.
 
-<u>[[Qubes|{{non_q_project_name_short}}]]</u>:
+<u>[[Non-Qubes-Whonix|{{non_q_project_name_short}}]]</u>:
 {{CodeSelect|code=10.152.152.10}}
 
 Press Esc.
@@ -577,7 +575,7 @@ inet [address of VM]
 inet [address of VM]
 }} Instead '''a'''ppend, enter a new line, and type
 
-<u>[[Qubes|{{non_q_project_name_short}}]]</u>:
+<u>[[Non-Qubes-Whonix|{{non_q_project_name_short}}]]</u>:
 {{CodeSelect|code=netmask 255.255.192.0}}
 
 <u>[[Qubes|{{q_project_name_short}}]]</u>:
@@ -671,24 +669,35 @@ qubes-prefs --set vm-name netvm {{project_name_gateway_vm}}
 }} <!-- close tab: Qubes|{{q_project_name_short}} -->
 
 {{Tab
-|title= == [[Qubes|{{non_q_project_name_short}}]] ==
+|title= == [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] ==
 |addToClass=info-box
 |content=
 
+'''Virtualizer Information'''
+
+{{non-q-project}}
+
 '''Download and Use the Default {{project_name_gateway_short}}'''
 
-[[Download]] and [[Download#Install|import]] the {{project_name_gateway_short}} using the same procedure as per the {{project_name_short}}-Default / Download-Version. No other {{project_name_gateway_short}} changes are required in this case!
+Download and import the {{project_name_gateway_short}} using the same procedure as per the {{project_name_short}}-Default / Download-Version. No other {{project_name_gateway_short}} changes are required in this case!
 
 '''Set up a {{project_name_customworkstation_short}}'''
 
 There are currently two ways to set up a {{project_name_customworkstation_short}}. Either:
 
-* '''A)''' Manually create a VirtualBox VM (established, '''old''' method), <u>or</u>
-* '''B)'''  Download and import a {{project_name_customworkstation_short}} ('''stable''' method).
+* '''A)''' Manually create a VM (established, '''old''' method), <u>or</u>
+* '''B)''' Download and import a {{project_name_customworkstation_short}} ('''stable''' method).
 
 <div class="toccolours mw-collapsible mw-collapsed">
-'''A)''' Users who want to manually create a VirtualBox VM using the established and '''old''' method, click on Expand on the right.
+'''A)''' Users who want to manually create a VM using the established and '''old''' method, click on Expand on the right.
+
 <div class="mw-collapsible-content">
+
+'''Platform Specific Notice:'''
+
+* <u>KVM:</u> [[Undocumented]].
+* <u>VirtualBox:</u> See below.
+
 '''1. Create a VirtualBox VM'''
 
 Follow these steps in order:
@@ -714,13 +723,25 @@ Follow these steps in order:
 <div class="toccolours mw-collapsible mw-collapsed">
 '''B)''' Users who want to download and import a {{project_name_customworkstation_short}} template using the '''stable''' method, click on Expand on the right.
 <div class="mw-collapsible-content">
+'''Introduction:'''
+
 This method's advantage is that there is need to manually create a new VM. The process is greatly simplified; the {{project_name_customworkstation_short}} only needs to be downloaded and imported. This approach has several benefits: it is easier, all security settings are set for the VM, and users don't have to remember and apply necessary settings.
+
+'''Platform Specific Notice:'''
+
+* <u>KVM:</u>
+** Use [https://github.com/Kicksecure/libvirt-dist/blob/master/usr/share/libvirt-dist/xml/Whonix-Custom-Workstation.xml <code>Whonix-Custom-Workstation.xml</code> (web)].
+*** Click the raw button on github or use [https://raw.githubusercontent.com/Kicksecure/libvirt-dist/master/usr/share/libvirt-dist/xml/Whonix-Custom-Workstation.xml <code>Whonix-Custom-Workstation.xml</code> (raw)] direct link for a copy and paste friendly version.
+** [[Undocumented]].
+* <u>VirtualBox:</u> See below.
+
+'''1. Download the {{project_name_customworkstation_short}}'''
 
 The latest {{project_name_customworkstation_short}} Version is: <span style="color: green">{{Whonix-Custom-Workstation-Version}}</span>
 
-Although the version number for {{project_name_gateway_short}} and {{project_name_short}}-Default / Download-Version might be far higher than the {{project_name_customworkstation_short}} version, this is normal. <ref>A newer {{project_name_customworkstation_short}} only needs to be redistributed if the settings for the VM have changed. For example, these have not changed between Whonix 9 and Whonix 13. Therefore, {{project_name_customworkstation_short}} version {{Whonix-Custom-Workstation-Version}} is recent enough to function, because it comes with an empty virtual hard drive (meaning software cannot be outdated).</ref>
-
-'''1. Download the {{project_name_customworkstation_short}}'''
+Although the version number for {{project_name_gateway_short}} and {{project_name_short}}-Default / Download-Version might be far higher than the {{project_name_customworkstation_short}} version, this is normal. <ref>
+A newer {{project_name_customworkstation_short}} only needs to be redistributed if the settings for the VM have changed. For example, these have not changed between Whonix 9 and Whonix 13. Therefore, {{project_name_customworkstation_short}} version {{Whonix-Custom-Workstation-Version}} is recent enough to function, because it comes with an empty virtual hard drive (meaning software cannot be outdated).
+</ref>
 
 Download the following image.
 
@@ -752,8 +773,8 @@ After importing the image, rename the virtual machine to something else. <ref>It
 If this method was used, please report how well it worked in the Whonix forum.
 </div>
 </div>
-}} <!-- close tab: [[Qubes|{{non_q_project_name_short}}]] -->
-}} <!-- close Controller: [[Qubes|{{q_project_name_short}}]] and [[Qubes|{{non_q_project_name_short}}]] -->
+}} <!-- close tab: [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] -->
+}} <!-- close Controller: [[Qubes|{{q_project_name_short}}]] and [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] -->
 
 ------
 
@@ -780,7 +801,7 @@ No additional network configuration require.
 }}
 
 {{Tab
-|title= == {{non_q_project_name_long}} ==
+|title= == {{non_q_project_name_short}} ==
 |addToClass=info-box
 |content=
 In your Custom-Workstation.

@@ -112,7 +112,7 @@ If you are using Arch Linux, click on Expand on the right.
 Update the package lists and install the following packages.
 
 {{CodeSelect|code=
-sudo pacman -Syu qemu libvirt virt-manager qemu-arch-extra dnsmasq bridge-utils
+sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils
 }}
 
 {{CodeSelect|code=
@@ -312,7 +312,7 @@ Advanced users are encouraged to [[Dev/Build_Documentation|build]] {{project_nam
 
 It is strongly recommended to read and apply the steps outlined in this section. By applying a known and tested configuration, this will provide better convenience and security.
 
-Be sure to use the qcow2 images that are provided by the {{project_name_short}} project instead of rolling your own <ref>Manually converting images from .ova to .qcow2 is no longer recommended, since .qcow images can be downloaded from the {{project_name_short}} project.</ref> because they contain important performance optimizations. <ref>As per [https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/2400_convert-raw-to-qcow2 build-steps.d/2400_convert-img-to-qcow2]
+Be sure to use the qcow2 images that are provided by the {{project_name_short}} project instead of rolling your own <ref>Manually converting images from .ova to .qcow2 is no longer recommended, since .qcow images can be downloaded from the {{project_name_short}} project.</ref> because they contain important performance optimizations. <ref>As per [https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/4400_convert-raw-to-qcow2 build-steps.d/4400_convert-raw-to-qcow2]
 
 , these are "-o cluster_size=2M" and "-o preallocation=metadata".</ref> The only exception is if images were [[Dev/Build_Documentation|created from source]]. <ref>Because the same performance optimizations are present.</ref>
 
@@ -733,6 +733,9 @@ Comment out.
 {{CodeSelect|code=
 auto eth0
 iface eth0 inet static
+       address 10.152.152.11
+       netmask 255.255.192.0
+       gateway 10.152.152.10
 }}
 
 Comment in.
@@ -937,10 +940,16 @@ sudo semanage fcontext -a -t svirt_image_t "/home/user/shared(/.*)?"
 restorecon -vR /home/user/shared
 }}
 
-Setting permissions on the user folder itself as follows may be necessary for the guest to start up without a permission error.
+Setting execute permission on the user folder itself may be necessary for the guest to start up without a permission error.
 
 {{CodeSelect|code=
 sudo chmod 701 /home/user
+}}
+
+Or, more safely, you can set it just for virt-manager. The name <code>libvirt-qemu</code> can be different on your distribution.
+
+{{CodeSelect|code=
+sudo setfacl -m u:libvirt-qemu:x /home/user
 }}
 
 If you are using the command line instead of virt-manager to edit the vm's device settings, add this next section to the xml.
