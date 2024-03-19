@@ -10,7 +10,7 @@ Email Overview
 {{intro|
 Anonymous Email. Thunderbird. Encryption.
 }}
-[[Image:Thunderbird_17.0.png|400px|thumb|link=Encrypted_Email_with_Thunderbird|[[Encrypted_Email_with_Thunderbird|Encrypted Email with Thunderbird]]]]
+[[Image:Thunderbird_17.0.png|thumb|link=Encrypted_Email_with_Thunderbird|[[Encrypted_Email_with_Thunderbird|Encrypted Email with Thunderbird]]]]
 = Introduction =
 
 On the {{project_name_long}} platform, there are two common methods for email:
@@ -63,7 +63,7 @@ pEp is cross-platform, decentralized, has a [https://en.wikipedia.org/wiki/Peer-
 
 In the default configuration, pEp does not rely on the Web of Trust or any form of centralized trust infrastructure. Instead users can verify each others' authenticity by comparing cryptographic fingerprints in the form of natural language strings, which the pEp developers have chosen to call "trustwords". If both sides are using pEp, it automatically uses the anonymous transport provided by [[GNUnet]]. With that technology, meta-data is no longer accessible to attackers. If the intended recipient has a GPG key, pEp is capable of inter-operating with legacy mail to secure that whenever possible ("opportunistic key exchange"). <ref>https://pep-project.org/2014-09/s1410740156</ref> The pEp project is guided by a foundation that supports Libre software <ref>https://pep-project.org/</ref> and the code has also been audited.
 
-For further information on the project's progress, check the [https://www.pep.security/docs/en/#welcome-to-pp-documentation milestones] [https://pep.foundation/pEp-software/ pages].
+For further information on the project's progress, check the [https://web.archive.org/web/20220516190553/https://www.pep.security/docs/en/#welcome-to-pp-documentation milestones] [https://web.archive.org/web/20231004061113/https://pep.foundation/pEp-software/ pages].
 
 = Safe Email Principles =
 
@@ -113,6 +113,18 @@ The entire client is javascript served to you at runtime, by ProtonMail, over TL
 
 A final possibility to consider is advanced adversaries who are capable of undertaking a [[Social_Engineering#Exploitation_Vectors|spear phishing]] or other attack in order to access encrypted webmail. In a 2019 case, it was reported that suspected Russian hackers targeted Bellingcat researchers who had been researching alleged crimes by the Russian military. The researchers relied upon ProtonMail and were presented with fake Swiss domains that replicated ProtonMail's interface and accessed the real site in the background in real-time. After the researchers had entered their two-factor authentication codes to access their anonymized accounts, the attackers were then able to get into the email accounts in order to read their correspondence. This highlights that even if email accounts are fully end-to-end encrypted, they can still be accessed if passwords are mistakenly given away during an attack. <ref>https://www.forbes.com/sites/zakdoffman/2019/07/26/russian-intelligence-cyberattacked-journalists-hacking-encrypted-email-accounts/</ref>
 
+== Self-Hosting ==
+Self-hosting e-mail is difficult. Even more difficult doing so anonymously. See also [[Hosting Location Hidden Services]] and {{kicksecure_wiki
+|wikipage=Server_Security_Guide
+|text=Server Security Guide
+}}.
+
+For example [https://www.reddit.com/r/ctemplar/comments/uy19y8/ctemplar_closure_final_letter/ CTemplar posted a shut-down notice and users had only 1 month time to migrate to a new e-mail provider]. Imagine your e-mail provider shutting down on short notice or instantly vanishing.
+
+The [https://www.reddit.com/r/ctemplar/comments/18bheck/ctemplar_is_closed_be_warned_of_new_ctemplar/ CTemplar domain name is back online but the previous owner says the domain registration expired and has been purchased by another entity and urged caution.]
+
+E-mail self-hosting protects against e-mail providers going out of business. A valid compromise for many users could be to at least own your own domain name but outsource the e-mail server hosting to a third-party.
+
 == Email Provider ==
 
 Avoid well-known, large, corporate email providers who purposefully invade user privacy. For instance, [https://martech.org/yahoo-email-scan-microsoft-scroogled/ Yahoo] and [https://www.theguardian.com/technology/2014/apr/15/gmail-scans-all-emails-new-google-terms-clarify Gmail] use automated software to scan emails for keywords to tailor advertising and sell products. [https://www.nytimes.com/2014/03/21/technology/microsofts-software-leak-case-raises-privacy-issues.html?_r=0 Hotmail] also has a history of reading private emails and messages.
@@ -143,7 +155,7 @@ Disadvantages:
 * If the email forwarding service provider went offline you cannot receive or send new emails from the alias address.
 * You need to trust the email forwarding provider to not use your email in malicious way like sending you spam/ads or malicious links. (You can solve this by self-hosting the email forwarding service.)
 
-There are many email forwarding services such as for example [https://anonaddy.com/ AnonAddy]. Others can be discovered through search engines.
+There are many email forwarding services such as for example [https://relay.firefox.com/ Firefox Relay] or [https://addy.io/ AnonAddy]. Others can be discovered through search engines.
 
 == JavaScript and Other Tracking Vectors ==
 
@@ -179,7 +191,7 @@ Such as disabling remote images embedded in HTML emails or enforcing plain text 
 
 = Email Provider Comparison =
 
-== Introduction ==
+== Email Provider Criteria ==
 
 A common question is whether particular email providers are safer than others, for example Protonmail compared to Tutanota, Riseup, Gmail and so on. <ref>In the past users asked whether I2Pmail was safer than Tor Mail, although Tor Mail is [https://www.democraticunderground.com/10023403890 now offline] because it was hosted on Freedom Hosting which was taken down by the FBI.</ref> <ref>https://www.wired.com/2013/09/freedom-hosting-fbi/</ref> <ref>Notably the FBI network investigative technique (NIT; aka "hack") used with Tor Mail relied on [https://www.vice.com/en_us/article/wnx5px/fbi-may-have-hacked-innocent-tormail-users malicious code that sent the real IP address to a Virginian server]. However, the code appeared before users logged in, meaning it was a dragnet technique rather than a targeted measure; innocent users of the service would have been similarly hacked.</ref>
 
@@ -188,9 +200,33 @@ The earlier [[#Email_Provider|Email Provider]] section noted that email is alway
 # Is anonymous registration over Tor possible?
 # Is any personal information required for registration?
 # Can the account be exclusively paired with Tor - preferably via a (v3) onion service?
-# Will the provider bow to external pressure by authorities and close or suspend the account when free speech issues arise? This has a greater impact for projects or movements, rather than individual accounts.
+# Will the provider bow to external pressure by third-parties such as campaigns or authorities and close or suspend the account when free speech issues arise? This has a greater impact for projects or movements, rather than individual accounts.
+# The account management system does not use JavaScript.
+# Works reliably on mailing lists if the user intents to use any.
+# POP email settings are available to download email and delete it from Riseup servers.
+# SMTP
+# IMAP (discouraged)
+# Onion domain name.
+# Server location.
+# Jurisdiction.
+# Warrant canary. <ref>
+In the past, the riseup canary was [https://forums.whonix.org/t/riseup-net-likely-compromised not updated] on a fixed, regular basis.
 
-Privacy by policy can only ever provide a weak layer of protection compared to privacy by design. One possible exception might be "pseudo-email" services <ref>These have a different design to classical email and are therefore incompatible.</ref> like [[BitMessage]], [[#I2P-Bote|I2P-Bote]] and [[#Freemail|Freemail]]. For instant messenger protocols with equivalent features, see [[Chat#Ricochet_IM|Richochet IM]] and [[Chat#RetroShare|RetroShare]].
+https://www.vice.com/en/article/bmv34m/warrant-canary-for-activist-email-service-riseup-seemingly-expires
+</ref>
+# [[Whonix_versus_VPNs#Criteria_for_Reviewing_VPN_Providers|Criteria for Reviewing VPN Providers]] might also be applicable. For instance, some providers claims that IP addresses are not logged is impossible to verify.
+# Price.
+# Various e-mail provider security features such as SPF, DKIM, DMARC. See {{kicksecure_wiki
+|wikipage=Server_Security_Guide
+|text=Server Security Guide
+}} and {{kicksecure_wiki
+|wikipage=Website_Tests
+|text=Website Tests
+}} for a number of test websites.
+
+One possible exception might be "pseudo-email" services <ref>
+These have a different design to classical email and are therefore incompatible.
+</ref> like [[BitMessage]], [[#I2P-Bote|I2P-Bote]] and [[#Freemail|Freemail]]. For instant messenger protocols with equivalent features, see [[Chat#Ricochet_IM|Richochet IM]] and [[Chat#RetroShare|RetroShare]].
 
 A few mail providers who are frequently discussed as possible options are briefly considered below. {{project_name_short}} stands neutral in this regard; objectively speaking no particular mail provider can be recommended.
 
@@ -225,29 +261,6 @@ Like the former TorBirdy add-on.
 </ref> Further, it is technically impossible to encrypt mails to clearnet addresses such as Gmail, Riseup and other providers, unless the sender and recipient are using end-to-end encryption such as OpenPGP. When these factors are considered, the I2P email service is no more or less secure than using alternatives.
 
 Even though the service is based on I2P, it can still be accessed in {{project_name_short}} over Tor; see [[I2P]] for instructions on tunneling I2P over Tor. To date, there has not been any notification of email account suspensions. <ref>It is unknown whether spam abuse has become an issue.</ref> Factors outlined in the [[#Safe_Email_Principles|Safe Email Principles]] section may also equally apply.
-
-== Riseup Mail ==
-
-{{mbox
-| image   = [[File:Ambox_notice.png|40px]]
-| text    = Issues discussed in the [[#Safe_Email_Principles|Safe Email Principles]] section equally apply to Riseup.
-}}
-
-Riseup provides a number of advantages for users who value privacy: <ref>https://riseup.net/en/email#what-is-special-about-riseup-email</ref>
-
-* No personal information is required to register an account, since the system relies upon "invite codes" from other users.
-* The account management system does not use JavaScript.
-* Riseup works reliably on mailing lists.
-* POP email settings are available to download email and delete it from Riseup servers.
-* The infrastructure is completely Tor-friendly. Onion services are available to help improve anonymity and circumvent censorship.
-* The {{project_name_short}} Project is unaware of any email accounts being suspended. <ref>It may have happened for spam abuse, but that is a separate issue.</ref>
-* Riseup claims users' emails are personally encrypted on the servers, so they can only be unlocked and read with the account holder's password.
-
-On the downside:
-
-* Servers are hosted in the US. <ref>Home of the global surveillance-complex.</ref>
-* In recent times the warrant canary was [https://forums.whonix.org/t/riseup-net-likely-compromised not updated] on a fixed, regular basis. <ref>The provider also "forgot" to update the canary on multiple occasions.</ref> <ref>https://www.vice.com/en/article/bmv34m/warrant-canary-for-activist-email-service-riseup-seemingly-expires</ref>
-* Privacy by policy is not a guarantee of improved anonymity. For instance, Riseup claims that IP addresses are not logged is impossible to verify.
 
 == Anonymity Friendly Email Provider List ==
 {{mbox

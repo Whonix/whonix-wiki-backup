@@ -245,11 +245,17 @@ sudo /usr/lib/sdwdate/restart_fresh
 = Manually Set Clock Time and Date =
 Usually not required.
 
-In case [[Sdwdate|sdwdate]] fails to properly randomize the system clock, it is possible to manually set a random value.
+In case [[Sdwdate|sdwdate]] fails to properly randomize the system clock, it is possible to manually set a random value. This simulates what sdwdate would have done.
 
-The first step should be completed on the host to ensure the host clock is set to the correct time.
+The first step should be completed on the host to ensure the host clock is set to the correct time. The next step will be to correct the time inside the {{VM}}.
+
 {{Box|text=
-'''1.''' On the host ([[Qubes|{{q_project_name_short}}]]: <code>dom0</code>), run the following command to report the time in UTC.
+'''1.''' Platform specific notice.
+
+* [[Non-Qubes-Whonix|{{non_q_project_name_short}}]]: On the host 
+* [[Qubes|{{q_project_name_short}}]]: <code>dom0</code>
+
+'''2.''' Run the following command to report the time in UTC.
 
 {{CodeSelect|code=
 date --utc
@@ -265,7 +271,9 @@ Mon Apr 22 04:30:44 UTC 2019
 {{CURRENTMONTHABBREV}} {{CURRENTDAY2}} {{CURRENTTIME}}:44 UTC {{CURRENTYEAR}}
 }}
 
-'''2.''' Set the correct time in {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>).
+'''3.''' Set the correct time inside the VM
+
+Such as {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>).
 
 Run the following command with the correct date and time parameters. <ref>
 A non-zero exit codes signifies an error, while <code>0</code> means it succeeded.
@@ -291,19 +299,26 @@ echo "Sat Oct 26 07:18:25 UTC 2019" {{!}} /usr/bin/clock-random-manual-cli
 echo "{{CURRENTMONTHABBREV}} {{CURRENTDAY2}} {{CURRENTTIME}}:44 UTC {{CURRENTYEAR}}" {{!}} sudo clock-random-manual-cli
 }}
 
-'''3.''' Restart sdwdate.
+'''4.''' Restart sdwdate.
 
 {{CodeSelect|code=
 sudo service sdwdate restart
 }}
 
-'''4.''' If Tor is still not functional, try restarting Tor.
+'''5.''' If Tor is still not functional, try restarting Tor.
+
+Only useful on {{project_name_gateway_short}}.
 
 {{CodeSelect|code=
 sudo service tor restart
 }}
 
-Tor should work once correct clock values are set, but that can be manually tested with [https://www.kicksecure.com/wiki/Systemcheck systemcheck].
+'''6.''' Done.
+
+Tor should work once correct clock values are set, but that can be manually tested with {{kicksecure_wiki
+|wikipage=systemcheck
+|text=systemcheck
+}}.
 }}
 
 = Block Networking until sdwdate Finishes =

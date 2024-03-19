@@ -361,7 +361,7 @@ Video websites, such as Vimeo make use of the Flash Player plugin to display vid
 
 The problem with non-default add-ons is that they are often comprised of [[non-free]] software, which can lead to the linkage of activities conducted under one pseudonym. They also worsen fingerprinting and open up attack vectors in the form of remote exploits.
 
-This advice holds true even though {{project_name_short}} is configured to prevent these applications (along with malware) from leaking the real external IP address, even if they are misconfigured (see [[Features]]). Before installing non-default add-ons, first consider the various alternatives such as HTML5 or online media converters. <ref>For example, most [https://www.youtube.com/html5|Youtube videos] can be viewed in HTML5 which Tor Browser supports and prefers.</ref>
+This advice holds true even though {{project_name_short}} is configured to prevent these applications (along with malware) from leaking the real external IP address, even if they are misconfigured (see [[Features]]). Before installing non-default add-ons, first consider the various alternatives such as HTML5 or online media converters. <ref>For example, most [https://www.youtube.com/supported_browsers videos] can be viewed in HTML5 which Tor Browser supports and prefers.</ref>
 
 = Torbutton =
 
@@ -871,134 +871,18 @@ For better anonymity:
 
 {{Anchor|Bypass Tor Censorship}}
 == Tor Censorship ==
-=== Censors ===
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
 | text    = Tor Censorship can mean two different things.
 
-* '''A)''' <u>Destination website level:</u> This section outlines Tor blocks by destination websites.
+* '''A)''' <u>Destination website level:</u> The [[Geo-blocking]] outlines Tor blocks by destination websites.
 * '''B)''' <u>{{isp}} level:</u> If connections to the Tor network are blocked by the user's ISP, then [[Bridges|bridges]] or other circumvention tools are necessary.
 }}
 
-A number of websites or services [https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor actively block Tor users] via:
-
-* A DNS query-based list used to tag IP addresses.
-* Content delivery network (CDN) and/or blocking software like [https://www.akamai.com/ Akamai] and [https://www.cloudflare.com/ Cloudflare].
-* Other individual blocks.
-
-This issue is [[unspecific|unspecific to {{project_name_short}}]] and specific to [[Tor]].
-
-Can {{project_name_short}} be the cause of the inability to access specific destination websites? No. If connectivity is generally functional (some websites can be reached), never in the history of {{project_name_short}}, any website were reachable in Tor Browser outside of {{project_name_short}} (such as Tor Browser on Debian) while unreachable in Tor Browser inside of {{project_name_short}}. Neither the [[#{{project_name_short}} Tor Browser Differences|{{project_name_short}} Tor Browser Differences]] nor {{project_name_short}} firewall discriminate against specific websites.
-
-A potential cause for confusion is the following. Cloudflare treats Tor Browser users different than other browsers (such as Firefox) or command line substitutes (such as curl) when being used over Tor. Quote Cloudflare [https://blog.cloudflare.com/cloudflare-onion-service/ Introducing the Cloudflare Onion Service]:
-
-<blockquote>Today’s edition of the Crypto Week introduces an “opportunistic” solution to this problem, so that under suitable conditions, anyone using Tor Browser 8.0 will benefit from improved security and performance when visiting Cloudflare websites without having to face a CAPTCHA.</blockquote>
-
-It is therefore possible that some websites can be visited with Tor Browser while attempting to fetch these websites with command line utilities such as curl would lead to a different result, a captcha.
-
-The CDN provider Cloudflare is used by millions of websites. <ref>
-* https://community.cloudflare.com/t/statistically-speaking-whats-the-percentage-of-total-sites-that-use-cf/372054
-* https://blog.cloudflare.com/application-security/
-</ref> Many of the top websites are using Cloudflare. See also the [https://framagit.org/dCF/deCloudflare/-/blob/master/README.md Great Cloudwall / Stop Cloudflare / #deCloudflare #Crimeflare project] ([http://crimeflare.eu.org This redirection link might always link to a functional version.]) ([https://news.ycombinator.com/item?id=31801947 on hackernews]), which has (non-exhaustive list):
-
-* [https://framagit.org/dCF/deCloudflare/-/blob/master/readme/en.md English version readme] / [https://framagit.org/dCF/deCloudflare/-/blob/master/README.md non-English version] contains a long list of arguments why cloudflare should not be used,
-* [https://framagit.org/dCF/deCloudflare/-/blob/master/readme/en.ethics.md ethics],
-* [https://framagit.org/dCF/deCloudflare/-/blob/master/PEOPLE.md anti-cloudflare citations, memes, outage report collections],
-* [https://framagit.org/dCF/deCloudflare/-/blob/master/HISTORY.md incidents],
-* [https://framagit.org/dCF/deCloudflare/-/blob/master/INSTRUCTION.md list of websites using cloudflare],
-* [https://framagit.org/dCF/deCloudflare/-/blob/master/anti-tor_users/domains/attd.txt list of Tor blocking websites]
-
-=== Bypass Tor Censorship ===
-There are various ad-hoc methods available to try and circumvent blocks. In most cases it is unnecessary to [[Tunnels/Introduction|create a tunnel]] which pairs {{project_name_short}} with other protocols (such as a VPN) in order to access the content.
-
-The following services fetch content via other websites, which is a privacy trade-off. Further, only some services are effective with embedded, non-static content or support specific file types like PDF, <code>.exe</code> and <code>mp3</code>. <ref>
-https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor#ad-hoc-solutions-for-accessing-blocked-content-on-tor
-</ref>
-
-'''Table:''' ''Tor Censorship Circumvention Options'' <ref>
-* Source: [https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor#ad-hoc-solutions-for-accessing-blocked-content-on-tor Ad-hoc Solutions for accessing blocked content on Tor]
-* License: Content on this site is Copyright The Tor Project, Inc.. Reproduction of content is permitted under a [https://creativecommons.org/licenses/by/3.0/us/ Creative Commons Attribution 3.0 United States License].
-</ref>
-
-{| class="wikitable"
-|-
-
-! scope="col"| '''Service'''
-! scope="col"| '''URL'''
-! scope="col"| '''Comment'''
-! scope="col"| '''Non-static Embedded Content'''
-! scope="col"| '''PDF, .exe, mp3'''
-|-
-
-! scope="row"| The Internet Archive's WaybackMachine
-| <code><nowiki>https://</nowiki>web.archive.org/web/<b><u><URL></u></b></code><br/>
-<code><nowiki>https://</nowiki>web.archive.org/save/_embed/<b><u><URL></u></b></code>
-| Archive.org respects robots.txt restrictions, works best with JS enabled
-| No
-| Yes
-|-
-
-! scope="row"| Archive.is
-| <code><nowiki>https://archive.ph/?run=1&url=</nowiki><b><u><URL></u></code>
-| Ideal for news sites, doesn't require JS
-| No
-| No
-|-
-
-! scope="row" | Google Cache
-| <code><nowiki>https://webcache.googleusercontent.com/search?q=cache:</nowiki><b><u><URL without "http://"></u></b></code>
-| Google sometimes blocks these requests
-| No - static only
-| No
-|-
-
-! scope="row" | Startpage.com
-|
-# Go to {{Archive_link|url=https://www.startpage.com/|archive=none|text=startpage.com}}
-# Find the URL by searching for the URL
-# Click on the Anonymous View mask icon (proxy option) next to the search result <ref>
-Note the icon is not visible with Tor Browser's security slider set to safest, but can still be clicked. [https://support.startpage.com/hc/en-us/articles/4521579122964-How-to-use-Anonymous-View Startpage documentation] states: <blockquote>Pages viewed through the proxy are served to you anonymously. No connection is made between your computer and the remote site. Because of their potential for being used to identify you, JavaScript is modified and cookies are disabled for proxied pages.</blockquote>
-</ref>
-| Not always efficacious
-| No
-| No
-|-
-
-! scope="row" | Any Searx Instance <ref>
-Searx instances utilizing v3 onions can be found {{Archive_link|url=https://searx.space/|onion=http://searxspbitokayvkhzhsnljde7rqmn7rvoga6e4waeub3h7ug3nghoad.onion|text=here}}.
-</ref>
-|
-# Choose one from {{Archive_link|url=https://searx.space|text=searx available instances}}.
-# Find the URL by searching
-# Click on the proxied option
-| Not always efficacious
-| No
-| No
-|-
-
-! scope="row" | Hypothes.is
-| <code><nowiki>https://</nowiki>via.hypothes.is/<b><u><URL></u></b></code>
-| Behind Cloudflare
-| Yes
-| Yes
-|-
-
-! scope="row" | Online Proxies
-| hide.me/en/proxy, proxysite.com, hidester.com/proxy
-| -
-| Yes
-| Yes
-|-
-
-|}
-
-The Tor community also recommends: <ref>
-https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor#other-relevant-services
-</ref>
-
-<blockquote>To avoid captchas that are sometimes required when visiting YouTube, use hooktube.com/ (behind Cloudflare).<br /> <br />
-imgur.com blocks Tor uploads, to upload images on an imgur domain go to a stackexchange website (for example tor.stackexchange.com), click on Ask a Question, use the image upload tooltip to upload the image, the resulting url will have a i.stack.imgur.com/... form.</blockquote>
+== Geo-blocking ==
+{{Anchor|Tor Censorship}}
+A website is unreachable? Shows access denied or a captcha? See [[Geo-blocking]].
 
 == AppArmor Confinement ==
 [[AppArmor|AppArmor]] can help to protect the user's system and data. It confines programs according to a set of rules that specify what files a given program can access, and with what privileges. This also provides some protection against zero-day attacks and exploits via unknown application flaws. An AppArmor profile for Tor Browser is by default nowadays in {{project_name_short}}.
@@ -2019,6 +1903,7 @@ This entry has been moved [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qu
 * [[Browser Tests]]
 * [[Tor-ctrl-observer|tor-ctrl-observer - Tor Connection Destination Viewer]]
 * [[Browser Plugins]]
+* [[Geo-blocking]]
 
 = Footnotes =
 {{reflist|close=1}}

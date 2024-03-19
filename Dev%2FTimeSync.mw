@@ -41,11 +41,11 @@ The Post Install Advice is part of this design, therefore read [[Post Install Ad
 
 == Local Clock Leaks ==
 * TCP Sequence Numbers &rarr; [https://github.com/Kicksecure/tirdad <code>tirdad</code>] <ref>
-* [https://mailman.boum.org/pipermail/tails-dev/2014-September/007062.html Tails-dev - TCP Sequence Numbers leak System Clock]
+* [https://web.archive.org/web/20160624053221/https://mailman.boum.org/pipermail/tails-dev/2014-September/007062.html Tails-dev - TCP Sequence Numbers leak System Clock]
 * [https://gitlab.torproject.org/legacy/trac/-/issues/16659 Linux TCP Initial Sequence Numbers may aid correlation]
 </ref>
 * ICMP timestamps &rarr; blocked by {{project_name_short}} firewall for {{project_name_short}} VMs. Host: [[Disable_TCP_and_ICMP_Timestamps#Disable_ICMP_Timestamps|Recommendation]] to disable on the host.
-* TCP timestamps &rarr; blocked in {{project_name_short}} VMs by [https://github.com/{{project_name_short}}/tcp-timestamps-disable tcp-timestamps-disable].; [[Computer_Security_Education#Disable_TCP_Timestamps|Recommendation]] to disable on the host.
+* TCP timestamps &rarr; blocked in {{project_name_short}} VMs by [https://github.com/Kicksecure/security-misc security-misc].; [[Computer_Security_Education#Disable_TCP_Timestamps|Recommendation]] to disable on the host.
 * NTP <ref name=ntp-rfc /> <ref name=ntp-se /> &rarr; Not installed by default in {{project_name_short}}. Host: TODO
 * Automatic updaters and other network using cron jobs that run at non-random, canned <ref>
 By distribution defaults.
@@ -165,7 +165,7 @@ Therefore we want a completely isolated virtual time.
 * {{project_name_gateway_long}} and {{project_name_workstation_short}} are commonly used inside virtualizers and therefore have their own virtual hardware system clocks.
 * Virtualizers time synchronization get disabled by {{project_name_short}}.
 ** Most VirtualBox time synchronization features get disabled by {{project_name_short}}.
-*** Guest additions time synchronization gets disabled in by [https://github.com/{{project_name_short}}/vbox-disable-timesync vbox-disable-timesync] at run time. See VirtualBox bug report [https://www.virtualbox.org/ticket/10828 VBoxService --disable-timesync broken]. They say it is actually not a bug. It is a missing feature, that running instances of VBoxService can not be modified in their settings.
+*** Guest additions time synchronization gets disabled in by [https://github.com/{{project_name_short}}/vm-config-dist vm-config-dist] at run time. See VirtualBox bug report [https://www.virtualbox.org/ticket/10828 VBoxService --disable-timesync broken]. They say it is actually not a bug. It is a missing feature, that running instances of VBoxService can not be modified in their settings.
 *** built in time synchronization features get disabled by ''VBoxManage setextradata "$VMNAME" "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled" "1"'' at build time.
 ** KVM: TODO document
 ** Qubes: TODO
@@ -293,7 +293,7 @@ Cons:
 * Only native SSL CA pinning support. No direct SSL certificate pinning support.
 * Does not distribute trust. <ref>As {{Code2|sdwdate}} does.</ref> <ref>https://github.com/ioerror/tlsdate/issues/112</ref> <ref>https://github.com/ioerror/tlsdate/issues/143#issuecomment-57053323</ref> The single time source can send by error or by malicious intent send wrong time replies.
 * Does not support hooks for user notifications about state of network time synchronization. &rarr; Users shouldn't use the internet in {{project_name_workstation_short}} before network time synchronization finished, and timesync is informing users about this. &rarr; Implementing notifications would be difficult or require patching tlsdate.
-* Produces clock jumps, which confuses various applications. Does not gradually adjust as {{Code2|sdwdate}} does with [https://github.com/Whonix/Whonix/issues/169 Slow Clock Adjuster]. <ref>[https://github.com/{{project_name_short}}/sdwdate/blob/master/usr/lib/sclockadj sclockadj]</ref>
+* Produces clock jumps, which confuses various applications. Does not gradually adjust as {{Code2|sdwdate}} does with [https://github.com/Whonix/Whonix/issues/169 Slow Clock Adjuster]. <ref>[https://github.com/{{project_name_short}}/sdwdate/blob/master/usr/src/sdwdate/sclockadj.c sclockadj]</ref>
 * Cannot connect to (most) Tor onion services, because most of those do not support SSL. <ref>Because in most cases, there is little need to combine Tor onion services with SSL. [[Onion_Services#Notes_about_End-to-end_security_of_Onion_Services|connections to Tor onion services are Tor-to-Tor encrypted by default ("not exactly end-to-end")]].</ref> <ref>https://github.com/ioerror/tlsdate/issues/157</ref>
 * Minor: {{Code2|command line parser doesn't fail closed on extraneous / unknown command line parameters}} <ref>https://github.com/ioerror/tlsdate/issues/158</ref> - not that important in the absence of bugs, butsafer behavior for {{Code2|tlsdate}} would be to fail closed on on extraneous / unknown command line parameters.
 * Likely denial of service issue: https://github.com/ioerror/tlsdate/issues/149
@@ -478,7 +478,7 @@ Originally posted in [https://phabricator.whonix.org/T151 sdwdate Tor Consensus 
 ** Quote: "Currently we use tordate to set the initial clock. It is very messy and error prone, so we desperately need a robust replacement." <ref>https://gitlab.tails.boum.org/tails/tails/-/issues/5774</ref>
 
 ===== Random Stuff =====
-* [https://mailman.boum.org/pipermail/tails-dev/2012-January/000822.html tails-dev mailing list: tordate: why is it safe to set time from unverified-consensus?]
+* [https://web.archive.org/web/20160629091629/https://mailman.boum.org/pipermail/tails-dev/2012-January/000822.html tails-dev mailing list: tordate: why is it safe to set time from unverified-consensus?]
 ** String parsing a unverified consensus using anondate is more risky [hitting hypothetical vulnerabilities in grep] than string parsing a verified Tor consensus.
 * Tor consensus is in some cases downloaded from Tor directory authorities and in some cases from Tor directory mirrors. The latter should not be trusted as much as the former.
 * https://github.com/torproject/torspec/blob/main/proposals/149-using-netinfo-data.txt
@@ -855,8 +855,8 @@ qvm-run --pass-io {{project_name_gateway_vm}} "date -u" ; date -u
 
 == Previous Discussion ==
 * [https://lists.torproject.org/pipermail/tor-talk/2011-January/008551.html System time in anonymity oriented LiveCDs]
-* [https://mailman.boum.org/pipermail/tails-dev/2014-August/006821.html Tails-dev mailing list - Tails htpdate - why use time information from neutral and foe pools?]
-* [https://mailman.boum.org/pipermail/tails-dev/2013-February/002635.html Tails-dev Endless Data Attack and Defense]
+* [https://web.archive.org/web/20160629151935/https://mailman.boum.org/pipermail/tails-dev/2014-August/006821.html Tails-dev mailing list - Tails htpdate - why use time information from neutral and foe pools?]
+* [https://web.archive.org/web/20160629152125/https://mailman.boum.org/pipermail/tails-dev/2013-February/002635.html Tails-dev Endless Data Attack and Defense]
 
 == Other Projects ==
 * [https://tails.boum.org/contribute/design/Time_syncing/ Tails Design: Time syncing]
@@ -979,7 +979,7 @@ TSC leaks may be similar to TCP sequence numbers. <ref>https://gitlab.torproject
 https://github.com/QubesOS/qubes-issues/issues/1764#issuecomment-195619793
 
 == Resources ==
-* [https://software.intel.com/en-us/blogs/2013/06/20/eliminate-the-dreaded-clocksource-is-unstable-message-switch-to-tsc-for-a-stable General information on various clock sources such as tsc etc. by intel]
+* [https://web.archive.org/web/20170701134458/https://software.intel.com/en-us/blogs/2013/06/20/eliminate-the-dreaded-clocksource-is-unstable-message-switch-to-tsc-for-a-stable General information on various clock sources such as tsc etc. by intel]
 
 == Footnotes ==
 {{reflist|close=1}}

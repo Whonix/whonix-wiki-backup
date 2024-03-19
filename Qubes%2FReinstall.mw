@@ -133,11 +133,11 @@ TODO
 
 In the instructions below, a check is first made for a newer version of the Template.
 
-* If a newer Template version exists, install it (<code>--action=upgrade</code>).
-* If no newer Template version is available, reinstall the existing version (<code>--action=reinstall</code>).
+* If a newer Template version exists, install it (<code>upgrade</code>).
+* If no newer Template version is available, reinstall the existing version (<code>reinstall</code>).
 
 Unfortunately there is no combined upgrade and reinstall command. <ref>
-[https://github.com/QubesOS/qubes-issues/issues/4518 qubes-dom0-update combined --action=upgrade --action=reinstall command]
+[https://github.com/QubesOS/qubes-issues/issues/4518 qubes-dom0-update combined upgrade reinstall command]
 </ref>
 
 {{Box|text=
@@ -151,36 +151,37 @@ Execute the following command.
 
 <u>Notes:</u>
 
-* <u>Template choice:</u> Replace <code>qubes-template-package</code> with either: <code>qubes-template-whonix-workstation-17</code> or <code>qubes-template-whonix-gateway-17</code>, respectively.
+* <u>Template choice:</u> Replace <code>qubes-template-package</code> with either: <code>qubes-template-whonix-workstation-{{VersionShort}}</code> or <code>qubes-template-whonix-gateway-{{VersionShort}}</code>, respectively.
 * <u>Testers-Only:</u> Testers should replace <code>--enablerepo=qubes-templates-community</code> with <code>--enablerepo=qubes-templates-community-testing</code>.
-** At time of writing, Template are only available from <code>--enablerepo=qubes-templates-community-testing</code>.
+
+Syntax:
+
+<pre>
+qvm-template --enablerepo=qubes-templates-community upgrade <qubes-template-package>
+</pre>
+
+For example, to reinstall and upgrade <code>whonix-gateway-{{VersionShort}}</code> Template.
 
 {{CodeSelect|code=
-sudo qubes-dom0-update --enablerepo=qubes-templates-community --action=upgrade <qubes-template-package>
+qvm-template --enablerepo=qubes-templates-community upgrade whonix-gateway-{{VersionShort}}
 }}
 
-For example, to reinstall and upgrade <code>whonix-gateway-17</code> Template.
+For example, to reinstall and upgrade <code>whonix-workstation-{{VersionShort}}</code> Template.
 
 {{CodeSelect|code=
-sudo qubes-dom0-update --enablerepo=qubes-templates-community --action=upgrade qubes-template-whonix-gateway-17
-}}
-
-For example, to reinstall and upgrade <code>whonix-workstation-17</code> Template.
-
-{{CodeSelect|code=
-sudo qubes-dom0-update --enablerepo=qubes-templates-community --action=upgrade qubes-template-whonix-workstation-17
+qvm-template --enablerepo=qubes-templates-community upgrade whonix-workstation-{{VersionShort}}
 }}
 
 '''3.''' Read the output of the above command. The following outcomes are possible, either:
 
 * '''A)''' The Template is upgraded. In that case, skip step four below ("Reinstall the Template"); OR
 * '''B)''' The commands above might finish relatively quickly and state <code>No new updates available</code>. In that case, proceed with step four below ("Reinstall the Template"); OR
-* '''C)''' A Template upgrade is unsupported. This might happen if a non-Fedora based UpdateVM is used in conjunction with the <code>--action=upgrade</code> option. See: [[Qubes/Reinstall#UpdateVM_Setting|UpdateVM Setting]] for further information; OR
+* '''C)''' A Template upgrade is unsupported. This might happen if a non-Fedora based UpdateVM is used in conjunction with the <code>upgrade</code> option. See: [[Qubes/Reinstall#UpdateVM_Setting|UpdateVM Setting]] for further information; OR
 * '''D)''' An error has occurred, such as a networking issue.
 
 '''4.''' ''Optional:'' <u>Reinstall</u> the Template.
 
-If <code>--action=upgrade</code> at step two did not actually reinstall the Template, this means there is no new [[Point Release]] available at present. This also means the Template has not been actually reinstalled and further action is required (see below).
+If <code>upgrade</code> at step two did not actually reinstall the Template, this means there is no new [[Point Release]] available at present. This also means the Template has not been actually reinstalled and further action is required (see below).
 
 If unsure, the commands below are safe in any case because if you already have the latest Template version, then it will simply be reinstalled again.
 
@@ -188,20 +189,22 @@ Execute the following command.
 
 <u>Notes:</u> Same notes as above apply.
 
+Syntax:
+
+<pre>
+qvm-template --enablerepo=qubes-templates-community reinstall <qubes-template-package>
+</pre>
+
+For example, to reinstall <code>whonix-gateway-{{VersionShort}}</code> Template.
+
 {{CodeSelect|code=
-sudo qubes-dom0-update --enablerepo=qubes-templates-community --action=reinstall <qubes-template-package>
+qvm-template --enablerepo=qubes-templates-community reinstall qubes-template-whonix-gateway-{{VersionShort}}
 }}
 
-For example, to reinstall <code>whonix-gateway-17</code> Template.
+For example, to reinstall <code>whonix-workstation-{{VersionShort}}</code> Template.
 
 {{CodeSelect|code=
-sudo qubes-dom0-update --enablerepo=qubes-templates-community --action=reinstall qubes-template-whonix-gateway-17
-}}
-
-For example, to reinstall <code>whonix-workstation-17</code> Template.
-
-{{CodeSelect|code=
-sudo qubes-dom0-update --enablerepo=qubes-templates-community --action=reinstall qubes-template-whonix-workstation-17
+qvm-template --enablerepo=qubes-templates-community reinstall qubes-template-whonix-workstation-{{VersionShort}}
 }}
 
 Read the output of the above command. There are two possible outcomes, either:
