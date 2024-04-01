@@ -1,0 +1,235 @@
+{{Header}}
+{{Title|title=
+Verify {{project_name_long}} Virtual Machine Images in Windows
+}}
+{{#seo:
+|description=Instructions for OpenPGP Verification of {{project_name_short}} Images using Windows
+|image=Approved-29149640.png
+}}
+[[image:Approved-29149640.png|250px|thumbnail]]
+{{intro|
+Instructions for OpenPGP Verification of {{project_name_short}} Images using Windows
+}}
+= Introduction =
+{{always_verify_signatures_reminder}}
+
+[https://gnupg.org/ GnuPG] is a complete and free implementation of [[OpenPGP]] that allows users to encrypt and sign data and communications. [https://www.gpg4win.org/ Gpg4win] is a graphical front end for GnuPG that is used for file and email encryption in Windows. The verification process for the {{project_name_short}} images begins with securely downloading and verifying the <code>gpg4win</code> package. Once completed GPG can be used from the command-line to verify the {{project_name_short}} images.
+
+The following guide provides steps to:
+
+# Install SignTool.
+# Download and verify GPG4win.
+# Download the {{project_name_short}} signing key.
+# Verify the {{project_name_short}} images.
+
+= Verify {{project_name_short}} Images in Windows using Gpg4win =
+
+{{Download_and_Verify_GPG4win_in_Windows}}
+
+== Download the {{project_name_short}} Signing Key ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This entry is strongly related to the [[Trust|Placing Trust in {{project_name_short}}]] page.
+}}
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = This entry is for Download the {{project_name_short}} Signing Key on the Windows platform. Includes Windows specifics such as file paths. This chapter might be out of date. In case of questions, see the [[Signing Key|{{project_name_short}} Signing Key]] page first which takes presedence.
+}}
+
+Since all {{project_name_short}} releases are signed with the same key, it is unnecessary to verify the key every time a new release is announced. Trust in the key might gradually increase over time, but cryptographic signatures must still be verified every time a new release is downloaded.
+
+<u>Note</u>: With the exception of step 1 all commands should be run from <code>C:\Users\<user_name\Downloads</code>
+
+{{Box|text=
+'''1.''' If not already completed, have GnuPG initialize your user data folder.
+
+{{CodeSelect|code=
+gpg --fingerprint
+}}
+
+'''2.''' Download [[Patrick Schleizer]]'s (adrelanos') [[OpenPGP]] key. <ref>
+{{CodeSelect|code=
+curl --tlsv1.3 --proto =https --max-time 180 --output derivative.asc {{project_clearnet}}/keys/derivative.asc
+}}
+</ref><br />
+{{Code2|<u>'''{{signing_key_main}}'''</u>}}
+
+Store the key as <code>C:\Users\<user_name>\Downloads\derivative.asc</code>
+
+'''3.''' Change to the <code>C:\Users\<user_name>\Downloads\</code> directory.
+
+{{CodeSelect|code=
+cd C:\Users\<user_name>\Downloads\
+}}
+
+'''4.''' Check fingerprints/owners without importing anything.
+
+{{CodeSelect|code=
+gpg --keyid-format long --with-fingerprint derivative.asc
+}}
+
+'''5.''' Verify the output.
+
+The most important check is confirming the key fingerprint <u>exactly</u> matches the output below. <ref>
+Minor changes in the output such as new uids (email addresses) or newer expiration dates are inconsequential.
+</ref>
+
+<pre>
+      Key fingerprint = 916B 8D99 C38E AF5E 8ADC  7A2A 8D66 066A 2EEA CCDA
+</pre>
+
+The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. Advanced users can learn more about this [[Main/Project Signing Key#OpenPGP_Web_of_Trust|here]].
+
+'''6.''' Import the key.
+
+{{CodeSelect|code=
+gpg --import derivative.asc
+}}
+
+The output should include the key was imported.
+
+<pre>
+gpg: Total number processed: 1
+gpg:               imported: 1
+</pre>
+
+''If the {{project_name_short}} signing key was already imported in the past'', the output should include the key is unchanged.
+
+<pre>
+gpg: Total number processed: 1
+gpg:              unchanged: 1
+</pre>
+
+If the following message appears at the end of the output.
+
+<pre>
+gpg: no ultimately trusted keys found
+</pre>
+
+This extra message does not relate to the {{project_name_short}} signing key itself, but instead usually means the user has not created an OpenPGP key yet, which is of no importance when verifying virtual machine images.
+
+Analyze the other messages as usual.
+}}
+
+== Verify the {{project_name_short}} Images ==
+{{Box|text=
+'''1.''' If <i>not</i> already completed, download both <code>Whonix.ova</code> images and the corresponding OpenGPG signature which will be used to verify the image.
+
+Both the signature and .ova image should be downloaded into the same directory.
+
+* Download the {{project_name_short}} VM image and signature from [[VirtualBox|VirtualBox Table]]; or
+* Download the {{project_name_short}} VM Image and Signature from [[VirtualBox|VirtualBox Table]].
+
+'''2.''' Start the cryptographic verification; this process can take several minutes.
+
+At the Windows command prompt, change to the directory with the <code>Whonix.ova</code> and corresponding signature file.
+
+{{CodeSelect|code=
+cd C:\Users\<user_name>\<directory_name>
+}}
+
+'''3.''' Verify the <code>Whonix.ova</code> image.
+
+{{CodeSelect|code=
+gpg --verify-options show-notations --verify Whonix*.ova.asc Whonix*.ova
+}}
+
+If the Virtual Machine image is correct the output will tell you that the signature is good.
+
+{{CodeSelect|code=
+gpg: Signature made Mon 19 Jan 2015 11:45:41 PM CET using RSA key ID 77BB3C48
+gpg: Good signature from "Patrick Schleizer <adrelanos@whonix.org>" [unknown]
+gpg: Signature notation: issuer-fpr@notations.openpgp.fifthhorseman.net=6E979B28A6F37C43BE30AFA1CB8D50BB77BB3C48
+gpg: Signature notation: file@name={{project_name_short}}-{{VersionNew}}.ova
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 916B 8D99 C38E AF5E 8ADC  7A2A 8D66 066A 2EEA CCDA
+     Subkey fingerprint: 6E97 9B28 A6F3 7C43 BE30  AFA1 CB8D 50BB 77BB 3C48
+}}
+
+This might be followed by a warning saying:
+{{Template:GnuPG-Warning}}
+
+{{gpg_signature_timestamp}}
+The first line includes the signature creation timestamp. Example.
+
+<pre>
+gpg: Signature made Mon 19 Jan 2015 11:45:41 PM CET using RSA key ID 77BB3C48
+</pre>
+
+{{GnuPG_file_names}}
+
+To help users confirm that the file name has not been tampered with, beginning with {{project_name_short}} version 9.6 and above the {{Code2|file@name}} OpenPGP notation includes the file name.
+
+{{do_not_continue_on_gpg_verification_errors}}
+
+'''4.''' When {{project_name_short}} verification is complete, continue with the [[VirtualBox|VirtualBox]] installation.
+}}
+
+= Troubleshooting =
+
+== SignTool is not Recognized ==
+
+'''Figure:''' ''SignTool not Recognized Error''
+
+[[image:signtool_command_not_recognized.png]]
+
+This error means the SignTool executable is not accessible through <code>cmd.exe</code>. A common cause for this error is SignTool was not installed in the user's [https://web.archive.org/web/20220707004040/https://john-dugan.com/path-variable-in-windows/?PageSpeed=noscript PATH]. To fix this issue add <code>signtool.exe</code> to your system PATH. <ref> https://www.godaddy.com/help/windows-cmd-signtool-is-not-recognized-as-an-internal-or-external-command-operable-program-or-batch-file-19987
+</ref>
+
+<u>Note</u>: This solution is temporary and works only until the command prompt is closed. When the command prompt is restarted <code>signtool.exe</code> must be added to the system PATH again.
+{{Box|text=
+'''1.''' Open a command prompt.
+
+In the Windows Start menu, run.
+
+{{CodeSelect|code=
+ cmd.exe
+}}
+
+'''2.''' Add the path to <code>signtool.exe</code> to your system PATH.
+
+The default installation path for <code>signtool.exe</code>:
+
+<pre>
+x86 systems:  C:\Program Files (x86)\Windows Kits\<windows_version>\bin\x86
+x64 systems:  C:\Program Files (x86)\Windows Kits\<windows_version>\bin\x64
+</pre>
+
+Run the following command to add "path\to\signtool.exe" to your system PATH. Also be sure to add the Windows version to the path.
+
+{{CodeSelect|code=
+set PATH="path to signtool.ext";%PATH%
+}}
+
+For example, the following command adds the path for an <code>x64</code> system.
+
+{{CodeSelect|code=
+set PATH="C:\Program Files (x86)\Windows Kits\<windows_version>\bin\x64";%PATH%
+}}
+}}
+
+== SignTool Certificate Chain Error ==
+
+'''Figure:''' ''Root Certificate Error''
+
+[[image:signtool_error_root_certificate_not_trusted.png]]
+
+This error message occurs if the <code>/pa</code> switch is not used with SignTool. This is because the default SignTool verify <code>some_file.exe</code> command uses the Windows Driver Verification Policy. <ref> See stackoverflow for further information: [https://stackoverflow.com/questions/11230091/whys-my-root-certificate-not-trusted Why's My Root Certificate Not Trusted?]</ref> In order for the file to verify properly the <code>/pa</code> switch must be used so SignTool uses the Default Authentication Verification Policy.
+
+== Encountering GPG Errors ==
+
+When a GPG error is encountered, first try a web search for the relevant error. The [https://security.stackexchange.com security stackexchange website] can also help to resolve GPG problems. Describe the problem thoroughly, but be sure it is GPG-related and not specific to {{project_name_short}}.
+
+More help resources are available on the [[Support]] page.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Documentation]]

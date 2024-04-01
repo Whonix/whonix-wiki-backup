@@ -52,6 +52,32 @@ Development discussion: https://forums.whonix.org/t/bisq-the-p2p-exchange-networ
 }}
 
 == {{project_name_workstation_long}} Installation Steps ==
+
+=== System Requirements ===
+
+Bisq is an application that is very resource intensive. Your system needs to accommodate the program requirements by changing the VM configuration.
+
+Platform specific.
+
+* [[VirtualBox]] / [[KVM]]:
+** {{kicksecure_wiki
+|wikipage=Tuning#Increase_Virtual_Machine_RAM
+|text=Increase Virtual Machine RAM
+}} to 6GB.
+* [[Qubes-Whonix]]: Assuming that your {{project_name_workstation_long}} is named <code>anon-bisq</code>. <u>In dom0</u>, run:
+** {{CodeSelect|code=
+qvm-prefs anon-bisq memory 600
+}}
+** Memory: <code>6GB</code>: {{CodeSelect|code=
+qvm-prefs anon-bisq maxmem 6000
+}}
+** Virtual CPU: <code>4</code>. {{CodeSelect|code=
+qvm-prefs anon-bisq vcpus 4
+}}
+** Storage: <code>5GB</code>. {{CodeSelect|code=
+qvm-volume extend anon-bisq:private 5Gi
+}}
+
 === Firewall Settings ===
 Modify the {{project_name_workstation_short}} (<code>{{project_name_workstation_vm}}</code>) user firewall settings and reload them.
 
@@ -80,29 +106,49 @@ bisq key change 2023 09 02 archive:
 </ref>
 
 {{gpg key
-|url=scurl-download https://github.com/bisq-network/bisq/releases/download/v2.0.1/E222AA02.asc
+|url=scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.0.1/E222AA02.asc
 |source_filename=E222AA02.asc
 |fingerprint=B493319106CC3D1F252E19CBF806F422E222AA02
 |gpg_fingerprint_output=
       Key fingerprint = B493 3191 06CC 3D1F 252E  19CB F806 F422 E222 AA02
 }}
 
+=== Bisq Version Number Choice ===
+'''1.''' Check the latest version number and read the release notes [https://github.com/bisq-network/bisq/releases here].
+
+'''2.''' Version number might be newer than the Bisq version number used on this wiki page.
+
+'''3.''' Bisq stable versus beta software notice.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Whonix first time users warning]]
+| text    = 
+
+* '''Bisq <u>1</u>:''' '''Recommended.''' Stable version. Instructions on this wiki page for Bisq 1 might work.
+* '''Bisq <u>2</u>:''' '''Discouraged.''' Beta version. Developers only! Instructions on this wiki page for Bisq 2 will probably not work. At time of writing, [https://bisq.network/blog/bisq-2-now-in-beta/ Bisq 2 was still in beta]. Additionally there have been two bugs [https://github.com/bisq-network/bisq2/issues/1798 Fix startup issues of Tor] (issue says fixed but no new version containing the fix was available at time of writing) and [https://github.com/bisq-network/bisq2/issues/1894 Cannot run on Whonix 17].
+}}
+
+'''4.''' Done.
+
 === Download ===
 
 '''On {{project_name_workstation_short}}.'''
 
-Check the latest version number and read the release notes [https://github.com/bisq-network/bisq/releases here].
+Download Bisq.
 
-Download bisq.
-
-{{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq/releases/download/v2.0.1/Bisq-64bit-2.0.1.deb
+* '''Bisq <u>1</u>:'''
+** Download Bisq. {{CodeSelect|code=
+scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.14/Bisq-64bit-1.9.14.deb
 }}
-
-Download OpenPGP signature.
-
-{{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq/releases/download/v2.0.1/Bisq-64bit-2.0.1.deb.asc
+** Download OpenPGP signature. {{CodeSelect|code=
+scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.14/Bisq-64bit-1.9.14.deb.asc
+}}
+* '''Bisq <u>2</u>:'''
+** Download Bisq. {{CodeSelect|code=
+scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.0.1/Bisq-64bit-2.0.1.deb
+}}
+** Download OpenPGP signature. {{CodeSelect|code=
+scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.0.1/Bisq-64bit-2.0.1.deb.asc
 }}
 
 === Verification ===
@@ -123,17 +169,38 @@ gpg --verify Bisq*.asc
 
 Follow these steps to avoid a Tor over Tor scenario.
 
-Create folder <code>/home/user/.local/share/Bisq/btc_mainnet/tor/</code>.
-
-{{CodeSelect|code=
+* '''Bisq <u>1</u>:'''
+** Create folder the Bisq tor folder. {{CodeSelect|code=
 mkdir -p /home/user/.local/share/Bisq/btc_mainnet/tor/
 }}
-
-Create a dummy Tor binary <code>/home/user/.local/share/Bisq/btc_mainnet/tor/tor</code>.
-
-{{CodeSelect|code=
+** Create a dummy tor binary. {{CodeSelect|code=
 sudo touch /home/user/.local/share/Bisq/btc_mainnet/tor/tor
 }}
+** Add the executable bit to the dummy tor binary. {{CodeSelect|code=
+sudo chmod +x /home/user/.local/share/Bisq/btc_mainnet/tor/tor
+}}
+* '''Bisq <u>2</u>:'''
+** Create folder the Bisq tor folder. {{CodeSelect|code=
+mkdir -p /home/user/.local/share/Bisq2/tor/
+}}
+** Create a dummy tor binary. {{CodeSelect|code=
+sudo ln -s /usr/bin/tor /home/user/.local/share/Bisq2/tor/tor
+}}
+
+Why is this needed? <ref>
+* Users: Ignore this footnote
+* Developers: For an explanation which might be interesting for developers only, see below. 
+
+Bisq installs its own version of Tor.
+
+From Bisq 2 log.
+
+<pre>
+16:06:19.474 INFO  [NetworkService.network-IO-pool-0] b.t.i.TorInstaller: Tor files installed to /home/user/.local/share/Bisq2/tor 
+</pre>
+
+Why sudo? To avoid <code>/home/user/.local/share/Bisq2/tor/tor</code> getting overwritten by Bisq.
+</ref>
 
 === xdg-desktop-menu Bug Workaround ===
 '''On {{project_name_workstation_short}}.'''
@@ -151,7 +218,11 @@ sudo mkdir -p /usr/share/desktop-directories
 For '''{{q_project_name_long}}''' you need create binding dirs in VM:
 
 {{CodeSelect|code=
+## Bisq 1:
 sudo mkdir -p /rw/bind-dirs/opt/bisq
+## Bisq 2:
+sudo mkdir -p /rw/bind-dirs/opt/bisq2
+
 sudo mkdir -p /rw/bind-dirs/usr/share/desktop-directories
 sudo mkdir -p /rw/config/qubes-bind-dirs.d
 }}
@@ -165,7 +236,11 @@ sudo nano /rw/config/qubes-bind-dirs.d/50_user.conf
 And specify which system folders are mapped to binding dirs — write there two lines and save:
 
 {{CodeSelect|code=
+## Bisq 1:
 binds+=( '/opt/bisq' )
+## Bisq 2:
+binds+=( '/opt/bisq2' )
+
 binds+=( '/usr/share/desktop-directories' )
 }}
 
@@ -184,8 +259,11 @@ sudo dpkg -i Bisq*.deb
 
 Start Bisq.
 
-{{CodeSelect|code=
+* '''Bisq <u>1</u>:''' {{CodeSelect|code=
 /opt/bisq/bin/Bisq --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true
+}}
+* '''Bisq <u>2</u>:''' {{CodeSelect|code=
+/opt/bisq2/bin/Bisq\ 2 --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true
 }}
 
 '''Figure:''' ''Bisq Launch in {{project_name_short}}''
@@ -208,8 +286,11 @@ It is the same as above but prepended with <code>GDK_SCALE=2</code>.
 https://github.com/bisq-network/bisq/issues/1425
 </ref>
 
-{{CodeSelect|code=
+* '''Bisq <u>1</u>:''' {{CodeSelect|code=
 GDK_SCALE=2 /opt/bisq/bin/Bisq --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true --daoActivated=false
+}}
+* '''Bisq <u>2</u>:''' {{CodeSelect|code=
+GDK_SCALE=2 /opt/bisq2/bin/Bisq\ 2 --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true --daoActivated=false
 }}
 
 Refer to the [https://docs.bisq.network/ official Bisq documentation] to learn about trading essentials, including:
