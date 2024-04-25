@@ -59,30 +59,54 @@ Two configurations are available:
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = [[Qubes|{{q_project_name_short}}]] only; [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] is [[unsupported]].
+| text    = Platform specific notice.
+
+* [[Qubes|{{q_project_name_short}}]]: Functional in principle but potentially broken due to Qubes bugs. See below.
+* [[Non-Qubes-Whonix|{{non_q_project_name_short}}]]: [[Unsupported]].
 }}
 
-This configuration has a separate VPN-Gateway between {{project_name_gateway_long}} and {{project_name_workstation_short}}: <code>{{project_name_workstation_short}}</code> &rarr; <code>VPN-Gateway</code> &rarr; <code>{{project_name_gateway_long}}</code>.
+This configuration has a separate VPN-Gateway between {{project_name_gateway_short}} and {{project_name_workstation_short}}: <code>{{project_name_workstation_short}}</code> &rarr; <code>VPN-Gateway</code> &rarr; <code>{{project_name_gateway_short}}</code>.
 
 <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>
 
-Qubes bugs maybe breaking this, maybe fixed:
-
+There used to be a Qubes specific bug breaking this. <ref>
 * https://github.com/QubesOS/qubes-issues/issues/7123#issuecomment-1245292312
 * https://github.com/QubesOS/qubes-issues/issues/7261#issuecomment-1242979914
-* <ref>
-https://github.com/QubesOS/qubes-core-agent-linux/blob/master/network/setup-ip
-</ref>
+* https://github.com/QubesOS/qubes-core-agent-linux/blob/master/network/setup-ip
 * in short: Contents of <code>/usr/lib/qubes/setup-ip</code> need to re replaced with [https://raw.githubusercontent.com/QubesOS/qubes-core-agent-linux/master/network/setup-ip <code>setup-ip</code>]
+</ref> It has probably been fixed at least since Qubes R4.2. Please try and report if this worked for you so this notice can be removed.
 
 {{Box|text=
-'''1.''' Clone a Template. For example, clone <code>debian-{{Stable_project_version_based_on_Debian_version_short}}</code> and name the new template clone <code>debian-{{Stable_project_version_based_on_Debian_version_short}}-vpn</code>. <ref>
+'''1.''' <u>Prerequisite knowledge:</u> '''Qubes VPN Setup over Clearnet'''
+
+"Forget" about {{project_name_short}} for a moment for this step 1. This is about Qubes only. This is [[unspecific|unspecific to {{project_name_short}}]].
+
+The user needs to master setting up the VPN-Gateway as per [https://forum.qubes-os.org/t/configuring-a-proxyvm-vpn-gateway/19061 Qubes VPN Documentation] in context of a "normal" VPN using clearnet. Meaning, without involving, mentioning {{project_name_short}} in any way. Connection scheme: <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code>
+
+It is recommended to follow the [https://forum.qubes-os.org/t/configuring-a-proxyvm-vpn-gateway/19061#set-up-a-proxyvm-as-a-vpn-gateway-using-iptables-and-cli-scripts-5 ''Set up a ProxyVM as a VPN gateway using iptables and CLI scripts''] instructions because this prevents clearnet leaks if/when the VPN breaks down.
+
+Two options. Choose one.
+
+* '''A)''' If intending to use <code>Qubes-vpn-support</code>:
+** Note regarding [https://github.com/tasket/Qubes-vpn-support Qubes-vpn-support]: See [https://github.com/tasket/Qubes-vpn-support/issues/72 Qubes-vpn-support broken in Qubes R4.2] status.
+* '''B)''' If not using <code>Qubes-vpn-support</code>: No special notice.
+
+<u>Note:</u>
+
+* <u>UDP:</u> UDP-style VPN connections are incompatible with Tor because it requires the VPN to be configured to use TCP. <ref>
+See [[Tor#UDP|UDP]].
+</ref> This requires adding <code>proto tcp</code> to the VPN configuration file <code>/rw/config/vpn/openvpn-client.ovpn</code>. Nearly all VPN providers support this configuration.
+* <u>Support:</u> Please do not contact {{project_name_short}} support for this step because mastering this skill is specific to Qubes only.
+
+'''2.''' Clone a Template.
+
+For example, clone <code>debian-{{Stable_project_version_based_on_Debian_version_short}}</code> and name the new template clone <code>debian-{{Stable_project_version_based_on_Debian_version_short}}-vpn</code>. <ref>
 At the time of writing Debian 11 <code>bullseye</code> was the stable release version.
 </ref>
 
 <code>Qube Manager</code> &rarr; <code>debian-{{Stable_project_version_based_on_Debian_version_short}}</code> &rarr; <code><u>C</u>lone qube</code> &rarr; <i><code>Enter name for Qube clone:</i> debian-{{Stable_project_version_based_on_Debian_version_short}}-vpn</code> &rarr; <code>Press: OK</code>
 
-'''2.''' Create a new ProxyVM based on the newly cloned template.
+'''3.''' Create a new ProxyVM based on the newly cloned template.
 
 Name the VM VPN-Gateway and set the {{project_name_gateway_short}} ProxyVM (<code>{{project_name_gateway_vm}}</code>) as NetVM. Make sure to check [✔] the box for "provides network".
 
@@ -97,37 +121,50 @@ Name the VM VPN-Gateway and set the {{project_name_gateway_short}} ProxyVM (<cod
 * Press: <code><u>O</u>K</code>
 }}
 
-'''3.''' Set up the VPN-Gateway as per [https://forum.qubes-os.org/t/configuring-a-proxyvm-vpn-gateway/19061 Qubes VPN Documentation].
+'''4.''' ''Torified VPN Setup''
 
-It is recommended to follow the [https://forum.qubes-os.org/t/configuring-a-proxyvm-vpn-gateway/19061#set-up-a-proxyvm-as-a-vpn-gateway-using-iptables-and-cli-scripts-5 ''Set up a ProxyVM as a VPN gateway using iptables and CLI scripts''] instructions because this prevents clearnet leaks if/when the VPN breaks down.
+Setup the VPN-Gateway. This will be similar to step 1. This will result in connection scheme <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> because in above step Networking: <code>{{project_name_gateway_vm}}</code> has been configured.
 
-Note:
-* Without configuring a fail closed configuration, all traffic originating from the {{project_name_workstation_short}} App Qube (<code>{{project_name_workstation_vm}}</code>) would <u>only</u> be forced through Tor if/when the VPN connection breaks down (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>).
-* UDP-style VPN connections are incompatible with Tor because it requires the VPN to be configured to use TCP. <ref>See [[Tor#UDP|UDP]].</ref> This requires adding <code>proto tcp</code> to the VPN configuration file <code>/rw/config/vpn/openvpn-client.ovpn</code>. Nearly all VPN providers support this configuration.
+<u>Notes:</u>
 
-'''4'''. Check the VPN-Gateway is fully functional.
+* <u>VPN Provider Choice:</u> A VPN provider different from the VPN provider used in step 1 should be used. This is because the VPN provider from step 1 knows you real IP address. The VPN provider used for connection scheme <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> should only know your Tor exit relay IP address.
+* <u>Fail closed mechanism:</u> Without configuring a fail closed configuration, all traffic originating from the {{project_name_workstation_short}} App Qube (<code>{{project_name_workstation_vm}}</code>) would <u>only</u> be forced through Tor if/when the VPN connection breaks down (<code>User</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>).
+* <u>UDP vs TCP</u>: Reminder. Only TCP can be used as mentioned in step 1.
+
+'''5.''' Check the VPN-Gateway is fully functional.
 
 Test connectivity from inside the VPN-Gateway as per [https://github.com/Qubes-Community/Contents/blob/master/docs/configuration/vpn.md Qubes VPN Documentation].
 
-'''5'''. ''Recommended:'' In {{project_name_workstation_short}} (<code>{{project_name_workstation_vm}}</code>), apply instructions from the [[#Prevent Bypassing of the Tunnel-Link|Prevent Bypassing of the Tunnel-Link]] section.
+'''6'''. ''Recommended:'' Prevent bypassing of the tunnel link.
 
-'''6.''' ''Optional:'' It is recommended to run the related [[#Leak_Tests|Leak Tests]].
+In {{project_name_workstation_short}} (<code>{{project_name_workstation_vm}}</code>), apply instructions from the [[#Prevent Bypassing of the Tunnel-Link|Prevent Bypassing of the Tunnel-Link]] section.
+
+'''7.''' ''Optional:'' Leak tests.
+
+It is recommended to run the related [[#Leak_Tests|Leak Tests]].
+
+'''8.''' Done.
 
 The VPN-Gateway configuration is complete.
 }}
 
 Notes:
 
-* No DNS configuration is required when using a separate VPN Gateway and system DNS should work out of the box. <ref>This is because a properly configured Qubes VPN-Gateway will be able to resolve DNS.</ref>
+* No DNS configuration is required when using a separate VPN Gateway and system DNS should work out of the box. <ref>
+This is because a properly configured Qubes VPN-Gateway will be able to resolve DNS.
+</ref>
 * For troubleshooting, see footnote. <ref>
 * Check the VPN-Gateway is fully functional. Test connectivity from inside the VPN-Gateway.
-* When testing the VPN connection <u>do not</u> add any VMs that have been previously used for non-anonymous activities behind the VPN-Gateway. This will burn the VPN, making it unsuitable for use with {{project_name_long}}!
+* When testing the VPN connection <u>do not</u> add any VMs that have been previously used for non-anonymous activities behind the VPN-Gateway. This will burn the VPN, making it unsuitable for use with {{project_name_short}}!
 * Create a fresh, newly created VM if intending to use a non-{{project_name_short}} VM behind the VPN-Gateway for testing purposes.
 </ref>
 * {{project_name_short}} user forum discussion: [https://forums.whonix.org/t/setup-a-vpn-in-proxyvm-over-{{project_name_gateway_vm}} Set up a VPN in ProxyVM over {{project_name_gateway_vm}}] <ref>
 * Qubes users mailing list discussion: https://groups.google.com/g/qubes-users/c/AXOwf1f9jd0/m/UkHwQmKVQQAJ
-* Qubes development ticket: https://github.com/QubesOS/qubes-issues/issues/2060</ref>
-* The following warning will appear when using [[Tor Browser]] and is expected (see technical footnote): <ref>This is because Tor Browser can no longer access Tor's ControlPort ([[Dev/onion-grater|onion-grater]]) on {{project_name_gateway_short}}.</ref>
+* Qubes development ticket: https://github.com/QubesOS/qubes-issues/issues/2060
+</ref>
+* The following warning will appear when using [[Tor Browser]] and is expected (see technical footnote): <ref>
+This is because Tor Browser can no longer access Tor's ControlPort ([[Dev/onion-grater|onion-grater]]) on {{project_name_gateway_short}}.
+</ref>
 
 <i><pre>
 Something Went Wrong!

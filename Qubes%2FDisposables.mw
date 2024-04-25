@@ -99,27 +99,35 @@ Live ISO:
 |-
 
 ! scope="row"| Ephemeral {{project_name_gateway_short}} ProxyVMs
-| Using Disposables for both the {{project_name_short}} Gateway and Workstation in Qubes <u>does not</u> increase security without any corresponding privacy downside, for the following reasons: <ref>[[#Warnings|Disposables are not Amnesic]].</ref> <ref>https://github.com/QubesOS/qubes-issues/issues/904</ref> <ref>[[Tor_Entry_Guards|Tor Entry Guards]].</ref> <br />
-* Disposables are not amnesic. In practice this means traces of their activity can be left on storage or in memory, making them vulnerable to forensic operations. <ref>This is another reminder of why full disk encryption should always be used on the host.</ref> <br />
-* Using a Disposable for the {{project_name_gateway_short}} results in [[Tor_Entry_Guards#Configure_Non-Persistent_Entry_Guards|non-persistent entry guards]] to the Tor network; behavior unlike the default configurations for {{project_name_short}}, Tor, and the Tor Browser Bundle. Mathematically speaking, end-to-end correlation attacks are ''more'' likely to succeed when a user chooses many random entry and exit points in the Tor network, rather than semi-permanent entry guards which are only rotated every few months. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/8240</ref> <ref>The reason is there are both malicious and benign guards in the Tor network. The more often the user "rolls the dice" (changes guards), the greater the chance of striking out.</ref> <br />
+| Using Disposables for both the {{project_name_short}} Gateway and Workstation in Qubes <u>does not</u> increase security without any corresponding privacy downside, for the following reasons: <ref>[[#Warnings|Disposables are not Amnesic]].</ref> <ref>https://github.com/QubesOS/qubes-issues/issues/904</ref> <ref>[[Tor_Entry_Guards|Tor Entry Guards]].</ref>
+* Disposables are not amnesic. In practice this means traces of their activity can be left on storage or in memory, making them vulnerable to forensic operations. <ref>This is another reminder of why full disk encryption should always be used on the host.</ref>
+* Using a Disposable for the {{project_name_gateway_short}} results in [[Tor_Entry_Guards#Configure_Non-Persistent_Entry_Guards|non-persistent entry guards]] to the Tor network; behavior unlike the default configurations for {{project_name_short}}, Tor, and the Tor Browser Bundle. Mathematically speaking, end-to-end correlation attacks are ''more'' likely to succeed when a user chooses many random entry and exit points in the Tor network, rather than semi-permanent entry guards which are only rotated every few months. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/8240</ref> <ref>The reason is there are both malicious and benign guards in the Tor network. The more often the user "rolls the dice" (changes guards), the greater the chance of striking out.</ref>
 * See additional footnote. <ref>The solution to the first problem is only allowing [https://github.com/QubesOS/qubes-issues/issues/904 in-RAM execution of Disposables], but this is not planned for implementation in the short-term. There is no perfect solution to the second problem. That said, there is an actual unstated security-privacy trade-off by running this configuration. Theoretically, an ephemeral {{project_name_gateway_short}} ProxyVM is only able to be infected for a single session (via the ''/home'', ''/usr/local'' and ''/rw'' directories), since it is discarded upon shutdown. This provides a counterbalance to the increased threat of malicious guards, as [https://gitlab.tails.boum.org/tails/blueprints/-/wikis/persistent_Tor_state/ {{project_name_short}} becomes more "Tails-like"].</ref>
-|-
-
-! scope="row"| Named Disposables: Manual Shutdown
-| Unlike Disposables spawned from the {{project_name_short}} default Disposable Template,<ref>See [[#User_Tips|Disposable Shutdown]] for more on this.</ref> named Disposables do <u>not</u> automatically shutdown when the first user process is terminated. If a fresh Named Disposable is needed, users must first shutdown the named Disposable and start a new Disposable instance. <ref>This is because named Disposables are created using a similar method to that which is used to create App Qubes. This means that named Disposables -- in <u>some</u> respects -- exhibit behavior similar to that of an App Qube. For example, behavior such as persistent VM settings across restarts; this includes, but is not limited to settings like --netvm, --autostart and --label to name a few. Before starting a new named Disposable instance, first verify in Qube Manager that the VM is fully shutdown.</ref> Failure to do so could lead to session data from previous activities persisting until the Disposable is properly shutdown.
 |-
 
 ! scope="row"| Spawning Disposables
 |
-* If a Disposable is spawned from within a VM that is not connected to {{project_name_gateway_short}}, the new Disposable may route its traffic over clearnet. <ref>Disposables are created in one of two ways:
+* Word definition. What does Spawning Disposables mean? For example using <code>qvm-open-in-dvm</code> or right click context menu in certain file manages for which Qubes provides integration.
+* If a Disposable is spawned from within a VM that is not connected to {{project_name_gateway_short}}, the new Disposable may route its traffic over clearnet. <ref>
+Disposables are created in one of two ways:
 <code>Open in Disposable</code>. On the command line (domU), run.
 {{CodeSelect|code=
 qvm-open-in-dvm
 }}
 </pre><code>Edit/View in Disposable</Code>. From the GUI context-menu (domU).
-<code>File</code> &rarr; <code>Actions</code> &rarr; <code>Edit/View in Disposable</code></pre>  </ref> <br />
-* The reason is because Disposables inherit their NetVMs from the calling VM, or the calling VM's <code>dispvm_netvm</code> setting (if different). The <code>dispvm_netvm</code> setting can be configured per VM via: <code>dom0</code> &rarr; <code>Qube Manager</code> &rarr; <code>VM Settings</code> &rarr; <code>Advanced</code> &rarr; <code>NetVM for Disposable</code> <ref>On the command line (dom0), run. {{CodeSelect|code=qvm-prefs -s vmname dispvm_netvm {{project_name_gateway_vm}}}} </ref> <br />
+<code>File</code> &rarr; <code>Actions</code> &rarr; <code>Edit/View in Disposable</code></pre>
+</ref>
+* The reason is because Disposables inherit their NetVMs from the calling VM, or the calling VM's <code>dispvm_netvm</code> setting (if different). The <code>dispvm_netvm</code> setting can be configured per VM via: <code>dom0</code> &rarr; <code>Qube Manager</code> &rarr; <code>VM Settings</code> &rarr; <code>Advanced</code> &rarr; <code>NetVM for Disposable</code> <ref>On the command line (dom0), run. {{CodeSelect|code=qvm-prefs -s vmname dispvm_netvm {{project_name_gateway_vm}}}}
+</ref>
 * If the calling VM is connected to {{project_name_gateway_short}}, this step is not necessary and the Disposable's traffic will be routed over Tor. See: [https://github.com/QubesOS/qubes-issues/issues/1954 {{project_name_short}} default NetVM settings fixes].
+|-
+
+! scope="row"| Named Disposables: Manual Shutdown
+| Unlike Disposables spawned from the {{project_name_short}} default Disposable Template, <ref>
+See [[#User_Tips|Disposable Shutdown]] for more on this.
+</ref> named Disposables do <u>not</u> automatically shutdown when the first user process is terminated. If a fresh Named Disposable is needed, users must first shutdown the named Disposable and start a new Disposable instance. <ref>
+This is because named Disposables are created using a similar method to that which is used to create App Qubes. This means that named Disposables -- in <u>some</u> respects -- exhibit behavior similar to that of an App Qube. For example, behavior such as persistent VM settings across restarts; this includes, but is not limited to settings like --netvm, --autostart and --label to name a few. Before starting a new named Disposable instance, first verify in Qube Manager that the VM is fully shutdown.
+</ref> Failure to do so could lead to session data from previous activities persisting until the Disposable is properly shutdown.
 |-
 
 ! scope="row"| Tor Browser in a Disposable Template
@@ -131,13 +139,13 @@ qvm-open-in-dvm
 
 ! scope="row"| Tor Browser Version
 |
-* When using Disposables, use the [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] daily to check the browser is up-to-date! <br />
+* When using Disposables, use the [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] daily to check the browser is up-to-date!
 * To learn about recent Tor Browser versions, follow [https://blog.torproject.org The Tor Project blog]. Tor Browser's version number can also be checked manually: <code>Tor Browser</code> &rarr; <code>Menu</code> &rarr; <code><u>H</u>elp</code> &rarr; <code>About Tor Browser</code>. See [[#Keep Tor Browser Up-to-date|Keep Tor Browser Up-to-date]].
 |-
 
 ! scope="row"| Verify Disposable Status
 |
-* Use caution when spawning a Disposable for the first time when it is based on a freshly created Disposable Template. This [https://github.com/QubesOS/qubes-issues/issues/3574 Qubes bug] can lead to the Disposable Template starting instead of the Disposable. <ref>https://forums.whonix.org/t/whonix-14-starting-a-whonix-14-dispvm-actually-starts-the-templatebasedvm-instead/5579</ref> <ref>After creation of a new Disposable Template, all VMs spawned from the Disposable Template should be Disposables by design. This includes the first start and all subsequent starts thereafter. While this is expected behavior, it is safest to confirm the Disposable was correctly spawned on each occasion it is used.</ref> There could be serious consequences if an application like Tor Browser was started in a Disposable Template and used extensively for web browsing. Compromise of the Disposable Template would mean all Disposables spawned from it would be similarly compromised; see [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]]. <br />
+* Use caution when spawning a Disposable for the first time when it is based on a freshly created Disposable Template. This [https://github.com/QubesOS/qubes-issues/issues/3574 Qubes bug] can lead to the Disposable Template starting instead of the Disposable. <ref>https://forums.whonix.org/t/whonix-14-starting-a-whonix-14-dispvm-actually-starts-the-templatebasedvm-instead/5579</ref> <ref>After creation of a new Disposable Template, all VMs spawned from the Disposable Template should be Disposables by design. This includes the first start and all subsequent starts thereafter. While this is expected behavior, it is safest to confirm the Disposable was correctly spawned on each occasion it is used.</ref> There could be serious consequences if an application like Tor Browser was started in a Disposable Template and used extensively for web browsing. Compromise of the Disposable Template would mean all Disposables spawned from it would be similarly compromised; see [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]].
 * To check the freshly started VM is a Disposable, verify it is named <i>[disp xxxx]</i> where <i>xxxx</i> is the number assigned to that Disposable. If the Disposable Template was started instead, then it should be shut down immediately. If the Disposable Template is ever inadvertently used for a dangerous activity like web browsing, then delete it and create a new one. This issue might be fixed in Qubes R4.2. This issue is likely not fixed in Qubes R4.1. Once Qubes-Whonix 16 for Qubes R4.1 has been deprecated, this warning can be removed.
 |-
 

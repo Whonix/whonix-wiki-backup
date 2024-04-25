@@ -61,19 +61,23 @@ As we move closer to the next ESR transition, this year it is beginning at Firef
 * Chaining medium/low vulnerabilities together to achieve an exploit like remote code execution; this provides a permanent window of opportunity.
 * Attacking other unknown or unpatched Firefox vulnerabilities (since it relies on a huge number of libraries) which may exist for an extended period.
 
-{{project_name_short}} developer madaidan has also noted that Firefox lacks many security features that are available in other browsers like Chromium. Firstly the sandbox is relatively weak, for example:
+madaidan has also noted that Firefox lacks many security features that are available in other browsers like Chromium. Firstly the sandbox is relatively weak, for example:
+
 * Sandbox escapes in Linux are relatively easy and it can be escaped through common Linux sandbox escape vectors like X11, PulseAudio and so on.
 * The seccomp filter is more permissive.
 * Dangerous system calls are available in the Windows sandbox.
 * Firefox has a much less granular process model.
 
 In addition, many exploit mitigations are missing in Firefox:
+
 * Arbitrary Code Guard (ACG) and Code Integrity Guard (CIG) are not yet available to prevent execution of malicious code following a ROP/JOP chain to transition memory pages to executable.
 * Control-Flow Integrity (CFI) has not yet been implemented to prevent code reuse attacks based on [https://resources.infosecinstitute.com/topic/return-oriented-programming-rop-attacks/ Return-Oriented Programmming (ROP)] or [https://web.archive.org/web/20180405003817/https://www.csc2.ncsu.edu/faculty/xjiang4/pubs/ASIACCS11.pdf Jump-Oriented Programming (JOP)].
 * The JIT engine includes far less mitigations than other browsers. Examples of such missing mitigations include constant blinding or NOP insertion.
 * There is no hardened memory allocator. More specifically, mozjemalloc's in-line metadata, weak memory partitioning, lack of guard pages and various other protections make heap exploitation significantly easier.
 
-Despite Tor Browser’s various security weaknesses, alternative browsers should not be used in the {{project_name_short}} platform because this would pose a serious [[Comparison_with_Others#Fingerprint|fingerprinting risk]]. Further, users may be exposed to critical unpatched vulnerabilities in alternatives, <ref>In recent history remotely exploitable vulnerabilities remained unpatched in Linux repositories for extended periods for alternative browsers (like Chromium), see: https://forums.whonix.org/t/chromium-browser-for-kicksecure-discussions-not-whonix/10388/82.</ref> while proprietary browsers like Chrome are antithetical to privacy.
+Despite Tor Browser’s various security weaknesses, alternative browsers should not be used in the {{project_name_short}} platform because this would pose a serious [[Comparison_with_Others#Fingerprint|fingerprinting risk]]. Further, users may be exposed to critical unpatched vulnerabilities in alternatives, <ref>
+In recent history remotely exploitable vulnerabilities remained unpatched in Linux repositories for extended periods for alternative browsers (like Chromium), see: https://forums.whonix.org/t/chromium-browser-for-kicksecure-discussions-not-whonix/10388/82.
+</ref> while proprietary browsers like Chrome are antithetical to privacy.
 
 == All my traffic is encrypted by default == 
 

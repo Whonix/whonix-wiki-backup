@@ -125,7 +125,7 @@ bisq key change 2023 09 02 archive:
 | text    = 
 
 * '''Bisq <u>1</u>:''' '''Recommended.''' Stable version. Instructions on this wiki page for Bisq 1 might work.
-* '''Bisq <u>2</u>:''' '''Discouraged.''' Beta version. Developers only! Instructions on this wiki page for Bisq 2 will probably not work. At time of writing, [https://bisq.network/blog/bisq-2-now-in-beta/ Bisq 2 was still in beta]. Additionally there have been two bugs [https://github.com/bisq-network/bisq2/issues/1798 Fix startup issues of Tor] (issue says fixed but no new version containing the fix was available at time of writing) and [https://github.com/bisq-network/bisq2/issues/1894 Cannot run on Whonix 17].
+* '''Bisq <u>2</u>:''' '''Discouraged.''' Beta version. Developers only! Instructions on this wiki page for Bisq 2 will probably not work. At time of writing, [https://bisq.network/blog/bisq-2-now-in-beta/ Bisq 2 was still in beta]. Additionally there have been two bugs [https://github.com/bisq-network/bisq2/issues/1798 Fix startup issues of Tor] (issue says fixed but no new version containing the fix was available at time of writing) and [https://github.com/bisq-network/bisq2/issues/1894 Cannot run on Whonix 17]. Upstream in the ticket, quote "added priority tor labels last week". So let's see what upstream is going to do and when. No additional information available. All communications happen in public.
 }}
 
 '''4.''' Done.
@@ -187,7 +187,7 @@ mkdir -p /home/user/.local/share/Bisq2/tor/
 sudo ln -s /usr/bin/tor /home/user/.local/share/Bisq2/tor/tor
 }}
 
-Why is this needed? <ref>
+Why is this needed? Optional. See footnote for reasons why. Users can skip this step. <ref>
 * Users: Ignore this footnote
 * Developers: For an explanation which might be interesting for developers only, see below. 
 
@@ -214,26 +214,36 @@ sudo mkdir -p /usr/share/desktop-directories
 }}
 
 === Install ===
+==== Platform Specific Steps ====
+* [[Non-Qubes-Whonix]]: No special steps required. Go to next chapter.
+* [[Qubes-Whonix]]: See below.
 
-For '''{{q_project_name_long}}''' you need create binding dirs in VM:
+On {{project_name_workstation_short}} <code>anon-bisq</code> App Qube.
 
-{{CodeSelect|code=
-## Bisq 1:
+You need to extend the bind-dirs configuration inside the VM.
+
+* Bisq 1: 
+** {{CodeSelect|code=
 sudo mkdir -p /rw/bind-dirs/opt/bisq
-## Bisq 2:
+}}
+* Bisq 2:
+** {{CodeSelect|code=
 sudo mkdir -p /rw/bind-dirs/opt/bisq2
-
+}}
+** {{CodeSelect|code=
 sudo mkdir -p /rw/bind-dirs/usr/share/desktop-directories
+}}
+** {{CodeSelect|code=
 sudo mkdir -p /rw/config/qubes-bind-dirs.d
 }}
 
-Then create the configuration file:
+Bisq 1 and Bisq 2: Then create the configuration file:
 
 {{CodeSelect|code=
 sudo nano /rw/config/qubes-bind-dirs.d/50_user.conf
 }}
 
-And specify which system folders are mapped to binding dirs — write there two lines and save:
+Paste.
 
 {{CodeSelect|code=
 ## Bisq 1:
@@ -244,8 +254,11 @@ binds+=( '/opt/bisq2' )
 binds+=( '/usr/share/desktop-directories' )
 }}
 
-Restart the qube to apply the binding dir settings.
+Save and exit.
 
+Restart the App Qube to apply the bind-dirs settings.
+
+=== Installation Command ===
 '''On {{project_name_workstation_short}}.'''
 
 Install Bisq.
