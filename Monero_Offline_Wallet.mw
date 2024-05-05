@@ -180,7 +180,29 @@ systemctl --user enable monerod
 systemctl --user restart monerod
 }}
 
-'''8.''' Done.
+'''8.''' Create folder <code>/rw/usrlocal/etc/qubes-rpc</code>.
+
+{{CodeSelect|code=
+sudo mkdir -p /rw/usrlocal/etc/qubes-rpc
+}}
+
+'''9.''' {{Open with root rights
+|filename=/rw/usrlocal/etc/qubes-rpc/user.monerod
+}}
+
+'''10.''' Add this line:
+
+{{CodeSelect|code=
+socat STDIO TCP:localhost:18081
+}}
+
+'''11.''' Make the <code>/rw/usrlocal/etc/qubes-rpc/user.monerod</code> script executable.
+
+{{CodeSelect|code=
+sudo chmod +x /rw/usrlocal/etc/qubes-rpc/user.monerod
+}}
+
+'''12.''' Done
 
 Creation and configuration of <code>monero<u>d</u></code> systemd user unit has been completed.
 
@@ -397,7 +419,6 @@ Secret view key: 89298e00f35bd89928b23d8a199bcfb49c61d63e242ffe0ca6b235cc0ddb870
 Enter a new password for the wallet:
 Confirm password:
 Generated new wallet: 496qfvthZzy99adqviEhoDdFivmwcDH3vBZvPRSX8V6VScBTkR2VuMdb8xEgeMjyPqCigRfBK4cfrEXiX6YEdkF55rWD2Rq
-Error: wallet failed to connect to daemon: http://localhost:18081. Daemon either is not started or wrong port was passed. Please make sure daemon is running or change the daemon address using the 'set_daemon' command.
 Restore from specific blockchain height (optional, default 0):
 The daemon is not set up to background mine.
 With background mining enabled, the daemon will mine when idle and not on battery.
@@ -405,7 +426,6 @@ Enabling this supports the network you are using, and makes you eligible for rec
 Do you want to do it now? (Y/Yes/N/No): : n
 Background mining not enabled. Set setup-background-mining to 1 to change.
 If you are new to Monero, type "welcome" for a brief overview.
-Error: wallet failed to connect to daemon: http://localhost:18081. Daemon either is not started or wrong port was passed. Please make sure daemon is running or change the daemon address using the 'set_daemon' command.
 Background refresh thread started
 </pre>
 
