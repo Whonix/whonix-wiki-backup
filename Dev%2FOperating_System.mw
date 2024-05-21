@@ -507,14 +507,37 @@ forum discussion:<br />
 https://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446
 
 == Why is {{project_name_short}} based on Debian Stable, not Debian Testing? ==
-* Sometimes severe bugs are introduced in Debian testing, such as the AppArmor [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=732578 bug], which prevented Tor from starting for everyone until a workaround was applied.
-* Sometimes bugs are introduced which break {{project_name_short}} build script, such as [https://web.archive.org/web/20220322233757/https://ml.grml.org/pipermail/grml/2014-January/011546.html this] bug related to mount, which breaks grml-debootstrap and therefore {{project_name_short}} build script or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=734794 this] kpartx bug.
-* Often other disturbing bugs are introduced, such as the grub bug (not able to reproduce and report upstream yet), non-functional VirtualBox Guest Additions or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=728399 issues] with shared folders.
-* Sometimes packages get entirely removed from Debian testing, such as enigmail wasn't available for a while in Debian testing. This is confusing and constantly creating support requests.
-* Too often, too many packages are upgraded (not just security fixes) (costs lots of time to keep up, bandwidth, system load).
-* Quote, [https://www.debian.org/security/faq.html#testing Debian Security FAQ]:
+A long time ago, {{project_name_short}} was based on Debian Testing. Due to many issues documented below, for many releases already, {{project_name_short}} is based on Debian Stable.
+
+* <u>Connectivity breaking bugs:</u> Sometimes severe bugs are introduced in Debian testing, such as the AppArmor [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=732578 bug], which prevented Tor from starting for everyone until a workaround was applied.
+* <u>Build process breaking bugs:</u> Sometimes bugs are introduced which break derivative-maker (build script), such as [https://web.archive.org/web/20220322233757/https://ml.grml.org/pipermail/grml/2014-January/011546.html this] bug related to mount, which breaks grml-debootstrap and therefore derivative-maker or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=734794 this] kpartx bug.
+* <u>Boot breaking bugs:</u> Often other disturbing bugs are introduced, such as the grub bug (not able to reproduce and report upstream yet).
+* <u>VirtulaBox Guest Additions breaking bugs:</u> Non-functional [[VirtualBox/Guest_Additions|VirtualBox Guest Additions]] or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=728399 issues] with shared folders.
+* <u>Higher upgrade time effort:</u> Too often, too many packages are upgraded (not just security fixes) (costs lots of time to keep up, bandwidth, system load).
+** <u>Lack of security support:</u> Quote, [https://www.debian.org/security/faq.html#testing Debian Security FAQ]:
 <blockquote>If you want to have a secure (and stable) server you are strongly encouraged to stay with stable.</blockquote>
-* Debian stable receives security fixes faster than Debian testing. For example, by 12/15/2016 Debian {{Stable project version based on Debian codename}} was Debian stable and Debian stretch was Debian testing. [https://lists.debian.org/debian-security-announce/2016/msg00316.html CVE-2016-1252] was fixed in Debian stable but not in Debian testing, see Debian security tracker by 12/15/2016].
+** Debian stable receives security fixes faster than Debian testing. For example, by 12/15/2016 Debian {{Stable project version based on Debian codename}} was Debian stable and Debian stretch was Debian testing. [https://lists.debian.org/debian-security-announce/2016/msg00316.html CVE-2016-1252] was fixed in Debian stable but not in Debian testing, see Debian security tracker by 12/15/2016].
+* <u>Permanent package removal:</u> Sometimes packages get entirely removed from Debian testing, such as enigmail wasn't available for a while in Debian testing.
+** <u>Support request overhead:</u> This is confusing and constantly creating support requests.
+* <u>(Temporary) package removal:</u> Sometimes packages are (temporarily) removed from Debian testing.
+
+** For example torsocks has been removed from Debian bookworm.
+*** https://bugs.debian.org/1066313
+*** https://web.archive.org/web/20240518161618/https://release.debian.org/britney/update_excuses.html#torsocks
+*** https://web.archive.org/web/20240520135347/https://qa.debian.org/excuses.php?package=torsocks
+
+<blockquote>torsocks (- to 2.4.0-1)<br />
+Migration status for torsocks (- to 2.4.0-1): BLOCKED: Rejected/violates migration policy/introduces a regression<br />
+Issues preventing migration:<br />
+Updating torsocks would introduce bugs in testing: [https://web.archive.org/web/20240520135343/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1066313 #1066313]
+</blockquote>
+
+*** Quote https://web.archive.org/web/20240520134953/https://tracker.debian.org/pkg/torsocks
+
+<blockquote>The package has not entered testing even though the delay is overnormal<br />
+The package has not entered testing even though the 5-day delay is over. Check why.</blockquote>
+*** Such package removal would break the {{project_name_short}} build process due to the missing dependency. ({{project_name_short}} package <code>uwt</code> (implements stream isolation) <code>Depends:</code> on <code>torsocks:</code>.)
+*** <u>System upgrade breaking bugs:</u> Such package removal can break system [[update]]s (<code>apt-get dist-upgrade</code>) due to missing dependencies. (Kicksecure or Whonix packages are often depending on such packages.)
 
 == Debian Rolling ==
 Does not exist.

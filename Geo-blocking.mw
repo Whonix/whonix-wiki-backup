@@ -4,15 +4,16 @@ title=Geo-blocking - Unreachable Websites
 }}
 {{#seo:
 |description=A website is unreachable? Shows access denied or a captcha?
-|image=xFmCp.png
+|image=Impossible-captcha-recaptcha.png
 }}
-[[File:xFmCp.png|thumb|example [[#Captcha_Images|captcha]]]]
+{{browser_mininav}}
+[[File:Impossible-captcha-recaptcha.png|thumb|example [[#Captcha_Images|captcha]]]]
 {{intro|
 A website is unreachable? Shows access denied or a captcha?
 }}
 = General Issue =
 {{quotation
-|quote=A website I am trying to reach is blocking access over Tor.
+|quote='''A website I am trying to reach is blocking access over Tor.'''
 
 Sometimes websites will block Tor users because they can't tell the difference between the average Tor user and automated traffic. The best success we've had in getting sites to unblock Tor users is getting users to contact the site administrators directly. Something like this might do the trick:
 
@@ -60,16 +61,28 @@ This issue is [[unspecific|unspecific to {{project_name_short}}]] and specific t
 Can {{project_name_short}} be the cause of the inability to access specific destination websites? No. If connectivity is generally functional (some websites can be reached), never in the history of {{project_name_short}}, any website were reachable in [[Install_Tor_Browser_Outside_of_Whonix|Tor Browser outside of {{project_name_short}} (such as Tor Browser on Debian)]] while unreachable in Tor Browser inside of {{project_name_short}}. Neither the [[Tor_Browser#{{project_name_short}} Tor Browser Differences|{{project_name_short}} Tor Browser Differences]] nor {{project_name_short}} firewall discriminate against specific websites.
 
 = Different Treatment of Tor Browser Versus Other Applications =
-A potential cause for confusion is the following. Cloudflare treats [[Tor Browser]] users different than [[Other Browsers|other browsers]] (such as Firefox) or command line substitutes (such as curl) when being used over Tor. Quote Cloudflare [https://blog.cloudflare.com/cloudflare-onion-service/ Introducing the Cloudflare Onion Service]:
+A potential cause for confusion is the following: Cloudflare treats [[Tor Browser]] users differently than [[Other Browsers|other browsers]] (such as Firefox) or command line substitutes (such as curl) when being used over Tor. Cloudflare discusses this in their announcement of the Cloudflare Onion Service:
 
-<blockquote>Today’s edition of the Crypto Week introduces an “opportunistic” solution to this problem, so that under suitable conditions, anyone using Tor Browser 8.0 will benefit from improved security and performance when visiting Cloudflare websites without having to face a CAPTCHA.</blockquote>
+{{quotation
+|quote=Today’s edition of the Crypto Week introduces an “opportunistic” solution to this problem, so that under suitable conditions, anyone using Tor Browser 8.0 will benefit from improved security and performance when visiting Cloudflare websites without having to face a CAPTCHA.
+|context=[https://blog.cloudflare.com/cloudflare-onion-service/ Introducing the Cloudflare Onion Service]
+}}
 
-It is therefore possible that some websites can be visited with Tor Browser while attempting to fetch these websites with command line utilities such as curl would lead to a different result, a captcha.
+It is therefore possible that some websites can be visited with Tor Browser while attempting to fetch these websites with command line utilities such as curl would lead to a different result, specifically a captcha.
 
 = Bypass Tor Censorship =
-There are various ad-hoc methods available to try and circumvent blocks. In most cases it is unnecessary to [[Tunnels/Introduction|create a tunnel]] which pairs {{project_name_short}} with other protocols (such as a VPN) in order to access the content.
+There are various ad-hoc methods available to try and circumvent blocks. Method A) <u>or</u> B). Choose one.
 
-The following services fetch content via other websites, which is a privacy trade-off. Further, only some services are effective with embedded, non-static content or support specific file types like PDF, <code>.exe</code> and <code>mp3</code>. <ref>
+* '''A)''' <u>create a tunnel</u>
+
+[[Tunnels/Introduction#Connecting_to_a_Tunnel-link_.28Proxy.2FVPN.2FSSH.29_before_Tor|Connecting to a Tunnel-link (Proxy/VPN/SSH) before Tor]].<br />
+Connection Scheme: '''<code>User</code> &rarr; <code>Tor</code> &rarr; <code>proxy/VPN/SSH</code> &rarr; <code>Internet</code>'''
+
+In most cases it is unnecessary to create a tunnel which pairs {{project_name_short}} with other protocols (such as a VPN) in order to access the content.
+
+* '''B)''' <u>fetch content via other websites</u>
+
+The following services fetch content via other websites, which is a privacy trade-off. Furthermore, only some services are effective with embedded, non-static content or support specific file types like PDF, <code>.exe</code>, and <code>mp3</code>. <ref>
 https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlockingTor#ad-hoc-solutions-for-accessing-blocked-content-on-tor
 </ref>
 
@@ -88,7 +101,7 @@ https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlocking
 ! scope="col"| '''PDF, .exe, mp3'''
 |-
 
-! scope="row"| The Internet Archive's WaybackMachine
+! scope="row"| The Internet Archive's Wayback Machine
 | <code><nowiki>https://</nowiki>web.archive.org/web/<b><u><URL></u></b></code><br/>
 <code><nowiki>https://</nowiki>web.archive.org/save/_embed/<b><u><URL></u></b></code>
 | Archive.org respects robots.txt restrictions, works best with JS enabled
@@ -113,9 +126,9 @@ https://gitlab.torproject.org/legacy/trac/-/wikis/org/doc/ListOfServicesBlocking
 ! scope="row" | Startpage.com
 |
 # Go to {{Archive_link|url=https://www.startpage.com/|archive=none|text=startpage.com}}
-# Find the URL by searching for the URL
-# Click on the Anonymous View mask icon (proxy option) next to the search result <ref>
-Note the icon is not visible with Tor Browser's security slider set to safest, but can still be clicked. [https://support.startpage.com/hc/en-us/articles/4521579122964-How-to-use-Anonymous-View Startpage documentation] states: <blockquote>Pages viewed through the proxy are served to you anonymously. No connection is made between your computer and the remote site. Because of their potential for being used to identify you, JavaScript is modified and cookies are disabled for proxied pages.</blockquote>
+# Find the URL by searching
+# Click on the Anonymous View mask icon next to the search result <ref>
+Note: The icon is not visible with Tor Browser's security slider set to safest, but can still be clicked. [https://support.startpage.com/hc/en-us/articles/4521579122964-How-to-use-Anonymous-View Startpage documentation] states: <blockquote>Pages viewed through the proxy are served to you anonymously. No connection is made between your computer and the remote site. Because of their potential for being used to identify you, JavaScript is modified and cookies are disabled for proxied pages.</blockquote>
 </ref>
 | Not always efficacious
 | No
@@ -160,7 +173,7 @@ imgur.com blocks Tor uploads, to upload images on an imgur domain go to a stacke
 = Impact on Anonymity =
 In short: None. Geo-blocking has no influence on the anonymity provided by Whonix.
 
-[[Reliable_IP_Hiding|Whonix provides reliable IP hiding]], but cannot make [[Data_Collection_Techniques#IP_Address|IP address]]. completely disappear. This is impossible. No tool can do this.
+[[Reliable_IP_Hiding|Whonix provides reliable IP hiding]], but cannot make [[Data_Collection_Techniques#IP_Address|IP address]] completely disappear. This is impossible. No tool can do this.
 
 There are two distinct strategies for user anonymization.
 
@@ -171,16 +184,17 @@ https://www.freehaven.net/anonbib/cache/usability:weis2006.pdf
 
 Since {{project_name_short}} is based on Tor ([[Why does Whonix use Tor|why?]]), it aims to enhance the functionality of [[Tor]], embracing similar design principles.
 
-The IPs of Tor exit relays is public known information. This is why [[#Censors|censors]] can easily download the list of Tor related IP addresses and block these.
+The IPs of Tor exit relays are publicly known. This is why [[#Censors|censors]] can easily download the list of Tor related IP addresses and block these.
 
-related FAQ: [https://support.torproject.org/misc/hide-exits/ You should hide the list of Tor relays, so people can't block the exits.]
+Related FAQ: [https://support.torproject.org/misc/hide-exits/ You should hide the list of Tor relays, so people can't block the exits.]
 
-Whonix is an anonymous operating system, but at time of writing does not focus on geo-blocking circumvention. In the far future, Whonix might implement a feature to make the use of [[Tunnels/Introduction|tunnels]] easier to use.
+Whonix is an anonymous operating system, but as of the time of writing, it does not focus on geo-blocking circumvention. In the future, Whonix might implement a feature to facilitate the use of [[Tunnels/Introduction|tunnels]].
 
 = Captcha Images =
 Captcha are related to geo-blocking. When using a different IP such as by using Tor or a VPN, users are more likely to get pestered with captcha challanges.
 
 <gallery widths=300px heights=300px>
+File:xFmCp.png
 File:impossible-captcha-recaptcha.png
 File:impossible-captcha-tractors.png
 </gallery>
