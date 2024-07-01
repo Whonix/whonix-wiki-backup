@@ -49,7 +49,11 @@ If the user installs custom applications and omits to explicitly take precaution
 
 The following graphic illustrates the difference of using Tor <code>SocksPort</code>'s compared to using Tor's <code>TransPort</code>. Using a dedicated Tor <code>SocksPort</code>'s per application results in taking different routes through the Tor network per application. Not necessarily all Tor relays (first, second, third) get replaced by Tor. Sometimes just the first, sometimes just the second, sometimes just the third, and sometimes multiple Tor relays in the Tor circuit change.
 
-[[Image:stream_isolation.1.0.jpg|frame|none|alt=|Stream Isolation Graphic]]
+This does not necessarily result in using a different [[Tor Entry Guards|Tor Entry Guard]] or Tor exit relay. Therefore a different Tor circuit can ''likely'' lead to using a different Tor exit relay and [[Data_Collection_Techniques#IP_Address|IP Address]], but this is not guaranteed. Related: [[Tips_on_Remaining_Anonymous#Only_Use_One_Online_Pseudonym_at_the_Same_Time|Only Use One Online Pseudonym at the Same Time]]
+
+{{ContentImage|
+[[Image:stream_isolation.1.0.jpg|Stream Isolation Graphic]]
+}}
 
 {{project_name_short}} implements protection against {{Code2|identity correlation through Tor circuit sharing}} for preinstalled applications, however, for better privacy, the user is advised to understand a bit of the technical background. Different <code>SocksPort</code>s, <code>DnsPort</code>s, or <code>TransPort</code>s are routed through different Tor circuits, therefore preventing {{Code2|identity correlation}}.
 
@@ -388,7 +392,7 @@ IsolatePID 1
 # [[Install Software|Install]] custom application.
 # Configure application to use a dedicated Tor <code>SocksPort</code> according to [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO Torify HOWTO] by either configuring the application's proxy settings.
 # protocol: socks 5
-# Platform specific. [[Non-Qubes-Whonix]] proxy IP: {{CodeSelect|code=10.152.152.10}} Qubes-Whonix: Use the IP address returned by running the following command (NOTE: do not use the command itself): {{CodeSelect|code=qubesdb-read /qubes-gateway}}
+# Platform specific. Proxy IP: '''A)''' <u>[[Non-Qubes-Whonix]]</u> {{CodeSelect|code=10.152.152.10}} '''B)''' <u>Qubes-Whonix:</u> Use the IP address returned by running the following command (NOTE: do not use the command itself): {{CodeSelect|code=qubesdb-read /qubes-gateway}}
 # port: {{CodeSelect|code=9153}} (use a different port according to list above if using multiple custom installed applications)
 # Start custom application.
 
@@ -463,6 +467,25 @@ Optional.
 See [https://2019.www.torproject.org/docs/tor-manual.html.en Tor manual] <code>IsolateSOCKSAuth</code>.
 
 <blockquote>Don’t share circuits with streams for which different SOCKS authentication was provided. [...]</blockquote>
+
+== Qubes Specific ==
+=== Qubes UpdatesProxy Stream Isolation ===
+This chapter is for advanced users only.
+
+Platform specific:
+
+* Non-Qubes-Whonix: <code>apt-get</code> is stream isolated by uwt and redirected to Tor <code>SocksPort</code>. (See [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]]) Therefore, every VM is using a different stream, thanks to Tor's default <code>IsolateClientAddr</code> option, which results in different IP source addresses (different internal network VM IPs) getting stream isolated.
+* Qubes-Whonix: Security and stream isolation are unfortunately conflicting goals. Templates in Qubes are non-networked by default for better security because they don't have a network stack, hence a lower attack surface. <code>apt-get</code> is redirected without a network through Qubes qrexec to Whonix-Gateway localhost where Qubes tinyproxy is listening. Therefore, the information of the internal source IP address of the VM is "lost in translation" and not reaching Tor on Whonix-Gateway. Hence, there is no benefit from <code>IsolateClientAddr</code>. Soon (time of writing: 07 June 2024) (in testers repository) [https://github.com/QubesOS/qubes-issues/issues/8398 tinyproxy on Whonix-Gateway has been configured to use a dedicated Tor <code>SocksPort</code>]. That of course does not result in <code>IsolateClientAddr</code>. But at least traffic by tinyproxy is no longer mixed into Tor's <code>TransPort</code> / <code>DnsPort</code>. Unfortunately, all Templates using sys-whonix as UpdatesProxy are mixed into the same stream. In conclusion, stream isolation of <code>apt-get</code> in Qubes-Whonix is a bit worse than stream isolation in Non-Qubes-Whonix. This situation is unlikely to change due to the technical difficulty of improving this unless [[Reporting_Bugs#Contributions|contributed]]. There are no known steps that users could take to improve this situation.
+** Qubes tinyproxy vs apt-cacher-ng?
+*** tinyproxy: Good, can at least use a Tor <code>SocksPort</code>.
+*** apt-cacher-ng: [[Unsupported]]. Unknown if it can use <code>SocksPort</code>. It might support a HTTP proxy so maybe a Tor <code>HTTPTunnelPort</code> could be used. <ref>
+https://forums.whonix.org/t/tor-can-now-serve-as-http-proxy-httptunnelport/5373
+</ref>
+** Qubes-Whonix related:
+*** [https://github.com/QubesOS/qubes-issues/issues/7737 remove tinyproxy from Whonix-Gateway (<code>sys-whonix</code>) and make Whonix Templates networked by default with Net qube set to <code>sys-whonix</code>]
+*** [[Qubes/UpdatesProxy|Qubes-Whonix UpdatesProxy user documentation]]
+*** [[Dev/Qubes#Torified_UpdatesProxy|Torified UpdatesProxy developer documentation]]
+** Future: Maybe in the future after/if [https://github.com/QubesOS/qubes-issues/issues/9294 Create <code>sys-ops-whonix</code> VM for Enhanced Security and Isolation in Qubes-Whonix] gets implemented, <code>sys-ops-whonix</code> could start a new instance of Qubes UpdatesProxy each time it receives a new connection from Qubes qrexec.
 
 == Deactivate Stream Isolation ==
 === Easy ===

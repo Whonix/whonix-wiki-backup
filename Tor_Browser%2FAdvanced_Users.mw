@@ -251,9 +251,13 @@ In {{project_name_short}}, the environment variable export <code>TOR_NO_DISPLAY_
 
 Normally this option in Tor Browser shows the three Tor relays used for the website in the current tab. This includes the IP addresses of each and the countries they are located in, and whether a bridge is being used (see below). The node immediately above the destination website reflects the Tor exit relay. <ref>https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html</ref>
 
-'''Figure:''' ''Tor Circuit View - Disabled in Whonix'' <ref> [https://blog.torproject.org/new-release-tor-browser-80a9 New Release: Tor Browser 8.09a9] License: [https://creativecommons.org/licenses/by/3.0/us/ Creative Commons Attribution 3.0 United States License]</ref>
+'''Figure:''' ''Tor Circuit View - Disabled in Whonix'' <ref>
+[https://blog.torproject.org/new-release-tor-browser-80a9 New Release: Tor Browser 8.09a9] License: [https://creativecommons.org/licenses/by/3.0/us/ Creative Commons Attribution 3.0 United States License]
+</ref>
 
-[[File:Torcircuitviewupdate.png|frame|none|alt=|Tor Browser Bundle's Improved Circuit Display]]
+{{ContentImage|
+[[File:Torcircuitviewupdate.png|Tor Browser Bundle's Improved Circuit Display]]
+}}
 
 The [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] configuration in {{project_name_short}} intentionally does not whitelist the Tor control protocol commands that would be required for Tor Circuit View to function. This information is made unavailable to {{project_name_workstation_short}} because {{project_name_workstation_short}} should not have access to IP address information. If unavailable it cannot leak. Otherwise [[Malware and Firmware Trojans|malicious]] or broken applications could leak it. Users might also unintentionally make screenshots of this information. One of the main advantages of {{project_name_short}} is, that there is no way to determine the real external IP address of the user from within {{project_name_workstation_short}}. Therefore also the IP address of the Tor entry guard or bridge as well as Tor middle relay should be inaccessible from {{project_name_workstation_short}}. Otherwise this information might aid an attacker who gained remote code execution capability within {{project_name_workstation_short}}.
 
@@ -305,6 +309,46 @@ sudo aa-enforce /etc/apparmor.d/home.tor-browser.firefox
 '''4.''' Done.
 
 Tor Browser should now have write access to the <code>/media/sf_shared</code> folder.
+
+= KeePassXC Browser Extension =
+Untested / [[unsupported]].
+
+Discouraged because this might change the browser fingerprint, see [[Tor_Browser#Non-default_Add-ons|Non-default Add-ons]].
+
+KeePassXC Browser Extension developers did at time of writing not address bug report [https://github.com/keepassxreboot/keepassxc/issues/10438 Problems with Tor Browser integration on Linux]. This issue is [[unspecific|unspecific to {{project_name_short}}]].
+
+'''1.''' {{Open with root rights
+|filename=/etc/apparmor.d/local/home.tor-browser.firefox
+}}
+
+'''2.''' Paste.
+
+{{CodeSelect|code=
+/home/user/.mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json rix,
+/usr/bin/keepassxc-proxy rix,
+}}
+
+'''3.''' Save.
+
+'''4.''' Reload the Tor Browser AppArmor profile.
+
+{{CodeSelect|code=
+sudo aa-enforce /etc/apparmor.d/home.tor-browser.firefox
+}}
+
+'''5.''' Symlink.
+
+TODO
+
+Symlink {{CodeSelect|inline=true|code=~/.mozilla/native-messaging-hosts}} to {{CodeSelect|inline=true|code=~/.local/opt/tor-browser/app/Browser/TorBrowser/Data/Browser/.mozilla/native-messaging-hosts}}? TODO: path needs adjustment
+
+See also:
+
+* https://forums.whonix.org/t/keepassxc-browser-doesnt-work-out-of-the-box/16877
+* https://github.com/keepassxreboot/keepassxc-browser/issues/1399#issuecomment-1246145118
+* [https://github.com/keepassxreboot/keepassxc/issues/9679 connection to KeePassXC breaks after Tor Browser updated itself] (describes symlink workaround)
+* https://github.com/keepassxreboot/keepassxc-browser/issues/281
+* https://github.com/keepassxreboot/keepassxc/issues/10866
 
 = Custom Homepage =
 
@@ -1118,7 +1162,10 @@ related: {{kicksecure_wiki
 == Tor Browser vs Firewalls Based Filtering ==
 As mentioned above, Tor Browser uses a Tor <code>SocksPort</code> by default as per upstream default.
 
-<code>iptables</code> and its successor <code>nftables</code> however does not inherently understand application-layer protocols like SOCKS. This is why <code>nftables</code> firewalls are unable to filter Tor Browser's traffic.
+<code>iptables</code> and its successor <code>nftables</code> however does not inherently understand application-layer protocols like SOCKS. This is why <code>nftables</code> firewalls are unable to filter Tor Browser's traffic. See {{kicksecure_wiki
+|wikpage=Socks_firewalling
+|text=SOCKS Firewalling
+}} for a detailed technical explanation.
 
 Firewall (IP, DNS) based filtering and would require either:
 

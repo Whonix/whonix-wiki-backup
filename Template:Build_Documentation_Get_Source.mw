@@ -17,17 +17,23 @@ sudo apt update && sudo apt install git
 '''2.''' Get the source code including git submodules. <ref>
 Optional <code>git</code> parameters:
 
-* <code>--depth=1</code>: Used to speed up download.
-* <code>--branch {{VersionNew}}-stable</code> Usability. Used to speed up download.
-* <code>--jobs=4</code>: Used to speed up download.
+* <code>--depth=1</code>: Used to speed up the download.
+* <code>--branch {{VersionNew}}-stable</code>: Usability. Used to speed up the download.
+* <code>--jobs=4</code>: Used to speed up the download.
 * <code>--recurse-submodules --shallow-submodules</code>: Usability.
 
 Knowledgeable <code>git</code> users are free to drop any of these optional parameters.
 </ref> <ref>
 Alternatively, this can be achieved with the following commands in several steps. This is useful if network issues arise.
 
-{{CodeSelect|code=
+* Over HTTPS:
+** {{CodeSelect|code=
 git clone --depth=1 --branch {{VersionNew}}-stable https://github.com/{{project_name_short}}/derivative-maker.git
+}}
+* Over SSH.
+** Might work better over slow networks but requires a GitHub account and a configured SSH public key at GitHub. See footnote [A] below.
+** {{CodeSelect|code=
+git clone --depth=1 --branch {{VersionNew}}-stable git@github.com:{{project_name_short}}/derivative-maker.git
 }}
 
 {{CodeSelect|code=
@@ -37,6 +43,26 @@ cd derivative-maker
 {{CodeSelect|code=
 git submodule update --init --recursive --progress --jobs=4
 }}
+
+----
+
+[A] GitHub SSH public key setup.
+
+'''1.''' You need to create an SSH public key.
+
+Undocumented.
+
+'''2.''' You view your your SSH public key.
+
+{{CodeSelect|code=
+cat ~/.ssh/id_ed25519.pub
+}}
+
+'''3.''' Copy it.
+
+'''4.''' And paste your the SSH public key on GitHub.
+
+https://github.com/settings/keys
 </ref>
 
 Note: Replace <code>{{VersionNew}}-stable</code> with the actual tag you want to build.
@@ -45,7 +71,72 @@ Note: Replace <code>{{VersionNew}}-stable</code> with the actual tag you want to
 git clone --depth=1 --branch {{VersionNew}}-stable --jobs=4 --recurse-submodules --shallow-submodules https://github.com/{{project_name_short}}/derivative-maker.git
 }}
 
-'''3.''' Done.
+'''3.''' Check if above command succeeded.
+
+If there have been errors such as:
+
+<pre>
+fatal: unable to access 'https://github.com/.../': Could not resolve host: github.com
+</pre>
+
+Or.
+
+<pre>
+fatal: unable to access 'https://github.com/.../': gnutls_handshake() failed: The TLS connection was non-properly terminated. 
+</pre>
+
+Then the download probably failed.
+
+Checking if the download failed or succeeded can be done by checking the exit code.
+
+Choose your shell.
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= ==Zsh in Kicksecure or Derivatives==
+|type=section
+|addToClass=info-box
+|active=true
+|content=
+If the last line contains something such as the following.
+
+<pre>
+zsh: exit 1
+</pre>
+
+Then do not proceed and see footnote. <ref name=git-clone-fail>
+Delete the <code>derivative-maker</code> source code folder and retry.
+
+<pre>
+sudo rm -r derivative-maker
+</pre>
+</ref>
+}}
+{{Tab
+|title= ==bash and other Shells==
+|type=section
+|addToClass=info-box
+|active=false
+|content=
+Show the exit code.
+
+{{CodeSelect|code=
+echo $?
+}}
+
+Output should show.
+
+<pre>
+0
+</pre>
+
+If any other exit code is shown, do not proceed and see footnote. <ref name=git-clone-fail />
+}}
+}}
+
+'''4.''' Done.
 
 Git repository cloning has been completed. <noinclude>
 = Footnotes =

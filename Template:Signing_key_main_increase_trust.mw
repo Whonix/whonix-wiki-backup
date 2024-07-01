@@ -1,0 +1,40 @@
+<noinclude>
+{{Header}}
+</noinclude>Configure the trust level for the GPG key. 
+
+Optional. <ref name=gpg-import-ownertrust>
+The trust level will be increased to <code>ultimately</code>. (This is because the command contains trust level "<code>:6:</code>".)
+<br />
+The purpose of this command is:
+
+* '''A)''' to avoid the following warning when importing the key. And,
+
+<pre>
+gpg: no ultimately trusted keys found
+</pre>
+
+* '''B)''' to avoid the following warning when verifying a file signed by that key.
+
+<pre>
+gpg: WARNING: This key is not certified with a trusted signature! 
+gpg: There is no indication that the signature belongs to the owner.
+</pre>
+
+Advanced users are free to skip this step or use a different GPG trust level.
+</ref>
+
+{{CodeSelect|code=
+echo "916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA:6:" {{!}} gpg --import-ownertrust
+}}
+
+The output should create trustdb.
+
+<pre>
+gpg: /home/user/.gnupg/trustdb.gpg: trustdb created
+gpg: inserting ownertrust of 6
+</pre><noinclude>
+= Footnotes =
+<references />
+{{Footer}}
+[[Category:MultiWiki]]
+</noinclude>

@@ -100,7 +100,20 @@ The message <code>gpg: key 50C78B6F9FF2EC85: 1 signature not checked due to a mi
 Do not continue if the fingerprint does not match! This risks using infected or erroneous files! The whole point of verification is to confirm file integrity.
 }}
 
-'''5.''' Import the key.
+'''5.''' Increase trust for the user GPG to ultimately.
+
+{{CodeSelect|code=
+echo "04EF2F666D36C354058B9DD450C78B6F9FF2EC85:6:" {{!}} gpg --import-ownertrust
+}}
+
+The output should create trustdb.
+
+<pre>
+gpg: /home/user/.gnupg/trustdb.gpg: trustdb created
+gpg: inserting ownertrust of 6
+</pre>
+
+'''6.''' Import the key.
 
 {{CodeSelect|code=
 gpg --import hulahoop.asc
@@ -120,19 +133,9 @@ gpg: Total number processed: 1
 gpg:              unchanged: 1
 </pre>
 
-If the following message appears at the end of the output.
+'''7.''' Advanced users can check [[#Web of Trust|Web of Trust]] further below for better security.
 
-<pre>
-gpg: no ultimately trusted keys found
-</pre>
-
-This extra message does not relate to the {{project_name_short}} signing key itself, but instead usually means the user has not created an OpenPGP key yet, which is of no importance when verifying virtual machine images.
-
-Analyze the other messages as usual.
-
-'''6.''' Advanced users can check [[#Web of Trust|Web of Trust]] further below for better security.
-
-'''7.''' Complete the {{project_name_short}} verification steps.
+'''8.''' Complete the {{project_name_short}} verification steps.
 
 If verifying {{project_name_short}} images, navigate to the relevant verification page below to finish the process:
 

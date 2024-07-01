@@ -216,6 +216,53 @@ The following resources are also recommended reading:
 * [https://community.torproject.org/onion-services/advanced/dos/ The Tor Project: Onion service DoS guidelines] ([http://xmrhfasfg5suueegrnc4gsgyi2tyclcy5oz7f5drnrodmdtob6t2ioyd.onion/onion-services/advanced/dos/index.html .onion])
 * [https://riseup.net/en/security/network-security/tor/onionservices-best-practices Riseup: Best Practices for Hosting Onion Services]
 
+== Setup Overview ==
+'''Optional.'''
+
+In Whonix, server applications typically run in a Whonix-Workstation, while Tor networking is handled by the Whonix-Gateway. This separation enhances security and anonymity.
+
+'''<u>Network Flow:</u>'''
+
+* 1) Tor connections reach the Whonix-Gateway.
+* 2) Whonix-Gateway's Tor forwards connections to the Whonix-Workstation <code>HiddenServicePort</code> <code>TARGET</code> (IP, port) based on the Tor configuration.
+* 3) The Whonix-Workstation's firewall allows these forwarded connections.
+* 4) The server application in the Whonix-Workstation processes the connections.
+
+'''<u>Instructions Overview:</u>'''
+
+<u>NOTE:</u> These is just a short overview. More detailed instructions can be find below. The user can skip reading this chapter.
+
+'''1.''' Install and configure the server application inside Whonix-Workstation.
+
+'''2.''' Configure the application to listen on all network interfaces <code>0.0.0.0</code> inside Whonix-Workstation. For elaboration and alternatives, see footnote. <ref>
+Listening on <code>0.0.0.0</code> means the application will accept connections on any IP address irrespective of Whonix-Workstation actual internal network interface <code>eth0</code> assigned IP address.
+
+Why not listen on localhost <code>127.0.0.1</code> inside Whonix-Workstation?
+
+* Generally, [[unspecific|unspecific to Whonix]]: One computer/VM cannot directly connect to another computer's/VM's localhost.
+* Whonix specific: Tor running on Whonix-Gateway can only connect to the applications on Whonix-Workstation listening on eth0 external network interfaces but not directly to Whonix-Workstation localhost. Therefore application in Whonix-Workstation must not listen on localhost but on eth0.
+
+Alternatives to listening on <code>0.0.0.0</code>:
+
+* '''A)''' It would also be possible for the server application to listen only on Whonix-Workstation internal network interface <code>eth0</code>. This however requires the application to support listening on a network interface rather than a hardcoded IP address. Many applications do not support that.
+* '''B)''' Listen on Whonix-Workstation internal IP address.
+* '''C)''' Listen on localhost <code>127.0.0.1</code> and then use something such as Qubes qrexec to connect Tor's <code>VIRTPORT</code> to the application's listening port.
+</ref>
+
+'''3.''' Edit Whonix-Workstation firewall configuration to open the port.
+
+'''4.''' Reload the Whonix-Workstation firewall to apply the configuration changes.
+
+'''5.''' Edit the Tor configuration file in Whonix-Gateway to add a <code>HiddenServicePort</code> so a Tor onion will opening a listening port on that <code>VIRTPORT</code>.
+
+'''6.''' Reload Tor configuration.
+
+'''7.''' Retrieve the <code>.onion</code> address.
+
+'''8.''' Test.
+
+'''9.''' Done.
+
 == Hidden Webserver ==
 
 === Whonix-Gateway ===
@@ -1000,7 +1047,7 @@ A number of serious onion service concerns <ref>Concerns with v2 onion services 
 {{Anchor|Hidden Service Authentication}}
 
 == Onion Service Authentication Client Setup ==
-There are two options to setup Onion Service Client Authentication. Chose <u>either</u> option '''A)''' <u>or</u> '''B)'''.
+There are two options to setup Onion Service Client Authentication. Choose <u>either</u> option '''A)''' <u>or</u> '''B)'''.
 
 * '''A)''' [[Tor_Browser#Onion_Client_Authorization|Tor Browser Onion Client Authorization]], <u>or</u>
 * '''B)''' [[Onion_Services#Onion_Service_Authentication_Client_Setup|Onion Service Client Authentication setup on {{project_name_gateway_short}}]], see below.

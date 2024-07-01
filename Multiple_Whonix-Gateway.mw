@@ -24,6 +24,7 @@ In this configuration ISPs are probably capable of detecting that two different 
 
 When multiple {{project_name_gateway_short}} are run in parallel, the risks explained in the [[Multiple Whonix-Workstation#Safety_Precautions|Multiple {{project_name_workstation_short}}: Safety Precautions]] section equally apply.
 
+= How to use Multiple Whonix-Gateway =
 Platform specific. Select your virtualizer below.
 
 {{Tab
@@ -31,7 +32,7 @@ Platform specific. Select your virtualizer below.
 |linkid=link1
 |content=
 {{Tab
-|title= = VirtualBox =
+|title= == VirtualBox ==
 |image=[[File:Virtualbox_logo.png|25px]]
 |addToClass=info-box
 |active=true
@@ -54,10 +55,12 @@ For the second, third or n<sup>th</sup> multiple {{project_name_gateway_short}} 
 '''4.''' Change {{project_name_workstation_short}} internal network name.
 
 * <code>VirtualBox</code> &rarr; {{project_name_workstation_short}} &rarr; <code>Settings</code> &rarr; <code>Network</code> &rarr; <code>Adapter '''<u>1</u>'''</code> &rarr; <code>Name:</code> &rarr; change <code>Whonix</code> to the same internal network name as above &rarr; <code>OK</code>
+
+'''5.''' Done.
 }} <!-- close tab: VirtualBox -->
 
 {{Tab
-|title= = KVM =
+|title= == KVM ==
 |image=[[File:Kvm-new-logo.png|25px]]
 |addToClass=info-box
 |content=
@@ -70,9 +73,9 @@ In Virtual Machine Manager: <code>Highlight VM</code> &rarr; <code>Open</code> &
 
 '''2.''' Export {{project_name_short}} internal network settings.
 
-<pre>
+{{CodeSelect|code=
 sudo virsh net-dumpxml Whonix-Internal > Whonix-Internal2.xml
-</pre>
+}}
 
 '''3.''' Edit the network configuration to make it unique.
 
@@ -105,17 +108,17 @@ Therefore, the network name was changed to <code>internal2</code> and the bridge
 
 '''4.''' Import and start the new network.
 
-<pre>
+{{CodeSelect|code=
 virsh -c qemu:///system net-define Whonix-Internal2.xml
-</pre>
+}}
 
-<pre>
+{{CodeSelect|code=
 virsh -c qemu:///system net-autostart Whonix-Internal2
-</pre>
+}}
 
-<pre>
+{{CodeSelect|code=
 virsh -c qemu:///system net-start Whonix-Internal2
-</pre>
+}}
 
 '''5.''' Attach the Gateway and Workstation VM NICs to the new network.
 
@@ -129,11 +132,21 @@ Note that the network is exclusively internal and does not communicate with the 
 '''6.''' Change the number of pinned CPUs.
 
 It is recommended to [[KVM#Editing_an_Imported_Machine.27s_XML_Configuration|edit]] the cloned workstation's configuration and change the number of pinned CPUs to a different value (3 or 4) compared to the existing gateway and primary workstation. This only works if users have a quad-core system.
+
+'''7.''' Setup different external network interfaces.
+
+Required?
+
+[[Undocumented]]. TODO.
+
+forum discussion: https://forums.whonix.org/t/do-multiple-whonix-gateways-require-different-whonix-external-virtual-nics/19903
+
+'''8.''' Done.
 }}
 }} <!-- close tab: KVM -->
 
 {{Tab
-|title= = {{q_project_name_long}} =
+|title= == {{q_project_name_long}} ==
 |image=[[File:Qubes-logo-icon.png|25px]]
 |addToClass=info-box
 |content=

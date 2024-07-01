@@ -31,7 +31,7 @@ Your computer's host clock must have an accuracy of at least ±30 minutes, ideal
 
 * '''Prerequisite knowledge:''' time formats, 12 hours AM/PM, 24 hours format, timezones. (Common knowledge. Not specific to computers.)
 * '''Generic task:''' Check your computer's time and make sure it is reasonably correct.
-* '''Operating system specific.'''
+* '''Operating system specific:''' Select your host operating system.
 
 {{Tab
 |type=controller
@@ -160,17 +160,17 @@ date --utc
 TODO: [https://phabricator.whonix.org/T71 Show desktop clock in local time; keep system in UTC]
 </ref>) <u>is more than 1 hour in the past or more than 3 hours in the future</u>, '''Tor cannot connect'''. <u>In this case,</u>
 
-'''1.''' Manually fix the host clock by right-clicking on it,
+'''1.''' Manually fix the host clock by right-clicking on it.
 
 See detailed instructions [[#Host_Clock|Host Clock]],
 
-'''2.''' and also check for an empty battery. Then,
+'''2.''' Check for an empty BIOS (computer motherboard) battery.
 
-'''3.''' power off and
+'''3.''' Power off {{project_name_gateway_short}}.
 
-'''4.''' power on the {{project_name_gateway_long}} and
+'''4.''' Power on {{project_name_gateway_short}}.
 
-'''5.''' done.
+'''5.''' Done.
 
 Tor should be able to reconnect.
 
@@ -190,16 +190,44 @@ A number of things influences clock accuracy inside {{project_name_short}} VMs.
 ** <blockquote>To protect against time zone leaks, the system clock inside {{project_name_short}} is set to UTC. This means it may be a few hours before or ahead of your host system clock. Do not change this setting!</blockquote>
 
 = Easy instructions =
-<u>{{non_q_project_name_short}}:</u> It is strongly discouraged to use the pause / suspend / save / hibernate features.
+Select your platform.
 
-<u>{{q_project_name_long}}:</u> It is strongly discouraged to use the pause feature of Qube Manager, but it is is safe to use the suspend or hibernate feature of dom0.
+{{Tab
+|type=controller
+|linkid=platform
+|content=
+
+{{Tab|
+|title= == {{non_q_project_name_short}} ==
+|content=
+* <u>Recommendation:</u> It is strongly discouraged to use the pause / suspend / save / hibernate features. <ref>
+VirtualBox does not provide notifications to VMs upon resume.
+</ref>
+}}
+{{Tab|
+|title= == {{q_project_name_short}} ==
+|content=
+* <u>Recommendation:</u> It is strongly discouraged to use the pause feature of Qube Manager, but it is is safe to use the suspend or hibernate feature of dom0. <ref>
+This is because dom0 will notify VMs upon resume. This will result in sdwdate restarting and fixing the clock.
+</ref>
+}}
+}}
+
+* <u>Rationale:</u> The clock will be slow after resume. This can break Tor connectivity.
+* <u>How to fix if you did this anyhow?</u> Power off the VMs and restart these. Really power off. Not only Reboot. Then everything will be back to normal.
 
 = Advanced instructions =
 <div class="toccolours mw-collapsible mw-collapsed">
 If you are interested in using the pause / suspend / save / hibernate features, please click the expand button for further instructions.
 <div class="mw-collapsible-content">
-'''<u>{{non_q_project_name_short}}</u>''':
+{{Tab
+|type=controller
+|linkid=platform
+|content=
 
+{{Tab|
+|title= == {{non_q_project_name_short}} ==
+|content=
 * <u>{{project_name_gateway_short}}</u>: It is strongly discouraged to pause / suspend / save / hibernate the {{project_name_gateway_short}}, because it is difficult to restore the clock after resume. <ref name=gateway_pause>
 This is because the clock will be incorrect after system resume. A correct clock is important for anonymity (see [[Dev/TimeSync]] to learn more).
 
@@ -212,9 +240,11 @@ If this advice is ignored, Tor can become confused if the time is more than 1 ho
 * <u>{{project_name_workstation_long}}</u>: It is strongly discouraged to pause / suspend / save / hibernate the {{project_name_workstation_long}}. If this advice is ignored, [[#Restart sdwdate|restart sdwdate]] after resume. <ref>
 Similarly, if users suspend or save the {{project_name_workstation_short}} state, the clock will again lag behind the correct value. This can be manually fixed by running: <code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Time Synchronization Monitor (sdwdate-gui)</code> &rarr; <code>restart sdwdate</code>.
 </ref>
+}}
 
-'''<u>{{q_project_name_short}}</u>''':
-
+{{Tab|
+|title= == {{q_project_name_short}} ==
+|content=
 * <u>{{project_name_gateway_short}}</u>: It is strongly discouraged to pause {{project_name_gateway_short}} (<code>{{project_name_gateway_vm}}</code>) using the pause feature of Qube Manager, because it is difficult to restore the clock after resume. <ref name=gateway_pause /> If this advice is ignored, it is easiest to shutdown and restart {{project_name_gateway_short}}.
 * <u>{{project_name_workstation_short}}</u>: It is strongly discouraged to pause {{project_name_workstation_short}} (<code>{{project_name_workstation_vm}}</code>) using the pause feature of Qube Manager. If this advice is ignored, [[#Restart sdwdate|restart sdwdate]] after resume. <ref>
 Qubes does not dispatch the <code>/etc/qubes/suspend-post.d</code> / <code>/etc/qubes/suspend-pre.d</code> hooks upon pause / resume using Qube Manager.
@@ -222,6 +252,10 @@ Qubes does not dispatch the <code>/etc/qubes/suspend-post.d</code> / <code>/etc/
 * <u>dom0 suspend / hibernate</u>: It is safe to use the suspend or hibernate feature of dom0 and a manual restart of sdwdate is unnecessary. <ref>
 https://github.com/QubesOS/qubes-issues/issues/1764
 </ref>
+}}
+
+}}
+
 </div>
 </div>
 

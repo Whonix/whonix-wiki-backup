@@ -167,9 +167,10 @@ https://linuxiac.com/devuan-forgot-to-renew-the-key-that-signs-system-updates/
 
 == NixOS ==
 
-Doesn't really care about the OS itself to hardenize it, It just care about Nix package manager. So to expect from them caring about OS security is sorta faraway.
-
-They dont use MAC/Namespaces by default. (MAC: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=apparmor Apparmor] and Namespaces: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=firejail firejail] are Turned OFF by default, While SElinux is [https://github.com/NixOS/rfcs/pull/41 unsupported] yet)
+* Does not use MAC/Namespaces by default.
+** (MAC: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=apparmor Apparmor] and Namespaces: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=firejail firejail] are turned OFF by default, While SElinux is [https://github.com/NixOS/rfcs/pull/41 unsupported] yet)
+* https://forums.whonix.org/t/nixos-distro-preview/19883
+* [https://search.nixos.org/packages?channel=unstable&show=tor-browser&from=0&size=50&sort=relevance&type=packages&query=tor-browser Tor Browser packaged by NixOS]
 
 == GuixOS ==
 
@@ -208,7 +209,7 @@ There are several reasons why {{project_name_short}} has decided not to use the 
 * <u>Future Roadmap:</u> Basing {{project_name_short}} on Subgraph would tie our future to the viability of another project. It is not ideal to rely on an OS in alpha status, particularly when the Debian alternative is rock solid and has decades of development behind it.
 * <u>Features:</u> Subgraph has some [[Comparison_with_Others/SubgraphOS|undesirable feature additions]] that add no value. {{project_name_short}} cannot benefit from Subgraph's manpower if the goals for the development roadmap are fundamentally different.
 * <u>Bugs:</u> The plentiful [https://github.com/subgraph/subgraph-os-issues/issues Subgraph bugs] would become {{project_name_short}} bugs and developers would depend on them for fixes.
-* <u>Programming Language:</u> Subgraph chose different programming languages (like Golang) that are unfamiliar to lead {{project_name_short}} developers, making customization or modification very difficult.
+* <u>Programming Language:</u> Subgraph choose different programming languages (like Golang) that are unfamiliar to lead {{project_name_short}} developers, making customization or modification very difficult.
 * <u>Desktop Environment:</u> {{project_name_short}} Developer HulaHoop has noted that Subgraph features completely rely on the GNOME desktop environment. This is undesirable because it is visually unappealing, has an over-simplified interface and would require any "cloud integration" elements to be removed. Configuring GNOME to approach the specifications already achieved in {{project_name_short}} would require a lot of effort.
 |-
 
@@ -274,7 +275,10 @@ In comparison, alternatives like Debian have a large user/contributor base, a si
 == openSUSE ==
 * https://forums.whonix.org/t/port-to-opensuse/17400
 * https://github.com/Kicksecure/security-misc/issues/138
-* [[Dev/openSUSE]]
+* {{kicksecure_wiki
+|wikipage=Dev/openSUSE
+|text=Dev/openSUSE
+}}
 
 == FreeBSD ==
 
@@ -516,7 +520,7 @@ A long time ago, {{project_name_short}} was based on Debian Testing. Due to many
 * <u>Higher upgrade time effort:</u> Too often, too many packages are upgraded (not just security fixes) (costs lots of time to keep up, bandwidth, system load).
 ** <u>Lack of security support:</u> Quote, [https://www.debian.org/security/faq.html#testing Debian Security FAQ]:
 <blockquote>If you want to have a secure (and stable) server you are strongly encouraged to stay with stable.</blockquote>
-** Debian stable receives security fixes faster than Debian testing. For example, by 12/15/2016 Debian {{Stable project version based on Debian codename}} was Debian stable and Debian stretch was Debian testing. [https://lists.debian.org/debian-security-announce/2016/msg00316.html CVE-2016-1252] was fixed in Debian stable but not in Debian testing, see Debian security tracker by 12/15/2016].
+** Debian stable receives security fixes faster than Debian testing. For example, by 12/15/2016 Debian jessie was Debian stable and Debian stretch was Debian testing. [https://lists.debian.org/debian-security-announce/2016/msg00316.html CVE-2016-1252] was fixed in Debian stable but not in Debian testing, see Debian security tracker by 12/15/2016.
 * <u>Permanent package removal:</u> Sometimes packages get entirely removed from Debian testing, such as enigmail wasn't available for a while in Debian testing.
 ** <u>Support request overhead:</u> This is confusing and constantly creating support requests.
 * <u>(Temporary) package removal:</u> Sometimes packages are (temporarily) removed from Debian testing.
@@ -569,17 +573,7 @@ For these reasons it is not a good idea to add popcon to {{project_name_short}}.
 == Missing Criteria ==
 The following criteria are not yet part of the following comparison table but should be added.
 
-* Compile time hardening flags.
-* services enabled by default or not <ref>
-https://forums.whonix.org/t/disable-newly-all-installed-services-by-default/9381
-</ref>
-* secure package manager
-* onion repositories
-* permission to use upstream repositories <ref>
-For example, derivatives of Debian such as {{project_name_short}} are permitted to use the <code>packages.debian.org</code> APT repository.
-</ref>
-* rebranding required
-** package name changes in the repository required
+* check all dependencies are up-to-date versus multiple dependencies versions
 * This is is non-exhaustive. What else?
 
 Not applicable, valid, clear or related or suffers from a lack of information in general to be covered in the table yet: 
@@ -587,7 +581,6 @@ Not applicable, valid, clear or related or suffers from a lack of information in
 * The user's package manager verifies the package maintainer's and upstream developer's digital signature.
 * End-to-end signed packages
 * Untrusted packages (similar to Debian proposal [https://wiki.debian.org/UntrustedDebs UntrustedDebs])
-* Daemons (systemd units) do not automatically start once package is installed (It is up to the package developer to have it not enabled by default on most all systems)
 
 == Previous Criteria ==
 * [[Vanguards]] available: dropped because unmaintained upstream
@@ -628,7 +621,7 @@ Define of usability of "Debian Linux" as "good" since it is a baseline, a starti
 | {{No}} ?
 |-
 
-! [https://theupdateframework.io/security/ The Update Framework (TUF) threat model] Pass
+! [https://theupdateframework.io/security/ The Update Framework (TUF) threat model] Pass / Secure Package Manager
 | {{Yes}}
 | ?
 | ?
@@ -638,7 +631,10 @@ Define of usability of "Debian Linux" as "good" since it is a baseline, a starti
 |-
 
 |-
-! Minimal Number of Services by Default
+! Minimal Number of Services by Default <ref>
+* Daemons (systemd units) do not automatically start once package is installed.
+* https://forums.whonix.org/t/disable-newly-all-installed-services-by-default/9381
+</ref>
 | {{No}}
 | {{Yes}} <ref>Since there is no default per se</ref>
 | {{Yes}} <ref>Since there is no default per se</ref>
@@ -658,7 +654,7 @@ Define of usability of "Debian Linux" as "good" since it is a baseline, a starti
 |-
 
 |-
-! Transactional updates by default
+! Transactional updates by default / auto-upgrades not risking broken boot
 | {{No}}
 | {{No}}
 | {{No}}
@@ -884,6 +880,24 @@ https://forums.whonix.org/t/chromium-browser-for-kicksecure-discussions-not-whon
 | {{Yes}}
 |-
 
+! flatpak Available
+| 
+| 
+| 
+| 
+| 
+| 
+|-
+
+! Tor Browser available as a package
+| 
+| 
+| 
+| 
+| 
+| 
+|-
+
 ! EFI Booting Available
 | {{Yes}}
 | {{Yes}}
@@ -936,7 +950,9 @@ https://voidlinux.org/news/2021/02/OpenSSL.html
 | ?
 |-
 
-! no legal issues (such as [[#Ubuntu_Legal_Issues|this]])
+! no legal issues (such as [[#Ubuntu_Legal_Issues|this]]) / not forbidden for derivatives to use upstream repositories <ref>
+For example, derivatives of Debian such as {{project_name_short}} are permitted to use the <code>packages.debian.org</code> APT repository.
+</ref> / no excessive, complicated rebranding required / package name changes in the repository required
 | {{Yes}}
 | ?
 | {{Yes}}
@@ -952,6 +968,24 @@ https://voidlinux.org/news/2021/02/OpenSSL.html
 | {{No}}
 | {{No}}
 | {{Yes}}
+|-
+
+! Up-to-date Compile Time Flags Hardening
+| 
+| 
+| 
+| 
+| 
+| 
+|-
+
+! Onion Repositories
+| 
+| 
+| 
+| 
+| 
+| 
 |-
 
 |}

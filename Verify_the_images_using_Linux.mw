@@ -3,12 +3,12 @@
 Verify Virtual Machine Images on Linux
 }}
 {{#seo:
-|description=Instructions for OpenPGP and Signify Verification of {{project_name_long}} VirtualBox and KVM on the Command Line
+|description=Instructions for OpenPGP and Signify Verification of {{project_name_long}} ISO, VirtualBox and KVM on the Command Line
 |image=Approved-29149640.png
 }}
 [[image:Approved-29149640.png|250px|thumbnail]]
 {{intro|
-Instructions for OpenPGP and Signify Verification of {{project_name_short}} VirtualBox and KVM on the Command Line
+Instructions for OpenPGP and Signify Verification of {{project_name_short}} ISO, VirtualBox and KVM on the Command Line
 }}
 <!--
 Copyright:
@@ -56,27 +56,56 @@ The Kicksecure Verify_the_images_using_Linux wiki page is forked from the Tails 
 
 {{gpg_verification_introduction}}
 
-'''1.''' Import the signing key.
+'''1.''' Choose your platform.
 
 {{Tab
 |type=controller
-|linkid=virtualizer
+|linkid=virtualizer_openpgp
 |content=
 {{Tab
-|title={{Headline|h=2|content={{project_name_short}} VirtualBox}}
-|image=[[File:Virtualbox_logo.png|25px]]
+|title={{Headline|h=2|content={{project_name_short}} ISO}}
+|image=[[File:Cd-rom-icon.png|25px]]
 |type=section
 |addToClass=info-box
 |active=true
+|content=
+'''NOTE: The {{project_name_short}} ISO is at time of writing available for <u>developers-only</u>. Any updates to this status would be added to the [[ISO]] wiki page.'''
+
+'''2.''' Import the signing key.
+
+Refer to the more secure, detailed [[Main/Project_Signing_Key|{{project_name_short}} Signing Key]] instructions.
+
+{{signing_key_main}}
+
+'''3.''' Download the cryptographic (OpenPGP) signature corresponding to the image you want to verify.
+
+'''4.''' Save the signature in the same folder as the image.
+
+{{Download_image_and_signature
+|text_image=ISO image
+|text_signature=ISO signature
+|flavor=Xfce
+|extension=iso
+|after_slash=ova
+|version={{VersionNew}}
+}}
+
+}} <!-- close tab: {{project_name_short}} OpenPGPG key -->
+
+{{Tab
+|title={{Headline|h=2|content=VirtualBox}}
+|image=[[File:Virtualbox_logo.png|25px]]
+|type=section
+|addToClass=info-box
 |content=
 
 Refer to the more secure, detailed [[Main/Project_Signing_Key|{{project_name_short}} Signing Key]] instructions.
 
 {{signing_key_main}}
 
-'''2.''' Download the cryptographic (OpenPGP) signature corresponding to the virtual machine image you want to verify.
+'''3.''' Download the cryptographic (OpenPGP) signature corresponding to the image you want to verify.
 
-'''3.''' Save the signature in the same folder as the virtual machine image.
+'''4.''' Save the signature in the same folder as the image.
 
 {{Tab
 |type=controller
@@ -86,21 +115,14 @@ Refer to the more secure, detailed [[Main/Project_Signing_Key|{{project_name_sho
 |image=[[File:Clipart-gui.svg|25px]]
 |addToClass=info-box
 |content=
-{{#widget:Download_Button
-|text=VirtualBox Xfce image
-|url=https://download.{{project_clearnet}}/ova/{{VersionNew}}/{{project_name_short}}-Xfce-{{VersionNew}}.ova
-|onion=https://download.{{project_onion}}/ova/{{VersionNew}}/{{project_name_short}}-Xfce-{{VersionNew}}.ova
-|os=
-|addToClass=
-}}
 
-{{#widget:Download_Button
-|text=VirtualBox Xfce signature
-|icon=sig
-|url=https://download.{{project_clearnet}}/ova/{{VersionNew}}/{{project_name_short}}-Xfce-{{VersionNew}}.ova.asc
-|onion=https://download.{{project_onion}}/ova/{{VersionNew}}/{{project_name_short}}-Xfce-{{VersionNew}}.ova.asc
-|os=
-|addToClass=
+{{Download_image_and_signature
+|text_image=VirtualBox Xfce image
+|text_signature=VirtualBox Xfce signature
+|flavor=Xfce
+|extension=ova
+|after_slash=ova
+|version={{VersionNew}}
 }}
 
 }} <!-- close tab: {{project_name_short}} VirtualBox Xfce -->
@@ -111,21 +133,13 @@ Refer to the more secure, detailed [[Main/Project_Signing_Key|{{project_name_sho
 |addToClass=info-box
 |content=
 
-{{#widget:Download_Button
-|text=VirtualBox CLI image
-|url=https://download.{{project_clearnet}}/ova/{{VersionNew}}/{{project_name_short}}-CLI-{{VersionNew}}.ova
-|onion=https://download.{{project_onion}}/ova/{{VersionNew}}/{{project_name_short}}-CLI-{{VersionNew}}.ova
-|os=
-|addToClass=
-}}
-
-{{#widget:Download_Button
-|text=VirtualBox CLI signature
-|icon=sig
-|url=https://download.{{project_clearnet}}/ova/{{VersionNew}}/{{project_name_short}}-CLI-{{VersionNew}}.ova.asc
-|onion=https://download.{{project_onion}}/ova/{{VersionNew}}/{{project_name_short}}-CLI-{{VersionNew}}.ova.asc
-|os=
-|addToClass=
+{{Download_image_and_signature
+|text_image=VirtualBox CLI image
+|text_signature=VirtualBox CLI signature
+|flavor=CLI
+|extension=ova
+|after_slash=ova
+|version={{VersionNew}}
 }}
 
 }} <!-- close tab: {{project_name_short}} VirtualBox CLI -->
@@ -137,48 +151,53 @@ Refer to the more secure, detailed [[Main/Project_Signing_Key|{{project_name_sho
 |image=[[File:Kvm-new-logo.png|25px]]
 |addToClass=info-box
 |content=
-
 Refer to the more secure, detailed [[KVM/Project_Signing_Key|{{project_name_short}} Signing Key]] instructions.
 
 {{signing_key_kvm}}
 
-'''2.''' Download the cryptographic (OpenPGP) signature corresponding to the virtual machine image you want to verify.
+'''3.''' Download the cryptographic (OpenPGP) signature corresponding to the image you want to verify.
 
-'''3.''' Save the signature in the same folder as the virtual machine image.
+'''4.''' Save the signature in the same folder as the image.
 
-{{#widget:Download_Button
-|text=KVM Xfce image
-|url=https://download.{{project_clearnet}}/libvirt/{{Version_KVM}}/{{project_name_short}}-Xfce-{{Version_KVM}}.Intel_AMD64.qcow2.libvirt.xz
-|onion=https://download.{{project_onion}}/libvirt/{{Version_KVM}}/{{project_name_short}}-Xfce-{{Version_KVM}}.Intel_AMD64.qcow2.libvirt.xz
-|os=
-|addToClass=
-}}
-
-{{#widget:Download_Button
-|text=KVM Xfce signature
-|icon=sig
-|url=https://download.{{project_clearnet}}/libvirt/{{Version_KVM}}/{{project_name_short}}-Xfce-{{Version_KVM}}.Intel_AMD64.qcow2.libvirt.xz.asc
-|onion=https://download.{{project_onion}}/libvirt/{{Version_KVM}}/{{project_name_short}}-Xfce-{{Version_KVM}}.Intel_AMD64.qcow2.libvirt.xz.asc
-|os=
-|addToClass=
+{{Download_image_and_signature
+|text_image=KVM Xfce image
+|text_signature=KVM Xfce signature
+|flavor=Xfce
+|extension=Intel_AMD64.qcow2.libvirt.xz
+|after_slash=libvirt
+|version={{Version_KVM}}
 }}
 
 }} <!-- close tab: KVM OpenPGP -->
 
 }} <!-- close tab controller: VirtualBox and KVM OpenPGP -->
 
-'''4.''' Start the cryptographic verification.
+'''5.''' Change directory.
+
+<pre>
+cd [the directory in which you downloaded the image and the signature]
+</pre>
+
+'''6.''' Start the cryptographic verification.
 
 This process can take several minutes.
 
-{{CodeSelect|code=
-cd [the directory in which you downloaded the .ova and the .asc]
-}}
-
 {{Tab
 |type=controller
-|linkid=virtualizer
+|linkid=virtualizer_openpgp
 |content=
+{{Tab
+|title={{Headline|h=2|content={{project_name_short}} ISO}}
+|image=[[File:Cd-rom-icon.png|25px]]
+|addToClass=info-box
+|content=
+
+{{CodeSelect|code=
+gpg --verify-options show-notations --verify {{project_name_short}}-*.iso.asc {{project_name_short}}-*.iso
+}}
+
+}} <!-- close tab Verify ISO -->
+
 {{Tab
 |title={{Headline|h=2|content=VirtualBox}}
 |image=[[File:Virtualbox_logo.png|25px]]
@@ -205,14 +224,27 @@ gpg --verify-options show-notations --verify {{project_name_short}}-*.libvirt.xz
 
 }} <!-- close tab controller: Verify VirtualBox & KVM -->
 
-'''5.''' Check the output of the verification step.
+'''7.''' Check the output of the verification step.
 
 {{GnuPG-Success}}
 
 {{Tab
 |type=controller
-|linkid=virtualizer
+|linkid=virtualizer_openpgp
 |content=
+{{Tab
+|title={{Headline|h=2|content={{project_name_short}} ISO}}
+|image=[[File:Cd-rom-icon.png|25px]]
+|type=section
+|addToClass=info-box
+|active=true
+|content=
+<pre>
+gpg: Good signature from "Patrick Schleizer"
+</pre>
+
+}} <!-- close tab: ISO Good Signature -->
+
 {{Tab
 |title={{Headline|h=2|content=VirtualBox}}
 |image=[[File:Virtualbox_logo.png|25px]]
@@ -256,8 +288,19 @@ gpg: Signature made Mon 19 Jan 2023 11:45:41 PM CET using RSA key ID ...
 
 {{Tab
 |type=controller
-|linkid=virtualizer
+|linkid=virtualizer_openpgp
 |content=
+{{Tab
+|title={{Headline|h=2|content={{project_name_short}} ISO}}
+|image=[[File:Cd-rom-icon.png|25px]]
+|type=section
+|addToClass=info-box
+|active=true
+|content=
+
+<div class="pre">gpg: Signature notation: file@name={{project_name_short}}-{{VersionNew}}.iso</div>
+}} <!-- close tab: VirtualBox Signature Notation -->
+
 {{Tab
 |title={{Headline|h=2|content=VirtualBox}}
 |image=[[File:Virtualbox_logo.png|25px]]
@@ -277,7 +320,7 @@ gpg: Signature made Mon 19 Jan 2023 11:45:41 PM CET using RSA key ID ...
 }} <!-- close tab: KVM Signature Notation -->
 }} <!-- close tab controller: VirtualBox and KVM Signature Notation -->
 
-<u>If the Virtual Machine image is not correct</u>, the output will inform that the signature is bad:
+<u>If the digital software signature verification failed</u>, the output will inform that the signature is bad:
 
 <pre>
 gpg: BAD signature
@@ -285,7 +328,7 @@ gpg: BAD signature
 
 {{do_not_continue_on_gpg_verification_errors}}
 
-'''6.''' Done.
+'''8.''' Done.
 
 Digital software signature verification using OpenPGP has been completed.
 
@@ -304,48 +347,63 @@ Digital software signature verification using OpenPGP has been completed.
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
 | text    = Advanced users only!
 }}
-'''1.''' [[Signing_Key#Download_the_signify_Key|Download the signify Key]] and save it as <code>derivative.pub</code>.
+'''1.''' Choose your platform.
 
 {{Tab
 |type=controller
-|linkid=virtualizer
+|linkid=virtualizer_signify
 |content=
 {{Tab
-|title={{Headline|h=2|content=VirtualBox}}
-|image=[[File:Virtualbox_logo.png|25px]]
+|title={{Headline|h=2|content={{project_name_short}} ISO Signify}}
+|image=[[File:Cd-rom-icon.png|25px]]
 |type=section
 |addToClass=info-box
 |active=true
 |content=
+'''2.''' [[Signing_Key#Download_the_signify_Key|Download the signify Key]] and save it as <code>derivative.pub</code>.
 
 {{signing_key_main_signify}}
 
 }} <!-- close tab: VirtualBox Signify -->
 
 {{Tab
-|title={{Headline|h=2|content=KVM}}
+|title={{Headline|h=2|content=VirtualBox Signify}}
+|image=[[File:Virtualbox_logo.png|25px]]
+|type=section
+|addToClass=info-box
+|active=
+|content=
+'''2.''' [[Signing_Key#Download_the_signify_Key|Download the signify Key]] and save it as <code>derivative.pub</code>.
+
+{{signing_key_main_signify}}
+
+}} <!-- close tab: VirtualBox Signify -->
+
+{{Tab
+|title={{Headline|h=2|content=KVM Signify}}
 |image=[[File:Kvm-new-logo.png|25px]]
 |addToClass=info-box
 |content=
+'''2.''' [[Signing_Key#Download_the_signify_Key|Download the signify Key]] and save it as <code>derivative.pub</code>.
 
 {{signing_key_kvm_signify}}
 
 }} <!-- close tab: KVM Signify -->
 }} <!-- close tab controller: VirtualBox and KVM signify tabs -->
 
-'''2.''' Install <code>signify-openbsd</code>.
+'''3.''' Install <code>signify-openbsd</code>.
 
 {{Install Package|
 package=signify-openbsd
 }}
 
-'''3.''' Note.
+'''4.''' Note.
 
 [https://forums.whonix.org/t/signify-openbsd/7842/5 It is impossible to <code>signify</code> sign images (<code>.ova</code> / <code>libvirt.tar.xz</code>) directly.] You can only verify the <code>.sha512sums</code> hash sum file using <code>signify-openbsd</code> and then verify the image against the <code>sha512</code> sum.
 
-'''4.''' Download the <code>.sha512sums</code> and <code>.sha512sums.sig</code> files.
+'''5.''' Download the <code>.sha512sums</code> and <code>.sha512sums.sig</code> files.
 
-'''5.''' Verify the <code>.sha512sums</code> file with <code>signify-openbsd</code>.
+'''6.''' Verify the <code>.sha512sums</code> file with <code>signify-openbsd</code>.
 
 {{CodeSelect|code=
 signify-openbsd -Vp derivative.pub -m {{project_name_short}}-*.sha512sums
@@ -359,7 +417,7 @@ Signature Verified
 
 If the signature is invalid, it will output an error.
 
-'''6.''' Compare the hash of the image file with the hash in the <code>.sha512sums</code> file.
+'''7.''' Compare the hash of the image file with the hash in the <code>.sha512sums</code> file.
 
 {{CodeSelect|code=
 sha512sum --strict --check {{project_name_short}}-*.sha512sums
@@ -371,7 +429,7 @@ If the hash is correct, it will output:
 
 {{do_not_continue_on_gpg_verification_errors}}
 
-'''7.''' Done.
+'''8.''' Done.
 
 Digital signature verification using signify has been completed.
 

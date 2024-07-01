@@ -1,0 +1,136 @@
+{{Header}}
+{{title|title=
+IPv6 Development
+}}
+{{#seo:
+|description=Development notes for adding IPv6 support to {{project_name_short}}.
+}}
+{{intro|
+Development notes for adding IPv6 support to {{project_name_short}}.
+}}
+= Essential Knowledge =
+* Tor 6to4: Tor is capable of tunneling IPv6 over IPv4. Even if your ISP does not support IPv4, the user will still be able to reach IPv6 destinations. Tor will build circuits over IPv4. However, IPv6 traffic is tunneled through IPv4. There is no need to have functional IPv6 support for clearnet just to be able to reach IPv6 destinations over Tor.
+* Qubes specific.
+** https://www.qubes-os.org/doc/networking/#limitations
+*** <blockquote>Currently only IPv4 DNS servers are configured, regardless of ipv6 feature state. It is done this way to avoid reconfiguring all connected qubes whenever IPv6 DNS becomes available or not. Configuring qubes to always use IPv6 DNS and only fallback to IPv4 may result in relatively long timeouts and poor usability. But note that DNS using IPv4 does not prevent to return IPv6 addresses. In practice this is only a problem for IPv6-only networks.</blockquote>
+** Qubes IPv6 only mode bug: [https://github.com/QubesOS/qubes-issues/issues/9288 Fix IPv6 connectivity on downstream qubes]
+
+= IPv6 Support in Whonix =
+IPv6 support are multiple parts.
+
+* '''A)''' Whonix-Workstation connecting to Whonix-Gateway using IPv6.
+** TODO
+* '''B)''' Tor proxying connections to IPv6 destinations.
+** Already functional with Tor Browser.
+*** NOTE: ISP IPv6 feature state does not matter. Tor does not require functional IPv6 by the ISP to be able to proxy/tunnel IPv6. Tor can tunnel IPv6 over IPv4.
+** curl: TODO
+** transparent proxying: TODO
+* '''C)''' Tor using IPv6 to build Tor circuits.
+** TODO
+
+= Whonix TODO =
+* Whonix
+** In file [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/sysctl.d/anonymizer-config-gateway.conf <code>/etc/sysctl.d/anonymizer-config-gateway.conf</code>] comment out <code>net.ipv6.conf.all.disable_ipv6 = 1</code>.
+* Use [https://en.wikipedia.org/wiki/Unique_local_address ULA (unique local address)]?
+** [https://github.com/QubesOS/qubes-issues/issues/7803 IPV6: Use GUA (Global Unicast Addresses) or reserved addresses instead of ULA (Unique Local Unicast Addresses) within Qubes]
+* Use IPv4 mapped IPv6 addresses?
+** <code>/etc/network/interfaces</code>
+
+<pre>
+iface eth0 inet6 static
+    address ::FFFF:192.168.0.1
+    netmask 96
+</pre>
+
+* Non-Qubes-Whonix
+** Whonix-Gateway: https://github.com/Whonix/whonix-gw-network-conf/blob/master/etc/network/interfaces.d/30_non-qubes-whonix
+** Whonix-Workstation: https://github.com/Whonix/whonix-ws-network-conf/blob/master/etc/network/interfaces.d/30_non-qubes-whonix
+* Qubes-Whonix
+** temporarily during development in dom0: {{CodeSelect|code=
+qvm-features sys-whonix ipv6 1
+}}
+** Send a pull request to Qubes salt to no longer run command <code>qvm-features sys-whonix ipv6 ""</code> or maybe <code>qvm-features sys-whonix ipv6 0</code>.
+
+= Tor IPv6 Configuration =
+{{CodeSelect|code=
+sudo nano /etc/tor/torrc
+}}
+
+{{CodeSelect|code=
+SocksPort [::1]:9050
+}}
+
+{{CodeSelect|code=
+sudo systemctl restart tor
+}}
+
+* [https://tor.stackexchange.com/questions/24029/how-to-listen-on-both-localhost-ipv4-and-ipv6-at-the-same-time-with-1-configura How to listen on both localhost, IPv4 and IPv6 at the same time with 1 configuration line?]
+* [https://gitlab.torproject.org/tpo/core/tor/-/issues/40952 document how to listen on localhost on both, IPv4 and IPv6 at the same time using SocksPort *:Port]
+
+Note: If localhost on the system (inside the VM) does not have IPv6 support, Tor will fail to start.
+
+<pre>
+[warn] Could not bind to ::1:9050: Cannot assign requested address
+[warn] Failed to parse/validate config: Failed to bind one of the listener ports.
+[err] Reading config failed--see warnings above.
+</pre>
+
+= Functional =
+Definitions:
+
+* broken ISP IPv6: Your ISP does not provide IPv6. Visiting IPv6 pages are broken.
+
+Overview:
+
+* broken ISP IPv6 + Debian + Tor IPv6 Configuration (see above) + <code>curl --ipv6</code> + IPv6 localhost
+** using IP (without DNS)
+*** {{CodeSelect|code=
+curl --ipv6 --proxy socks5h://[::1]:9050 --resolve v6.ipv6test.app:443:[2600:9000:21f3:1800:18:3c03:3680:93a1] https://v6.ipv6test.app/
+}}
+** using DNS
+*** {{CodeSelect|code=
+curl --ipv6 --proxy socks5h://[::1]:9050 https://v6.ipv6test.app/
+}}
+** example output: <code>2a0b:f4c2:1::1</code>
+*** an IP address of a Tor IPv6 exit relay. Can be verified using [[ExoneraTor|ExoneraTor]] ([https://metrics.torproject.org/exonerator.html?ip=2a0b%3Af4c2%3A1%3A%3A1&timestamp=2024-06-04&lang=en example]).
+* broken ISP IPv6 + Debian + Tor Browser + IPv6-only test page
+* broken ISP IPv6 + Whonix-Workstation + Tor Browser + IPv6-only test page
+
+Notes:
+
+* Tor <code>SocksPort</code> configuration option <code>IPv6Traffic</code> is optional, not required.
+* Find out the IP address of an IPv6 test server. Requires functional IPv6 connectivity somewhere.
+** {{CodeSelect|code=
+nslookup v6.ipv6test.app
+}}
+*** <code>2600:9000:21f3:1800:18:3c03:3680:93a1</code>
+
+= TODO Test =
+
+* functional ISP IPv6 + Debian + <code>curl --ipv6</code> + IPv6 via IP only (without DNS)
+** useful for testing if IP connectivity is functional while exluding potential DNS related issues
+** {{CodeSelect|code=
+curl --ipv6 --resolve v6.ipv6test.app:443:[2600:9000:21f3:1800:18:3c03:3680:93a1] https://v6.ipv6test.app/
+}}
+
+= IPv6-only test pages =
+These are <u>only</u> reachable over IPv6. Not over IPv4 at all. This makes these test pages ideal for testing.
+
+* https://v6.ipv6test.app/
+
+= Test Scenario =
+After full IPv6 support has been added to Whonix, the following test might be ideal to test if IPv6 is fully functional.
+
+IPv6 only ISP simulation:
+
+* Disable IPv4 either:
+** A) on the router or,
+** B) alternatively, in case of Non-Qubes-Whonix alternatively on the host operating system.
+** C) alternatively, in case of Qubes-Whonix use a VM <code>sys-ipv4-breaker</code> (A ProxyVM that disables IPv4 using sysctl)
+
+= Discussion =
+* [https://forums.whonix.org/t/add-ipv6-support/19893 add IPv6 support]
+* [https://github.com/QubesOS/qubes-issues/issues/9267 add IPv6 support to Qubes-Whonix]
+
+[[Category:Development]]
+{{Footer}}

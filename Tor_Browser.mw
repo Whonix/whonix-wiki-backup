@@ -380,9 +380,9 @@ It is recommended to learn more about [[Fingerprint|Fingerprinting]] and [[Data 
 == New Identity Function ==
 [[File:Newidentityicon.png|thumb|New Identity Broom Symbol]]
 
-There are two ways to get a new identity in Tor Browser. Chose one.
+There are two ways to get a new identity in Tor Browser. Choose one.
 
-* '''A)''' <u>Restart Tor Browser Method:</u> Simply close all Tor Browser windows and restart Tor Browser. <u>Or,</u>
+* '''A)''' <u>[[#Restart_Tor_Browser|Restart Tor Browser]] Method:</u> Simply close all Tor Browser windows and restart Tor Browser. <u>Or,</u>
 * '''B)''' <u>New Identity Button Method:</u> Use Tor Browser "New Identity" button. It clears the browser state, closes all browser tabs, and obtains a fresh Tor circuit for future requests. <ref>
 * "New Identity" button sends the protocol command "signal newnym" to Tor's <code>ControlPort</code>.
 ** Further, "signal newnym" does not interfere with long-lived connections such as an SSH or IRC connection originating from other applications.
@@ -390,7 +390,7 @@ There are two ways to get a new identity in Tor Browser. Chose one.
 * [https://gitlab.torproject.org/legacy/trac/-/issues/3455 Tor Browser's tab isolation by socks user name] should result in using new socks user names and therefore in using new circuits.
 </ref>
 
-There are two ways to reach the New Identity button. Chose one.
+There are two ways to reach the New Identity button. Choose one.
 
 # <code>Left-click the Hamburger Icon</code> &rarr; <code>Select "New Identity"</code>
 # <code>Left-click the 'broom' icon in the URL bar</code>
@@ -418,7 +418,7 @@ Please read [[Tor_Browser/Advanced_Users#New_Tor_Circuit_Design|New Tor Circuit 
 | text    = '''Warning:''' This function does not attempt to clear Tor browsing session data or unlink activity, unlike the "New Identity" feature.
 }}
 
-The "New Tor Circuit for this Site" feature creates a new circuit for the <i>current</i> Tor Browser tab, including other open tabs or windows from the same website. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/9442</ref> If it is really necessary to separate contextual identities, it is always safer to close and then restart Tor Browser.
+The "New Tor Circuit for this Site" feature creates a new circuit for the <i>current</i> Tor Browser tab, including other open tabs or windows from the same website. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/9442</ref> If it is really necessary to separate contextual identities, it is always safer to close and then [[#Restart_Tor_Browser|Restart Tor Browser]].
 
 There are several, potential use cases for this feature: <ref>https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html</ref>
 
@@ -768,7 +768,7 @@ techniques.</blockquote></ref>
 For security improvement it might help to force connections to onions for websites that are reachable over clearnet and onion. This is currently only documented for [[Forcing .onion on Project]] but [[Unsupported|undocumented]] for arbitrary websites. Doing so would be possible as per [[Self_Support_First_Policy|Self Support First Policy]].
 
 == Onion Client Authorization ==
-There are two options to setup Onion Service Client Authentication. Chose <u>either</u> option '''A)''' <u>or</u> '''B)'''.
+There are two options to setup Onion Service Client Authentication. Choose <u>either</u> option '''A)''' <u>or</u> '''B)'''.
 
 * '''A)''' [[Tor_Browser#Onion_Client_Authorization|Tor Browser Onion Client Authorization]], see below. <u>Or</u>,
 * '''B)''' [[Onion_Services#Onion_Service_Authentication_Client_Setup|Onion Service Client Authentication setup on {{project_name_gateway_long}}]].
@@ -807,7 +807,9 @@ To setup Tor Browser Onion Client Authorization, perform the following instructi
 |filename_new=40_onion_authentication
 }}
 
-'''2.''' Learn how a client authorization private key looks.
+'''2.''' [[#Restart_Tor_Browser|Restart Tor Browser]].
+
+'''3.''' Learn how a client authorization private key looks.
 
 Sample onion client authorization private key.
 
@@ -817,15 +819,15 @@ NOTE: The user must not use the following private key because it is only an exam
 XAJKD2BRVOI4C4IHK2OWF3EKIJNVIDBVCP2IM2Z2ZHPN456HNRZA
 </pre>
 
-'''3.''' Open the onion service link in Tor Browser in {{project_name_workstation_short}}.
+'''4.''' Open the onion service link in Tor Browser in {{project_name_workstation_short}}.
 
-'''4.''' Get the onion client authorization private key from the onion service host.
+'''5.''' Get the onion client authorization private key from the onion service host.
 
 The onion client authorization private key can only be provided by the onion service administrator.
 
-'''5.''' Tor Browser Onion Client Authorization normally.
+'''6.''' Tor Browser Onion Client Authorization normally.
 
-'''6.''' Done.
+'''7.''' Done.
 
 Tor Browser Onion Client Authorization setup is complete.
 }}
@@ -1581,6 +1583,65 @@ Similarly, these comparisons would be helpful in order to help with TBB (non-{{p
 * TBB in different Windows platforms.
 
 = Troubleshooting =
+== Restart Tor Browser ==
+Simply close all Tor Browser windows and restart Tor Browser. This is in most cases sufficient for a Tor Browser restart.
+
+In case of issues the user might want to:
+
+* [[#Confirm Terminated Tor Browser|Confirm Terminated Tor Browser]]
+* [[#Force Terminate Tor Browser|Force Terminate Tor Browser]]
+
+== Confirm Terminated Tor Browser ==
+While Tor Browser windows might have been closed, Tor Browser might still be running in the background due to a bug. To confirm that Tor Browser has really been terminated there are two options.
+
+* A) <u>System reboot method:</u> This is the simplest method. By simply restarting the Whonix-Workstation it is guaranteed that Tor Browser will be terminated.
+* B) <u>Manual process viewing method:</u>
+
+{{CodeSelect|code=
+pgrep firefox     
+}}
+
+Example output if still running:
+
+Note: The process number (pid) will most likely be different.
+
+<pre>
+259109
+</pre>
+
+Example output if not running:
+
+<pre>
+zsh: exit 1     pgrep firefox
+</pre>
+
+See footnote for alternative command. <ref>
+{{CodeSelect|code=
+ps aux {{!}} grep firefox
+}}
+</ref>
+
+== Force Terminate Tor Browser ==
+To kill Tor Browser, run.
+
+{{CodeSelect|code=
+killall firefox.real
+}}
+
+Example output if still running:
+
+Note: This means "none".
+
+<pre>
+</pre>
+
+Example output if not running:
+
+<pre>
+firefox.real: no process found
+zsh: exit 1     killall firefox.real
+</pre>
+
 == Tor Browser Download, Installation and Digital Software Verification Issues ==
 
 # Check [https://forums.{{project_clearnet}} {{project_name_short}} forums] for existing discussions.
@@ -1772,7 +1833,7 @@ As a workaround:
 
 # Open <code>about:config</code> in the Tor Browser URL bar.
 # Search for and set <code>extensions.torbutton.display_circuit</code> to <code>false</code>.
-# Restart Tor Browser.
+# [[#Restart_Tor_Browser|Restart Tor Browser]].
 
 In {{q_project_name_short}}, see [https://www.qubes-os.org/doc/disposable-customization/ Disposable Customization] to make this change persistent in Disposables.
 

@@ -7,15 +7,19 @@
 }}
 = Issues =
 == Important Issues ==
+
+
 === Important Networking Issues ===
 * [https://github.com/QubesOS/qubes-issues/issues/3994 change Qubes network policy, UpdatesProxy to network disabled by default for better leak-proofness #3994]
 * [https://github.com/QubesOS/qubes-issues/issues/7614 disallow setting netvm of whonix-ws to a non whonix-gw]
 * [https://github.com/QubesOS/qubes-issues/issues/6948 self-contained Qubes templates including meta scripts (salt) / improve Qubes-Whonix installation usability]
 * Absence of [https://github.com/QubesOS/qubes-issues/issues/3412 add UpdateVM setting to qubes-vm-settings] feature leads to user confusion which VM will be used as UpdateVM.
+* [https://github.com/QubesOS/qubes-issues/issues/3118 UpdateVM for templates always defaults to sys-net #3118] - UpdateVM setting is confused by users as UpdatesProxy, thereby leading Template upgrades not over Tor.
 * [https://forums.whonix.org/t/qubes-whonix-security-disadvantages-help-wanted/8581 Qubes-Whonix Security Disadvantages]
 * [https://github.com/QubesOS/qubes-issues/issues/1814 sys-net phones home to fedoraproject.org for captive portal detection #1814] - Qubes openQA test missing
 * [https://github.com/QubesOS/qubes-issues/issues/7586 document how to route all traffic over Tor / how to disable Qubes default clearnet traffic #7586]
 * [https://github.com/QubesOS/qubes-issues/issues/7801 Qubes should keep IP forwarding in VMs with the provides network (Net Qube) disabled by default #7801]
+* [https://github.com/QubesOS/qubes-issues/issues/9294 Create sys-ops-whonix VM for Enhanced Security and Isolation in Qubes-Whonix #9294]
 
 === Important Security Disadvantages ===
 * [https://forums.whonix.org/t/qubes-whonix-security-disadvantages-help-wanted/8581 Qubes-Whonix Security Disadvantages - Help Wanted!]
@@ -132,15 +136,6 @@ QubesVm IP address is generated based on its netvm ID (subnet number) and the sa
 In your Torless TBB launcher script for use with Qubes' transparent Tor proxy, TOR_SOCKS_HOST=10.137.3.1. Is this supposed to be the same for all Qubes machines regardless of how many ProxyVMs users have created (or other user settings)? Or is the user supposed to change this before using the script?
 
 Perhaps it is good idea to add some firewall rule in TorVM to redirect traffic to any 10.137.0.0/16 IP + port 9050/9049 to the tor running in TorVM. This way AnonVM can use any IP as a sock proxy address.
-
-= Run updates over Proxy/Tor =
-[https://groups.google.com/g/qubes-devel/c/2vnGqsoM9p0/m/0YCltU-Qs-MJ source]
-
-Without wasting a lot space, having lots of standalone VMs... How could one persistently install software in QubesOS using package managers over Tor just for a specific VM? Routing all traffic over Tor is also an option, but not a ideal one either (having some clearnet traffic is better for various reasons).
-
-Set TorVM as netvm for the template. By default template updates are routed via "update proxy" (simple http proxy, which allow access only to
-yum-repository-like sites). This proxy is running in netvm, so after TorVM. Because of that its you need to disable 'yum-proxy-setup' service for this
-template and allow some traffic in the firewall settings. Or enable 'qubes-yum-proxy' service in TorVM and ensure that its traffic goes through tor.
 
 = Time Sync =
 == Introduction ==
@@ -634,15 +629,7 @@ RELEASE=4.2 REPO_PROXY="" make DISTS_VM="whonix-gateway-17 whonix-workstation-17
 * Does qubes {{project_name_short}} network / firewall service run after qubes-sysinit.service? Check full systemd dependency resolution.
 
 = Qubes VM Manger Firewall Tab Settings =
-([https://www.qubes-os.org/attachment/doc/r4.0-manager-firewall.png screenshot])
-
-Short:<br />
-Have no effect for {{q_project_name_short}} VMs. Can be ignored.
-
-Long <ref>https://groups.google.com/g/qubes-devel/c/uzgN42uEJpE/m/hymUCMxoCwAJ</ref>:<br />
-All that settings are in separate file in the VM directory - dom0 /var/lib/qubes/appvms/whonix/firewall.xml. If the VM is running, those settings are converted to iptables syntax and loaded into QubesDB of directly connected ProxyVM. The qubes-firewall service in the ProxyVM watch for such changes and applies the rules.
-
-I.e. in case of {{project_name_short}}, the connected ProxyVM is {{project_name_gateway_vm}}. Since in {{project_name_short}} qubes-firewall service is disabled ({{project_name_short}} 12 <ref>https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf</ref>), these settings do not affect {{project_name_short}}. ([https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf qubes-whonix-firewall.service] is what {{project_name_short}} uses.)
+Moved to [[Qubes/Firewall]].
 
 = Qubes Upstream Bugs =
 Usability:
@@ -689,21 +676,29 @@ Disposable
 HVM
 HVM Template
 
+{{Anchor|Network_in_TemplateVMs.}}
+{{Anchor|Network_in_TemplateVMs}}
 = Network in Templates =
-As default setting, any Template (including {{project_name_short}}) in Qubes R4.0 and above have their NetVM set to <code>none</code>.
+As per Qubes upstream default, any Template (including {{project_name_short}}) in Qubes R4.0 and above have their Net Qube set to <code>none</code>.
 
-Networking and [[update]] of Templates is possible through Qubes UpdatesProxy.
+Networking and [[update]] of Templates is possible through [[Qubes/UpdatesProxy|Qubes UpdatesProxy]].
 
 = Torified UpdatesProxy =
 == Connection through Qubes UpdatesProxy ==
+The following command allows to make a torified connection (in this example using curl) from inside the Qubes Template to the internet.
+
 In Qubes Template.
 
 {{CodeSelect|code=
 http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 curl.anondist-orig https://check.torproject.org
 }}
 
+It is torified because Qubes dom0 UpdatesProxy settings configure sys-whonix as UpdatesProxy.
+
 == {{project_name_gateway_vm}} ==
-File /usr/share/tinyproxy/default.html gets [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/init/qubes-whonix-sysinit modified]. The following is the original.
+File {{CodeSelect|inline=true|code=/usr/share/tinyproxy/default.html}} gets modified.
+
+The following is the original.
 
 <pre>
 <head>
@@ -723,23 +718,16 @@ Modified to the following.
 </pre>
 
 == {{project_name_short}} Templates ==
-Inside {{project_name_short}} Templates, [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/utility_functions.sh the following command is run will be run].
+Inside {{project_name_short}} Templates:
 
-=== Qubes R3.2 ===
-<pre>
-curl_output="$(UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "${PROXY_SERVER}")" || true
-</pre>
-
-After the variables are substituted, the command actually run will be the following.
-
-<pre>
-curl_output="$(UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://10.137.255.254:8082/" || true
-</pre>
-
-To simulate (test) this, run the following command.
+* [https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/utility_functions.sh utility_functions.sh]
+* https://github.com/{{project_name_short}}/qubes-whonix/blob/master/usr/lib/qubes-whonix/init/qubes-whonix-sysinit
+* https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/systemd/system/qubes-whonix-torified-updates-proxy-check.service
+* https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-whonix/init/torified-updates-proxy-check
+* https://github.com/Whonix/qubes-whonix/blob/master/etc/uwt.d/40_qubes.conf
 
 <pre>
-UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://10.137.255.254:8082/" ; echo $?
+UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://127.0.0.1:8082/"
 </pre>
 
 Should output the following.
@@ -780,18 +768,13 @@ That output gets `grep`ed for PROXY_META, i.e. for.
 
 If that matches, the <code>whonix-secure-proxy</code> Qubes service is activated. In other words, the <code>/var/run/qubes-service/whonix-secure-proxy</code> status file is being created.
 
-=== Qubes R4 ===
-TODO
-
-<pre>
-UWT_DEV_PASSTHROUGH="1" curl --silent --connect-timeout 10 "http://127.0.0.1:8082/"
-</pre>
-
 == Related ==
 
 * [https://github.com/QubesOS/qubes-issues/issues/1957 Cache updates #1957, qubes-updates-cache, qubes-updates-proxy]
 * design decision: [https://github.com/QubesOS/qubes-issues/issues/1880 Difficulty to upgrade {{project_name_short}} Templates over clearnet considered a bug or feature?]
 * bug: [https://forums.whonix.org/t/templates-incorrectly-think-theyre-not-connected-to-a-whonix-gateway Templates incorrectly think they're not connected to a {{project_name_short}} gateway.]
+* [https://github.com/QubesOS/qubes-issues/issues/1880 Difficulty to upgrade Whonix TemplateVMs over clearnet considered a bug or feature?] -> Considered a feature.
+* [https://github.com/QubesOS/qubes-issues/issues/7737 remove tinyproxy from Whonix-Gateway (<code>sys-whonix</code>) and make Whonix Templates networked by default with Net qube set to <code>sys-whonix</code>]
 
 = Troubleshooting =
 See [[Qubes/Troubleshooting|Troubleshooting Qubes specific]].
