@@ -129,17 +129,63 @@ To edit the VM virtual NIC settings: <br />
 
 Note that the network is exclusively internal and does not communicate with the host in any way.
 
-'''6.''' Change the number of pinned CPUs.
+'''6.''' Setup different external network interfaces.
+
+Also required. The {{project_name_gateway_short}}  lacks a DHCP client for security hardening reasons and so cannot be attached to the same external network without conflicting with other {{project_name_gateway_short}}s' traffic. So we must repeat the same steps for creating a unique external network per {{project_name_gateway_short}}.
+
+{{CodeSelect|code=
+sudo virsh net-dumpxml Whonix-External > Whonix-External2.xml
+}}
+
+Edit the network configuration to make it unique.
+
+* Change the '''name''' and '''bridge name'''.
+* Delete the '''mac address''' and '''uuid''' parameters.
+
+Alternatively, replace the configuration with the example below (this assumes the only custom networks are {{project_name_short}}-related).
+
+<pre style="white-space: pre-wrap;">
+<network>
+  <name>Whonix-External2</name>
+  <bridge name='virbr4' stp='on' delay='0'/>
+</network>
+</pre>
+
+Save and exit.
+
+<pre>
+CTRL-X
+y
+CTRL-M
+</pre>
+
+Import and start the new network.
+
+{{CodeSelect|code=
+virsh -c qemu:///system net-define Whonix-External2.xml
+}}
+
+{{CodeSelect|code=
+virsh -c qemu:///system net-autostart Whonix-External2
+}}
+
+{{CodeSelect|code=
+virsh -c qemu:///system net-start Whonix-External2
+}}
+
+Attach the Gateway and Workstation VM NICs to the new network.
+
+Ensure that one Gateway NIC is attached to the external network. It is important to carefully match internal network interfaces to the new ones and not accidentally switch to a NIC that connects outside.
+
+To edit the VM virtual NIC settings: <br />
+<code>Highlight VM</code> &rarr; <code>Open</code> &rarr; <code>Settings</code> &rarr; <code>NIC virtual hardware</code> &rarr; Set Network Source to: <code>Virtual network 'Whonix-External2' : NAT</code>
+
+Related forum discussion: https://forums.whonix.org/t/do-multiple-whonix-gateways-require-different-whonix-external-virtual-nics/19903
+
+'''7.''' Change the number of pinned CPUs.
 
 It is recommended to [[KVM#Editing_an_Imported_Machine.27s_XML_Configuration|edit]] the cloned workstation's configuration and change the number of pinned CPUs to a different value (3 or 4) compared to the existing gateway and primary workstation. This only works if users have a quad-core system.
 
-'''7.''' Setup different external network interfaces.
-
-Required?
-
-[[Undocumented]]. TODO.
-
-forum discussion: https://forums.whonix.org/t/do-multiple-whonix-gateways-require-different-whonix-external-virtual-nics/19903
 
 '''8.''' Done.
 }}

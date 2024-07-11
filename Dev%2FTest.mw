@@ -1,17 +1,81 @@
 {{Header}}
 {{title|title=
-How-to: "Un{{project_name_long}}" - enable clearnet networking
+How-to: "Un{{project_name_long}}" - using clearnet networking
 }}
 {{#seo:
-|description=Enable clearnet networking for Whonix-Gateway and/or Whonix-Workstation / Curl Clearnet Connectivity Test from Whonix-Gateway.
+|description=Using clearnet networking for Whonix-Gateway and/or Whonix-Workstation / Curl Clearnet Connectivity Test from Whonix-Gateway.
 }}
 {{local_connections_mininav}}
 {{intro|
-Enable clearnet networking for Whonix-Gateway and/or Whonix-Workstation / Curl Clearnet Connectivity Test from Whonix-Gateway.
+Using clearnet networking for Whonix-Gateway and/or Whonix-Workstation / Curl Clearnet Connectivity Test from Whonix-Gateway.
 
-This is for developers only!
+This is mostly for developers only!
 }}
 __TOC__
+= The clearnet User =
+
+The <code>clearnet</code> user is a special user account on the {{project_name_gateway_short}} that is designed to bypass Tor for specific purposes. Unlike the default user account <code>user</code>, which routes all traffic through Tor, the clearnet user has direct access to the internet without anonymization.
+
+Key points about the clearnet user:
+
+* <u>Purpose:</u> It allows certain applications or services to connect directly to the internet when necessary, such as for the SSH connection in this setup.
+* <u>Security considerations:</u> Traffic from the clearnet user is not anonymized. Any connections made using this account will reveal your real IP address and can potentially be traced back to you.
+* <u>Limited use:</u> The clearnet user should only be used when absolutely necessary and for specific tasks that require a direct internet connection.
+* <u>Isolation:</u> By using a separate user account for non-Tor traffic, {{project_name_short}} maintains a clear separation between anonymized and non-anonymized connections, reducing the risk of accidental deanonymization.
+* <u>Persistence:</u> By default, the clearnet user's home directory is not persistent. This will change in a future {{project_name_short}} version. How to make it persistent is documented below.
+
+The clearnet user is essential for establishing the initial tunnel connection that will then be used to route Tor traffic. This allows for the <code>User</code> &rarr; <code>proxy/SSH/VPN</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code> configuration, where the tunnel connection acts as an additional layer before Tor.
+
+{{mbox
+| type    = critical
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Always be aware that when using the clearnet user, your activities are not protected by Tor's anonymity features. Only use this account for tasks that specifically require a direct internet connection and where anonymity is not a concern.
+}}
+
+== Make Clearnet home persistent ==
+
+There is no persistent home for the <code>clearnet</code> user by default. Therefore make it persistent so SSH user data (keys, known_hosts file) can be saved there.
+
+'''1.''' Change folder location of user <code>clearnet</code> to <code>/home/clearnet</code>.
+
+Platform specific. See below on where to run the following command.
+
+* [[Non-Qubes-Whonix]]: On {{project_name_gateway_short}}.
+* [[Qubes-Whonix]]: On <code>{{project_name_gateway_template}}</code> Template. <ref>
+Because <code>/etc/passwd</code>, the configuration file that declares location of the home folders for users, is stored in the Qubes root image.
+</ref>
+
+{{CodeSelect2|code=
+sudo usermod -d /home/clearnet clearnet
+}}
+
+'''2.''' Create the new persistent home folder.
+
+Platform specific. See below on where to run the following commands.
+
+* [[Non-Qubes-Whonix]]: On {{project_name_gateway_short}}.
+* [[Qubes-Whonix]]: On <code>{{project_name_gateway_vm}}</code> App Qube. <ref>
+Because home folders of users are stored in the Qubes private image.
+</ref>
+
+{{CodeSelect2|code=
+sudo mkdir -p /home/clearnet
+}}
+
+'''3.''' Change owner and group to <code>clearnet</code>.
+
+{{CodeSelect2|code=
+sudo chown -R clearnet:clearnet /home/clearnet
+}}
+
+'''4.''' Adjust permissions.
+
+{{CodeSelect2|code=
+sudo chmod 755 /home/clearnet
+}}
+
+This will most likely be simplified in a future {{project_name_short}} version, where user <code>clearnet</code> will have a persistent home folder by default.
+
 = Curl Clearnet Connectivity Test from Whonix-Gateway =
 '''Warning:''' <u>Not anonymous!</u>
 
