@@ -7,11 +7,14 @@
 Instructions to build {{project_name_short}} Virtual Machine Images from Source Code.
 }}
 = Introduction =
-This page documents how to <u>build {{project_name_short}}</u> VM (<u>V</u>irtual <u>M</u>achine) images for [[VirtualBox]] ({{Code2|.ova}}) or [[KVM]] ({{Code2|.qcow2}}) [[Trust#Builds_from_Source_Code_versus_Builds_including_Binary_Packages|<u>"from source code"</u>]]. Most users do not build {{project_name_short}} from source code but instead [[Download|download {{project_name_short}}]].
+This page documents how to <u>build {{project_name_short}}</u> VM (<u>V</u>irtual <u>M</u>achine) images for [[VirtualBox]] ({{Code2|.ova}}) or [[KVM]] ({{Code2|.qcow2}}) [[Trust#Builds_from_Source_Code_versus_Builds_including_Binary_Packages|<u>"from source code"</u>]] using {{kicksecure_wiki
+|wikipage=Dev/Derivative-Maker
+|text=derivative-maker
+}}. Most users do not build {{project_name_short}} from source code but instead [[Download|download {{project_name_short}}]].
 
 For [[Qubes|{{q_project_name_long}}]], see [[Dev/Qubes#Build_{{q_project_name_short}}_Templates|{{q_project_name_long}} Build Documentation]].
 
-Building from source code as security advantages (see [[Trust]]).
+Building from source code has security advantages (see [[Trust]]).
 
 The goal of this build documentation is to be usable by as many users as possible. Therefore written as easy as possible with no prior knowledge of tools used required.
 
@@ -35,9 +38,9 @@ Steps concerning digital software verification are pointed out as "This step is 
 When verifying digital software signatures, these instructions will be slightly more complicated but therefore even more secure.
 
 # Host preparation.
-# Get {{project_name_short}} source code (which includes {{project_name_short}} build script).
+# Get derivative-maker source code.
 # Verify digital software signatures.
-# Run {{project_name_short}} build script
+# Run derivative-maker.
 # Done, build of {{project_name_short}} has been completed.
 
 = Host Preparation =
@@ -52,12 +55,12 @@ When making changes here, please consider also making changes there.
 == Host Preparation Notices ==
 {{Expand_or_Collapse_All}}
 <div class="toccolours mw-collapsible mw-collapsed">
-* <u>operating system:</u> You need to build on '''Debian''' <u><code>{{Stable project version based on Debian codename}}</code></u>, such as {{project_name_workstation_long}} <code>{{VersionShort}}</code> or a Debian <code>{{Stable project version based on Debian codename}}</code> VM.
+* <u>operating system:</u> You need to build on a '''Debian''' <u><code>{{Stable project version based on Debian codename}}</code></u> based operating system, such as {{project_name_workstation_long}} <code>{{VersionShort}}</code> or a Debian <code>{{Stable project version based on Debian codename}}</code> VM.
 * <u>disk space:</u> You need ~ <code>30</code> GB free disk space.
 * <u>RAM:</u> You need ~ <code>4</code> GB free RAM.
 ** Might actually work with a lot less RAM.
 ** Might actually work with less RAM if you have swap.
-* <u>linux user account:</u> Do not build under user <code>root</code>. Login regular as user <code>user</code>. Do not use <code>sudo</code> to run <code>derivative-maker</code> because this is handled by the build script.
+* <u>linux user account:</u> Do not build under user <code>root</code>. Login regular as user <code>user</code>. Do not use <code>sudo</code> to run <code>derivative-maker</code> because becoming root when necessary is handled by the build script.
 * <u>build place notice:</u> You cannot build on {{project_name_gateway_long}} (due to networking issues).
 * <u>build logs:</u> Build logs: If using a GUI (graphical user interface) it is recommended to set your terminal (for example <code>xfce4-terminal</code>) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
 <div class="mw-collapsible-content">
@@ -71,13 +74,7 @@ Unless you know what you are doing. Technically, it would work. This is recommen
 </div>
 </div>
 <div class="toccolours mw-collapsible mw-collapsed">
-* <u>Exiting VMs name collision warning:</u> Make sure there aren't any VMs in VirtualBox (inside your build machine) already called {{project_name_gateway_short}} or {{project_name_workstation_short}}!
-<div class="mw-collapsible-content">
-Because the build script would fail, because it tries to create VMs either named {{project_name_gateway_short}} or {{project_name_workstation_short}}. Running the clean script between builds will prevent this error.
-</div>
-</div>
-<div class="toccolours mw-collapsible mw-collapsed">
-* <u>Parallel builds unsupported warning:</u> Do not try to build {{project_name_gateway_short}} and {{project_name_workstation_short}} at the same time!
+* <u>parallel builds unsupported warning:</u> Do not try to build {{project_name_gateway_short}} and {{project_name_workstation_short}} at the same time!
 <div class="mw-collapsible-content">
 Building {{project_name_gateway_short}} and {{project_name_workstation_short}} at the same time is not supported due to limitations in the build script. In other words, do not try to run for example {{Code|~/derivative-maker/derivative-maker --flavor whonix-gateway -- --target virtualbox}} and {{Code|~/derivative-maker/derivative-maker --flavor whonix-workstation -- --target virtualbox}} at the same time. The build would probably fail.
 </div>
@@ -114,18 +111,25 @@ https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-ste
 </div>
 </div>
 
+<div class="toccolours mw-collapsible mw-collapsed">
+* <u>official builds:</u> In case of creating official builds to be redistributed on <code>{{project_clearnet}}</code> and not for personal use, press expand on the right side.
+<div class="mw-collapsible-content">
+Prepend the following variable:
+{{CodeSelect|code=
+dist_build_redistributable=true
+}}
+
+sets:
+
+* <code>--repo true</code>
+* <code>--tb closed</code>
+
+See also: [[Dev/Redistribution]]
+</div>
+</div>
+
 == Host Preparation Steps ==
-'''1.''' <u>build dependencies:</u>
-
-{{Build_Dependencies}}
-'''2.''' <u>Platform specific notices</u>:
-
-* VirtualBox: Install VirtualBox on the build machine as per [[VirtualBox/Recommended_Version|recommended VirtualBox version]]. <ref>
-Due to technical challenges, see [[Dev/VirtualBox#VirtualBox_Installation_Challenges|VirtualBox Installation Challenges]].
-</ref>
-* Other platforms: No special notice.
-
-'''3.''' <u>sudo setup</u>:
+<u>sudo setup</u>:
 
 Choose either Option A <u>or</u> Option B.
 
@@ -137,12 +141,12 @@ Choose either Option A <u>or</u> Option B.
 |active=true
 |id=sudo-setup
 |addToClass=info-box active
-|title=== Option A: passwordless sudo ==
+|title==== Option A: passwordless sudo ===
 |content=
 <u>Option A:</u> Set up passwordless sudo.
 
 * Abstract task overview: Setup passwordless sudo for your Linux user account name.
-* Detailed task overview: Setup sudo and add your current linux user account to the linux user group <code>sudo</code>. The following instructions use Linux user account name <code>user</code> as an example. If the user is using a different Linux user account name such as <code>myname</code> then the commands below have to be adjusted accordingly.
+* Detailed task overview: Setup sudo and add your linux user account to the linux user group <code>sudo</code>. The following instructions use Linux user account name <code>user</code> as an example. If the user is using a different Linux user account name such as <code>myname</code> then the commands below have to be adjusted accordingly.
 * Unspecific: Configuration of sudo is [[unspecific|unspecific to {{project_name_short}}]].
 * {{project_name_short}} specific: When building inside {{project_name_short}}, user <code>user</code> is already a member of group <code>sudo</code> by default. Therefore the following step "1." can be skipped.
 * Detailed steps:
@@ -162,12 +166,12 @@ The process of setting up passwordless sudo has been completed.
 {{Tab
 |id=sudo-setup
 |addToClass=info-box
-|title=== Option B: long sudo timeout ==
+|title==== Option B: long sudo timeout ===
 |content=
 <u>Option B:</u> Set a longer sudo password timeout.
 
 * Abstract task overview: Setup sudo with a longer timeout for your Linux user account name.
-* Detailed task overview: Setup sudo and increase the sudo password timeout (four all Linux user accounts or all users). The following instructions use Linux user account name <code>user</code> as an example. If the user is using a different Linux user account name such as <code>myname</code> then the commands below have to be adjusted accordingly.
+* Detailed task overview: Setup sudo and increase the sudo password timeout (for all Linux user accounts or all users). The following instructions use Linux user account name <code>user</code> as an example. If the user is using a different Linux user account name such as <code>myname</code> then the commands below have to be adjusted accordingly.
 * Unspecific: Configuration of sudo is [[unspecific|unspecific to {{project_name_short}}]].
 * {{project_name_short}} specific: When building inside {{project_name_short}}, user <code>user</code> is already a member of group <code>sudo</code> by default. Therefore the following step "1." can be skipped.
 * Detailed steps:
@@ -188,6 +192,13 @@ The process of setting up a longer sudo timeout has been completed.
 
 = Special Notice =
 There is currently no special notice.
+
+<code>{{VersionNew}}</code> build currently failing.
+
+Updates will be posted here:
+
+* https://forums.whonix.org/t/whonix-version-17-2-0-1-build-from-source-code-failure-the-following-signatures-were-invalid-expkeysig-74a941ba219ec810-deb-torproject-org-archive-signing-key/20108
+* https://forums.whonix.org/t/whonix-image-builds/13815
 
 = Choose Version =
 {{mbox
@@ -291,15 +302,15 @@ Multiple build targets at the same time are also possible.
 
 | '''A)'''
 | [[VirtualBox]] VMs
-| Production.
-| <code>.vdi</code>
+| Stable.
+| {{nowrap|<code>.vdi</code>}}
 | {{CodeSelect|code=--target virtualbox}}
 |-
 
 | '''B)'''
 | [[KVM]] (and [[QEMU]])
-| KVM: Production.; QEMU: [[unsupported]]
-| <code>.qcow2</code>
+| KVM: Stable.; QEMU: [[unsupported]]
+| {{nowrap|<code>.qcow2</code>}}
 | {{CodeSelect|code=--target qcow2}}
 |-
 
@@ -315,7 +326,7 @@ Multiple build targets at the same time are also possible.
 * [[MacOS#M1]]
 * https://forums.whonix.org/t/whonix-on-mac-m1-arm/11310
 </ref>
-| Tested on Mac M1, testers only, <code>--arch <u>arm64</u></code>.
+| Tested on Mac M1, M2, ... testers only, <code>--arch <u>arm64</u></code>.
 | <code>.raw</code>
 | {{CodeSelect|code=--target utm}}
 |-
@@ -424,33 +435,13 @@ export DERIVATIVE_APT_REPOSITORY_OPTS
 * These instructions assume you have the {{project_name_short}} source code in your home folder (<code>~/derivative-maker</code>), and
 * use VirtualBox as an example.
 
-----
-
-'''7.''' Delete any existing {{project_name_gateway_short}} virtual machine with the following command.
-
-'''Warning''': This will delete any virtual machine named {{project_name_gateway_short}} from VirtualBox installed on your build machine!
-
-{{CodeSelect|code=
-~/derivative-maker/derivative-delete --flavor {{project_name_short_lowercase}}-gateway-xfce --target virtualbox
-}}
-
-'''8.''' Delete any existing {{project_name_workstation_short}} virtual machine with the following command.
-
-'''Warning''': This will delete any virtual machine named {{project_name_workstation_short}} from VirtualBox installed on your build machine!
-
-{{CodeSelect|code=
-~/derivative-maker/derivative-delete --flavor {{project_name_short_lowercase}}-workstation-xfce --target virtualbox
-}}
-
-----
-
-'''9.''' Build a {{project_name_gateway_short}} virtual machine image. {{Code2|build command}}:
+'''7.''' Build a {{project_name_gateway_short}} virtual machine image. {{Code2|build command}}:
 
 {{CodeSelect|code=
 ~/derivative-maker/derivative-maker --flavor {{project_name_short_lowercase}}-gateway-xfce --target virtualbox --repo true
 }}
 
-'''10.''' Build a {{project_name_workstation_short}} virtual machine image. {{Code2|build command}}:
+'''8.''' Build a {{project_name_workstation_short}} virtual machine image. {{Code2|build command}}:
 
 {{CodeSelect|code=
 ~/derivative-maker/derivative-maker --flavor {{project_name_short_lowercase}}-workstation-xfce --target virtualbox --repo true
@@ -477,48 +468,10 @@ tail -n 100 -f ~/build-log 2>&1
 
 = VM Build Result =
 
-* <u>VirtualBox</u>: The newly created VMs can be seen in VirtualBox user interface and in the usual VirtualBox data folders.
+* <u>VirtualBox</u>: The resulting <code>.ova</code> images can be found in <code>~/derivative-binary</code> folder.
 * <u>KVM, QEMU, raw images</u>: The resulting <code>.qcow2</code> and/or <code>.raw</code> images can be found in <code>~/derivative-binary</code> folder.
 
 Most users have completed the build process at this point, can start using {{project_name_short}} and skip the rest of this page.
-
-= Unified Images =
-<u>Optional.</u>
-
-Creation of ([https://forums.whonix.org/t/whonix-virtualbox-14-0-1-4-4-unified-ova-downloads-point-release/6996 unified]) <code>.ova</code> image(s) for {{project_name_short}} VirtualBox or <code>libvirt.xz</code> archives for {{project_name_short}} KVM. This might only be interesting if the goal is [[Dev/Redistribution|Redistribution]] of images to third parties such as the public.
-
-There are two options.
-
-* '''A''') <u>Automated:</u> A bit difficult (since it expects preexisting signing keys), using [[#Prepare Release|dm-prepare-release]] script, <u>OR</u>
-* '''B''') <u>Manually:</u>
-** <u>VirtualBox:</u> Using the VirtualBox graphical or command line interface VM export feature could be used. <ref>
-This is sane since important VM settings were already configured in https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/4600_create-vbox-vm.
-
-<code>dm-prepare-release</code> VM export does nothing special/important for privately used builds.
-</ref>
-** <u>KVM:</u> Manually.
-
-= Prepare Release =
-[https://github.com/Kicksecure/developer-meta-files/blob/master/usr/bin/dm-prepare-release dm-prepare-release] is useful for:
-
-* Creation of a [https://forums.whonix.org/t/whonix-virtualbox-14-0-1-4-4-unified-ova-downloads-point-release/6996 unified] <code>.ova</code> image or <code>libvirt.xz</code> archive
-* Creation of torrent files.
-* Creation of hash sum files.
-* Creation of digital software signatures.
-** [[OpenPGP]] (gpg) signatures
-** [[signify|signify]] signatures
-** [https://forums.whonix.org/t/use-codecrypt-to-sign-whonix-releases/7844 soon] {{kicksecure_wiki
-|wikipage=PQCrypto#Codecrypt
-|text=Codecrypt
-}} signatures
-* Adding the license agreement.
-* Adding the disclaimer.
-* [[Dev/Redistribution|Redistribution]].
-* Example: {{CodeSelect|code=
-dm-prepare-release --build --target virtualbox --flavor whonix-workstation-xfce
-}}
-
-For private builds, i.e. for builds which are not supposed to be redistributed to others, none of this is important. If any of this was important, it could also be done manually.
 
 = Footnotes =
 {{reflist|close=1}} {{Footer}} [[Category:Development]]
