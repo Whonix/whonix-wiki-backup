@@ -73,6 +73,43 @@ Build limitations:
 = misc =
 * [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1054343 add support for "apt install fp-units-win-rtl" instead of "apt install fp-units-win-rtl-3.2.2"]
 
+= Notes =
+== UseVersionInfo WhonixSetup.lpi ==
+
+[[File:WhonixSetupVersionInfo.png|thumb]]
+
+Can the following variables be removed if not essential?
+
+<pre>
+OriginalFilename="WhonixInstaller-XYZ-1.2.3.4.exe"
+</pre>
+
+<pre>
+      <UseVersionInfo Value="True"/>
+      <MajorVersionNr Value="1"/>
+</pre>
+
+<p>
+The variables aren't essential for functionality.
+</p>
+
+<p>
+For reasons of end user confidence it's recommended to keep the version and file information (<UseVersionInfo Value="True"/>).
+</p>
+
+<p>
+"OriginalFilename" could just be "WhonixInstaller.exe". ( but I like to set the same as the final filename displayed in file browser )
+</p>
+
+<p>
+"MajorVersionNr", "MinorVersionNr", "RevisionNr", "BuildNr" is summarized as "FileVersion" by Lazarus.
+If we delete these values the file version will be 0.0.0.0
+</p>
+
+<p>
+I'm not sure in this case if the version refers to the installer or the software being installed.
+</p>
+
 = CI =
 Whonix-Starter:
 
@@ -249,34 +286,8 @@ readpe hello_with_signature_reset_PE.exe
 readpe hello_without_signature_reset_PE.exe
 }}
 
-= TODO =
-== merge ==
-Reminder: Always please merge first before developing further.
-
-== update this wiki page ==
-Please add comments to this wiki page once any things have been changed.
-
-== WhonixSetup.lpi ==
-Can the following variables be removed if not essential?
-
-<pre>
-OriginalFilename="WhonixInstaller-XYZ-1.2.3.4.exe"
-</pre>
-
-<pre>
-      <UseVersionInfo Value="True"/>
-      <MajorVersionNr Value="1"/>
-</pre>
-
-== rename setup to installer ==
-* Please rename all mentions of textual string <code>Setup</code> to <code>Installer</code> in <code>WhonixStarter.msi</code>.
-
-== remove minimal installation ==
-Only "full" installation option needed for simplicity.
-
-<code>whonixinstaller_main.pas</code> still contains some mentions of <code>minimal</code>. Please remove, if possible.
-
-== bug with WhonixStarter.msi execution ==
+= Archived Tasks =
+== WhonixStarter.msi execution ==
 Happening on Windows 10.
 
 <pre>
@@ -287,7 +298,10 @@ Execute: msiexec /i "C:\Users\user\AppData\Local\Whonix-Xfce-17.2.0.1\WhonixStar
 Error : Whonix-Starter could not be installed.
 </pre>
 
-=== Debugging Attempt 1: Double Clicking WhonixStarter.msi ===
+-> fixed: see https://github.com/einsiedler90/Whonix-Installer/commit/5e52d6fc436001345db896ffee2f89c8b20c0ab1
+
+'''Debugging Attempt 1: Double Clicking WhonixStarter.msi'''
+
 While this happened, user kept the Whonix-Installer open and then attempted to manually run <code>C:\Users\user\AppData\Local\Whonix-Xfce-17.2.0.1\WhonixStarter.msi</code> for debugging reasons. Result:
 
 <pre>
@@ -300,8 +314,28 @@ Retry | Cancel
 
 What can we conclude from this? Maybe while Whonix installer is running, it cannot execute <code>msiexec /i "C:\Users\user\AppData\Local\Whonix-Xfce-17.2.0.1\WhonixStarter.msi"</code> because it is blocking itself?
 
-=== Debugging Attempt 2: Starting WhonixStarter.msi from Terminal ===
+-> perhaps obsolete due to previous fix?
+Strange: execution of "msiexec" is finnished when "Whonix-Starter could not be installed." appears.
+
+''' Debugging Attempt 2: Starting WhonixStarter.msi from Terminal '''
+
 Starting <code>msiexec /i "C:\Users\user\AppData\Local\Whonix-Xfce-17.2.0.1\WhonixStarter.msi"</code> from terminal does not show any additional output.
+
+= TODO =
+== merge ==
+Reminder: Always please merge first before developing further.
+
+== update this wiki page ==
+Please add comments to this wiki page once any things have been changed.
+
+== rename setup to installer - update #3 ==
+file: Whonix-Installer build-dummy.sh
+
+<pre>
+export FILE_INSTALLER_BINARY_FINAL=~/windows-installer-dummy-temp-delete-me/WhonixSetup-$VERSION_FULL.exe
+</pre>
+
+Please don't name "setup" because not using that word anywhere else.
 
 == do not delete WhonixStarter.msi after installation ==
 A user reported that WhonixStarter.msi gets deleted once Whonix installer gets closed.
