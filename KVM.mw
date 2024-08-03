@@ -956,8 +956,51 @@ To add more vcpus, increase the number in between the opening and closing <code>
 If preserving cpu pinning while increasing core count is desired, pin the vcpus to different numbered ones compared to other sensitive VMs. Map them in a 1:1 ratio to avoid over committing cores (which leads to performance problems).
 
 == 3D Graphics Acceleration ==
+Under consideration. (Advanced users, see: [[Dev/KVM#Virgl3D|Dev/KVM#Virgl3D]])
 
-[[Dev/KVM#Virgl3D|Not yet functional]] as of Debian <code>buster</code> but this has been fixed upstream. Future enhancements for performance and security are planned. Will revisit in Bullseye.
+Default configuration:
+
+<pre>
+    <graphics type='spice' autoport='yes'>
+      <clipboard copypaste='no'/>
+      <filetransfer enable='no'/>
+      <gl enable='no'/>
+    </graphics>
+</pre>
+
+<pre>
+    <video>
+      <model type='virtio' heads='1' primary='yes'/>
+    </video>
+</pre>
+
+Untested!
+
+Note: Enabling <code>acceleration accel3d='yes'</code> will increase the attack surface.
+
+To enable 3D:
+
+<pre>
+    <graphics type='spice' autoport='yes'>
+      <clipboard copypaste='no'/>
+      <filetransfer enable='no'/>
+      <gl enable='yes'/>
+    </graphics>
+</pre>
+
+<pre>
+    <video>
+      <model type='virtio' heads='1' primary='yes'/>
+      <acceleration accel3d='yes' accel2d='yes'/>
+      <gl enable='yes'/>
+    </video>
+</pre>
+
+
+<code>accel2d='yes'</code> / <code><gl enable='yes'/></code>:
+
+* Performance impact untested.
+* Setting to <code>no</code> might reduce attack surface.
 
 == Mouse Smoothness ==
 

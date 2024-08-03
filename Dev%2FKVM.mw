@@ -365,15 +365,15 @@ https://wiki.libvirt.org/page/Networking#Forwarding_Incoming_Connections
 
 ==Virgl3D==
 
-'''Buster Update:''' Still cannot enable on Buster because of an QEMU process restrictions which were fixed upstream, but unfortunately after the freeze. <ref>
+<s>Still cannot enable on Buster because of an QEMU process restrictions which were fixed upstream, but unfortunately after the freeze. <ref>
 https://bugzilla.redhat.com/show_bug.cgi?id=1659484
-</ref>
+</ref></s>
 
-https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
+https://www.kraxel.org/blog/2016/09/using-virtio-gpu-with-libvirt-and-spice/
 
-According to Gerd Hoffman (libvirt dev) ''vhost-user virtio gpu'' is the ideal mode for performance and security but this is only available as of QEMU 4.1 which came after the Buster freeze <ref>
-https://wiki.qemu.org/ChangeLog/4.1#Graphics
-</ref> Libvirt support is also pending.
+[https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/ Quote] Gerd Hoffman (libvirt dev) ''vhost-user virtio gpu'':
+
+<blockquote>This is good from the security perspective, especially if you want use virgl 3D acceleration, and it also helps with opengl performance.</blockquote>
 
 QXL has been superseded by virtio-vga where most development happens (and security attention probably). 2D acceleration as a distinct mechanism is outdated and 3D mode is where all types of graphical acceleration will be handled:
 
@@ -385,30 +385,37 @@ This device has support for 2D acceleration. This becomes more and more useless 
 * https://github.com/Kicksecure/libvirt-dist/commit/097eca3af732d6ab241d0b2d8c874708e3684f54#diff-5e55db5897227f5167927761177ae7b4
 * https://forums.whonix.org/t/help-welcome-kvm-development-staying-the-course/166/352
 * https://forums.whonix.org/t/make-screen-resolution-1920x1080-by-default-for-all-vms/9143/13
-
-'''Stretch:''' Blog gives complete minimum requirements and settings needed to enable. Check Stretch package versions after freeze and determine if its supported or not. Document how to enable 3D on wiki.
-
-https://www.kraxel.org/blog/2016/09/using-virtio-gpu-with-libvirt-and-spice/
-
-https://forums.whonix.org/t/canvas-fingerprints-identical-across-different-pcs-running-whonix/3310
+* https://forums.whonix.org/t/canvas-fingerprints-identical-across-different-pcs-running-whonix/3310
 
 <blockquote>
-VMs with the same or related OS have the same canvas fingerprint. So Firefox in all Debian, Ubuntu etc VMs have the same fingerprint. Tor browser blocks fingerprinting, but Iceweasel doesn't. But if some bug allowed canvas fingerprinting in {{project_name_short}} Tor browser, it would be the same as Firefox in another Debian-related VM.
+VMs with the same or related OS have the same canvas fingerprint. So Firefox in all Debian, Ubuntu etc VMs have the same fingerprint. Tor browser blocks fingerprinting, but Iceweasel doesn't. But if some bug allowed canvas fingerprinting in {{project_name_short}} Tor Browser, it would be the same as Firefox in another Debian-related VM.
 </blockquote>
 
 Asked upstream for help testing this:
 
-https://listman.redhat.com/archives/libvir-list/2016-December/msg01157.html
-
+[https://listman.redhat.com/archives/libvir-list/2016-December/msg01157.html libvirt: Do different Virgil3D users running have the same CANVAS fingerprint?   bancfc at openmailbox.org]
 
 Given that the 3D enabled virtio-gpu is also a virtual GPU it should show the same model for all guests and therefore I predict it will be the same as with results of virtualized graphics without this feature.
 
 https://listman.redhat.com/archives/libvir-list/2017-January/msg00296.html
 
-
 Vulkan support is being added by Google to the virtio-gpu <ref>
 https://www.phoronix.com/news/VirtIO-GPU-Venus-Vulkan
 </ref>
+
+Demi Marie Obenour (Qubes core developer) [https://github.com/QubesOS/qubes-issues/issues/4234#issuecomment-1664860957 quote]:
+
+<blockquote>
+VirGL and Venus run the userspace driver (OpenGL and Vulkan respectively) on the host. This means that they provide a hardware-independent API to the guest, but also means that the entire userspace stack becomes guest-accessable attack surface. This attack surface is very large, and Linux graphics developers have stated on IRC that it is not a security boundary. Therefore, @marmarek has decided that Qubes OS will never use VirGL or Venus and I agree with his decision.
+
+virtGPU native contexts, on the other hand, expose the kernel ioctl API to the guest. This API is accessible to unprivileged userspace processes, which means it is a supported security boundary. It is also much smaller than the OpenGL or Vulkan APIs, which means that its attack surface is vastly smaller. As a bonus, native contexts offer near-native performance, which should be enough even for games and other demanding tasks.
+
+The kernel ioctl API (also known as the userspace API or uAPI) is hardware-dependent, so virtGPU native contexts are only supported on a subset of hardware. Currently, Intel, AMD, and Adreno GPUs are supported using the upstream i915, amdgpu, and freedreno drivers.
+
+Xen supports grant-based virtio, so virtio-GPU should not be incompatible with running QEMU in a stubdomain. The virtio-GPU emulator will need to run in dom0, but its job is much simpler than that of QEMU (it is only emulating a single device) and so the attack surface should (hopefully!) be acceptable.
+</blockquote>
+
+todo: read https://www.kraxel.org/blog/2021/05/virtio-gpu-qemu-graphics-update/
 
 == Audit Output of virsh domxml-to-native ==
 <pre>
