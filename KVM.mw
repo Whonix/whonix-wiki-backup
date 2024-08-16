@@ -68,13 +68,13 @@ sudo apt update
 For '''Debian {{Stable project version based on Debian codename}}+''' on Intel / AMD you need to install:
 
 {{CodeSelect|code=
-sudo apt install --no-install-recommends qemu-kvm qemu-system-x86 libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables
+sudo apt install --no-install-recommends qemu-kvm qemu-system-x86 libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm
 }}
 
 For '''Debian {{Stable project version based on Debian codename}}+''' on PowerPC you need to install:
 
 {{CodeSelect|code=
-sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables
+sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm
 }}
 </div>
 </div>
@@ -87,7 +87,7 @@ If you are using Ubuntu, click on Expand on the right.
 Install dependencies.
 
 {{CodeSelect|code=
-sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libguestfs-tools genisoimage virtinst libosinfo-bin virt-manager dnsmasq-base iptables
+sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libguestfs-tools genisoimage virtinst libosinfo-bin virt-manager dnsmasq-base iptables safe-rm
 }}
 
 Add your user to KVM Groups (1 of 2).
@@ -114,7 +114,7 @@ Update the package lists and install the following packages.
 TODO: Possible to only install dnsmasq-base without the dnsmasq systemd unit or does Arch Linux keep the systemd unit disabled by default?
 
 {{CodeSelect|code=
-sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils
+sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils safe-rm
 }}
 
 {{CodeSelect|code=
@@ -209,19 +209,19 @@ The qemu-kvm and libvirt-bin packages are necessary. virt-manager is also requir
 If any of the following errors appear while later using {{Code|virsh define}}.
 
 {{CodeSelect|code=
-error: Failed to define domain from {{project_name_gateway_short}}_kvm-8.6.2.8.xml
+error: Failed to define domain from {{project_name_gateway_short}}_kvm.xml
 error: internal error Unknown controller type 'pci
 }}
 
 {{CodeSelect|code=
-{{project_name_gateway_short}}_kvm-8.6.2.8.xml:24: element pm: Relax-NG validity error : Element domain has extra content: pm
-{{project_name_gateway_short}}_kvm-8.6.2.8.xml fails to validate
+{{project_name_gateway_short}}_kvm.xml:24: element pm: Relax-NG validity error : Element domain has extra content: pm
+{{project_name_gateway_short}}_kvm.xml fails to validate
 }}
 
 {{CodeSelect|code=
 Relax-NG validity error : Extra element devices in interleave
-{{project_name_gateway_short}}_kvm-8.6.2.8.xml:24: element devices: Relax-NG validity error : Element domain failed to validate content
-{{project_name_gateway_short}}_kvm-8.6.2.8.xml fails to validate
+{{project_name_gateway_short}}_kvm.xml:24: element devices: Relax-NG validity error : Element domain failed to validate content
+{{project_name_gateway_short}}_kvm.xml fails to validate
 }}
 
 Then a more recent version of libvirt and kvm is likely needed.
@@ -256,7 +256,6 @@ sudo gpasswd -a $USER libvirt
 {{CodeSelect|code=
 sudo gpasswd -a $USER kvm
 }}
-
 
 <ref>
 By default Debian does not use <code>sudo</code>, so groups can be added with <code>usermod</code>. If your user is <code>foo</code> the following commands will work.
