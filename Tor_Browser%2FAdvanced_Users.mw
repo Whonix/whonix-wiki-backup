@@ -167,7 +167,10 @@ Tor Browser patches and the integrated Torbutton features can potentially disabl
 * The Torbutton function design section immediately below.
 
 == New Identity Design ==
-The Tor Browser design document describes the full features provided by this extension: <ref>https://gitlab.torproject.org/legacy/trac/-/issues/523</ref> <ref name=new_identity>https://2019.www.torproject.org/projects/torbrowser/design/#new-identity</ref> <br />
+The Tor Browser design document describes the full features provided by this extension: <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/523</ref> <ref name=new_identity>https://2019.www.torproject.org/projects/torbrowser/design/#new-identity
+</ref>
+
 <div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
 * Disables Javascript and plugins on all tabs and windows.
 * Stops all page activity for each tab.
@@ -192,8 +195,11 @@ The Tor Browser design document describes the full features provided by this ext
 ** All other browser site permissions.
 * Closes all remaining HTTP keep-alive connections.
 * Sends Tor the "newnym" signal to issue a new Tor circuit.
-</div> <br />
+</div>
+
 After this process above, a fresh browser window is opened and the current browser window is closed (this does not spawn a new Firefox process, only a new window). When the final window is closed, any blob:UUID URLs that were created by websites are purged. <ref name=new_identity />
+
+While there is no Tor running inside {{project_name_workstation_short}}, this is still possible. [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]] redirects the connection to {{project_name_gateway_short}}, where [[onion-grater|onion-grater (user documentation)]] ([[Dev/onion-grater|onion-grater (developer documentation)]]) is running, forwarding it to Tor.
 
 == New Tor Circuit Design ==
 The "New Tor Circuit for this Site" feature sends the "newnym" signal to the Tor control port to cause a new circuit to be created for the <i>current</i> Tor Browser tab. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/9442</ref> Other open tabs and windows from the same website will use the new circuit as well once they have reloaded, but connections to other websites on separate tabs are not affected. <ref>https://tb-manual.torproject.org/managing-identities/</ref>
