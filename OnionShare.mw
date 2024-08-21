@@ -68,32 +68,43 @@ OnionShare cannot protect users if the OnionShare address and private key is not
 = Installation =
 == {{project_name_gateway_long}} Installation Steps ==
 === onion-grater Profile ===
-<noinclude>__NOINDEX__</noinclude>{{mbox
-| image   = [[File:Ambox_notice.png|40px]]
-| text    =
+{{onion-grater-warning}}
 
-This application requires incoming connections through a Tor onion service and the use of [[Tor_Browser#Onion_Client_Authorization| Tor Browser Onion Client Authorization]]. Supported [[{{project_name_gateway_short}}|{{project_name_gateway_long}}]] modifications are therefore necessary for full functionality; see instructions below.
-
-For better security, consider using [[Multiple Whonix-Gateway|Multiple {{project_name_gateway_short}}]] and [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_long}}]]. In any case, [[About|{{project_name_short}}]] is the safest choice for running it. <ref>
-Security considerations:
-
-* By using {{project_name_short}}, additional protections are in place for greater security.
-* This application requires access to Tor's control protocol.
-* In the {{project_name_short}} context, Tor's control protocol has dangerous features. The Tor control command {{Code2|GETINFO address}} reveals the real, external IP of the Tor client.
-* {{project_name_short}} provides [[Dev/onion-grater|onion-grater, a Tor Control Port Filter Proxy - filtering dangerous Tor Control Port commands]].
-* When this application is run inside {{project_name_gateway_short}} with an onion-grater whitelist extension, this will limit {{project_name_workstation_short}} application rights to Tor control protocol access only. Non-whitelisted Tor control commands such as {{Code2|GETINFO address}} are rejected by onion-grater in these circumstances. In the event {{project_name_workstation_short}}, it can't determine its own IP address via requesting to Tor Controller, as onion-grater filters the reply.
-* In comparison, if the application is run on a non-Tor focused operating system like Debian, it will have unlimited access to Tor's control protocol (a less secure configuration).
-* If the (non-)Whonix platform is used to host onion services, then running applications are more vulnerable to attacks against the Tor network compared to when Tor is solely used as a client; see also [[Onion_Services#Onion_Services_Security|Onion Services Security]].
-
-In conclusion, {{project_name_short}} is the safest and correct choice for running this application.
-</ref>
-}}
+'''1.''' OnionShare onion-grater profile.
 
 {{Control_Port_Filter_Python_Profile_Add
 |filename_new=40_onionshare
 }}
 
+'''2.''' Onion client authorization onion-grater profile.
+
+This is required if using OnionShare in combination with [[Tor_Browser#Onion_Client_Authorization|Onion Client Authorization]].
+
+{{Control_Port_Filter_Python_Profile_Add
+|filename_new=40_onion_authentication
+}}
+
+'''3.''' Done.
+
+Onion-grater configuration has been completed.
+
 == {{project_name_workstation_long}} Installation Steps ==
+=== Installation ===
+Before installing OnionShare:
+
+* A separate {{project_name_workstation_short}} ([[Qubes|{{q_project_name_long}}]]: <code>anon-whonix</code> App Qube) is also recommended. The reason is the OnionShare installation will persist in this configuration and it is best practice to separate different, anonymous activities in distinct VMs (App Qubes). See [[Multiple Whonix-Workstation]].
+* Installation using {{kicksecure_wiki
+|wikipage=Install_Software#Flatpak
+|text=<code>flatpak</code>
+}} or <code>snap</code> is discouraged because it leads to [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]].
+* Installation from Debian package sources as documented below is recommended.
+
+Inside {{project_name_workstation_short}}.
+
+{{Install_Package
+|package=onionshare
+}}
+
 === Firewall Settings ===
 Modify the {{project_name_workstation_short}} (<code>anon-whonix</code>) user firewall settings and reload them.
 
@@ -113,22 +124,6 @@ Save.
 {{Reload_Firewall_ws}}
 }}
 
-=== Installation ===
-Before installing OnionShare:
-
-* A separate {{project_name_workstation_short}} ([[Qubes|{{q_project_name_long}}]]: <code>anon-whonix</code> App Qube) is also recommended. The reason is the OnionShare installation will persist in this configuration and it is best practice to separate different, anonymous activities in distinct VMs (App Qubes). See [[Multiple Whonix-Workstation]].
-* Installation using {{kicksecure_wiki
-|wikipage=Install_Software#Flatpak
-|text=<code>flatpak</code>
-}} or <code>snap</code> is discouraged because it leads to [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]].
-* Installation from Debian package sources as documented below is recommended.
-
-Inside {{project_name_workstation_short}}.
-
-{{Install_Package
-|package=onionshare
-}}
-
 = Using OnionShare =
 == Start OnionShare ==
 You can launch OnionShare in {{project_name_workstation_short}} using either the command-line interface (CLI) or the graphical user interface (GUI). The GUI can also be started from its icon shortcut.
@@ -144,26 +139,38 @@ flatpak run org.onionshare.OnionShare
 }}
 
 == OnionShare Configuration ==
-* After running OnionShare, configure Tor by clicking on "Network Settings".
+'''1.''' Be greeted by OnionShare start screen.
+
+'''Figure:''' ''OnionShare start screen''
 
 {{ContentImage|
 [[File:onionshare.png|border]]
 }}
 
-* Choose "Connect using socket file" then click "Save" <ref>
+'''2.''' Network Settings.
+
+After running OnionShare, configure Tor by clicking on "Network Settings".
+
+'''3.''' Choose "Connect using socket file" then click "Save" <ref>
 Even if you mistakenly connected by "Use the Tor version built into OnionShare" it does not lead to [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] thanks to special support by [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]].
 
 https://github.com/Whonix/anon-ws-disable-stacked-tor/blob/master/usr/bin/tor.anondist#L70
 </ref>.
 
+'''Figure:''' ''OnionShare Tor Settings''
+
 {{ContentImage|
 [[File:onionshare2.png|border]]
 }}
 
-* It will return you to the first page after running OnionShare, hit "Connect to Tor" and you should be presented with OnionShare services.
+'''4.''' Homepage.
+
+It will return you to the first page after running OnionShare, hit "Connect to Tor" and you should be presented with OnionShare services.
+
+'''Figure:''' ''OnionShare homepage''
 
 {{ContentImage|
-[[Image:Onionsharehomepage.png|border]]
+[[File:Onionsharehomepage.png|border]]
 }}
 
 == How-to: Use OnionShare ==
@@ -197,13 +204,13 @@ That person then must load the address in Tor Browser. After logging in with the
 '''Figure:''' ''Select File to Share''
 
 {{ContentImage|
-[[Image:Sharefileone.png|border]]
+[[File:Sharefileone.png|border]]
 }}
 
 '''Figure:''' ''Secret Onion URL for Downloaders''
 
 {{ContentImage|
-[[Image:Sharefiletwo.png|border]]
+[[File:Sharefiletwo.png|border]]
 }}
 
 '''Figure:''' ''Add private key in Tor Browser for authentication''
@@ -217,7 +224,7 @@ https://micahflee.com/2018/02/onionshare-has-some-exciting-new-features/
 </ref>
 
 {{ContentImage|
-[[Image:OnionSharereceive.png|border]]
+[[File:OnionSharereceive.png|border]]
 }}
 
 === Receive Files and Messages ===
@@ -241,7 +248,7 @@ You can check “Disable submitting text” if want to only allow file uploads, 
 '''Figure:''' ''Receive Files or Messages''
 
 {{ContentImage|
-[[Image:Onionsharereceivefiles.png|border]]
+[[File:Onionsharereceivefiles.png|border]]
 }}
 
 '''Figure:''' ''Receive Files Onion Hidden Services After Authentication''
