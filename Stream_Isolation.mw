@@ -291,10 +291,30 @@ For more information about stream isolation refer to the Tor manual.
 * [https://2019.www.torproject.org/docs/tor-manual.html.en Tor stable manual]
 * [https://2019.www.torproject.org/docs/tor-manual-dev.html.en Tor alpha manual]
 
-Different tabs and websites in Tor Browser are isolated by since Tor Browser. <ref>
-https://gitlab.torproject.org/legacy/trac/-/issues/3455
+=== Tor Browser ===
+Tor Browser has a feature [https://gitlab.torproject.org/legacy/trac/-/issues/3455 Tor Browser should set SOCKS username for a request based on first party domain]. Tor Browser makes use of Tor's [[Stream_Isolation#IsolateSOCKSAuth|<code>IsolateSOCKSAuth</code>]] option. {{project_name_short}} does not break this feature. <ref>
+This feature does not even require Tor <code>ControlPort</code> access. All that Tor Browser requires from {{project_name_short}} is being able to connect to a Tor <code>SocksPort</code>.
 </ref>
 
+Note: This wiki page stated <s>Different tabs and websites in Tor Browser are isolated by since Tor Browser. <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/3455
+</ref></s>. This was either always incorrect or Tor Browser's behavior has changed meanwhile.
+
+{{quotation|
+quote='''Tor circuit and HTTP connection linkability'''
+
+'''Design Goal:''' Tor circuits and HTTP connections from a third party in one URL bar origin MUST NOT be reused for that same third party in another URL bar origin.
+
+'''Implementation Status:''' The isolation functionality is provided by a Torbutton component that [https://gitweb.torproject.org/torbutton.git/tree/src/components/domain-isolator.js sets the SOCKS username and password for each request]. The Tor client has logic to prevent connections with different SOCKS usernames and passwords from using the same Tor circuit. Firefox has existing logic to ensure that connections with SOCKS proxies do not re-use existing HTTP Keep-Alive connections unless the proxy settings match. [https://bugzilla.mozilla.org/show_bug.cgi?id=1200802 We extended this logic] to cover SOCKS username and password authentication, providing us with HTTP Keep-Alive unlinkability.
+While the vast majority of web requests adheres to the circuit and connection unlinkability requirement there are still corner cases we [https://gitweb.torproject.org/tor-browser.git/commit/?h=tor-browser-52.5.2esr-7.0-2&id=8661822237c56d543d5c9117c8a4708c402a110f need to treat separately] or that [https://bugs.torproject.org/22343 lack a fix altogether].
+|context=upstream, The Tor Project: [https://www.torproject.org/projects/torbrowser/design/ The Design and Implementation of the Tor Browser (DRAFT)]
+}}
+
+Tor Browser is developed by upstream, [https://www.torproject.org The Tor Project], which is an independent entity. For up-to-date information, refer to upstream, Tor Browser.
+
+forum discussion: https://forums.whonix.org/t/tor-browser-new-identity-differs-from-restarting-tor-browser-in-whonix/3098/4
+
+=== Onion Services ===
 Connections to different Tor [[Onion Services]] are automatically stream isolated. <ref>
 https://lists.torproject.org/pipermail/tor-talk/2012-September/025432.html
 </ref>
@@ -467,6 +487,12 @@ Optional.
 See [https://2019.www.torproject.org/docs/tor-manual.html.en Tor manual] <code>IsolateSOCKSAuth</code>.
 
 <blockquote>Don’t share circuits with streams for which different SOCKS authentication was provided. [...]</blockquote>
+
+This is can be used with the <code>SocksPort</code> option.
+
+<blockquote>SocksPort [address:]port|unix:path|auto [flags] [isolation flags]</blockquote>
+
+<code>IsolateSOCKSAuth</code> is a sub option of the <code>SocksPort</code> option.
 
 == Qubes Specific ==
 === Qubes UpdatesProxy Stream Isolation ===

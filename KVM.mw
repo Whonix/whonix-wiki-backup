@@ -51,12 +51,17 @@ For the opposite viewpoint, see [[Dev/VirtualBox#Why_use_VirtualBox_over_KVM?|Wh
 {{Computer_Security_Education}}
 
 == Install KVM ==
-{{Anchor|Debian stable}}
-=== Debian ===
-<div class="toccolours mw-collapsible mw-collapsed">
-If you are using Debian {{Code2|stable}} (currently: {{Code2|{{Stable project version based on Debian codename}}}}), click on Expand on the right.
 
-<div class="mw-collapsible-content">
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= = Debian =
+|image=
+|addToClass=info-box
+|active=true
+|content=
+
 {{Sudo_Setup}}
 
 Update package lists.
@@ -76,16 +81,13 @@ For '''Debian {{Stable project version based on Debian codename}}+''' on PowerPC
 {{CodeSelect|code=
 sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm
 }}
-</div>
-</div>
+}} <!-- close tab: Debian -->
 
-=== Ubuntu ===
-<div class="toccolours mw-collapsible mw-collapsed">
-If you are using Ubuntu, click on Expand on the right.
-
-<div class="mw-collapsible-content">
-Install dependencies.
-
+{{Tab
+|title= = Ubuntu =
+|image=
+|addToClass=info-box
+|content=
 {{CodeSelect|code=
 sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libguestfs-tools genisoimage virtinst libosinfo-bin virt-manager dnsmasq-base iptables safe-rm
 }}
@@ -101,16 +103,14 @@ Add your user to KVM Groups (2 of 2).
 {{CodeSelect|code=
 sudo adduser $USER libvirt-qemu
 }}
-</div>
-</div>
 
-=== Arch Linux ===
-<div class="toccolours mw-collapsible mw-collapsed">
-If you are using Arch Linux, click on Expand on the right.
+}} <!-- close tab: Ubuntu -->
 
-<div class="mw-collapsible-content">
-Update the package lists and install the following packages.
-
+{{Tab
+|title= = Arch Linux =
+|image=
+|addToClass=info-box
+|content=
 TODO: Possible to only install dnsmasq-base without the dnsmasq systemd unit or does Arch Linux keep the systemd unit disabled by default?
 
 {{CodeSelect|code=
@@ -120,20 +120,21 @@ sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils safe-r
 {{CodeSelect|code=
 sudo systemctl enable libvirtd
 }}
-</div>
-</div>
 
-=== Fedora ===
-<div class="toccolours mw-collapsible mw-collapsed">
-If you are using Fedora, click on Expand on the right.
+}} <!-- close tab: Arch Linux -->
 
-<div class="mw-collapsible-content">
-
+{{Tab
+|title= = Fedora =
+|image=
+|addToClass=info-box
+|content=
 '''Check System Requirements'''
 
 As KVM requires a CPU with virtualization extensions, check whether the system has either Intel VT or AMD-V. If the following command prints nothing, the system does not support the relevant virtualization extensions.
 
-<code>egrep -E '^flags.*(vmx|svm)' /proc/cpuinfo</code>
+{{CodeSelect|code=
+egrep -E '^flags.*(vmx{{!}}svm)' /proc/cpuinfo
+}}
 
 '''Install Dependencies'''
 
@@ -163,7 +164,7 @@ sudo systemctl enable libvirtd
 
 Verify the KVM kernel modules loaded properly. If this command lists <code>kvm_intel</code> or <code>kvm_amd</code>, KVM is properly configured.
 
-<code>lsmod | grep kvm</code>
+<code>lsmod {{!}} grep kvm</code>
 
 '''Edit the libvirtd Configuration'''
 
@@ -189,21 +190,24 @@ unix_sock_rw_perms = "0770"
 
 Save and exit.
 
-To administer libvirt as a regular user, add the user to the libvirt group.<ref>Otherwise the sudo password is required every time virtual-manager is started.</ref>
+To administer libvirt as a regular user, add the user to the libvirt group. <ref>
+Otherwise the sudo password is required every time virtual-manager is started.
+</ref>
 
 {{CodeSelect|code=
 sudo usermod -a -G libvirt $(whoami)
 }}
 
 You must log out and log in to apply the changes.
-</div>
-</div>
 
-=== Other Distributions ===
-<div class="toccolours mw-collapsible mw-collapsed">
-If you are using a Linux distribution that is not documented above, click on Expand on the right.
+}} <!-- close tab: Fedora -->
 
-<div class="mw-collapsible-content">
+{{Tab
+|title= = Other Distributions =
+|image=
+|addToClass=info-box
+|content=
+
 The qemu-kvm and libvirt-bin packages are necessary. virt-manager is also required in order to use a graphical user interface (which most users want). It is most likely this software can be installed using the usual distribution's package manager.
 
 If any of the following errors appear while later using {{Code|virsh define}}.
@@ -225,8 +229,11 @@ Relax-NG validity error : Extra element devices in interleave
 }}
 
 Then a more recent version of libvirt and kvm is likely needed.
-</div>
-</div>
+
+}} <!-- close tab: Other Distributions -->
+
+}} <!-- close Controller: Everything -->
+
 Readers are welcome to add detailed instructions for other distributions here!
 
 == Notice ==
@@ -621,9 +628,21 @@ Start {{project_name_gateway_short}}.
 Repeat the steps for {{project_name_workstation_short}}.
 
 === Command Line Interface (CLI) ===
-On the host.
+'''1.''' Open a terminal Inside the VM that should be accessed through CLI.
 
-To start {{project_name_gateway_short}}, run.
+This is required for the setup of the serial console VM settings.
+
+'''2.''' Install package.
+
+{{Install Package|
+package=serial-console-enable
+}}
+
+'''3.''' Shut down the VM.
+
+'''3.''' Open a terminal on the host.
+
+'''4.''' To start {{project_name_gateway_short}}, run.
 
 {{CodeSelect|code=
 sudo virsh start {{project_name_gateway_short}}
@@ -635,13 +654,17 @@ To start {{project_name_workstation_short}}, run.
 sudo virsh start {{project_name_workstation_short}}
 }}
 
-To interact with the {{project_name_workstation_short}} via [https://forums.whonix.org/t/how-do-i-enter-the-whonix-shell-from-cli/7271 serial console], run.
+'''5.''' To interact with the {{project_name_workstation_short}} via serial console], run.
 
 {{CodeSelect|code=
 sudo virsh console {{project_name_workstation_short}}
 }}
 
-==== Finishing configuration ====
+forum discussion: https://forums.whonix.org/t/how-do-i-enter-the-whonix-shell-from-cli/7271
+
+'''6.''' setup-dist
+
+TODO: Is this still required?
 
 You'll need to log into your Whonix-Gateway once and run
 
@@ -966,7 +989,11 @@ Enabling 3D acceleration is discouraged because this increases the attack surfac
 
 (Advanced users, see: [[Dev/KVM#Virgl3D|Dev/KVM#Virgl3D]])
 
-Default configuration:
+[[Untested]]!
+
+'''1.''' [[KVM#VM_Settings_Modification|VM Settings Modification]] required.
+
+'''2.''' Locate the following section:
 
 <pre>
     <graphics type='spice' autoport='yes'>
@@ -976,38 +1003,45 @@ Default configuration:
     </graphics>
 </pre>
 
-<pre>
-    <video>
-      <model type='virtio' heads='1' primary='yes'/>
-    </video>
-</pre>
+'''3.''' Replace it with:
 
-Untested!
-
-Note: Enabling <code>acceleration accel3d='yes'</code> will increase the attack surface.
-
-To enable 3D:
-
-<pre>
-    <graphics type='spice' autoport='yes'>
+{{CodeSelect|code=
+    
+<graphics type='spice' autoport='yes'>
       <clipboard copypaste='no'/>
       <filetransfer enable='no'/>
       <gl enable='yes'/>
-    </graphics>
-</pre>
+</graphics>
+}}
+
+'''4.''' Locate the following section:
 
 <pre>
     <video>
       <model type='virtio' heads='1' primary='yes'/>
-      <acceleration accel3d='yes' accel2d='yes'/>
-      <gl enable='yes'/>
     </video>
 </pre>
+
+'''5.''' Replace it with:
+
+{{CodeSelect|code=
+<video>
+      <model type='virtio' heads='1' primary='yes'/>
+      <acceleration accel3d='yes' accel2d='yes'/>
+      <gl enable='yes'/>
+</video>
+}}
+
+'''6.''' Notes.
+
+Note: Enabling <code>acceleration accel3d='yes'</code> will increase the attack surface.
 
 <code>accel2d='yes'</code> / <code><gl enable='yes'/></code>:
 
 * Performance impact untested.
 * Setting to <code>no</code> might reduce attack surface.
+
+'''7.''' Done.
 
 == Mouse Smoothness ==
 
