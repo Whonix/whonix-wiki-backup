@@ -39,7 +39,6 @@ QEMU changes will likely need kernel commandline adjustment to adjust and re-ena
 
 == Document new features and open relevant upstream tickets ==
 
-
 == Canokey ==
 
 https://www.qemu.org/docs/master/system/devices/canokey.html#id9
@@ -50,11 +49,9 @@ https://qemu.readthedocs.io/en/v8.2.1/system/devices/canokey.html
 
 https://mail.gnu.org/archive/html/qemu-devel/2022-05/msg03913.html
 
-
 https://forums.whonix.org/t/canokey-kvms-emulated-gpg-smartcard/19981
 
 Should supercede the emulated TPM + swtpm-tools suggested here.
-
 
 * Opened a Debian RFP: https://lists.debian.org/debian-wnpp/2024/06/msg00422.html
 * Asked Canokey devs to clarify the security properties of the virtual implementation: https://github.com/canokeys/canokey-qemu/issues/8
@@ -63,7 +60,6 @@ Should supercede the emulated TPM + swtpm-tools suggested here.
 Unsure about its usecases but cool to have anyhow.
 
 https://www.phoronix.com/news/VirtIO-Bluetooth-Next
-
 
 ==QEMU LLVM Support==
 https://www.phoronix.com/news/QEMU-6.0-Released
@@ -80,7 +76,6 @@ Debian built Openstack images tailored for KVM environments can be fetched from 
 https://cdimage.debian.org/cdimage/openstack/
 
 These images don't ship with a DE but were essential in coming up with a VM config that works. Here's the XML for a machine that successfully booted and reached the systemc console with minimal modifcations from defaults. Note that on an actual aach64 host, the domain type would need to be set to 'kvm' instead to run without CPU emulation. More modifications may be needed to this section, but it woun;t be possible to know without hands-on experience:
-
 
 <pre style="white-space: pre-wrap;">
 <domain type='qemu' id='58'>
@@ -231,7 +226,6 @@ These images don't ship with a DE but were essential in coming up with a VM conf
 Now supported in Linux 5.13. Move on from the current emulated device whenever it's available in stable.
 https://www.phoronix.com/news/VirtIO-Sound-Driver-Linux-5.13
 
-
 == Virtio-Video ==
 Paravirtual webcam access and screen sharing capability soon to land in KVM. Worth documenting when ready.
 
@@ -252,14 +246,11 @@ sudo apt install swtpm-tools
 * OpenSSH has added TPM2 support and can import existing keys as of 1.7.0-rc0<ref>https://github.com/tpm2-software/tpm2-pkcs11/releases/tag/1.7.0-rc0</ref> 
 https://blog.ledger.com/ssh-with-tpm/
 
-
 The upstream TPM2 project is looking at consolidating the multiple code projects out there into an upstream implementation superseding the projects below.
 
 https://github.com/tpm2-software/tpm2-tools/issues/518
 
 https://github.com/tpm2-software/tpm2-pkcs11
-
-
 
 To summarize in someone else's words:
 
@@ -289,8 +280,6 @@ https://lwn.net/Articles/768419/
 
 https://blog.hansenpartnership.com/using-your-tpm-as-a-secure-key-store/
 
-
-
 Patches for GPG support for TPMs https://lists.gnupg.org/pipermail/gnupg-devel/2018-January/033350.html has been submitted but I have yet to see what happened. Needs following up for sure so it can make it before the next freeze hopefully.
 
 To be done:
@@ -298,10 +287,7 @@ To be done:
 * How to secure OpenSSH keys
 * Suggesting Tor supports this for Onion service keys and even session key material if TPM detected.
 
-
-
 Contents of TPM can be encrypted in the libvirt version in Bullseye.
-
 
 This nifty code supports the major applications on TPM 2
 
@@ -309,12 +295,9 @@ https://github.com/irtimmer/tpm2-pk11
 
 https://github.com/irtimmer/tpm2-pk11/wiki  RFP: https://bugs.debian.org/941951
 
-
-
     * OpenSSH Client (SSH key in TPM)
     * Firefox (Private key of Client certificate in TPM)
     * GnuPG using gnupg-pkcs11-scd (PGP key in TPM)
-
 
 https://phabricator.whonix.org/T931
 
@@ -329,7 +312,6 @@ https://listman.redhat.com/archives/libvirt-users/2019-October/msg00008.html
 </ref> Opened a RFP. <ref>
 https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=941939
 </ref>
-
 
 GPG 2.3 has added support for binding keys to TPM2 chips. Needs to be tested if it works with the vTPM. <ref>
 https://www.phoronix.com/news/GnuPG-2.3-Released
@@ -616,7 +598,6 @@ sudo chmod ug+x /mnt/shared
 
 = Done =
 
-
 == QCOW2 Preallocation Settings ==
 
 Preallocating metadata speeds up disk use in guest at expense of time during disk creation.
@@ -652,7 +633,6 @@ The new '''extended L2 entries''' feature in QEMU 5.2+ gives us the best of all 
 *Smaller images and less duplication of data.
 </pre>
 
-
 How to use:
 
 <pre>
@@ -662,7 +642,6 @@ $ qemu-img create -f qcow2 -o extended_l2=on,cluster_size=128k img.qcow2 1T
 
 And that’s all you need to do. Once the image is created all allocations will happen at the subcluster level.
 </pre>
-
 
 Change commit:
 https://github.com/adrelanos/Whonix/pull/1/commits/16f5404eb929b6748178948ceb509211c95a016c
@@ -678,8 +657,6 @@ https://lists.nongnu.org/archive/html/qemu-discuss/2016-03/msg00023.html
 https://web.archive.org/web/20161002204349/https://secure-os.org/pipermail/desktops/2016-March/000108.html
 
 https://bugzilla.redhat.com/show_bug.cgi?id=1318813
-
-
 
 https://marc.info/?l=linux-kernel&m=145877344732456&w=2
 
@@ -706,13 +683,11 @@ https://cgit.freedesktop.org/spice/spice-gtk/tree/src/channel-inputs.c
 
 https://git.qemu.org/?p=qemu.git;a=blob;f=hw/input/ps2.c
 
-
 Virtualization is useful in presenting an identical environment and set of "hardware" for each user which goes a long way in creating an anonymity set of systems. That way a system attacker, advertisers and online trackers would not be able to fingeprint a user or their hardware.
 
 The problem: Tracking techniques have become more sophisticated with time. They advanced from simple cookies to browser/device fingerprinting (which Tor Browser focuses on defeating) to user behavior fingerprinting. The latter is about profiling how a user types on a keyboard or uses a mouse [2].
 
 Keystroke dynamics is a super creepy way to track users based on how long they press keys (dwell time) and the time between key presses (gap time). This is extremely accurate at identifying individuals because of how unique these measurements are. Advertising networks  (Google, Facebook...) that fingeprprint users on both the clearnet and Tor can deanonymize users. This technique is already actively used in the wild [6][7].
-
 
 Potential Solutions:
 
@@ -720,16 +695,13 @@ Since input devices are all emulated its a great opportunity to stop this profil
 
 * A security researcher designed a proof of concept plugin for Chrome browser that mitigates this. Implementing something like the PoC addon in [1] known as KeyBoardPrivacy. Some random delay in milliseconds in a 50 millisecond range for dwell and gap times for the emulated keyboards is enough to skew the values to render this attack useless while not affecting performance.
 
-
 * The changes made to Tor Borwser to make JS timers more coarse grained but constant (250ms for keyboard events) were not enough to stop keystroke dynamics fingerprinting because a malicious script can evict the cache and allow extrapolation of true timing events within 1-5ms accuracy .[3][5] Their goal is to instead add jitter to the timers [4]. A similar solution proposed in [4] can be implemented in all QEMU-KVM timers to mitigate both attacks.
-
 
 EDIT: Second solution not the way to go. High precision timers in virtualizers have bad security implications. They enable sidechannel attacks on crypto operations running on other VMs as well as aid in biometric fingerprinting. A multi hypervisor study on timer accuracy shows most have high accuracy[8] by necessity. Increasing coarseness in the hypervisor's code can lead to guest slow downs or instability. This varies by hypervisor. CPU load does NOT affect timer accuracy [in KVM] however IO does. A stress/stress-ng daemon installed on GW that runs some varying workload may introduce a skew to timer data.
 
 EDIT 2:
 
 Even if the user's destination does not itself surreptitiously sniff their biometrics, any one observing the traffic of any interactive JS application can generate a model for your biometric statistics. [16]
-
 
 [1] https://paul.reviews/behavioral-profiling-the-password-you-cant-change/
 
@@ -773,17 +745,13 @@ on Keystroke Dynamics) millisecond resolution is vital
 
 [20] https://web.archive.org/web/20210412030235/https://www.comp.nus.edu.sg/~tsim/documents/keystroke-dynamics-published.pdf (Keystroke Dynamics in a General Setting) Compared fingerprinting users in a general setting in contrast to typing a password. Measured dynamics of typing common words. Another surprising finding is non-English users were even more susceptible to keystroke fingerprinting than English ones.
 
-
 higher level behavior fingerprinting:
 
 https://www.researchgate.net/profile/Roman_Yampolskiy/publication/256169398_Game_Playing_Tactic_as_a_Behavioral_Biometric_for_Human_Identification/links/569c3c1d08aea1476954742c.pdf
 
-
 higher level "cognitive" behavioral biometrics are application specific. That paper uses descriptive statistics for actions that are very specific to the game and don't really apply anywhere else.
 
-
 === Mouse Tracking ===
-
 
 User re-authentication via mouse movements
 https://web.archive.org/web/20230519163324/https://csis.pace.edu/~ctappert/it691-projects/mouse-pusara.pdf
@@ -930,8 +898,6 @@ I figured out safe defaults and will do a pull request. NB clflush was abused to
 </cpu>
 </pre>
 
-
-
 https://libvirt.org/formatdomain.html#cpu-model-and-topology
 
 Informative link about cpu flag functionality:
@@ -940,7 +906,6 @@ https://unix.stackexchange.com/questions/43539/what-do-the-flags-in-proc-cpuinfo
 https://www.berrange.com/posts/2010/02/15/guest-cpu-model-configuration-in-libvirt-with-qemukvm/
 
 "Every hypervisor has its own policies for what a guest will see for its CPUs by default, Xen just passes through the host CPU, with QEMU/KVM the guest sees a generic model called “qemu32” or “qemu64”.  "
-
 
 cat output:
 
@@ -1152,8 +1117,6 @@ HulaHoop: Just having the device added is enough to take advantage of it. At the
 https://www.linux-kvm.org/page/Projects/auto-ballooning
 </ref> This space will be watched for developments; as soon as its incorporated upstream and an option added in libvirt I will enable it in the configuration.
 
-
-
 Memory ballooning is indeed another vector for side channel atacks on memory. Confirmed in a follow-up by side-channel attacks researcher Daniel Gruss:
 
 "Not Rowhammer, but there has already been a side-channel attack on memory ballooning earlier this year: https://ieeexplore.ieee.org/document/7562068/"
@@ -1246,7 +1209,6 @@ Another guiede to test with:
 https://web.archive.org/web/20111211210506/http://blog.danielcosta.pt/?p=440
 
 Note: Both MAC systems cannot be run simultaneously run. This is not supported by LSM and may also be a source of conflicts.
-
 
 For Debian hosts, AppArmor makes more sense.
 
@@ -1415,8 +1377,6 @@ Why are our qemu xml files currently called ${VMNAME}_qemu-x86-x64.xml. Are they
 
 Any QEMU architecture works on any host supported by QEMU.i386 tested and working but pointless when x86-64 works on i386 hosts too.
 
-
-
 ==Disable Microphone Input==
 Figure out how to disable Microphone input to Guests. While a nice feature for VoIP, is a very dangerous setting to have by default as its unexpected.
 
@@ -1451,13 +1411,11 @@ serverfault.com/questions/457603/any-way-to-release-focus-on-a-kvm-guest-in-virt
 
 <pre>press Ctrl_L & Alt_L</pre>
 
-
 ==Audio Retasking==
 
 SPEAKE(a)R: Turn Speakers to Microphones for Fun
 and Profit
 https://arxiv.org/ftp/arxiv/papers/1611/1611.07350.pdf
-
 
 conclusion:
 
@@ -1490,7 +1448,6 @@ https://zee-nix.blogspot.com/2014/05/berlin-dx-hackfest-boxes-rain-and.html
 
 Initial commit:
 https://web.archive.org/web/20140701164007/https://gitorious.org/govf
-
 
 Update 2016:
 
@@ -1646,9 +1603,7 @@ When uncompressed, upload would take ~250 hours per image. Now compressing using
 In xml file add:
 <timer name='kvmclock' present='no'/>
 
-
 What does KVMClock do? "kvmclock or KVM pvclock lets guests read the host’s wall clock time." This is bad. [https://rwmj.wordpress.com/2010/10/15/kvm-pvclock/ source]
-
 
 How to adjust KVM to have clock=vm on host.
 
@@ -1680,7 +1635,6 @@ Make sure <code>kvmclock</code> is not listed as a response any longer.
 
 Documented for reference but is irrelevant as of now since this problem is solved.
 
-
 https://bugzilla.redhat.com/show_bug.cgi?id=783921#c6 < This link provides the solution to disabling kvmclock and verifying that it is so.
 
 whonixcheck (since {{project_name_short}} 8) would tell you if kvmclock is enabled. whonixcheck --verbose will tell you, that it is not enabled.
@@ -1699,7 +1653,6 @@ Internal network 'Whonix' defined from network xml file residing in the followin
 # virsh net-autostart {{project_name_short}} Network 'Whonix' marked to be autostarted upon boot.
 # virsh net-start {{project_name_short}} Network 'Whonix' has been started
 </pre>
-
 
 == Leak ==
 * [<nowiki>https://www.whonix.org/old-forum/index.php/topic,243.msg1636.html</nowiki> New FIN ACK / RST ACK Leak Test]
@@ -1732,8 +1685,6 @@ If you need to isolate the VM Guest clock from the host one, specify clock=vm in
 How to use '''-rtc clock=vm''' ?
 
 How to check, that KVM '''-rtc''' is set to '''clock=vm''' ?
-
-
 
 Does not seem to be a valid or accepted parameter by libvirt as its always sanitized from the xml file upon saving. But it is  accepted by QEMU directly. However I noticed that even with kvmclock enabled, I no longer see any change in a guest's time in response to a host skew of the time. In the recent past this was not true, as any change was immediately reflected in the Guest clock immediately. kvmclock on its own can be disabled  and confirmed to be so as outlined below.
 
@@ -1801,11 +1752,9 @@ Quote
     in guest os, change /boot/grub/device.map from "(hd0) /dev/sda" to "(hd0) /dev/vda"
     in guest os, change /boot/grub/grub.cfg from "root=/dev/sda1" to "root=/dev/vda1", if you are using UUID, then no need to do this step.
 
-
 I changed all mention of sda1 to vda1 in the grub file. I changed the disk controller type from virtmanager to virtio which takes care of this at the libvirt xml level. Now the vm boots normally with no hangups and I feel a little faster.
 
  A bit of advice, that I'll add so you can decide:
-
 
 Quote
 
@@ -1851,8 +1800,6 @@ grep 26ada0c0-1165-4098-884d-aafd2220c2c6 /usr/sbin/grml-debootstrap
 </pre>
 
 Maybe using UUID and even a fixed one will aid this feature.
-
-
 
 HulaHoop: Yes it will. I found very encouraging answers to your inquiries on the forum that I'll post here:
 
@@ -1969,9 +1916,6 @@ Then post it... Where?
 
 Done: <br />
 https://bugzilla.redhat.com/show_bug.cgi?id=1126641
-
-
-
 
 This is finally it. Added in Libvirt 4.4.0. Need to add it when Buster rolls around.
 
