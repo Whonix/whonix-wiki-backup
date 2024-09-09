@@ -3,6 +3,7 @@
 |description=A reasonably accurate host clock is required for many general security properties. An inaccurate clock can lead to broken internet connectivity and time related security issues.
 |image=TineSynchronization2134234.jpg
 }}
+{{time_mininav}}
 [[File:TineSynchronization2134234.jpg|thumb]]
 {{intro|
 A reasonably accurate host clock is required for many general security properties. An inaccurate clock can lead to broken internet connectivity and time related security issues.
@@ -196,25 +197,32 @@ A number of things influences clock accuracy inside {{project_name_short}} VMs.
 |type=controller
 |linkid=platform
 |content=
-
 {{Tab|
+|active=true
 |title= == {{non_q_project_name_short}} ==
 |content=
-* <u>Recommendation:</u> It is strongly discouraged to use the pause / suspend / save / hibernate features. <ref>
+<u>Recommendation:</u> It is strongly discouraged to use the pause / suspend / save / hibernate features. <ref>
 VirtualBox does not provide notifications to VMs upon resume.
 </ref>
 }}
 {{Tab|
 |title= == {{q_project_name_short}} ==
 |content=
-* <u>Recommendation:</u> It is strongly discouraged to use the pause feature of Qube Manager, but it is is safe to use the suspend or hibernate feature of dom0. <ref>
+<u>Recommendation:</u> It is strongly discouraged to use the pause feature of Qube Manager, but it is is safe to use the suspend or hibernate feature of dom0. <ref>
 This is because dom0 will notify VMs upon resume. This will result in sdwdate restarting and fixing the clock.
 </ref>
 }}
 }}
 
-* <u>Rationale:</u> The clock will be slow after resume. This can break Tor connectivity.
-* <u>How to fix if you did this anyhow?</u> Power off the VMs and restart these. Really power off. Not only Reboot. Then everything will be back to normal.
+'''2.''' Background information.
+
+<u>Rationale:</u> The clock will be slow after resume. This can break Tor connectivity.
+
+'''3.''' Fix.
+
+<u>How to fix if you did this anyhow?</u> Power off the VMs and restart these. Really power off. Not only Reboot. Then everything will be back to normal.
+
+'''4.''' Done.
 
 = Advanced instructions =
 <div class="toccolours mw-collapsible mw-collapsed">
@@ -224,8 +232,10 @@ If you are interested in using the pause / suspend / save / hibernate features, 
 |type=controller
 |linkid=platform
 |content=
+Select your platform.
 
 {{Tab|
+|active=true
 |title= == {{non_q_project_name_short}} ==
 |content=
 * <u>{{project_name_gateway_short}}</u>: It is strongly discouraged to pause / suspend / save / hibernate the {{project_name_gateway_short}}, because it is difficult to restore the clock after resume. <ref name=gateway_pause>
@@ -260,20 +270,11 @@ https://github.com/QubesOS/qubes-issues/issues/1764
 </div>
 
 = Restart sdwdate =
-To restart <code>sdwdate</code>.
+To restart <code>sdwdate</code> chose either option A <u>or</u> B.
 
-<code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Time Synchronization Monitor (sdwdate-gui)</code> &rarr; <code>restart sdwdate</code>
-
-Or in a terminal. <ref>
-Simplified in next upgrade.
-
-{{CodeSelect|code=
+* '''A)''' <u>{{Gui}}:</u> <code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Time Synchronization Monitor (sdwdate-gui)</code> &rarr; <code>restart sdwdate</code>
+* '''B)''' <u>{{Cli}}:</u> {{CodeSelect|inline=true|code=
 sudo sdwdate-clock-jump
-}}
-</ref>
-
-{{CodeSelect|code=
-sudo /usr/lib/sdwdate/restart_fresh
 }}
 
 = Manually Set Clock Time and Date =
@@ -546,15 +547,6 @@ sudo service sdwdate stop
 {{CodeSelect|code=
 sudo systemctl mask sdwdate
 }}
-
-= Related =
-* [[Timezone]]
-* [[sdwdate]]
-* [[sdwdate-gui]]
-* [[Boot Clock Randomization]]
-* [[Time Attacks]]
-* [[Dev/sdwdate]]
-* [[Dev/TimeSync]]
 
 = Footnotes =
 {{reflist|close=1}}
