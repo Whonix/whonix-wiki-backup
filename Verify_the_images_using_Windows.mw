@@ -10,17 +10,59 @@ Verify {{project_name_long}} Virtual Machine Images in Windows
 {{intro|
 Instructions for OpenPGP Verification of {{project_name_short}} Images using Windows
 }}
-= Introduction =
+= Context =
 {{always_verify_signatures_reminder}}
 
-[https://gnupg.org/ GnuPG] is a complete and free implementation of [[OpenPGP]] that allows users to encrypt and sign data and communications. [https://www.gpg4win.org/ Gpg4win] is a graphical front end for GnuPG that is used for file and email encryption in Windows. The verification process for the {{project_name_short}} images begins with securely downloading and verifying the <code>gpg4win</code> package. Once completed GPG can be used from the command-line to verify the {{project_name_short}} images.
+= Usability =
+Due to [[Verifying_Software_Signatures#Conceptual_Challenges_in_Digital_Signatures_Verification|Conceptual Challenges in Digital Signatures Verification]] and [[Windows_Hosts#Windows_Software_Sources|impracticality, unpopularity of digital software signature verification on the Windows platform]], this is a cumbersome process. None of these issues are specific to {{project_name_short}} to caused by {{project_name_short}}. <ref>
+This is being stated to avoid {{project_name_short}} of getting blamed for this mess. Previously users put it this way:
+
+{{quotation
+|quote=I never had to verify any software. Why Whonix makes this more complicated than everyone else?
+}}
+</ref>
+
+{{quotation
+|quote=To keep a system secure and free of malware it is strongly recommended to [[Warning#Always_Verify_Signatures|always verify software signatures]]. However, this is very difficult, if not impossible for Windows users. Most often, Windows programs do not have software signature files (OpenPGP / gpg signatures) that are normally provided by software engineers in the GNU/Linux world.
+}}
+
+Most other vendors of software on the Windows platform are either unaware or ignore this issue. The {{project_name_short}} project makes an effort to document and cope up with the mess on the Windows platform.
+
+= Introduction =
+This page includes documentation on how to securely acquire Gpg4win - an application which can be used to verify digital software signatures provided by the {{project_name_short}} project and other software.
+
+Use either option A) <u>or</u> B).
+
+'''A)''' <u>Using SignTool to verify Gpg4win</u>:
 
 The following guide provides steps to:
 
-# Install SignTool.
-# Download and verify GPG4win.
-# Download the {{project_name_short}} signing key.
-# Verify the {{project_name_short}} images.
+# Download and installation of SignTool.
+# Download Gpg4win.
+# Verify Gpg4win using SignTool.
+# Import the developer's GPG signing key into Gpg4win.
+# Verify the {{project_name_short}} Windows Installer using Gpg4win.
+
+SignTool is a Windows platform focused tool provided by Microsoft which can be used to verify software digital signatures.
+
+[https://gnupg.org/ GnuPG] is a complete and free implementation [[OpenPGP]] that allows users to encrypt and sign data and communications. Popular on Windows, macOS and Linux platform. [https://www.gpg4win.org/ Gpg4win] is a graphical front end for GnuPG that is used to for file and email encryption in Windows. The verification process for the {{project_name_short}} Windows Installer includes securely downloading an verifying the <code>gpg4win</code> package. Once completed GPG can be used from the command-line to verify the {{project_name_short}} Windows Installer.
+
+Download and installation of SignTool (from the Microsoft website over TLS) and verification of Gpg4win using SignTool might be considered optional. This is because both, SignTool and Gpg4win (downloaded from the Gpg4win website over TLS) are only downloaded over [[SSL|TLS]], a very basic form of authentication. The argument for that is debatable. "It would be much more unlikely for a massive company like Microsoft to be compromised and serve malicious software than gpg4win server." <ref>
+https://forums.whonix.org/t/testing-whonix-installer-for-windows/2987/217
+</ref> Some browser might use [[SSL#Key_Pinning|Key Pinning]] for microsoft.com but unfortunately for gpg4win.org would not be eligible.
+
+Therefore optionally the user might decide to skip the SignTool step and simplify as follows.
+
+'''B)''' <u>Not using SignTool to verify Gpg4win</u>:
+
+# Download and install Gpg4win.
+# Import the developer's GPG signing key into Gpg4win.
+# Verify the {{project_name_short}} Windows Installer using Gpg4win.
+
+The Gpg4win documentation also covers subject.
+
+* [https://www.gpg4win.org/package-integrity.html Check integrity of Gpg4win packages - Gpg4win website]
+* [https://wiki.gnupg.org/Gpg4win/CheckIntegrity Check integrity of Gpg4win packages - Gpg4win wiki]
 
 = Verify {{project_name_short}} Images in Windows using Gpg4win =
 
@@ -117,12 +159,11 @@ Analyze the other messages as usual.
 
 == Verify the {{project_name_short}} Images ==
 {{Box|text=
-'''1.''' If <i>not</i> already completed, download both <code>Whonix.ova</code> images and the corresponding OpenGPG signature which will be used to verify the image.
+'''1.''' If <i>not</i> already completed, download the <code>Whonix.ova</code> image and the corresponding OpenGPG signature which will be used to verify the image.
 
-Both the signature and .ova image should be downloaded into the same directory.
+Both the signature and the <code>.ova</code> image should be downloaded into the same directory.
 
-* Download the {{project_name_short}} VM image and signature from [[VirtualBox|VirtualBox Table]]; or
-* Download the {{project_name_short}} VM Image and Signature from [[VirtualBox|VirtualBox Table]].
+Download the {{project_name_short}} VM image and signature from [[VirtualBox|VirtualBox Table]].
 
 '''2.''' Start the cryptographic verification; this process can take several minutes.
 
@@ -135,7 +176,7 @@ cd C:\Users\<user_name>\<directory_name>
 '''3.''' Verify the <code>Whonix.ova</code> image.
 
 {{CodeSelect|code=
-gpg --verify-options show-notations --verify Whonix*.ova.asc Whonix*.ova
+gpg --verify-options show-notations --verify Whonix*.*.asc Whonix*.*
 }}
 
 If the Virtual Machine image is correct the output will tell you that the signature is good.
@@ -152,13 +193,15 @@ Primary key fingerprint: 916B 8D99 C38E AF5E 8ADC  7A2A 8D66 066A 2EEA CCDA
 }}
 
 This might be followed by a warning saying:
+
 {{Template:GnuPG-Warning}}
 
 {{gpg_signature_timestamp}}
+
 The first line includes the signature creation timestamp. Example.
 
 <pre>
-gpg: Signature made Mon 19 Jan 2015 11:45:41 PM CET using RSA key ID 77BB3C48
+gpg: Signature made Sun 18 Aug 2019 08:31:41 PM EDT
 </pre>
 
 {{GnuPG_file_names}}

@@ -47,9 +47,6 @@ For the opposite viewpoint, see [[Dev/VirtualBox#Why_use_VirtualBox_over_KVM?|Wh
 {{First_Time_User}}
 
 = KVM Setup Instructions =
-== Before Installing ==
-{{Computer_Security_Education}}
-
 == Install KVM ==
 Choose your host operating system.
 
@@ -236,35 +233,19 @@ Then a more recent version of libvirt and kvm is likely needed.
 
 Readers are welcome to add detailed instructions for other distributions here!
 
-== Notice ==
-
-=== Intel 3rd Gen CPUs ===
-
-Performance is markedly degraded on 3rd generation Intel CPUs as reported by a user on the forums and confirmed and therefore should be avoided. <ref>https://forums.whonix.org/t/poor-performance/13385/6</ref>
-
 == Addgroup ==
 
-In order to be able to manage virtual machines as a regular (non-root) user, that user must be added to the <code>libvirt</code> and the <code>kvm</code> groups. The following command will work in Debian and assumes the simple scenario whereby KVM will be utilized with the current logged in user. For older Ubuntu versions, note that the group names vary and ''libvirt'' may be called ''libvirtd'' instead. For Ubuntu 20.04, ''libvirt'' works.
+In order to be able to manage virtual machines as a regular (non-root) user, that user must be added to the <code>libvirt</code> and the <code>kvm</code> groups.
 
-{{CodeSelect|code=
+* Debian (based) / Ubuntu:
+** The following command will work in Debian and assumes the simple scenario whereby KVM will be utilized with the current logged in user. For older Ubuntu versions, note that the group names vary and ''libvirt'' may be called ''libvirtd'' instead. For Ubuntu 20.04, ''libvirt'' works.
+** {{CodeSelect|inline=true|code=
 sudo adduser "$(whoami)" libvirt
 }}
-
-{{CodeSelect|code=
+** {{CodeSelect|inline=true|code=
 sudo adduser "$(whoami)" kvm
 }}
-
-Equivalent commands for Arch:
-
-{{CodeSelect|code=
-sudo gpasswd -a $USER libvirt
-}}
-
-{{CodeSelect|code=
-sudo gpasswd -a $USER kvm
-}}
-
-<ref>
+** <ref>
 By default Debian does not use <code>sudo</code>, so groups can be added with <code>usermod</code>. If your user is <code>foo</code> the following commands will work.
 
 {{CodeSelect|code=
@@ -277,10 +258,14 @@ And.
 usermod -a -G kvm foo
 }}
 </ref>
-
-=== Other Distributions ===
-
-If another distribution is in use, then first refer to the distribution manual. For example, a necessary reference for Arch users is the [https://wiki.archlinux.org/title/libvirt Arch Linux libvirt wiki page].
+* Arch Linux:
+** {{CodeSelect|inline=true|code=
+sudo gpasswd -a $USER libvirt
+}}
+** {{CodeSelect|code=
+sudo gpasswd -a $USER kvm
+}}
+* Other Distributions: If another distribution is in use, then first refer to the distribution manual. For example, a necessary reference for Arch users is the [https://wiki.archlinux.org/title/libvirt Arch Linux libvirt wiki page].
 
 == Restart libvirtd ==
 
@@ -320,15 +305,19 @@ sudo virsh -c qemu:///system net-start default
 
 Advanced users are encouraged to [[Dev/Build_Documentation|build]] {{project_name_short}} images for high security assurance.
 
-== Download and Extract ==
-
-=== Introduction ===
+= Information =
 
 It is strongly recommended to read and apply the steps outlined in this section. By applying a known and tested configuration, this will provide better convenience and security.
 
-Be sure to use the qcow2 images that are provided by the {{project_name_short}} project instead of rolling your own <ref>Manually converting images from .ova to .qcow2 is no longer recommended, since .qcow images can be downloaded from the {{project_name_short}} project.</ref> because they contain important performance optimizations. <ref>As per [https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/4400_convert-raw-to-qcow2 build-steps.d/4400_convert-raw-to-qcow2]
+Be sure to use the qcow2 images that are provided by the {{project_name_short}} project instead of rolling your own <ref>
+Manually converting images from .ova to .qcow2 is no longer recommended, since .qcow images can be downloaded from the {{project_name_short}} project.
+</ref> because they contain important performance optimizations. <ref>
+As per [https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/4400_convert-raw-to-qcow2 build-steps.d/4400_convert-raw-to-qcow2]
 
-, these are "-o cluster_size=2M" and "-o preallocation=metadata".</ref> The only exception is if images were [[Dev/Build_Documentation|created from source]]. <ref>Because the same performance optimizations are present.</ref>
+, these are "-o cluster_size=2M" and "-o preallocation=metadata".
+</ref> The only exception is if images were [[Dev/Build_Documentation|created from source]]. <ref>
+Because the same performance optimizations are present.
+</ref>
 
 If problems are encountered with free disk space, using a file system that supports [[sparse files]] is recommended. Also refer to the following [https://forums.whonix.org/t/please-reduce-kvm-image-size/160 forum discussion].
 
@@ -336,17 +325,40 @@ If {{project_name_short}} libvirt images already exist, then consider a [[#Clean
 
 For simplicity the {{project_name_short}} images should be downloaded and stored in the home folder ({{Code2|/home/<your user name>}}) so the following commands can be copied/pasted without changes.
 
-=== Download {{project_name_short}} ===
+= Download {{project_name_short}} =
 <!-- Extra terms of service notice because KVM has no VM import dialog which could present TOS. -->
 {{tos}}
 
-'''{{free}}''' {{#widget:Download_Button
- |text=Download Whonix ™ Xfce
+'''{{free}}''' 
+
+{{Tab
+|type=controller
+|addToClass=clear-float
+|content=
+{{Tab
+|active=true
+|title= == GUI ==
+|image=[[File:Clipart-gui.svg|alt=Symbol representing GUI]]
+|content=
+
+{{#widget:Icon_Bullet_List
+|addClass=minimal margin-bottom-20
+|fontSize=17px
+|item=fa-solid fa-info cs-blue,{{project_name_short}} with Xfce {{Gui}}.
+|item=fa-solid fa-info cs-blue,This version of {{project_name_short}} is designed to run inside KVM. 
+}} <!-- End #widget:Icon_Bullet_List -->
+
+{{#widget:Download_Button
+ |text=Download {{project_name_short}} Xfce
  |url=https://download.{{project_clearnet}}/libvirt/{{Version_KVM}}/{{project_name_short}}-Xfce-{{Version_KVM}}.Intel_AMD64.qcow2.libvirt.xz
  |os=kvm
 }}
 
-=== Verify the {{project_name_short}} Images ===
+<div class="toccolours mw-collapsible mw-collapsed" data-expandtext="Learn More" data-collapsetext="Show Less">
+Optional: Digital signature verification.
+<div class="mw-collapsible-content">
+<big>Version: <span style="color: green">{{VersionNew}}</span></big>
+
 {{always_verify_signatures_reminder}}
 {{DownloadTableUnified
 |url=https://download.{{project_clearnet}}
@@ -368,24 +380,80 @@ Verify images using this [[Main/Project_Signing_Key|{{project_name_short}} signi
 {{Anchor|Verify the {{project_name_short}} Images}}
 
 * [[Verify_the_images_using_Linux|Verify the {{project_name_short}} KVM images]]
+</div>
+</div>
 
-=== Decompress ===
+}} <!-- End tab GUI -->
+{{Tab
+|title= == CLI ==
+|image=[[File:Utilities-terminal.png|alt=Symbol representing CLI|50px]]
+|content=
+{{GoogleOff|nosnippet=1|content=
+
+{{#widget:Icon_Bullet_List
+|addClass=minimal
+|fontSize=17px
+|item=fa-solid fa-info cs-blue,{{project_name_short}} with {{cli}}.
+|item=fa-solid fa-info cs-blue,This version of {{project_name_short}} is designed to run inside KVM. 
+|item=fa-solid fa-exclamation-circle cs-red,{{project_name_short}} with CLI is a version suited for advanced users -- those who want {{project_name_short}} without a {{gui}}.
+}} <!-- End #widget:Icon_Bullet_List -->
+
+{{#widget:Download_Button
+ |text=Download {{project_name_short}} CLI
+ |url=https://download.{{project_clearnet}}/libvirt/{{Version_KVM}}/{{project_name_short}}-CLI-{{Version_KVM}}.Intel_AMD64.qcow2.libvirt.xz
+ |os=kvm
+}}
+
+<div class="toccolours mw-collapsible mw-collapsed" data-expandtext="Learn More" data-collapsetext="Show Less">
+Optional: Digital signature verification.
+<div class="mw-collapsible-content">
+<big>Version: <span style="color: green">{{VersionNew}}</span></big>
+
+{{always_verify_signatures_reminder}}
+{{DownloadTableUnified
+|url=https://download.{{project_clearnet}}
+|project={{project_name_short}}
+|flavor=Xfce
+|flavor_case_sensitive=Xfce
+|after_slash=libvirt
+|extension=Intel_AMD64.qcow2.libvirt.xz
+|version={{Version_KVM}}
+|appendix=
+|signing=
+Verify images using this [[Main/Project_Signing_Key|{{project_name_short}} OpenPGP Signing Key]]
+{{signing_key_main}}
+|signify=
+Verify images using this [[Main/Project_Signing_Key|{{project_name_short}} signify Key]]
+
+{{signing_key_main_signify}}
+}}
+{{Anchor|Verify the {{project_name_short}} Images}}
+
+* [[Verify_the_images_using_Linux|Verify the {{project_name_short}} KVM images]]
+</div>
+</div>
+
+}} <!-- End GoogleOff -->
+}} <!-- End tab CLI -->
+}} <!-- End Tab Controller -->
+
+= Decompress =
 
 '''1.''' Ensure the tarball is in the user home folder before applying these steps.
 
 '''2.''' Do not use <code>unxz</code>! Extract the images using gnu <code>tar</code>.
 
-'''3.''' Use gnu <code>tar</code> to decompress the archive.
+'''3.''' Use GNU <code>tar</code> to decompress the archive.
 
 {{CodeSelect|code=
 tar -xvf Whonix*.libvirt.xz
 }}
 
-=== License Agreement ===
+= License Agreement =
 
 {{License_Read}}
 
-== VM Settings Modification ==
+= VM Settings Modification =
 {{Anchor|Optional: XML Modification}}
 '''Optional.'''
 
@@ -1561,6 +1629,12 @@ Potential solution: -> [[#Development Help Wanted]]
 * https://forums.whonix.org/t/help-welcome-kvm-development-staying-the-course/166/546
 * [https://lists.libvirt.org/archives/list/users@lists.libvirt.org/thread/UUMUA4X3YWTOTQYSXTMOWDZDKXZYGS7U/ KVM static internal networking without host bridge interface (virbr)]
 * QEMU/KVM feature request: [https://gitlab.com/qemu-project/qemu/-/issues/2494 Isolated network between VMs not visible to the host]
+
+== Intel 3rd Gen CPUs ==
+
+Performance is markedly degraded on 3rd generation Intel CPUs as reported by a user on the forums and confirmed and therefore should be avoided. <ref>
+https://forums.whonix.org/t/poor-performance/13385/6
+</ref>
 
 = Development =
 
