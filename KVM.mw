@@ -1049,73 +1049,149 @@ To add more vcpus, increase the number in between the opening and closing <code>
 If preserving cpu pinning while increasing core count is desired, pin the vcpus to different numbered ones compared to other sensitive VMs. Map them in a 1:1 ratio to avoid over committing cores (which leads to performance problems).
 
 == 3D Graphics Acceleration ==
-Videos issues? See [[KVM#Videos|Videos]] instead.
+Having video issues? See [[KVM#Videos|Videos]] instead.
 
-Enabling 3D acceleration is discouraged because this increases the attack surface. This is a general KVM issue and [[unspecific|unspecific to {{project_name_short}}]].
+Enabling 3D acceleration is discouraged because it increases the attack surface. This is a general KVM issue and is [[unspecific|not specific to {{project_name_short}}]].
 
 (Advanced users, see: [[Dev/KVM#Virgl3D|Dev/KVM#Virgl3D]])
 
-[[Untested]]!
-
-'''1.''' [[KVM#VM_Settings_Modification|VM Settings Modification]] required.
-
-'''2.''' Locate the following section:
-
-<pre>
-    <graphics type='spice' autoport='yes'>
-      <clipboard copypaste='no'/>
-      <filetransfer enable='no'/>
-      <gl enable='no'/>
-    </graphics>
-</pre>
-
-'''3.''' Replace it with:
+'''1.''' Ensure that your host GPU drivers are installed and functional. If your host lacks a dedicated GPU and relies on software rendering (CPU), you should install <code>libgl1-mesa-dri</code> and <code>mesa-utils</code> on the host (if it’s Debian-based) to verify OpenGL functionality and enable software-based OpenGL rendering.
 
 {{CodeSelect|code=
-    
-<graphics type='spice' autoport='yes'>
-      <clipboard copypaste='no'/>
-      <filetransfer enable='no'/>
-      <gl enable='yes'/>
-      <listen type="socket"/>
-</graphics>
+sudo apt install libgl1-mesa-dri mesa-utils
 }}
 
-'''4.''' Locate the following section:
+'''2.''' Modify the VM settings before or after installation, as required:
+
+* [[KVM#VM_Settings_Modification|Before Installation]].
+* After Installation:
+
+{{CodeSelect|code=
+sudo virsh edit Whonix-Workstation 
+}}
+
+'''3.''' Locate the following section and apply the necessary changes:
+
+* {{CodeSelect|inline=true|code=
+<listen type='none'/>
+}}: SPICE doesn't support TLS + OpenGL with remote connections, so it must be enabled locally.
+* {{CodeSelect|inline=true|code=
+<gl enable='yes'/> 
+}}: Enable OpenGL.
+* {{CodeSelect|inline=true|code=
+<acceleration accel3d='yes'/> 
+}}: Enable 3D acceleration.
+
+Here is a full example of the relevant sections.
 
 <pre>
+    <graphics type='spice'>
+      <listen type='none'/>
+      <clipboard copypaste='yes'/>
+      <filetransfer enable='no'/>
+      <gl enable='yes'/>
+    </graphics>
+    <audio id='1' type='spice'/>
     <video>
-      <model type='virtio' heads='1' primary='yes'/>
+      <model type='virtio' heads='1' primary='yes'>
+        <acceleration accel3d='yes'/>
+      </model>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
     </video>
 </pre>
 
-'''5.''' Replace it with:
+'''4.''' Restart your VMs if they are running.
 
-{{CodeSelect|code=
-<video>
-      <model type='virtio' heads='1' primary='yes'/>
-      <acceleration accel3d='yes' accel2d='yes'/>
-      <gl enable='yes'/>
-</video>
-}}
+'''5.''' Notes:
 
-'''6.''' Notes.
-
-Notes:
-
-* '''Listen type performance:''' Setting {{CodeSelect|inline=true|code=
+* '''Spice Listen Type:''' Setting {{CodeSelect|inline=true|code=
 <listen type="socket"/>
-}} [https://forums.whonix.org/t/how-to-enable-3d-acceleration/16501/4 might be unnecessary and slow down performance.] Try without it. If that is functional, that would be better.
-* '''Attack surface:'''  Enabling <code>acceleration accel3d='yes'</code> will increase the attack surface.
-* '''Notes on options:''' {{CodeSelect|inline=true|code=
-accel2d='yes
-}}' / {{CodeSelect|inline=true|code=
-<gl enable='yes'/>
-}}:
-** '''Performance impact:''' Untested.
-** '''Security impact:''' Setting to <code>no</code> might reduce attack surface.
+}} [https://forums.whonix.org/t/how-to-enable-3d-acceleration/16501/4 can also be used].
 
-'''7.''' Done.
+'''6.''' Done.
+
+== 3D Graphics Acceleration - Troubleshooting ==
+The errors below are common when dealing with 3D acceleration, especially in environments with older hardware or improper configurations. Use these error outputs as references when troubleshooting.
+
+What if OpenGL is not found or installed on the host, especially when there is no dedicated graphics card (GPU)?
+
+<pre>
+Error starting domain: internal error: QEMU unexpectedly closed the monitor (vm='Whonix-Workstation'): 2024-09-04T04:29:19.732050Z qemu-system-x86_64: -device {"driver":"virtio-vga-gl","id":"video0","max_outputs":1,"bus":"pcie.0","addr":"0x1"}: opengl is not available
+
+Traceback (most recent call last):
+  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 72, in cb_wrapper
+    callback(asyncjob, *args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 108, in tmpcb
+    callback(*args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", line 57, in newfn
+    ret = fn(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/share/virt-manager/virtManager/object/domain.py", line 1402, in startup
+    self._backend.create()
+  File "/usr/lib/python3/dist-packages/libvirt.py", line 1379, in create
+    raise libvirtError('virDomainCreate() failed')
+libvirt.libvirtError: internal error: QEMU unexpectedly closed the monitor (vm='Whonix-Workstation'): 2024-09-04T04:29:19.732050Z qemu-system-x86_64: -device {"driver":"virtio-vga-gl","id":"video0","max_outputs":1,"bus":"pcie.0","addr":"0x1"}: opengl is not available
+</pre>
+
+What if the host lacks a dedicated GPU and uses an outdated CPU?
+
+<pre>
+Error starting domain: internal error: QEMU unexpectedly closed the monitor (vm='Whonix-Workstation'): qemu_gl_create_compile_shader: compile vertex error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+
+qemu_gl_create_compile_shader: compile fragment error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+
+qemu_gl_create_compile_shader: compile vertex error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+
+qemu_gl_create_compile_shader: compile fragment error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+
+Traceback (most recent call last):
+  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 72, in cb_wrapper
+    callback(asyncjob, *args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 108, in tmpcb
+    callback(*args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", line 57, in newfn
+    ret = fn(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/share/virt-manager/virtManager/object/domain.py", line 1402, in startup
+    self._backend.create()
+  File "/usr/lib/python3/dist-packages/libvirt.py", line 1379, in create
+    raise libvirtError('virDomainCreate() failed')
+libvirt.libvirtError: internal error: QEMU unexpectedly closed the monitor (vm='Whonix-Workstation'): qemu_gl_create_compile_shader: compile vertex error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+
+qemu_gl_create_compile_shader: compile fragment error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+
+qemu_gl_create_compile_shader: compile vertex error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+
+qemu_gl_create_compile_shader: compile fragment error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+</pre>
+
+What if TLS is enabled for remote SPICE along with 3D acceleration/OpenGL?
+
+<pre>
+Error starting domain: internal error: process exited while connecting to monitor: 2024-09-04T04:34:37.668627Z qemu-system-x86_64: SPICE GL support is local-only for now and incompatible with -spice port/tls-port
+
+Traceback (most recent call last):
+  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 72, in cb_wrapper
+    callback(asyncjob, *args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/asyncjob.py", line 108, in tmpcb
+    callback(*args, **kwargs)
+  File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", line 57, in newfn
+    ret = fn(self, *args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/share/virt-manager/virtManager/object/domain.py", line 1402, in startup
+    self._backend.create()
+  File "/usr/lib/python3/dist-packages/libvirt.py", line 1379, in create
+    raise libvirtError('virDomainCreate() failed')
+libvirt.libvirtError: internal error: process exited while connecting to monitor: 2024-09-04T04:34:37.668627Z qemu-system-x86_64: SPICE GL support is local-only for now and incompatible with -spice port/tls-port
+</pre>
 
 == Mouse Smoothness ==
 
