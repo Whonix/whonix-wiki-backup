@@ -31,10 +31,26 @@ Architecture specific packages in {{project_name_short}}. "Special packages". So
 * <code>ppc64el</code> {{kicksecure}} functional, created using distro-morphing on a test server for {{project_name_short}} developer Patrick.
 * Distro-morphing should generate viable images for KVM on <code>arm64</code>.
 
-= Packages =
-== NOTE ==
+== Notes ==
+{{Anchor|NOTE}}
+=== Note on Terminology ===
 {{Amd64}}
 
+=== Virtualization versus Emulation versus Architecture ===
+* <u>prerequisite knowledge:</u> [[#Note on Terminology|Note on Terminology]]
+* <u>Examples of architectures:</u> amd64, arm64, riscv64, POWER9
+* <u>Examples of virtualizers:</u> VirtualBox and KVM.
+* <u>Examples of emulators:</u> QEMU and Bochs.
+* <u>Virtualizers:</u> The guest operating system architecture must be compatible with the host operating system architecture. For instance, an amd64 host can only virtualize an amd64 guest. It is impossible to run arm64, riscv64, POWER9, etc. inside a virtualizer.
+* <u>Emulators:</u> The guest operating system architecture does not need to be compatible with the host operating system architecture. For example, an amd64 host can emulate an amd64, riscv64, POWER9, etc. guest.
+* <u>Speed comparison:</u> Virtualizers are faster than emulators, which are too slow for everyday desktop operating system production use cases.
+* <u>Conclusion:</u> Debian, Qubes, Kicksecure, Whonix builds for <code>amd64</code> cannot be run on host architectures such as <code>arm64</code>, <code>riscv64</code>, <code>POWER9</code>, etc. using a virtualizer such as VirtualBox or KVM.
+* <u>Porting:</u> To run an operating system on a different architecture, a port is required. The base operaging system (in case of Whonix, that is Debian) needs to be available for that architecture. Furthermore, the derivative (Kickssecure, Whonix) architecture specific packages need to be able to be build for that architecture. This is most likely possible. These packages are documented below. Furthermore, a bootable image (VM or ISO) needs to be created. Depending on the architecture, this can be a difficult process, which is elaborated on {{kicksecure_wiki
+|wikipage=Dev/image_creation
+|text=Development of System Image Creation and Bootstrapping Tools
+}}.
+
+= Packages =
 == Porting Simplicity ==
 To simplify ports to other architectures, all of the following packages are optional dependencies. These packages have very useful functionality however to simplify bootstrapping a port of {{project_name_short}} for a quick motivational milestone to reach of {{project_name_short}} building and booting, all architecture specific packages are optional dependencies by design in {{project_name_short}}.
 
