@@ -59,81 +59,131 @@ Kloak has the added benefit of foiling attacks that identify search queries in e
 https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slides_monaco.pdf
 </ref>
 
-=== Kloak Debug Mode ===
-Notes:
+=== Rescue Keys ===
+Kloak by default recognizes a "rescue key" sequence, which will terminate the kloak process. If you are running kloak as a systemd service (the default), this will ''restart'' kloak (as systemd will automatically re-launch it after it terminates). If you are running kloak in a terminal, this will ''terminate'' kloak, de-anonymizing keyboard and mouse actions.
 
-* Only in enable in case of issues when needing a log file to share.
-* '''Warning: Privacy implications of log sharing are unknown!'''
-
-'''1.''' {{Open with root rights|filename=
-/lib/systemd/system/kloak.service
-}}
-
-'''2.''' Search for:
-
-<pre>
-ExecStart=/usr/sbin/kloak
-</pre>
-
-'''3.''' Replace with:
-
-(Simply append a <code>-v</code>.)
+The default rescue key sequence is <code>KEY_LEFTSHIFT + KEY_RIGHTSHIFT + KEY_ESC</code> (i.e. left shift + right shift + escape). This may be customzied by using the <code>-k</code> option, which takes a comma-separated list of key codes as an argument. The full list of supported key codes can be seen at https://github.com/Whonix/kloak/blob/master/src/keycodes.c. For instance, to run kloak with the rescue key set to <code>KEY_LEFTSHIFT + KEY_ESC</code>, run:
 
 {{CodeSelect|code=
-ExecStart=/usr/sbin/kloak -v
+# Stop background kloak process first
+sudo systemctl stop kloak
+# Run kloak in terminal
+sudo kloak -k KEY_LEFTSHIFT,KEY_ESC
+# Terminate with Ctrl+C or rescue key sequence when done
+# Restart background kloak process
+sudo systemctl start kloak
 }}
 
-'''4.''' Save.
+=== Disabling rescue keys ===
+Notes:
 
-'''5.''' Reload systemd manager configuration.
+* '''The following feature is not yet fully implemented and published. It should be published soon.'''
+
+Some users have reported that they are unable to use certain keyboard shortcuts on account of the rescue key functionality. To disable the rescue key feature entirely, you may use the <code>-p</code> option. Be warned that this will prevent you from terminating or restarting kloak using the rescue key sequence! To run kloak with the rescue key feature disabled:
+
+{{CodeSelect|code=
+# Stop background kloak process first
+sudo systemctl stop kloak
+# Run kloak in terminal
+sudo kloak -p
+# Terminate with Ctrl+C when done
+# Restart background kloak process
+sudo systemctl start kloak
+}}
+
+=== Kloak Debug Mode ===
+If you are experiencing problems with kloak, generating debug logs can be useful for determining what's going wrong.
+
+{{mbox
+|icon=fa-solid fa-exclamation cs-red
+|addToClass=cs-yellow-light
+|text=
+Warning:
+
+* Only in enable in case of issues when needing a log file for debugging or sharing with a trusted user.
+* Kloak acts as a keylogger when running in verbose mode! Logs contain detailed info of all keystrokes and mouse movements made while kloak is running. Sharing kloak logs with another individual reveals key logs, mouse activity logs, and keyboard/mouse biometrics to the receiving user. Do not do anything sensitive while kloak is generating debug logs! Under no circumstances should you share a kloak log with any user you do not fully trust! Do not publicize kloak logs, transmit them over an insecure channel, or store them online unencrpyted!
+}}
+
+Kloak provides a <code>-v</code> option that is useful in these scenarios. Due to the volume of data kloak produces during logging, it is recommended that you run kloak in a terminal when gathering logs. To run kloak in verbose mode, run the following commands:
+
+{{CodeSelect|code=
+# Stop background kloak process first
+sudo systemctl stop kloak
+# Run kloak in terminal
+sudo kloak -v
+# Gather logs, then terminate with Ctrl+C or rescue key sequence
+# Restart background kloak process
+sudo systemctl start kloak
+}}
+
+=== Setting persistent kloak settings ===
+Notes:
+
+* Kloak's verbose mode can be enabled as a persistent setting by following these instructions. However, verbose mode generates copious amounts of data, which may consume large amounts of disk space or cause wear-and-tear on the disks. Enabling verbose mode as a persistent setting is not recommended.
+
+If you use kloak as a systemd service and wish to use some of its options, you may do so by adding a configuration file for kloak. To do this:
+
+'''1.''' {{Open with root rights|filename=
+/lib/systemd/system/kloak.service.d/50_user.conf
+}}
+
+'''2.''' Append.
+
+<u>Note:</u> Replace <code>&lt;options&gt;</code> with the options you wish to pass to kloak.
+
+{{CodeSelect|code=
+[Service]
+ExecStart=/usr/sbin/kloak <options>
+}}
+
+'''3.''' Reload systemd manager configuration.
 
 {{CodeSelect|code=
 sudo systemctl daemon-reload
 }}
 
-'''6.''' Restart kloak.
+'''4.''' Restart kloak.
 
 {{CodeSelect|code=
 sudo systemctl restart kloak
 }}
 
-'''7.''' Done.
+'''5.''' Done.
 
-Kloak debug mode has been enabled.
+Kloak will now run with custom options.
 
-'''8.''' Do some activity.
-
-Try something that might be broken such as touchpad keys.
-
-'''9.''' Access kloak log.
+=== View kloak journal log ===
+If you want to look at any info kloak may have output since starting it, you may do so by checking the journal logs. To do this, run:
 
 {{CodeSelect|code=
 sudo journalctl -u kloak {{!}} cat
 }}
 
 = Defense Testing =
-You can test that kloak actually works by trying a keystroke test website:
+You can test that kloak actually works by trying a keystroke test website. https://vmonaco.com/device-fingerprinting/ is a good choice as it is free, open source, and requires no personal data or signup process to use. The code is visible at https://github.com/vmonaco/device-fingerprinting.
 
-Update: keytrac, the keystroke biometrics demo this wiki chapter was originally written for is down. Other tests are yet to be researched, tested and documented. This is still [[undocumented]].
+To use the test:
 
-Other potential tests:
+* Ensure kloak is not running.
+* Open the website.
+* Move the mouse around and click on random locations on the page. You will see a graph labeled "mousemove" start to update. As the mouse moves, the graph should eventually show a few (oftentimes only one) orange-marked spikes that act as a fingerprint for your device.
+* Click inside the text area and type for some amount of time. A graph labeled "keydown" should show one or more prominent orange-marked spikes after a bit of typing.
+* Start kloak. then refresh the page.
+* Move the mouse around again. The graph will act erratically and fail to obtain an orange-marked spike for very long.
+* Click inside the text area and type for some amount of time. The graph should act erratically similar to the mouse graph.
+* By default, the website uses <code>event.timeStamp</code> as a time source for fingerprint extraction. If desired, repeat the above steps with the other time sources (<code>Date.now()</code>, <code>performance.now()</code>, and <code>Web Worker</code>).
 
-* https://vmonaco.com/device-fingerprinting/
+A device or biometric fingerprint can be obtained quickly and with high certainty when kloak is not used. The tests done with kloak enabled show that kloak obfuscated typing behavior, making it difficult to authenticate or identify a particular user.
+
+Note that websites that observe typing behavior will likely see users running kloak as being distinctly different from other users (due to the randomized, unnatural typing rhythms and mouse movements). This is similar to how Tor users can be detected separately from internet users who do not use Tor, but telling individual Tor users from each other is very difficult. As more users use kloak, the anonymity set will increase.
+
+Other potential tests (not recommended):
+
 * https://www.typingdna.com/demo-sametext.html
 * https://github.com/topics/keystroke-dynamics
 * [https://forums.whonix.org/t/current-state-of-kloak/5605/60 forum discussion]
 
-You can test that kloak actually works by trying an keytrac online keystroke biometrics demo. Update: This proprietary cloud hosted demo is down.
-
-For example, try these three different scenarios:
-
-* '''Train normal, test normal'''
-* '''Train normal, test kloak'''
-* '''Train kloak, test kloak'''
-
-Train normal means to train with normal typing behavior (without kloak running). At the enrollment page on the KeyTrac demo, enter a username and password without kloak running, and then on the authenticate page, try authenticating.
-
-Expected results and interpretation:
+Previously KeyTrac was recommended for testing kloak. However, the KeyTrac demo is no longer available. When KeyTrac did exist, the following results were obtained by training and testing KeyTrac with and without kloak:
 
 {{Box|text=
 '''Train normal, test normal'''
@@ -161,7 +211,7 @@ trial 2: 42%
 trial 3 36%
 }}
 
-Without kloak users can be identified with very high certainty. The second set of tests show that kloak definitely obfuscates typing behavior, making it difficult to authenticate or identify a particular user. Third set: users running kloak may look "similar" to other users running kloak. That is, it might be possible to identify kloak users from non-kloak users. If this is the case, the anonymity set will increase as more users start running kloak.
+Without kloak users can be identified with very high certainty. The second set of tests show that kloak definitely obfuscates typing behavior, making it difficult to authenticate or identify a particular user. Third set: users running kloak may look "similar" to other users running kloak. That is, it might be possible to identify kloak users from non-kloak users. These results are similar to the results obtained using vmonaco's device fingerprinting test.
 
 References:
 
