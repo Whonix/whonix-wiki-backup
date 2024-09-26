@@ -31,17 +31,13 @@ Most other vendors of software on the Windows platform are either unaware or ign
 = Introduction =
 This page includes documentation on how to securely acquire Gpg4win – an application which can be used to verify digital software signatures provided by the {{project_name_short}} project and other software.
 
-Use either option A) <u>or</u> B).
+Use either option A) <u>or</u> B) <u>or</u> C).
 
-'''A)''' <u>Using SignTool to verify Gpg4win</u>:
+'''A)''' UAC (recommended)
 
-The following guide provides steps to:
+When trying to run the installer on Windows, the User Access Control dialog will show the publisher. (If you have disabled User Access Control use a different method.) 
 
-# Download and installation of SignTool.
-# Download Gpg4win.
-# Verify Gpg4win using SignTool.
-# Import the developer's GPG signing key into Gpg4win.
-# Verify the {{project_name_short}} Windows Installer using Gpg4win.
+'''B)''' <u>Using SignTool to verify Gpg4win</u>:
 
 SignTool is a Windows platform-focused tool provided by Microsoft which can be used to verify software digital signatures.
 
@@ -53,7 +49,7 @@ https://forums.whonix.org/t/testing-whonix-installer-for-windows/2987/217
 
 Therefore, optionally, the user might decide to skip the SignTool step and simplify as follows.
 
-'''B)''' <u>Not using SignTool to verify Gpg4win</u>:
+'''C)''' <u>Not using SignTool to verify Gpg4win</u>:
 
 # Download and install Gpg4win.
 # Import the developer's GPG signing key into Gpg4win.
@@ -76,45 +72,34 @@ The Gpg4win documentation also covers this subject.
 | text    = This entry is strongly related to the [[Trust|Placing Trust in {{project_name_short}}]] page.
 }}
 
-{{mbox
-| type    = notice
-| image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = This entry is for Download the {{project_name_short}} Signing Key on the Windows platform. Includes Windows specifics such as file paths. This chapter might be out of date. In case of questions, see the [[Signing Key|{{project_name_short}} Signing Key]] page first which takes presedence.
-}}
-
 Since all {{project_name_short}} releases are signed with the same key, it is unnecessary to verify the key every time a new release is announced. Trust in the key might gradually increase over time, but cryptographic signatures must still be verified every time a new release is downloaded.
 
-<u>Note</u>: With the exception of step 1 all commands should be run from <code>C:\Users\<user_name\Downloads</code>
-
 {{Box|text=
-'''1.''' If not already completed, have GnuPG initialize your user data folder.
-
-{{CodeSelect|code=
-gpg --fingerprint
-}}
-
-'''2.''' Download [[Patrick Schleizer]]'s (adrelanos') [[OpenPGP]] key. <ref>
+'''1.''' Download [[Patrick Schleizer]]'s (adrelanos') [[OpenPGP]] key. <ref>
 {{CodeSelect|code=
 curl --tlsv1.3 --proto =https --max-time 180 --output derivative.asc {{project_clearnet}}/keys/derivative.asc
 }}
 </ref><br />
 {{Code2|<u>'''{{signing_key_main}}'''</u>}}
 
-Store the key as <code>C:\Users\<user_name>\Downloads\derivative.asc</code>
+Store the key in <code>\Downloads\</code> folder as <code>derivative.asc</code>
 
-'''3.''' Change to the <code>C:\Users\<user_name>\Downloads\</code> directory.
+[[File:gpg-windows-import-keys.jpg]]
+
+'''2.''' Open Windows Powershell then Change to the <code>\Downloads\</code> directory.
+
 
 {{CodeSelect|code=
-cd C:\Users\<user_name>\Downloads\
+cd .\Downloads\
 }}
 
-'''4.''' Check fingerprints/owners without importing anything.
+'''3.''' Check fingerprints/owners without importing anything.
 
 {{CodeSelect|code=
 gpg --keyid-format long --with-fingerprint derivative.asc
 }}
 
-'''5.''' Verify the output.
+'''4.''' Verify the output.
 
 The most important check is confirming the key fingerprint <u>exactly</u> matches the output below. <ref>
 Minor changes in the output such as new uids (email addresses) or newer expiration dates are inconsequential.
@@ -126,7 +111,7 @@ Minor changes in the output such as new uids (email addresses) or newer expirati
 
 The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. Advanced users can learn more about this [[Main/Project Signing Key#OpenPGP_Web_of_Trust|here]].
 
-'''6.''' Import the key.
+'''5.''' Import the key.
 
 {{CodeSelect|code=
 gpg --import derivative.asc

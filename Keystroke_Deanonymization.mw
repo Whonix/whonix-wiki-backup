@@ -60,36 +60,76 @@ https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slid
 </ref>
 
 === Rescue Keys ===
-Kloak by default recognizes a "rescue key" sequence, which will terminate the kloak process. If you are running kloak as a systemd service (the default), this will ''restart'' kloak (as systemd will automatically re-launch it after it terminates). If you are running kloak in a terminal, this will ''terminate'' kloak, de-anonymizing keyboard and mouse actions.
+Kloak by default recognizes a "rescue key" sequence, which will terminate the kloak process.
 
-The default rescue key sequence is <code>KEY_LEFTSHIFT + KEY_RIGHTSHIFT + KEY_ESC</code> (i.e. left shift + right shift + escape). This may be customzied by using the <code>-k</code> option, which takes a comma-separated list of key codes as an argument. The full list of supported key codes can be seen at https://github.com/Whonix/kloak/blob/master/src/keycodes.c. For instance, to run kloak with the rescue key set to <code>KEY_LEFTSHIFT + KEY_ESC</code>, run:
+The default rescue key sequence is <code>KEY_LEFTSHIFT + KEY_RIGHTSHIFT + KEY_ESC</code> (i.e. left shift + right shift + escape).
+
+Depending on how kloak is run:
+
+* '''A)''' <u>daemon</u>: If you are running kloak as a systemd service (the default), this will ''restart'' kloak (as systemd will automatically re-launch it after it terminates).
+* '''B)''' <u>manual</u>: If you are running kloak in a terminal, this will ''terminate'' kloak, which then will be no longer anonymizing keyboard and mouse actions.
+
+==== Rescue Keys Customization ====
+Kloak rescue keys may be customized by using the <code>-k</code> option, which takes a comma-separated list of key codes as an argument. The full list of supported key codes can be seen at [https://github.com/Whonix/kloak/blob/master/src/keycodes.c <code>keycodes.c</code>].
+
+For instance, to run kloak with the rescue key set to <code>KEY_LEFTSHIFT + KEY_ESC</code>, run:
+
+'''1.''' Stop background kloak process first.
 
 {{CodeSelect|code=
-# Stop background kloak process first
 sudo systemctl stop kloak
-# Run kloak in terminal
+}}
+
+'''2.''' Run kloak in terminal.
+
+{{CodeSelect|code=
 sudo kloak -k KEY_LEFTSHIFT,KEY_ESC
-# Terminate with Ctrl+C or rescue key sequence when done
-# Restart background kloak process
+}}
+
+'''3.''' Terminate with Ctrl+C or rescue key sequence when done.
+
+'''4.''' Restart background kloak process.
+
+{{CodeSelect|code=
 sudo systemctl start kloak
 }}
 
-=== Disabling rescue keys ===
-Notes:
+'''5.''' Persistent configuration change.
 
-* '''The following feature is not yet fully implemented and published. It should be published soon.'''
+To make this change permanent, see [[Keystroke_Deanonymization#Setting_persistent_kloak_settings|setting persistent kloak settings]].
+
+'''6.''' Done.
+
+==== Disabling rescue keys ====
+Note: '''The disabling rescue keys feature is at time of writing only available from source code or in the testers repository.'''
 
 Some users have reported that they are unable to use certain keyboard shortcuts on account of the rescue key functionality. To disable the rescue key feature entirely, you may use the <code>-p</code> option. Be warned that this will prevent you from terminating or restarting kloak using the rescue key sequence! To run kloak with the rescue key feature disabled:
 
+'''1.''' Stop background kloak process first.
+
 {{CodeSelect|code=
-# Stop background kloak process first
 sudo systemctl stop kloak
-# Run kloak in terminal
+}}
+
+'''2.''' Run kloak in terminal.
+
+{{CodeSelect|code=
 sudo kloak -p
-# Terminate with Ctrl+C when done
-# Restart background kloak process
+}}
+
+'''3.''' Terminate with Ctrl+C when done.
+
+'''4.''' Restart background kloak process.
+
+{{CodeSelect|code=
 sudo systemctl start kloak
 }}
+
+'''5.''' Persistent configuration change.
+
+To make this change permanent, see [[Keystroke_Deanonymization#Setting_persistent_kloak_settings|setting persistent kloak settings]].
+
+'''6.''' Done.
 
 === Kloak Debug Mode ===
 If you are experiencing problems with kloak, generating debug logs can be useful for determining what's going wrong.
@@ -100,21 +140,37 @@ If you are experiencing problems with kloak, generating debug logs can be useful
 |text=
 Warning:
 
-* Only in enable in case of issues when needing a log file for debugging or sharing with a trusted user.
-* Kloak acts as a keylogger when running in verbose mode! Logs contain detailed info of all keystrokes and mouse movements made while kloak is running. Sharing kloak logs with another individual reveals key logs, mouse activity logs, and keyboard/mouse biometrics to the receiving user. Do not do anything sensitive while kloak is generating debug logs! Under no circumstances should you share a kloak log with any user you do not fully trust! Do not publicize kloak logs, transmit them over an insecure channel, or store them online unencrpyted!
+* Only enable in case of issues when needing a log file for debugging or sharing with a trusted user.
+* Kloak acts as a keylogger when running in verbose mode! Logs contain detailed info of all keystrokes and mouse movements made while kloak is running. Sharing kloak logs with another individual reveals key logs, mouse activity logs, and keyboard/mouse biometrics to the receiving user. Do not do anything sensitive while kloak is generating debug logs! Under no circumstances should you share a kloak log with any user you do not fully trust! Do not publicize kloak logs, transmit them over an insecure channel, or store them online unencrypted!
 }}
 
 Kloak provides a <code>-v</code> option that is useful in these scenarios. Due to the volume of data kloak produces during logging, it is recommended that you run kloak in a terminal when gathering logs. To run kloak in verbose mode, run the following commands:
 
+'''1.''' Stop background kloak process first
+
 {{CodeSelect|code=
-# Stop background kloak process first
 sudo systemctl stop kloak
-# Run kloak in terminal
+}}
+
+'''2.''' Run kloak in terminal
+
+{{CodeSelect|code=
 sudo kloak -v
-# Gather logs, then terminate with Ctrl+C or rescue key sequence
-# Restart background kloak process
+}}
+
+'''3.''' Gather logs, then terminate with Ctrl+C or rescue key sequence.
+
+'''4.''' Restart background kloak process
+
+{{CodeSelect|code=
 sudo systemctl start kloak
 }}
+
+'''5.''' Persistent configuration change.
+
+To make this change permanent, see [[Keystroke_Deanonymization#Setting_persistent_kloak_settings|setting persistent kloak settings]].
+
+'''6.''' Done.
 
 === Setting persistent kloak settings ===
 Notes:
@@ -127,7 +183,7 @@ If you use kloak as a systemd service and wish to use some of its options, you m
 /lib/systemd/system/kloak.service.d/50_user.conf
 }}
 
-'''2.''' Append.
+'''2.''' Paste.
 
 <u>Note:</u> Replace <code>&lt;options&gt;</code> with the options you wish to pass to kloak.
 
@@ -136,19 +192,21 @@ If you use kloak as a systemd service and wish to use some of its options, you m
 ExecStart=/usr/sbin/kloak <options>
 }}
 
-'''3.''' Reload systemd manager configuration.
+'''3.''' Save and exit.
+
+'''4.''' Reload systemd manager configuration.
 
 {{CodeSelect|code=
 sudo systemctl daemon-reload
 }}
 
-'''4.''' Restart kloak.
+'''5.''' Restart kloak.
 
 {{CodeSelect|code=
 sudo systemctl restart kloak
 }}
 
-'''5.''' Done.
+'''6.''' Done.
 
 Kloak will now run with custom options.
 
@@ -157,6 +215,15 @@ If you want to look at any info kloak may have output since starting it, you may
 
 {{CodeSelect|code=
 sudo journalctl -u kloak {{!}} cat
+}}
+
+=== xrdp ===
+{{quotation
+|quote=
+Looked into what would be necessary to make kloak work over xrdp. Sadly this does not seem possible, as xrdp acts as its own X server (to my awareness) and thus intercepting and delaying keystrokes would require kloak to somehow intercept the keystrokes at the layer between the X server and the applications. I looked ways of doing this but failed to find them - there are ways of logging keystrokes at the X server level, but my research failed to find a way to block keystrokes or otherwise keep them from being delivered to applications for the purpose of delaying them. This issue affects any use of kloak over a remote desktop session - unless the remote desktop application creates uinput devices on the remote machine and then feeds user input into them, kloak will not be able to intercept them.
+
+Recommendation - xrdp users should run kloak on the client machine to obfuscate their typing patterns on the client. This will then naturally obfuscate them on the remote machine as well.
+|context=ArrayBolt3
 }}
 
 = Defense Testing =
