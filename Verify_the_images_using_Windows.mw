@@ -148,48 +148,56 @@ Analyze the other messages as usual.
 
 These instructions often reference <code>ova</code> (VirtualBox image). The instructions are equally applicable to other file types such as <code>exe</code> (Whonix Windows Installer). The only difference is the file extension.
 
-'''1.''' If <i>not</i> already completed, download the Whonix image and the corresponding OpenGPG signature which will be used to verify the image.
+'''1.''' Download the Whonix image and the corresponding OpenGPG signature which will be used to verify the image.
 
 Choose either option A) <u>or</u> B)
 
 * '''A)''' <u>Whonix for VirtualBox Windows Installer</u> <code>ova</code>.
 
-Both, the signature and the <code>.ova</code> image should be downloaded into the same directory.
+Both, the signature and the <code>.ova</code> image should be downloaded into the same directory (mostly in \Downloads\).
 
 Download the {{project_name_short}} VM image and signature from [[VirtualBox|VirtualBox Table]].
 
 * '''B)''' <u>Whonix Windows Installer</u> <code>exe</code>.
 
-Both, the signature and the <code>.exe</code> image should be downloaded into the same directory.
+Both, the signature and the <code>.exe</code> image should be downloaded into the same directory (mostly in \Downloads\).
 
 {{windows_installer_image_and_signature}}
 
 '''2.''' Start the cryptographic verification; this process can take several minutes.
 
-At the Windows command prompt, change to the directory with the <code>Whonix.ova</code> and corresponding signature file.
+At the Windows PowerShell, change to the directory with the <code>Whonix.ova</code> or <code>Whonix.exe</code> and corresponding signature file/s downloaded (assuming in \Download\ directly).
 
 {{CodeSelect|code=
-cd C:\Users\<user_name>\<directory_name>
+cd .\Downloads\
 }}
 
-'''3.''' Verify the <code>Whonix.ova</code> image.
+'''3.''' Verify the <code>Whonix.ova</code> or <code>Whonix.exe</code> image.
 
 {{CodeSelect|code=
-gpg --verify-options show-notations --verify Whonix*.*.asc Whonix*.*
+gpg --verify-options show-notations --verify (Get-ChildItem -Filter "Whonix*.*.asc").FullName (Get-ChildItem -Filter "Whonix*.*" | Where-Object { $_.FullName -notlike "*.asc" }).FullName
 }}
 
 If the Virtual Machine image is correct the output will tell you that the signature is good.
 
-{{CodeSelect|code=
-gpg: Signature made Mon 19 Jan 2015 11:45:41 PM CET using RSA key ID 77BB3C48
-gpg: Good signature from "Patrick Schleizer <adrelanos@whonix.org>" [unknown]
+[[File:verify-whonix-windows-images.jpg]]
+
+<pre>
+PS C:\Users\techy> cd .\Downloads\
+PS C:\Users\techy\Downloads> gpg --verify-options show-notations --verify (Get-ChildItem -Filter "Whonix*.*.asc").FullName (Get-ChildItem -Filter "Whonix*.*" | Where-Object { $_.FullName -notlike "*.asc" }).FullName
+gpg: Signature made 09/25/24 17:45:23 Arabian Standard Time
+gpg:                using RSA key 6E979B28A6F37C43BE30AFA1CB8D50BB77BB3C48
+gpg: Good signature from "Patrick Schleizer <adrelanos@kicksecure.com>" [unknown]
+gpg:                 aka "Patrick Schleizer <adrelanos@riseup.net>" [unknown]
+gpg:                 aka "Patrick Schleizer <adrelanos@whonix.org>" [unknown]
 gpg: Signature notation: issuer-fpr@notations.openpgp.fifthhorseman.net=6E979B28A6F37C43BE30AFA1CB8D50BB77BB3C48
-gpg: Signature notation: file@name={{project_name_short}}-{{VersionNew}}.ova
+gpg: Signature notation: file@name=Whonix-Xfce-17.2.3.2.exe
 gpg: WARNING: This key is not certified with a trusted signature!
 gpg:          There is no indication that the signature belongs to the owner.
 Primary key fingerprint: 916B 8D99 C38E AF5E 8ADC  7A2A 8D66 066A 2EEA CCDA
      Subkey fingerprint: 6E97 9B28 A6F3 7C43 BE30  AFA1 CB8D 50BB 77BB 3C48
-}}
+PS C:\Users\techy\Downloads>
+</pre>
 
 This might be followed by a warning saying:
 
@@ -213,48 +221,6 @@ To help users confirm that the file name has not been tampered with, beginning w
 }}
 
 = Troubleshooting =
-
-== SignTool is not Recognized ==
-
-'''Figure:''' ''SignTool not Recognized Error''
-
-[[File:signtool_command_not_recognized.png]]
-
-This error means the SignTool executable is not accessible through <code>cmd.exe</code>. A common cause for this error is SignTool was not installed in the user's [https://web.archive.org/web/20220707004040/https://john-dugan.com/path-variable-in-windows/?PageSpeed=noscript PATH]. To fix this issue add <code>signtool.exe</code> to your system PATH. <ref> https://www.godaddy.com/help/windows-cmd-signtool-is-not-recognized-as-an-internal-or-external-command-operable-program-or-batch-file-19987
-</ref>
-
-<u>Note</u>: This solution is temporary and works only until the command prompt is closed. When the command prompt is restarted <code>signtool.exe</code> must be added to the system PATH again.
-{{Box|text=
-'''1.''' Open a command prompt.
-
-In the Windows Start menu, run.
-
-{{CodeSelect|code=
- cmd.exe
-}}
-
-'''2.''' Add the path to <code>signtool.exe</code> to your system PATH.
-
-The default installation path for <code>signtool.exe</code>:
-
-<pre>
-x86 systems:  C:\Program Files (x86)\Windows Kits\<windows_version>\bin\x86
-x64 systems:  C:\Program Files (x86)\Windows Kits\<windows_version>\bin\x64
-</pre>
-
-Run the following command to add "path\to\signtool.exe" to your system PATH. Also be sure to add the Windows version to the path.
-
-{{CodeSelect|code=
-set PATH="path to signtool.ext";%PATH%
-}}
-
-For example, the following command adds the path for an <code>x64</code> system.
-
-{{CodeSelect|code=
-set PATH="C:\Program Files (x86)\Windows Kits\<windows_version>\bin\x64";%PATH%
-}}
-}}
-
 == SignTool Certificate Chain Error ==
 
 '''Figure:''' ''Root Certificate Error''

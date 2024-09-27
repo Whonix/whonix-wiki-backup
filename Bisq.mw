@@ -106,7 +106,7 @@ bisq key change 2023 09 02 archive:
 </ref>
 
 {{gpg key
-|url=scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.0.1/E222AA02.asc
+|url=scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.0/E222AA02.asc
 |source_filename=E222AA02.asc
 |fingerprint=B493319106CC3D1F252E19CBF806F422E222AA02
 |gpg_fingerprint_output=
@@ -138,17 +138,17 @@ Download Bisq.
 
 * '''Bisq <u>1</u>:'''
 ** Download Bisq. {{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.14/Bisq-64bit-1.9.14.deb
+scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.17/Bisq-64bit-1.9.17.deb
 }}
 ** Download OpenPGP signature. {{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.14/Bisq-64bit-1.9.14.deb.asc
+scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.17/Bisq-64bit-1.9.17.deb.asc
 }}
 * '''Bisq <u>2</u>:'''
 ** Download Bisq. {{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.0.1/Bisq-64bit-2.0.1.deb
+scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.0/Bisq-2.1.0.deb
 }}
 ** Download OpenPGP signature. {{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.0.1/Bisq-64bit-2.0.1.deb.asc
+scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.0/Bisq-2.1.0.deb.asc
 }}
 
 === Verification ===
@@ -179,13 +179,6 @@ sudo touch /home/user/.local/share/Bisq/btc_mainnet/tor/tor
 ** Add the executable bit to the dummy tor binary. {{CodeSelect|code=
 sudo chmod +x /home/user/.local/share/Bisq/btc_mainnet/tor/tor
 }}
-* '''Bisq <u>2</u>:'''
-** Create folder the Bisq tor folder. {{CodeSelect|code=
-mkdir -p /home/user/.local/share/Bisq2/tor/
-}}
-** Create a dummy tor binary. {{CodeSelect|code=
-sudo ln -s /usr/bin/tor /home/user/.local/share/Bisq2/tor/tor
-}}
 
 Why is this needed? Optional. See footnote for reasons why. Users can skip this step. <ref>
 * Users: Ignore this footnote
@@ -205,6 +198,8 @@ Why sudo? To avoid <code>/home/user/.local/share/Bisq2/tor/tor</code> getting ov
 === xdg-desktop-menu Bug Workaround ===
 '''On {{project_name_workstation_short}}.'''
 
+* '''Bisq <u>1</u>:'''
+
 Use the following workaround to avoid a known bug in xdg which fails to find a writable system menu directory. <ref>
 https://github.com/bisq-network/bisq/issues/848
 </ref>
@@ -222,16 +217,13 @@ On {{project_name_workstation_short}} <code>anon-bisq</code> App Qube.
 
 You need to extend the bind-dirs configuration inside the VM.
 
-* Bisq 1: 
+* '''Bisq <u>1</u>:'''
 ** {{CodeSelect|code=
 sudo mkdir -p /rw/bind-dirs/opt/bisq
 }}
-* Bisq 2:
+* '''Bisq <u>2</u>:'''
 ** {{CodeSelect|code=
 sudo mkdir -p /rw/bind-dirs/opt/bisq2
-}}
-** {{CodeSelect|code=
-sudo mkdir -p /rw/bind-dirs/usr/share/desktop-directories
 }}
 ** {{CodeSelect|code=
 sudo mkdir -p /rw/config/qubes-bind-dirs.d
@@ -250,7 +242,7 @@ Paste.
 binds+=( '/opt/bisq' )
 ## Bisq 2:
 binds+=( '/opt/bisq2' )
-
+## Bisq 1:
 binds+=( '/usr/share/desktop-directories' )
 }}
 
@@ -276,7 +268,7 @@ Start Bisq.
 /opt/bisq/bin/Bisq --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true
 }}
 * '''Bisq <u>2</u>:''' {{CodeSelect|code=
-/opt/bisq2/bin/Bisq\ 2 --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true
+/opt/bisq2/bin/Bisq2
 }}
 
 '''Figure:''' ''Bisq Launch in {{project_name_short}}''
@@ -299,7 +291,7 @@ https://github.com/bisq-network/bisq/issues/1425
 GDK_SCALE=2 /opt/bisq/bin/Bisq --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true --daoActivated=false
 }}
 * '''Bisq <u>2</u>:''' {{CodeSelect|code=
-GDK_SCALE=2 /opt/bisq2/bin/Bisq\ 2 --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true --daoActivated=false
+GDK_SCALE=2 /opt/bisq2/bin/Bisq2
 }}
 
 Refer to the [https://docs.bisq.network/ official Bisq documentation] to learn about trading essentials, including:
