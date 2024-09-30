@@ -70,13 +70,13 @@ sudo apt update
 For '''Debian {{Stable project version based on Debian codename}}+''' on Intel / AMD you need to install:
 
 {{CodeSelect|code=
-sudo apt install --no-install-recommends qemu-kvm qemu-system-x86 libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm
+sudo apt install --no-install-recommends qemu-kvm qemu-system-x86 libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm xz-utils
 }}
 
 For '''Debian {{Stable project version based on Debian codename}}+''' on PowerPC you need to install:
 
 {{CodeSelect|code=
-sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm
+sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm xz-utils
 }}
 }} <!-- close tab: Debian -->
 
@@ -86,7 +86,7 @@ sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system l
 |addToClass=info-box
 |content=
 {{CodeSelect|code=
-sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libguestfs-tools genisoimage virtinst libosinfo-bin virt-manager dnsmasq-base iptables safe-rm
+sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libguestfs-tools genisoimage virtinst libosinfo-bin virt-manager dnsmasq-base iptables safe-rm xz-utils
 }}
 
 Add your user to KVM Groups (1 of 2).
@@ -111,7 +111,7 @@ sudo adduser $USER libvirt-qemu
 TODO: Possible to only install dnsmasq-base without the dnsmasq systemd unit or does Arch Linux keep the systemd unit disabled by default?
 
 {{CodeSelect|code=
-sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils safe-rm
+sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils safe-rm xz-utils
 }}
 
 {{CodeSelect|code=
@@ -138,13 +138,13 @@ egrep -E '^flags.*(vmx{{!}}svm)' /proc/cpuinfo
 To install mandatory and default packages in the virtualization group, run.
 
 {{CodeSelect|code=
-sudo dnf install @virtualization
+sudo dnf install @virtualization xz-utils
 }}
 
 Alternatively, to install the mandatory, default, and optional packages, run.
 
 {{CodeSelect|code=
-sudo dnf group install --with-optional virtualization
+sudo dnf group install --with-optional virtualization xz-utils
 }}
 
 After package installation, start the libvirtd service.
@@ -205,7 +205,7 @@ You must log out and log in to apply the changes.
 |addToClass=info-box
 |content=
 
-The qemu-kvm and libvirt-bin packages are necessary. virt-manager is also required in order to use a graphical user interface (which most users want). It is most likely this software can be installed using the usual distribution's package manager.
+The qemu-kvm and libvirt-bin packages are necessary. virt-manager is also required in order to use a graphical user interface (which most users want). tar, xz-utils is required to extract the {{project_name_short}} images. It is most likely this software can be installed using the usual distribution's package manager.
 
 If any of the following errors appear while later using {{Code|virsh define}}.
 
@@ -443,7 +443,9 @@ Verify images using this [[Main/Project_Signing_Key|{{project_name_short}} signi
 
 '''2.''' Do not use <code>unxz</code>! Extract the images using gnu <code>tar</code>.
 
-'''3.''' Make sure the <code>xz-utils</code> package is installed on your system <ref>https://forums.whonix.org/t/tar-child-xz-cannot-exec-no-such-file-or-directory-install-xz-utils-package/16708/7</ref>.
+'''3.''' Make sure the <code>xz-utils</code> package is installed on your system. <ref>
+https://forums.whonix.org/t/tar-child-xz-cannot-exec-no-such-file-or-directory-install-xz-utils-package/16708/7
+</ref>
 
 {{CodeSelect|code=
 tar -xvf Whonix*.libvirt.xz
