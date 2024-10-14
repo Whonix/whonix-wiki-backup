@@ -334,28 +334,34 @@ Reminder: Always please merge first before developing further.
 Please add comments to this wiki page once any things have been changed.
 
 == document debug mode ==
-todo: document how to use the debug mode
+
+[[File:Bildschirmfoto vom 2024-10-13 17-42-16.png|startup in debug mode]]
+
+to use the debug mode just type in "--debug" behind the executable when startup with console.
 
 == false-positive installation failure error ==
 See screenshot provided.
 
 == tell user there is a debug mode in the show installation details box ==
-todo
+done: https://github.com/einsiedler90/Whonix-Installer/commit/175a005ad08088039e81346ee34db191529606ec
 
 == tell user where to find the log file in the show installation details box ==
-todo
+obsolete, as a separate log file is no longer needed at the moment.
 
 == Microsoft Visual C++ 2019 Redistributable Package Error ==
 [[File:VirtualBox_Microsoft_Visual_C_2019_Redistributable_Package.png|Microsoft Visual C++ 2019 Redistributable Package Error]]
 
 * Integrate vc_redist.x64.exe into the installer.
 * Installer can assume vc_redist.x64.exe is already on the hard drive. (No automated download from the internet.)
-* Please check if installed.
-* If not installed, install.
+* Please check if installed.¹
+* If not installed, install.¹
 
 https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
 
 https://aka.ms/vs/17/release/vc_redist.x64.exe
+
+done. see: https://github.com/einsiedler90/Whonix-Installer/commit/df9ad3e91f48958fc48f30a8323e547bb4c87bd4
+¹vc_redist.x64.exe checks itself so no separate check is needed.
 
 == rename setup to installer - update #3 ==
 file: Whonix-Installer build-dummy.sh
@@ -398,37 +404,6 @@ Please delete this wiki chapter now.
 7) Incomplete implementation: Some methods like LabelCompleteDescClick are empty, suggesting incomplete functionality.
 
 == ChatGPT AI based Code Review of whonixinstaller_main.pas ==
-=== Cross-Platform Compatibility ===
-The function <code>AppDiskGetFreeSpace</code> in <code>WhonixUtils.pas</code> seems to have platform-specific implementations, but it doesn't handle cases for platforms other than Windows and Linux.
-
-<pre lang="pascal">
-{$ifdef linux}
-// Linux-specific code
-{$endif}
-
-{$ifdef windows}
-// Windows-specific code
-{$endif}
-
-//cannot detect
-Exit(-1);
-</pre>
-
-'''Solution:'''
-Add support for other platforms or at least log an appropriate message when the platform is unsupported.
-
-=== Missing <code>ApplicationName</code> Declaration ===
-In <code>WhonixInstaller_Main.pas</code>, <code>ApplicationName</code> is used but not declared or initialized:
-
-<pre lang="pascal">
-UnpackPath := IncludeTrailingPathDelimiter(
-  IncludeTrailingPathDelimiter(SelectDirectoryDialog.FileName) +
-  ApplicationName);
-</pre>
-
-'''Solution:'''
-Declare and initialize <code>ApplicationName</code>.
-
 === Thread Blocking Due to <code>Sleep</code> and <code>Application.ProcessMessages</code> ===
 In <code>WhonixUtils.pas</code>, <code>Execute</code> uses <code>Sleep</code> and <code>Application.ProcessMessages</code> in a loop, which can lead to a blocking UI:
 
@@ -443,20 +418,12 @@ until (BytesRead = 0) and not Running;
 '''Solution:'''
 Consider using a separate thread for executing processes to avoid blocking the main UI thread.
 
-=== Potential Infinite Loop in <code>CopyUnblocked</code> ===
-In <code>WhonixUtils.pas</code>, the <code>CopyUnblocked</code> procedure might result in an infinite loop if <code>FromStream.Size</code> is less than 1024 * 1024:
-
-<pre lang="pascal">
-while FromStream.Position + 1024 * 1024 < FromStream.Size do
-begin
-  ToStream.CopyFrom(FromStream, 1024 * 1024);
-  Application.ProcessMessages;
-end;
-ToStream.CopyFrom(FromStream, FromStream.Size - FromStream.Position);
-</pre>
-
-'''Solution:'''
-Ensure that <code>FromStream</code> and <code>ToStream</code> are correctly handled and check the loop conditions carefully.
+'''Answer from Developer:'''
+Any longer loop without "Application.ProcessMessages;" lead to a blocking UI.
+That's what the function is there for, to keep the UI responsive if the program is only single threaded.
+A separate thread is an alternative solution but it takes a few hours for some restructuring.
+This would also allow the installer logic to be separated more cleanly from the installer GUI.
+Please add a TODO if you want me to implement this.
 
 === Potential Memory Leaks ===
 There are several places where dynamically allocated resources may not be freed properly in case of an exception, especially in <code>FormCreate</code> and <code>InstallationBuildIn</code>.
@@ -473,6 +440,9 @@ finally
 end;
 </pre>
 
+'''Answer from Developer:'''
+In most cases with dynamic data this is correct, but this code only loads static content from the program resources (license text) which is always present (except by any errors while compile time), so I have omitted the “try finally” for shorter code.
+
 === Deprecation and Error Handling ===
 Deprecated code comments indicate potential areas that might be out of date:
 
@@ -488,285 +458,7 @@ end;
 '''Solution:'''
 Review and update the deprecated code.
 
-=== Unchecked User Inputs ===
-The method <code>SelectDirectoryDialog.Execute</code> assumes that the user input is always valid, which might not be the case:
-
-<pre lang="pascal">
-if SelectDirectoryDialog.Execute then
-begin
-  UnpackPath := IncludeTrailingPathDelimiter(
-    IncludeTrailingPathDelimiter(SelectDirectoryDialog.FileName) + ApplicationName);
-  ...
-end;
-</pre>
-
-'''Solution:'''
-Validate the user's input and handle errors gracefully.
-
-== ChatGPT AI based Code Review of whonixutils.pas ==
-
-1) Error Handling:
-
-The Execute procedure has a try-except block that only handles and logs exceptions if Output is not nil. This could lead to unhandled exceptions if Output is nil.
-pascal
-
-<pre>
-except
-  on E: Exception do
-    if Output <> nil then
-    begin
-      Output.Append('Exception: ' + E.Message);
-    end;
-</pre>
-
-Consider adding a more robust error handling mechanism that logs errors regardless of the Output parameter.
-
-2) Resource Management:
-
-In EnsureExePath, TStringList is allocated but only freed at the end. If an exception occurs before sl.Free, there could be a memory leak.
-pascal
-
-<pre>
-sl := TStringList.Create;
-...
-sl.Free;
-</pre>
-
-Use a try-finally block to ensure sl.Free is always called.
-
-<pre>
-sl := TStringList.Create;
-try
-  ...
-finally
-  sl.Free;
-end;
-</pre>
-
-3) Platform Command Execution:
-
-The Execute procedure uses different commands for Windows and other platforms to find executable paths. This can be simplified and made more robust by using Lazarus/Free Pascal's built-in utilities when possible.
-pascal
-
-<pre>
-{$IFDEF WINDOWS}
-Execute('where /r C:\ ' + filename, sl);
-{$ELSE}
-Execute('which ' + filename, sl);
-{$ENDIF}
-</pre>
-
-4) Process Output Handling:
-
-In the Execute procedure, handling of process output is done via pipes. This is correct, but you might want to ensure that both stdout and stderr are captured correctly by setting poStderrToOutPut.
-
-<pre>
-Process.Options := Process.Options + [poUsePipes, poStderrToOutPut];
-</pre>
-
-5) Possible Infinite Loop:
-
-In the Execute procedure, there is a potential for an infinite loop if Process.Running never returns false. This can occur if the process hangs.
-
-<pre>
-repeat
-  ...
-until (BytesRead = 0) and not Running;
-</pre>
-
-== whonixutils.pas by ChatGPT ==
-<pre>
-unit WhonixUtils;
-
-{$mode ObjFPC}{$H+}
-
-interface
-
-uses
-  Classes, SysUtils, FileUtil, Forms, Process, Math;
-
-function AppDiskGetFreeSpace(const fn: string): Int64;
-function EnsureExePath(var TargetPath: string; DefaultPath: string): Boolean;
-procedure Execute(CommandLine: string; Output: TStrings = nil);
-procedure StreamSaveToFile(Stream: TStream; FileName: String);
-procedure CopyUnblocked(FromStream, ToStream: TStream);
-
-implementation
-
-function AppDiskGetFreeSpace(const fn: string): Int64;
-begin
-  {$ifdef linux}
-  //this crashes on FreeBSD 12 x64
-  Exit(SysUtils.DiskFree(SysUtils.AddDisk(ExtractFileDir(fn))));
-  {$endif}
-
-  {$ifdef windows}
-  Exit(SysUtils.DiskFree(SysUtils.GetDriveIDFromLetter(ExtractFileDrive(fn))));
-  {$endif}
-
-  //cannot detect
-  Exit(-1);
-end;
-
-function EnsureExePath(var TargetPath: string; DefaultPath: string): Boolean;
-var
-  filename: string;
-  sl: TStringList;
-begin
-  if FileExists(TargetPath) then
-  begin
-    Exit(true);
-  end;
-
-  if (TargetPath <> DefaultPath) and FileExists(DefaultPath) then
-  begin
-    TargetPath := DefaultPath;
-    Exit(true);
-  end;
-
-  filename := ExtractFileName(DefaultPath);
-  TargetPath := FindDefaultExecutablePath(filename);
-  if FileExists(TargetPath) then
-  begin
-    Exit(true);
-  end;
-
-  sl := TStringList.Create;
-  try
-    {$IFDEF WINDOWS}
-    Execute('where /r C:\ ' + filename, sl);
-    {$ELSE}
-    Execute('which ' + filename, sl);
-    {$ENDIF}
-
-    if (sl.Count > 0) and FileExists(sl.Strings[0]) then
-    begin
-      TargetPath := sl.Strings[0];
-      Result := True;
-    end
-    else
-    begin
-      TargetPath := '';
-      Result := False;
-    end;
-  finally
-    sl.Free;
-  end;
-end;
-
-procedure Execute(CommandLine: string; Output: TStrings = nil);
-const
-  BUFSIZE = 2048;
-var
-  Process: TProcess;
-  StrStream: TStringStream;
-  BytesRead: longint;
-  Running: boolean;
-  Buffer: array[1..BUFSIZE] of byte;
-begin
-  Process := TProcess.Create(nil);
-  try
-    Process.CommandLine := CommandLine;
-    Process.Options := Process.Options + [poNoConsole];
-
-    if Output <> nil then
-    begin
-      Process.Options := Process.Options + [poUsePipes, poStderrToOutPut];
-      Output.Append('Execute: ' + Process.CommandLine);
-    end;
-
-    Process.Execute;
-
-    StrStream := TStringStream.Create;
-    try
-      repeat
-        Sleep(100);
-        Application.ProcessMessages;
-
-        Running := Process.Running;
-        BytesRead := Min(BUFSIZE, Process.Output.NumBytesAvailable);
-        if BytesRead > 0 then
-        begin
-          BytesRead := Process.Output.Read(Buffer, BytesRead);
-          StrStream.Write(Buffer, BytesRead);
-        end;
-      until (BytesRead = 0) and not Running;
-    except
-      on E: Exception do
-        if Output <> nil then
-        begin
-          Output.Append('Exception: ' + E.Message);
-        end;
-    end;
-
-    if Output <> nil then
-    begin
-      Output.Append('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-      if StrStream.Size > 0 then
-      begin
-        Output.Append(StrStream.DataString);
-      end;
-      Output.Append('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
-    end;
-  finally
-    StrStream.Free;
-    Process.Free;
-  end;
-end;
-
-procedure StreamSaveToFile(Stream: TStream; FileName: String);
-var
-  FileStream: TFileStream;
-begin
-  FileStream := TFileStream.Create(FileName, fmCreate);
-  try
-    CopyUnblocked(Stream, FileStream);
-  finally
-    FileStream.Free;
-  end;
-end;
-
-procedure CopyUnblocked(FromStream, ToStream: TStream);
-const
-  CHUNK_SIZE = 1024 * 1024;
-begin
-  while FromStream.Position + CHUNK_SIZE < FromStream.Size do
-  begin
-    ToStream.CopyFrom(FromStream, CHUNK_SIZE);
-    Application.ProcessMessages;
-  end;
-  ToStream.CopyFrom(FromStream, FromStream.Size - FromStream.Position);
-end;
-
-end.
-</pre>
-
-Summary of Changes
-
-* Added try-finally for TStringList creation and free in EnsureExePath.
-* Introduced a constant CHUNK_SIZE for readability in CopyUnblocked.
-* Encapsulated the Process creation and freeing in a try-finally block in the Execute procedure.
-* Added a comment for potential infinite loop and suggested a timeout mechanism in Execute.
-* General readability improvements and ensured consistent exception handling.
-
-== whonixinstaller_main.lfm DebugInfoType ==
-Can be removed or is useful for debugging?
-
-1)
-
-<pre>
-<Debugging>
-  <DebugInfoType Value="dsDwarf2"/>
-</Debugging>
-</pre>
-
-2)
-
-<pre>
-<Verbosity>
-  <ShowDebugInfo Value="True"/>
-</Verbosity>
-</pre>
+done. https://github.com/einsiedler90/Whonix-Installer/commit/8ec3962f94a6610436219a2666ffb4eecc62cd20
 
 == More ChatGPT AI based Review ==
 https://chatgpt.com/
