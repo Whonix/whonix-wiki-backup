@@ -12,15 +12,14 @@
 {{intro|
 Qubes VM Manager (QVMM) Firewall Tab Settings in Qubes-Whonix
 }}
-{{stub}}
-
 = Qubes VM Manager Firewall Tab Settings =
 ([https://www.qubes-os.org/attachment/doc/r4.0-manager-firewall.png screenshot])
 
-* Short user documentation: The Qubes VM Manager (QVMM) Firewall Tab Settings have no effect for {{q_project_name_short}} VMs by default. These can be ignored.
-* Technical details: All the settings are in a separate file in the VM directory - dom0 <code>/var/lib/qubes/appvms/whonix/firewall.xml</code>. If the VM is running, those settings are converted to nftables syntax and loaded into QubesDB of directly connected Net Qube. The qubes-firewall service in the Net Qube watches for such changes and applies the rules.
-** For example, in the case of {{project_name_workstation_vm}}, the connected Net Qube is {{project_name_gateway_vm}}. Since in {{project_name_short}} the qubes-firewall service is disabled ({{project_name_short}}, these settings do not affect {{project_name_short}}.
-** File <code>/usr/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf</code> (part of qubes-whonix package) is disabling <code>qubes-firewall.service</code>.
+* Short user documentation: The Qubes VM Manager (QVMM) Firewall Tab Settings have no effect for Qubes-Whonix-Workstation VMs by default. These can be ignored.
+* Technical details: All the settings are in a separate file in the VM directory - dom0 <code>/var/lib/qubes/appvms/whonix/firewall.xml</code>. If the VM is running, those settings are converted to <code>nftables</code> syntax and loaded into QubesDB of directly connected Net Qube. The qubes-firewall service in the Net Qube watches for such changes and applies the rules.
+** For example, in the case of <code>{{project_name_workstation_vm}}</code>, the connected Net Qube is <code>{{project_name_gateway_vm}}</code>. Since in {{project_name_short}} the qubes-firewall service is disabled in {{project_name_short}}, these settings do not affect {{project_name_short}}.
+** File <code>/usr/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf</code> (part of <code>qubes-whonix</code> package) is disabling <code>qubes-firewall.service</code>.
+** This will be fixed in the near future: https://github.com/Whonix/qubes-whonix/commit/7009e0b12c321dfb3422645badea7d6cc41fd043
 
 sources:
 
@@ -39,9 +38,13 @@ sources:
 sudo rm /usr/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf
 }}
 
+<s>NOTE: This does not survive upgrade of the qubes-whonix package.</s> (Fixed in git. File removed in git.)
+
 '''2.''' Shutdown the Template.
 
 '''3.''' Reboot any App Qube that was based on that Template.
+
+'''4.''' Done.
 
 = Whonix-Gateway Firewall =
 
@@ -51,17 +54,13 @@ sudo rm /usr/lib/systemd/system/qubes-firewall.service.d/40_qubes-whonix.conf
 * <u>Use case, bridge firewall:</u> Useful as a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/BridgeFirewall BridgeFirewall]. The user could limit connections only to the IP address of [[Bridges]] the user has configured.
 * <u>Cannot filter IP destinations:</u> This cannot be used to block specific destination IP addresses over Tor. For example, if blocking IP <code>8.8.8.8</code> in QVMM Firewall Tab Settings for Whonix-Gateway, [[Tor Browser]] and other applications will still be able to reach that IP address. This is because the Net Qube can only see encrypted traffic by Tor to Tor relays or bridges. Netfilter on the Net Qube is incapable of looking "inside" the Tor connection. Hence, no destination IPs can be blocked.
 
-'''2.''' Enable QVMM Firewall Tab Settings.
-
-Documented above.
-
-'''3.''' Add firewall rules in dom0 QVMM for Whonix-Gateway QVMM Firewall Tab Settings.
+'''2.''' Add firewall rules in dom0 QVMM for Whonix-Gateway QVMM Firewall Tab Settings.
 
 To set up a bridge firewall:
 
 * QVMM -> select <code>Limit outgoing connections to ...</code> -> press the plus ("<code>+</code>") symbol -> enter IP address of the bridge -> repeat for additional bridges if applicable
 
-'''4.''' Done.
+'''3.''' Done.
 
 = Whonix-Workstation Firewall =
 '''1.''' Prerequisite knowledge.
@@ -96,8 +95,8 @@ Documented above.
 
 '''1.''' Identify the Net qube where to run the following commands.
 
-* Whonix-Gateway (sys-whonix) QVMM Firewall Tab Settings: sys-firewall
-* Whonix-Workstation (anon-whonix) QVMM Firewall Tab Settings: sys-whonix
+* {{Project name gateway short}} (<code>{{Project name gateway vm}}</code>) QVMM Firewall Tab Settings: <code>sys-firewall</code>
+* {{Project name workstation short}} (<code>{{Project name workstation vm}}</code>) QVMM Firewall Tab Settings: <code>{{Project name gateway vm}}</code>
 
 '''2.''' Store current nftables rules to file nftables-old.
 
@@ -127,6 +126,8 @@ Use a graphical diff viewer.
 meld nftables-old nftables-new
 }}
 
+'''6.''' Done.
+
 = Development Discussion =
 https://forums.whonix.org/t/qubes-sys-whonix-does-not-do-its-job-as-qubes-firewallvm/18937
 
@@ -135,9 +136,6 @@ Qubes issues:
 
 * [https://github.com/QubesOS/qubes-issues/issues/9057 Unite IPv4 and IPv6 qubes firewall tables]
 
-= Footnotes =
 {{reflist|close=1}}
-
 {{Footer}}
-
 [[Category:Documentation]]
