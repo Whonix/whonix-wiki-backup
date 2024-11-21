@@ -95,7 +95,6 @@ Save.
 '''On {{project_name_workstation_short}}.'''
 
 <u>Note:</u> The user should take special notice that the Bisq signing key changed on 2023 09 02 without any explanation easily found by the author of this wiki page. <ref>
-
 bisq key change 2023 09 02 archive:
 
 * https://forums.whonix.org/t/bisq-the-p2p-exchange-network/4953/78
@@ -104,11 +103,9 @@ bisq key change 2023 09 02 archive:
 * [https://web.archive.org/web/20230906114551/https://objects.githubusercontent.com/github-production-release-asset-2e65be/17662022/2819a24a-6c31-4650-b166-189f646683bc?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20230906%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230906T114551Z&X-Amz-Expires=300&X-Amz-Signature=b4233cda19f2f22738bc0ceb586dd8afe6e55592c98bc9d7b4247d09b5b6b8c9&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=17662022&response-content-disposition=attachment%3B%20filename%3DE222AA02.asc&response-content-type=application%2Foctet-stream E222AA02.asc github redirect link]
 </ref>
 
-Version 2.1.2 does not use the signing key of Alejandro García (key ID: E222AA02) that is listed with these downloads on github. However the explanation and signing key are linked from the installation and verification instructions to the wiki at https://bisq.wiki/Bisq_2#Installation  
-
 {{gpg key
-|url=scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.0/E222AA02.asc
-|source_filename=E222AA02.asc
+|url=scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.2/387C8307.asc
+|source_filename=387C8307.asc
 |fingerprint=B493319106CC3D1F252E19CBF806F422E222AA02
 |gpg_fingerprint_output=
       Key fingerprint = B493 3191 06CC 3D1F 252E  19CB F806 F422 E222 AA02
@@ -117,7 +114,7 @@ Version 2.1.2 does not use the signing key of Alejandro García (key ID: E222AA0
 === Bisq Version Number Choice ===
 '''1.''' Check the latest version number and read the release notes [https://github.com/bisq-network/bisq/releases here].
 
-'''2.''' The instructions on this wiki page have not been kept up to date with the latest versions of Bisq 2. <ref>
+'''2.''' Version number might be newer than the Bisq version number used on this wiki page. <ref>
 * At time of writing, [https://bisq.network/blog/bisq-2-now-in-beta/ Bisq 2 was still in beta].
 * [https://github.com/bisq-network/bisq2/issues/1798 Fix startup issues of Tor] 
 * [https://github.com/bisq-network/bisq2/issues/1894 Cannot run on Whonix 17]
@@ -127,7 +124,7 @@ Version 2.1.2 does not use the signing key of Alejandro García (key ID: E222AA0
 No additional information available. All communications happen in public.
 </ref>
 
-'''3.''' Version 2.0.4 notes introduce support for Whonix.[https://github.com/bisq-network/bisq2/releases/]
+'''3.''' Done.
 
 === Download ===
 
@@ -135,19 +132,11 @@ No additional information available. All communications happen in public.
 
 Download Bisq.
 
-* '''Bisq <u>1</u>:'''
-** Download Bisq. {{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.17/Bisq-64bit-1.9.17.deb
+* Download Bisq. {{CodeSelect|code=
+scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.2/Bisq-2.1.2.deb
 }}
-** Download OpenPGP signature. {{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq/releases/download/v1.9.17/Bisq-64bit-1.9.17.deb.asc
-}}
-* '''Bisq <u>2</u>:'''
-** Download Bisq. {{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.0/Bisq-2.1.0.deb
-}}
-** Download OpenPGP signature. {{CodeSelect|code=
-scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.0/Bisq-2.1.0.deb.asc
+* Download OpenPGP signature. {{CodeSelect|code=
+scurl-download https://github.com/bisq-network/bisq2/releases/download/v2.1.2/Bisq-2.1.2.deb.asc
 }}
 
 === Verification ===
@@ -168,17 +157,16 @@ gpg --verify Bisq*.asc
 
 Follow these steps to avoid a Tor over Tor scenario.
 
-* '''Bisq <u>1</u>:'''
-** Create folder the Bisq tor folder. {{CodeSelect|code=
-mkdir -p /home/user/.local/share/Bisq/btc_mainnet/tor/
+* Create folder the Bisq tor folder. {{CodeSelect|code=
+mkdir -p /home/user/.local/share/Bisq2/tor
 }}
 ** Create a dummy tor binary. {{CodeSelect|code=
-sudo touch /home/user/.local/share/Bisq/btc_mainnet/tor/tor
+sudo touch /home/user/.local/share/Bisq2/tor/tor
 }}
-** Add the executable bit to the dummy tor binary. {{CodeSelect|code=
-sudo chmod +x /home/user/.local/share/Bisq/btc_mainnet/tor/tor
+* Add the executable bit to the dummy tor binary. {{CodeSelect|code=
+sudo chmod +x /home/user/.local/share/Bisq2/tor/tor
 }}
-** Why is this needed? See footnote for reasons why. <ref>
+* Developers information: Why is this needed? See footnote for reasons why. <ref>
 * Users: Ignore this footnote.
 * Developers: For an explanation, which might be interesting for developers only, see below.
 
@@ -192,21 +180,8 @@ From Bisq 2 log.
 16:06:19.474 INFO  [NetworkService.network-IO-pool-0] b.t.i.TorInstaller: Tor files installed to /home/user/.local/share/Bisq2/tor 
 </pre>
 
-Why sudo? To avoid <code>/home/user/.local/share/Bisq2/tor/tor</code> getting overwritten by Bisq.
+Why <code>sudo</code>? To avoid <code>/home/user/.local/share/Bisq2/tor/tor</code> getting overwritten by Bisq.
 </ref>
-* '''Bisq <u>2</u>:''' No special notice.
-
-=== xdg-desktop-menu Bug Workaround ===
-'''On {{project_name_workstation_short}}.'''
-
-* '''Bisq <u>1</u>:'''
-** Use the following workaround to avoid a known bug in xdg which fails to find a writable system menu directory. <ref>
-https://github.com/bisq-network/bisq/issues/848
-</ref>
-*** {{CodeSelect|inline=true|code=
-sudo mkdir -p /usr/share/desktop-directories
-}}
-* '''Bisq <u>2</u>:''' No special notice.
 
 === Install ===
 ==== Platform Specific Steps ====
@@ -217,19 +192,14 @@ On {{project_name_workstation_short}} <code>anon-bisq</code> App Qube.
 
 You need to extend the bind-dirs configuration inside the VM.
 
-* '''Bisq <u>1</u>:'''
-** {{CodeSelect|code=
-sudo mkdir -p /rw/bind-dirs/opt/bisq
-}}
-* '''Bisq <u>2</u>:'''
-** {{CodeSelect|code=
+* {{CodeSelect|code=
 sudo mkdir -p /rw/bind-dirs/opt/bisq2
 }}
-** {{CodeSelect|code=
+* {{CodeSelect|code=
 sudo mkdir -p /rw/config/qubes-bind-dirs.d
 }}
 
-Bisq 1 and Bisq 2: Then create the configuration file:
+Then create the configuration file:
 
 {{CodeSelect|code=
 sudo nano /rw/config/qubes-bind-dirs.d/50_user.conf
@@ -238,12 +208,7 @@ sudo nano /rw/config/qubes-bind-dirs.d/50_user.conf
 Paste.
 
 {{CodeSelect|code=
-## Bisq 1:
-binds+=( '/opt/bisq' )
-## Bisq 2:
 binds+=( '/opt/bisq2' )
-## Bisq 1:
-binds+=( '/usr/share/desktop-directories' )
 }}
 
 Save and exit.
@@ -264,10 +229,7 @@ sudo dpkg -i Bisq*.deb
 
 Start Bisq.
 
-* '''Bisq <u>1</u>:''' {{CodeSelect|code=
-/opt/bisq/bin/Bisq --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true
-}}
-* '''Bisq <u>2</u>:''' {{CodeSelect|code=
+{{CodeSelect|code=
 /opt/bisq2/bin/Bisq2
 }}
 
@@ -279,18 +241,13 @@ Start Bisq.
 
 [[File:Bisqclient.png|border]]
 
-After version 1.9.8, the use of DAO became mandatory for everyone and the line <code>--daoActivated=false</code> now gives an error.
-
 If the fonts are too small, you could alternatively use the following command. <ref>
 It is the same as above but prepended with <code>GDK_SCALE=2</code>.
 
 https://github.com/bisq-network/bisq/issues/1425
 </ref>
 
-* '''Bisq <u>1</u>:''' {{CodeSelect|code=
-GDK_SCALE=2 /opt/bisq/bin/Bisq --torControlPort=9051 --torControlPassword=notrequired --socks5ProxyBtcAddress=127.0.0.1:9050 --useTorForBtc=true --daoActivated=false
-}}
-* '''Bisq <u>2</u>:''' {{CodeSelect|code=
+{{CodeSelect|code=
 GDK_SCALE=2 /opt/bisq2/bin/Bisq2
 }}
 

@@ -135,14 +135,16 @@ In order of increasing security, the {{project_name_short}} images can be:
 
 ! Binary Image Creation
 | Patrick
-| HulaHoop
-| Qubes project <ref>Builds can be [[Dev/Qubes#Official_Builds|initiated]] by Patrick but the template build server and template repository are hosted by the Qubes project.</ref>
+| Patrick
+| Qubes project <ref>
+Builds can be [[Dev/Qubes#Official_Builds|initiated]] by Patrick but the template build server and template repository are hosted by the Qubes project.
+</ref>
 | -
 |-
 
 ! Binary Images Trust
 | Patrick
-| HulaHoop
+| Patrick
 | Qubes project and Patrick
 | -
 |-
@@ -268,124 +270,7 @@ See [[Verifying_Software_Signatures|Verifying Software Signatures]] for details 
 
 In short, a user must be careful to ensure the public keys that are used for signature verification are the [[Signing Key|{{project_name_short}} key pair]] belonging to the {{project_name_short}} developer of the component specific component. At time of writing there are two different components and signing keys.
 
-* [[Main/Project Signing Key|{{project_name_short}} Main, VirtualBox, APT Repository and Source Code Signing Key]]
-* [[KVM/Project Signing Key|{{project_name_short}} KVM Signing Key]]
-
-== TLS ==
-
-TLS, SSL and HTTPS are all flawed since they rely on the vulnerable Certificate Authority (CA) model; see [[Warning#The_Fallible_Certificate_Authority_Model|here]] for further details and SSL/TLS alternatives. <ref>{{project_name_short}} developers place little trust in the CA model. Even if the numerous implementation problems were solved, such as problematic revocation and the ability for every CA to issue certificates for anything (including "*"), third party trust cannot be established. Until an alternative arrives and is widely adopted, everybody has to rely upon SSL/TLS to some extent.</ref>
-
-== Evil Developer Attack ==
-
-=== Introduction ===
-
-An "evil developer attack" is a narrow example of an ''insider threat'': <ref>https://www.se.rit.edu/~samvse/publications/An_Insider_Threat_Activity_in_a_Software_Security_Course.pdf</ref>
-
-<blockquote>Software development teams face a critical threat to the security of their systems: insiders.<br />
-
-[...]
-
-An insider threat is a current or former employee, business partner, or contractor who has access to an organization’s data, network, source code, or other sensitive information who may intentionally misuse this information and negatively affect the availability, integrity, or confidentiality of the organization’s information system.</blockquote>
-
-In the case of software, a disguised attack is conducted on the integrity of the software platform. While this threat is only theoretical, it would be naive to assume that no major software project has ever had a malicious insider. {{project_name_short}} and all other open source software projects face this problem, particularly those that are focused on anonymity such as VeraCrypt, <ref>TrueCrypt has been discontinued.</ref> Tails, I2P, The Tor Project and so on.
-
-=== Attack Methodology ===
-
-A blueprint for a successful insider attack is as follows:
-
-# Either start a new software project or join an existing software project.
-# Gain trust by working hard, behaving well, and publishing your sources.
-# Build binaries directly from your sources and offer them for download.
-# Attract a lot of users by making a great product.
-# Continue to develop the product.
-# Make a second branch of your sources and add malware.
-# Continue to publish your clean sources, but offer your malicious binaries for download.
-# If undetected, a lot of users are now infected with malware.
-
-An evil developer attack is very difficult for end users to notice. If the backdoor is rarely used, then it may remain a secret for a long time. If it was used for something obvious, such as adding all the users to a botnet, then it would be quickly discovered and reported on.
-
-Open source software has some advantages over proprietary code, but certainly not for this threat model. For instance, no one is checking if the binaries are made from the proclaimed source and publishing the results, a procedure called "deterministic builds". <ref>https://mailman.stanford.edu/pipermail/liberationtech/2013-June/009257.html</ref> <ref>https://gitlab.torproject.org/legacy/trac/-/issues/3688</ref> This standard is quite difficult to achieve, but is being worked towards. <ref>Interested readers can investigate its complexity by searching with the phrase "trusting trust".</ref>
-
-=== Related Attacks ===
-
-While most security experts are focused on the possibility of a software backdoor, other insider attacks can have equally deleterious effects. For instance, the same methodology can be used to infiltrate a targeted project team but in a role unrelated to software development; for example, as a moderator, site administrator, wiki approver and so on. This approach is particularly effective in smaller projects that are starved of human resources.
-
-Following infiltration, disruption is caused within the project to affect productivity, demoralize other team members and (hopefully) cause primary contributors to cease their involvement. For example, using a similar blueprint to that of the evil developer attack, a feasible scenario is outlined below:
-
-# Join an existing software project as a general member.
-# Gain trust by working hard, behaving well, assisting readily in forums, making significant wiki contributions and so on.
-# Attract a lot of community admiration by outwardly appearing to be a bona fide and devoted project member.
-# Eventually attain moderator, administrator or other access once team membership is extended. <ref>The time period is likely to be shorter for smaller projects, perhaps less than 12 months.</ref>
-# Continue to behave, moderate and publish well.
-# Once trust is firmly established, subtly undermine the authority, character and contributions of other team members. <ref>For example, by casting unjustified aspersions.</ref>
-# If the insider threat is undetected for a significant period, this can lead to a diminished software product due to a fall in contributions in numerous domains and team ill will.
-
-=== Conclusion ===
-
-The insider threat nicely captures how difficult it is to trust developers or other project members, even if they are not anonymous. Further, even if they are known and have earned significant trust as a legitimate developer, this does not discount the possibility of serious mistakes that may jeopardize the user. The motives and internal security of everyone contributing to major software projects like Tor, distribution developers and contributors, and the hundreds of upstream developers and contributors is a legitimate concern. <ref>In the case of {{project_name_short}}, binaries are not distributed nor created. Only unmodified upstream binaries are distributed, along with shell scripts. This claim is much easier to verify than if {{project_name_short}} were distributing binaries from project source code.</ref>
-
-The trusted computing base of a modern operating system is enormous. There are so many people involved in software and complex hardware development, that it would be unsurprising if none of the bugs in existence were intentional. While detecting software changes in aggregate may be easy (by diffing the hash sums), finding and proving that a change is a purposeful backdoor rather than a bug in well designed source code is near impossible.
-
-== Legal Issues ==
-
-{{mbox
-| type    = notice
-| image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = The following is not legal advice and does not refer to any specific laws; it is a theoretical consideration by non-lawyers.
-}}
-
-Users occasionally raise the possible privacy and security implications if contemporary, draft laws were to be passed. For example, how the {{project_name_short}} project would react to laws:
-* banning end-to-end encryption
-* outlawing anonymity tools like Tor
-* demanding that operating systems include a backdoor
-
-It is important to note that government members have diverse and conflicting interests. Bills which are hostile to Internet privacy and security are regularly introduced in various jurisdictions, but common sense usually prevails and ill-conceived legislation normally stalls and fails to become law. Conversely, bills that allocate funding to support cryptographic development and privacy tools garner support and are normally passed because most legislators understand their importance in an open society. While Internet privacy advocacy groups should remain vigilant, it is unproductive to become unduly stressed whenever a bill hostile to privacy or security is proposed.
-
-Although it may be counter-intuitive, in the event privacy-hostile laws are passed this is not a {{project_name_short}}-specific issue, even though {{project_name_short}} would obviously be affected. For the most part, {{project_name_short}} is a compilation of existing software packages provided by third parties which allow re-use in a compilation due to permissive licensing (Freedom Software). In this context, noteworthy components which {{project_name_short}} relies on directly or indirectly are the base operating system (Debian at time of writing) and an anonymizer (Tor at time of writing). At first, such a law would very likely harm the security properties of these and other projects (see footnote). <ref>To learn more about this organizational structure, see: {{kicksecure_wiki
-|wikipage=Linux User Experience versus Commercial Operating Systems
-|text=Linux User Experience versus Commercial Operating Systems
-}}.</ref>
-
-=== Legal Jurisdiction ===
-
-In response to the possibility of privacy-hostile laws being implemented, it is usually suggested that the {{project_name_short}} legal entity should relocate to a different country. The effectiveness of moving to another jurisdiction would of course depend upon the specifics of the legal text, however it is unlikely that simple legal loopholes would exist. For example, legal entity relocation does or did not help people who would like to sell controlled substances (such as medicine) or goods (such as weapons) without all authorizations required by law. Another example are financial services; this is also why unnamed stock certificates on the blockchain do not exist.
-
-Some U.S. laws apparently apply to all international jurisdictions. Take the case of Kim Dotcom who is a German/Finnish dual national. Although a permanent resident of and physically present in New Zealand at the time of alleged copyright infringement charges brought forth by the USA, he had his assets seized, worldwide bank accounts frozen, was arrested, and is fighting extradition to the USA. As Kim Dotcom {{Twitter_link|KimDotcom/status/582068295366410240|summarized on Twitter}}:
-
-<blockquote>
-I never lived there<br />
-I never traveled there<br />
-I had no company there<br />
-
-But all I worked for now belongs to the U.S.
-
-[https://www.techdirt.com/articles/20150326/18041530458/how-us-government-legally-stole-millions-kim-dotcom.shtml How The US Government Legally Stole Millions From Kim Dotcom]
-</blockquote>
-
-=== Legal Compliance ===
-
-Sometimes it is suggested to simply not comply with new laws impacting privacy, however this is an unreasonable request. Most laws include an enforcement mechanism, although it can be selectively applied depending on government interests. Serious penalties apply if a law is not being complied with, especially for repeat and continuous offenses. Penalties may include:
-* imprisonment
-* monetary fines
-* for failure to pay monetary fines, the threat of asset seizure, imprisonment or worse
-
-Law enforcement has incredibly long arms. In most cases there is no way to openly defy the law for an extended period and get away with it. To a large degree policy issues cannot be fixed only via technological means; it must be combined with peaceful resistance on a political level. Government policy is affected by popular opinion, and those who support privacy-enhancing technologies can help the cause by sharing their reasoned opinions with others. Casual supporters are also important to raise public awareness.
-
-Even if privacy-hostile laws are in place, it might still be permitted to contribute Open Source code to Open Source projects. For example, perhaps only the person(s) redistributing binary builds to the public would be held personally accountable. This is pure speculation until a new draft law catastrophic to security software eventuates.
-
-If {{project_name_short}} was ever forced to add a backdoor by law, users would be notified and the project would be shut down before the law took effect. Fortunately, as yet there are no outrageous law proposals that would force the continued running of backdoored projects. In this case, efforts might focus on a new Linux-based project centered on stability, reliability, documentation, recovery, and usability.
-
-Forum discussion:<br />
-[https://forums.{{project_clearnet}}/t/eu-wants-to-create-device-os-level-backdoor/10402 EU Wants To Create Device/OS Level Backdoor]
-
-== Other Projects Discussing Trust ==
-
-* Tails is a live CD or USB that aims to preserve privacy and anonymity - [https://tails.boum.org/doc/about/trust/index.en.html Tails about trust.]
-* I2P (anonymizing network) has also discussed [https://geti2p.net/en/docs/how/threat-model#dev development attacks].
-* [https://www.qubes-os.org/security/verifying-signatures/ Qubes OS: What digital signatures can and cannot prove]
-* [https://hyper.to/blog/link/attack-scenarios-software-distribution/ Miron’s Weblog: Attack Scenarios on Software Distributions]
-* A list of incidents concerning compromised servers: [https://web.archive.org/web/20160313141340/http://www.koch.ro/blog/index.php?/archives/153-On-distributing-binaries.html On distributing binaries]
-* https://forum.qubes-os.org/t/qubes-os-could-be-honeypot/16180
+* [[Main/Project Signing Key|{{project_name_short}} Main, VirtualBox, KVM, APT Repository and Source Code Signing Key]]
 
 = Footnotes  =
 {{reflist|close=1}}
