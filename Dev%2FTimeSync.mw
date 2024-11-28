@@ -96,12 +96,13 @@ For understanding {{project_name_short}} Time Synchronization Mechanism, it is r
 
 === KVM's Time Synchronization Features ===
 * KVM attempts (in vain) to use:
-**<code> ntpd</code> 
-**If offline or manually selected (with a compatible CPU), Time Stamp Counters (TSC) from the CPU.<ref>docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/chap-kvm_guest_timing_management</ref>
+** <code> ntpd</code> 
+** If offline or manually selected (with a compatible CPU), Time Stamp Counters (TSC) from the CPU.<ref>docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/chap-kvm_guest_timing_management</ref>
 
 It is possible to check what exact method of synchronization the guest is trying to use by typing <code>cat /sys/devices/system/clocksource/clocksource0/current_clocksource</code> <ref>https://www.linux-kvm.org/page/KVMClock</ref> 
 
-As of 2024, on Whonix, this is TSC (KVM does not control the process as <code>kvm-clock</code> is not included within the output). <code>sdwdate</code> and <code>bootclockrandomizer</code> fix any timing attacks that could be introduced.
+As of 2024, on Whonix, this is TSC (KVM does not control the process as <code>kvm-clock</code> is not included within the output). <code>sdwdate</code> and <code>bootclockrandomization</code> fix any timing attacks that could be introduced.
+
 === Qubes Time Synchronization Features ===
 TODO: document
 
@@ -176,7 +177,6 @@ Therefore we want a completely isolated virtual time.
 ** Most VirtualBox time synchronization features get disabled by {{project_name_short}}.
 *** Guest additions time synchronization gets disabled in by [https://github.com/{{project_name_short}}/vm-config-dist vm-config-dist] at run time. See VirtualBox bug report [https://www.virtualbox.org/ticket/10828 VBoxService --disable-timesync broken]. They say it is actually not a bug. It is a missing feature, that running instances of VBoxService can not be modified in their settings.
 *** built in time synchronization features get disabled by ''VBoxManage setextradata "$VMNAME" "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled" "1"'' at build time.
-** KVM: kvm-clock tries to sync from NTP by default on the guest. If offline or manually selected on a compatible CPU, TSC. NTP patched by <code>sdwdate</code> and any timing attacks from TSC are patched by <code>sdwdate</code> and <code>bootclockrandomizer</code>.
 ** Qubes: TODO
 *** https://phabricator.whonix.org/T389
 *** https://phabricator.whonix.org/T440
