@@ -514,29 +514,49 @@ Modification of network settings should only be undertaken with great care, and 
 {{Anchor|Prevent_Tor_over_Tor_Scenarios}}
 == Refrain from "Tor over Tor" Scenarios ==
 
-{{mbox
-| type      = notice
-| image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = This is a {{project_name_short}}-specific issue.
-}}
+* <u>Generic description</u>: When a machine or VM (workstation) is used, that is transparently proxied over Tor, it is possible to start a Tor session from the workstation as well as from the gateway that runs Tor, creating a "Tor over Tor" scenario.
+* <u>Whonix specific description</u>: [[Whonix-Gateway]]'s [[Stream_Isolation#Transparent_Proxy|transparent proxying]] is enabled by default for all of [[Whonix-Workstation]]'s traffic. When installing an application inside {{project_name_workstation_short}} that comes with its own internal Tor client, this might create a "Tor over Tor" scenario.
 
-When a transparent proxy is used (like in {{project_name_short}}), it is possible to start a Tor session from the client as well as from the transparent proxy, creating a "Tor over Tor" scenario. This happens when installing Tor inside {{project_name_workstation_short}} or when using Tor Browser without configuring it to use a SocksPort instead of the TransPort. This is covered in further detail in the [[Tor Browser]] entry.
-
-'''Doing so produces undefined and potentially unsafe behavior'''. In theory, the user could get six hops instead of three in the Tor network. However, it is not guaranteed that the three additional hops received are different; the user could end up with the same hops, possibly in reverse or mixed order. The Tor Project opinion is that this is unsafe: <ref>https://support.torproject.org/#misc_misc-11</ref>
+'''Doing so produces undefined and potentially unsafe behavior.''' In theory, the user could get six hops instead of three in the Tor network. However, it is not guaranteed that the three additional hops received are different; the user could end up with the same hops, possibly in reverse or mixed order. The Tor Project opinion is that this is unsafe: 
+<ref>
+https://support.torproject.org/#misc_misc-11
+</ref>
 
 <blockquote>We don't want to encourage people to use paths longer than this — it increases load on the network without (as far as we can tell) providing any more security. Remember that the best way to attack Tor is to attack the endpoints and ignore the middle of the path. Also, using paths longer than 3 could harm anonymity, first because it makes "denial of security" attacks easier, and second because it could act as an identifier if only a few people do it ("Oh, there's that person who changed her path length again").</blockquote>
 
-Users can manually choose an entry or exit point in the Tor network, <ref>https://support.torproject.org/tbb/tbb-16/</ref> but the best security relies on leaving the route (path) selection to Tor. Overriding the choice of Tor entry and/or Tor exit relays can degrade anonymity in ways that are not well understood. Therefore, Tor over Tor configurations are strongly discouraged.
+Users can manually choose an entry or exit point in the Tor network, 
+<ref>
+https://support.torproject.org/tbb/tbb-16/
+</ref> 
+but the best security relies on leaving the route (path) selection to Tor. Overriding the choice of Tor entry and/or Tor exit relays can degrade anonymity in ways that are not well understood. Therefore, Tor over Tor configurations are strongly discouraged.
 
-License of "Prevent Tor over Tor scenarios.": <ref name=adrelicense>
+License of "Prevent Tor over Tor scenarios.": 
+<ref name=adrelicense>
 This was originally posted by adrelanos (proper) to the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#ToroverTor TorifyHOWTO] ([https://gitlab.torproject.org/legacy/trac/-/wikis/doc/LegalStuff license]). Adrelanos did not surrender any copyrights and can therefore re-use it here. It is under the same license as this DoNot page.
 </ref>
 
-Tor log message <ref>
+Tor log message: 
+<ref>
 https://forums.whonix.org/t/sys-whonix-tor-over-tor-warning-in-nyx/12886
 </ref>
 
-<blockquote>Not attempting connection to [scrubbed]:80 because the network would reject it. Are you trying to send Tor traffic over Tor? This traffic can be harmful to the Tor network. If you really need it, try using a bridge as a workaround.</blockquote>
+<blockquote>
+Not attempting connection to [scrubbed]:80 because the network would reject it. Are you trying to send Tor traffic over Tor? This traffic can be harmful to the Tor network. If you really need it, try using a bridge as a workaround.
+</blockquote>
+
+Thanks to [[Dev/anon-ws-disable-stacked-tor]], this issue does not happen in {{project_name_short}} when running the following applications inside {{project_name_workstation_short}}:
+
+* [[Tor]]
+* [[Tor Browser]]
+
+To prevent this issue for the following applications:
+
+* [[OnionShare]];
+* [[Bisq]];
+* [https://forums.whonix.org/t/installing-haveno-in-whonix/20014 Haveno];
+* other applications with Tor integration,
+
+the user needs to follow the documentation for these applications on how to disable the internal Tor of these applications. A simple way to avoid this risk of Tor over Tor when using custom installed applications with Tor integration is to [[Stream_Isolation#Disable_Transparent_Proxying|Disable Transparent Proxying]].
 
 {{Anchor|Do use bridges if you think Tor usage is dangerous/suspicious in your country}}
 
