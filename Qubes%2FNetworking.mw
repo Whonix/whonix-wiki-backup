@@ -1,0 +1,51 @@
+{{Header}}
+{{Title|title=
+{{q_project_name_long}} Networking
+}}
+{{#seo:
+|description=Guide to networking inside Qubes Templates, including how to use commands like curl, gpt and git.
+}}
+{{qubes_mininav}}
+{{intro|
+Guide to networking inside Qubes Templates, including how to use commands like curl, gpt and git.
+}}
+= Introduction =
+Qubes Templates are non-networked by default. This is a security feature.
+
+* Why are APT operating system upgrades functional? Qubes has a special implementation for that. APT isn't using networking in Qubes Templates but qrexec. Documented on the [[Qubes/UpdatesProxy]] wiki page.
+* How to make other applications functional inside Qubes Templates such as <code>curl</code>, <code>gpg</code>, <code>git</code>? This is documented below.
+
+This is [[unspecific|unspecific to Whonix]]. This is as per Qubes upstream design default. Whonix does not influence this.
+
+= HowTo: Networking inside Qubes Templates =
+<u>Warning:</u> Users are not supposed to do that. However, [[Advanced Users]] understanding {{kicksecure_wiki
+|wikipage=Threat_Modeling
+|text=Computer Security Threat Modeling
+}}, that understand {{kicksecure_wiki
+|wikipage=Mental_Model
+|text=Computer Security Mental Model
+}} might sometimes do this.
+
+<u>Note:</u> Replace <code>command</code> with the actual command. <ref>
+<code>UWT_DEV_PASSTHROUGH=1</code> is redundant but harmless in some cases. <code>UWT_DEV_PASSTHROUGH=1</code> is required in some cases to circumvent Whonix's default [[Stream Isolation]] wrappers. Otherwise, original <code>.anondist-orig</code> binaries would need to be used.
+
+{{CodeSelect|code=
+http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 curl.anondist-orig [...]
+}}
+
+{{CodeSelect|code=
+http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 git.anondist-orig [...]
+}}
+</ref>
+
+{{CodeSelect|code=
+UWT_DEV_PASSTHROUGH=1 http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 command
+}}
+
+= Forum Discussion =
+* Qubes forums: [https://forum.qubes-os.org/t/curl-proxy-wget-proxy-scripts-in-templates-so-users-can-add-gpg-distro-keys-linked-to-added-external-repositories/10935 Curl-proxy / wget-proxy scripts in Templates so users can add GPG distro keys linked to added external repositories]
+
+= Footnotes =
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]
