@@ -1595,6 +1595,53 @@ sudo virsh edit {{project_name_gateway_short}}
 
 forum discussion: [https://forums.whonix.org/t/issues-starting-vms-in-kvm-blkio-device-weight-is-valid-only-for-bfq-or-cfq-scheduler/10160 Issues starting VM's in KVM. - blkio device weight is valid only for bfq or cfq scheduler]
 
+== cannot set CPU affinity on process 1994: invalid argument ==
+In case of experiencing the following issue...
+
+Main error message:
+
+<pre>
+libvirt.libvirtError: cannot set CPU affinity on process 1994: invalid argument
+</pre>
+
+Longer log:
+
+<pre>
+Traceback (most recent call last):
+File “/usr/share/virt-manager/virtManager/asyncjob.py”, line 75, in cb_wrapper
+callback(asyncjob, *args, **kwargs)
+File “/usr/share/virt-manager/virtManager/asyncjob.py”, line 111, in tmpcb
+callback(*args, **kwargs)
+File “/usr/share/virt-manager/virtManager/libvirtobject.py”, line 66, in newfn
+ret = fn(self, *args, **kwargs)
+File “/usr/share/virt-manager/virtManager/domain.py”, line 1400, in startup
+self._backend.create()
+File “/usr/lib/python3/dist-packages/libvirt.py”, line 1080, in create
+if ret == -1: raise libvirtError (‘virDomainCreate() failed’, dom=self)
+libvirt.libvirtError: cannot set CPU affinity on process 1994: invalid argument
+</pre>
+
+Setting `cpuset='1'` is a default to minimize impact of sidechannel attacks on cryptographic operations in case the VM has been compromised. This might not be compatible with some older hardware.
+
+'''1.''' [[KVM#VM_Settings_Modification|VM Settings Modification]]
+
+'''2.''' Remove.
+
+{{CodeSelect|code=
+cpuset='1'
+}}
+
+'''3.''' Done.
+
+forum discussion:
+
+* [https://forums.whonix.org/t/cannot-set-cpu-affinity-on-process-1994-invalid-argument/9822 cannot set CPU affinity on process 1994: invalid argument]
+
+related:
+
+* [https://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335 Whonix 15: increasing allocated CPU number makes the VM incredibly slow]
+* [[KVM#Adding_vCPUs|Adding vCPUs]]
+
 == Arch/Ubuntu Users ==
 See [[KVM#Request_operation_not_valid:_blkio_device_weight_is_valid_only_for_bfq_or_cfq_scheduler|Request operation not valid: blkio device weight is valid only for bfq or cfq scheduler]].
 

@@ -19,14 +19,22 @@ Development notes for adding IPv6 support to {{project_name_short}}.
 IPv6 support are multiple parts.
 
 * '''A)''' Whonix-Workstation connecting to Whonix-Gateway using IPv6.
-** TODO
+** The following pull requests implement this:
+*** https://github.com/Whonix/anon-ws-disable-stacked-tor/pull/2
+*** https://github.com/Whonix/anon-gw-anonymizer-config/pull/5
+*** https://github.com/Whonix/whonix-gw-network-conf/pull/1
+*** https://github.com/Whonix/qubes-whonix/pull/2
+*** https://github.com/Whonix/whonix-firewall/pull/10
+*** https://github.com/Kicksecure/helper-scripts/pull/10
+*** https://github.com/Whonix/whonix-ws-network-conf/pull/1
+*** https://gitlab.torproject.org/tpo/core/torsocks/-/merge_requests/17
 * '''B)''' Tor proxying connections to IPv6 destinations.
 ** Already functional with Tor Browser.
 *** NOTE: ISP IPv6 feature state does not matter. Tor does not require functional IPv6 by the ISP to be able to proxy/tunnel IPv6. Tor can tunnel IPv6 over IPv4.
-** curl: TODO
-** transparent proxying: TODO
+** curl: TODO - connection via IPv6 works once above pull requests are merged, however for name resolution curl wants to open a nameserver connection, which gets filtered by torsocks. Thus curl currently fails resolving IPv6 destinations.
+** transparent proxying: Implemented once above pull requests are merged
 * '''C)''' Tor using IPv6 to build Tor circuits.
-** TODO
+** Implemented once above pull requests are merged
 
 = Whonix TODO =
 * Whonix
@@ -59,6 +67,42 @@ qvm-features sys-whonix ipv6 1
 *** Vice versa, when enabling sysctl <code>sysctl net.ipv6.conf.all.disable_ipv6=1</code> in sys-whonix without enabling Qubes host virtualizer setting <code>qvm-features sys-whonix ipv6 1</code>, networking will also fail to come up.
 *** This makes migration very difficult.
 *** TODO: patch Qubes upstream to simplify this so networking does not fail just because of IPv6 disabled/enabled on host VM settings but not disabled/enabled inside VM sysctl settings
+
+= VirtualBox =
+* VirtualBox NAT currently doesn't support IPv6. It only provides an IPv4 address which we configured statically in <code>etc/network/interfaces.d/30_non-qubes-whonix</code>
+* As a workaround, we can switch the Gateway network to use a Bridged Adapter to the hosts network interface. This however exposes the Gateway to the hosts network. To allow IPv6 packages reaching the VM, Promiscuous mode needs to be changed to "Allow All".
+* We need to add an address to our network configuration in <code>etc/network/interfaces.d/30_non-qubes-whonix</code> or let it automatically be configured, such as with
+ iface eth0 inet6 auto
+
+
+= Libvirt =
+* On the gateway, the network XML configuration needs to be modified to add an additional IPv6 address, such as the following:
+
+ <network>
+  <name>Whonix-External</name>
+  <uuid>0944b9e9-dd9c-4dd2-97e8-3b8d810d3b3f</uuid>
+  <forward mode="nat"/>
+  <bridge name="virbr1" stp="on" delay="0"/>
+  <mac address="52:54:00:18:58:37"/>
+  <dns enable="no"/>
+  <ip family="ipv4" address="10.0.2.2" netmask="255.255.255.0">
+  </ip>
+  <ip family="ipv6" address="fd19:c33d:98bc::" prefix="64">
+  </ip>
+ </network>
+* We need to add the same address also to our network configuration in <code>etc/network/interfaces.d/30_non-qubes-whonix</code>
+ auto eth0
+ iface eth0 inet6 static
+        address fd19:c33d:98bc::15
+        netmask 64
+        gateway fd19:c33d:98bc::
+* On the host it may be necessary to allow forwarding of IPv6 traffic for the desired network on the firewall. The necessary rules may or may not be added by libvirt automatically. Here an example configuration for ip6tables created by libvirt:
+ -A LIBVIRT_FWI -d fd19:c33d:98bc::/64 -o virbr1 -j ACCEPT
+ -A LIBVIRT_FWI -o virbr1 -j REJECT --reject-with icmp6-port-unreachable
+ -A LIBVIRT_FWO -s fd19:c33d:98bc::/64 -i virbr1 -j ACCEPT
+ -A LIBVIRT_FWO -i virbr1 -j REJECT --reject-with icmp6-port-unreachable
+ -A LIBVIRT_FWX -i virbr1 -o virbr1 -j ACCEPT
+* On the host we also need to enable forwarding of IPv6 with <code>sysctl net.ipv6.conf.all.forwarding=1</code>
 
 = Tor IPv6 Configuration =
 {{CodeSelect|code=
