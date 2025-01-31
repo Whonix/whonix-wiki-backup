@@ -6,10 +6,12 @@
 {{Title|title=
 Connections between {{project_name_gateway_short}} and {{project_name_workstation_short}}
 }}
+{{complex_networking_mininav}}
 [[File:Binary-503583640.jpg|thumb|200px]]
 {{intro|
 Authenticated / Encrypted Connections between {{project_name_gateway_short}} and {{project_name_workstation_short}}, ARP spoofing defense, SSH, OpenVPN, Using additional (isolated) network interfaces. Remote {{project_name_gateway_short}}.
 }}
+
 = Introduction =
 
 * This chapter does not apply to [[Qubes|{{q_project_name_long}}]]. <ref name=qubes_network_isolated>Because by Qubes default, AppVMs behind the same ProxyVM [or NetVM] are prevented from connecting to each other.</ref>
@@ -22,7 +24,7 @@ Related: [[Ports|Opening ports in {{project_name_short}}]]
 
 == Essentials ==
 
-By default, {{project_name_long}} assumes that {{project_name_gateway_short}} and {{project_name_workstation_short}} are connected by (virtual) LAN cable. Wireless technologies are not recommended as a malware compromised {{project_name_workstation_short}} could access (other) wireless access points and subsequently connect without Tor or find user's location based on WiFi SSIDs. Using a (virtual) cable enforces that {{project_name_workstation_short}} can only connect through {{project_name_gateway_short}}. For the same reason, connections to {{project_name_gateway_short}} over the internet are also not recommended.
+By default, {{project_name_long}} assumes that {{project_name_gateway_short}} and {{project_name_workstation_short}} are connected by (virtual) LAN cable. Wireless technologies are not recommended as a malware-compromised {{project_name_workstation_short}} could access (other) wireless access points and subsequently connect without Tor or find user's location based on WiFi SSIDs. Using a (virtual) cable enforces that {{project_name_workstation_short}} can only connect through {{project_name_gateway_short}}. For the same reason, connections to {{project_name_gateway_short}} over the internet are also not recommended.
 
 By default, connections between {{project_name_workstation_short}} and {{project_name_gateway_short}} are neither authenticated nor encrypted. The above (virtual) LAN connection between {{project_name_workstation_short}} and {{project_name_gateway_short}} is assumed to be secure. <ref>Here, secure is an assumption that nothing within your (virtual) LAN will MITM attack anything else.</ref> Adding authentication and/or encryption by default would further increase the complexity of {{project_name_short}}, which is to be avoided as explained in earlier chapters.
 
@@ -32,16 +34,16 @@ If you want to run [[Multiple Whonix-Workstation|Multiple {{project_name_worksta
 ** Authentication is enough.
 ** Encryption is not required. (When machines cannot be impersonated, MITM attacks are not possible from within the virtual LAN.)
 * Inside physical LANs:
-** If your threat model includes the possibility of a MITM attack, encryption is needed .
+** If your threat model includes the possibility of a MITM attack, encryption is needed.
 
 If you want to connect to a {{project_name_gateway_short}} over insecure, untrusted, or unknown foreign networks (internet):
 
 * Both authentication and encryption should be added.
 ** Encryption is required to deny MITM eavesdropping.
 ** Authentication validates the identity of the connecting machine.
-*** Encryption solutions such as OpenVPN and ssh also provide authentication.
+*** Encryption solutions such as OpenVPN and SSH also provide authentication.
 
-== Motivation for secure {{project_name_gateway_short}} / {{project_name_workstation_short}} connections ==
+== Motivation for Secure {{project_name_gateway_short}} / {{project_name_workstation_short}} Connections ==
 '''Only applies to ''non-stock'' configurations''': If you run [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_short}}]] simultaneously or want to connect to {{project_name_gateway_short}} over insecure or untrusted networks (internet):
 
 A compromised {{project_name_workstation_short}} can impersonate the {{project_name_gateway_short}}, or any other {{project_name_workstation_short}}, within the same (virtual) LAN, perform active MITM attacks, or passively eavesdrop.
@@ -50,25 +52,28 @@ A compromised {{project_name_workstation_short}} can impersonate the {{project_n
 
 Encryption can be added using OpenVPN or SSH. SSH, but not OpenVPN, has the advantage of being able to still easily tunnel a VPN through Tor, later. If you don't plan to do so, OpenVPN is probably easier. SSH has the disadvantage of increased setup complexity in this use case - you are probably better off using OpenVPN.
 
-= Authenticated connections between {{project_name_gateway_short}} and {{project_name_workstation_short}} =
+= Authenticated Connections Between {{project_name_gateway_short}} and {{project_name_workstation_short}} =
 
-== ARP spoofing defense ==
+== ARP Spoofing Defense ==
 
 This has only been quickly researched: From the [https://en.wikipedia.org/wiki/ARP_spoofing Wikipedia article about ARP spoofing], it appears that ''Static ARP entries'' could be used to authenticate connections between {{project_name_gateway_short}} and {{project_name_workstation_short}}.
 
-== Using additional (isolated) network interfaces ==
+== Using Additional (Isolated) Network Interfaces ==
+
 === Theoretical ===
+
 ''(This chapter is actually not authentication, but solves the threat nonetheless.)''
 
-A workaround, when running all vm's on the same VirtualBox host:
+A workaround when running all VMs on the same VirtualBox host:
 
-* One can enable additional Virtual Network Adapters with uniquely named internal virtual networks, inherently isolating up to 7 {{project_name_workstation_short}} per {{project_name_gateway_short}}, <ref>"[https://www.virtualbox.org/manual/ch06.html Four of the network cards can be configured in the "Network" section of the settings dialog in the graphical user interface of VirtualBox. You can configure all eight network cards on the command line via VBoxManage modifyvm]"</ref>
+* One can enable additional Virtual Network Adapters with uniquely named internal virtual networks, inherently isolating up to 7 {{project_name_workstation_short}} per {{project_name_gateway_short}}. <ref>"[https://www.virtualbox.org/manual/ch06.html Four of the network cards can be configured in the "Network" section of the settings dialog in the graphical user interface of VirtualBox. You can configure all eight network cards on the command line via VBoxManage modifyvm]"</ref>
 
-A workaround, for {{project_name_short}} with Physical Isolation, where ''all'' possible connecting machines are trusted:
+A workaround for {{project_name_short}} with Physical Isolation, where ''all'' possible connecting machines are trusted:
 
 * {{project_name_gateway_short}} inherently requires two network interfaces - external and internal. Additional physical and/or virtual LAN interfaces could be added. ''(Ensure no bridging takes place.)''
 
 === Instructions ===
+
 <div class="toccolours mw-collapsible mw-collapsed">
 '''DRAFT! UNFINISHED!'''
 
@@ -77,15 +82,15 @@ If you would like to see the unfinished documentation, please press on expand on
 These instructions explain how to do it using [[VirtualBox]].
 
 For basic setup, see this forum thread:<br/>
-https://forums.whonix.org/t/running-2-isolated-workstations-on-a-single-gateway/835
+[https://forums.whonix.org/t/running-2-isolated-workstations-on-a-single-gateway/835 Running 2 Isolated Workstations on a Single Gateway]
 
-The original poster is on a good track already. Some more changes required.
+The original poster is on a good track already. Some more changes are required.
 
-On {{project_name_workstation_short}} in an additional isolated network.
+On {{project_name_workstation_short}} in an additional isolated network:
 
 {{Network_Config}}
 
-Use these settings.
+Use these settings:
 
 {{CodeSelect|code=
 address 10.152.152.17
@@ -93,11 +98,11 @@ netmask 255.255.192.0
 gateway 10.152.152.13
 }}
 
-On {{project_name_gateway_short}}.
+On {{project_name_gateway_short}}:
 
 {{Network_Config}}
 
-Add this.
+Add this:
 
 {{CodeSelect|code=
 auto eth2
@@ -108,7 +113,7 @@ iface eth2 inet static
 
 {{Firewall_Settings}}
 
-And add additional interfaces to the firewall config.
+And add additional interfaces to the firewall config:
 
 {{CodeSelect|code=
 INT_IF="\
@@ -118,13 +123,13 @@ eth2"
 INT_TIF="$INT_IF"
 }}
 
-Reload {{project_name_short}} firewall (or reboot).
+Reload {{project_name_short}} firewall (or reboot):
 
 {{CodeSelect|code=
 sudo whonix_firewall
 }}
 
-Restart networking.
+Restart networking:
 
 {{CodeSelect|code=
 sudo service networking restart
@@ -132,14 +137,14 @@ sudo service networking restart
 
 Perhaps NetworkManager is interfering and must be disabled.
 
-Also the file /usr/share/tor/tor-service-defaults-torrc needs some changes. Tor needs to listen on the additional interfaces.
+Also, the file <code>/usr/share/tor/tor-service-defaults-torrc</code> needs some changes. Tor needs to listen on the additional interfaces.
 
 {{Open with root rights|filename=
 /usr/share/tor/tor-service-defaults-torrc
 }}
 
 Use this file:<br/>
-https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/share/tor/tor-service-defaults-torrc.anondist
+[https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/usr/share/tor/tor-service-defaults-torrc.anondist tor-service-defaults-torrc.anondist]
 
 <ref>This likely should not be made the default version. Because... '''TODO''': Explain.</ref>
 
@@ -149,13 +154,13 @@ Restart Tor.
 sudo service tor@default restart
 }}
 
-It will now loudly complain, that Tor is listening on all IPs that may not be what you want. You can ignore this, because the external network interface is firewalled.
+It will now loudly complain that Tor is listening on all IPs, which may not be what you want. You can ignore this because the external network interface is firewalled.
 
 '''TODO''': Explain what happens during upgrades.
 
 {{project_name_workstation_short}} whonixcheck / timesync / Tor Browser won't work. (Would need updated IP of the other gateway internal interface.) '''TODO''': Expand.
 
-{{project_name_workstation_short}} TransPort access should be functional though. I.e. nslookup check.torproject.org and/or Firefox should work.
+{{project_name_workstation_short}} <code>TransPort</code> access should be functional though. I.e. <code>nslookup check.torproject.org</code> and/or Firefox should work.
 
 {{project_name_customworkstation_long}} should work.
 </div>
@@ -167,7 +172,7 @@ Isolated ports are a Libvirt feature supported since 6.1.0. <ref>
 https://libvirt.org/formatdomain.html#isolating-guests-network-traffic-from-each-other
 </ref>
 
-The <code>port</code> element property <code>isolated</code>, when set to <code>yes</code> (default setting is <code>no</code>) is used to isolate this interface's network traffic from that of other guest interfaces connected to the same network that also have <code><port isolated='yes'/></code>. This setting is only supported for emulated interface devices that use a standard tap device to connect to the network via a Linux host bridge. This property can be inherited from a libvirt network, so if all guests that will be connected to the network should be isolated, it is better to put the setting in the network configuration. (NB: this only prevents guests that have <code>isolated='yes'</code> from communicating with each other; if there is a guest on the same bridge that doesn't have <code>isolated='yes'</code>, even the isolated guests will be able to communicate with it.)
+The <code>port</code> element property <code>isolated</code>, when set to <code>yes</code> (default setting is <code>no</code>), is used to isolate this interface's network traffic from that of other guest interfaces connected to the same network that also have <code><port isolated='yes'/></code>. This setting is only supported for emulated interface devices that use a standard tap device to connect to the network via a Linux host bridge. This property can be inherited from a libvirt network, so if all guests that will be connected to the network should be isolated, it is better to put the setting in the network configuration. (NB: this only prevents guests that have <code>isolated='yes'</code> from communicating with each other; if there is a guest on the same bridge that doesn't have <code>isolated='yes'</code>, even the isolated guests will be able to communicate with it.)
 
 <pre style="white-space: pre-wrap;">
 <devices>
@@ -178,19 +183,19 @@ The <code>port</code> element property <code>isolated</code>, when set to <code>
 </devices>
 </pre>
 
-= Encrypted and authenticated connections between {{project_name_gateway_short}} and {{project_name_workstation_short}} =
+= Encrypted and Authenticated Connections Between {{project_name_gateway_short}} and {{project_name_workstation_short}} =
 
-== Using SSH (not tested/recommended) ==
+== Using SSH (Not Tested/Recommended) ==
 
 Each Gateway and Workstation should have its own SSH account and certificate distributed to each machine to which it will connect. <ref>
 Internet search How to set up ssh keys, for example, for instructions.
-</ref>  Each Gateway and Workstations will need  ssh installed and the service started. Workstations need to be configured to automatically reconnect - in case {{project_name_workstation_short}} starts before the Gateway, or restarts. <ref>Consider: autossh</ref> Workstations need to use the tunnel IP to connect to the Gateway. The {{project_name_gateway_short}} should only accept certificate authentication, and only forward or answer to Tor over the SSH tunnel. All Workstations must use the established SSH tunnel to the Gateway, redirect such network access to socks via tranSOCKS_ev or similar. The {{project_name_gateway_short}} firewall may need corresponding changes. Not impossible to use SSH for this - but intricate.
+</ref> Each Gateway and Workstation will need SSH installed and the service started. Workstations need to be configured to automatically reconnect - in case {{project_name_workstation_short}} starts before the Gateway, or restarts. <ref>Consider: autossh</ref> Workstations need to use the tunnel IP to connect to the Gateway. The {{project_name_gateway_short}} should only accept certificate authentication, and only forward or answer to Tor over the SSH tunnel. All Workstations must use the established SSH tunnel to the Gateway and redirect such network access to SOCKS via <code>tranSOCKS_ev</code> or similar. The {{project_name_gateway_short}} firewall may need corresponding changes. Not impossible to use SSH for this - but intricate.
 
 Do not allow SSH logins! <ref>
-See: [https://serverfault.com/questions/56566/ssh-tunneling-only-access ssh login]
+See: [https://serverfault.com/questions/56566/ssh-tunneling-only-access SSH Tunneling Only Access]
 </ref>
 
-You may be better off using OpenVPN. ''However - OpenVPN is a full machine to machine connection, while ssh is easily port restricted.''
+You may be better off using OpenVPN. ''However - OpenVPN is a full machine-to-machine connection, while SSH is easily port restricted.''
 
 == Using OpenVPN ==
 <div class="toccolours mw-collapsible mw-collapsed">
@@ -198,21 +203,21 @@ You may be better off using OpenVPN. ''However - OpenVPN is a full machine to ma
 
 If you would like to see the unfinished documentation, please press on expand on the right.
 <div class="mw-collapsible-content">
-Right now only supports two modes/security domains:
+Right now, only supports two modes/security domains:
 
 * {{project_name_workstation_short}} with the secret key (=trusted) and
-* other workstation with no key/vpn configured.
+* Other workstation with no key/VPN configured.
 
 NOTE:
 
-* Transparent proxying doesn't seem to work at all, therefore you need to configure all applications to use socks ports.
+* Transparent proxying doesn't seem to work at all, therefore you need to configure all applications to use <code>SocksPort</code>s.
 
 On the gateway:
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px|alt=Whonix first time users warning]]
 | text    =
-The following information only applies to the <u>deprecated</u> version of {{project_name_short}} 0.5.6. It requires updating for more recent versions of {{project_name_short}}. Nowadays using wireguard instead of openvpn? Please help.
+The following information only applies to the <u>deprecated</u> version of {{project_name_short}} 0.5.6. It requires updating for more recent versions of {{project_name_short}}. Nowadays using WireGuard instead of OpenVPN? Please help.
 }}
 
 {{CodeSelect|code=
@@ -222,13 +227,13 @@ sudo -i
 apt --yes install openvpn
 }}
 
-Create a new symmetric key
+Create a new symmetric key:
 
 {{CodeSelect|code=
 sudo -u user openvpn --genkey --secret /home/user/static.key
 }}
 
-Copy key to workstation (Firewall needs to be disabled and openssh-server installed on {{project_name_workstation_short}} for this to work).
+Copy key to workstation (Firewall needs to be disabled and OpenSSH-server installed on {{project_name_workstation_short}} for this to work).
 
 {{CodeSelect|code=
 sudo -u user scp /home/user/static.key user@10.152.152.10:/home/user/static.key
@@ -243,7 +248,7 @@ chown root:root /etc/openvpn/static.key
 chmod 700 /etc/openvpn/static.key
 }}
 
-Create server configuration.
+Create server configuration:
 
 {{CodeSelect|code=
 echo "
@@ -259,14 +264,15 @@ service openvpn restart
 }}
 
 Edit torrc.<br />
-TODO: only selectively change listening addresses. TransPort and optionally other SocksPorts have to remain available, if unauthenticated workstations are to be used. NOTE: we are using a hardcoded default IP here, if you are using non standard settings this will have to be edited.
+TODO: only selectively change listening addresses. <code>TransPort</code> and optionally other <code>SocksPort</code>s have to remain available if unauthenticated workstations are to be used. NOTE: we are using a hardcoded default IP here, if you are using non-standard settings this will have to be edited.
 
 {{CodeSelect|code=
 ed -s /usr/local/etc/torrc.d/50_user.conf <<< $',s/10.152.152.10/10.8.0.1/g\nw'
 }}
 
-Edit /usr/local/bin/whonix_firewall.<br />
-TODO: Put this automatically where it actually belongs
+Edit <code>/usr/local/bin/whonix_firewall</code>.<br />
+TODO: Put this automatically where it actually belongs.
+
 {{CodeSelect|code=
 echo '
 # Allow openvpn in on port 1194
@@ -282,7 +288,7 @@ ed -s /usr/local/bin/whonix_firewall<<< $',s/INT_TIF=eth1/INT_TIF=tun0/g\nw'
 
 On the Workstation(s):
 
-TODO: Disable/tweak the new firewall
+TODO: Disable/tweak the new firewall.
 
 {{CodeSelect|code=
 sudo -i
@@ -297,7 +303,7 @@ chown root:root /etc/openvpn/static.key
 chmod 700 /etc/openvpn/static.key
 }}
 
-Should be in the default installation.
+Should be in the default installation:
 
 {{CodeSelect|code=
 apt --yes install --no-install-recommends torsocks
@@ -313,7 +319,7 @@ ifconfig 10.8.0.2 10.8.0.1
 secret /etc/openvpn/static.key" > /etc/openvpn/server.conf
 }}
 
-Edit resolv.conf.
+Edit resolv.conf:
 
 {{CodeSelect|code=
 chattr -i /etc/resolv.conf
@@ -328,20 +334,21 @@ chattr +i /etc/resolv.conf
 </div>
 
 = Remote {{project_name_gateway_short}} =
+
 At the time of writing, the Whonix project is primarily designed for the Whonix-Workstation and Whonix-Gateway to be connected over a trusted network using virtual, isolated network cards.
 
-Setting up a Remote Whonix-Gateway, where the Whonix-Gateway is accessed remotely from a different location, is currently not well-documented or and [[unsupported]] supported by the Whonix project.
+Setting up a Remote Whonix-Gateway, where the Whonix-Gateway is accessed remotely from a different location, is currently not well-documented. It is [[unsupported]] by the Whonix project.
 
-While there are some pointers and references available on on this wiki page, they are insufficient to fully guide users in setting up a remote configuration.
+While there are some pointers and references available on this wiki page, they are insufficient to fully guide users in setting up a remote configuration.
 
-Development considerations.
+== Development Considerations ==
 
 Setting up a remote {{project_name_gateway_short}} would involve the following considerations:
 
-* 1) Authenticated and encrypted connections between {{project_name_gateway_short}} and {{project_name_workstation_short}} would be necessary. This can be achieved using tools like OpenSSH or WireGuard.
-* 2) An open port on the host operating system would need to be forwarded to {{project_name_gateway_short}} to make it accessible from the internet. Prior knowledge about ports is required. See [[Ports]].
+* '''1)''' Authenticated and encrypted connections between {{project_name_gateway_short}} and {{project_name_workstation_short}} would be necessary. This can be achieved using tools like OpenSSH or WireGuard.
+* '''2)''' An open port on the host operating system would need to be forwarded to {{project_name_gateway_short}} to make it accessible from the internet. Prior knowledge about ports is required. See [[Ports]].
 
-However, it's important to note that a remote setup would not utilize the (virtual) isolated network that {{project_name_short}} typically employs when used locally. Therefore this would be less secure.
+However, it's important to note that a remote setup would not utilize the (virtual) isolated network that {{project_name_short}} typically employs when used locally. Therefore, this would be less secure.
 
 To address this, it may be more suitable to implement this functionality at the virtualizer level rather than modifying the {{project_name_short}} VMs extensively. If {{project_name_short}} is running within a virtualizer that can securely connect two VMs with authentication and encryption, there would be no need for complex modifications to the {{project_name_short}} configuration.
 
@@ -352,13 +359,13 @@ As of the author's current knowledge:
 * Xen does not have such a feature.
 * [[Qubes]] (based on Xen) does not have such a feature.
 
-Other virtualizers might have this feature but {{project_name_short}} is unavailable for these platforms at the time of writing.
+Other virtualizers might have this feature, but {{project_name_short}} is unavailable for these platforms at the time of writing.
 
 Readers are encouraged to consider submitting a generic feature request to any of these virtualizers. The request should focus on the generic need for encrypted connections between VMs and does not necessarily have to mention {{project_name_short}} explicitly.
 
-Realistically, it's important to acknowledge that a feature request may not lead to immediate implementation. The realization of such a feature might only get implemented if someone pays for it.
+Realistically, it's important to acknowledge that a feature request may not lead to immediate implementation. The realization of such a feature might only occur if someone funds its development.
 
-forum discussion: [https://forums.whonix.org/t/remote-whonix-gateway-access-to-whonix-gateway-from-an-external-computer/16785 Remote Whonix-Gateway - Access to Whonix-Gateway from an external Computer]
+'''Forum discussion:''' [https://forums.whonix.org/t/remote-whonix-gateway-access-to-whonix-gateway-from-an-external-computer/16785 Remote Whonix-Gateway - Access to Whonix-Gateway from an external Computer]
 
 = See Also =
 * [[{{project_name_workstation_short}}_Firewall|{{project_name_workstation_short}} Firewall]]
