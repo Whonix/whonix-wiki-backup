@@ -7,13 +7,14 @@
 {{intro|
 Overview of Advanced Deanonymization Attacks and their development status in {{project_name_short}}.
 }}
+
 = Introduction =
 
-This page aims to track and document advanced attacks <ref>https://phabricator.whonix.org/T540</ref> that also affect virtualized and anonymous systems like {{project_name_short}}. Attacks discussed below tend to have a very high accuracy rate and can easily have devastating impacts upon anonymity. The common thread to these attacks is abuse of the underlying hardware design to undermine isolation barriers imposed by the software stack operating above it. <ref>See [https://web.archive.org/web/20220305144901/http://cs.sru.edu/~mullins/cpsc100book/module02_introduction/module02-03_introduction.html Introduction to Computers: Hardware and Software] for a basic description of the difference between hardware, firmware and software.</ref> Exploiting buggy software remains the lowest hanging fruit for network adversaries. It is expected they will further expand their toolbox and more regularly utilize these vectors, since the chances of discovery are minimal to none.
+This page aims to track and document advanced attacks that also affect virtualized and anonymous systems like {{project_name_short}}. The attacks discussed below tend to have a very high accuracy rate and can easily have devastating impacts on anonymity. The common thread among these attacks is the exploitation of underlying hardware design flaws to undermine isolation barriers imposed by the software stack operating above it. <ref>See [https://web.archive.org/web/20220305144901/http://cs.sru.edu/~mullins/cpsc100book/module02_introduction/module02-03_introduction.html Introduction to Computers: Hardware and Software] for a basic description of the difference between hardware, firmware, and software.</ref> Exploiting buggy software remains the lowest-hanging fruit for network adversaries. It is expected that they will further expand their toolbox and more regularly utilize these vectors, as the chances of discovery are minimal to none.
 
 = Attack Definitions =
 
-'''Table:''' ''Common Attack Vectors causing Data Leakage''
+'''Table:''' ''Common Attack Vectors Causing Data Leakage''
 
 {| class="wikitable"
 |-
@@ -23,7 +24,7 @@ This page aims to track and document advanced attacks <ref>https://phabricator.w
 
 |-
 ! scope="row"| Biometric Tracking
-| Behavioral tracking (also called biometric tracking) relies on spying on how users interact with their devices, <ref>https://forums.whonix.org/t/biometric-fingerprinting-mass-surveillance-and-you/2236</ref> rather than looking at the unique identifiers of the device, protocol or application levels.
+| Behavioral tracking (also called biometric tracking) relies on spying on how users interact with their devices, <ref>https://forums.whonix.org/t/biometric-fingerprinting-mass-surveillance-and-you/2236</ref> rather than looking at the unique identifiers at the device, protocol, or application levels.
 |-
 
 ! scope="row"| Local Covert Channels
@@ -31,7 +32,7 @@ This page aims to track and document advanced attacks <ref>https://phabricator.w
 |-
 
 ! scope="row"| Network Covert Channels
-| [https://en.wikipedia.org/wiki/Covert_channel#Data_hiding_in_OSI_model Network] [https://en.wikipedia.org/wiki/Covert_channel#Data_hiding_in_LAN_environment_by_covert_channels covert] [https://en.wikipedia.org/wiki/Covert_channel#Data_hiding_in_TCP/IP_Protocol_suite_by_covert_channels channels] only require that a compromised VM induce identifiable changes in network traffic that are immediately visible to adversaries that surveil the network.
+| [https://en.wikipedia.org/wiki/Covert_channel#Data_hiding_in_OSI_model Network] [https://en.wikipedia.org/wiki/Covert_channel#Data_hiding_in_LAN_environment_by_covert_channels covert] [https://en.wikipedia.org/wiki/Covert_channel#Data_hiding_in_TCP/IP_Protocol_suite_by_covert_channels channels] only require that a compromised VM induce identifiable changes in network traffic, which are immediately visible to adversaries surveilling the network.
 |-
 
 ! scope="row"| Side Channels
@@ -42,15 +43,20 @@ This page aims to track and document advanced attacks <ref>https://phabricator.w
 
 = Attack Methodology =
 == Advanced Remote Deanonymization Methods ==
+
 '''Table:''' ''Advanced Remote Deanonymization Methods''
 
 {| class="wikitable"
 |-
 
 |
-! '''CPU-induced Network Latency''' <ref>https://phabricator.whonix.org/T530</ref>
-! '''TCP ISNs and Temperature-induced Clock Skews''' <ref>https://phabricator.whonix.org/T543</ref>
-! '''[[Keystroke Deanonymization]]''' <ref>https://phabricator.whonix.org/T542</ref>
+! '''CPU-induced Network Latency''' <ref>
+https://forums.whonix.org/t/cpu-induced-latency-covert-channel-countermeasures/18875
+</ref>
+! '''TCP ISNs and Temperature-induced Clock Skews''' <ref>
+https://forums.whonix.org/t/tcp-isns-and-temperature-induced-clock-skews/18862
+</ref>
+! '''[[Keystroke Deanonymization]]'''
 ! '''[[Surfing_Posting_Blogging#Mouse_Fingerprinting|Mouse Fingerprinting]]'''
 |-
 
@@ -62,20 +68,19 @@ This page aims to track and document advanced attacks <ref>https://phabricator.w
 |-
 
 ! '''Attack Summary'''
-| CPU load induces a noticeable latency in ICMP network packets. <ref>https://lists.torproject.org/pipermail/tor-talk/2016-July/041807.html</ref>
+| CPU load induces noticeable latency in ICMP network packets. <ref>https://lists.torproject.org/pipermail/tor-talk/2016-July/041807.html</ref>
 | CPU load skews the clock crystal frequency; these changes are detectable in the TCP ISN field.
-| Timing of/between keystrokes creates a unique individual pattern.
-| Timing of/between mouse movement speed/angles creates a unique individual pattern.
+| Timing of and between keystrokes creates a unique individual pattern.
+| Timing of and between mouse movement speed/angles creates a unique individual pattern.
 |-
 
 ! '''Mitigation'''
-| Add random delays per ICMP packet with tc-netem or block the protocol on host. No mitigation needed for Whonix - Tor is TCP only. Attack doesn't work on TCP and tc-netem causes visible latency for streams when traffic is induced, harming anonymity and performance. <ref name=T530>
-https://phabricator.whonix.org/T530#20163 / [[Dev/latency-obfuscator]]
+| Add random delays per ICMP packet with tc-netem or block the protocol on the host. No mitigation needed for Whonix because Tor is TCP-only. The attack doesn't work on TCP, and tc-netem causes visible latency for streams when traffic is induced, harming anonymity and performance. <ref name=T530>
+https://forums.whonix.org/t/cpu-induced-latency-covert-channel-countermeasures/18875 / [[Dev/latency-obfuscator]]
 </ref>
 | Rewrite TCP ISNs to conceal timer skews.
-| Abstract keyboard input into a network layer and the injection of random delays. <ref name=fine-grained>Removing fine-grained timers also helps in this situation.</ref>
-| Abstract mouse input into a network layer and the injection of random delays. <ref name=fine-grained />
-
+| Abstract keyboard input into a network layer and inject random delays. <ref name=fine-grained>Removing fine-grained timers also helps in this situation.</ref>
+| Abstract mouse input into a network layer and inject random delays. <ref name=fine-grained />
 |-
 
 ! '''{{project_name_short}} [[KVM]] Mitigation'''
@@ -102,14 +107,21 @@ https://phabricator.whonix.org/T530#20163 / [[Dev/latency-obfuscator]]
 |}
 
 == Advanced Local Deanonymization Methods ==
+
 '''Table:''' ''Advanced Local Deanonymization Methods''
 
 {| class="wikitable"
 |-
 
 |
-! '''DRAMA Cross-CPU Attacks''' <ref>https://phabricator.whonix.org/T541</ref>
-! '''Cross-VM CPU Cache Attacks''' <ref>https://phabricator.whonix.org/T539</ref> <ref>[https://cmaurice.fr/pdf/ndss17_maurice.pdf Hello from the Other Side: SSH over Robust Cache Covert Channels in the Cloud]: a newer covert channel attack that requires the same condition of a shared CPU cache.</ref>
+! '''DRAMA Cross-CPU Attacks''' <ref>
+https://forums.whonix.org/t/advanced-attacks-meta-ticket/18865
+</ref>
+! '''Cross-VM CPU Cache Attacks''' <ref>
+https://forums.whonix.org/t/cross-vm-cache-attacks-countermeasures/18866
+</ref> <ref>
+[https://cmaurice.fr/pdf/ndss17_maurice.pdf Hello from the Other Side: SSH over Robust Cache Covert Channels in the Cloud]: a newer covert channel attack that requires the same condition of a shared CPU cache.
+</ref>
 |-
 
 ! '''Attack Class'''
@@ -119,16 +131,16 @@ https://phabricator.whonix.org/T530#20163 / [[Dev/latency-obfuscator]]
 
 ! '''Attack Summary'''
 | Timing of access to the shared memory bank permits data leaks, as well as snooping on keystrokes.
-| Measurement of the shared CPU cache access latency; this leaks timing data concerning cryptographic processes.
+| Measurement of shared CPU cache access latency leaks timing data concerning cryptographic processes.
 |-
 
 ! '''Mitigation'''
-| Block clflush and tsc instructions, as well as removing all timers. Further, avoid the multi-threading of VMs, or alternatively use non-interleaved NUMA with pinned vCPUs.
-| Pin vCPUs to separate pCPUs. Proper mitigations are added by upstream crypto lib projects when attacks are discovered.
+| Block <code>clflush</code> and <code>tsc</code> instructions, as well as remove all timers. Additionally, avoid multi-threading of VMs, or alternatively use non-interleaved NUMA with pinned vCPUs.
+| Pin vCPUs to separate pCPUs. Proper mitigations are added by upstream cryptographic library projects when attacks are discovered.
 |-
 
 ! '''{{project_name_short}} [[KVM]] Mitigation'''
-| {{No}} <ref>Measure reverted to enable spectre/meltdown guest mitigations</ref>
+| {{No}} <ref>Measure reverted to enable Spectre/Meltdown guest mitigations</ref>
 | style="background-color: {{Green}}"| Production
 |-
 
@@ -137,7 +149,7 @@ https://phabricator.whonix.org/T530#20163 / [[Dev/latency-obfuscator]]
 | {{No}}
 |-
 
-!| '''[[Qubes|{{q_project_name_short}}]] Mitigation'''
+! '''[[Qubes|{{q_project_name_short}}]] Mitigation'''
 | {{No}}
 | {{No}}
 |-
@@ -145,19 +157,19 @@ https://phabricator.whonix.org/T530#20163 / [[Dev/latency-obfuscator]]
 |}
 
 == Other Advanced Deanonymization Attacks ==
-There are numerous other advanced attacks which have not been included in the above table. The reason is they have easy fixes, such as avoiding some [[KVM#Unsafe_Features|unsafe hypervisor features]].
+There are numerous other advanced attacks that have not been included in the above table. The reason is that they have easy fixes, such as avoiding some [[KVM#Unsafe_Features|unsafe hypervisor features]].
 
 = Other Deanonymization Vectors =
 High-risk users should familiarize themselves with other attack vectors that can lead to deanonymization or other harmful outcomes.
 
 * [[Time_Attacks|Time-related Attacks]]: These are in a class of their own. In simple terms, insecure time synchronization and the leaking of time data can result in deanonymization. Although documented separately, time attacks have some overlap with factors outlined here.
-* [[Speculative_Tor_Attacks|Tor Ecosystem Attacks]]: Advanced adversaries are capable of attacking the Tor client, server and/or [[Warning#Tor_Network_Attacks|network]] (sometimes in combination) to identify users and/or servers in specific situations.
+* [[Speculative_Tor_Attacks|Tor Ecosystem Attacks]]: Advanced adversaries are capable of attacking the Tor client, server, and/or [[Warning#Tor_Network_Attacks|network]] (sometimes in combination) to identify users and/or servers in specific situations.
 
 = Development =
 
 * [[Dev/Advanced Deanonymization Attacks]]
-* Ticket: [https://phabricator.whonix.org/T540 Covert Channels Meta Ticket]
-* [https://forums.whonix.org/t/advanced-deanonymization-attacks/2879 forum discussion]
+* Ticket: [https://forums.whonix.org/t/advanced-attacks-meta-ticket/18865 Covert Channels Meta Ticket]
+* [https://forums.whonix.org/t/advanced-deanonymization-attacks/2879 Forum Discussion]
 
 = Footnotes =
 {{reflist|close=1}}

@@ -5,143 +5,111 @@
 {{intro|
 Notes on Advanced Deanonymization Attacks.
 }}
-== Covert Channels ==
 
-This page is a brain-dump all known covert channels and mitigation ideas. A brushed up version for users will be written later when countermeasures are deployed.
+= Covert Channels =
 
-See also:<br />
-[[Advanced Deanonymization Attacks]]
+This page is a brain-dump of all known covert channels and mitigation ideas. A refined version for users will be written later when countermeasures are deployed.
 
-ticket:<br />
-[https://phabricator.whonix.org/T540 Covert Channels Meta Ticket]
+See also: [[Advanced Deanonymization Attacks]]
 
-=== Topics ===
-Intro
+Ticket: [https://phabricator.whonix.org/T540 Covert Channels Meta Ticket]
 
-choices: Some can be eliminated outright, Other channels need to be degraded sufficiently). Good news is it is possible to defend against them all but not without cost.
+== Topics ==
 
-All problems linked (keystroke dynamics, cpu-induced network latency, TCP ISN CPU temp-induced timer skew, DRAMA cross-vm keystroke monitoring, cpu-cache crypto sidechannels).
+Some covert channels can be eliminated outright, while others need to be sufficiently degraded. The good news is that it is possible to defend against all of them, though not without cost.
 
-covert channels are part of TEMPEST category of attacks. Cryptographers had to deal with them forever but they pose serious problems for systems aiming to isolate untrusted malicious processes. They can be classified as snooping on activity outside a VM or being able to communicate secretly with the outside world.
+All problems are interconnected: keystroke dynamics, CPU-induced network latency, TCP ISN CPU temperature-induced timer skew, DRAMA cross-VM keystroke monitoring, and CPU-cache cryptographic side channels.
 
-----
+Covert channels are part of the TEMPEST category of attacks. Cryptographers have dealt with them for a long time, but they pose serious challenges for systems aiming to isolate untrusted, malicious processes. They can be classified as either snooping on activity outside a VM or secretly communicating with the outside world.
 
-keystroke fingerprinting:
+= Keystroke Fingerprinting =
 
-Excellent paper on covert channels in general:
+An excellent paper on covert channels in general: [https://www.usenix.org/legacy/events/sec06/tech/shah/shah_html/jbug-Usenix06.html USENIX Paper]
 
-https://www.usenix.org/legacy/events/sec06/tech/shah/shah_html/jbug-Usenix06.html
+CPU stress as a solution for keystroke fingerprinting? Not effective.
 
-cpu stress solution for keystrokes? not effective
+'''Question: How to delay keystrokes?''' [https://stackoverflow.com/a/33134735 StackOverflow answer]: Funnel all system input events through a local network interface and inject random latency. This must be done on the host to apply system-wide.
 
-Question: How to delay keystrokes?:
+<code>uinput</code> is the kernel input device API, but it requires C expertise to write a program for direct implementation.
 
-https://stackoverflow.com/a/33134735
+<code>usbip</code>? It is in the mainline kernel but not a solution for PCI input devices, which most PCs use.
 
-Answer: funnel all system input events through a local network interface which you inject random latency in. On host so its system wide.
+'''Network latency mitigation:''' Use the iperf stress tool or Ethan's netfilter_queue solution.
 
-uinput is the kernel input device API but needs C expertise to write a program to do this directly.
+'''Alternatives:'''
+* [https://superuser.com/questions/67659/linux-share-keyboard-over-network Linux share keyboard over network]
+* [https://unix.stackexchange.com/questions/46363/share-keyboard-over-network-as-separate-device Share keyboard over network as a separate device]
+* [https://github.com/Blub/netevent/wiki/Share-devices-over-the-net NetEvent - Share devices over the network]
 
-usbip? - in mainline.
---Not a solution for PCI input devices - most of PCs.
+NetEvent cobbles together netcat host/client on a loopback interface. It runs as a service with the client as localhost. Applying netfilter_queue on the loopback interface introduces random delays.
+* Pros: Kernel-based solution, display server agnostic (it captures all events using the uinput interface).
 
-network latency: iperf stress tool or Ethan's netfilter_queue soltion
+'''New research results on obfuscation: No working tool yet.''' Contact researchers to inquire if they can develop one.
 
-alternatives:
-https://superuser.com/questions/67659/linux-share-keyboard-over-network
-https://unix.stackexchange.com/questions/46363/share-keyboard-over-network-as-separate-device
-https://github.com/Blub/netevent/wiki/Share-devices-over-the-net
+* [https://github.com/vmonaco/keystroke-obfuscation Keystroke Obfuscation GitHub]
+* [https://github.com/vmonaco/keystroke-obfuscation/issues/1 Open issues on Keystroke Obfuscation]
 
-netevent cobbles netcat host/client together. set on loopback. Run as service with client as localhost. Apply netfilter_queing on loopback to introduce random delays. Pros: kernel solution, display server agnostic. (It uses uinput interface to capture all events)
+= TCP ISN =
 
-New research results on obfuscation - no working tool. Contact them and ask if they can write one?
+Blocking TCP ISN at the firewall? Rewriting TCP ISN?  
+* Not possible and necessary for security. TCP ISN is a fundamental part of all modern operating systems.
 
-https://github.com/vmonaco/keystroke-obfuscation
+'''References:'''
+* [https://fahrplan.events.ccc.de/congress/2006/Fahrplan/attachments/1211-23c3hotornotpres.pdf 23C3 Presentation]
+* [https://fahrplan.events.ccc.de/congress/2006/Fahrplan/events/1513.en.html 23C3 Event]
+* [https://events.ccc.de/congress/2005/fahrplan/events/798.en.html 22C3 Event]
+* [https://murdoch.is/papers/ccs06hotornot.pdf Hot or Not: Revealing Hidden Services by Their Clock Skew]
+* [https://murdoch.is/talks/eurobsdcon07hotornot.pdf EuroBSDCon Presentation]
+* [https://www.lightbluetouchpaper.org/2006/09/04/hot-or-not-revealing-hidden-services-by-their-clock-skew/ Light Blue Touchpaper Analysis]
 
-https://github.com/vmonaco/keystroke-obfuscation/issues/1
+'''23C3 Slide 30:'''
+* Running the CPU at full load is an inefficient mitigation method.
+* Different tasks have varying temperature effects.
+* Full CPU stress is required for TCP ISN mitigation to maintain constant CPU temperature and foil skew patterns in timers/crystal clocks.
 
-----
+Mitigation must be applied on the host to remain out of reach of malicious code inside the VM.
 
-block tcp isn firewall? rewrite tcp isn?
+== CPU Activity-Induced Latency ==
 
-Not possible and needed for security anyway. Are a part of all modern OSs
+'''Mitigation:''' Quality of Service (QoS) solution by Ethan White.
 
-https://fahrplan.events.ccc.de/congress/2006/Fahrplan/attachments/1211-23c3hotornotpres.pdf
+Originally proposed in 23C3 slides and later realized.
 
-https://fahrplan.events.ccc.de/congress/2006/Fahrplan/events/1513.en.html
+'''Status:''' Stalled.
 
-https://events.ccc.de/congress/2005/fahrplan/events/798.en.html
+= DRAM Addressing =
 
-https://murdoch.is/papers/ccs06hotornot.pdf
+A severe risk: A process inside an anonymous VM can sniff keystrokes from other VMs, leading to data leaks.  
+'''Scenario:''' JavaScript running in a browser can exploit this.
 
-https://murdoch.is/talks/eurobsdcon07hotornot.pdf
+[https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/pessl DRAMA: Exploiting DRAM Addressing for Cross-CPU Attacks]
 
-https://www.lightbluetouchpaper.org/2006/09/04/hot-or-not-revealing-hidden-services-by-their-clock-skew/
+'''Test Proof-of-Concept (PoC):'''
+* [https://github.com/IAIK/drama DRAMA PoC GitHub Repository]
 
-23C3 Slide 30:
+'''Mitigation: Memory stress'''
+* The stress-m2 method, when applied in parallel (i.e., the attacker's core is under stress), makes measurements impossible.
+* No false positives occurred in tests, but only 9 events were correctly detected.
+* The attack is susceptible to noise, especially if the attacker only has a fraction of CPU time.
 
-Run CPU at full load
-Inefficient  and  must  be  done  with
-care  since  different  types  of  tasks
-can  have  varying  temperature  ef-
-fects
+'''NUMA combined with CPU pinning:'''
+* Described as a valid mitigation, but NUMA environments are mostly available for server systems.
 
-CPU stress must be full load - (what about c-states and temp? Is there a technique less damaging to hardware?) - mitigation for TCP ISN. Maintains constant CPU temperature hence foils skew patterns in timers/crystal clock.
+Mitigation must be applied on the host to stay out of reach of malicious code inside the VM.
 
-on host out of reach of malicious code in vm.
+<blockquote>
+In this attack, the spy and the victim can run on separate CPUs and do not share memory, i.e., there is no access to shared libraries and no page deduplication between VMs.
+</blockquote>
 
-----
+= Cryptographic Side Channels =
 
-cpu activity induced latency:
+'''Mitigation:'''
+* vCPU pinning to physical CPUs ensures no cross-cache attacks on cryptographic processes.
+* This also makes other attacks significantly harder.
 
-QoS solution by Ethan White
-
-Concept originally proposed in 23C3 slides and has now been realized.
-
-Status: Awaiting deployment as a host and GW package.
-
-----
-
-very dangerous - process in anon vm can sniff keystrokes in other vms unmasking and stealing user data. /Scenario: JS in browser can pull this off:
-
-https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/pessl
-
-Test PoC:
-https://github.com/IAIK/drama
-
-memory stress - DRAMA attack mitigation
-
-stress-m2
-in parallel (i.e., the attacker’s core is under stress) made any measurements impossible. While
-no false positive detections occurred, only 9 events were correctly detected. Thus, our attack is susceptible to
-noise especially if the attacker only gets a fraction of
-CPU time on its core.
-
-NUMA combined with CPU pinning also described as valid mitigation. Problem is NUMA environments exist for server systems only for the most part.
-
-on host out of reach of malicious code in vm.
-
-"In
-this attack, the spy and the victim can run on sepa-
-rate CPUs and do not share memory,
-i.e.
-, no access
-to shared libraries and no page deduplication between
-VMs. "
-
-----
-
-crypto side channels:
-
-vcpu pinning to physical to guarantee no cross cache attacks on cryptoand make other attacks harder.
-
-----
-
-See also:<br />
-[[Advanced Deanonymization Attacks]]
-
-ticket:<br />
-[https://phabricator.whonix.org/T540 Covert Channels Meta Ticket]
+= See also =
+* [[Advanced Deanonymization Attacks]]
+* Ticket: [https://phabricator.whonix.org/T540 Covert Channels Meta Ticket]
 
 {{Footer}}
 [[Category:Development]]
