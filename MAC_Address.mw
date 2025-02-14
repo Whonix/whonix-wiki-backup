@@ -38,54 +38,55 @@ The {{project_name_short}} MAC Address wiki page is forked from the Tails Enable
 {{intro|
 MAC Address Spoofing and Tracking Threats
 }}
+
 = MAC Address Documentation =
 
 {{upstream_wiki}}
 
 == Auto-connect Risk ==
 
-Apart from the difficulty in creating an appropriate MAC address for spoofing purposes, there are also technical hurdles to overcome in the form of preventing automatic network connections.
+Beyond the challenge of generating an appropriate spoofed MAC address, there are technical hurdles related to preventing automatic network connections.
 
-It is futile to prepare a spoofed MAC address if the computer instantly connects to the public network after booting, disclosing the user's real MAC address in the process:
+A spoofed MAC address is ineffective if the computer automatically connects to a public network after booting, thereby exposing the real MAC address:
 
-* <u>Physical Isolation:</u> {{project_name_gateway_long}} automatically connects to Tor after start.
-* <u>USB Wi-FI Device:</u> Automatic connections might also occur, depending on the configuration.
-* <u>VM users:</u> The host operating system most likely automatically connects via updates, perhaps time sync, and other avenues.
+* <u>Physical Isolation:</u> {{project_name_gateway_long}} automatically connects to Tor upon startup.
+* <u>USB Wi-Fi Device:</u> Automatic connections may occur depending on the configuration.
+* <u>VM Users:</u> The host operating system is likely to automatically connect to the internet for updates, time synchronization, or other background services.
 
 = Other Location Tracking Risks =
 
 == Tor Entry Guard Fingerprinting ==
 
-Dealing with the MAC address problem is only one piece of the larger location tracking puzzle. Users must also contend with changing the usual Tor entry guards used for connections across different locations, in order to prevent guard fingerprinting. To mitigate this threat, follow <u>one</u> of the  [[Tor_Entry_Guards#Mitigate_the_Threat_of_Guard_Fingerprinting|recommended configurations]]:
+Addressing MAC address concerns is only one part of a broader location tracking problem. Users must also consider how Tor entry guards are used across different locations to avoid guard fingerprinting. To mitigate this risk, follow <u>one</u> of the [[Tor_Entry_Guards#Mitigate_the_Threat_of_Guard_Fingerprinting|recommended configurations]]:
 
 # [[Tor_Entry_Guards#Clone_Whonix-Gateway_(sys-whonix)_with_New_Entry_Guards|Clone {{project_name_gateway_short}} ({{project_name_gateway_vm}}) with New Entry Guards]].
 # [[Tor_Entry_Guards#Regenerate_the_Tor_State_After_Saving_the_Tor_State_Folder|Regenerate the Tor State File after Saving the Current Tor State]].
 # Configure Tor to use [[Tor_Entry_Guards#Alternating_Bridges|Alternating Bridges]].
-# If moving to a new location permanently, create [[Tor_Entry_Guards#Fresh_Tor_Entry_Guards_by_Regenerating_the_Tor_State_File|Fresh Tor Entry Guards by Regenerating the Tor State File]].
+# If relocating permanently, create [[Tor_Entry_Guards#Fresh_Tor_Entry_Guards_by_Regenerating_the_Tor_State_File|Fresh Tor Entry Guards by Regenerating the Tor State File]].
 
-To fully thwart this threat, entry guard changes are necessary for every Tor instance on the user's machine host (apt-transport-tor) and guest.
+To fully mitigate this threat, entry guard changes must be applied to every Tor instance on both the host (e.g., apt-transport-tor) and guest systems.
 
 = Using Personal Computers in a Public Network =
 
 {{mbox
 | type      = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = This refers to using a personal laptop, desktop or any other Internet-facing device in a public network.
+| text    = This applies to using a personal laptop, desktop, or any other internet-facing device in a public network.
 }}
 
-In this scenario, the MAC address <u>must</u> be changed and a [[Tor_Entry_Guards#Mitigate_the_Threat_of_Guard_Fingerprinting|new set of Tor entry guards]] should also be configured. <ref>This process involves removal of the ''/var/lib/tor/state'' file.</ref> Attempts should be made to disguise the use of Tor from the administrator of the public network. Depending on the user's configuration, this may involve using an obfsproxy bridge or the tunneling of traffic through [[Tunnels/Connecting_to_SSH_before_Tor|SSH]] or a [[Tunnels/Connecting_to_a_VPN_before_Tor|VPN]] prior to connecting to the Tor network.
+In this scenario, the MAC address <u>must</u> be changed, and a [[Tor_Entry_Guards#Mitigate_the_Threat_of_Guard_Fingerprinting|new set of Tor entry guards]] should be configured. <ref>This process involves removing the ''/var/lib/tor/state'' file.</ref> Additionally, efforts should be made to obscure Tor usage from the network administrator. Depending on the user's setup, this may involve using an obfsproxy bridge or tunneling traffic through [[Tunnels/Connecting_to_SSH_before_Tor|SSH]] or a [[Tunnels/Connecting_to_a_VPN_before_Tor|VPN]] before connecting to the Tor network.
 
-Depending on the user's threat model, changing the MAC address and using Tor might rule out revisiting that public network again in the future. If the same public network will be reused, then it is necessary to decide whether to use the same MAC address (and set of Tor entry guards) or to generate a new one.
+Depending on the threat model, changing the MAC address and using Tor may prevent revisiting the public network. If reuse is needed, the user must choose between keeping the same MAC address and Tor entry guards or generating new ones.
 
-If MAC address logging by the administrator is suspected, it is unwise to change the MAC address and arouse suspicion. If it is assessed the network is sufficiently public and observation is unlikely, then it might be safe to use a new MAC address -- with a popular vendor ID and random/unique second part (identifier) -- each time the network is used.
+If the network administrator is suspected of logging MAC addresses, changing the MAC may arouse suspicion. Conversely, if the network is sufficiently public and individual observation is unlikely, it may be safe to use a new MAC address each time -- one that features a popular vendor ID and a random second part.
 
-For further discussion on this rather complex topic, see [[Dev/MAC]].
+For further discussion on this complex topic, see [[Dev/MAC]].
 
 = Changing MAC Addresses =
 
 == Whonix ==
 
-TODO: please help to test and improve these instructions.
+'''TODO: Please help test and improve these instructions.'''
 
 {{Box|text=
 '''1.''' Edit the network interfaces file.
@@ -95,7 +96,7 @@ TODO: please help to test and improve these instructions.
 
 '''2.''' Install macchanger.
 
-In a terminal, run.
+In a terminal, run:
 
 {{CodeSelect|code=
 su
@@ -110,7 +111,7 @@ apt update && apt install macchanger
 {{mbox
 | type      = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = The following steps will manually change the MAC address for the device. An example is provided for a wireless device (<code>wlan0</code>). Replace <code>wlan0</code> to match the device being spoofed, such as an ethernet device (<code>eth0</code>) and so on.
+| text    = The following steps manually change the MAC address for a device. An example is provided for a wireless device (<code>wlan0</code>). Replace <code>wlan0</code> with the appropriate device, such as an ethernet device (<code>eth0</code>).
 }}
 
 {{CodeSelect|code=
@@ -129,7 +130,8 @@ macchanger -a wlan0
 ifconfig wlan0 up
 }}
 
-If instructions from Step 1+ did not work, the following steps might also work without macchanger. Replace <code>wlan0</code> to match the specific device.
+If the steps above do not work, the following method might work without macchanger. Replace <code>wlan0</code> with the correct device name.
+
 {{CodeSelect|code=
 su
 }}
@@ -146,7 +148,8 @@ ifconfig wlan0 hw ether 00:AA:BB:CC:DD:EE
 ifconfig wlan0 up
 }}
 
-Or use iproute2 commands to change the MAC address.
+Alternatively, use iproute2 commands to change the MAC address.
+
 {{CodeSelect|code=
 ip link set down wlan0
 }}
@@ -161,7 +164,7 @@ ip link set up wlan0
 
 '''4.''' Complete the MAC address change.
 
-Below <code>iface eth0 inet dhcp</code>, add.
+Below <code>iface eth0 inet dhcp</code>, add:
 
 {{CodeSelect|code=
 hwaddress ether 00:00....
@@ -169,21 +172,21 @@ hwaddress ether 00:00....
 
 '''5.''' ''Optional:'' Automatically randomize the MAC address on boot.
 
-If this is desired, add.
+To enable this, add:
 
 {{CodeSelect|code=
 pre-up macchanger -e eth0
 }}
 
-'''6.''' Change new network interfaces settings.
+'''6.''' Modify network interface settings.
 
-To prevent new network interfaces being brought up automatically, comment the following.
+To prevent new network interfaces from being automatically activated, comment out the following line:
 
 {{CodeSelect|code=
 auto eth0
 }}
 
-Then configure manual bring ups with the following setting.
+Then, configure manual activation with:
 
 {{CodeSelect|code=
 sudo ifup eth0

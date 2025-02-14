@@ -2,124 +2,169 @@
 {{#seo:
 |description=Development notes for adding MAC address anonymization to {{project_name_long}}.
 }}
+{{intro|
+Development notes for adding MAC address anonymization to {{project_name_long}}.
+}}
 
 = Introduction =
-Trying to sketch a user interface for a MAC changer, fulfilling everything mentioned on https://gitlab.tails.boum.org/tails/tails/-/issues/5421
+Attempting to design a user interface for a MAC changer that fulfills all requirements mentioned in [https://gitlab.tails.boum.org/tails/tails/-/issues/5421 this issue].
 
-To understand the problem better myself and to make sure we are all talking about the same thing, it may be a good idea to create an overview. Therefore a nice table, which is attached below, has been created.
+To better understand the problem and ensure clarity in discussions, it may be helpful to create an overview. Therefore, a table summarizing various use cases has been created below.
 
-There are so many different threat models and goals. Might become too difficult for the average user. For supporting all use cases, the user interface would become giant, just for deciding on which MAC touse.
+There are numerous different threat models and goals. This complexity might make it too difficult for the average user. Supporting all use cases would result in a massive user interface, just for deciding which MAC to use.
 
-= use case overview =
+= Use Case Overview =
 
-public computer could be a library.
+A public computer could be, for example, a library computer.
 
-public network_C could be a free wifi hotspot in a mall.
+Public network_C could be a free WiFi hotspot in a mall.
 
-public network_A, public network_B, public network_D and public network_E could be different coffee houses with free wifi.
+Public network_A, public network_B, public network_D, and public network_E could be different coffee shops with free WiFi.
 
-{|   class="wikitable"
-!  align="left" | number
-!  align="left" | place
-!  align="left" | past usage
-!  align="left" | threat model
-!  align="left" | new recommendation
-|-  class="odd"
-|  align="left" | 1
-|  align="left" | home computer
-|  align="left" | real mac
-|  align="left" | none
-|  align="left" | macchiato mac random
-|-  class="even"
-|  align="left" | 2
-|  align="left" | public computer
-|  align="left" | real mac
-|  align="left" | changing mac gets admin attention and/or network breaks
-|  align="left" | real mac
-|-  class="odd"
-|  align="left" | 3
-|  align="left" | public network_A
-|  align="left" | real mac
-|  align="left" | admin looks for consistent mac
-|  align="left" | real mac
-|-  class="even"
-|  align="left" | 4
-|  align="left" | public network_B
-|  align="left" | macchanger random mac_B
-|  align="left" | admin looks for consistent mac, but not for Tor or popular vendor ids
-|  align="left" | macchanger random mac_B
-|-  class="odd"
-|  align="left" | 5
-|  align="left" | public network_C
-|  align="left" | never used
-|  align="left" | many users, admin logs mac addresses and looks out for unpopular vendor ids
-|  align="left" | random macchiato mac
-|-  class="even"
-|  align="left" | 6
-|  align="left" | public network_D
-|  align="left" | never used
-|  align="left" | admin logs mac addresses, looks for unpopular vendor ids, looks for consistent mac
-|  align="left" | macchiato mac_D
-|-  class="odd"
-|  align="left" | 7
-|  align="left" | public network_E
-|  align="left" | never used
-|  align="left" | admin logs mac addresses, looks for unpopular vendor ids, looks for consistent mac
-|  align="left" | macchiato mac_E
+{| class="wikitable"
+! align="left" | Number
+! align="left" | Place
+! align="left" | Past Usage
+! align="left" | Threat Model
+! align="left" | New Recommendation
+|- class="odd"
+
+| align="left" | 1
+| align="left" | Home computer
+| align="left" | Real MAC
+| align="left" | None
+| align="left" | Macchiato MAC random
+|- class="even"
+
+| align="left" | 2
+| align="left" | Public computer
+| align="left" | Real MAC
+| align="left" | Changing MAC draws admin attention and/or breaks network access
+| align="left" | Real MAC
+|- class="odd"
+
+| align="left" | 3
+| align="left" | Public network_A
+| align="left" | Real MAC
+| align="left" | Admin monitors for consistent MAC addresses
+| align="left" | Real MAC
+|- class="even"
+
+| align="left" | 4
+| align="left" | Public network_B
+| align="left" | Macchanger random MAC_B
+| align="left" | Admin checks for consistent MAC addresses but does not monitor Tor usage or vendor IDs
+| align="left" | Macchanger random MAC_B
+|- class="odd"
+
+| align="left" | 5
+| align="left" | Public network_C
+| align="left" | Never used
+| align="left" | High user volume; admin logs MAC addresses and detects uncommon vendor IDs
+| align="left" | Random Macchiato MAC
+|- class="even"
+
+| align="left" | 6
+| align="left" | Public network_D
+| align="left" | Never used
+| align="left" | Admin logs MAC addresses, detects uncommon vendor IDs, and looks for consistency
+| align="left" | Macchiato MAC_D
+|- class="odd"
+| align="left" | 7
+| align="left" | Public network_E
+| align="left" | Never used
+| align="left" | Admin logs MAC addresses, detects uncommon vendor IDs, and looks for consistency
+| align="left" | Macchiato MAC_E
+|-
+
 |}
 
-Legend:
+'''Legend:'''
 
-* Consistent mac: always the same after choosing one. Not showing up with a new mac each time.
-* [https://github.com/EtiennePerot/macchiato macchiato]
-* macchiato mac random: popular vendor id, latter part varies every time
-* macchiato mac_D (or E): popular vendor id, latter part was random when the mac address was first created, after creating macchiato mac_D always get macchiato mac_D when choosing macchiato mac_D
+* '''Consistent MAC:''' Always the same once chosen, instead of generating a new one each time.
+* '''[https://github.com/EtiennePerot/macchiato Macchiato]'''
+* '''Macchiato MAC random:''' Uses a popular vendor ID, but the latter part changes randomly each time.
+* '''Macchiato MAC_D (or E):''' Uses a popular vendor ID; the latter part is randomly generated upon first use but remains consistent when selecting Macchiato MAC_D or MAC_E in the future.
 
-= Or in words... =
+= Or in Words... =
 
-# "I am using my home computer, give me a macchiato mac random. I don't really need it, just give it to me. Feel so much better. Just in case."
-# "I am using a public computer, don't change the mac. Otherwise this might bring unwanted admin attention or the network simply gets unaccessible."
-# "I am using public network_A. I always used my real mac in past. The admin knows everyone and gets suspicious if someone changes its mac. Stick to my real mac."
-# "I am in public network_B again, I previously used macchanger to get the random mac_B. The admin looks if I am sticking to that mac, but doesn't know, that the vendor id doesn't even exist. Stick to the old random mac_B."
-# "I am using public network C for the first time. There are many users. I think the admin logs all mac addresses. I also think the admin knows about unpopular vendor ids and gnu macchanger. It is a popular network. The admin however won't remember me or anyone else. Give me a random mac from with a popular vendor id (macchiato)."
-# "I am using public network D for the first time. I think the admin logs mac addresses. I also think the admin looks for unpopular mac addresses and knows gnu macchanger. The admin also get suspicious if someone changes its mac. Give me a random mac with a popular vendor id, call it mac_D and re-use it when I next time visit this network."
-# "Yes, network_E has very similarities with network_D. I think the admin logs mac addresses. I also think the admin looks for unpopular mac addresses and knows gnu macchanger. The admin also get suspicious if someone changes its mac. Give me a random mac with a popular vendor id, call it mac_E and re-use it when I next time visit this network. Don't confuse it with other mac's"
+# "I am using my home computer. Give me a Macchiato MAC random. I don't really need it, but it makes me feel better. Just in case."
+# "I am using a public computer. Don't change the MAC. Otherwise, this might attract unwanted admin attention or make the network inaccessible."
+# "I am using public network_A. I have always used my real MAC in the past. The admin knows all users and gets suspicious if someone changes their MAC. Stick to my real MAC."
+# "I am in public network_B again. I previously used Macchanger to get a random MAC_B. The admin checks for consistency but does not recognize that the vendor ID is non-existent. Stick to my old random MAC_B."
+# "I am using public network_C for the first time. Many users connect here, and I believe the admin logs all MAC addresses. I also suspect the admin is aware of uncommon vendor IDs and GNU Macchanger. Since this is a popular network, the admin won’t remember me specifically. Assign me a random MAC from a popular vendor ID (Macchiato)."
+# "I am using public network_D for the first time. I suspect the admin logs MAC addresses and recognizes uncommon ones. The admin also gets suspicious if someone changes their MAC frequently. Assign me a random MAC from a popular vendor ID, name it MAC_D, and ensure I use the same one whenever I revisit this network."
+# "Yes, network_E is very similar to network_D. I suspect the admin logs MAC addresses and detects uncommon ones. The admin also gets suspicious if someone changes their MAC frequently. Assign me a random MAC from a popular vendor ID, name it MAC_E, and ensure I use the same one whenever I revisit this network. Don't confuse it with other MACs."
 
 = Thoughts =
 
-Supporting use cases 6 and 7 would either require persistence or the user would have to remember or write down the mac address, which is difficult.
+Supporting use cases 6 and 7 would either require persistence or require the user to remember or write down the MAC address, which is difficult.
 
-An ideal solution doesn't require persistence.
+An ideal solution should not require persistence.
 
-The user enters a word and using that word will result in creating the same macchiato mac_D or macchiato mac_E.
+A possible approach is for the user to enter a keyword, and using that keyword will consistently generate the same Macchiato MAC_D or Macchiato MAC_E.
 
 = Newer =
-Thesis "Like with Tor and anonymity in general. You cannot hide the fact you are trying to hide."
+Thesis:
 
-From https://tails.boum.org/contribute/design/MAC_address/ ...
+{{quotation
+|quote=Like with Tor and anonymity in general, you cannot hide the fact that you are trying to hide.
+}}
 
-* AdvCapSniff
-* AdvCapRecords
-* AdvCapOwners
+See also:
 
-* AdvGoalTracking
-* AdvGoalProfiling
-* AdvCapOwners
-* AdvGoalIdTails
-* AdvGoalIdMacSpoof
+* [[Fingerprint]]
+* [[Hide Tor from your Internet Service Provider]]
+* https://forums.whonix.org/t/idea-proposal-of-cover-traffic-a-fake-workstation/146
 
-* AvoidTracking
-* AvoidIdTails
-* AvoidIdMacSpoof
-* AvoidConnectionProbs
+From [https://tails.boum.org/contribute/design/MAC_address/ this Tails design page]:
+
+* '''AdvCapSniff'''
+* '''AdvCapRecords'''
+* '''AdvCapOwners'''
+
+* '''AdvGoalTracking'''
+* '''AdvGoalProfiling'''
+* '''AdvCapOwners'''
+* '''AdvGoalIdTails'''
+* '''AdvGoalIdMacSpoof'''
+
+* '''AvoidTracking'''
+* '''AvoidIdTails'''
+* '''AvoidIdMacSpoof'''
+* '''AvoidConnectionProbs'''
+
+= Leak-proof MAC Randomization - Technical Implementation Challenges =
+
+Leak-proof MAC randomization - ensuring that the real MAC address is never leaked - is very difficult to implement. Implementations using tools such as <code>NetworkManager</code>, <code>udev</code>, and/or the init system (such as <code>systemd</code>) might, in theory, leak the original MAC address. This is because these are complex code bases with intricate system interactions, where MAC randomization was not originally supported but later bolted on as an afterthought. Supporting MAC randomization at a different level, such as by the kernel, might be a more reliable approach to MAC randomization.
+
+Related bug reports and discussions:
+
+* NetworkManager bug report: [https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1710 CRITICAL - True MAC address leaked during NM startup, despite rand/cloned being configured]
+* https://forums.whonix.org/t/mac-randomization-is-flawed-proposed-new-solution/21366/8
+* https://forum.qubes-os.org/t/mac-randomization-is-flawed-proposed-new-solution/32150
+* https://gitlab.tails.boum.org/tails/tails/-/issues/11293#note_253628
+
+Related general security ecosystem-wide issues:
+
+* {{kicksecure_wiki
+|wikipage=Dev/About_Computer_(In)Security
+|text=About Computer (In)Security
+}}
 
 = See Also =
-* [[Pre_Install_Advice#MAC_Address]]
-* https://tails.boum.org/contribute/design/MAC_address/
-* https://gitlab.tails.boum.org/tails/tails/-/issues/5421
-* https://gitlab.tails.boum.org/tails/blueprints/-/wikis/macchanger/
+* {{kicksecure_wiki
+|wikipage=MAC_Address
+|text=MAC Address
+}}
+* {{whonix_wiki
+|wikipage=MAC_Address
+|text=MAC Address
+}}
+* [https://tails.boum.org/contribute/design/MAC_address/ Tails MAC Address Design]
+* [https://gitlab.tails.boum.org/tails/tails/-/issues/5421 MAC Changer Issue]
+* [https://gitlab.tails.boum.org/tails/blueprints/-/wikis/macchanger/ Tails MAC Changer Wiki]
 * Worth reading! Thanks to Tails!
 
 {{Footer}}
-
 [[Category:Development]] [[Category:Design]]
