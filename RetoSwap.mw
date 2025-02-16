@@ -1,16 +1,217 @@
 {{Header}}
 {{Title|title=
-RetoSwap
+RetoSwap (previously Haveno-reto), a P2P Monero DEX
 }}
 {{#seo:
-|description=todo
+|description=How to set up RetoSwap (previously Haveno-reto) - a P2P decentralized exchange (DEX) based on Monero - in {{project_name_long}}
 }}
 {{intro|
-todo
+How to set up RetoSwap (previously Haveno-reto) - a P2P decentralized exchange (DEX) based on Monero - in {{project_name_long}}
 }}
 {{Community Support|scope=page}}
 = Introduction =
-todo
+== Name ==
+The name of the app was changed from '''Haveno-reto''' to '''RetoSwap''' on 22 November 2024<ref>https://x.com/RetoSwap/status/1859903768164532588</ref>, but the old name can still be seen when launching the app, and people online may variously refer to it as either name or even as plain "Haveno" (technically, Haveno or Haveno DEX is the name of the upstream project).
+
+== Background ==
+RetoSwap is a fork of Haveno (Haveno DEX), which is itself a fork of Bisq.
+
+RetoSwap is a peer-to-peer (P2P) decentralized exchange (DEX), meaning that each user that runs the RetoSwap software is running their own server (built into the software) for trades; there is no central server where trades are coordinated.
+
+RetoSwap has a built-in Monero (currency code: XMR) wallet and uses Monero as the base pair for all trades on its platform.
+
+Haveno (Haveno DEX) is the upstream (parent) project of RetoSwap and doesn't feature any actual live trading with real cryptocurrencies (it only has testnet/stagenet trading).
+
+Bisq<ref>See the [[Bisq|{{project_name_short}} wiki page on Bisq]]</ref> is the project that Haveno was forked from. It is a P2P DEX with a built-in Bitcoin (BTC) wallet and uses Bitcoin as the base pair for all trades on its platform.
+
+== Links ==
+=== RetoSwap Links ===
+
+RetoSwap official website:  
+https://retoswap.com/
+
+RetoSwap official X/Twitter account:  
+https://x.com/RetoSwap/
+
+RetoSwap GitHub project homepage:  
+https://github.com/retoaccess1/haveno-reto
+
+RetoSwap GitHub project releases page (downloads available here):  
+https://github.com/retoaccess1/haveno-reto/releases/
+
+RetoSwap old homepage (redirects to retoswap.com):  
+https://haveno-reto.com
+
+=== Haveno (Haveno DEX) Links ===
+
+Haveno official website:  
+https://haveno.exchange/
+
+Haveno official FAQ:  
+https://haveno.exchange/faq/
+
+Haveno GitHub project homepage:  
+https://github.com/haveno-dex/haveno
+
+Haveno GitHub project issues page (issues with RetoSwap can generally be reported there):  
+https://github.com/haveno-dex/haveno/issues
+
+=== Other Guides ===
+
+boldsucks's Haveno Documentation:  
+https://boldsuck.codeberg.page/haveno-docs/
+
+boldsucks's guide to setting up RetoSwap on {{project_name_short}}:  
+https://boldsuck.codeberg.page/haveno-docs/haveno-ui/tor_advanced/#whonix
+
+= Installation =
+{{#widget:Icon_Bullet_List
+|item=fa-solid fa-info cs-blue,This guide was created in February 2025 and is based on {{project_name_long}} 17.2.8.5 and RetoSwap 10.0.18. As the app's name was recently changed from Haveno-reto, some file paths referenced below use the name <code>haveno</code> or <code>haveno-reto</code>. This may change in the future.
+}} <!-- End #widget:Icon_Bullet_List -->
+
+== System Requirements ==
+Generally, RetoSwap doesn't use a lot of system resources, as it connects to remote Monero nodes by default and doesn't download any full blockchains to the user's computer. It can also be set up to use a local Monero node, but that is beyond the scope of this guide.
+
+Generally, the storage space used by RetoSwap will be under 100 MB.
+
+== Downloading & Installing RetoSwap ==
+{{#widget:Icon_Bullet_List
+|item=fa-solid fa-info cs-blue,All of the steps for downloading & installing the RetoSwap .deb file take place on {{project_name_workstation_short}}
+}} <!-- End #widget:Icon_Bullet_List -->
+
+'''1. Download RetoSwap:''' Download the latest .deb version of RetoSwap from:  
+
+https://github.com/retoaccess1/haveno-reto/releases/
+
+(For example, for RetoSwap v1.0.18, download  
+https://github.com/retoaccess1/haveno-reto/releases/download/v1.0.18/haveno-linux-deb.zip).
+
+You can also go to the official RetoSwap website's download section:
+
+https://retoswap.com/#download  
+
+and under "RetoSwap for Linux," click the .deb button.
+
+It should download automatically to:
+
+<code>/home/user/.tb/tor-browser/Browser/Downloads/</code>.
+
+'''2. Verify the signature''' (out of scope for this guide)
+
+{{Always verify signatures reminder}}
+
+'''3. Extract the archive:''' Right-click on the downloaded .zip (e.g., <code>/home/user/.tb/tor-browser/Browser/Downloads/haveno-linux-deb.zip</code>) and click “Extract Here.”
+
+'''4. Install the .deb:''' Open the newly extracted folder (e.g., <code>/home/user/.tb/tor-browser/Browser/Downloads/haveno-linux-deb/</code>) and in a terminal window type (with a trailing space):
+
+{{CodeSelect|code=
+sudo dpkg -i 
+}}
+
+Then, drag the .deb installer from the folder into the terminal to complete the file path (e.g., for RetoSwap v1.0.18, it should read  
+<code>sudo dpkg -i '/home/user/.tb/tor-browser/Browser/Downloads/haveno-linux-deb/haveno-v1.0.18-linux-x86_64-installer.deb'</code>).
+
+Press enter; RetoSwap should be installed to <code>/opt/haveno/</code>.
+
+If it fails because of missing dependencies, run the command:
+
+{{CodeSelect|code=
+sudo apt install -f
+}}
+
+to download and install the missing dependencies, and then try the original <code>sudo dpkg -i '[...].deb'</code> command again.
+
+'''5. Create a desktop shortcut:''' Copy (or drag) <code>/opt/haveno/lib/haveno-Haveno.desktop</code> to your desktop.
+
+== Setting Up the Tor Hidden Service ==
+{{#widget:Icon_Bullet_List
+|item=fa-solid fa-info cs-blue,All of the steps for setting up the Tor hidden service take place on {{project_name_gateway_short}}
+}} <!-- End #widget:Icon_Bullet_List -->
+
+'''6. Create the Tor hidden service:''' {{Open with root rights|filename=
+/usr/local/etc/torrc.d/50_user.conf
+}}
+
+Edit the file to add the following:<ref>10.152.152.11 refers to the internal IP address of {{project_name_workstation_short}}. You can verify this by running the command <code>ifconfig</code> on {{project_name_workstation_short}}. TCP port 9999 is the default port for RetoSwap.</ref>
+
+<pre>
+# RetoSwap (Haveno-reto) incoming anonymity connections
+HiddenServiceDir /var/lib/tor/haveno/
+HiddenServicePort 9999 10.152.152.11:9999
+</pre>
+
+Save and close the file.
+
+'''7. Reload Tor:'''
+{{CodeSelect|code=
+sudo systemctl reload tor
+}}
+
+'''8. Get your hidden service address:''' Retrieve your newly generated hidden service .onion address:
+
+{{CodeSelect|code=
+sudo cat /var/lib/tor/haveno/hostname
+}}
+
+It should look something like:
+
+<code>exampleonionaddress52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion</code>
+
+Copy and keep your .onion address handy for the next steps.
+
+== Setting Up the Firewall ==
+{{#widget:Icon_Bullet_List
+|item=fa-solid fa-info cs-blue,All of the steps for setting up the firewall take place on {{project_name_workstation_short}}
+}} <!-- End #widget:Icon_Bullet_List -->
+
+'''9. Open the firewall port:''' {{Open with root rights|filename=
+/etc/whonix_firewall.d/50_user.conf
+}}
+
+Edit the file to add the following:<ref>TCP port 9999 is the default port for RetoSwap.</ref>
+<pre>
+# RetoSwap (Haveno-reto) firewall TCP port 9999
+EXTERNAL_OPEN_PORTS+=" 9999 "
+</pre>
+Save and close the file.
+
+'''10. Reload the firewall:'''
+{{CodeSelect|code=
+sudo whonix_firewall
+}}
+
+== Setting Up RetoSwap ==
+{{#widget:Icon_Bullet_List
+|item=fa-solid fa-info cs-blue,All of the steps for setting up RetoSwap take place on {{project_name_workstation_short}}
+}} <!-- End #widget:Icon_Bullet_List -->
+
+'''11. Set your hidden service address:''' Open the file <code>/home/user/.local/share/Haveno-reto/haveno.properties</code> in an editor. 
+
+{{#widget:Icon_Bullet_List
+|item=fa-solid fa-info,This filepath uses the old name "Haveno-reto"; this might change in a future update of RetoSwap.
+}} <!-- End #widget:Icon_Bullet_List -->
+
+Edit the file to add the following:
+<pre>
+hiddenServiceAddress=
+</pre>
+followed by your hidden service .onion address from the section "Setting Up the Tor Hidden Service."
+
+It should look something like this:
+<pre>
+hiddenServiceAddress=exampleonionaddress52rck2vv4rvmdlkiu3zzui5du4xyclen53wid.onion
+</pre>
+Save and close the file.
+
+'''12. You're done!''' You can now run RetoSwap, and it should connect. If it fails, see the Troubleshooting section.
+
+== Troubleshooting ==
+If RetoSwap fails to connect or gives errors on startup, try launching the app several times. This could be a network issue.
+
+There is also a forum topic dedicated to setting up RetoSwap on {{project_name_short}}, where you can get support:
+
+https://forums.whonix.org/t/installing-haveno-in-whonix/20014
+
 = Footnotes =
 {{reflist|close=1}}
 {{Footer}}
