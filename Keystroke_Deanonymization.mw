@@ -250,6 +250,58 @@ sudo systemctl restart kloak
 sudo systemctl status kloak
 }}
 
+== Qubes Event Buffering ==
+
+{{mbox
+|type = notice
+|image = [[File:Ambox_notice.png|40px|alt=Info]]
+|text = This feature is only available in Qubes OS R4.3 and later. At the time of this writing, Qubes OS R4.3 has not yet been released. Use of the pre-release builds is not recommended for inexperienced users or users with high security requirements.
+
+This is a feature built into Qubes OS. It is not a part of Whonix itself, and can be used with any Qubes OS virtual machine except for full desktop StandaloneVMs.
+}}
+
+Qubes OS is incompatible with Kloak, due to the fact that most VMs in Qubes OS do not use evdev to receive input. To provide the same benefits as Kloak despite these limitations, Qubes OS R4.3 provides a feature known as "event buffering". Whereas kloak would run within each individual VM, intercepting and buffering evdev input events, Qubes event buffering runs on dom0, catching X11 input events intended for a particular VM and buffering them before sending them to the VM. Qubes event buffering uses the same underlying algorithms as kloak, and should be similarly effective.
+
+To enable event buffering for a particular VM:
+
+'''1:''' Determine the VM you want to enable event buffering on. We will use <code>whonix-workstation-17-dvm</code> as our example here.
+
+'''2:''' Open a terminal in dom0.
+
+'''3:''' Run:
+
+{{CodeSelect|code=
+qvm-features whonix-workstation-17-dvm gui-events-max-delay 200
+}}
+
+This will enable event buffering on <code>whonix-workstation-17-dvm</code>, with a maximum buffer time of 200ms. If you want a longer buffer time, specify a larger number as the last argument.
+
+'''4:''' This setting does not take effect on currently running VMs. If <code>whonix-workstation-17-dvm</code> or any DispVMs based on it are running, shut them down.
+
+'''5:''' Done. Event buffering is now enabled for <code>whonix-workstation-17-dev</code>. You should notice a delay in typing when you launch the VM next.
+
+= Limitations =
+== Kloak and Qubes Event Buffering ==
+Both kloak and Qubes event buffering have some limitations users MUST be aware of before relying on them for security:
+
+* '''Mouse events are cloaked, but not as well as keyboard events.''' Pointing devices (mice, touchpads, trackballs, etc.) produce a very large number of events when the pointer is being moved by the user. Both kloak and Qubes event buffering use a scheduling system that queues events as they arrive, and tries to ensure no event is delayed longer than the set maximum delay value. Because pointing devices flood the queue with events when the pointer is moved, this usually results in almost all of the events involved in a pointer movement being delayed for exactly the maximum delay time. This gets rid of almost all anonymizing jitter, and may allow an adversary to fingerprint and identify the user via mouse movements even if kloak or event buffering is being used.
+* '''Typing may be substantially more difficult.''' Because kloak and event buffering both queue, delay, and release keystrokes at semi-randomly chosen times, typing is not as easy when using kloak. Lag is usually noticeable and unpredictable. Shorter maximum delay times can improve usability, but only at the cost of providing less anonymity.
+* '''Biometric software can tell that you're using kloak.''' When using kloak, one's typing rhythm will appear very unnatural and strange to biometric software, which is a pretty clear indicator that one is using kloak or software similar to it. Kloak makes no attempt to mask its use. It only is able to make all kloak and kloak-alike users look similar to each other. This is similar to the limitations of Tor - one cannot tell which Tor user is accessing a resource, but they can tell very easily that the resource is being accessed over Tor.
+* '''Legitimate uses of biometric software will break.''' If you use software that uses keystroke biometrics to identify you, it will almost certainly fail to identify you if you are using kloak. This may require you to temporarily disable kloak before using certain services.
+
+== Kloak only ==
+The following limitations apply only to kloak, not to Qubes event buffering:
+
+* '''Kloak only works if the system uses the evdev input driver.''' Almost all modern Linux distributions use evdev by default for input devices. Qubes OS is a notable exception - it uses its own virtual input device, which the X server in each qube reads from. Kloak is not capable of intercepting events from non-evdev-based input devices.
+* '''Kloak does not intercept events that are fed directly to the system's display server without going through an input device driver.''' Any form of emulated input cannot be intercepted by kloak. Remote desktop software frequently uses emulated input for obvious reasons. Another common class of software that makes use of emulated input is Keyboard-Video-Mouse (KVM) software such as Barrier, Synergy, and Input Leap. If you need kloak to provide anonymity in these scenarios, you '''must''' run kloak on the machine that the physical keyboard and mouse are attached to. This will obfuscate the movements the host machine sees, and therefore obfuscate the movements that are sent to other machines via emulated input.
+
+== Qubes event buffering only ==
+The following limitations apply only to Qubes event buffering, not kloak:
+
+* '''Event buffering is not available in any version of Qubes R4.2 or earlier.''' It will be present in Qubes R4.3.0 and later.
+* '''There is no easy way to enable or configure event buffering.''' The only way to enable and configure event buffering is using the <code>qvm-features</code> command in a dom0 terminal. A configuration feature event buffering may be added to Qube Manager in the future.
+* '''Event buffering is not enabled by default on Qubes-Whonix-Workstation.''' It must be explicitly enabled by the end user. This is expected to be fixed. See [https://github.com/QubesOS/qubes-issues/issues/9771 Enable X11 event buffering in Whonix by default].
+
 = Defense Testing =
 You can test that kloak actually works by trying a keystroke test website. https://vmonaco.com/device-fingerprinting/ is a good choice as it is free, open source, and requires no personal data or signup process to use. The code is visible at https://github.com/vmonaco/device-fingerprinting.
 
@@ -316,6 +368,12 @@ References:
 * https://forums.whonix.org/t/current-state-of-kloak/5605
 * https://phabricator.whonix.org/T583
 * https://forums.whonix.org/t/device-fingerprinting-with-peripheral-timestamps-mouse-fingerprinting/12114
+
+= Potential future development research =
+
+* Do X11 or Wayland provide hooks that would allow intercepting input events as read by the Wayland compositor or X server, before those events are sent directly to applications? This would allow kloak to work even with setups that don't use evdev.
+* Could a "toggle" feature be added to kloak to allow temporarily enabling and disabling it without having to stop the kloak service entirely? This would be useful for users who have high anonymity requirements, but also have to use systems that use keystroke biometrics as a legitimate method of authentication.
+* Can mouse events be obfuscated better? It might be possible to randomly select times at which to deliver mouse events, then deliver all queued mouse events at once at those selected times, with intermediate events "squashed" together so that the mouse simply jumps to the position it would have ended up in had all mouse events been processed normally. If this is done, mouse events should probably be handled in a separate queue from keyboard events.
 
 = See Also =
 * [https://raw.githubusercontent.com/vmonaco/vmonaco.github.io/master/papers/Device%20Fingerprinting%20with%20Peripheral%20Timestamps.pdf Device Fingerprinting with Peripheral Timestamps]
