@@ -106,152 +106,32 @@ Most will probably want to avoid phones altogether and use tablets instead, but 
 
 = Keystroke Fingerprinting =
 
-== Introduction ==
+Keystroke dynamics is a way to recognize people based on how they type. Everyone types in a unique way, just like handwriting or a signature. This poses a risk to anonymity and privacy because even if someone hides their IP address (like using Tor), their typing style can still expose their identity.
 
-Keystroke biometric algorithms have advanced to the point where it is viable to fingerprint individuals based on soft biometric traits. This is a privacy risk because masking spatial information -- such as the IP address via Tor -- is insufficient for anonymity. <ref>
-https://github.com/vmonaco/keystroke-obfuscation
-</ref>
+This is being elaborated on the [[Keystroke_Deanonymization|Keystroke Deanonymization]] wiki page.
 
-Unique fingerprints can be derived from various dynamics: <ref name=keystroke_dynamics>https://en.wikipedia.org/wiki/Keystroke_dynamics</ref>
+In addition, users must also disguise their linguistic style to combat [[Surfing_Posting_Blogging#Stylometry|stylometric analysis]] and be aware of [[Surfing_Posting_Blogging#Mouse_Fingerprinting|mouse tracking techniques]] available to adversaries.
 
-* Typing speed.
-* Exactly when each key is located and pressed (seek time), how long it is held down before release (hold time), and when the next key is pressed (flight time).
-* How long the breaks/pauses are in typing.
-* How many errors are made and the most common errors produced.
-* How errors are corrected during the drafting of material.
-* The type of local keyboard that is being used.
-* The likelihood of being right or left-handed.
-* Rapidity of letter sequencing indicating the user's likely native language.
+Keystroke Anonymization Tool (Kloak)
 
-A unique neural algorithm generates a primary pattern for future comparison. It is thought that most individuals produce keystrokes that are as unique as handwriting or signatures. This technique is imperfect; typing styles can vary during the day and between different days depending on a person's emotional state and energy level. <ref name=keystroke_dynamics />
-
-Unless protective steps are taken to obfuscate the time intervals between key press and release events, it is likely most people can be deanonymized based on their keystroke manner and rhythm biometrics; see [https://arxiv.org/pdf/1609.07612.pdf Obfuscating Keystroke Time Intervals to Avoid Identification and Impersonation]. Adversaries are likely to have samples of clearnet keystroke fingerprinting which they can compare with "anonymous" Tor samples. One basic precaution is to avoid typing into browsers with JavaScript enabled, since this enables this deanonymization vector. Text should be written in an offline text editor and then copied and pasted into the web interface when it is complete.
-
-There are several related anonymity threats that need to be considered. For instance:
-
-* Linguistic style must be disguised to combat [[Surfing_Posting_Blogging#Stylometry|stylometric analysis]].
-* [[Surfing_Posting_Blogging#Mouse_Fingerprinting|Mouse tracking techniques]] must also be countered.
-
-== Keystroke Anonymization Tool (kloak) ==
-
+{{anchor|Keystroke Anonymization Tool (kloak)}}
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
 | text    = Platform Specific Notice:
 
 * [[{{non_q_project_name_short}}|{{non_q_project_name_short}}]]: Kloak is installed in [[{{project_name_workstation_short}}|{{project_name_workstation_short}}]] by default.
-* [[{{q_project_name_short}}|{{q_project_name_short}}]]: Unfortunately [[unsupported]]. <ref>
+* [[{{q_project_name_short}}|{{q_project_name_short}}]]: At time of writing - unfortunately [[unsupported]]. <ref>
 * https://github.com/QubesOS/qubes-issues/issues/2558
 * https://github.com/QubesOS/qubes-issues/issues/1850
 * https://github.com/vmonaco/kloak/issues/74
 * Using <code>/dev/input/event0</code> in Qubes VMs [https://forums.whonix.org/t/current-state-of-kloak/5605/6 will not work since not a keyboard device].
-</ref>
+</ref> However, kloak-alike functionality may become available in Qubes R4.3 and above. For more information and updates, see [[Keystroke_Deanonymization#Qubes_Event_Buffering|Qubes Event Buffering]].
 }}
-
-=== Overview ===
-
-kloak is designed to stymie adversary attempts to identify and/or impersonate users' biometric traits. The GitHub site succinctly describes kloak's purpose and the tradeoff between usability and the level of privacy. Notably, shorter time delays between keystrokes and release events reduces overall anonymity: <ref>
-https://github.com/Whonix/kloak
-</ref>
-
-<blockquote>kloak is a privacy tool that makes keystroke biometrics less effective. This is accomplished by obfuscating the time intervals between key press and release events, which are typically used for identification. <b>This project is experimental.</b>
-
-...
-
-kloak works by introducing a random delay to each key press and release event. This requires temporarily buffering the event before it reaches the application (e.g., a text editor).
-
-The maximum delay is specified with the -d option. This is the maximum delay (in milliseconds) that can occur between the physical key events and writing key events to the user-level input device. The default is 100 ms, which was shown to achieve about a 20-30% reduction in identification accuracy and doesn't create too much lag between the user and the application (see the paper below). As the maximum delay increases, the ability to obfuscate typing behavior also increases and the responsive of the application decreases. This reflects a tradeoff between usability and privacy.</blockquote>
-
-While kloak makes it hard for adversaries to identify individuals or to replicate their typing behavior -- for example to overcome two-factor authentication based on keystroke biometrics -- it is not perfect:
-
-* Small delays are not effective; higher values that can be tolerated are preferable.
-* It does not address stylometric threats.
-* Repeated (held-down) key presses that repeat at a unique rate can lead to identification.
-
-=== Testing and Interpretation ===
-NOTE: The test website documented below (<nowiki>keytrac.net</nowiki>) seems to be permanently down. This wiki page needs yet to be updated to using one or multiple of the following tests. Help welcome!
-
-* https://vmonaco.com/device-fingerprinting/
-* https://www.typingdna.com/demo-sametext.html
-* TODO: research https://github.com/topics/keystroke-dynamics
-** https://forums.whonix.org/t/current-state-of-kloak/5605/60
-
-It is recommended to test that kloak is actually working by trying an <nowiki>https://www.keytrac.net/en/tryout</nowiki> online keystroke biometrics demo. Three different scenarios are available, but "Train normal" (without kloak running) is <u>not</u> recommended for anonymity reasons:
-
-# Train normal, test normal
-# Train normal, test kloak
-# Train kloak, test kloak
-
-The KeyTrac demo allows the entering of a username and password on the enrollment page and then testing it on an authentication page. Below is a sample result and interpretation of entering a username and password without/without kloak running, with both training methods.
-
-'''Table:''' ''Sample kloak Test Results''
-
-{| class="wikitable"
-|-
-! '''kloak Configuration'''
-! '''Results and Interpretation'''
-|-
-
-! Train normal, test normal
-|
-* trial 1: 94% accuracy identified
-* trial 2: 92% accuracy
-* trial 3: 94% ..
-|-
-
-! Train normal, test kloak
-|
-* trial 1: 18%
-* trial 2: 15%
-* trial 3: 19%
-|-
-
-! Train kloak, test kloak
-|
-* trial 1: 40%
-* trial 2: 42%
-* trial 3 36%
-|-
-
-|}
-
-From the first test set it is evident that without kloak, users can be identified with a high degree of certainty. The second test set demonstrates that kloak definitely obfuscates typing behavior, making it difficult to authenticate or identify a particular user. Finally, the third set evidences that users who run kloak may look "similar" to one another. That is, it might be possible to identify kloak users from non-kloak users; if this is true, then the anonymity set will increase as more users start running kloak.
 
 = Mouse Fingerprinting =
 
-Mouse or cursor tracking occurs when software collects the positions of the mouse cursor and click data on the computer. While this can have benefits for web designers, it also poses a privacy (profiling) threat. Without explicit user consent or awareness, a range of data can be leaked via JavaScript, plug-ins or other software: <ref name=mouse_tracking>
-https://en.wikipedia.org/wiki/Mouse_tracking
-</ref>
-
-* JavaScript and Cascading Style Sheets (CSS) <ref>https://en.wikipedia.org/wiki/CSS</ref> readily allow developers to track users' mouse movements by simply entering relevant code on the webpage. This has already been employed on high-traffic websites, such as search engines.
-* Similar to JavaScript, installed and enabled software modules (plug-ins) can track mouse movements.
-* Specific mouse tracking software can reveal:
-** mouse location
-** time stamps
-** mouse clicks
-** a mouse cursor hovering over embedded links and its duration
-** the amount of time spent in certain webpage areas
-** heat maps
-** full playbacks which retrace the mouse's trajectory
-** mouse wheel tracking <ref>
-https://web.archive.org/web/20221022104548/http://jcarlosnorte.com/assets/fingerprint/
-</ref> <ref>
-https://web.archive.org/web/20221114004700/http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html
-</ref>
-
-For a practical example of deanonymization, consider someone who regularly uses both clearnet and Tor with JavaScript enabled. Individuals have distinctly unique characteristics associated with mouse movements and mouse clicks. Therefore, if these research methods are used in the public domain, supervised learning methods are likely to "learn" the typical behavior of individuals. Over time, it may be possible to link "anonymous" activities with the known profile of a clearnet user with a high degree of probability. <ref name=mouse_tracking /> <ref>
-This deanonymization technique is likely to succeed, since it is already used to lock persons out of secure accounts (pending identity verification) when their monitored behavior significantly deviates from behavior that has been learned.
-</ref>
-
-Disabling JavaScript cannot mitigate this as it can also be done with just CSS. <ref>
-https://web.archive.org/web/20190510191716if_/https://twitter.com/davywtf/status/1124146339259002881
-</ref> The author of the [[Keystroke_Deanonymization#mouse|kloak]] software tool has noted high accuracy device fingerprinting can be performed with DOM event timestamps and this affects both keyboard and mouse events.
-
-A solution was implemented that involves slights delays of mouse events to throw off phase estimation in kloak. <ref>
-https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507
-</ref> <ref>
-8-16ms should be enough for this purpose.
-</ref>
+Mouse fingerprinting happens when software records how a user moves their mouse or cursor and where they click. This can help website designers, but it also creates de-anonymization risks. See [[Keystroke_Deanonymization#Mouse_Fingerprinting|Mouse Fingerprinting]].
 
 = Covert Impairments in Human Computer Interaction =
 

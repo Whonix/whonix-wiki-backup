@@ -1,12 +1,15 @@
 {{Header}}
+{{title|title=
+Keystroke and Mouse Deanonymization
+}}
 {{#seo:
-|description=Deanonymization using user keystrokes, keystroke deanonymization, keystroke fingerprinting and defenses.
+|description=Deanonymization through keystroke and mouse movement analysis, fingerprinting techniques, and protective measures.
 |image=Keystroke.png
 }}
 {{web_related}}
 [[File:Keystroke.png|thumb]]
 {{intro|
-Deanonymization using user keystrokes, keystroke deanonymization, keystroke fingerprinting and defenses.
+Deanonymization through keystroke and mouse movement analysis, fingerprinting techniques, and protective measures.
 }}
 = Keystroke Dynamics =
 Keystroke biometric algorithms have advanced to the point where it is viable to fingerprint users based on soft biometric traits. This is a privacy risk because masking spatial information -- such as the IP address via Tor -- is insufficient to anonymize users. <ref>
@@ -33,11 +36,54 @@ Unless protective steps are taken to obfuscate the time intervals between key pr
 
 Typing on the most popular keyboard layout which is probably en-US might help mitigation however a more effective way is the following. At a minimum users should not type into browsers with Javascript enabled, since this opens up this deanonymization vector. Text should be written in an offline text editor and then copied and pasted into the web interface when it is complete.
 
-In addition, users must also disguise their linguistic style to combat [[Surfing_Posting_Blogging#Stylometry|stylometric analysis]] and be aware of [[Surfing_Posting_Blogging#Mouse_Fingerprinting|mouse tracking techniques]] available to adversaries.
+In addition, users must also disguise their linguistic style to combat [[Stylometry|stylometry (stylometric analysis)]] and be aware of [[Mouse_Fingerprinting|mouse tracking techniques]] available to adversaries.
+
+= Mouse Fingerprinting =
+
+Mouse or cursor tracking occurs when software collects the positions of the mouse cursor and click data on the computer. While this can have benefits for web designers, it also poses a privacy (profiling) threat. Without explicit user consent or awareness, a range of data can be leaked via JavaScript, plug-ins or other software: <ref name=mouse_tracking>
+https://en.wikipedia.org/wiki/Mouse_tracking
+</ref>
+
+* JavaScript and Cascading Style Sheets (CSS) <ref>https://en.wikipedia.org/wiki/CSS</ref> readily allow developers to track users' mouse movements by simply entering relevant code on the webpage. This has already been employed on high-traffic websites, such as search engines.
+* Similar to JavaScript, installed and enabled software modules (plug-ins) can track mouse movements.
+* Specific mouse tracking software can reveal:
+** mouse location
+** time stamps
+** mouse clicks
+** a mouse cursor hovering over embedded links and its duration
+** the amount of time spent in certain webpage areas
+** heat maps
+** full playbacks which retrace the mouse's trajectory
+** mouse wheel tracking <ref>
+* https://web.archive.org/web/20221022104548/http://jcarlosnorte.com/assets/fingerprint/
+* https://web.archive.org/web/20221114004700/http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html
+</ref>
+
+For a practical example of deanonymization, consider someone who regularly uses both clearnet and Tor with JavaScript enabled. Individuals have distinctly unique characteristics associated with mouse movements and mouse clicks. Therefore, if these research methods are used in the public domain, supervised learning methods are likely to "learn" the typical behavior of individuals. Over time, it may be possible to link "anonymous" activities with the known profile of a clearnet user with a high degree of probability. <ref name=mouse_tracking /> <ref>
+This deanonymization technique is likely to succeed, since it is already used to lock persons out of secure accounts (pending identity verification) when their monitored behavior significantly deviates from behavior that has been learned.
+</ref>
+
+Disabling JavaScript cannot mitigate this as it can also be done with just CSS. <ref>
+https://web.archive.org/web/20190510191716if_/https://twitter.com/davywtf/status/1124146339259002881
+</ref> The author of the [[Keystroke_Deanonymization#Kloak|Kloak]] software tool has noted high accuracy device fingerprinting can be performed with DOM event timestamps and this affects both keyboard and mouse events.
+
+A solution was implemented that involves slights delays of mouse events to throw off phase estimation in Kloak. <ref>
+https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507
+</ref>
+
+= Threat Model =
+There are two general situations where biometric fingerprinting via keyboard and mouse behavior can be a problem:
+
+* An adversary can observe your behavior both when using Tor and when using clearnet, and is attempting to link your activity on Tor to your identity.
+* An adversary can only observe your behavior over Tor, and is attempting to uniquely detect you separately from other Tor users.
+
+Without defenses, the adversary in either of these scenarios can obtain a fingerprint unique to you by observing your patterns of keystrokes as described above. '''Mouse movements can be fingerprinted in a manner very similar to keystrokes.''' If the adversary can observe your behavior both on Tor and when using clearnet, they can conclude that the person with your fingerprint when using Tor is the same person with your fingerprint when using clearnet, and thus deanonymize your Tor activity.
+
+If the adversary can only observe your behavior when using Tor, they cannot determine your real identity using biometric techniques alone, but they can still tell you apart from other Tor users. This may be problematic if an entity that provides a resource over Tor has the desire to prevent you from accessing the resource, or wishes to watch what you in particular do when you interact with the resource.
 
 = Defenses =
 == Kloak ==
-Kloak is an input device anonymization tool. It includes mitigations for keystroke fingerprinting as well as for masking unique user mouse movement behavior.<ref>https://github.com/vmonaco/kloak/pull/38</ref><ref>https://github.com/vmonaco/kloak/pull/50#issuecomment-1657250132</ref><ref>https://arxiv.org/pdf/2101.09087.pdf</ref>
+Kloak is an input device anonymization tool. It includes mitigations for keystroke fingerprinting as well as for masking unique user mouse movement behavior.<ref>https://github.com/vmonaco/kloak/pull/38</ref><ref>https://github.com/vmonaco/kloak/pull/50#issuecomment-1657250132</ref><ref>https://arxiv.org/pdf/2101.09087.pdf</ref> '''Kloak does not mask mouse movement behavior as effective as it masks typing behavior, see [[Keystroke_Deanonymization#Limitations|Limitations]] below.'''
 
 * [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] supported by default.
 * [[Qubes|{{q_project_name_long}}]] Unavailable. <ref>
@@ -60,6 +106,20 @@ Kloak has the added benefit of foiling attacks that identify search queries in e
 </ref> <ref>
 https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slides_monaco.pdf
 </ref>
+
+kloak is designed to stymie adversary attempts to identify and/or impersonate users' biometric traits. The GitHub site succinctly describes kloak's purpose and the tradeoff between usability and the level of privacy. Notably, shorter time delays between keystrokes and release events reduces overall anonymity: <ref>
+https://github.com/Whonix/kloak
+</ref>
+
+<blockquote>kloak is a privacy tool that makes keystroke biometrics less effective. This is accomplished by obfuscating the time intervals between key press and release events, which are typically used for identification. <b>This project is experimental.</b>
+
+...
+
+kloak works by introducing a random delay to each key press and release event. This requires temporarily buffering the event before it reaches the application (e.g., a text editor).
+
+The maximum delay is specified with the -d option. This is the maximum delay (in milliseconds) that can occur between the physical key events and writing key events to the user-level input device. The default is 100 ms, which was shown to achieve about a 20-30% reduction in identification accuracy and doesn't create too much lag between the user and the application (see the paper below). As the maximum delay increases, the ability to obfuscate typing behavior also increases and the responsive of the application decreases. This reflects a tradeoff between usability and privacy.</blockquote>
+
+While kloak makes it hard for adversaries to identify individuals or to replicate their typing behavior -- for example to overcome two-factor authentication based on keystroke biometrics -- it is not perfect and has [[#Limitations]].
 
 === Rescue Keys ===
 Kloak by default recognizes a "rescue key" sequence, which will terminate the kloak process.
@@ -257,18 +317,22 @@ sudo systemctl status kloak
 |image = [[File:Ambox_notice.png|40px|alt=Info]]
 |text = This feature is only available in Qubes OS R4.3 and later. At the time of this writing, Qubes OS R4.3 has not yet been released. Use of the pre-release builds is not recommended for inexperienced users or users with high security requirements.
 
-This is a feature built into Qubes OS. It is not a part of Whonix itself, and can be used with any Qubes OS virtual machine except for full desktop StandaloneVMs.
+This is a feature built into Qubes OS. It is not a part of Whonix itself, and can be used with any Qubes OS virtual machine except for Qubes HVMs.
 }}
 
-Qubes OS is incompatible with Kloak, due to the fact that most VMs in Qubes OS do not use evdev to receive input. To provide the same benefits as Kloak despite these limitations, Qubes OS R4.3 provides a feature known as "event buffering". Whereas kloak would run within each individual VM, intercepting and buffering evdev input events, Qubes event buffering runs on dom0, catching X11 input events intended for a particular VM and buffering them before sending them to the VM. Qubes event buffering uses the same underlying algorithms as kloak, and should be similarly effective.
+Qubes Event Buffering is Kloak-alike software.
+
+Qubes OS is incompatible with Kloak, due to the fact that most VMs in Qubes OS do not use <code>evdev</code> to receive input. To provide the same benefits as Kloak despite these limitations, Qubes OS R4.3 provides a feature known as "event buffering". Whereas Kloak would run within each individual VM, intercepting and buffering <code>evdev</code> input events, Qubes event buffering runs on dom0, catching X11 input events intended for a particular VM and buffering them before sending them to the VM. Qubes event buffering uses the same underlying algorithms as Kloak, and should be similarly effective.
+
+'''Qubes event buffering does not mask mouse movement behavior as well as it masks typing behavior, see [[Keystroke_Deanonymization#Limitations|Limitations]] below.'''
 
 To enable event buffering for a particular VM:
 
-'''1:''' Determine the VM you want to enable event buffering on. We will use <code>whonix-workstation-17-dvm</code> as our example here.
+'''1.''' Determine the VM you want to enable event buffering on. We will use <code>whonix-workstation-17-dvm</code> as our example here.
 
-'''2:''' Open a terminal in dom0.
+'''2.''' Open a terminal in dom0.
 
-'''3:''' Run:
+'''3.''' Run:
 
 {{CodeSelect|code=
 qvm-features whonix-workstation-17-dvm gui-events-max-delay 200
@@ -276,30 +340,36 @@ qvm-features whonix-workstation-17-dvm gui-events-max-delay 200
 
 This will enable event buffering on <code>whonix-workstation-17-dvm</code>, with a maximum buffer time of 200ms. If you want a longer buffer time, specify a larger number as the last argument.
 
-'''4:''' This setting does not take effect on currently running VMs. If <code>whonix-workstation-17-dvm</code> or any DispVMs based on it are running, shut them down.
+'''4.''' This setting does not take effect on currently running VMs. If <code>whonix-workstation-17-dvm</code> or any DispVMs based on it are running, shut them down.
 
-'''5:''' Done. Event buffering is now enabled for <code>whonix-workstation-17-dev</code>. You should notice a delay in typing when you launch the VM next.
+'''5.''' Done. Event buffering is now enabled for <code>whonix-workstation-17-dvm</code>. You should notice a delay in typing when you launch the VM next.
 
 = Limitations =
 == Kloak and Qubes Event Buffering ==
-Both kloak and Qubes event buffering have some limitations users MUST be aware of before relying on them for security:
 
-* '''Mouse events are cloaked, but not as well as keyboard events.''' Pointing devices (mice, touchpads, trackballs, etc.) produce a very large number of events when the pointer is being moved by the user. Both kloak and Qubes event buffering use a scheduling system that queues events as they arrive, and tries to ensure no event is delayed longer than the set maximum delay value. Because pointing devices flood the queue with events when the pointer is moved, this usually results in almost all of the events involved in a pointer movement being delayed for exactly the maximum delay time. This gets rid of almost all anonymizing jitter, and may allow an adversary to fingerprint and identify the user via mouse movements even if kloak or event buffering is being used.
-* '''Typing may be substantially more difficult.''' Because kloak and event buffering both queue, delay, and release keystrokes at semi-randomly chosen times, typing is not as easy when using kloak. Lag is usually noticeable and unpredictable. Shorter maximum delay times can improve usability, but only at the cost of providing less anonymity.
-* '''Biometric software can tell that you're using kloak.''' When using kloak, one's typing rhythm will appear very unnatural and strange to biometric software, which is a pretty clear indicator that one is using kloak or software similar to it. Kloak makes no attempt to mask its use. It only is able to make all kloak and kloak-alike users look similar to each other. This is similar to the limitations of Tor - one cannot tell which Tor user is accessing a resource, but they can tell very easily that the resource is being accessed over Tor.
-* '''Legitimate uses of biometric software will break.''' If you use software that uses keystroke biometrics to identify you, it will almost certainly fail to identify you if you are using kloak. This may require you to temporarily disable kloak before using certain services.
+Both Kloak and Qubes event buffering have some limitations users '''MUST''' be aware of before relying on them for security:
+
+* '''Mouse events are cloaked, but not as effectively as keyboard events.''' Pointing devices (mice, touchpads, trackballs, etc.) produce a very large number of events when the pointer is being moved by the user. Both Kloak and Qubes event buffering use a scheduling system that queues events as they arrive and tries to ensure no event is delayed longer than the set maximum delay value. Because pointing devices flood the queue with events when the pointer is moved, this usually results in almost all of the events involved in a pointer movement being delayed for exactly the maximum delay time. This removes almost all anonymizing jitter and may allow an adversary to fingerprint and identify the user via mouse movements even if Kloak or event buffering is being used.
+* '''Typing may be substantially more difficult.''' Because Kloak and event buffering both queue, delay, and release keystrokes at semi-randomly chosen times, typing is not as easy when using Kloak. Lag is usually noticeable and unpredictable. Shorter maximum delay times can improve usability, but only at the cost of providing less anonymity.
+* '''Biometric software can tell that you're using Kloak.''' When using Kloak, one's typing rhythm will appear very unnatural and strange to biometric software, which is a clear indicator that one is using Kloak or similar software. Kloak makes no attempt to mask its use; it only ensures that all Kloak and Kloak-alike users appear similar to each other. This is similar to the limitations of Tor - one cannot tell which Tor user is accessing a resource or the true identity of the Tor user, but they can very easily tell that the resource is being accessed over Tor.
+* '''Legitimate uses of biometric software will break.''' If you use software that relies on keystroke biometrics to identify you, it will almost certainly fail to do so if you are using Kloak. This may require you to temporarily disable Kloak before using certain services.
+* Small delays are not effective; higher values that can be tolerated are preferable.
+* It does not address [[Stylometry]] threats.
+* Repeated (held-down) key presses that repeat at a unique rate can lead to identification.
 
 == Kloak only ==
-The following limitations apply only to kloak, not to Qubes event buffering:
 
-* '''Kloak only works if the system uses the evdev input driver.''' Almost all modern Linux distributions use evdev by default for input devices. Qubes OS is a notable exception - it uses its own virtual input device, which the X server in each qube reads from. Kloak is not capable of intercepting events from non-evdev-based input devices.
-* '''Kloak does not intercept events that are fed directly to the system's display server without going through an input device driver.''' Any form of emulated input cannot be intercepted by kloak. Remote desktop software frequently uses emulated input for obvious reasons. Another common class of software that makes use of emulated input is Keyboard-Video-Mouse (KVM) software such as Barrier, Synergy, and Input Leap. If you need kloak to provide anonymity in these scenarios, you '''must''' run kloak on the machine that the physical keyboard and mouse are attached to. This will obfuscate the movements the host machine sees, and therefore obfuscate the movements that are sent to other machines via emulated input.
+The following limitations apply only to Kloak, not to Qubes event buffering:
+
+* '''Kloak only works if the system uses the <code>evdev</code> input driver.''' Almost all modern Linux distributions use <code>evdev</code> by default for input devices. Qubes OS is a notable exception - it uses its own virtual input device, which the X server in each Qube reads from. Kloak is not capable of intercepting events from non-<code>evdev</code>-based input devices.
+* '''Kloak does not intercept events that are fed directly to the system's display server without going through an input device driver.''' Any form of emulated input cannot be intercepted by Kloak. Remote desktop software frequently uses emulated input for obvious reasons. Another common class of software that makes use of emulated input is Keyboard-Video-Mouse (KVM) software such as Barrier, Synergy, and Input Leap. If you need Kloak to provide anonymity in these scenarios, you '''must''' run Kloak on the machine that the physical keyboard and mouse are attached to. This will obfuscate the movements the host machine sees and, therefore, obfuscate the movements that are sent to other machines via emulated input.
 
 == Qubes event buffering only ==
-The following limitations apply only to Qubes event buffering, not kloak:
+
+The following limitations apply only to Qubes event buffering, not Kloak:
 
 * '''Event buffering is not available in any version of Qubes R4.2 or earlier.''' It will be present in Qubes R4.3.0 and later.
-* '''There is no easy way to enable or configure event buffering.''' The only way to enable and configure event buffering is using the <code>qvm-features</code> command in a dom0 terminal. A configuration feature event buffering may be added to Qube Manager in the future.
+* '''There is no easy way to enable or configure event buffering.''' The only way to enable and configure event buffering is using the <code>qvm-features</code> command in a dom0 terminal. A configuration feature for event buffering may be added to Qube Manager in the future.
 * '''Event buffering is not enabled by default on Qubes-Whonix-Workstation.''' It must be explicitly enabled by the end user. This is expected to be fixed. See [https://github.com/QubesOS/qubes-issues/issues/9771 Enable X11 event buffering in Whonix by default].
 
 = Defense Testing =
@@ -328,52 +398,47 @@ Other potential tests (not recommended):
 
 Previously KeyTrac was recommended for testing kloak. However, the KeyTrac demo is no longer available. When KeyTrac did exist, the following results were obtained by training and testing KeyTrac with and without kloak:
 
-{{Box|text=
-'''Train normal, test normal'''
+'''Table:''' ''Sample KeyTrac versus Kloak Test Results''
 
-trial 1: 94% accuracy identified
+{| class="wikitable"
+|-
+! '''Kloak Configuration'''
+! '''Results and Interpretation'''
+|-
 
-trial 2: 92% accuracy
+! Train normal, test normal
+|
+* trial 1: 94% accuracy identified
+* trial 2: 92% accuracy
+* trial 3: 94% ..
+|-
 
-trial 3: 94% ..
+! Train normal, test Kloak
+|
+* trial 1: 18%
+* trial 2: 15%
+* trial 3: 19%
+|-
 
-'''Train normal, test kloak'''
+! Train Kloak, test Kloak
+|
+* trial 1: 40%
+* trial 2: 42%
+* trial 3 36%
+|-
 
-trial 1: 18%
+|}
 
-trial 2: 15%
-
-trial 3: 19%
-
-'''Train kloak, test kloak'''
-
-trial 1: 40%
-
-trial 2: 42%
-
-trial 3 36%
-}}
-
-Without kloak users can be identified with very high certainty. The second set of tests show that kloak definitely obfuscates typing behavior, making it difficult to authenticate or identify a particular user. Third set: users running kloak may look "similar" to other users running kloak. That is, it might be possible to identify kloak users from non-kloak users. These results are similar to the results obtained using vmonaco's device fingerprinting test.
-
-References:
-
-* [[Surfing_Posting_Blogging#Mouse_Fingerprinting|Mouse Fingerprinting]]
-* https://github.com/vmonaco/keystroke-obfuscation
-* https://github.com/vmonaco/keystroke-obfuscation/issues/1#issuecomment-268598887
-* https://github.com/vmonaco/kloak
-* https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507
-* https://twitter.com/{{project_name_short}}/status/1111053743905226752
-* https://t.co/QcKyLppZBr
-* https://forums.whonix.org/t/current-state-of-kloak/5605
-* https://phabricator.whonix.org/T583
-* https://forums.whonix.org/t/device-fingerprinting-with-peripheral-timestamps-mouse-fingerprinting/12114
+Without Kloak users can be identified with very high certainty. The second set of tests show that Kloak definitely obfuscates typing behavior, making it difficult to authenticate or identify a particular user. Third set: users running Kloak may look "similar" to other users running Kloak. That is, it might be possible to identify Kloak users from non-Kloak users. These results are similar to the results obtained using vmonaco's device fingerprinting test.
 
 = Potential future development research =
 
-* Do X11 or Wayland provide hooks that would allow intercepting input events as read by the Wayland compositor or X server, before those events are sent directly to applications? This would allow kloak to work even with setups that don't use evdev.
-* Could a "toggle" feature be added to kloak to allow temporarily enabling and disabling it without having to stop the kloak service entirely? This would be useful for users who have high anonymity requirements, but also have to use systems that use keystroke biometrics as a legitimate method of authentication.
+* Do X11 or Wayland provide hooks that would allow intercepting input events as read by the Wayland compositor or X server, before those events are sent directly to applications? This would allow Kloak to work even with setups that don't use <code>evdev</code>.
+* Could a "toggle" feature be added to Kloak to allow temporarily enabling and disabling it without having to stop the Kloak service entirely? This would be useful for users who have high anonymity requirements but also have to use systems that use keystroke biometrics as a legitimate method of authentication.
 * Can mouse events be obfuscated better? It might be possible to randomly select times at which to deliver mouse events, then deliver all queued mouse events at once at those selected times, with intermediate events "squashed" together so that the mouse simply jumps to the position it would have ended up in had all mouse events been processed normally. If this is done, mouse events should probably be handled in a separate queue from keyboard events.
+
+= Resources =
+* arxiv: [https://arxiv.org/pdf/1609.07612.pdf Obfuscating Keystroke Time Intervals to Avoid Identification and Impersonation]
 
 = See Also =
 * [https://raw.githubusercontent.com/vmonaco/vmonaco.github.io/master/papers/Device%20Fingerprinting%20with%20Peripheral%20Timestamps.pdf Device Fingerprinting with Peripheral Timestamps]
@@ -381,8 +446,16 @@ References:
 * [[Surfing_Posting_Blogging|Surfing Posting Blogging]]
 
 = References =
+* https://github.com/vmonaco/keystroke-obfuscation
+* https://github.com/vmonaco/keystroke-obfuscation/issues/1#issuecomment-268598887
+* https://github.com/vmonaco/kloak
+* https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507
+* https://twitter.com/{{project_name_short}}/status/1111053743905226752
+* https://github.com/vmonaco/kloak/releases/tag/v0.2
+* https://forums.whonix.org/t/current-state-of-kloak/5605
+* https://forums.whonix.org/t/try-kloak-anti-keystroke-deanonymization-tool-and-leave-feedback/18826
+* https://forums.whonix.org/t/device-fingerprinting-with-peripheral-timestamps-mouse-fingerprinting/12114
+
 {{reflist|close=1}}
-
 {{Footer}}
-
 [[Category:Documentation]]
