@@ -1,19 +1,27 @@
 <!--{* For Documentation see Template:Archive_link . Weird formatting due to preventing spaces (Css important) *}-->
 
-<!--{if ! empty( $onion ) && $onion != 'none'}--><!--{$isOnion=true}--><!--{else}--><!--{$isOnion=false}--><!--{/if}-->
+<!--{if !isset( $url ) || $url == ""}-->[Broken Archive_Link: no url provided]<!--{else}-->
+<!--{assign var="urlIs" value="normal"}-->
+<!--{if $url|regex_replace:"/^https?:\/\/[^\.\/]+\.?[^\.\/]+\.onion(\/|$)/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="onion"}--><!--{/if}-->
+<!--{if $url|regex_replace:"/^https:\/\/web\.archive\.org\/web/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="aOrg"}--><!--{/if}-->
+<!--{if $url|regex_replace:"/^https:\/\/archive\.(today|fo|is|li|md|ph|vn)/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="aToday"}--><!--{/if}-->
 
-<a target="_blank" href="<!--{$url|escape:'html'}-->" class="external" rel="noreferrer noopener<!--{if $isOnion && $onion == 'copy'}--> nofollow<!--{/if}-->">
+<a target="_blank" href="<!--{$url|escape:"html"}-->" class="external" rel="noreferrer noopener<!--{if $urlIs == "onion"}--> nofollow<!--{/if}-->">
   <!--{$text}-->
 </a>
-<!--{if isset( $archive ) && $archive != 'none'}--><sup class="ext-link-to-archive<!--{if $isOnion}--> has-sibling<!--{/if}-->" title="Link to archived version">
-  <a target="_blank" rel="noreferrer noopener" title="Link to archived version" href="<!--{if isset( $archive ) && $archive == 'copy'}--><!--{$url|escape:'html'}--><!--{else}-->https://web.archive.org/web/<!--{$url|escape:'html'}--><!--{/if}-->">
+<!--{if isset( $archive ) && $archive != "none" && $urlIs != "onion" }--><!--{if $urlIs != "aToday" && $archive != "a_today"}--><sup class="ext-link-to-archive<!--{if $archive != "a_org" }--> has-sibling<!--{/if}-->" title="Link to archived version on archive.org">
+  <a target="_blank" rel="noreferrer noopener" title="<!--{if $urlIs == "aOrg"}-->This is an archive.org url<!--{else}-->Link to archived version on archive.org<!--{/if}-->" href="<!--{if $urlIs == "aOrg"}--><!--{$url|escape:"html"}--><!--{else}-->https://web.archive.org/web/<!--{$url|escape:"html"}--><!--{/if}-->">
     <img src="/w/images/7/73/Internet_Archive_logo.png" width="14" height="16" alt="The Web Archive" />
   </a>
-</sup><!--{/if}-->
-<!--{if $isOnion}--><sup class="ext-link-to-archive" title="Link to alternative onion url">
-  <a target="_blank" rel="noreferrer noopener nofollow" title="Link to alternative onion url" href="<!--{if $onion == 'copy'}--><!--{$url|escape:'html'}--><!--{else}--><!--{$onion|escape:'html'}--><!--{/if}-->">
+</sup><!--{/if}--><!--{if $urlIs != "aOrg" && $archive != "a_org"}--><sup class="ext-link-to-archive<!--{if ! empty( $onion ) && $onion != "none"}--> has-sibling<!--{/if}-->" title="Link to archived version on archive.today">
+  <a target="_blank" rel="noreferrer noopener" title="<!--{if $urlIs == "aOrg"}-->This is an archive.today url<!--{else}-->Link to archived version on archive.today<!--{/if}-->" href="<!--{if $urlIs == "aToday"}--><!--{$url|escape:"html"}--><!--{else}-->https://archive.today/<!--{$url|escape:"html"}--><!--{/if}-->">
+    <img src="/w/images/8/8f/Archive-today-logo-homage.svg" width="12" height="16" alt="The Web Archive" />
+  </a>
+</sup><!--{/if}--><!--{/if}-->
+<!--{if $onion != "none" && ( $onion != "auto" || $urlIs == "onion" ) }--><sup class="ext-link-to-archive" title="Link to alternative onion url">
+  <a target="_blank" rel="noreferrer noopener nofollow" title="<!--{if $urlIs == "onion" && $onion == "auto" }-->This is an onion url<!--{else}-->Link to alternative onion url<!--{/if}-->" href="<!--{if $urlIs == "onion" && $onion == "auto" }--><!--{$url|escape:"html"}--><!--{else}--><!--{$onion|escape:"html"}--><!--{/if}-->">
     <img src="/w/images/thumb/a/a8/Iconfinder_tor_386502.png/40px-Iconfinder_tor_386502.png" width="16" height="16" alt="Onion Version" />
   </a>
-</sup><!--{/if}--><noinclude>
+</sup><!--{/if}--><!--{/if}--><noinclude>
 [[Category:MultiWiki]]
 </noinclude>
