@@ -31,21 +31,6 @@ Paragraph to jump over
 
 [[#test-anchor-template]]
 
-== Archive_Link (Template, nested Widget) ==
-
-Different archive link tests, wrapped in div.info-box to prevent over-width on mobile
-
-<div class="info-box">
-* No parameter (useless): {{Archive_link}}
-* Only text (useless): {{Archive_link|text=Whonix Clearnet}}
-* Text and url : {{Archive_link|text=Whonix Clearnet|url=https://www.whonix.org}}
-* Text, url, archive=copy : {{Archive_link|text=Whonix Clearnet|archive=copy|url=https://www.whonix.org}}
-* Text, url, archive=none : {{Archive_link|text=Whonix Clearnet|archive=none|url=https://www.whonix.org}}
-* Text and url, onion=copy : {{Archive_link|text=Kicksecure Onion|onion=copy|url=http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/}}
-* Text and url, onion=w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/ : {{Archive_link|text=Kicksecure|onion=http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/|url=https://www.kicksecure.com}}
-* Text and url, archive=copy, onion=w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/ : {{Archive_link|text=Kicksecure|archive=copy|onion=http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/|url=https://www.kicksecure.com}}
-</div>
-
 == Blockquote & Quotation Tests ==
 
 === Blockquote ===
@@ -510,6 +495,62 @@ Box 3 Preview
 <div class="mw-collapsible-content">
 Box 3 content
 </div>
+</div>
+
+== ExtLink (Template) ==
+
+Different archive link tests, wrapped in div.info-box to prevent over-width on mobile
+
+<div class="info-box">
+* No urls (useless)
+** expected broken link
+** {{ExtLink}}
+* Only text (useless)
+** expected broken link
+** {{ExtLink|text=Whonix Clearnet}}
+* text, 1 url
+** expected: url as main link plus 1 icon link with main url
+** {{ExtLink|text=Whonix Clearnet|https://www.whonix.org}}
+* No text, 1 url
+** expected: url as text, url as main link plus 1 icon link with main url
+** {{ExtLink|https://www.whonix.org}}
+* text, icons=none, 1 url
+** expected: url as main link, no icons
+** {{ExtLink|icons=none|text=Whonix Clearnet|https://www.whonix.org}}
+* No text, icons=none, 1 url
+** expected: url as text, url as main link, no icons
+** {{ExtLink|icons=none|https://www.whonix.org}}
+* text, 6 urls (6th = onion)
+** expected: First url only used as main link, then icon links: 1x archive.org, 1x archive.today, 2x pseudo archives, 1x onion
+** {{ExtLink
+|text=Main Link
+|https://www.kicksecure.com/
+|https://web.archive.org/https://www.kicksecure.com/
+|https://archive.today/https://www.kicksecure.com/
+|https://whonix.org/kicksecure-backup
+|https://whonix.org/kicksecure-backup2
+|http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/
+}}
+* text, 4 urls (second = onion) - typical (maximum!) use case
+** expected: First url only used as main link, then icon links: 1x onion, 1x archive.org, 1x archive.today
+** {{ExtLink
+|text=Interesting data on the test.com website
+|https://www.test.com
+|http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/
+|https://web.archive.org/https://www.test.com
+|https://archive.today/https://www.test.com
+}}
+* text, 1 onion url
+** expected: onion url used for main link and for first icon
+** {{ExtLink
+|text=Onion Link
+|http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/
+}}
+* no text, 1 onion url
+** expected: url used for text and as main link and for first icon
+** {{ExtLink
+|http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/
+}}
 </div>
 
 == Gallery (MediaWiki) ==
@@ -1429,6 +1470,15 @@ This is current year
 * [{{canonicalurl:{{FULLPAGENAME}}|action=history&feed=atom}} atom feed]
 * <code>FULLPAGENAME</code>: {{FULLPAGENAME}}
 * <code>NAMESPACE</code>: {{NAMESPACE}}
+
+== LinkToArchiveExtension ==
+
+The following are all external links
+
+# This is an onion main link. One icon link with onion icon and main link expected http://www.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion/
+# This is an archive.org main link. One icon link with archive.org icon and main link expected https://web.archive.org/web/https://forums.whonix.org/t/flatpak-as-a-software-source-flathub-as-a-source-of-software/8500/61
+# This is an archive.today main link. One icon link with archive.today icon and main link expected https://archive.ph/https://forums.whonix.org/t/flatpak-as-a-software-source-flathub-as-a-source-of-software/8500/61
+# This is normal link. Two icon links expected. One icon link with archive.org logo and web.archiv.org/[main-url], one icon link with archive.today logo and archiv.today/[main-url] expected. https://www.whonix.org/
 
 = H1 =
 

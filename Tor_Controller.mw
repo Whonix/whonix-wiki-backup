@@ -6,18 +6,21 @@
 {{Title|
 title=Control and Monitor Tor
 }}
+{{tor_mininav}}
 [[File:onioncircuits.png|onioncircuits - View Tor Circuits|thumb]]
 {{intro|
 Using a Tor Controller with {{project_name_short}}. Onion Circuits. Nyx. View or change your Tor circuits. Monitor Tor and inspect logs.
 }}
 [[File:0brand_Arm_Controller-1.png|Nyx Tor Controller|thumb]]
+
 = Introduction =
 
-[[#Nyx|nyx]] is the primary Tor Controller option that comes pre-installed in {{project_name_short}}.
+[[#Nyx|Nyx]] is the primary Tor Controller option that comes pre-installed in {{project_name_short}}.
 
-Note: [[#Vidalia|Vidalia]] has been deprecated and is no longer packaged in Debian.
+'''Note''': [[#Vidalia|Vidalia]] has been deprecated and is no longer packaged in Debian.
 
 {{Anchor|Arm}}
+
 = Nyx =
 
 {{mbox
@@ -28,7 +31,7 @@ Note: [[#Vidalia|Vidalia]] has been deprecated and is no longer packaged in Debi
 
 == Nyx Usage ==
 
-Nyx is recommended and is already pre-installed in {{project_name_gateway_long}}. <ref>Since [[#Vidalia|Vidalia]] is [[#Vidalia_recommended_against|recommended against]].</ref>
+Nyx is recommended and comes pre-installed in {{project_name_gateway_long}}. <ref>Since [[#Vidalia|Vidalia]] is [[#Vidalia_recommended_against|recommended against]].</ref>
 
 {{Start_Arm}}
 
@@ -38,7 +41,7 @@ To receive a new circuit, press:
 n
 </pre>
 
-To exit nyx, press:
+To exit Nyx, press:
 
 <pre>
 q
@@ -46,79 +49,81 @@ q
 </pre>
 
 == Nyx FAQ ==
+{{anchor|Arm_FAQ}}
 {| class="wikitable" style="background-color: #fff;text-align: left"
-
 ! '''Message / Question'''
 ! '''Response'''
-
 |-
+
 | {{Code2|arm vs nyx?}}
 | The software was previously called <code>arm</code>, but the new name is <code>nyx</code>. <ref>https://tor.stackexchange.com/tags/nyx/info</ref>
-
 |-
+
 | <u>{{Code2|Should any of the following nyx messages concern me?}}</u>
 | No; see below for reasons why. See also: [[Malware and Firmware Trojans#Valid_Compromise_Indicators_versus_Invalid_Compromise_Indicators|Indicators of Compromise]] and [[Reporting_Bugs#Support_Request_Policy|Support Request Policy]] ([[Reporting_Bugs#Policy_Rationale|rationale]]).
-
 |-
+
 | <u>{{Code2|Am I compromised? Does nyx report leaks?}}</u>
-| Nyx is conceptually not a tool to discover serious issues such as a possible compromise or leaks. <ref>
+| Nyx is not designed to detect serious issues such as possible compromises or leaks. <ref>
 
-Nyx works on a different level -- it is a Tor Controller. Nyx talks to Tor using Tor's <code>ControlPort</code> and is an interface to show what Tor thinks. Neither Tor nor nyx implement anything like virus detection, compromise detection, leak detection and so on. Nyx messages are generally interesting and useful, but there is rarely  any cause for concern.
-
-For leak testing, see [[Dev/Leak_Tests|leak tests]].
-</ref>
-
+Nyx operates on a different level. It is a Tor Controller. Nyx communicates with Tor via the <code>ControlPort</code> and serves as an interface to display what Tor perceives. Neither Tor nor Nyx provides functionality for virus detection, compromise detection, or leak detection. While Nyx messages are generally informative and useful, they rarely indicate a cause for concern.
+</ref> Nyx is listed on the [[Dev/Leak_Tests|leak tests]] wiki page in chapter [[Dev/Leak_Tests#Unsuitable_Tests|Unsuitable Tests]].
 |-
+
 | <u>{{Code2|Nyx sometimes shows my public IP address and other times the internal <code>10.0.2.15</code> and <code>127.0.0.1</code> IPs. Is it normal or dangerous?}}</u> <ref>https://forums.whonix.org/t/strange-nyx-behavior/9514</ref>
-| This is a normal nyx feature. {{project_name_short}} uses a Tor control port filter proxy ([[Onion-grater|onion-grater]]) that prevents abuse of the <code>ControlPort</code>, including blocking dangerous commands like <code>GETINFO address</code>. When the real IP address appears, it is only local and nobody else can see it.
+| This is a normal Nyx feature. {{project_name_short}} utilizes a Tor control port filter proxy ([[Onion-grater|onion-grater]]) that prevents abuse of the <code>ControlPort</code>, including blocking dangerous commands like <code>GETINFO address</code>. When the real IP address appears, it is only visible locally and cannot be seen by others.
 
 |-
-
 | {{Code2|Tor is preventing system utilities like netstat and lsof from working. This means that nyx can't provide you with connection information. You can change this by adding 'DisableDebuggerAttachment 0' to your torrc and restarting tor. For more information see... https://gitlab.torproject.org/legacy/trac/-/issues/3313}}
 | If you want to learn about the technical details, read https://gitlab.torproject.org/legacy/trac/-/issues/3313.
-
 |-
+
 | DisableDebuggerAttachment even when running as root.
-| This [https://gitlab.torproject.org/legacy/trac/-/issues/7709 bug] in nyx has been resolved.
+| This [https://gitlab.torproject.org/legacy/trac/-/issues/7709 bug] in Nyx has been resolved.
 
 |-
 | {{Code2|man page (GENERAL OPTIONS and COMMAND-LINE OPTIONS)}}
-| This [https://gitlab.torproject.org/legacy/trac/-/issues/9679 bug] in nyx has been resolved.
+| This [https://gitlab.torproject.org/legacy/trac/-/issues/9679 bug] in Nyx has been resolved.
 
 |-
 | {{Code2|[WARN] Socks version 71 not recognized. (Tor is not an http proxy.)}}
-|
-This is caused by the [https://www.kicksecure.com/wiki/Systemcheck systemcheck] function {{Code2|check_tor_socks_port_reachability}}. It checks if a Tor SocksPort is reachable by trying to fetch it using curl. <ref>
+| This is caused by the {{kicksecurewiki
+|wikipage=systemcheck
+|text=systemcheck
+}} function {{Code2|check_tor_socks_port_reachability}}, which verifies if a Tor SocksPort is accessible by testing it using curl. <ref>
 {{CodeSelect|code=
 {{Curl_Plain}} 10.152.152.10:9100
 }}
-</ref> It will not report anything if it works, but will complain if it fails.
-
+</ref> If successful, it does not return a response, but it will issue a warning if it fails.
 |-
+
 | {{Code2|[WARN] Socks version 71 not recognized. (This port is not an HTTP proxy; did you want to use HTTPTunnelPort?)}}
 | This occurs for similar reasons to the entry above.
 
 |-
 | {{Code2|[WARN] Rejecting request for anonymous connection to private address [scrubbed] on a TransPort or NATDPort.  Possible loop in your NAT rules?}}
-| This happens for example if you run "curl 192.168.0.15". The reason is when you type "curl" in {{project_name_short}}, by default you are not directly using curl, but a uwt-wrapped ([[Stream_Isolation|stream-isolated]]) curl instead. It does not try to directly connect to 192.168.0.15, but rather to connect to 192.168.0.15 through Tor, leading to this Tor message. It really means an operation was attempted that will not work in that way. In this instance, deactivate the curl stream isolation wrapper or use the non-wrapped version - see [[Stream_Isolation|Stream Isolation]].
-
+| This happens, for example, if you run <code>curl 192.168.0.15</code>. By default, when using <code>curl</code> in {{project_name_short}}, it is not executed directly but rather via a uwt-wrapped ([[Stream_Isolation|stream-isolated]]) version of curl. This means it does not attempt a direct connection to <code>192.168.0.15</code> but instead tries to connect through Tor, resulting in this Tor message. It indicates that the attempted operation is not feasible. To resolve this, either deactivate the curl stream isolation wrapper or use the non-wrapped version, see [[Stream_Isolation|Stream Isolation]].
 |-
+
 | {{Code2|[NOTICE] You configured a non-loopback address '10.152.152.10:9179' for SocksPort. This allows everybody on your local network to use your machine as a proxy. Make sure this is what you wanted. [1 duplicate hidden]}} (Or another port number or DnsPort or TransPort.)
-| Tor really listens on that IP/port. It is {{project_name_gateway_short}} network interface and is only available to {{project_name_workstation_long}}. This restriction is enforced by an internal network with {{project_name_workstation_long}}(s) and because {{project_name_gateway_short}} is firewalled; see ''{{W_Firewall}}'' or the {{project_name_short}} source code for more information.
+| Tor is genuinely listening on that IP/port. It belongs to the {{project_name_gateway_short}} network interface and is only accessible from {{project_name_workstation_long}}. This restriction is enforced by an internal network between {{project_name_workstation_long}}(s), and {{project_name_gateway_short}} is also protected by a firewall. See ''{{W_Firewall}}'' or the {{project_name_short}} source code for further details.
 
 |-
 | {{Code2|[NOTICE] New control connection opened. [2 duplicates hidden]}} (Or more duplicates.)
-| This is caused by [https://www.kicksecure.com/wiki/Systemcheck systemcheck]'s Tor Bootstrap Status Test, which uses Tor's <code>ControlPort</code> or [[Dev/onion-grater|CPFP]].
+| This is caused by {{kicksecurewiki
+|wikipage=systemcheck
+|text=systemcheck
+}}'s Tor Bootstrap Status Test, which utilizes Tor's <code>ControlPort</code> or [[Dev/onion-grater|onion-grater]].
 
 |-
-| {{Code2|[NOTICE][NYX_WARN] The torrc differ from what tor's using. You can issue a sighup to reload the torrc values by pressing x. Configuration value is missing from the torrc: RunAsDaemon}}
-| Nyx usability bug. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/16459</ref> <ref>The issue was closed as 'not a bug' several years ago.</ref>
-
+| {{Code2|[NOTICE][NYX_WARN] The torrc differs from what Tor is using. You can issue a sighup to reload the torrc values by pressing x. Configuration value is missing from the torrc: RunAsDaemon}}
+| This is a Nyx usability bug. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/16459</ref> <ref>The issue was closed as 'not a bug' several years ago.</ref>
 |-
+
 | {{Code2|"192.168.0.1 UNKNOWN 1 / Guard" in circuit information}}
-| This indicates that you are connecting to the Tor network with a [[Bridges|Tor Bridge]].
+| This indicates that you are connecting to the Tor network using a [[Bridges|Tor Bridge]].
 
-If you are directly connecting to the public Tor network without a Tor Bridge, the real IP and Nickname of the Guard should be visible instead. <ref><nowiki>https://forums.whonix.org/t/how-to-check-if-i-configured-bridges-correctly-and-the-bridges-are-working-properly/4371/5</nowiki></ref>
+If you are connecting directly to the public Tor network without a Tor Bridge, the real IP and Nickname of the Guard should be visible instead. <ref><nowiki>https://forums.whonix.org/t/how-to-check-if-i-configured-bridges-correctly-and-the-bridges-are-working-properly/4371/5</nowiki></ref>
 |-
 
 |}
@@ -142,15 +147,16 @@ sudo ln -s /usr/share/applications/gateway-nyx.desktop /etc/xdg/autostart/gatewa
 Nyx should now autostart after the next reboot.
 
 = Onion Circuits =
+
 <blockquote>
 Onion Circuits is a GTK+ application to display Tor circuits and streams. It allows the user to inspect the circuits the locally running Tor daemon has built, along with some metadata for each node.
 </blockquote> <ref>https://packages.debian.org/{{Stable project version based on Debian codename}}/onioncircuits</ref>
 
-[https://packages.debian.org/{{Stable project version based on Debian codename}}/onioncircuits Onion Circuits] is installed by default, but is not a full Tor controller; only Tor circuits are shown. It can be launched from the start menu.
+[https://packages.debian.org/{{Stable project version based on Debian codename}}/onioncircuits Onion Circuits] is installed by default but is not a full Tor controller; it only displays Tor circuits. It can be launched from the start menu.
 
 = New Identity and Tor Circuits =
 
-The behavior of "New Identity" in the context of Tor Browser and <code>nyx</code> is often misunderstood. First of all, there are various ways to issue a "New Identity" (this list is not exhaustive):
+The behavior of "New Identity" in the context of Tor Browser and <code>nyx</code> is often misunderstood. First, there are various ways to issue a "New Identity" (this list is not exhaustive):
 
 * [[Tor_Browser#New_Identity_Function|Tor Browser New Identity Function]]
 * [[#Nyx|nyx]]
@@ -159,41 +165,40 @@ The behavior of "New Identity" in the context of Tor Browser and <code>nyx</code
 
 In all cases, the "New Identity" function sends the protocol command <code>SIGNAL newnym</code> to [[Tor]]'s <code>ControlPort</code>.
 
-[[Tor Browser]]'s new identity function additionally clears the browser state, closes tabs and obtains a fresh Tor circuit for future requests. <ref>
-https://blog.torproject.org/torbutton-141-released
-</ref>
+[[Tor Browser]]'s new identity function additionally clears the browser state, closes tabs, and obtains a fresh Tor circuit for future requests. <ref>https://blog.torproject.org/torbutton-141-released</ref>
 
-Other Tor controllers such as <code>nyx</code> run only <code>SIGNAL newnym</code>.
+Other Tor controllers, such as <code>nyx</code>, run only <code>SIGNAL newnym</code>.
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
 | text    = '''Warning:''' The New Identity feature will ''likely'' create a new circuit with a different Tor exit relay and [[Data_Collection_Techniques#IP_Address|IP Address]], but this is not guaranteed.
 }}
 
-The impact of "signal newnym" on Tor circuit lifetimes is often misunderstood. "signal newnym" uses a fresh circuit for ''new'' connections. Sometimes Tor only replaces the middle relay while using the same Tor exit relay. This is by design and the Tor default. Further, "signal newnym" does not interfere with long-lived connections like an file downloads, website downloads, SSH or IRC connections.
+The impact of "signal newnym" on Tor circuit lifetimes is often misunderstood. "signal newnym" ensures a fresh circuit for ''new'' connections. However, sometimes Tor only replaces the middle relay while keeping the same Tor exit relay. This behavior is by design and follows the Tor default settings. Additionally, "signal newnym" does not interfere with long-lived connections such as file downloads, website downloads, SSH, or IRC connections.
 
 Interested readers can verify the effect of "signal newnym" as follows:
 
 # Open https://check.torproject.org in Tor Browser.
 # Issue "signal newnym" using [[#Nyx|nyx]].
 # Reload https://check.torproject.org.
-# In some cases it will still show the same IP address, probably because the browser did not close the connection to https://check.torproject.org in the first place.
+# In some cases, it will still show the same IP address, probably because the browser did not close the connection to https://check.torproject.org in the first place.
 
-Now repeat this experiment with a small modification which should result in a new Tor exit IP address:
+Now, repeat this experiment with a small modification, which should result in a new Tor exit IP address:
 
 # Open https://check.torproject.org in Tor Browser.
 # Issue "signal newnym" using [[#Nyx|nyx]].
 # Close Tor Browser, then restart it.
-# Open https://check.torproject.org again and a new Tor exit relay IP address is (likely) visible.
+# Open https://check.torproject.org again. A new Tor exit relay IP address is (likely) visible.
 
-New identity is not an IP selection or cycling feature. It is a circuit changer. Not an IP changer. Tor replaces your real external IP address with a Tor IP but it does not easily let users pick any specific IP. Tor chooses the IP. Whonix does not influence that. [[unspecific|This is unspecific to Whonix.]]
+New identity is not an IP selection or cycling feature; it is a circuit changer, not an IP changer. Tor replaces your real external IP address with a Tor IP, but it does not easily let users pick any specific IP. Tor determines the exit IP, and {{project_name_short}} does not influence this. [[unspecific|This is unspecific to Whonix.]]
 
-Forcing an IP change might be possible. This is discouraged as per [[Tor#Tor_Routing_Algorithm|Tor Routing Algorithm]]. By changing Tor configuration, selection of specific IPs might be possible. This is [[unsupported]] and the user would need to [[Tor#Edit_Tor_Configuration|edit the Tor configuration]]. Which settings specifically, the user would need to research as per [[Self Support First Policy]], not by asking in Whonix forums.
+Forcing an IP change might be possible, but this is discouraged as per [[Tor#Tor_Routing_Algorithm|Tor Routing Algorithm]]. Changing the Tor configuration to select specific IPs might be possible, but this is [[unsupported]]. Users attempting this must [[Tor#Edit_Tor_Configuration|edit the Tor configuration]] themselves. The exact settings required would need to be researched by the user as per the [[Self Support First Policy]], rather than asking in {{project_name_short}} forums.
 
 == tor-ctrl ==
+
 [https://github.com/Kicksecure/tor-ctrl tor-ctrl] is installed by default.
 
-For example, to get a new circuit, run.
+For example, to get a new circuit, run:
 
 {{CodeSelect|code=
 tor-ctrl signal NEWNYM
@@ -205,7 +210,7 @@ The output should show:
 250 OK
 </pre>
 
-Repeat this command every time a new circuit is desired.
+Repeat this command each time a new circuit is desired.
 
 See also:
 
@@ -221,17 +226,17 @@ man tor-ctrl
 | text    = Advanced users only.
 }}
 
-== Talking to the real Tor Controller ==
+== Talking to the Real Tor Controller ==
 
-To talk to the real Tor Controller, you should run the commands on the {{project_name_gateway_short}}, as  the {{project_name_workstation_short}}, the connection goes through the [https://www.whonix.org/wiki/Onion-grater onion-grater controller proxy] and some commands might be filtered.
+To communicate directly with the Tor Controller, run the commands on {{project_name_gateway_short}}. If executed on {{project_name_workstation_short}}, the connection passes through the [[onion-grater|onion-grater controller proxy]], which may filter some commands.
 
-On {{project_name_gateway_short}}. {{Code2|test}} is the example password being used. Feel free to use a different/stronger one.
+On {{project_name_gateway_short}}, {{Code2|test}} is the example password. Use a different, stronger password if desired.
 
-<pre>
+{{CodeSelect|code=
 tor --hash-password test
-</pre>
+}}
 
-Will show something like this:
+This will return an output similar to:
 
 <pre>
 16:1CEAF6E6A08E0CF460AFD71772461C5F56BD9738FA8824B882FCA4A785
@@ -239,53 +244,60 @@ Will show something like this:
 
 {{Open /usr/local/etc/torrc.d/50_user.conf}}
 
+Add the following:
+
 <pre>
 HashedControlPassword 16:1CEAF6E6A08E0CF460AFD71772461C5F56BD9738FA8824B882FCA4A785
 </pre>
 
 {{Reload_Tor}}
 
-<pre>
+{{CodeSelect|code=
 sudo service tor reload
-</pre>
+}}
 
-Connect to Tor's Controller:
+To connect to Tor's Controller:
 
-<pre>
+{{CodeSelect|code=
 sudo -n -u debian-tor socat - UNIX-CONNECT:/var/run/tor/control
-</pre>
+}}
 
 Authenticate:
 
-<pre>
+{{CodeSelect|code=
 authenticate "test"
-</pre>
+}}
 
-Should reply the following if successful:
+A successful authentication returns:
 
 <pre>
 250 OK
 </pre>
 
-Test your commands. For example, start logging stream events:
+Test commands, such as starting logging stream events:
 
-<pre>
+{{CodeSelect|code=
 setevents stream
-</pre>
+}}
 
-Will do nothing after this, but when you start using Tor (i.e. by running Tor Browser, APT or so), it will show the stream events similar to the example below:
+Initially, this does nothing. However, when Tor is used (e.g., running Tor Browser, APT, etc.), stream events similar to the following appear:
 
 <pre>
 650 STREAM 211 NEW 0 pop.riseup.net:995 SOURCE_ADDR=10.152.152.11:47036 PURPOSE=USER
 ...
 </pre>
 
-{{project_name_short}} has a wrapper called <code>tor-ctrl</code> to communicate directly with tor's controller. By using it, you don't have to worry about authentication method, or which program to use to connect to the socket, or which program to use to convert the cookie to base32. As the intent of this section is to teach how to communicate without external programs, this is mentioned at last. If you wish to accomplish the same as above, you can do so with <code>tor-ctrl -w setevents stream</code>.
+{{project_name_short}} includes <code>tor-ctrl</code>, a wrapper for direct communication with Tor's controller. This simplifies authentication, socket connection, and cookie conversion to base32. While this section explains direct communication without external programs, users can accomplish the same task with:
+
+{{CodeSelect|code=
+tor-ctrl -w setevents stream
+}}
 
 == netcat ==
+
 netcat is no longer required. [[#tor-ctrl|tor-ctrl]] is recommended instead.
 
-netcat provides an easy way to send Tor protocol commands to Tor's <code>ControlPort</code> form inside {{project_name_workstation_short}}. Actually for security reasons to onion-grater, the [[Dev/onion-grater|Tor Control Protocol Filter Proxy]].
+netcat provides an easy way to send Tor protocol commands to Tor's <code>ControlPort</code> from within {{project_name_workstation_short}}. However, for security reasons, commands are processed through [[onion-grater|onion-grater (Tor Control Protocol Filter Proxy)]].
 
 {{Box|text=
 Inside {{project_name_workstation_short}}.
@@ -297,7 +309,7 @@ sudo apt install netcat-openbsd
 }}
 
 '''2.''' Connect to Tor's <code>ControlPort</code>. <ref>
-This works in {{project_name_workstation_short}}, because the [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor anon-ws-disable-stacked-tor] package has set up listening for connections on localhost and forwards them to {{project_name_gateway_short}}, where the [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] is listening.
+This works in {{project_name_workstation_short}} because the [[Dev/anon-ws-disable-stacked-tor|anon-ws-disable-stacked-tor]] package opens localhost listener ports and forwards connections to {{project_name_gateway_short}}, where [[Dev/onion-grater|onion-grater (Control Port Filter Proxy)]] is listening.
 </ref>
 
 {{CodeSelect|code=
@@ -310,7 +322,7 @@ nc 127.0.0.1 9051
 signal newnym
 }}
 
-The output should be.
+Expected output:
 
 <pre>
 250 OK
@@ -318,23 +330,22 @@ The output should be.
 }}
 
 == tor-prompt ==
-On {{project_name_gateway_short}}, run.
 
-Example <code>tor-prompt</code> in non-interactive mode.
+On {{project_name_gateway_short}}, run:
+
+Example of <code>tor-prompt</code> in non-interactive mode:
 
 {{CodeSelect|code=
 tor-prompt --no-color --run "getinfo consensus/valid-until"
 }}
 
-Example <code>tor-prompt</code> in interactive mode.
-
-On {{project_name_gateway_short}}, run.
+Example of <code>tor-prompt</code> in interactive mode:
 
 {{CodeSelect|code=
 tor-prompt
 }}
 
-Will be greeted with the following or similar introduction message.
+This will display an introduction similar to:
 
 <pre>
 Welcome to Stem's interpreter prompt. This provides you with direct access to
@@ -357,17 +368,19 @@ For more information run '/help'.
 >>>
 </pre>
 
-Run any Tor control protocol command. For example <code>GETINFO version</code>. Replace <code>GETINFO version</code> with the actual command intended to run.
+To run a Tor control protocol command, such as <code>GETINFO version</code>, enter:
+
+<u>Note:</u> Replace <code>GETINFO version</code> with the actual command intended to run.
 
 {{CodeSelect|code=
 GETINFO version
 }}
 
-Should show something similar to.
+Expected output:
 
 <pre>
-  250-version=0.2.5.1-alpha-dev (git-245ecfff36c0cecc)
-  250 OK
+250-version=0.2.5.1-alpha-dev (git-245ecfff36c0cecc)
+250 OK
 </pre>
 
 = Deprecated =
@@ -379,9 +392,16 @@ Should show something similar to.
 }}
 {{Anchor|Vidalia_recommended_against}}
 
-Vidalia is recommended against because development has ceased, leading to it being removed from all Debian variants (stretch, sid etc.) as well as from Tor Browser Bundle v3.5 by The Tor Project. <ref>https://tor.stackexchange.com/questions/1075/what-happened-to-vidalia</ref> <ref>As noted by Tor developer Roger Dingledine: <br />
+Vidalia is no longer recommended because development has ceased. As a result, it has been removed from all Debian variants (stretch, sid, etc.) and was also dropped from Tor Browser Bundle v3.5 by The Tor Project. <ref>https://tor.stackexchange.com/questions/1075/what-happened-to-vidalia</ref> <ref>As noted by Tor developer Roger Dingledine: <br />
 <blockquote>Cammy is right -- we've removed the bridge/relay/exit bundles from the download page too, since Vidalia has been unmaintained for years and pointing people to unmaintained software is dangerous. I'd love to have enough developers to do everything at once, but we don't.</blockquote>
-</ref> Vidalia had a number of limitations, such as an inability to fully control Tor -- it could not stop Tor which came with the Debian package because it is started as user "debian-tor". It also could not edit {{Code2|/usr/local/etc/torrc.d/50_user.conf}} <ref>It is unclear whether control commands such as New Identity were correctly processed either.</ref> and did not understand obfuscated bridges. Since Vidalia has been deprecated and provides a pretty bad and confusing user experience, it is simply better to use [[#Nyx|nyx]]. <ref>Unless the reader is interested in Vidalia's nice network map.</ref>
+</ref>
+
+Vidalia had several limitations, such as the inability to fully control Tor. For example:
+* It could not stop Tor when installed via the Debian package, as Tor runs under the user "debian-tor."
+* It was unable to edit {{Code2|/usr/local/etc/torrc.d/50_user.conf}}. <ref>It is unclear whether control commands such as New Identity were correctly processed either.</ref>
+* It did not support obfuscated bridges.
+
+Since Vidalia has been deprecated and provides a poor and confusing user experience, it is best to use [[#Nyx|nyx]] instead. <ref>Unless the reader is specifically interested in Vidalia's graphical network map.</ref>
 
 = See Also =
 * [[Tor-ctrl-observer|tor-ctrl-observer - Tor Connection Destination Viewer]]

@@ -1,0 +1,58 @@
+<!--{* For Documentation see Template:ExtLink . strip (smarty) used to have well-readable formatting without the white spaces *}-->
+<!--{strip}-->
+
+<!--{if !isset( $urls ) || $urls|@count == 0 }-->
+[Broken-ExtLink--no-url-was-provided]
+<!--{else}-->
+
+<!--{assign var="urlsCount" value=$urls|@count}-->
+
+<!--{foreach $urls as $url}-->
+
+<!--{assign var="urlIs" value="general"}-->
+<!--{if $url|regex_replace:"/^https?:\/\/[^\.\/]+\.?[^\.\/]+\.onion(\/|$)/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="onion"}--><!--{/if}-->
+<!--{if $url|regex_replace:"/^https:\/\/web\.archive\.org/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="aOrg"}--><!--{/if}-->
+<!--{if $url|regex_replace:"/^https:\/\/archive\.(today|fo|is|li|md|ph|vn)/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="aToday"}--><!--{/if}-->
+
+<!--{if $url@iteration == 1}-->
+<a target="_blank" href="<!--{$url|escape:"html"}-->" class="external template-extlink" rel="noreferrer noopener<!--{if $urlIs == "onion"}--> nofollow<!--{/if}-->">
+<!--{if isset($text) && $text != ""}--><!--{$text}--><!--{else}--><!--{$url}--><!--{/if}-->
+</a>
+<!--{/if}-->
+
+<!--{if ( $url@iteration > 1 || $urlsCount == 1 ) && ( ! isset($icons) || $icons != "none" ) }-->
+
+<!--{assign var="linkTitle" value=""}-->
+
+<!--{if $urlsCount == 1}-->
+<!--{if $urlIs == "onion"}--><!--{assign var="linkTitle" value="This is an .onion link"}-->
+<!--{elseif $urlIs == "aOrg"}--><!--{assign var="linkTitle" value="This is an archived link on archive.org"}-->
+<!--{elseif $urlIs == "aToday"}--><!--{assign var="linkTitle" value="This is an archived link on archive.today"}-->
+<!--{else}--><!--{assign var="linkTitle" value="This is an archive link on an alternative archive storage"}-->
+<!--{/if}-->
+<!--{else}-->
+<!--{if $urlIs == "onion"}--><!--{assign var="linkTitle" value="Alternative .onion link"}-->
+<!--{elseif $urlIs == "aOrg"}--><!--{assign var="linkTitle" value="Link to an archived version on archive.org"}-->
+<!--{elseif $urlIs == "aToday"}--><!--{assign var="linkTitle" value="Link to an archived version on archive.today"}-->
+<!--{else}--><!--{assign var="linkTitle" value="Link to an archived version on an alternative archive"}-->
+<!--{/if}-->
+<!--{/if}-->
+
+<sup class="ext-link-to-archive<!--{if $url@iteration < $urlsCount}--> has-sibling<!--{/if}-->">
+<a href="<!--{$url|escape:"html"}-->" target="_blank" rel="noreferrer noopener<!--{if $urlIs == "onion"}--> nofollow<!--{/if}-->" title="<!--{$linkTitle}-->">
+<!--{if $urlIs == "onion"}--><img src="/w/images/thumb/a/a8/Iconfinder_tor_386502.png/40px-Iconfinder_tor_386502.png" width="16" height="16" alt="Onion Logo" />
+<!--{elseif $urlIs == "aOrg"}--><img src="/w/images/7/73/Internet_Archive_logo.png" width="14" height="16" alt="The Web Archive Logo" />
+<!--{elseif $urlIs == "aToday"}--><img src="/w/images/8/8f/Archive-today-logo-homage.svg" width="12" height="16" alt="Archive.today Logo Homage" />
+<!--{else}--><img src="/w/images/4/4e/General-archive-logo.svg" width="12" height="16" alt="General Archive Symbol" />
+<!--{/if}-->
+</a>
+</sup>
+
+<!--{/if}-->
+<!--{/foreach}-->
+
+<!--{/if}-->
+
+<!--{strip}--><noinclude>
+[[Category:MultiWiki]]
+</noinclude>
