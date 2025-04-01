@@ -120,7 +120,7 @@ As not the first child after a text (or other) node
 
 * 1 <blockquote>test</blockquote>
 
-=== div class pre blockquote ===
+=== Probox blockquote ===
 real <code>pre</code> tag:
 
 <pre>
@@ -137,9 +137,9 @@ Primary key fingerprint: 2133 BC60 0AB1 33E1 D826  D173 FE43 009C 4607 B1FB
      Subkey fingerprint: 7A02 B352 1DC7 5C54 2BA0  1545 6AFE E6D4 9E92 B601
 </pre>
 
-<code>div class="pre"</code>
+<code>PreBox template</code>
 
-<div class="pre">gpg: assuming signed data in 'tor-{{Tor_upstream_version}}.tar.gz'
+{{PreBox|gpg: assuming signed data in 'tor-{{Tor_upstream_version}}.tar.gz'
 gpg: Signature made Mon 09 Dec 2019 06:21:51 PM UTC
 gpg:                using RSA key 7A02B3521DC75C542BA015456AFEE6D49E92B601
 gpg: Good signature from "Nick Mathewson <nickm@alum.mit.edu>" [unknown]
@@ -149,7 +149,7 @@ gpg:                 aka "Nick Mathewson <nickm@torproject.org>" [unknown]
 gpg: WARNING: This key is not certified with a trusted signature!
 gpg:          There is no indication that the signature belongs to the owner.
 Primary key fingerprint: 2133 BC60 0AB1 33E1 D826  D173 FE43 009C 4607 B1FB
-     Subkey fingerprint: 7A02 B352 1DC7 5C54 2BA0  1545 6AFE E6D4 9E92 B601</div>
+     Subkey fingerprint: 7A02 B352 1DC7 5C54 2BA0  1545 6AFE E6D4 9E92 B601}}
 
 === Quotation Template Tests ===
 ==== Functional ====
@@ -1429,7 +1429,7 @@ code tag
 
 <code>long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test long test</code>
 
-== pre and div.pre tests ==
+== pre and PreBox tests ==
 
 === pre test ===
 
@@ -1443,7 +1443,15 @@ text 1
 text 2
 </pre>
 
-=== div.pre ===
+=== pre with data-code test ===
+
+Pre without data-code
+<pre>123</pre>
+
+Pre with data-code
+<pre data-code>123</pre>
+
+=== PreBox (Template) ===
 
 Pre without parsing
 
@@ -1453,13 +1461,27 @@ This is current year
 {{CURRENTYEAR}}
 </pre>
 
-Div.pre with parsing
+PreBox with parsing
 
-<div class="pre">
+{{PreBox|
 This is current year
 
 {{CURRENTYEAR}}
-</div>
+}}
+
+PreBox with 3 lines
+
+{{PreBox|
+This is
+current year
+{{CURRENTYEAR}}
+}}
+
+PreBox with 3 lines, but first line is directly on the starting line, last line directly before closing brackets.
+
+{{PreBox|This is
+current year
+{{CURRENTYEAR}}}}
 
 == Variables ==
 * <code>SITENAME</code>: <code>{{SITENAME}}</code>
