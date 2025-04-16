@@ -3,130 +3,229 @@
 Keystroke and Mouse Deanonymization
 }}
 {{#seo:
-|description=Deanonymization through keystroke and mouse movement analysis, fingerprinting techniques, and protective measures.
+|description=Explains how your typing and mouse movement patterns can be used to track or identify you online, even when using privacy tools like Tor - and how to protect yourself.
 |image=Keystroke.png
 }}
 {{web_related}}
 [[File:Keystroke.png|thumb]]
 {{intro|
-Deanonymization through keystroke and mouse movement analysis, fingerprinting techniques, and protective measures.
+This page explains how your unique typing and mouse movement patterns - also known as behavioral biometrics - can be used to track or identify you online, even if you're using privacy tools like Tor. It also covers real-world examples of these techniques, how they work, and what you can do to protect your identity.
 }}
-= Keystroke Dynamics =
-Keystroke biometric algorithms have advanced to the point where it is viable to fingerprint users based on soft biometric traits. This is a privacy risk because masking spatial information -- such as the IP address via Tor -- is insufficient to anonymize users. <ref>
-https://github.com/vmonaco/keystroke-obfuscation
+= Mouse Fingerprinting =
+
+This wiki chapter explains how tracking mouse movements can be used to identify people online - even without their knowledge or consent - just by using a regular web browser like Firefox or Chrome.
+
+Mouse fingerprinting is not just a theory. It is already being used on real websites. In fact, as of 2023, up to 36% of the 80,000 most popular websites may already use mouse fingerprinting. <ref>
+{{quotation
+|quote=
+[...]
+
+we collected a data set
+containing information about the top 80k most popular
+websites according to the Tranco list [28].
+
+[...]
+
+Our results show that over 599 scripts fall within the
+criteria explained in Section 3 to be considered as files
+suspicious of containing mouse tracking. Those scripts are
+present in 28,854 of the websites (36% of the total 80,000
+websites scanned). In order to evaluate them, a human
+expert has to explore its code to distinguish between
+mouse tracking instances and false positives. However,
+nowadays most JavaScript resources are minimized or
+obfuscated, both techniques that render the code very hard
+to analyze by humans, reducing the number of scripts that
+can be studied because of time constraints.
+
+[...]
+|context=[https://upcommons.upc.edu/bitstream/handle/2117/400222/Detecting_and_Analyizing_Mouse_Tracking_in_the_Wild.pdf Detecting and Analyzing Mouse Tracking in the Wild]
+}}
+
+https://ieeexplore.ieee.org/document/10190681/
+</ref> This includes well-known, high-traffic sites like search engines. <ref>
+{{quotation
+|quote=
+[...]
+
+mouse tracking has very practical applications for webmasters, and in particular for search engines. Dr. Ioannis Aparakis from Telefonica Research and co-author of both publications, clarifies: “When you search for something at Google or Bing, your mouse movements are sending a tiny signal to the search engine indicating if you are interested or not in the content you have been shown. As mouse tracking may have privacy issues, we investigated the possibility of recording only a small part of the whole movement trajectory and see if we can still infer how people make choices in web search.”
+
+[...]
+|context=University of Luxembourg, Faculty of Science, Technology and Medicine (FSTM) University / Central Administration and Rectorate, [https://www.uni.lu/en/news/mouse-movements-reveal-your-behaviour/ Mouse movements reveal your behaviour]
+}}
 </ref> 
 
-Users can be uniquely fingerprinted based on: <ref name=keystroke_dynamics>
+Several companies offer mouse tracking and behavioral analytics tools designed to monitor user interactions - such as mouse movements, clicks, and scrolls - to enhance marketing strategies, boost sales, and improve user experience. These tools are widely used in e-commerce, advertising, and conversion rate optimization (CRO).​
+
+{{quotation
+|quote=Trusted by 210,000+ digital experience frontrunners worldwide<br/>
+
+Vodafone; Philips; TUI Cruises; Verizon; Scotts
+|context={{ExtLink
+|https://mouseflow.com/
+|https://web.archive.org/web/20250408184041/https://mouseflow.com/
+|https://archive.is/0CfNZ
+|text=mouseflow
+}}
+}}
+
+Mouse or cursor tracking happens when websites record where your mouse moves and when you click. While this helps website designers improve layout and usability, it also creates a privacy risk. This information can be recorded silently - without your permission - through everyday web browsing. <ref name=mouse_tracking>
+* https://en.wikipedia.org/wiki/Mouse_tracking
+* [https://www.scirj.org/papers-0420/scirj-P0420766.pdf A Study on Mouse Movement Features to Identify User]
+* https://github.com/MIMIC-LOGICS/Mouse-Synthesizer/blob/main/MIMIC%20A%20Kinematic%20Theory-Based%20Synthesizer-Alessandro%20Nicola%20Capriati.pdf
+* https://www.mimic.sbs/
+</ref>
+
+Modern websites use technologies like [https://en.wikipedia.org/wiki/CSS CSS] and [https://en.wikipedia.org/wiki/JavaScript JavaScript] to make pages look and feel interactive. But these same tools can also be used to track where your mouse moves. Even add-ons in your browser can do this.
+
+* Tracking software can record things like:
+** where and when you click
+** how long you stay in one part of the page
+** where your mouse is on the screen
+** if you hover your mouse over a link and for how long
+** See the footnote for more examples of mouse tracking. <ref>
+Other details websites can record, additional mouse tracking techniques:
+* the exact time of every mouse movement or click
+* maps showing where most users move their mouse
+* full replays of your mouse path
+* scrolling behavior using the mouse wheel
+
+* The original author of the [[Keystroke_and_Mouse_Deanonymization#Kloak|Kloak]] software tool, John V. Monaco, has noted that highly accurate device fingerprinting can be performed using DOM event timestamps - a browser timing mechanism that can be exploited to identify users. This affects both keyboard and mouse events.
+** Source: [https://vmonaco.com/papers/Device%20Fingerprinting%20with%20Peripheral%20Timestamps.pdf Device_Fingerprinting_with_Peripheral_Timestamps.pdf]
+* the exact times of movement or clicks (timestamps)
+* visual "heat maps" showing frequent cursor paths and attention areas
+* full replays of the mouse's movement path (trajectory playback)
+* use of the mouse wheel (scroll activity)
+** Sources:
+*** https://web.archive.org/web/20221022104548/http://jcarlosnorte.com/assets/fingerprint/
+*** https://web.archive.org/web/20221114004700/http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html
+</ref>
+
+Imagine someone using the internet both normally (without tools to hide their identity) and through privacy tools like Tor. People have unique ways of moving their mouse. Computers can learn those patterns. So if a person acts anonymously on Tor but has similar mouse behavior as they do on regular websites, their identities can be linked. <ref name=mouse_tracking /> This technique is already used in real life. For example, if someone’s behavior seems very different from usual, websites may block access to their accounts until their identity is confirmed. This kind of tracking - called behavioral biometrics - is sold by companies as a product to website owners. <ref>
+* https://www.pingidentity.com/en/resources/blog/post/behavioral-biometrics.html
+* https://www.feedzai.com/blog/behavioral-biometrics-next-generation-fraud-prevention/
+* https://www.biocatch.com/
+</ref>
+
+For a practical example of deanonymization (the process of revealing someone's true identity online), consider someone who regularly browses the internet using both [[Tips_on_Remaining_Anonymous#clearnet|clearnet]] (i.e., the regular internet without anonymity tools like Tor) and anonymity networks (such as Tor). Individuals exhibit distinctly unique patterns in how they move and click their mouse. Therefore, when these tracking techniques are used on popular websites, {{kicksecure_wiki
+|wikipage=Artificial_intelligence
+|text=Artificial intelligence (AI)
+}} systems trained on behavioral data can recognize these patterns and associate them with specific users. Over time, this makes it possible to link "anonymous" activity on Tor to known identities from clearnet usage - with a high degree of probability. <ref name=mouse_tracking /> <ref>
+This deanonymization technique is likely to succeed, as it is already used to lock individuals out of secure accounts (pending identity verification) when their monitored behavior significantly deviates from previously learned patterns.
+</ref>
+
+Turning off JavaScript does not protect you from this. The same tracking can be done using CSS. <ref>
+* {{ExtLink
+|https://web.archive.org/web/20190510191716if_/https://twitter.com/davywtf/status/1124146339259002881
+|https://archive.is/sxD3n
+}}
+* {{ExtLink
+|https://gist.github.com/wybiral/c8f46fdf1fc558d631b55de3a0267771
+|https://web.archive.org/web/20190612061243/https://gist.github.com/wybiral/c8f46fdf1fc558d631b55de3a0267771
+|https://archive.is/FUZmN
+}}
+</ref>
+
+[[Tor Browser]] (a browser that helps you stay anonymous online) bug report: {{ExtLink
+|https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/30392
+|https://web.archive.org/web/20250413102940/https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/30392
+|https://archive.ph/6pYBT
+|text=CSS features allow real-time tracking
+}}
+
+Whonix, a privacy-focused operating system, has built-in tools (like [[Keystroke_and_Mouse_Deanonymization#Kloak|Kloak]] and [[Keystroke_and_Mouse_Deanonymization#Qubes_Event_Buffering|Qubes Event Buffering]]) that try to confuse tracking by slightly changing the timing of your mouse movements. This can make it harder to match your behavior over time. <ref>
+https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507
+</ref> More improvements are being worked on. See: [https://forums.whonix.org/t/better-mouse-obfuscation/21445/ Better mouse obfuscation].
+
+= Keystroke Dynamics =
+This chapter explains how typing behavior - also known as keystroke dynamics - can be used to identify people online, even when they use privacy tools like Tor.
+
+Keystroke tracking has become advanced enough to create a unique "fingerprint" of each user based on how they type. This is a privacy concern because hiding your IP address (for example, with Tor) is no longer enough to stay anonymous. <ref>
+https://github.com/vmonaco/keystroke-obfuscation
+</ref>
+
+Websites can recognize users by how they interact with the keyboard, including: <ref name=keystroke_dynamics>
 https://en.wikipedia.org/wiki/Keystroke_dynamics
 </ref>
 
-* Typing speed.
-* Exactly when each key is located and pressed (seek time), how long it is held down before release (hold time), and when the next key is pressed (flight time).
-* How long the breaks/pauses are in typing.
-* How many errors are made and the most common errors produced.
-* How errors are corrected during the drafting of material.
-* The type of local keyboard that is being used.
-* Whether they are likely right or left-handed.
-* Rapidity of letter sequencing indicating the user's likely native language.
-* [[Keyboard Layout]] as the placement of the keys on the keyboard leads to different key seek times and typing mistakes.
-
-A unique neural algorithm generates a primary pattern for future comparison. It is thought that most individuals produce keystrokes that are as unique as handwriting or signatures. This technique is imperfect; typing styles can vary during the day and between different days depending on the user's emotional state and energy level. <ref name=keystroke_dynamics />
-
-Unless protective steps are taken to obfuscate the time intervals between key press and release events, it is likely most users can be deanonymized based on their keystroke manner and rhythm biometrics. Adversaries are likely to have samples of clearnet keystroke fingerprinting which they can compare with "anonymous" Tor samples.
-
-Typing on the most popular keyboard layout which is probably en-US might help mitigation however a more effective way is the following. At a minimum users should not type into browsers with Javascript enabled, since this opens up this deanonymization vector. Text should be written in an offline text editor and then copied and pasted into the web interface when it is complete.
-
-In addition, users must also disguise their linguistic style to combat [[Stylometry|stylometry (stylometric analysis)]] and be aware of [[Mouse_Fingerprinting|mouse tracking techniques]] available to adversaries.
-
-= Mouse Fingerprinting =
-
-Mouse or cursor tracking occurs when software collects the positions of the mouse cursor and click data on the computer. While this can have benefits for web designers, it also poses a privacy (profiling) threat. Without explicit user consent or awareness, a range of data can be leaked via JavaScript, plug-ins or other software: <ref name=mouse_tracking>
-https://en.wikipedia.org/wiki/Mouse_tracking
+* how fast they type
+* how long it takes to find and press each key, how long each key is held down, and how long the pause is before the next key is pressed <ref>
+These are known as "seek time," "hold time," and "flight time" in keystroke dynamics research.
 </ref>
+* how long they pause while typing
+* the kinds of typing mistakes they make - and how they correct them
+* what type of keyboard they use
+* whether they are likely right- or left-handed
+* patterns that reveal their likely native language
+* which keyboard layout they use (like QWERTY or Dvorak), which influences speed and errors
 
-* JavaScript and Cascading Style Sheets (CSS) <ref>https://en.wikipedia.org/wiki/CSS</ref> readily allow developers to track users' mouse movements by simply entering relevant code on the webpage. This has already been employed on high-traffic websites, such as search engines.
-* Similar to JavaScript, installed and enabled software modules (plug-ins) can track mouse movements.
-* Specific mouse tracking software can reveal:
-** mouse location
-** time stamps
-** mouse clicks
-** a mouse cursor hovering over embedded links and its duration
-** the amount of time spent in certain webpage areas
-** heat maps
-** full playbacks which retrace the mouse's trajectory
-** mouse wheel tracking <ref>
-* https://web.archive.org/web/20221022104548/http://jcarlosnorte.com/assets/fingerprint/
-* https://web.archive.org/web/20221114004700/http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html
-</ref>
+A computer program can build a profile based on these typing traits - similar to how a signature or handwriting can be used to identify someone. While typing styles may change depending on a person’s mood, energy, or time of day, the patterns are still often unique enough to recognize individuals. <ref name=keystroke_dynamics />
 
-For a practical example of deanonymization, consider someone who regularly uses both clearnet and Tor with JavaScript enabled. Individuals have distinctly unique characteristics associated with mouse movements and mouse clicks. Therefore, if these research methods are used in the public domain, supervised learning methods are likely to "learn" the typical behavior of individuals. Over time, it may be possible to link "anonymous" activities with the known profile of a clearnet user with a high degree of probability. <ref name=mouse_tracking /> <ref>
-This deanonymization technique is likely to succeed, since it is already used to lock persons out of secure accounts (pending identity verification) when their monitored behavior significantly deviates from behavior that has been learned.
-</ref>
+If users don’t take steps to block this kind of tracking, their typing rhythm can likely be used to deanonymize them. For example, someone using Tor might unknowingly type the same way they do on other websites, allowing trackers or attackers to match both identities. Adversaries may already have samples of how the person types on the regular internet and can use that to link them.
 
-Disabling JavaScript cannot mitigate this as it can also be done with just CSS. <ref>
-https://web.archive.org/web/20190510191716if_/https://twitter.com/davywtf/status/1124146339259002881
+To reduce this risk:
 
-https://archive.is/sxD3n
+* Use a common keyboard layout (like **en-US**) to blend in with most users.
+* Avoid typing directly into websites when **JavaScript is enabled** - websites can silently track when you press and release each key.
+* Instead, type your message in a text editor (offline), then copy and paste it into the website when finished.
 
-https://web.archive.org/web/20190624234158/https://trac.torproject.org/projects/tor/ticket/30392#ticket
+Other tips:
 
-https://web.archive.org/web/20190612061243/https://gist.github.com/wybiral/c8f46fdf1fc558d631b55de3a0267771
-
-https://gist.github.com/wybiral/c8f46fdf1fc558d631b55de3a0267771
-</ref> The author of the [[Keystroke_and_Mouse_Deanonymization#Kloak|Kloak]] software tool has noted high accuracy device fingerprinting can be performed with DOM event timestamps and this affects both keyboard and mouse events.
-
-A solution was implemented that involves slights delays of mouse events to throw off phase estimation in Kloak. <ref>
-https://github.com/vmonaco/kloak/issues/7#issuecomment-893817507
-</ref>
-
-https://github.com/MIMIC-LOGICS/Mouse-Synthesizer/blob/main/MIMIC%20A%20Kinematic%20Theory-Based%20Synthesizer-Alessandro%20Nicola%20Capriati.pdf
-
-https://www.mimic.sbs/antibot/On-Anti-Bot-Biometric-Protections.md/#a-keyboard-synthesizer
-
-https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/30392
-https://web.archive.org/web/20250413102940/https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/30392
-https://archive.ph/6pYBT
-
-https://www.scirj.org/papers-0420/scirj-P0420766.pdf
-
-
-used in the wild
-https://upcommons.upc.edu/bitstream/handle/2117/400222/Detecting_and_Analyizing_Mouse_Tracking_in_the_Wild.pdf
+* try to change your writing style to reduce risk from [[Stylometry|Stylometry (writing pattern analysis)]]
+* understand [[Keystroke_and_Mouse_Deanonymization#Mouse_Fingerprinting|mouse tracking]], which can also be used to identify users
 
 = Threat Model =
-There are two general situations where biometric fingerprinting via keyboard and mouse behavior can be a problem:
+This section explains when and how your unique typing or mouse behavior - also known as biometric fingerprinting - could be used to compromise your privacy, even when using tools like Tor.
 
-* An adversary can observe your behavior both when using Tor and when using clearnet, and is attempting to link your activity on Tor to your identity.
-* An adversary can only observe your behavior over Tor, and is attempting to uniquely detect you separately from other Tor users.
+There are two main threat scenarios:
 
-Without defenses, the adversary in either of these scenarios can obtain a fingerprint unique to you by observing your patterns of keystrokes as described above. '''Mouse movements can be fingerprinted in a manner very similar to keystrokes.''' If the adversary can observe your behavior both on Tor and when using clearnet, they can conclude that the person with your fingerprint when using Tor is the same person with your fingerprint when using clearnet, and thus deanonymize your Tor activity.
+* '''1.''' A tracker can observe how you type or move your mouse both when you are using Tor and when you are using the regular internet (clearnet). They try to match your identity across both.
+* '''2.''' A tracker can only see your behavior on Tor, but still wants to tell you apart from other Tor users.
 
-If the adversary can only observe your behavior when using Tor, they cannot determine your real identity using biometric techniques alone, but they can still tell you apart from other Tor users. This may be problematic if an entity that provides a resource over Tor has the desire to prevent you from accessing the resource, or wishes to watch what you in particular do when you interact with the resource.
+In both cases, the tracker can create a fingerprint based on how you type - using patterns described in the [[#Keystroke_Dynamics|Keystroke Dynamics]] section - and how you move your mouse. <ref>
+Mouse fingerprinting can analyze factors like cursor speed, scrolling style, pause durations, and path curvature. These traits can be just as unique as typing patterns.
+</ref>
+
+If the tracker can watch your behavior on both Tor and clearnet, they may be able to tell that the person typing in one environment is the same person typing in the other - effectively removing your anonymity and linking your identity to your Tor activity.
+
+If the tracker can only watch what you do on Tor, they might not know who you are in real life, but they can still tell your behavior apart from everyone else using Tor. This may still be a problem. For example:
+
+* A website on the Tor network might block you if it recognizes your fingerprint.
+* It might also track everything ''you specifically'' do across multiple visits, even without knowing your identity.
+
+This means that even without knowing your name or IP address, a website or attacker could still follow your behavior just by how you type or move the mouse.
 
 = Defenses =
 == Kloak ==
-Kloak is an input device anonymization tool. It includes mitigations for keystroke fingerprinting as well as for masking unique user mouse movement behavior.<ref>https://github.com/vmonaco/kloak/pull/38</ref><ref>https://github.com/vmonaco/kloak/pull/50#issuecomment-1657250132</ref><ref>https://arxiv.org/pdf/2101.09087.pdf</ref> '''Kloak does not mask mouse movement behavior as effective as it masks typing behavior, see [[Keystroke_and_Mouse_Deanonymization#Limitations|Limitations]] below.'''
+Kloak is a privacy tool (input device anonymization tool) that hides your typing and mouse movement patterns, which can be used to identify you online.<ref>
+Technically, kloak anonymizes input device signals by introducing random delays in keyboard and mouse events, disrupting timing-based biometric identification. See:
 
-* [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] supported by default.
-* [[Qubes|{{q_project_name_long}}]] Unavailable. <ref>
-* https://github.com/vmonaco/kloak/pull/50 stalled
+* https://github.com/vmonaco/kloak/pull/38
+* https://github.com/vmonaco/kloak/pull/50#issuecomment-1657250132
+* https://arxiv.org/pdf/2101.09087.pdf
+</ref> '''Kloak is better at hiding keyboard behavior than mouse behavior. See [[Keystroke_and_Mouse_Deanonymization#Limitations|Limitations]].'''
 
-For previous tickets on this issue, see [https://forum.qubes-os.org/t/tutorial-how-to-use-kloak-with-usb-keyboards/14134 this].
+* [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] includes kloak by default.
+* [[Qubes|{{q_project_name_long}}]] support unavailable. <ref>
+Ongoing development is stalled. See: https://github.com/vmonaco/kloak/pull/50
 
+More info: [https://forum.qubes-os.org/t/tutorial-how-to-use-kloak-with-usb-keyboards/14134 community forum guide]
+
+Deprecated issues:
 * <s>https://github.com/QubesOS/qubes-issues/issues/2558</s>
 * <s>https://github.com/QubesOS/qubes-issues/issues/1850</s>
-* Using <code>/dev/input/event0</code> in Qubes VMs [https://forums.whonix.org/t/current-state-of-kloak/5605/6 will not work since not a keyboard device].
+* Using <code>/dev/input/event0</code> in Qubes VMs does not work. See: [https://forums.whonix.org/t/current-state-of-kloak/5605/6]
 * https://github.com/QubesOS/qubes-issues/issues/9771
 * https://github.com/QubesOS/qubes-issues/issues/9775
-</ref> See [[Keystroke_and_Mouse_Deanonymization#Qubes_Event_Buffering|Qubes Event Buffering]].
+</ref> Instead, see [[Keystroke_and_Mouse_Deanonymization#Qubes_Event_Buffering|Qubes Event Buffering]].
 
-Kloak is installed in {{non_q_project_name_long}} {{project_name_workstation_long}} by default.
+Kloak is pre-installed in {{non_q_project_name_long}} {{project_name_workstation_long}}.
 
-We recommend [[Packages for Debian Hosts|installing kloak on the host]] too so it remains effective in event of a {{project_name_workstation_short}} VM compromise. If you need to access accounts (for example banking) that enforce keystroke biometrics, then it may be a good idea to just limit installation to {{project_name_long}} VMs.
+We recommend [[Packages for Debian Hosts|installing kloak on your host system]] as well, to keep it effective even if your {{project_name_workstation_short}} VM gets compromised. However, if you're accessing sites that use typing biometrics (like some banking sites), it might be better to only use kloak within {{project_name_long}} VMs.
 
-Kloak has the added benefit of foiling attacks that identify search queries in encrypted network traffic using information leaked through autocomplete suggestions of search engines. <ref>[https://vmonaco.com/papers/Feasibility%20of%20a%20Keystroke%20Timing%20Attack%20on%20Search%20Engines%20with%20Autocomplete.pdf Feasibility of a Keystroke Timing Attack on Search Engines with Autocomplete]
-</ref> <ref>
-https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slides_monaco.pdf
+Another benefit of kloak is that it helps protect your search queries even if they are being analyzed in encrypted traffic using autocomplete leaks. <ref>
+* [https://vmonaco.com/papers/Feasibility%20of%20a%20Keystroke%20Timing%20Attack%20on%20Search%20Engines%20with%20Autocomplete.pdf Keystroke Timing Attack on Search Engines with Autocomplete]
+* https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slides_monaco.pdf
 </ref>
 
 kloak is designed to stymie adversary attempts to identify and/or impersonate users' biometric traits. The GitHub site succinctly describes kloak's purpose and the tradeoff between usability and the level of privacy. Notably, shorter time delays between keystrokes and release events reduces overall anonymity: <ref>
@@ -460,6 +559,9 @@ Without Kloak users can be identified with very high certainty. The second set o
 * Can mouse events be obfuscated better? It might be possible to randomly select times at which to deliver mouse events, then deliver all queued mouse events at once at those selected times, with intermediate events "squashed" together so that the mouse simply jumps to the position it would have ended up in had all mouse events been processed normally. If this is done, mouse events should probably be handled in a separate queue from keyboard events. Planned: https://forums.whonix.org/t/better-mouse-obfuscation/21445
 
 = Resources =
+* [http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html Advanced Tor Browser Fingerprinting] (2016)
+* [https://bigthink.com/technology-innovation/tor-users-can-be-tracked-by-their-mouse-movements/ Tor Users Can Be Tracked by Their Mouse Movements]
+* [https://thenextweb.com/news/mouse-movements-can-reveal-identity-even-tor-cant-hide Your mouse movements can reveal your identity - even when you use Tor]
 * arxiv: [https://arxiv.org/pdf/1609.07612.pdf Obfuscating Keystroke Time Intervals to Avoid Identification and Impersonation]
 
 = See Also =
