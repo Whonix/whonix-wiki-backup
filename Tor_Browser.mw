@@ -950,107 +950,70 @@ The procedure is complete.
 | text    = It is recommended to follow [https://blog.torproject.org The Tor Project blog] to stay informed about recent updates.
 }}
 
-Unfortunately, updating Tor Browser is more complex than regular system updates due to technical limitations outside of {{project_name_short}} control. <ref>
-[[Tor_Browser/Advanced_Users#Tor_Browser_Update:_Technical_Details|Tor Browser Update:Technical Details]]
-</ref> However, the following instructions will keep Tor Browser up-to-date at all times.
+Unfortunately, updating Tor Browser is more complex than regular system updates due to technical limitations outside of {{project_name_short}} control. <ref>[[Tor_Browser/Advanced_Users#Tor_Browser_Update:_Technical_Details|Tor Browser Update:Technical Details]]</ref> However, the following instructions will keep Tor Browser up-to-date at all times.
 
-There are three options for updating Tor Browser in {{project_name_short}}:
+=== Overview of Tor Browser Installation and Update Methods ===
 
-# The <code>{{project_name_short}}</code> [[#Tor_Browser_Downloader_by_{{project_name_short}}|Tor Browser Downloader]]. <ref>This does [https://phabricator.whonix.org/T400 not yet notice upgrades] performed by Tor Browser's Internal Updater.</ref>
-# <code>The Tor Project</code>'s Tor Browser [[#Tor_Browser_Internal_Updater|Internal Updater]]. <ref>Since v5.0, Tor Browser is configured to [https://blog.torproject.org/tor-browser-50-released update itself].</ref>
-# Tor Browser [[#Tor_Browser_Manual_Update|manual updates]].
+{| class="wikitable"
+! Method
+! Summary
+! Best Used When
+! Drawbacks
+|-
+! [[#Tor_Browser_Downloader_by_{{project_name_short}}|Tor Browser Downloader ({{project_name_short}})]]
+| A downloader that retrieves, verifies, and installs Tor Browser. Ideal for fresh installs or reinstalls.
+|
+* First-time installs  
+* Reinstalling a corrupted Tor Browser  
+* When internal updater fails
+|
+* Not a true updater  
+* Does not preserve user data (e.g., bookmarks, passwords)
+|-
+! [[#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]]
+| Built into Tor Browser by The Tor Project. Automatically fetches and applies updates in the background or manually.
+|
+* Regular updates  
+* Preserves user data  
+* Ideal for most users
+|
+* Not invoked by {{project_name_short}} downloader  
+|-
 
-The first two methods are suitable in most circumstances. Manual updates are only required if the {{project_name_short}} Tor Browser update script ever breaks. Never continue to use an outdated version of Tor Browser, otherwise serious security flaws may degrade anonymity or result in a VM compromise. <ref>https://tb-manual.torproject.org/updating/</ref>
+! [[#Tor_Browser_Manual_Update|Manual Update]]
+| Manual download and signature verification of Tor Browser from torproject.org
+|
+* When the other two options break  
+* For experienced users
+|
+* Requires manual work  
+* Can be error-prone  
+* Not ideal for beginners
+|-
 
-{{Anchor|Tor Browser Updater ({{project_name_short}})}}
+|}
 
-{{Anchor|Tor Browser Downloader by}}
+'''Warning:''' Never continue to use an outdated version of Tor Browser. This can degrade anonymity and may even lead to compromise of the {{project_name_workstation_short}} VM. <ref>https://tb-manual.torproject.org/updating/</ref>
+
 == Tor Browser Downloader by {{project_name_short}} ==
 {{Anchor|Downloader}}
-=== Configuration ===
-==== Manual Download Version Choice ====
-If the online detected version (for example <code>INFO: Online detected version: 10.5</code>) is different from the version number intended for download, it is possible to manually choose the download version on the command line. This can be useful when a new version of Tor Browser has been released but the version file <ref>
-At time of writing: https://aus1.torproject.org/torbrowser/update_3/release/downloads.json
-</ref> has not been updated yet by The Tor Project. The version file which is used to programmatically detect the latest Tor Browser version is usually updated a few days after new releases. <ref>
-This might be due to pragmatic reasons (work flow) or perhaps this is a staged rollout release strategy. (The term staged rollout hasn't been seen; see this definition [https://medium.com/bleeding-edge/the-art-of-staging-a-rollout-8e203b337b75 here].)
+=== tb-updater Introduction ===
+{{Anchor|Downloader}}
 
-</ref>
+Tor Browser Downloader by {{project_name_short}} is a usability tool designed to automate the process of downloading and installing the Tor Browser inside {{project_name_workstation_short}}. It simplifies installation for both [[Non-Qubes-Whonix]] and [[Qubes|{{q_project_name_short}}]] users by handling retrieval, signature verification, and extraction of the latest stable or alpha versions of Tor Browser.
 
-Syntax:
+'''Important:''' This tool is not an updater. It is incapable of preserving user data such as bookmarks, passwords, or other browser profile settings. For retaining user data across Tor Browser upgrades, use the [[#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] instead.
 
-{{CodeSelect|code=
-tbb_version=version.number update-torbrowser
-}}
+The tool supports:
 
-Example:
+* Initial installation of Tor Browser.
+* Re-installation of Tor Browser in case of corruption or failed updates.
+* Selecting between stable and alpha versions.
+* Optionally downloading over <code>.onion</code>.
 
-Note: Replace <code>10.5</code> with the actual version number.
+For security, the tool verifies digital signatures and highlights potential downgrade or freeze attacks before proceeding with installation.
 
-{{CodeSelect|code=
-tbb_version=10.5 update-torbrowser
-}}
-
-==== Onion Download ====
-It is possible to download over onion rather than clearnet.
-
-To permanently set downloads over onion, apply the following instructions.
-
-{{Box|text=
-'''1.''' {{Open with root rights|filename=
-/etc/torbrowser.d/50_user.conf
-}}
-
-'''2.''' Add the following setting.
-
-{{CodeSelect|code=
-tb_onion=true
-}}
-
-'''3.''' Save the file.
-
-The procedure is complete.
-}}
-
-Alternatively, the following command could be used to download over onion only once.
-
-{{CodeSelect|code=
-update-torbrowser --onion
-}}
-
-{{Anchor|alpha}}
-{{Anchor|Alpha}}
-
-==== Alpha Version ====
-{{Testers-only}}
-
-It is possible to configure the downloading of alpha rather than stable Tor Browser versions. Becoming a tester is a helpful way to [[contribute]] to {{project_name_short}}.
-
-To permanently enable downloading alpha versions, apply the following instructions.
-
-{{Box|text=
-'''1.''' {{Open with root rights|filename=
-/etc/torbrowser.d/50_user.conf
-}}
-
-'''2.''' Add the following setting.
-
-{{CodeSelect|code=
-tbb_download_alpha_version=true
-}}
-
-'''3.''' Save the file.
-
-The procedure is complete.
-}}
-
-Alternatively, the following command could be used to download the alpha version only once. Choose either option '''A)''' or '''B)'''.
-
-* '''A)''' tb-updater {{cli}} version: {{CodeSelect|code=
-update-torbrowser --alpha
-}}
-* '''B)''' tb-updater {{gui}} version: {{CodeSelect|code=
-update-torbrowser --alpha --input gui
-}}
+The next sections detail how to launch the downloader, perform installation, and configure behavior based on user preferences and threat models.
 
 === Installation Process ===
 '''Note:''' {{Code2|Tor Browser Downloader ({{project_name_short}})}} is really just a downloader, not an updater. This means it is incapable of retaining user data such as bookmarks and passwords. In order to preserve data, use the [[#Tor_Browser_Internal_Updater|Internal Updater]] method instead.
@@ -1066,24 +1029,79 @@ Tor Browser Downloader can download Tor Browser. Tor Browser Downloader cannot u
 
 '''2.''' Launch Tor Browser Downloader.
 
-{{Box|text=
+Select your platform.
+
+{{Tab
+|type=controller
+|content=
+
+{{Tab
+|type=section
+|linkid=non-qubes
+|addToClass=info-box
+|image=[[File:Whonix-logo-icon.svg]]
+|title= {{Headline|h=5|content=Non-Qubes-Whonix}}
+|content=
+<u>If you are using a [[Non-Qubes-Whonix]] system</u>, complete the following steps <u>inside {{project_name_workstation_short}}</u>.
+
+<code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Tor Browser Downloader ({{project_name_short}})</code>
+}}
+
+{{Tab
+|type=section
+|linkid=qubes
+|addToClass=info-box
+|image=[[File:Qubes-logo-blue.png]]
+|title= {{Headline|h=5|content=Qubes-Whonix}}
+|content=
+Qube type selection.
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|type=section
+|linkid=qubes-new
+|addToClass=info-box
+|image=[[File:Qubes-logo-blue.png]]
+|title= {{Headline|h=5|content=New App Qubes and Disposables}}
+|content=
 <u>If you are using [[Qubes|{{q_project_name_short}}]]</u>, to ensure that <u>new</u> App Qubes and [[Qubes/Disposables|Disposables]] are created with a copy of the latest Tor Browser version, complete the following steps:
 
 <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>{{project_name_workstation_short}} Template</code> (<code>{{project_name_workstation_template}}</code>) &rarr; <code>Tor Browser Downloader ({{project_name_short}})</code>
+}}
 
+{{Tab
+|type=section
+|linkid=qubes-existing
+|addToClass=info-box
+|image=[[File:Qubes-logo-blue.png]]
+|title= {{Headline|h=5|content=Existing App Qubes}}
+|content=
 <u>If you are using [[Qubes|{{q_project_name_short}}]]</u>, to re-install the latest Tor Browser version in <u>existing</u> {{project_name_workstation_short}} App Qubes, complete the following steps:
 
 <code>Qubes App Launcher (blue/grey "Q")</code> &rarr; <code>{{project_name_workstation_short}} App Qube</code> (<code>{{project_name_workstation_vm}}</code>) &rarr; <code>Tor Browser Downloader ({{project_name_short}})</code>
+}}
+}} <!-- End nested Qubes Tab Controller -->
+}}
 
-<u>If you are using a graphical {{project_name_workstation_short}}</u>, complete the following steps:
-
-<code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Tor Browser Downloader ({{project_name_short}})</code>
-
+{{Tab
+|type=section
+|linkid=terminal
+|addToClass=info-box
+|image=[[File:Utilities-terminal.png]]
+|title= {{Headline|h=5|content=Terminal}}
+|content=
 <u>If you are using a terminal</u>, complete the following steps:
+
 {{CodeSelect|code=
 update-torbrowser
 }}
 }}
+
+}} <!-- End Main Tab Controller -->
+
+'''3.''' Downloader.
 
 The downloader will show it is checking for updates.
 
@@ -1091,7 +1109,7 @@ The downloader will show it is checking for updates.
 
 [[File:Tor Browser Downloader({{project_name_short}}) checking for updates.png|400px|Tor Browser Downloader ({{project_name_short}}) checking for updates.]]
 
-'''3.''' Selected the preferred Tor Browser version when prompted.
+'''4.''' Selected the preferred Tor Browser version when prompted.
 
 Select the Tor Browser version and confirm installation. Take heed of the warning in the confirmation box stating <u>the existing Tor Browser user profile (including bookmarks and passwords) will be lost during this process.</u>
 
@@ -1105,7 +1123,7 @@ After agreeing to the download process, a progress indicator will be displayed b
 
 [[File:Tor Browser Downloader({{project_name_short}}) downloading.png|400px|Tor Browser Downloader ({{project_name_short}}) Downloading Tor Browser.]]
 
-'''4.''' Check the Tor Browser signature was correctly verified.
+'''5.''' Check the Tor Browser signature was correctly verified.
 
 Once the download has finished, the downloader will provide verification (or not) of the cryptographic signature associated with the Tor Browser binary, highlighting the key used to sign it and the date. The downloader will then ask for confirmation to install the package: see [[#Installation_Confirmation_Notification|Installation Confirmation Notification]] for steps on identifying a possible targeted attack.
 
@@ -1113,7 +1131,7 @@ Once the download has finished, the downloader will provide verification (or not
 
 [[File:torbrowserdownloader2.png|Tor Browser Downloader ({{project_name_short}}) Installation Confirmation.]]
 
-'''5.''' Confirm installation of Tor Browser.
+'''6.''' Confirm installation of Tor Browser.
 
 If the installation process is confirmed, the downloader will extract Tor Browser.
 
@@ -1121,7 +1139,7 @@ If the installation process is confirmed, the downloader will extract Tor Browse
 
 [[File:Tor Browser Downloader({{project_name_short}}) Extracting.png|400px|Tor Browser Downloader ({{project_name_short}}) Extracting.]]
 
-'''6.''' ''Optional:'' Launch Tor Browser.
+'''7.''' ''Optional:'' Launch Tor Browser.
 
 In the final step, the downloader will prompt whether the upgraded Tor Browser should be launched, unless the procedure was completed in a Qubes {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>).
 
@@ -1130,6 +1148,10 @@ In the final step, the downloader will prompt whether the upgraded Tor Browser s
 [[File:Tor Browser Downloader({{project_name_short}})FInished2.png|600px|Tor Browser Downloader ({{project_name_short}}) Finished Installing Tor Browser.]]
 
 <font size=-3>(Also available as [https://www.whonix.org/w/images/f/f2/Tor_Browser_Update_Check_005.png CLI version].)</font>
+
+'''8.''' Done.
+
+The process has been completed.
 }}
 
 === Download Confirmation Notification ===
@@ -1186,6 +1208,112 @@ TODO: expand.
 {{Qubes_Tor_Browser_Update}}
 
 {{anchor|download_failure}}
+=== Configuration ===
+'''Table 1:''' ''Permanent configuration options for Tor Browser Downloader''
+
+{| class="wikitable"
+! style="vertical-align: top;" | Feature
+! style="vertical-align: top;" | Description
+! style="vertical-align: top;" | Configuration Steps
+|-
+
+! style="vertical-align: top;" | {{anchor_link|Manual Download Version Choice}}
+| style="vertical-align: top;" | Manually specify a version when the latest one has not yet been detected. <ref>
+* If the online detected version (e.g. <code>INFO: Online detected version: 10.5</code>) is different from the desired version, it is possible to manually choose the version to download. This is helpful if the Tor Project has released a new version but the version file.
+* This might be due to pragmatic reasons (work flow) or perhaps a staged rollout release strategy. (The term staged rollout hasn't been seen; see this definition [https://medium.com/bleeding-edge/the-art-of-staging-a-rollout-8e203b337b75 here].)
+* https://aus1.torproject.org/torbrowser/update_3/release/downloads.json
+</ref>
+| style="vertical-align: top;" |
+'''Syntax:'''
+
+{{CodeSelect|code=
+tbb_version=version.number update-torbrowser
+}}
+
+'''Example:''' Replace <code>10.5</code> with the actual version number.
+
+{{CodeSelect|code=
+tbb_version=10.5 update-torbrowser
+}}
+|-
+
+! style="vertical-align: top;" | {{anchor_link|Onion Download}}
+| style="vertical-align: top;" | Download via the Tor network (onion) instead of clearnet.
+| style="vertical-align: top;" |
+'''Set permanently:'''
+
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''2.''' Add:
+
+{{CodeSelect|code=
+tb_onion=true
+}}
+
+'''3.''' Save the file.
+
+'''4.''' Done.
+}}
+|-
+
+! style="vertical-align: top;" | {{anchor_link|Alpha Version}}
+| style="vertical-align: top;" | Download alpha (testing) versions of Tor Browser instead of stable versions. Useful for contributors and testers.
+
+{{Testers-only}}
+| style="vertical-align: top;" |
+'''Set permanently:'''
+
+{{Box|text=
+'''1.''' {{Open with root rights|filename=
+/etc/torbrowser.d/50_user.conf
+}}
+
+'''2.''' Add:
+
+{{CodeSelect|code=
+tbb_download_alpha_version=true
+}}
+
+'''3.''' Save the file.
+
+'''4.''' Done.
+}}
+|-
+
+|}
+
+'''Table 2:''' ''One-time command-line options''
+
+{| class="wikitable"
+! style="vertical-align: top;" | Feature
+! style="vertical-align: top;" | One-time Command
+|-
+! style="vertical-align: top;" | Onion Download
+| style="vertical-align: top;" | Download over onion just once:
+
+{{CodeSelect|code=
+update-torbrowser --onion
+}}
+|-
+! style="vertical-align: top;" | Alpha Version
+| style="vertical-align: top;" | Download alpha version just once.
+
+* '''A)''' CLI version:
+
+{{CodeSelect|code=
+update-torbrowser --alpha
+}}
+
+* '''B)''' GUI version:
+
+{{CodeSelect|code=
+update-torbrowser --alpha --input gui
+}}
+|}
+
 === Tor Browser Downloader (by {{project_name_short}} developers) Issues downloading Tor Browser ===
 '''Figure:''' ''Tor Browser Downloader (by {{project_name_short}} developers) failed to download Tor Browser''
 
