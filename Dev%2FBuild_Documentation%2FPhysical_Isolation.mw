@@ -835,84 +835,9 @@ Done.
 
 {{Build_Documentation_Cleanup}}
 
-== Experimental: On the Raspberry Pi 3 B (RPI3) ==
-
-[[File:Piraspberryicon.png|Raspberry Pi Logo|200px|thumb]]
-
-=== Introduction ===
-
-* Contributor of <code>Experimental: On the Raspberry Pi 3 B (RPI3)</code>: [https://forums.whonix.org/u/Algernon Algernon]
-* Forum discussion: [https://forums.whonix.org/t/whonix-for-arm64-raspberry-pi-rpi-duplicate-forum-topic/1788 {{project_name_short}} for arm64 / Raspberry Pi (RPi)]
-* <u>Broken!</u> [https://forums.whonix.org/t/whonix-for-arm64-raspberry-pi-rpi-duplicate-forum-topic/1788/181 Cannot be used at this time] due to lack of maintainer.
-
-=== Procedure ===
-
-{{Box|text=
-'''1.''' [[#Get_the_Source_Code|Get the source code]].
-
-'''2.''' Build {{project_name_gateway_short}}.
-
-Run this command inside the {{project_name_short}} source folder.
-
-{{CodeSelect|code=
-sudo ./derivative-maker --target raw --flavor whonix-gateway-rpi --build --arch arm64 --kernel linux-image-arm64 --headers linux-headers-arm64
-}}
-
-'''3.''' Burn the image to a micro SD card.
-
-After a successful build, burn the <code>whonix_gw_rpi.img</code> image to a micro SD card using <code>gnome-disk-utility</code>.
-# Within gnome-disk-utility select the SD card.
-# At the top panel select "options" (next to the poweroff button).
-# Click "restore disk image" and choose the respective file.
-# Click "start restoring" and wait until it is finished.
-# Put the SD card into the RPI3, attach an HDMI monitor, an USB-ethernet adapter as well as a keyboard and boot it.
-
-'''4.''' Configure interfaces.
-
-After login, run.
-
-{{CodeSelect|code=
-sudoedit /etc/network/interfaces.d/30_non-qubes-whonix
-}}
-
-Change the address and the gateway of <code>eth0</code> corresponding to the local network / upstream router. As an example, our ISP router uses <code>192.168.0.1/24</code> for the internal network. In this case the <code>eth0</code> settings would look like the following:
-
-{{CodeSelect|code=
-auto eth0
-iface eth0 inet static
-    address 192.168.0.11
-    netmask 255.255.255.0
-    gateway 192.168.0.1
-}}
-
-'''5.''' Set up network cables.
-
-By default <code>eth0</code> is the native ethernet connection of the RPI3. Hence, connect a network cable from there to the router. <code>eth1</code> is the USB-ethernet adapter which should also be connected via cable to the computer running {{project_name_workstation_short}}.
-
-'''6.''' Manually set the time.
-
-The RPI3 lacks a real time clock, so it is necessary to manually set the current UTC date and time. Example:
-
-{{CodeSelect|code=
-sudo date -s "10 JUL 2021 17:00:00"
-}}
-
-'''7.''' Connect to the Tor network.
-
-Restart the networking service.
-
-{{CodeSelect|code=
-sudo service networking restart
-}}
-
-Restart the Tor service.
-
-{{CodeSelect|code=
-sudo service tor restart
-}}
-
-<u>Note</u>: Depending on the hypervisor it is necessary to change network settings on {{project_name_workstation_short}} in order to connect it to {{project_name_gateway_short}} (see next section).
-}}
+== Raspberry Pi ==
+{{anchor|Experimental: On the Raspberry Pi 3 B (RPI3)}}
+See [[Raspberry Pi]].
 
 == Unrecommended: In a VM ==
 
