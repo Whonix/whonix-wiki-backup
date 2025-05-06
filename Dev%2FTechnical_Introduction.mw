@@ -287,9 +287,18 @@ In the past, a number of ideas have been put forward as anti-forensics.
 * Restoring a fresh [[{{project_name_workstation_short}}_Security#VM_Snapshots|snapshot]] every time {{project_name_short}} is used.
 * Running {{project_name_short}} [https://forums.whonix.org/t/whonix-and-truecrypt/293/6 completely in ramdisks].
 * Using [[Full_Disk_Encryption|full disk encryption]].
+* Logs deletion.
 * And so on.
 
-Unfortunately, these methods are not a sufficient substitute. It is manifestly unsafe to try and deal with data by wiping it after it has already been stored, so this is a poor design principle to implement. Use [[Live Mode]] instead. The advantage is that sensitive (or unencrypted) data is never stored on storage media in the first place.
+Unfortunately, these methods are not a sufficient substitute. It is manifestly unsafe to try and deal with data by wiping it after it has already been stored, so this is a poor design principle to implement. One reason for that is [https://en.wikipedia.org/wiki/Wear_leveling wear leveling]. The issue with wear leveling is that the disk controller tells the kernel "file deleted," while in reality the sector has been marked as unusable but still contains data. This data can be recovered by data recovery professionals using low-level disk controller commands. This is documented in more detail here: {{kicksecure_wiki
+|wikipage=Full_Disk_Encryption#Advice_for_Solid-state_Drives_and_USB_Storage
+|text=Advice for Solid-state Drives and USB Storage
+}}.
+
+Use [[Live Mode]] on the host {{os}} instead. The advantage is that sensitive (or unencrypted) data is never stored on storage media in the first place. Ideally, this would be combined with {{kicksecure_wiki
+|wikipage=read-only
+|text=read-only
+}} mode.
 
 Using full disk encryption is still useful to protect against forensic analysis, but in some parts of the world this is illegal or draws unwanted attention.
 
@@ -301,6 +310,10 @@ Readers are urged to exercise caution when encountering claims about the capabil
 * [https://en.wikipedia.org/wiki/Computer_forensics Computer forensics].<ref>While the developers have a foundational understanding, they primarily advocate caution.</ref>
 * Residual data on USBs and SSDs post [https://web.archive.org/web/20201201150503/http://www.infosecisland.com/blogview/12153-Data-Remains-on-USB-and-SSDs-After-Secure-Erase.html "secure" erasure].
 * [https://en.wikipedia.org/wiki/Wear_leveling Wear leveling].
+** {{kicksecure_wiki
+|wikipage=Full_Disk_Encryption#Advice_for_Solid-state_Drives_and_USB_Storage
+|text=Advice for Solid-state Drives and USB Storage
+}}
 * Occasional tendencies of conventional hard drives to flag sectors as defective, retaining their data indefinitely.<ref>This phenomenon warrants further research.</ref>
 * Data remnants potentially [https://research.torproject.org/techreports/tbb-forensic-analysis-2013-06-28.pdf left behind by Tor Browser] across macOS, Linux, and Windows.
 * Other associated [https://web.archive.org/web/20170911205814/http://www.forensicswiki.org/wiki/Main_Page forensic competencies].
