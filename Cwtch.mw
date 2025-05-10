@@ -1,0 +1,131 @@
+{{Header}}
+{{Title|title=
+Cwtch
+}}
+{{#seo:
+|description=Anonymous Cwtch in {{project_name_short}}.
+}}
+{{chat_mininav}}
+{{intro|
+Anonymous Cwtch {{project_name_short}}.
+}}
+= Cwtch Introduction =
+[https://cwtch.im/ Cwtch] (by [https://openprivacy.ca/ Open Privacy]). <ref>
+* [https://docs.cwtch.im/blog/cwtch-nightly-preview-whonix-save-history/ Cwtch announced Whonix support.]
+</ref>
+
+related:
+
+* upstream documentation: [https://docs.cwtch.im/docs/platforms/whonix/ Running Cwtch on Whonix]
+* Whonix forum discussion: [https://forums.whonix.org/t/cwtch-messaging/5353 Cwtch messaging]
+
+= Notices =
+
+{{Testers-only}}
+
+{{Third_Party_Repository}}
+
+= Installation =
+== Cwtch {{project_name_gateway_short}} Installation Steps ==
+{{onion-grater-warning}}
+
+{{Control_Port_Filter_Python_Profile_Add
+|filename_new=40_cwtch
+}}
+
+<ref>
+These instructions use the [https://github.com/Whonix/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_cwtch.yml <code>/usr/share/doc/onion-grater-merger/examples/40_cwtch.yml</code>] onion-grater profile packaged for Whonix.
+
+In the future it is conceivable that the upstream [https://git.openprivacy.ca/cwtch.im/cwtch-ui/src/branch/trunk/linux/cwtch-whonix.yml <code>cwtch-whonix.yml</code>] onion-grater profile is more recent.
+
+In that case it might be necessary to replace <code>/usr/share/doc/onion-grater-merger/examples/40_cwtch.yml</code> with upstream's <code>cwtch-whonix.yml</code> until onion-grater in Whonix is upgraded to contain the new onion-grater profile.
+</ref>
+
+== Cwtch {{project_name_workstation_short}} Installation Steps ==
+=== Installation ===
+'''1.''' Notice.
+
+* [[{{Non_q_project_name_short}}|{{non_q_project_name_long}}]]: Perform these steps inside {{project_name_short}}.
+* [[{{q_project_name_short}}|{{q_project_name_long}}]]: Perform these steps inside Qubes <code>{{project_name_workstation_template}}</code> Template.
+
+'''2.''' Add the GPG key to the APT keyrings. <ref>
+Unfortunately not installable from Debian package repositories at time of writing.
+[https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=922887 RFP: cwtch -- Privacy Preserving Infrastructure for Asynchronous, Decentralized, Multi-Party, and Metadata Resistant Applications]
+</ref>
+
+{{apt_key_add_derivative
+|download_command=scurl-download https://deb.cwtch.im/F6E3CBE475D0929825F9FC363498D4989B3F602B.asc
+|download_command_qubes_templatevm=http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 scurl-download https://deb.cwtch.im/F6E3CBE475D0929825F9FC363498D4989B3F602B.asc
+|source_filename=F6E3CBE475D0929825F9FC363498D4989B3F602B.asc
+|target_filename=/usr/share/keyrings/deb.cwtch.im-keyring.gpg
+|gpg_fingerprint=Key fingerprint = F6E3 CBE4 75D0 9298 25F9  FC36 3498 D498 9B3F 602B
+}}
+
+'''3.'''  {{kicksecure_wiki
+|wikipage=Dev/Strong_Linux_User_Account_Isolation#umask_hardening
+|text=umask hardening
+}} workaround.
+
+This may no longer be required in a future version.
+
+{{CodeSelect|code=
+sudo chmod o+r /usr/share/keyrings/deb.cwtch.im-keyring.gpg
+}}
+
+'''4.''' Add the cwtch repository.
+
+{{CodeSelect|code=
+echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/deb.cwtch.im-keyring.gpg] https://deb.cwtch.im/cwtch.im/ stable main' {{!}} sudo sttee /etc/apt/sources.list.d/cwtch.im.list
+}}
+
+<ref>
+{{CodeSelect|code=
+sudo overwrite /etc/apt/sources.list.d/cwtch.im.list 'deb [arch=amd64 signed-by=/usr/share/keyrings/deb.cwtch.im-keyring.gpg] https://deb.cwtch.im/cwtch.im/ stable main'
+}}
+</ref>
+
+'''5.''' Install cwtch.
+
+{{Install Package|
+package=cwtch
+}}
+
+'''6.''' Done.
+
+Installation of cwtch has been completed.
+
+=== Firewall Settings ===
+Modify the {{project_name_workstation_short}} (<code>anon-whonix</code>) user firewall settings and reload them.
+
+{{box|text=
+{{Firewall_Settings_Workstation}}
+
+Add. 
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" $(seq 15000 15378) "
+}}
+
+Save.
+
+{{Reload_Firewall_ws}}
+}}
+
+= Cwtch Usage =
+Inside {{project_name_workstation_short}}.
+
+To start Cwtch. <ref>
+The following environment variables might be set by default in a future Whonix version.
+<pre>
+env CWTCH_TAILS=true CWTCH_RESTRICT_PORTS=true CWTCH_BIND_EXTERNAL_WHONIX=true
+</pre>
+</ref>
+
+{{CodeSelect|code=
+env CWTCH_TAILS=true CWTCH_RESTRICT_PORTS=true CWTCH_BIND_EXTERNAL_WHONIX=true cwtch
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]

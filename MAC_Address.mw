@@ -35,6 +35,10 @@ The {{project_name_short}} MAC Address wiki page is forked from the Tails Enable
 |image=MACaddress2131.jpg
 }}
 [[File:MACaddress2131.jpg|thumb]]
+<div class="mininav">
+* [[MAC Address]]
+* [[Dev/MAC|MAC address (developers)]]
+</div>
 {{intro|
 MAC Address Spoofing and Tracking Threats
 }}
@@ -43,44 +47,14 @@ MAC Address Spoofing and Tracking Threats
 
 {{upstream_wiki}}
 
-== Auto-connect Risk ==
-
-Beyond the challenge of generating an appropriate spoofed MAC address, there are technical hurdles related to preventing automatic network connections.
-
-A spoofed MAC address is ineffective if the computer automatically connects to a public network after booting, thereby exposing the real MAC address:
-
-* <u>Physical Isolation:</u> {{project_name_gateway_long}} automatically connects to Tor upon startup.
-* <u>USB Wi-Fi Device:</u> Automatic connections may occur depending on the configuration.
-* <u>VM Users:</u> The host operating system is likely to automatically connect to the internet for updates, time synchronization, or other background services.
-
 = Other Location Tracking Risks =
 
 == Tor Entry Guard Fingerprinting ==
 
-Addressing MAC address concerns is only one part of a broader location tracking problem. Users must also consider how Tor entry guards are used across different locations to avoid guard fingerprinting. To mitigate this risk, follow <u>one</u> of the [[Tor_Entry_Guards#Mitigate_the_Threat_of_Guard_Fingerprinting|recommended configurations]]:
-
-# [[Tor_Entry_Guards#Clone_Whonix-Gateway_(sys-whonix)_with_New_Entry_Guards|Clone {{project_name_gateway_short}} ({{project_name_gateway_vm}}) with New Entry Guards]].
-# [[Tor_Entry_Guards#Regenerate_the_Tor_State_After_Saving_the_Tor_State_Folder|Regenerate the Tor State File after Saving the Current Tor State]].
-# Configure Tor to use [[Tor_Entry_Guards#Alternating_Bridges|Alternating Bridges]].
-# If relocating permanently, create [[Tor_Entry_Guards#Fresh_Tor_Entry_Guards_by_Regenerating_the_Tor_State_File|Fresh Tor Entry Guards by Regenerating the Tor State File]].
-
-To fully mitigate this threat, entry guard changes must be applied to every Tor instance on both the host (e.g., apt-transport-tor) and guest systems.
-
-= Using Personal Computers in a Public Network =
-
-{{mbox
-| type      = notice
-| image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = This applies to using a personal laptop, desktop, or any other internet-facing device in a public network.
+Moved to {{kicksecure_wiki
+|wikipage=MAC_Address#Other_Location_Tracking_Risks
+|text=Other Location Tracking Risks
 }}
-
-In this scenario, the MAC address <u>must</u> be changed, and a [[Tor_Entry_Guards#Mitigate_the_Threat_of_Guard_Fingerprinting|new set of Tor entry guards]] should be configured. <ref>This process involves removing the ''/var/lib/tor/state'' file.</ref> Additionally, efforts should be made to obscure Tor usage from the network administrator. Depending on the user's setup, this may involve using an obfsproxy bridge or tunneling traffic through [[Tunnels/Connecting_to_SSH_before_Tor|SSH]] or a [[Tunnels/Connecting_to_a_VPN_before_Tor|VPN]] before connecting to the Tor network.
-
-Depending on the threat model, changing the MAC address and using Tor may prevent revisiting the public network. If reuse is needed, the user must choose between keeping the same MAC address and Tor entry guards or generating new ones.
-
-If the network administrator is suspected of logging MAC addresses, changing the MAC may arouse suspicion. Conversely, if the network is sufficiently public and individual observation is unlikely, it may be safe to use a new MAC address each time -- one that features a popular vendor ID and a random second part.
-
-For further discussion on this complex topic, see [[Dev/MAC]].
 
 = Changing MAC Addresses =
 
