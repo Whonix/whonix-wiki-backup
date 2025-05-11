@@ -147,6 +147,62 @@ A related topic is the potential to [[Hide_Tor_from_your_Internet_Service_Provid
 
 <blockquote>It is impossible to hide Tor use from the <u>I</u>nternet <u>S</u>ervice <u>P</u>rovider (ISP). It has been concluded this goal is difficult beyond practicality.</blockquote>
 
+== Advanced Traffic Fingerprinting ==
+
+{{quotation
+|quote=
+[...]
+
+Passive Operating System Identification  
+
+Passive Operating System identification relies on the fact that each OS's IP implementation differs slightly, depending on RFC interpretation. This is most accurately done by analyzing TCP SYN packets, as these have the greatest number of unique identifiers. The fields used to make this determination are Initial TTL, Don't Fragment flag, Initial SYN Packet Size, IP ID, TOS Field, Source Port and TCP Options, such as Window Size, MSS Size, Nop Option, Window Scaling Option and SackOK Option.  
+
+Previously, excellent papers on this topic have been published by both Lance Spitzner and Toby Miller. Both of these papers are excellent; however, they present slightly varied techniques. Currently, there exist two automated tools for doing such analysis: Siphon (which doesn't appear to have been updated in a while) and p0f (which was recently updated). Of these two tools, p0f relies mainly on a combination of IP fields and TCP SYN packet options, while Siphon uses mainly IP-level information such as TTL and Don't Fragment bit. Automating analysis is quite easy with p0f. P0F even detects some not so OS-dependent nuances such as Nmap scans, as follows:
+
+[...]
+|context=[https://www.csd.uoc.gr/~gvasil/old2009/old/stuff/papers/Passive%20Network%20Traffic%20Analysis.pdf Passive Network Traffic Analysis: Understanding a Network Through Passive Monitoring]
+}}
+
+See also [https://www.sciencedirect.com/topics/computer-science/passive-fingerprinting Passive Fingerprinting].
+
+{{quotation
+|quote=The OS fingerprinting result can be used for tethering detection.
+|context=[https://conferences2.sigcomm.org/imc/2014/papers/p173.pdf OS Fingerprinting and Tethering Detection in Mobile Networks]
+}}
+
+{{quotation
+|quote=
+Boot Time: Machine boot time can be inferred from TCP timestamp values in packets sent from that machine. Most OS implementations use a random number as the starting value of TCP timestamps after booting. Hence the estimated boot time is not the real one. However, the value can still quite uniquely identify a machine because different machines have distinct boot times and distinct initial TCP timestamp values [39].
+|context=[https://conferences2.sigcomm.org/imc/2014/papers/p173.pdf OS Fingerprinting and Tethering Detection in Mobile Networks]
+}}
+
+(Therefore it is a good idea that Kicksecure's security-misc disables TCP timestamps.)
+
+https://security.stackexchange.com/questions/232865/how-do-isps-detect-whether-a-phone-uses-tethering
+
+https://onlinelibrary.wiley.com/doi/10.1155/2023/8658278
+
+https://yewtu.be/watch?v=vfQSY0-Tzns
+
+https://yewtu.be/watch?v=hQJZrLOVwYY
+
+https://yewtu.be/watch?v=MbSPxCEuAi4
+
+https://threatpicture.com/terms/tcp-fingerprinting/
+
+https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
+
+https://arxiv.org/html/2404.12738v1
+
+https://blog.foxio.io/ja4+-network-fingerprinting
+
+https://incolumitas.com/2021/03/13/tcp-ip-fingerprinting-for-vpn-and-proxy-detection/
+
+TCP timestamps:
+https://www.sysnet.ucsd.edu/sysnet/miscpapers/YoshiTDSC05.pdf
+
+https://censoredplanet.org/fingerprint-rtt
+
 == Visited Websites ==
 
 Destination websites can retrieve [[Data_Collection_Techniques|a lot of information]] about a user's browser and system, while [[Tor_Browser/Advanced_Users#Adversary_Attack_Capabilities|advanced adversaries]] have even greater capabilities. <ref>Information that is leaked depends on the browser in use, JavaScript settings, Tor Browser's security slider settings, whether it is a malicious attack or not, and other factors.</ref> This information can include:
@@ -199,9 +255,11 @@ https://blog.torproject.org/critique-website-traffic-fingerprinting-attacks
 
 This attack should not be confused with end-to-end correlation attacks performed by malicious Entry guards set up by Tor-relay level adversaries.
 
-<ref>
+More sources: <ref>
 * https://thehackernews.com/2021/11/researchers-demonstrate-new.html
 * https://witestlab.poly.edu/blog/de-anonymizing-tor-traffic-with-website-fingerprinting/
+* https://www.cs.sfu.ca/~taowang/wf/Ca-Tamaraw.pdf
+* https://www.usenix.org/conference/usenixsecurity22/presentation/smith
 </ref>
 
 = {{project_name_short}} Fingerprint Comparison =
