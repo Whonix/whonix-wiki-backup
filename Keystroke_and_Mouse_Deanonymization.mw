@@ -467,13 +467,28 @@ This will enable event buffering on <code>whonix-workstation-17-dvm</code>, with
 '''5.''' Done. Event buffering is now enabled for <code>whonix-workstation-17-dvm</code>. You should notice a delay in typing when you launch the VM next.
 
 = Limitations =
+== Shared Personality ==
+Prerequisite knowledge:
+
+* shared personality
+* virtual personality
+
+Please read [[Protocol-Leak-Protection_and_Fingerprinting-Protection#Identifiers_Design_Goals|Identifiers Design Goals]] first to acquire the perquisite knowledge.
+
+In line with Identifiers Design Goals, a shared personality instead of a virtual personality has been implemented.
+
+This is mentioned again below as "Biometric software can tell that you're using Kloak." [...]
+
+Discussion:
+[https://github.com/QubesOS/qubes-gui-daemon/pull/149#issuecomment-2868613211 Related GitHub discussion on Kloak and Qubes Event Buffering and shared versus virtual personality]
+
 == Kloak and Qubes Event Buffering ==
 
 Both Kloak and Qubes event buffering have some limitations users '''MUST''' be aware of before relying on them for security:
 
 * '''Mouse events are cloaked, but not as effectively as keyboard events.''' Pointing devices (mice, touchpads, trackballs, etc.) produce a very large number of events when the pointer is being moved by the user. Both Kloak and Qubes event buffering use a scheduling system that queues events as they arrive and tries to ensure no event is delayed longer than the set maximum delay value. Because pointing devices flood the queue with events when the pointer is moved, this usually results in almost all of the events involved in a pointer movement being delayed for exactly the maximum delay time. This removes almost all anonymizing jitter and may allow an adversary to fingerprint and identify the user via mouse movements even if Kloak or event buffering is being used.
 * '''Typing may be substantially more difficult.''' Because Kloak and event buffering both queue, delay, and release keystrokes at semi-randomly chosen times, typing is not as easy when using Kloak. Lag is usually noticeable and unpredictable. Shorter maximum delay times can improve usability, but only at the cost of providing less anonymity.
-* '''Biometric software can tell that you're using Kloak.''' When using Kloak, one's typing rhythm will appear very unnatural and strange to biometric software, which is a clear indicator that one is using Kloak or similar software. Kloak makes no attempt to mask its use; it only ensures that all Kloak and Kloak-alike users appear similar to each other. This is similar to the limitations of Tor - one cannot tell which Tor user is accessing a resource or the true identity of the Tor user, but they can very easily tell that the resource is being accessed over Tor.
+* '''Biometric software can tell that you're using Kloak.''' When using Kloak, one's typing rhythm will appear very unnatural and strange to biometric software, which is a clear indicator that one is using Kloak or similar software. Kloak makes no attempt to mask its use; it only ensures that all Kloak and Kloak-alike users appear similar to each other. This is similar to the limitations of Tor - one cannot tell which Tor user is accessing a resource or the true identity of the Tor user, but they can very easily tell that the resource is being accessed over Tor. ([[Keystroke_and_Mouse_Deanonymization#Shared_Personality|Shared Personality]])
 * '''Legitimate uses of biometric software will break.''' If you use software that relies on keystroke biometrics to identify you, it will almost certainly fail to do so if you are using Kloak. This may require you to temporarily disable Kloak before using certain services.
 * Small delays are not effective; higher values that can be tolerated are preferable.
 * It does not address [[Stylometry]] threats.

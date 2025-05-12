@@ -469,35 +469,44 @@ Advantages if a shared MAC Addresses would be used by all {{project_name_worksta
 See [[Metadata]].
 
 = Identifiers Design Goals =
-(In response to [https://www.reddit.com/r/Whonix/comments/lrk2v0/some_linux_systems_including_whonix_have_a_unique/ Some Linux systems (including Whonix) have a unique identifier called machine-id that doesn't change. Here is how to change it.])
 
-Should identifiers such as <code>/etc/machine-id</code>:
+Should the goal be,
 
-* '''A)''' be shared among all {{project_name_short}} users all the time, OR
-* '''B)''' be unique per user per boot?
+* '''A)''' <u>a shared personality:</u> to have all {{project_name_short}} appear with the same uniform fingerprint at all times, OR
+* '''B)''' <u>a virtual personality:</u> to invent and emulate a different unique fingerprint for each user?
+
+In other words, should each {{project_name_short}} system look exactly the same to observers, or should it try to look different for every user?
+
+The same question rephrased in more technical terms: should identifiers such as <code>/etc/machine-id</code>:
+
+* '''A)''' <u>shared:</u> be the same across all {{project_name_short}} systems, OR
+* '''B)''' <u>unique:</u> be regenerated for each user at every system boot?
 
 {{project_name_short}} design, at the time of writing, is A). <ref>
 https://github.com/Whonix/dist-base-files
-</ref> It may be possible to make arguments for either option. However, upon consideration, it seems clear that A) is better.
+</ref> It may be possible to argue for either option. However, upon consideration, it seems clear that A) offers greater privacy in the context of how {{project_name_short}} is used.
 
-The threat model here is that software running inside {{project_name_workstation_short}} might read the machine ID and send it to remote servers, which could then use it to fingerprint the user. This could be considered privacy-invasive software that should be avoided or even malicious software.
+The threat model being considered here is that some software inside {{project_name_workstation_short}} might read system identifiers — such as the machine ID — and send them to a remote server. That remote server could then use this identifier to recognize or track users. This type of software can be described as privacy-invasive or, in more severe cases, malicious.
 
-A) leaks "it is a {{project_name_short}} user." However, the fact that "it is a {{project_name_short}} user" is being leaked is realistically unavoidable. For details on why this is the case, refer to the [[VM Fingerprinting]] page and the {{kicksecure_wiki
+Choosing option A) does mean that the machine ID reveals, "this is a {{project_name_short}} system." However, avoiding this kind of leakage is realistically not possible. For a deeper explanation, refer to the [[VM Fingerprinting]] page and the {{kicksecure_wiki
 |wikipage=System_identity_camouflage
 |text=System Identity Camouflage
-}} wiki pages. This is a general issue and [[unspecific|unspecific to {{project_name_short}}]]. If an application or malware intends to track users, such applications, in most cases, could generate their own unique ID for tracking purposes. Therefore, taming identifiers such as <code>/etc/machine-id</code> does not help much.
+}} wiki pages. This is a general problem and is [[unspecific|unspecific to {{project_name_short}}]]. In fact, if an application or malware wants to track users, it can simply generate its own identifier and use that. Therefore, trying to hide system-level identifiers like <code>/etc/machine-id</code> does not meaningfully increase privacy in most cases.
 
-The approach of Tor and the Tor Browser Bundle is also similar to A). Tor and Tor Browser do not attempt to create a fresh, random pseudonym per session. Rather, Tor and Tor Browser attempt to make all users look the same. The Tor Project coined this <code>Anonymity Loves Company</code> (a good web search term). {{project_name_short}} attempts to be an extension of Tor and therefore follows similar design principles.
+Tor and the Tor Browser take a similar approach to this issue. They do not try to generate a new random identity (pseudonym) each time they are used. Instead, their strategy is to make all users appear the same to outside observers. The Tor Project refers to this concept as <code>Anonymity Loves Company</code> (you can search the web for this term for more background). Since {{project_name_short}} is designed as an extension of Tor, it follows the same principle.
 
-B) would not leak "it is a {{project_name_short}} user," but attempting to hide that is realistically impossible as per [[VM Fingerprinting]].
+Option B) would avoid revealing that a system is running {{project_name_short}}, but actually hiding this fact is not practically achievable, as explained in [[VM Fingerprinting]].
 
-There is also an optimization conflict between perfect fingerprinting resistance against locally running malware and security hardening settings. Security hardening of the system unfortunately leaks the fact (fingerprintable) that the system has been hardened. One cannot have both perfect fingerprinting resistance and security hardening at the same time. Since perfect local fingerprinting resistance cannot realistically be established, {{project_name_short}} chooses security hardening whenever such a conflict arises.
+There is also a trade-off between two goals: complete resistance to fingerprinting by local software, and applying strong system hardening for better security. Unfortunately, when the system is hardened for security, this itself becomes a fingerprint: it reveals that the system has been customized or secured, which may make it more identifiable. Since it is impossible to achieve both goals perfectly, {{project_name_short}} prioritizes security hardening whenever these goals conflict.
 
-When not using VMs, locally running privacy-invasive or malicious software has even more possibilities for fingerprinting users due to direct access to hardware identifiers.
+When not using virtual machines (VMs),  privacy-invasive software running on the host system has even greater ability to fingerprint users, because it can directly access hardware identifiers such as serial numbers, MAC addresses, or CPU features.
 
 For a related wiki page on identifiers, see: [[Protocol-Leak-Protection_and_Fingerprinting-Protection|Protocol Leak Protection and Fingerprinting Protection‎]].
 
-Forum discussion: [https://forums.whonix.org/t/anonymize-etc-machine-id/7721 Anonymize <code>/etc/machine-id</code>]
+Discussions:
+
+* This wiki chapter has been written in response to [https://www.reddit.com/r/Whonix/comments/lrk2v0/some_linux_systems_including_whonix_have_a_unique/ Some Linux systems (including Whonix) have a unique identifier called machine-id that doesn't change. Here is how to change it.]
+* Forum discussion: [https://forums.whonix.org/t/anonymize-etc-machine-id/7721 Anonymize <code>/etc/machine-id</code>]
 
 = CPU Output Tests =
 

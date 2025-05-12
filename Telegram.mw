@@ -38,12 +38,88 @@ Disadvantages include:
 
 * The application requires the user to register a phone number to create a Telegram account. See also [[Phone Number Validation]]. This is why it is not recommended for anonymous messaging at this time.
 * End-to-end client encryption is <u>not</u> enabled by default.
-** The desktop version has no end-to-end encryption feature.
+** The desktop and web versions have no end-to-end encryption feature. Messages from non-encrypted chats are stored on Telegram's servers and Telegram team has access to it according to section 3.3.1 of [https://web.archive.org/web/20250509102950/https://telegram.org/privacy/eu privacy policy (archived at time of writing)]. Telegram moderators may check messages that users have reported, as stated in section 5.3 of privacy policy.
 ** The mobile version has easily confused encrypted versus non-encrypted chats.
+** Telegram does <u>not have</u> encrypted group chats, channels and chats with bots.
 ** For the purpose of encrypted chats, it is better to use a messenger that is always encrypted end-to-end by default.
-* At the time of writing, starting a phone call from a secret (encrypted) chat results in a regular (unencrypted) call. The call log appears in the chat log of the regular (unencrypted) chat, not in the secret (encrypted) one. There is no visual feedback to distinguish an encrypted call from an unencrypted one, even if encrypted calls exist.
+* MTProto 2.0 has been repeatedly criticized by cryptography experts <ref>
+* https://blog.cryptographyengineering.com/2024/08/25/telegram-is-not-really-an-encrypted-messaging-app/
+* https://eprint.iacr.org/2022/088
+* https://eprint.iacr.org/2022/595
+* https://mtpsym.github.io/
+</ref>
+* Telegram collects a lot of metadata: IP address, devices and Telegram apps you've used, history of username changes, etc. This metadata can be kept for 12 months, as stated in section 5.2 of privacy policy.
+* Telegram cooperates with intelligence agencies and may share user data (IP address and phone number), as stated in paragraph 8.3 of the privacy policy.
 
 One viewpoint is to see Telegram as a modern public chat or IRC alternative.
+
+= Telegram Data Harvesting =
+
+Telegram collects information about the operating system, sends it to the server, stores it there, and then sends a message to the user without end-to-end encryption. Here is an example:
+
+{{quotation
+|quote=Device : Telegram Desktop, 4.6.5 Snap, Desktop, Linux Qubes X11 glibc 2.35
+|context=Telegram, service notifications <ref>
+https://forum.qubes-os.org/t/telegram-desktop-identifying-qubes-in-standalonevm/17906
+</ref>
+}}
+
+This means Telegram has collected at least:
+
+{| class="wikitable"
+! <!-- item --> Category
+! <!-- value --> Value
+|-
+
+! Device
+| Telegram Desktop
+|-
+
+! Installation method
+| Snap
+|-
+
+! Telegram version number
+| 4.6.5
+|-
+
+! Operating system kernel
+| Linux
+|-
+
+! Operating system
+| Qubes
+|-
+
+! Window manager
+| X11
+|-
+
+! System libraries detected
+| glibc 2.35
+|-
+
+|}
+
+This has sparked discussion among users:
+
+* https://forum.qubes-os.org/t/how-to-hide-the-fact-that-im-qubes-os-from-telegram/22934?
+* https://forum.qubes-os.org/t/telegram-desktop-identifying-qubes-in-standalonevm/17906
+* https://forums.whonix.org/t/qubes-identifiers/17994
+
+See also: [[VM_Fingerprinting|VM Fingerprinting]]
+
+= Telegram User Freedom Threats =
+
+As defined in {{kicksecure_wiki
+|wikipage=Miscellaneous_Threats_to_User_Freedom#User_Freedom_Threats
+|text=User Freedom Threats
+}}:
+
+* Proprietary Tethers
+* RegistrationRequired
+* Non-freedom network service
+* Enforced centralization
 
 = Installation =
 <ref>
