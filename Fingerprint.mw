@@ -124,7 +124,13 @@ One addition which is unique to {{project_name_short}} is its Tor configuration 
 |-
 
 ! scope="row"| Time Synchronization
-| When {{project_name_short}} is started, the system clock is synchronized to make sure it slightly differs from the host clock via <code>[[sdwdate]]</code>. <code>[https://www.kicksecure.com/wiki/Systemcheck systemcheck]</code> also issues some network traffic to check for updates and news, which all passes through different circuits. This behavior might be specific to {{project_name_short}}. <ref>It is unknown if an ISP can detect whether a user has many different Tor circuits open. On the other hand, Tor seems to only open X entry guards and maintain them for a period, thus not opening as many entry guards as streams.</ref>
+| When {{project_name_short}} is started, the system clock is synchronized to make sure it slightly differs from the host clock via <code>[[sdwdate]]</code>. <ref>
+It is unknown if an ISP can detect whether a user has many different Tor circuits open. On the other hand, Tor seems to only open X entry guards and maintain them for a period, thus not opening as many entry guards as streams.
+</ref>
+|-
+
+! scope="row"| systemcheck
+| <code>[[systemcheck]]</code> also issues some network traffic over Tor to check for updates and [[Systemcheck#Warrant_Canary_Check|Warrant Canary Check]], which all passes through different circuits. Traffic passes through different circuits. This behavior might be specific to {{project_name_short}}.
 |-
 
 ! scope="row"| [[Fingerprint#Website Traffic Fingerprinting|Website Traffic Fingerprinting]]
@@ -148,6 +154,17 @@ A related topic is the potential to [[Hide_Tor_from_your_Internet_Service_Provid
 <blockquote>It is impossible to hide Tor use from the <u>I</u>nternet <u>S</u>ervice <u>P</u>rovider (ISP). It has been concluded this goal is difficult beyond practicality.</blockquote>
 
 == Advanced Traffic Fingerprinting ==
+For example, one could ask why Qubes Debian Template might not look the same as Fedora (non-Qubes)?
+
+* Different default Fedora packages.
+* Therefore different amount of traffic.
+* Connections to Qubes’ Fedora repository (qubes-core-agent, …)
+* Qubes Fedora disables TCP timestamps. (Actually good.)
+* [https://github.com/QubesOS/qubes-core-agent-linux/blob/main/config-overrides/20_tcp_timestamps.conf qubes-core-agent-linux/config-overrides/20_tcp_timestamps.conf]
+** Upstream Fedora probably doesn’t.
+* Conclusion: Fingerprintable.
+
+Other considerations:
 
 {{quotation
 |quote=
@@ -178,34 +195,28 @@ Boot Time: Machine boot time can be inferred from TCP timestamp values in packet
 
 (Therefore it is a good idea that Kicksecure's security-misc disables TCP timestamps.)
 
-https://security.stackexchange.com/questions/232865/how-do-isps-detect-whether-a-phone-uses-tethering
-
-https://onlinelibrary.wiley.com/doi/10.1155/2023/8658278
-
-https://yewtu.be/watch?v=vfQSY0-Tzns
-
-https://yewtu.be/watch?v=hQJZrLOVwYY
-
-https://yewtu.be/watch?v=MbSPxCEuAi4
-
-https://threatpicture.com/terms/tcp-fingerprinting/
-
-https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
-
-https://arxiv.org/html/2404.12738v1
-
-https://blog.foxio.io/ja4+-network-fingerprinting
-
-https://incolumitas.com/2021/03/13/tcp-ip-fingerprinting-for-vpn-and-proxy-detection/
+* https://security.stackexchange.com/questions/232865/how-do-isps-detect-whether-a-phone-uses-tethering
+* https://onlinelibrary.wiley.com/doi/10.1155/2023/8658278
+* https://yewtu.be/watch?v=vfQSY0-Tzns
+* https://yewtu.be/watch?v=hQJZrLOVwYY
+* https://yewtu.be/watch?v=MbSPxCEuAi4
+* https://threatpicture.com/terms/tcp-fingerprinting/
+* https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
+* https://arxiv.org/html/2404.12738v1
+* https://blog.foxio.io/ja4+-network-fingerprinting
+* https://incolumitas.com/2021/03/13/tcp-ip-fingerprinting-for-vpn-and-proxy-detection/
 
 TCP timestamps:
-https://www.sysnet.ucsd.edu/sysnet/miscpapers/YoshiTDSC05.pdf
 
-https://censoredplanet.org/fingerprint-rtt
+* https://www.sysnet.ucsd.edu/sysnet/miscpapers/YoshiTDSC05.pdf
+* https://censoredplanet.org/fingerprint-rtt
 
 == Visited Websites ==
 
-Destination websites can retrieve [[Data_Collection_Techniques|a lot of information]] about a user's browser and system, while [[Tor_Browser/Advanced_Users#Adversary_Attack_Capabilities|advanced adversaries]] have even greater capabilities. <ref>Information that is leaked depends on the browser in use, JavaScript settings, Tor Browser's security slider settings, whether it is a malicious attack or not, and other factors.</ref> This information can include:
+Destination websites can retrieve [[Data_Collection_Techniques|a lot of information]] about a user's browser and system, while [[Tor_Browser/Advanced_Users#Adversary_Attack_Capabilities|advanced adversaries]] have even greater capabilities. <ref>
+Information that is leaked depends on the browser in use, JavaScript settings, Tor Browser's security slider settings, whether it is a malicious attack or not, and other factors.
+</ref> This information can include:
+
 <div style="column-count:3;-moz-column-count:3;-webkit-column-count:3">
 * the browser name and version
 * CSS media queries:
@@ -228,13 +239,15 @@ Destination websites can retrieve [[Data_Collection_Techniques|a lot of informat
 ** retrieve unique plugin identifiers
 * read / store identifiers related to HTTP auth, DOM storage, cached scripts, client certificates and TLS session IDs
 * browser cache
-* giving the user a unique favicon <ref> Note that in the Tor Browser, favicons are wiped after pressing the 'New Identity' button or exiting the current session. The Tor Browser cannot protect you from this method while you are in a session though.
+* giving the user a unique favicon <ref>
+Note that in the Tor Browser, favicons are wiped after pressing the 'New Identity' button or exiting the current session. The Tor Browser cannot protect you from this method while you are in a session though.
 
 This method is usually only used to detect if a user of the site that previously browsed the site at a different connection is accessing the site from the same browser regardless if they try to obfuscate where they are connecting from. There are no recorded attacks of this being used against Whonix or regular users in the wild, but practical implementations do exist.
 </ref> <ref>
 An example of an implementation is the supercookie project at https://github.com/jonasstrehle/supercookie
 </ref>
 </div>
+
 To make it difficult to distinguish {{project_name_short}} and TBB <ref name="tbb" /> users, TBB <ref name="tbb" /> is included on the platform. Therefore, {{project_name_short}} should provide the same information as TBB <ref name="tbb" /> in order to generate very similar fingerprints.
 
 = Website Traffic Fingerprinting =
@@ -274,7 +287,7 @@ More sources: <ref>
 * [[VM Fingerprinting]]
 * [[Hide_Tor_from_your_Internet_Service_Provider|Hide Tor use from the Internet Service Provider]]
 
-= References =
+= Footnotes =
 {{reflist|close=1}}
 
 = License =
