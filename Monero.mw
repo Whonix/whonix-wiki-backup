@@ -1,65 +1,158 @@
 {{Header}}
-{{title|title=
-Monero (XMR): A Reasonably Private Digital Currency
-}}
 {{#seo:
 |description=How to use Monero in {{project_name_long}}
 |image=Moneroheader.png
 }}
-{{monero_mininav}}
+{{title|title=
+Monero (XMR): A Reasonably Private Digital Currency
+}}
 [[File:Monero-symbol-1280.png|thumb|128px|256px|alt=Monero|link=Monero|Monero Logo]]
 {{intro|
 Monero is a private-centric cryptocurrency launched in 2014 to allow direct and anonymous digital payments without being dependent on a central authority.
 }}
+= Installation Sources =
+There are many different options to install Monero. Choose one.
+
+* '''A)''' <u>Flathub:</u> This is documented below.
+* '''B)''' <u>Manual installation:</u> [[Undocumented]] but same as if using Debian. Therefore [[Unspecific|unspecific to {{project_name_short}}]]. <ref>
+Maybe {{whonix_wiki
+|wikipage=Monero/Manual_Instructions
+|text=Monero, Manual Instructions
+}} could be updated and ported to {{project_name_short}} wiki.
+</ref>
+* '''C)''' <u>Official Debian packages sources:</u> [https://packages.debian.org/{{Stable project version based on Debian codename}}/monero <code>packages.debian.org</code>] <code>monder<u>d</u></code> and {{Cli}} only. Monero {{Gui}} unavailable from Debian package sources.
+
 = Installation =
 
-{{upstream_wiki}}
+Apart from these optional hints, installation and usage of Monero in {{project_name_short}} does not differ from installing Monero on any Linux based distribution.
 
-= Stream Isolation =
-Simplified: Stream isolation is about details. Not about IP masking. Your real external IP address is masked no matter what you do in the Whonix-Workstation. See also [[Reliable IP Hiding]].
+'''1.''' Allow unverified publishers.
 
-{{mbox
-| type  = notice
-| image = [[File:Ambox_notice.png|40px|alt=Info]]
-| text  = Advanced users only!
-}}
+Due to a Flathub issue, it is required to [[Install_Software#Change_Flathub_Settings|Change Flathub Settings]] by using the following command. See footnote for technical details. <ref>
+The Flathub repository has been enabled by in {{project_name_short}} by default but with the [https://docs.flathub.org/docs/for-users/installation/#subsets subset] <code>verified_floss</code>, which allows only applications that are both, <code>verified</code> publishers and <code>floss</code> (Freedom Software). Monero is <code>floss</code> however there is an issue with <code>verified</code>.
 
-[[Untested]]! [[Stream Isolation]] for Monero has not yet been considered. Refer to the [[Stream Isolation]] page and search for:
+This issue is happening because [https://github.com/monero-project/monero-gui/issues/4206 Monero Flatpak did not receive the verified badge from Flathub yet] due to [https://github.com/flathub/flathub/issues/3905#issuecomment-1694349732 delays caused by Flathub].
 
-* {{CodeSelect|inline=true|code=torsocks}}, and
-* {{CodeSelect|inline=true|code=IsolatePID 1}}.
+If not enabling unverified publishers, the following issue would happen.
 
-To enforce stream isolation, you could experiment with the following commands.
+<pre>
+Looking for matches…
+error: Nothing matches org.getmonero.Monero in remote flathub
+zsh: exit 1     flatpak install flathub org.getmonero.Monero
+</pre>
 
-<u>Note:</u> Replace <code>monerod</code>, <code>monero-wallet-gui</code>, <code>monero-wallet-cli</code> with the actual path to <code>monerod</code>, for example <code>/home/user/monero-gui/monerod</code> or <code>./monerod</code>.
-
-{{CodeSelect|code=
-DNS_PUBLIC=tcp TORSOCKS_ALLOW_INBOUND=1 torsocks monerod --p2p-bind-ip 127.0.0.1 --no-igd --hide-my-port
-}}
+If the user is able to install Monero without allowing unverified publishers then this is very good and might mean that Flathub finally added Monero to the list of verified publishers.
+</ref>
 
 {{CodeSelect|code=
-torsocks monero-wallet-gui
+sudo flatpak remote-modify --subset=floss flathub
 }}
+
+'''2.''' {{Flatpak Install|package=
+org.getmonero.Monero
+}}
+
+'''3.''' Done.
+
+Installation of Monero from Flathub has been completed.
+
+= Monero Operations =
+
+== Start Monero GUI ==
+'''1.''' {{Open a product ws terminal}}
+
+'''2.''' Monero GUI start command.
 
 {{CodeSelect|code=
-torsocks monero-wallet-cli
+flatpak run org.getmonero.Monero
 }}
 
-For more inspiration, refer to the related forum discussion: [https://forums.whonix.org/t/monero-in-whonix-with-torsocks-for-better-stream-isolation/5432 Monero in {{project_name_short}} with torsocks for better stream isolation].
+'''3.''' Done.
+
+Monero GUI should be running.
+
+'''4.''' Further information.
+
+For detailed instructions on how to use Monero, please refer to the [https://web.getmonero.org/get-started/using/ official Monero documentation].
+
+'''Figure:''' ''Monero GUI in {{project_name_short}}''
+
+[[File:Monerogui.png|border]]
+
+== Start Monero CLI ==
+Alternatively, you could also use Monero on the command line.
+
+{{CodeSelect|code=
+flatpak run --command=monero-wallet-cli org.getmonero.Monero
+}}
+
+== Wallet-File Command Line Argument ==
+This chapter is for advanced users only.
+
+Advanced users using the <code>--wallet-file</code> need to first grant access to the host file system.
+
+<u>Note:</u> This command might be non-ideal. A finer permission would be desirable such as only granting the <code>org.getmonero.Monero</code> flatpak access to 1 additional folder. [[Unspecific|Unspecific to {{project_name_short}}]].
+
+{{CodeSelect|code=
+sudo flatpak override org.getmonero.Monero --filesystem=host
+}}
+
+To run Monero CLI flatpak using the <code>--wallet-file</code> see the following example.
+
+<u>Note:</u> Adjust path to wallet file.
+
+{{CodeSelect|code=
+flatpak run --command=monero-wallet-cli org.getmonero.Monero --wallet-file /home/user/path/to/wallet
+}}
+
+Other command line parameters can be appended if required.
+
+Note: This results in Monero using folder <code>~/.bitmonero</code> instead of <code>~/.var/app/org.getmonero.Monero/.bitmonero</code> as per https://github.com/monero-project/monero-gui/issues/3929#issuecomment-2437133065
+
+= Remote Node Security and Privacy Considerations =
+
+Using a remote node provides a quick way to set up your Monero wallet. You will not have to download the entire blockchain.
+
+It is important to note that the remote node:
+
+* cannot spend your XMR (you hold the keys);
+* does not know your IP address (we are connecting to it over Tor);
+* does not know your XMR address; and
+* does not know your balance or private view key.
+
+However, using a remote node is not without risk. To learn more about the possible attacks, see: https://web.archive.org/web/20230331040213/https://moneroworld.com/
+
+In general, if the wallet warns you about the node misbehaving, then immediately exit the wallet and connect to a different node.
 
 = Donations =
 After installing Monero, please consider making a [[Donate|donation]] to {{project_name_short}} to help keep it running for many years to come.
 
 {{Pay_Monero_Specific}}
 
-= See Also =
-It is recommended to read the [[Money]] wiki page as it contains a lot of related information on how to make anonymous payments.
+= Appendix =
 
-Advanced [[Qubes]] users can also look into [[Monero_Wallet_Isolation|How-to: Use Monero with Wallet Isolation in {{q_project_name_long}}]].
+== Monero Architecture ==
+
+Monero works by having contributors host large files which are equivalent to a public ledger. Any time someone broadcasts a transaction, every ledger maintainer updates their copy of the ledger and ensures no cheating or fraud has occurred. As with most cryptocurrencies, transactions are sent to Public Addresses which are derived from personally created private keys.
+
+Since transactions could otherwise be traced by watching which addresses are sending to each-other, Monero uses a Diffie-Hellman key exchange using the transaction information on the sender's side and the public address on the receiver's end of a transaction to encrypt the recipients address on the ledger. To protect the sender, spending Monero is equivalent to forwarding the output of the previous transaction, so a users address is never stored on the ledger at all - this technique is called Stealth Addressing.
+
+Since this solution is imperfect, and allows EABE attacks and is dependent on ECC for the key exchange, Monero uses a second layer of anonymity called Ring Signatures. When signing a transaction and broadcasting it to the network, Ring Signatures take signers from previous transactions and forge a new signature with Ring Size = N, where you cannot tell which entity in the group N actually authorized a transaction. This further obfuscates the blockchain and reduces the available attack vectors on the cryptocurrency as a whole, as well as introduces several zero knowledge proofs which prevent absolute analysis of the ledger.
+
+Ring Signatures combined with Stealth Addressing prevent many attack vectors, but since new transactions are forwarded outputs from previous ones you can still perform analysis by viewing the amounts spent on-chain. To address this potential issue, a solution called RingCT was introduced which obfuscates the amount spent in a transaction.
+
+Further attack vectors including cross-referencing an address posted in multiple places and IP leaks when connecting to the network are further developments sought out by the Monero community. These potential issues are addressed with Subaddresses and Kovri respectively.
+
+== monero-gui Debian Package ==
+Project [https://ccs.getmonero.org/proposals/adrelanos-debian-package.html Monero Debian Package Repository for 2 years] is no longer available. No extension request is planned.
+
+In technical terms, the previously pre-installed version of Monero in folder <code>/usr/bin</code> is no longer available.
+
+As a replacement, it is recommended to use the official Monero Flatpak installation method which is documented above.
 
 = Footnotes =
-The former [[Monero/Manual Instructions|Manual Monero Instructions]] have been archived for historic reasons.
-
 {{reflist|close=1}}
+
 {{Footer}}
+
 [[Category:Documentation]]

@@ -6,9 +6,9 @@ See detailed documentation in Dev/mediawiki
 function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl = '/wiki/Donate', isLocalFileSystem = false ) {
 
 	const localStorageName = 'dismiss-end-of-year-sitenotice';
-	
+
 	let valid = true;
-	
+
 	// Basic error checks
 	if( ! contentForSlides ) {
 		console.error('Dev: contentForSlides is missing but needed. Please check for errors');
@@ -17,37 +17,37 @@ function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl 
 
 	// If the user has the dismissed less than a week ago, it will not be executed
 	if( isLocalFileSystem && localStorage.getItem(localStorageName) > Date.now() ) valid = false;
-	
+
 	// If it failed at least on test
 	if( ! valid ) {
 		$('#donate-end-of-year').hide();
 		return;
 	}
-	
+
 	// Remove item (because it's not valid) if it exists
 	if( isLocalFileSystem ) localStorage.removeItem(localStorageName);
-	
+
 	// --------------------
 	// Settings and Globals
-	
+
 	const settings = {
 		durationSlide: 10000, // Milliseconds
 		durationProgressbar: 9500, // Milliseconds
 		mobileBreak: 660, // Pixels
 		paymentBottomBorderSpace: 15, // Pixels
 	};
-	
+
 	const refs = {
 		playNextTimeout: null,
 	};
-	
+
 	const states = {
 		slideIndex: null,
 		slideCount: 0,
 		isPlay: null,
 		crypto: { payBitcoin: '', payMonero: '', payEthereum: '', },
 	};
-	
+
 	// ---
 	// DOM
 
@@ -72,19 +72,19 @@ function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl 
 	        </div> <a href="${donatePageUrl}" target="_blank">Or Other Payment Options</a>
 	    </div>
 	`);
-	
+
 	endOfYearDiv = $(endOfYearDiv);
 	endOfYearDiv.append( content );
-	
+
 	let mobileDonateButtonTemplate = $('<span class="mobile-donate-button">Donate</span>');
 
 	// ---
 	// FNs
-	
+
 	function switchSlide( slideButton ) {
 		endOfYearDiv.find('.slideshow .content > div').removeClass('active');
 		endOfYearDiv.find('.slideshow .control > .slide-buttons span').removeClass('active');
-		
+
 		endOfYearDiv.find('.slideshow .slide-buttons span.active').removeClass('active');
 		slideButton.addClass('active');
 		states.slideIndex = slideButton.index();
@@ -93,39 +93,39 @@ function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl 
 		slide.css( 'opacity', 0 );
 		slide.animate( { opacity: 1 }, 300 );
 	}
-	
+
 	function playNext( isPlay ) {
 		if( isPlay != 'auto' ) {
 			clearTimeout( refs.playNextTimeout );
 			endOfYearDiv.find('.slideshow .progress').stop( true );
-			
+
 			if( isPlay != states.isPlay ) {
 				if( typeof isPlay == 'boolean' ) states.isPlay = isPlay;
 				else if( isPlay == 'toggle' ) states.isPlay = ! states.isPlay;
 				endOfYearDiv.find('.slideshow .control .flow i').removeClass('active');
 				endOfYearDiv.find('.slideshow .control .flow i.is-' + ( states.isPlay ? 'play' : 'pause'  ) ).addClass('active');
 			}
-			
+
 			if( ! states.isPlay ) return;
 		}
-		
+
 		if( states.slideIndex == null || states.slideIndex >= states.slideCount - 1 ) states.slideIndex = 0;
 		else states.slideIndex++;
 		switchSlide( endOfYearDiv.find( '.slideshow .slide-buttons span' ).eq( states.slideIndex ) );
 		endOfYearDiv.find('.slideshow .progress').css( 'width', '1%' ).stop( true ).animate( { width: '100%' }, settings.durationProgressbar );
 		refs.playNextTimeout = setTimeout( () => playNext( 'auto' ), settings.durationSlide );
 	}
-	
+
 	// -----
 	// Setup
-	
+
 	// Imported Initializations
-	
+
 	endOfYearDiv.find('.pay-via-paypal-module').payViaPaypal('init');
 	endOfYearDiv.find('.payment .crypto-container .code-select').codeSelect('init');
-	
+
 	// Content
-	
+
 	endOfYearDiv.find('.content').html( contentForSlides );
 
 	if( endOfYearDiv.find('.content h1').length > 0 ) {
@@ -138,7 +138,7 @@ function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl 
 		endOfYearDiv.find('.content [data-crypto-addresses]').remove();
 		states.crypto = { ...crypto };
 	}
-	
+
 	if( ! states.crypto.payBitcoin ) console.warn('Dev: payBitcoin is missing. Please check for errors');
 	if( ! states.crypto.payMonero ) console.warn('Dev: payMonero is missing. Please check for errors');
 	if( ! states.crypto.payEthereum ) console.warn('Dev: payEthereum is missing. Please check for errors');
@@ -146,15 +146,15 @@ function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl 
 	endOfYearDiv.find('.payment .btc .code').text( states.crypto.payBitcoin );
 	endOfYearDiv.find('.payment .xmr .code').text( states.crypto.payMonero );
 	endOfYearDiv.find('.payment .eth .code').text( states.crypto.payEthereum );
-	
+
 	// Add Mobile donate link button
-	
+
 	if( $(window).width() <= settings.mobileBreak ) {
 		endOfYearDiv.find('.content > div').append( mobileDonateButtonTemplate.clone() );
 	}
-	
+
 	// Iterate over slides
-	
+
 	let maxHeight = 0;
 
 	endOfYearDiv.find('.slideshow .content > div').each( function() {
@@ -164,17 +164,17 @@ function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl 
 		endOfYearDiv.find('.slideshow .slide-buttons').append( '<span' + ( $(this).hasClass('active') ? ' class="active"' : '' ) + '></span>' );
 		states.slideCount++;
 	});
-	
+
 	// If not mobile include the height of payment
 	if( $(window).width() > settings.mobileBreak ) {
 		let paymentAdjustedHeight = endOfYearDiv.find('.payment').outerHeight() - endOfYearDiv.find('.slideshow .control').outerHeight() - settings.paymentBottomBorderSpace;
 		if( paymentAdjustedHeight > maxHeight ) maxHeight = paymentAdjustedHeight;
 	}
-	
+
 	endOfYearDiv.find('.slideshow .content').height( maxHeight );
-	
+
 	endOfYearDiv.find('.payment').animate( { opacity: 1}, 300 );
-	
+
 	// ------
 	// Events
 
@@ -187,29 +187,29 @@ function initEndOfYearSitenotice( endOfYearDiv, contentForSlides, donatePageUrl 
 			switchSlide( $(this) );
 		}
 	});
-	
+
 	if( isLocalFileSystem ) {
 		$('#siteNotice .sitenotice-close').on('click', function() {
 			localStorage.setItem(localStorageName, Date.now() + cookieValidity );
 		});
 	}
-	
+
 	endOfYearDiv.find('.slideshow .control .flow i').on( 'click', () => playNext( 'toggle' ) );
-	
+
 	endOfYearDiv.find('.content .mobile-donate-button').on( 'click', function() {
 		playNext( false );
 		endOfYearDiv.find('.slideshow').hide();
 		endOfYearDiv.find('.payment').show();
 		endOfYearDiv.css('height','auto');
 	});
-	
+
 	// ----
 	// Init
-	
+
 	// FadeIn endOf year the start playing the slideshow
 	endOfYearDiv.animate( { opacity: 1}, 300 );
 	playNext( true );
-		
+
 }
 
 /*

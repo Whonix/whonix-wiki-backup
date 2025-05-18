@@ -1,107 +1,1282 @@
-{{Title|title=Install Additional Software Safely}}
 {{Header}}
+{{Title|title=
+Install Additional Software Safely
+}}
 {{#seo:
-|description=Installing additional Software on {{project_name_long}}. Safety considerations.
+|description=Installing additional software on {{project_name_short}}. Security considerations.
 |image=Software-871026-640.jpg
 }}
-[[File:Software-871026-640.jpg|400px|thumb]]
+{{release_mininav}}
+[[File:Software-871026-640.jpg|thumb|200px]]
 {{intro|
-Installing additional Software on {{project_name_short}}. Safety considerations.
+This wiki page provides guidance on how to install additional software on the {{project_name_long}} operating system using security best practices,
 }}
-== General Advice ==
 
-{{project_name_short}} users are free to install their favorite software packages.
+= Introduction =
 
-Almost any application can be installed, with a few exceptions for programs that are [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#Howtotorifyspecificprograms impossible to torify]. In addition, {{project_name_short}} provides:
+{{mbox
+|icon=fa-solid fa-check cs-green
+|text=
+[[Based_on_Debian|'''{{project_name_short}} is based on Debian.''']] The software installation process is [[Unspecific|unspecific to {{project_name_short}}]]. This means that most Debian software can be installed on {{project_name_short}}, exactly the way you would install it on Debian. It should work out of the box. You can also check for tutorials on how to install software on Debian and apply them to your {{project_name_short}} software needs. In most cases, there is no need to ask how to install specific software on {{project_name_short}} because it is better to resolve the question as per the [[Self_Support_First_Policy|Self Support First Policy]]. In case of issues, the user is advised to attempt [[Reporting_Bugs#Generic_Bug_Reproduction|Generic Bug Reproduction]]. Only in rare cases will there be {{project_name_short}} specific issues requiring [[Support]].
+}}
 
-* protection from IP and DNS leaks (see above for details)
-* partial protection against [[Protocol-Leak-Protection and Fingerprinting-Protection|protocol leaks and fingerprinting]], but this is far from perfect
+{{mbox
+|icon=fa-solid fa-info cs-blue
+|text=
+For recommended software for various daily tasks, compiled by the {{project_name_short}} team, visit the [[Software|{{project_name_short}} software]] page. There you will find
+* '''Pre-installed {{project_name_short}} applications''' which are already available for different tasks.
+* '''Recommended software''' for different user activities.
+* '''Installation instructions.'''
+* '''Security advice''' regarding software.
+}}
 
-Users are responsible for trying to prevent any other [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#protocol-leaks protocol leaks] using the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO "Torify: How-to" guide], but most of those are mitigated by {{project_name_short}}.
+'''Below you will find instructions on the installation process''', divided into different user qualifications.
 
-* Read the [[Protocol-Leak-Protection and Fingerprinting-Protection|protocol leak and fingerprinting protection]] entry first. It highlights useful information, like the fact that DNS and IP-related leaks do not apply to {{project_name_short}}.
-* Refer to the Tor Project's [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO Torify: How-to] which discusses various [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#protocol-leaks protocol leaks] and how to mitigate them.
-* Review the Tor Project's [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TransparentProxyLeaks Transparent Proxy Leaks] documentation, which is particularly relevant for users other [[Other Operating Systems|custom workstations]] using Microsoft Windows.
+== Platform Specific Notices ==
 
-Since {{project_name_short}} is a Debian derivative, new users should always [https://wiki.debian.org/DontBreakDebian follow Debian advice] when installing or removing packages to avoid common mistakes which can break or destabilize the system.
+Before we start here are some platform specific notices.
 
-The user should be aware that additional software increases the [https://en.wikipedia.org/wiki/Attack_surface attack surface] of the platform.
+Platform specific. Select your platform.
 
-== Browsers ==
-{{Other_Browsers}}
+{{mbox
+|icon=fa-solid fa-info cs-blue
+|text=
+'''{{project_name_short}} users:
+* ''' No special notice.
+}}
 
-= {{project_name_workstation_short}} is Firewalled =
+{{mbox
+|icon=fa-solid fa-info cs-blue
+|text=
+'''[[Qubes|{{q_project_name_long}}]] users:'''
+* The following notices describe the general technical implementation for all (including non-{{project_name_short}} templates) and are [[unspecific|unspecific to {{project_name_short}}]].
+* Need to [https://www.qubes-os.org/doc/how-to-install-software/ install and update persistent software] in the {{project_name_workstation_long}} Template(s) (<code>{{project_name_workstation_template}}</code>).
+** Learn more about [[Qubes#Qubes_Persistence|Qubes Persistence]].
+* Using APT in the App Qube (such as for example <code>{{project_name_workstation_vm}}</code>) will only install software for the current session, with changes being lost when the VM is shut down; see [[#Install_Software_in_an_App_Qube|Install Software in an App Qube]].
+}}
+
+{{Anchor|Easy}}
+{{Anchor|Install_from_Debian_stable}}
+
+= All Users instructions (Novice, Easy) =
+
+== Package Installation from Debian Package Sources ==
+{{mbox
+|icon=fa-solid fa-check cs-green
+|text=
+'''Install from Debian stable''': The easiest and best way to install software is from Debian <code>stable</code> APT software repository.
+}}
+
+'''To install a package from Debian stable''', follow the steps below. Replace <code>package-name</code> with the name of the software to be installed.
+
+{{Install_Package
+|package=package-name
+}}
+
+'''Examples''': There are numerous examples of this procedure on the [[Software]] page and throughout the wiki.
+
+== Re-Install Package ==
+
+{{CodeSelect|code=
+sudo apt install --reinstall --no-install-recommends package-name
+}}
+
+Related: [[Configuration_Files#Reset_Configuration_Files_to_Vendor_Default|Reset Configuration Files to Vendor Default]]
+
+{{Anchor|Advanced}}
+
+= Advanced Users instructions =
+
+These instructions are for more advances users who have experience with Linux operating systems.
+
+== Install Newer Software Versions ==
+It is sometimes possible to install newer versions of applications. Newer versions than the versions which are available through [[Operating System Software and Updates]]. But this is in most cases:
+
+* Often not required for security reasons due to [[Operating_System_Software_and_Updates#Frozen_Packages|Frozen Packages]].
+* Only a user customization activity done by a user who wishes to use newer features of applications.
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Prerequisite knowledge</u>: refer to the [[Operating_System_Software_and_Updates#Frozen_Packages|Frozen Packages]] and [[Operating_System_Software_and_Updates#Application_Specific_Update_Indicators|Application Specific Update Indicators]] entries in the [[Operating_System_Software_and_Updates|Operating System Software and Updates]] chapter.
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Due to [[Linux_User_Experience_versus_Commercial_Operating_Systems|general usability issues of all Linux distributions]] (which are [[unspecific|unspecific to {{project_name_short}}]]), this activity is for advanced users only.
+}}
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Difficulty: medium / hard, depending on the application.
+}}
+
+It is sometimes possible to install newer versions of applications, via any of the following installation methods (non-exhaustive list):
+
+* '''A)''' alternative official Debian APT repositories such as
+** [[#Backports|backports]],
+** [[#Fasttrack|fasttrack]],
+** [[#Install from Debian Testing|testing]],
+** [[#Install from Debian Unstable|unstable]],
+* '''B)''' third party provided Debian APT repositories
+* '''C)''' alternative installation methods such as
+** [[#Flatpak|flatpak]],
+** [[#snap|snap]],
+* '''D)''' or by manual installation from:
+** extraction from a compressed archive file,
+** installation of a <code>.deb</code> package,
+** source code.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = The user is trading one security advantage (installing most software only from Debian repositories) against other security advantages (newer software versions) and disadvantages (trusting another software source). [[Install_Software#Foreign_Sources|Foreign Sources]] come with [[Install_Software#Risks|Risks]].
+}}
+
+Availability depends on the installation methods which either Debian, a derivative (such as {{project_name_short}}) or the upstream (original) application developers made available.
+
+To install other custom software, it is suggested to follow recommendations throughout this website for better security. Specific instructions for custom software installations will vary for each application. This process is mostly [[unspecific|unspecific to {{project_name_short}}]] and therefore the [[Self_Support_First_Policy|Self Support First Policy]] applies to installation steps. The user would have to [[Please_Use_Search_Engines_And_See_Documentation_First|Utilize Search Engines and Documentation]] and research how this process would be achieved in Debian version <code>{{Stable project version based on Debian codename}}</code>, which {{project_name_short}} is currently based on. The same is true for {{q_project_name_short}} users -- first consider how this process would be achieved in a Debian-based Qubes template.
+
+When intending to use newer versions of certain applications like Electrum, it is best to approach the process as an application installation, rather than an application update.
+
+In oversimplified terms, a Debian package is just a vehicle to place files into a location. For example, the [https://github.com/{{project_name_short}}/binaries-freedom <code>binaries-freedom</code> Debian package] in {{project_name_short}} used to ship Electrum. It came with the appimage file (<code>/usr/share/binaries-freedom/electrum-appimage/electrum-4.0.7-x86_64.AppImage</code>) and a start menu entry (<code>/usr/share/applications/electrum-appimage.desktop</code>). The presence of such files, as in this example, does not impose limitations; it is still possible to customize the system and install newer software versions.
+
+These files could also be ignored; for example, it was not necessary to use the <code>binaries-freedom</code> start menu entry. The <code>binaries-freedom</code> package was intended to improve usability and was never designed to limit customization, nor does it have that side effect. As per {{project_name_short}} policy, there are [[Reasons for Freedom Software#no_intentional_user_freedom_restrictions|No Intentional User Freedom Restrictions]]. <ref>
+In simple terms, {{project_name_short}} modifications can be ignored.
+</ref>
+
+As an illustration, installation of a newer version of Electrum would require:
+
+# Uninstalling the <code>electrum</code> package (Optional and best avoided. Prerequisite knowledge: [[Debian Packages]]).
+# Finding out the real website of Electrum (avoid downloading malicious money-stealing software forks from scammers).
+# Downloading the Electrum compressed archive from upstream (original developers).
+# Optional but highly recommended [[Verifying Software Signatures|digital software verification]] of the downloaded Electrum.
+# Extracting the Electrum compressed archive.
+# Changing directory into the extracted Electrum folder.
+# Starting Electrum from the command line.
+# Optional beautifications such as adding start menu entries or autostart.
+
+== Enable Debian Backports Repository ==
+<u>Operating System Specific Notes</u>:
+
+* [[File:Kicksecure-basic-logo.png|25px|link=]] {{project_name_short}} VM users: Should skip this step! Debian APT backports repository is already default in {{project_name_short}} version <code>16</code> and above.
+* [[File:Debian.png|15px|link=]] Debian: The following instructions are for Debian host operating system or Debian VM users.
+
+'''1.''' Boot the virtual machine. (Qubes: <code>debian-{{Stable project version based on Debian version short}}</code> Template).
+
+'''2.''' Add the current Debian stable backports codename <code>{{Stable_project_version_based_on_Debian_codename}}-backports</code> to Debian apt sources.
+
+<u>Notes</u>:
+
+* This applies to Debian <code>{{VersionShort}}</code>. Later Debian versions will use a codename different to <code>{{Stable_project_version_based_on_Debian_codename}}</code>.
+* Advanced users note: Instructions for torification of the fasttrack clearnet repository or fasttrack onion repository can be found in the following footnote.
+
+Run. <ref>
+Alternatively, users who like torify over clearnet can add <code>tor+</code>.
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb tor+https://deb.debian.org/debian {{Stable_project_version_based_on_Debian_codename}}-backports main contrib non-free' > /etc/apt/sources.list.d/backports.list"
+}}
+
+Alternatively, users who like [[Onionizing Repositories]] can use the onion instead.
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb tor+http://{{Debian_onion}}/debian {{Stable_project_version_based_on_Debian_codename}}-backports main contrib non-free' > /etc/apt/sources.list.d/backports.list"
+}}
+</ref>
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb https://deb.debian.org/debian {{Stable_project_version_based_on_Debian_codename}}-backports main contrib non-free' > /etc/apt/sources.list.d/backports.list"
+}}
+
+'''3.''' Done.
+
+The procedure of enabling Debian backports repository has been completed.
+
+'''4.''' Undo.
+
+On occasion it is necessary to undo this configuration, for example when upgrading from Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> to <code>{{Debian_Codename_Testing}}</code>. <ref>
+Most often this step applies before attempting major {{project_name_short}} upgrades; upgrade instructions are also made available at that time (see [[Stay_Tuned|Stay Tuned]]).
+</ref> To proceed, run.
+
+{{CodeSelect|code=
+sudo rm /etc/apt/sources.list.d/backports.list
+}}
+
+== Enable Debian Fasttrack Repository ==
+<u>Operating System Specific Notes</u>:
+
+* [[File:Kicksecure-basic-logo.png|25px|link=]] {{project_name_short}} VM users: Should skip this step! Debian APT fasttrack repository is already default in {{project_name_short}} version <code>16</code> and above.
+* [[File:Debian.png|15px|link=]] Debian: The following instructions are for Debian host operating system or Debian VM users.
+
+'''1.''' Boot the Debian VM. (Qubes: <code>debian-{{Stable project version based on Debian version short}}</code>) Template.
+
+'''2.''' Install the <code>fasttrack-archive-keyring</code> package.
+
+{{Install Package||package=
+fasttrack-archive-keyring
+}}
+
+'''3.''' Add the current Debian fasttrack APT repository.
+
+<u>Notes</u>:
+
+* This applies to Debian <code>{{VersionShort}}</code>. Later Debian versions will use a codename different to <code>{{Stable_project_version_based_on_Debian_codename}}</code>.
+* Advanced users note: Instructions for torification of the fasttrack clearnet repository or fasttrack onion repository can be found in the following footnote.
+
+Run. <ref>
+Alternatively, users who like torify the clearnet repository can add <code>tor+</code>.
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb tor+https://fasttrack.debian.net/debian/ {{Stable_project_version_based_on_Debian_codename}}-fasttrack main contrib non-free' > /etc/apt/sources.list.d/fasttrack.list"
+}}
+
+[https://salsa.debian.org/fasttrack-team/support/-/issues/27 It is not yet possible to set an <i>.onion</i> mirror for fastrack.]
+</ref>
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb https://fasttrack.debian.net/debian/ {{Stable_project_version_based_on_Debian_codename}}-fasttrack main contrib non-free' > /etc/apt/sources.list.d/fasttrack.list"
+}}
+
+'''4.''' Done.
+
+The procedure of enabling Debian fasttrack repository has been completed.
+
+'''5.''' Undo.
+
+On occasion it is necessary to undo this configuration, for example when upgrading from Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> to <code>{{Debian_Codename_Testing}}</code>. <ref>
+Most often this step applies before attempting major {{project_name_short}} upgrades; upgrade instructions are also made available at that time (see [[Stay_Tuned|Stay Tuned]]).
+</ref> To proceed, run.
+
+{{CodeSelect|code=
+sudo rm /etc/apt/sources.list.d/fasttrack.list
+}}
+
+== Backports ==
+[https://backports.debian.org Debian Backports]:
+
+<blockquote>Backports are packages taken from the next Debian release (called "testing"), adjusted and recompiled for usage on Debian stable.</blockquote>
+
+This is a far safer alternative than the Debian testing or unstable repositories. However, Debian backports should be used conservatively.
+
+<blockquote>Backports cannot be tested as extensively as Debian stable, and backports are provided on an as-is basis, with risk of incompatibilities with other components in Debian stable. Use with care!</blockquote>
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Replace <code>package-name</code> below with the package you actually want to install.
+}}
+
+{{Install Backport|package=
+package-name
+}}
+
+=== System-Wide Upgrade to Backports ===
+Discouraged.
+
+No, even though backports are enabled by default in {{project_name_short}}, by Debian default, APT does not upgrade all packages to the backports version by default. See footnote for evidence. <ref>
+'''1.''' Check locally installed systemd version.
+
+{{CodeSelect|code=
+dpkg -l {{!}} grep systemd
+}}
+
+'''2.''' Check systemd versions available from Debian.
+<br />
+https://packages.debian.org/search?keywords=systemd
+<br />
+'''3.''' Compare versions.
+
+* local: <code>252.19-1~deb12u1</code>
+* <code>bookworm</code>: <code>252.19-1~deb12u1</code>
+* <code>bookworm-backports</code>: <code>254.5-1~bpo12+3</code>
+
+'''4.''' Conclusion.
+<br />
+Upgrades from backports are not installed by default.
+</ref>
+
+How? See footnote. <ref>
+'''Discouraged!''' system-wide upgrade to backports.
+
+{{CodeSelect|code=
+sudo apt dist-upgrade -t bookworm-backports
+}}
+</ref>
+</ref>
+
+== Fasttrack ==
+[https://fasttrack.debian.net Debian Fasttrack]:
+
+<blockquote>Debian Fast Track is a repository that allows making “backports” of packages available to users of the stable distribution, if those packages cannot be maintained in testing and backported in the usual way.</blockquote>
+
+This is a far safer alternative than the Debian testing or unstable repositories. However, Debian fasttrack should be used conservatively similarly to [[Install_Software#Backports|Backports]].
+
+<blockquote>Backports cannot be tested as extensively as Debian stable, and backports are provided on an as-is basis, with risk of incompatibilities with other components in Debian stable. Use with care!</blockquote>
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Replace <code>package-name</code> below with the package you actually want to install.
+}}
+
+{{Install Fasttrack|package=
+package-name
+}}
+
+== Install from Debian Testing ==
+
+=== Warnings ===
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Mixing packages from Debian <code>stable</code> with those from a later release like <code>testing</code> can destabilize the system due to associated software [[#Dependency_Hell|dependencies]] required for full functionality.
+}}
+
+Before completing steps in this section, first read [[#Prefer Packages from Debian Stable Repository|Prefer Packages from Debian Stable Repository]]. Carefully check how packages will change before proceeding -- a host of upgrades is usually safe, but no {{project_name_short}} packages should be removed as part of the process; see [[Debian_Packages|{{project_name_short}} Debian Packages]]. Be aware that problems are still possible; see [https://forums.whonix.org/t/modulenotfounderror-no-module-named-distutils-spawn/6826 here] for an example.
+
+It is recommended to complete this process in a [[Multiple {{project_name_workstation_short}}|separate {{project_name_workstation_short}}]] (<code>{{project_name_workstation_template}}-debian-testing-mix</code>) due to the risks. Ask for advice in the forums on a case-by-case basis.
+
+=== Procedure ===
+
+{{Box|text=
+'''1.''' Boot the {{project_name_workstation_short}} (<code>{{project_name_workstation_template}}-debian-testing-mix</code>) Template.
+
+'''2.''' Add the current Debian testing codename <code>{{Debian_Codename_Testing}}</code> to ''sources.list''
+
+Note: this applies to {{project_name_short}} 16. Later {{project_name_short}} versions may use a codename different to <code>{{Debian_Codename_Testing}}</code>.
+
+In the {{project_name_workstation_short}} (<code>{{project_name_workstation_template}}-debian-testing-mix</code>) Template, run.
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb https://deb.debian.org/debian {{Debian_Codename_Testing}} main' > /etc/apt/sources.list.d/testing.list"
+}}
+
+Or alternatively use the <i>.onion</i> mirror.
+
+{{CodeSelect|code=
+sudo su -c "echo -e 'deb tor+http://{{Debian_onion}}/debian {{Debian_Codename_Testing}} main' > /etc/apt/sources.list.d/testing.list"
+}}
+
+'''3.''' [[Update#Updates|Update]] the package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+'''4.''' Install the select software.
+
+* <u>Note:</u> Replace <code>package-name</code> with the package you actually want to install.
+
+{{CodeSelect|code=
+sudo apt -t {{Debian_Codename_Testing}} install package-name
+}}
+
+The procedure is now complete.
+
+'''5.''' Undo.
+
+On occasion it is necessary to undo this configuration, for example when upgrading from Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> to <code>{{Debian_Codename_Testing}}</code>. <ref>Most often this step applies before attempting major {{project_name_short}} upgrades; upgrade instructions are also made available at that time (see [[Stay_Tuned|Follow {{project_name_short}} Developments]]).</ref> To proceed, run.
+
+{{CodeSelect|code=
+sudo rm /etc/apt/sources.list.d/testing.list
+}}
+}}
+
+== Install from Debian Unstable ==
+
+=== Warnings ===
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Managing security updates for the "stable" distribution remains the highest priority for the Debian security team. This means security fixes for Debian "unstable" are managed by the contributors themselves and not by the Debian security team. Therefore, "unstable" does not receive security updates in a timely manner. <ref>https://www.debian.org/releases/sid/</ref> <ref>https://www.debian.org/security/faq#unstable</ref>
+}}
+
+Before completing steps in this section, first read [[#Prefer Packages from Debian Stable Repository|Prefer Packages from Debian Stable Repository]].
+
+Mixing packages from Debian <code>stable</code> with those from a later release like <code>unstable</code> can destabilize the system due to associated software [[#Dependency_Hell|dependencies]] required for full functionality. First carefully check how packages will change before proceeding. <ref>See: https://wiki.debian.org/DebianUnstable#What_are_some_best_practices_for_testing.2Fsid_users.3F</ref>
+
+A host of upgrades is usually safe, but no {{project_name_short}} packages should be removed as part of the process; see [[Debian_Packages|{{project_name_short}} Debian Packages]]. It is recommended to complete this process in a [[Multiple {{project_name_workstation_short}}|separate {{project_name_workstation_short}}]] (<code>{{project_name_workstation_template}}-debian-unstable-mix</code>) due to the risk. Ask for advice in the forums on a case-by-case basis.
+
+=== Procedure ===
+
+{{Install_Unstable|
+package=package-name
+}}
+
+== Install from Custom APT Repository ==
+Adding custom APT repositories is mostly [[unspecific|unspecific to {{project_name_short}}]]. Should be the same or at least very similar to the process on Debian because [[Based_on_Debian|{{project_name_short}} is based on Debian]]. Therefore the user should utilize the [[Self_Support_First_Policy|Self Support First Policy]].
+
+To add custom APT repositories, there are few different cases (non-exhaustive list):
+
+* '''A)''' Only the provider of the custom APT repository provides instructions how to add the custom APT repository to the system.
+* '''B)''' Sparse or no instructions on how to add the custom APT repository to the system.
+* '''C)''' Documentation exists but is for a different Linux distribution such as Ubuntu and cannot be trivially translated to Debian based Linux distributions such as {{project_name_short}}.
+* '''D)''' For some custom APT repositories, there are detailed instructions on how to add the custom repository in the {{project_name_short}} documentation. Examples for documented third-party repositories include: [[Signal|Signal messenger]], [[Session|Session messenger]], [[Tor_Versioning|The Tor Project]]. <ref>
+Not a "custom" repository but example instructions: [[Packages for Debian Hosts]]
+</ref>
+
+No generic documentation can be provided to cover any custom APT repository since it is dependent on the specific custom repository. In other words, it varies depending on the custom repository. The steps required per custom repository are similar but not the very same.
+
+The generic basic skills required to add a custom repository where documentation is insufficient are:
+
+# Acquire an APT signing key signing key.
+# Open file with root rights.
+# Copy a file with root rights.
+# Adding an APT signing key to APT keyring.
+# Adding an APT repository file to the <code>/etc/apt/sources.list.d</code> folder.
+
+The generic advanced skills required for better security that are required are:
+
+# [[Secure Downloads|Securely download]] an APT signing key.
+# View and verify an [[OpenPGP]] key fingerprint for better security.
+# Open file with root rights.
+# Copy a file with root rights.
+# Adding a signing key to the <code>/usr/share/keyrings</code> folder
+# Adding an APT repository file to the <code>/etc/apt/sources.list.d</code> folder.
+# Configuring an APT repository to use a single specific APT signing key file only using <code>signed-by</code>. (forum discussion: [https://forums.whonix.org/t/apt-repository-signing-keys-per-apt-sources-list-signed-by/12302 APT repository signing keys per APT sources.list - signed-by])
+
+== Package Reinstallation ==
+
+As per the [[Self_Support_First_Policy|free support principle]], package re-installation utilizes normal Debian processes.
+
+The example below shows how the <code>keepassxc</code> package would be reinstalled. It is possible to  substitute <code>keepassxc</code> with many other packages, so long as they do not have too many dependencies. These instructions are not suitable for any packages needed for connectivity such as <code>tor</code>, because the re-installation would be very difficult and is currently [[unsupported]].
+
+Even in the <code>keepassxc</code> package example, dependency complications emerge. In the example below the <code>kicksecure-qubes-gui</code> package also depends on <code>keepassxc</code>.
+
+{{Box|text=
+'''1.''' Update the package lists and upgrade.
+
+See [[Operating_System_Software_and_Updates#Updates|Updates]] for instructions.
+
+'''2.''' Purge the package you want to reinstall.
+
+{{CodeSelect|code=
+sudo apt purge keepassxc
+}}
+
+The output will show something like the following.
+
+<pre>
+sudo apt purge keepassxc
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  libqrencode4 libqt5concurrent5 libykpers-1-1 libyubikey-udev libyubikey0 libzxcvbn0
+Use 'sudo apt autoremove' to remove them.
+The following packages will be REMOVED:
+  keepassxc* kicksecure-desktop-applications-recommended* kicksecure-qubes-gui*
+0 upgraded, 0 newly installed, 3 to remove and 0 not upgraded.
+After this operation, 19.1 MB disk space will be freed.
+Do you want to continue? [Y/n]
+</pre>
+
+The packages <code>kicksecure-qubes-gui</code> has been inadvertently uninstalled due to technical limitations. <ref>
+[[Debian_Packages#Technical_Information]]
+</ref> These packages are reinstalled at a later step.
+
+'''3.''' Delete the user configuration folder if that is desired.
+
+In this <code>keepassxc</code> example, the user configuration folder is specified below (it changes depending on the package).
+
+{{CodeSelect|code=
+rm -r ~/.keepassxc
+}}
+
+'''4.''' Reinstall the <code>keepassxc</code> package and the additional packages that were purged.
+
+The <code>--no-install-recommends</code> parameter below is optional.
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends keepassxc kicksecure-qubes-gui
+}}
+
+Related to: [[Debian_Packages|{{project_name_short}} Debian Packages]].
+}}
+
+== Install Software in an App Qube ==
+
 {{mbox
 | type      = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = '''Note:''' This section is relevant to server software or other advanced / uncommon applications.
+| text    = [[Qubes|{{q_project_name_short}}]] only! Custom scripting is recommended, which is beyond the scope of this entry. Use a search engine to locate free articles and instructions on this process.
 }}
 
-The {{project_name_gateway_long}} firewall <ref>The firewall is found on {{project_name_gateway_long}}: <i>{{W_Firewall}}</i></ref> has several effects upon {{project_name_workstation_short}}.
+There is no reason to avoid installing software in [https://www.qubes-os.org/doc/glossary/#app-qube App Qubes], although installed software will not persist across reboots. A custom script can be used to automate this process, which minimizes the time spent re-installing packages.
 
-'''Table:''' ''{{project_name_gateway_short}} Firewall Effects''
+=== Advantages ===
+
+This software installation method means a single [https://www.qubes-os.org/doc/glossary/#vm VM] assumes many of the positive characteristics found in both App Qubes and [https://www.qubes-os.org/doc/glossary/#standalone Standalones].
+
+*<u>Centralized Updates:</u> [https://www.qubes-os.org/doc/glossary/#app-qube App Qubes] are based on a [https://www.qubes-os.org/doc/glossary/#template Template]. This means the App Qube's root filesystem is based on the corresponding template's root filesystem. Any updates to the Template will be reflected in the App Qube's root filesystem upon restart. <ref name="qubes-software">[https://www.qubes-os.org/doc/how-to-install-software/ How to install software]</ref>
+*<u>Minimal Disk Usage:</u> App Qubes require much less disk space than Standalones, since the App Qube's root filesystem is based on the corresponding template. The App Qube only needs enough disk space to hold user files in the <code>/home</code> directory.
+*<u>Semi-persistent Storage:</u> User data stored in <code>/home</code> , <code>/rw</code> and <code>/usr/local</code> survives reboot. Many applications like [https://www.whonix.org/wiki/Signal Signal] and [https://en.wikipedia.org/wiki/Wire_(software) Wire] store user data in the <code>/home</code> folder. Since the custom script installs the software seamlessly with little or no user interaction, the App Qube has <i>"quasi-full persistence"</i>, not unlike a Standalone's full persistence.
+
+=== App Qube Preparation ===
+{{Box|text=
+'''1.''' Create an App Qube based on <code>{{project_name_workstation_template}}</code>.
+
+'''2.''' Pre-install any necessary dependencies.
+
+Dependencies are available from [https://packages.debian.org/stable/ packages.debian.org] and can be pre-installed in the Template to speed up the repetitive software installation process. This means only packages or software missing from [https://packages.debian.org/stable packages.debian.org] will be repeatedly installed in the App Qube.
+
+'''3.''' Create a custom script that runs at VM boot.
+
+The purpose of this script is to automate software installation that would otherwise require manual user steps. Note that script functionality is variable, dependent on the software packages being installed and the experience of the user.
+
+Scripting is useful for common tasks like:
+
+* adding specific software repositories
+* importing verified signing keys
+* updating the package list with <code>apt update</code>, after the repository and signing key are imported
+* finally running <code>apt install</code> to install the relevant software package(s)
+}}
+
+=== App Qube Use ===
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = The App Qube's root filesystem does not provide a strong [https://www.qubes-os.org/doc/templates/#note-on-treating-app-qubes-root-filesystem-non-persistence-as-a-security-feature non-persistent security feature]. The persistence of the <code>/home</code>, <code>/rw</code>, and <code>/usr/local</code> filesystem means malware can be specifically written to target Qubes-based App Qubes, inserting hooks inside these directory's files. <ref>https://www.qubes-os.org/doc/templates/#note-on-treating-app-qubes-root-filesystem-non-persistence-as-a-security-feature</ref>
+}}
+
+Once user preparation is complete and the App Qube has started, it will automatically start the script to begin installing software. When the process finishes, the App Qube can be used like any other. However when the App Qube is shutdown, all data outside of the persistent <code>/home</code> folder will be lost, including the newly installed software packages. Following reboot, the VM will again install the software packages automatically.
+
+=== Using bind-dirs Selective Persistence ===
+
+Using selective [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs] persistence is currently a difficult problem and undocumented. Further research is required to ascertain which files require persistence across VM reboots.
+
+== Add Application Launcher to Start Menu ==
+{{Launcher
+|name=program-name
+|path=/path/to/program
+|categories=Other
+}}
+
+== snap ==
+
+General forum discussion about snap: [https://forums.whonix.org/t/snap-store-snaps-snapd-snapcraft-io-a-new-software-source/7631 Snap Store / snaps / snapd / snapcraft.io - a new software source?]
+
+[[Qubes|{{q_project_name_short}}]] issues:
+
+* Efforts to persistently install snap apps in [[Qubes|{{q_project_name_short}}]] via [https://www.qubes-os.org/doc/bind-dirs/ bind-dirs] or with snap proxy settings have been unsuccessful. This means it must be [[#Install_Software_in_an_App_Qube|installed in an App Qube]] on every occasion it is required. Efforts to improve this situation are most welcome, see: [https://forums.whonix.org/t/wickr-me-vs-qubes-whonix-persistence/9593 Wickr Me vs Qubes-{{project_name_short}} Persistence] and [https://forums.whonix.org/t/snap-totally-unusable-on-whonix-ws/10146 snap totally unusable on Qubes-{{project_name_short}}].
+* Qubes Templates are non-networked by default, <ref>APT works because of Qubes' qrexec-based updates proxy.</ref> which means snap does not run inside <code>{{project_name_workstation_template}}</code> Template. It is likely snap is similarly affected in other Qubes' Templates like the Debian Template. As per [[Self_Support_First_Policy|Self Support First Policy]] it is recommended to test snap functionality in a non-{{project_name_short}} based Template before attempting the same procedure inside {{project_name_short}}.
+
+Apparently software in snap store is not well vetted for being non-malicious. Uploader "<code>bitcoin1btc</code>" <ref>
+https://web.archive.org/web/20231003103857/https://snapcraft.io/publisher/bitcoin1btc
+</ref> uploaded an <u>unofficial</u>, [https://old.reddit.com/r/ledgerwallet/comments/16tqe79/warning_snap_version_of_liveledger_is_fraudulent/ reportedly malware (money stealing)] application <code>Ledger Live: Crypto & NFT App</code>. Unclickable link: <nowiki>https://snapcraft.io/ledgerlive</nowiki> <ref>
+https://web.archive.org/web/20231002100632/https://snapcraft.io/ledgerlive
+</ref> - Scam!
+
+Note: For avoidance of doubt, while Ledger has been [[Hardware_Wallet_Security#Key_Extraction|criticized for its Ledger Recovery service among other things]], this is <u>not</u> Ledger's fault. There is no way for Ledger to prevent its software to be uploaded by malicious third-parties to arbitrary software stores.
+
+Even days after this has been reported, snap store did not take action to remove the malware from their store.
+
+In conclusion, snap store has bad software verification practices as well as a broken incident response procedure.
+
+== Flatpak ==
+
+=== Introduction ===
+
+[https://flatpak.org Flatpak] is: <ref>https://en.wikipedia.org/wiki/Flatpak</ref>
+<blockquote>...a utility for software deployment and package management for Linux. It is advertised as offering a sandbox environment in which users can run application software in isolation from the rest of the system. ...
+
+Applications using Flatpak need permissions to have access to resources such as Bluetooth, sound (with PulseAudio), network, and files. These permissions are defined by the maintainer of the Flatpak and can be added or removed by users on their system.
+
+Another key feature of Flatpak is that it allows application developers to directly provide updates to users without going through distributions, and without having to package and test the application separately for each distribution.</blockquote>
+
+There are several advantages of utilizing Flatpak: <ref>https://en.wikipedia.org/wiki/Flatpak#Features</ref> <ref>https://en.wikipedia.org/wiki/Flatpak#Support</ref> <ref>https://docs.flatpak.org/en/latest/introduction.html</ref>
+* Packages are easily added via Flathub, which is a repository located at <code>flathub.org</code>; for a {{project_name_short}} example, see [[Dev/OnionShare|here]].
+* Numerous Linux distributions are either supported out-of-the-box or after the <code>flatpak</code> package is installed; Debian is a supported platform (which {{project_name_short}} is based upon).
+* Desktop applications are sandboxed and have limited access to the host environment. <ref>Although Firejail cannot be run in conjunction with Flatpak.</ref>
+* Flatpak bundles are a single-file format which contains the application or runtime. <ref>Runtimes are basic dependencies that are used by packages.</ref>
+* Any Flatpak breakage will not lead to destabilization of the host OS.
+* Elevated privileges (root) are not required to install Flatpak packages.
+* Only changed files are downloaded for updates.
+* Libraries and files used by multiple applications are de-duplicated to save space.
+
+For further information, refer to the [https://flatpak.org/faq/ Flatpak FAQ] and [https://docs.flatpak.org/en/latest/index.html Flatpak documentation].
+
+=== Flathub Package Sources Security ===
+Flathub, a central repository for Flatpak applications, hosts Flatpaks from various sources:
+
+* '''A)''' Official Flatpaks: These are packaged directly by the original developers of the application. Also called [https://docs.flathub.org/docs/for-users/verification/ verified apps] or sometimes publisher verification.
+* '''B)''' Unofficial Flatpaks: These packages are created by third-party developers.
+
+Official Flatpaks are clearly identified by a blue verified checkmark, but the absence of any indicator on unofficial Flatpaks creates a risk of confusion and security concerns. It is essential to have a distinct visual signal, such as a red 'unverified' mark, on these unofficial Flatpaks. This is crucial for ensuring that users are fully aware of the non-verified nature of these applications, thereby significantly reducing the likelihood of downloading potentially harmful software. The current lack of differentiation is a clear Flathub failure that compromises user safety, as it could lead users to mistakenly trust and download malware from unverified sources.
+
+'''Figure:''' Firefox Flatpak showing the blue verified checkmark
+
+[[File:Firefox-verified-flatpak.png]]
+
+A security concern was identified with the Mullvad Browser Flatpak, as reported in [https://github.com/flathub/net.mullvad.MullvadBrowser/issues/16 this issue]. Although it appeared as an official Mullvad Browser Flatpak, it was, in fact, unofficial and impersonating the official version. The appearance of this Flatpak can be viewed in the [https://web.archive.org/web/20230502081811/https://flathub.org/apps/net.mullvad.MullvadBrowser archived webpage].
+
+{{quotation
+|quote=Mullvad Browser<br/>
+by Mullvad
+}}
+
+This issue was partially addressed by the third-party Flatpak packager, who was non-malicious. They added the following notice to clarify the situation:
+
+{{quotation
+|quote=NOTE: This wrapper is not verified by, affiliated with, or supported by Mullvad VPN AB.
+}}
+
+The Monero Project requested a verified checkmark for the [https://flathub.org/apps/org.getmonero.Monero Monero GUI Flatpak]. However at time of writing in January 2023, this is being [https://github.com/monero-project/monero-gui/issues/4206 delayed by Flathub since August 2023 by Flathub].
+
+Flathub acknowledged the need for improvement publisher verification, as discussed in [https://discourse.flathub.org/t/situation-report-new-flathub-website-work-app-verifications-logins-etc/2259 this forum thread]. They initiated beta.flathub.org with the intention of enhancing verification, but this now redirects to flathub.org, and the feature providing detailed verification information is not yet implemented on the Flathub website. The current status of this feature, whether it is deprecated or still in planning, is unclear as the full forum thread has not been reviewed, nor has further research been conducted.
+
+In the next version of Kicksecure, there are plans to mitigate this issue by enabling the Flathub repository by default. See [[#Kicksecure_Flathub_Repository_Default_Settings|Kicksecure Flathub Repository Default Settings]].
+
+Depending on the application, Flatpaks are either:
+
+* '''A)''' Built from source code, <u>or</u>
+* '''B)''' Downloaded in binary (non-source) format from the original developers. <ref>[https://www.reddit.com/r/flatpak/comments/w7dm0c/who_builds_binaries/]
+</ref>
+
+Flathub's build process of downloading binaries poses certain risks. Since builds are automated, it is unlikely and not enforced that the packager verifies that the source code is complete, can be compiled, and is free of binary blobs, [https://wiki.debian.org/EmbeddedCopies Embedded Code Copies] of libraries, other software, or non-freedom software. In contrast, Debian policy [https://www.debian.org/doc/debian-policy/ch-source.html#embedded-code-copies strictly prohibits embedded code copies] in all software from the Debian repository (packages.debian.org). Moreover, [https://wiki.debian.org/buildd Debian build servers do not have external network access], ensuring that software can be built while all build dependencies are sourced exclusively from the Debian repository, avoiding reliance on any remote sources.
+
+Flatpak or the Flathub.org web interface currently does not show if Flatpaks are built from source code or downloaded as binary from the original developers. Flathub feature request: [https://github.com/flathub/flathub/issues/5733 Indicate on flathub.org Whether a Flatpak is Built from Source or Binary During Build Process on Flathub]
+
+'''Table:''' ''Comparison of Various Flatpak Applications''
 
 {| class="wikitable"
+! Name of Flatpak !! Upstream !! Subline !! Risk of User Confusion !! Flatpak Packager !! Manifest File !! Official/Non-Official !! License Type !! Method of Build
 |-
-
-! scope="col"| '''Category'''
-! scope="col"| '''Notes'''
+| [https://flathub.org/apps/details/com.visualstudio.code <code>Visual Studio Code</code>] || {{nowrap|<code>Microsoft</code>}} || <code>by {{nowrap|Microsoft}} {{nowrap|Corporation}}</code> || high <ref>missing unverified mark, saying "by Microsoft Corporation" but actually packaged by a third-party</ref> || Third-party || [https://github.com/flathub/com.visualstudio.code/blob/master/com.visualstudio.code.yaml#L101 link] || {{nowrap|Non-Official}} || {{nowrap|Non-Freedom}} || Binary
 |-
-
-! scope="row"| Additional Firewall Restrictions
-| The firewall on {{project_name_gateway_short}} is very restrictive. It can be made even more restrictive by activating options within the firewall script. <ref>
-<pre>
-         ## Optionally restrict TransPort.
-         ## Replace above rule with a more restrictive one, e.g.:
-         #$iptables_cmd -t nat -A PREROUTING -i "$int_if_item" -p tcp --match multiport --dports 80,443 --syn -j REDIRECT --to-ports "$TRANS_PORT_WORKSTATION"
-</pre>
-</ref> It is possible to limit which outgoing ports are redirected to Tor's <code>TransPort</code>. Depending on user intentions, it could also be useful to remove all <code>SocksPort</code>s.
+| [https://flathub.org/apps/details/com.vscodium.codium <code>{{nowrap|VSCodium}}</code>] || {{nowrap|<code>VSCodium</code>}} || <code>by {{nowrap|Peter}} {{nowrap|Squicciarini}}</code> || medium (missing unverified mark) || Third-party || [https://github.com/flathub/com.vscodium.codium/blob/master/com.vscodium.codium.yaml link] || Non-Official || Freedom || Binary
 |-
+| [https://flathub.org/apps/details/org.mozilla.firefox <code>{{nowrap|Firefox}}] || {{nowrap|<code>Mozilla</code>}} || <code>by {{nowrap|Mozilla}}</code> || none (verified mark) || Mozilla || [https://hg.mozilla.org/mozilla-central/file/tip/taskcluster/docker/firefox-flatpak/runme.sh link] || Official || Freedom || Binary
+|}
 
-! scope="row"| DNS Requests
-| Standard DNS requests on UDP port <code>53</code> are redirected to Tor's <code>DnsPort</code>. <ref>If the DNS server is changed in {{project_name_workstation_short}} <i>/etc/resolv.conf</i>, this will likely have no effect. The reason is the firewall on {{project_name_gateway_short}} will redirect all those requests to Tor's <code>DnsPort</code>. The working exception to this rule is when users tunnel / encrypt DNS requests (DNSCrypt, httpsdnsd), as per the [[Alternative_DNS_Resolver|secondary DNS resolver instructions]].</ref>
-|-
+<div class="toccolours mw-collapsible mw-collapsed">
+For the source of this information, please press on expand on the right.
+<div class="mw-collapsible-content">
+* This can be seen by looking on Flathub.org for the fields <code>developer</code> and <code>publisher</code>.
+* By looking at the manifest files, it is easy to see.
+** Visual Studio Code: {{CodeSelect|inline=true|code=
+        url: https://packages.microsoft.com/repos/code/pool/main/c/code/code_1.85.1-1702462158_amd64.deb
+}}
+** VSCodium: {{CodeSelect|inline=true|code=
+    sources:
+      - type: file
+        url: https://github.com/VSCodium/vscodium/releases/download/1.85.1.23348/codium_1.85.1.23348_amd64.deb
+        sha256: 28cdc4df80f8cfdb69532cae8b1b19515ce24290217c1fa97b1946ccf3e1f25a
+}}
+** Firefox: {{CodeSelect|inline=true|code=
+# Download en-US linux64 binary
+$CURL -o "${WORKSPACE}/firefox.tar.bz2" \
+    "${CANDIDATES_DIR}/${VERSION}-candidates/build${BUILD_NUMBER}/linux-x86_64/en-US/firefox-${VERSION}.tar.bz2"
+}}
+</div>
+</div>
 
-! scope="row"| Incoming Connections
-|
-* Incoming connections are not supported.
-* If programs make outgoing connections, then incoming connections are accepted for web browsing, IRC, or other relevant applications.
-* Server [[Ports|ports]] ("open ports") are blocked.
-* Unless explicitly configured, the Ident Protocol / web server listening port is not reachable.
-|-
+See also: [https://blog.frehi.be/2023/04/23/the-security-risks-of-flathub/ The security risks of Flathub]
 
-! scope="row"| IPv6
-| Tor only [https://gitlab.torproject.org/legacy/trac/-/wikis/org/roadmaps/Tor/IPv6Features partially supports IPv6], although full implementation is likely in the near term. <ref>
-The only missing elements at the time of writing were automatic client connections and inter-relay connections via IPv6. Bridges are fully supported. See also: [https://gitlab.torproject.org/legacy/trac/-/wikis/org/roadmaps/Tor/IPv6 IPv6 roadmap].
-</ref> This is not a {{project_name_short}}-specific issue. <ref>
-* [[Dev/ipv6]]
-* https://forums.whonix.org/t/port-to-nftables-as-a-replacement-for-iptables/18896
+Online discussions:
+
+* https://www.reddit.com/r/linuxquestions/comments/1139nri/is_flathub_safe/
+
+=== Flatpak Package Manager Security ===
+
+This entry compares Flatpak security features (such as signed metadata) against Debian's APT package manager. <ref>Note that source code is not considered in this comparison.</ref> With one caveat, Flatpak package manager security is comparable to Debian's APT package manager: [https://github.com/flatpak/flatpak/issues/4031#issuecomment-748891490 Flatpak currently does not defend against <code>indefinite freeze attacks</code>].
+
+A definition of <code>indefinite freeze attacks</code> is provided by {{TUF4}}:
+
+<blockquote>An attacker continues to present files to a software update system files that the client has already seen. As a result, the client is kept unaware of new files.</blockquote>
+
+For many adversaries this attack is difficult because it requires breaking [[SSL|TLS]]. While Flatpak package version information is not protected by a [https://github.com/flatpak/flatpak/issues/4031#issuecomment-753581447 <code>valid-until</code> field], it is fetched over TLS. Adversaries capable of breaking TLS face an obstacle when dealing with torified connections (like those in torsocks flatpak -- an indefinite freeze attack cannot target a specific user, but will affect all Tor users. This increases the chances of being caught unless they also have the ability to break Tor. Even then the attack chain would be very complex:
+* <code>Break Tor</code> &rarr; <code>Target specific user(s)</code> &rarr; <code>Break TLS</code> &rarr; <code>Mount an indefinite freeze attack</code> &rarr; <code>Exploit a vulnerability caused by an outdated software version</code>.
+
+To safeguard against this possibility, it is recommended to perform manual checks of version numbers for Flatpak-installed applications -- they should match those available from the flathub repository. Every flathub application has a corresponding website page with an <code>Additional information</code> section that lists <code>Updated</code> and <code>Version</code> information. For example, at the time of writing for [[Chromium]]:
+* This is the associated [https://flathub.org/apps/details/org.chromium.Chromium org.chromium.Chromium flathub website page].
+* The additional information section lists:
+** <code>Updated</code>: <code>October 5, 2021</code>
+** <code>Version</code>: <code>94.0.4606.71</code>
+
+Researching version information on the flathub website with a browser is equally vulnerable to indefinite freeze attacks because it also relies upon TLS. It is therefore recommended to use {{project_name_short}} or Tor Browser for this purpose. <ref>In theory some adversaries are capable of mounting an indefinite freeze attack against all visitors arriving from the Tor network. This is considered unlikely because the threat of eventual detection is too high. Such an attack would be widely publicized and might lead to major improvements in how Internet encrypted/authenticated connections are established.
 </ref>
+
+Sometimes APT software versions are quite old, which can lead to less functionality or even exposure to known vulnerabilities that are being exploited in the wild (see footnote). <ref>[[Dev/Chromium#Remotely_Exploitable_Chromium_Security_Vulnerability_CVE-2021-21193_exploited_in_the_wild|Chromium exploitation example]].</ref> Conversely, Flatpak usually offers more recent software versions and/or deploys security fixes in a more timely manner.
+
+In summary, Flatpak advantages are considered to outweigh the potential risks of an indefinite freeze attack because the attack chain is complex. Also, Flatpak is sometimes the only trustworthy, easy-to-use software source that provides newer versions than available in Debian [[#Install_from_Debian_stable|stable]] (with [[Operating_System_Software_and_Updates#Frozen_Packages|Frozen Packages]]) (or [[#Install Newer Software Versions|newer]]).
+
+Forum discussion:
+* [https://forums.whonix.org/t/flatpak-as-a-software-source-flathub-as-a-source-of-software/8500 flathub as a source of software].
+
+=== Flatpak Sandbox Security ===
+
+Flatpak's sandbox is imperfect. Despite Flatpak sandbox issues, it is safe to use in the software installation context. By comparison, Debian's default package manager APT and other Linux package managers do not attempt to sandbox applications.
+
+Flatpak is a victim of imperfect marketing. Since the Flatpak sandbox is a built-in feature, any reported security issues reflect negatively on Flatpak's reputation. Frequently, non-technical users are unable to properly contextualize or assess its impact through [[Threat_Modeling|threat modeling]]. Building a "perfect" sandbox is a much harder task - containing arbitrary, ever-changing applications running on an ever-changing operating system - than creating a package manager. The latter is essentially a file delivery mechanism and is therefore comparatively simpler to develop.
+
+Flatpak's sandboxing abilities are irrelevant so long as the sandboxing is not worse than software that is manually installed.
+
+=== Flatpak Breaking the Native Sandbox of Applications ===
+Flatpak's sandbox, which is mandatory and cannot be disabled, can break application’s native sandboxing. For example, in case of Chromium Flatpak, adjustments were required.
+
+{{quotation
+|quote=The Chromium Flatpak has patches on it to utilize Flatpak's support for
+nested sandboxing.
+|context=https://github.com/flatpak/flatpak/issues/4032
+}}
+
+Flatpak's own sandboxing capabilities interfere with other sandboxing initiatives like [[sandbox-app-launcher|Sandboxed Application Launcher]] and [[Firejail|Firejail]]: <ref>
+https://flatpak.org/faq/
+</ref>
+
+See also the discussion [https://discuss.privacyguides.net/t/does-flatpak-weaken-chromium-firefoxs-sandbox/13373 Does Flatpak weaken Chromium/Firefox’s sandbox?]
+
+<blockquote>
+Is Flatpak compatible with other desktop isolation frameworks?
+
+In general, unprivileged container systems can’t stack, because anything running inside the sandbox does not have the necessary privileges to set up a sandbox, nor does it have the ability to raise its privileges in any way. For instance, Firejail can never work inside Flatpak, because it is setuid. That being said, using multiple sandboxing frameworks at once does not really make anything more secure, so there is little point in trying to nest things like that.
+</blockquote>
+
+In the case of [[sandbox-app-launcher|Sandboxed Application Launcher]], it is not used much at the time of writing. However, that is not a reason against using it. Flatpak's own sandboxing and [[sandbox-app-launcher|Sandboxed Application Launcher]] can be co-installed without issues, but the latter will be unable to sandbox applications installed through Flatpak. <ref>
+[https://forums.whonix.org/t/flatpak-as-a-software-source-flathub-as-a-source-of-software/8500/19 FlatPak as a Software Source / flathub as a source of software].
+</ref>
+
+[https://forum.vivaldi.net/topic/33411/flatpak-support/192 Ruarí (Vivaldi Browser Team) also confirmed this.]
+
+=== Flatpak Criticism ===
+==== Flathub Promoting non-freedom Software ====
+
+{{quotation
+|quote=Oh, also, even if I have that, flathub lists proprietary apps right next to free software apps without any distinction. That is very bad. The search and listing functionality do not allow me to find only free software apps. l read the little license field, and if you are a new user, how are you going to know that a little unexplained license acronym like "MIT" or "GPL-3.0" means it is free software? It is sending the message, the license is a small unimportant detail, things that are way more important are: it's functionality category, the editor's choice, it's "popularity", because you can find apps through that, but not if it has a free license.
+Also, the license information is much worse. In debian based distros, I can easily see the license of every dependency. There is more complete licensing info in /usr/share/doc/PACKAGE/copyright. And I know that someone has put some time and effort into checking them.
+|context=[https://lwn.net/Articles/900479/ LWN Comment]
+}}
+
+Flathub could mitigate this by now showing non-freedom software by default and only for users who opt-in. Such functionality is however not planned according to the knowledge of the author.
+
+==== Higher Disk Space Requirements ====
+As [https://lwn.net/Articles/900210/ explained here], flatpak requires more disk space.
+
+=== Qubes OS Specific ===
+
+At the time of writing, applications installed using Flatpak do not present in the Qubes start menu. <ref>
+[https://github.com/QubesOS/qubes-issues/issues/6325 flatpak installed applications do not show up in Qubes start menu]
+</ref> <br />Workaround: <code>navigate to Qube settings</code> &rarr; <code>applications tab</code> &rarr; <code>press "Refresh Applications"</code>.
+
+=== Flatpak - system-wide versus per-user ===
+Flatpak can either be used system-wide or per-user.
+
+* '''A)''' <u>system-wide</u>: without the <code>--user</code> option.
+** example: {{CodeSelect|inline=true|code=
+flatpak install flathub org.chromium.Chromium
+}}
+* '''B)''' <u>per-user</u>: when using the <code>--user</code> option.
+** example: {{CodeSelect|inline=true|code=
+flatpak --user install flathub org.chromium.Chromium
+}}
+
+=== Enable Flathub Repository ===
+prerequisite knowledge: [[Install_Software#Flatpak_-_system-wide_versus_per-user|Flatpak - system-wide versus per-user]]
+
+The Flathub repository by default in {{project_name_short}}:
+
+* '''A)''' <u>system-wide</u>: enabled.
+* '''B)''' <u>per-user</u>: not enabled. <ref>
+Not enabled per-user by default for reasons documented here: [https://forums.whonix.org/t/flatpak-as-a-software-source-flathub-as-a-source-of-software/8500/61 FlatPak as a Software Source / flathub as a source of software]
+</ref>
+
+<div class="toccolours mw-collapsible mw-collapsed" data-expandtext="Learn More" data-collapsetext="Show Less">
+If the user wishes to see the instructions on how to enable the Flathub repository, please press on Learn More on the right side.
+<div class="mw-collapsible-content">
+
+{{Box|text=
+'''1.''' Notice.
+
+<div class="toccolours mw-collapsible mw-collapsed" data-expandtext="Learn More" data-collapsetext="Show Less">
+<u>Optional:</u> Digital signature verification.
+<div class="mw-collapsible-content">
+
+{{always_verify_signatures_reminder}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+The following <code>flatpak</code> <code>remote-add</code> command in step 2 is not the most secure way to do this. However, it is the most popular method and is also recommended in the official instructions by upstream, Flathub. <ref name="flatpak-debian">
+https://flatpak.org/setup/Debian/
+</ref> As of 18 January 2024, the author of this warning has not found any significant concerns about this method anywhere else on the internet.
+
+A strong understanding of the content on the [[Verifying Software Signatures]] wiki page is essential to comprehend this issue.
+
+The concern arises because the command uses [https://en.wikipedia.org/wiki/Trust_on_first_use TOFO (Trust on First Use)], which is not the most secure approach. Employing this method reduces the [[Verifying_Software_Signatures#System_Security_Level|System Security Level]] from <code>Always use software signatures verification</code> to <code>Always use TLS</code>. This change occurs because the Flatpak repository definition file, downloaded over [[SSL|TLS]], includes an OpenPGP (<code>gpg</code>) signing key, which is not authenticated by any means stronger than TLS. This concern relates to [[Verifying_Software_Signatures#Checking_Digital_Fingerprints_of_Signing_Keys|Checking Digital Fingerprints of Signing Keys]]. <ref>The <code>flatpakref</code> file, sourced from <code>https://flathub.org/repo/flathub.flatpakrepo</code>, contains the <code>GPGKey=</code> keyword, which includes the OpenPGP (<code>gpg</code>) signing key.</ref>
+
+To mitigate this security issue, users should avoid using any <code>flatpak</code> <code>remote-add</code> command. Instead, they should add a configuration snippet directly to the <code>/etc/flatpak/remotes.d</code> directory. For instance, creating a file like <code>/etc/flatpak/remotes.d/flathub.flatpakrepo</code> would be advisable. This configuration file, or the content of its <code>GPGKey=</code> keyword, should be obtained from sources authenticated by means stronger than TLS. This process is currently [[undocumented]].
+
+Flatpak upstream bug report: [https://github.com/flatpak/flatpak/issues/5657 <code>flatpak remote-add</code> TOFU and TLS security issue / use stronger authentication than TLS]
+
+This issue is [[unspecific|unspecific to {{project_name_short}}]].
+}}
+</div>
+</div>
+
+'''2.''' Select your platform.
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|type=section
+|linkid=os-nonqubes
+|active=true
+|image=[[File:Kicksecure-logo-icon.svg]]
+|title={{Headline|h=3|content=A : {{non_q_project_name_long}}}} ===
+|content=
+<div>{{project_name_workstation_short}}</code></div>
+
+(Not required. Enabled by default.)
+
+{{CodeSelect|code=
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+}}
+}}
+{{Tab
+|type=section
+|linkid=os-qubes-template
+|image=[[File:Qubes-logo-blue.png]]
+|title={{Headline|h=3|content=B : {{q_project_name_long}} Template}} ===
+|content=
+<div>{{q_project_name_short}} Template (<code>{{project_name_workstation_template}}</code>)</div>
+
+(Not required. Enabled by default.)
+
+{{CodeSelect|code=
+http_proxy=http://127.0.0.1:8082 https_proxy=$http_proxy flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+}}
+}}
+{{Tab
+|type=section
+|linkid=os-qubes-appqube
+|image=[[File:Qubes-logo-blue.png]]
+|title={{Headline|h=3|content=C : {{q_project_name_short}} App Qube}}
+|content=
+<div>{{q_project_name_short}} App Qube (<code>{{project_name_workstation_vm}}</code>)</div>
+
+Required. Not enabled by default.
+
+{{CodeSelect|code=
+flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+}}
+}}
+}} <!-- End Tab Controller -->
+
+'''3.''' Done.
+
+The process of enabling the Flathub repository has been completed.
+</div>
+</div>
+}}
+
+=== Kicksecure Flathub Repository Default Settings ===
+
+Kicksecure mitigates the issues described in chapter [[#Flathub_Package_Sources_Security|Flathub Package Sources Security]] related to unverified applications and non-freedom software by using Flatpak's subset option with the <code>verified_floss</code> parameter, which means that only Flatpaks can be installed that are both <code>verified</code> apps and <code>floss</code> (Freedom Software).
+
+This means by default it will not be possible to install unverified or non-freedom software Flatpaks from Flathub. This is to avoid the user accidentally installing Flatpaks from one of these two categories. Unverified Flatpaks are disabled by default for better security. Non-freedom Flatpaks are disabled to [[Avoid_nonfreedom_software|Avoid Non-Freedom Software]].
+
+This is not a user freedom restriction. In Kicksecure, there are [[Reasons_for_Freedom_Software#No_Intentional_User_Freedom_Restrictions|No Intentional User Freedom Restrictions]]. This setting can be easily changed. See chapter [[#Change_Flathub_Settings|Change Flathub Settings]].
+
+=== Change Flathub Settings ===
+Flathub offers support for [https://docs.flathub.org/docs/for-users/installation/#subsets subsets], which is relevant to the discussion in [[#Flathub_Package_Sources_Security|Flathub Package Sources Security]]. The recommended setting is <code>verified_floss</code>. However, if you are confident in your understanding of these settings, you are free to choose different options as per your requirements.
+
+For instance, as of this writing, [[Monero]] could not be installed due to its Flatpak not having received the verified badge from Flathub. This situation is a result of [https://github.com/monero-project/monero-gui/issues/4206 delays in verification by Flathub], as detailed in [https://github.com/flathub/flathub/issues/3905#issuecomment-1694349732 Flathub's issue tracking]. If a user has independently verified that an application deemed unverified is from a reputable source, they may choose to modify their settings to allow the installation of unverified Flatpaks. In the case of Monero, if the user already has confidence in the Monero developers, it might be reasonable to permit the installation of the unverified Monero Flatpak, especially considering it has been developed by the Monero team and is in the process of becoming a verified Flatpak.
+
+It's important to note that once you enable the installation of unverified or non-freedom software Flatpaks, extra caution is required to avoid inadvertently installing other unverified or non-freedom software Flatpaks. This is due to the lack of an option to permit unverified Flatpaks on a per-Flatpak basis. Instead, there's only a global Flatpak setting, which affects all instances of the Flatpak installation command.
+
+'''Table:''' ''<code>flatpak</code> <code>subsets</code> - Security Viewpoint''
+
+{| class="wikitable"
+! Option / Comment
+! No Unverified Publishers Allowed
+! No {{nowrap|Non-Freedom}} Software Allowed
+! Command
 |-
 
-! scope="row"| Server Services
-| [[Onion Services]] and/or [[Hosting_Location_Hidden_Services|Location Hidden Services]] can be hosted.
+| {{nowrap|<code></code>}}<br/>Flathub default.
+| {{No}}
+| {{No}}
+| {{CodeSelect|code=sudo flatpak remote-modify --subset= flathub}}
 |-
 
-! scope="row"| Tor Routing
-| {{TorifiedGateway}} Refer to the footnotes for further information.
+| {{nowrap|<code>verified</code>}}
+| {{Yes}}
+| {{No}}
+| {{CodeSelect|code=sudo flatpak remote-modify --subset=verified flathub}}
 |-
 
-! scope="row"| UDP
-| [[Tor#UDP|Tor does not support UDP]]. This is not a {{project_name_short}}-specific issue.
+| {{nowrap|<code>floss</code>}}
+| {{No}}
+| {{Yes}}
+| {{CodeSelect|code=sudo flatpak remote-modify --subset=floss flathub}}
+|-
+
+| {{nowrap|<code>verified_floss</code>}}<br/>Recommended.
+| {{Yes}}
+| {{Yes}}
+| {{CodeSelect|code=sudo flatpak remote-modify --subset=verified_floss flathub}}
 |-
 
 |}
 
-Related topics:
+The following table expresses the very same as above, just from a different viewpoint.
 
-* [[{{project_name_gateway_short}}_Firewall|{{project_name_gateway_short}} Firewall]]
-* [[{{project_name_workstation_short}}_Firewall|{{project_name_workstation_short}} Firewall]]
-* [[Ports]]
+'''Table:''' ''<code>flatpak</code> <code>subsets</code> - Functionality Viewpoint''
 
-= Install Software General =
+{| class="wikitable"
+! Option
+! Unverified Publishers Allowed
+! {{nowrap|Non-Freedom}} Software Allowed
+! Command
+|-
 
-{{upstream_wiki}}
+| {{nowrap|<code></code>}}
+| yes
+| yes
+| {{CodeSelect|code=sudo flatpak remote-modify --subset= flathub}}
+|-
+
+| {{nowrap|<code>verified</code>}}
+| no
+| yes
+| {{CodeSelect|code=sudo flatpak remote-modify --subset=verified flathub}}
+|-
+
+| {{nowrap|<code>floss</code>}}
+| yes
+| no
+| {{CodeSelect|code=sudo flatpak remote-modify --subset=floss flathub}}
+|-
+
+| {{nowrap|<code>verified_floss</code>}}
+| no
+| no
+| {{CodeSelect|code=sudo flatpak remote-modify --subset=verified_floss flathub}}
+|-
+
+|}
+
+<ref>
+When changing these settings, what technically happens is that <code>flathub</code> changes settings in file <code>/var/lib/flatpak/repo/config</code>.
+
+{{CodeSelect|code=
+cat /var/lib/flatpak/repo/config
+}}
+
+The content of the <code>xa.subset</code> keyword changes.
+</ref>
+
+Recommendations:
+
+* Installation of unverified Flatpaks is discouraged for better security.
+* Installation of non-freedom software is discouraged as per [[Avoid_nonfreedom_software|Avoid Non-Freedom Software]].
+
+=== Install from Flatpak ===
+This is an example.
+
+<u>Note:</u> Replace the Flatpak application ID <code>org.chromium.Chromium</code> with the actual Flatpak application ID to install such as for example <code>org.mozilla.firefox</code>.
+
+{{Flatpak_Install|package=
+org.chromium.Chromium
+}}
+
+=== Flatpak Troubleshooting ===
+==== Flatpak error: Nothing matches ====
+If you encounter an error message similar to the one below...
+
+<pre>
+Looking for matches…
+error: Nothing matches org.getmonero.Monero in remote flathub
+zsh: exit 1     flatpak install flathub org.getmonero.Monero
+</pre>
+
+...it may be due to the software being a unverified application and/or not being non-freedom software. This issue can arise because of the hardened [[#Kicksecure Flathub Repository Default Settings|Kicksecure Flathub Repository Default Settings]], which are designed to mitigate some security issues outlined in the section [[#Flathub_Package_Sources_Security|Flathub Package Sources Security]].
+
+To override these restrictions and proceed with installation, refer to the instructions in the section [[#Change Flathub Settings|Change Flathub Settings]].
+
+== Installers ==
+
+curl bash pipe's are to be avoided for security reasons. See also [[Dev/curl_bash_pipe|curl bash pipe - Security Discussion]].
+
+Examples.
+
+<u>'''NOTE:''' Do not run the following command!</u> These are only an illustrative examples. <ref>
+https://github.com/swizzin/swizzin
+</ref>
+
+<pre>
+curl https://www.example.com/installer | bash
+</pre>
+
+<pre>
+bash <(curl -sL s5n.sh) && . ~/.bashrc
+</pre>
+
+<pre>
+bash <(wget -qO - s5n.sh) && . ~/.bashrc
+</pre>
+
+= Best Practices =
+
+'''Table:''' ''Best Software Installation Practices''
+
+{| class="wikitable"
+|-
+! scope="col"| '''Domain'''
+! scope="col"| '''Advice'''
+|-
+
+! scope="row"| Always Verify Signatures
+|
+* For greater system security, it is strongly recommended to avoid installing unsigned software. Always make sure that [[Verifying_Software_Signatures|signing keys and signatures are correct]] and/or use mechanisms that heavily simplify and automate this process, like [[Operating_System_Software_and_Updates#Updates|APT upgrades]].
+* Note: digital signatures are not a magic bullet. While they increase the certainty that no backdoor was introduced by a third party during transit, this does not mean the software is absolutely "backdoor-free". Learn more about this process and [[Verifying_Software_Signatures#What_Digital_Signatures_Prove|what digital signatures prove]].
+|-
+
+! scope="row"| Avoid Manual Software Installation
+|
+* Generally avoid the manual installation of packages, even trusted ones. In practice that means software should only be installed with <code>apt</code>, unless special circumstances exist. <ref>
+Such as desirable software versions that are not yet bundled in the official repositories.
+</ref>
+* Other risks: foreign packages are often unsigned, and users may forget to regularly update the software.
+|-
+
+! scope="row"| Avoid Third Party Package Managers
+|
+* There are many third party package managers besides <code>APT</code>, however many lack the security safeguards that are standard in Debian. Popular examples are <code>pip</code> and <code>node.js</code>.
+* The security concern with third party options is they do not verify the code comes from the author. When used, these package managers run processes that pull untrusted code from the Internet and perform operations with root level permissions.
+* If a trusted Workstation VM is required for sensitive use cases such as a Bitcoin wallet, then completely avoid this option. <ref>
+https://web.archive.org/web/20170919173146/https://arstechnica.com/information-technology/2017/09/devs-unknowingly-use-malicious-modules-put-into-official-python-repository/
+</ref> <ref>
+The pip developers refused to implement any kind of proper GPG signature verification, [https://github.com/pypa/pip/issues/1035 opting to support server HTTPS instead] which is a lot weaker. While the TUF secure updater project has [https://theupdateframework.io/ implemented a safe version of pip], it is not clear how widely it has been adopted and whether it will become popular.
+</ref>
+|-
+
+! scope="row"| Prefer APT
+|
+* The safest option is to stick with Debian's official package manager <code>APT</code>. This is referenced throughout the wiki whenever the user runs <code>apt</code>.
+* <code>APT</code> is a secure package manager which passes the TUF threat model, since it features metadata verification and expiration detection. <ref name=tufaaw>https://theupdateframework.io/security/
+</ref> <ref>
+https://www2.cs.arizona.edu/stork/packagemanagersecurity/attacks-on-package-managers.html
+</ref>
+|-
+
+{{Anchor|Prefer Packages from Debian Stable Repository}}
+! scope="row"| Prefer Packages from Debian Stable Repository
+|
+* Considering the risks, it is safest to install new software from Debian's stable repository, rather than the testing / unstable or third party repositories -- the [https://www.debian.org/doc/manuals/debian-faq/choosing Debian FAQ] provides a strong rationale for using the stable repository; see footnote. <ref>
+<blockquote>If security or stability are at all important for you: install stable. period. This is the most preferred way.
+...
+Since there is typically over 1 year between releases you might find that stable contains old versions of packages. However, they have been tested in and out. One can confidently say that the packages do not have any known severe bugs, security holes etc., in them. The packages in stable integrate seamlessly with other stable packages. These characteristics are very important for production servers which have to work 24 hours a day, 7 days a week.
+...
+Stable is rock solid. It does not break and has full security support. But it might not have support for the latest hardware.
+
+On the other hand, packages in testing or unstable can have hidden bugs, security holes etc. Moreover, some packages in testing and unstable might not be working as intended.</blockquote>
+</ref>
+* Only advanced users should attempt to mix packages from Debian testing or Debian unstable. The reason is it can lead to a [[#Dependency Hell|dependency hell]], making it very difficult to resolve the breakage of APT package management.
+* To use newer package versions, see chapter [[#Install Newer Software Versions|Install Newer Software Versions]].
+|-
+
+|}
+
+{{Anchor|More_Security}}
+
+= Security Advice =
+
+== General Advice ==
+
+{{project_name_short}} users are free to install their favorite software packages, but should be aware that additional software increases the [https://en.wikipedia.org/wiki/Attack_surface attack surface] of the platform.
+
+== APT Meta-data ==
+
+When updating with <code>apt</code>, information will leak about which software packages and versions have been installed, unless [[Onionizing_Repositories|Tor onion repositories]] have been configured. <ref>
+See [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#Softwareupdaters software updaters] for more information on this topic.
+</ref>
+
+For repositories that come enabled by default with {{project_name_short}}, this meta-data cannot be directly linked to any other activity like web browsing, because the apt-transport-tor forces it to pass through its own Tor circuit. <ref>
+Consider the following example. A user announces online that software X is being utilized, and another specific application set x, y, and z is installed. If this information becomes available to an adversary and the circuit-isolated <i>apt</i> passes through any Tor exit relays, mirrors or ISPs under their control, then they may guess it is associated with the same pseudonym. In that case, the adversary has a list of the user's installed packages, and can attempt a stale mirror attack, or try other attacks against <i>apt</i>.
+</ref> <ref>
+As per the previous footnote, this threat equally applies to users who run an onion service with a specific set of server software, for example apache, mediawiki, phpbb, and others.
+</ref>
+
+For user custom added repositories, the user should consider adding the onion version of that repository if available or use apt-transport-tor with the <code>tor+</code> syntax in the apt sources file. [[Undocumented]]. The user could refer to upstream apt-transport-tor documentation.
+
+== Recommendations ==
+
+For greater security when updating:
+
+* Follow the guidelines [[#How-to:_Install_or_Update_with_Utmost_Caution|below]].
+* Be especially careful when adding custom repositories, particularly Personal Package Archives (PPAs). <ref>[https://itsfoss.com/ppa-guide/ Using PPA in Ubuntu Linux (Complete Guide)]: <blockquote>PPA stands for Personal Package Archive. The PPA allows application developers and Linux users to create their own repositories to distribute software. With PPA, you can easily get newer software version or software that are not available via the official Ubuntu repositories.</blockquote></ref> Compared to main distribution repositories, solo developers are more susceptible to influence and theoretically might have malicious intent.
+
+== How-to: Install or Update with Utmost Caution ==
+
+# Stop all activities and shutdown any open applications like Tor Browser.
+# Change the Tor circuit -- this step may not apply if the user is running an onion service.
+# Update using <code>apt</code> after a random delay. By default, a new Tor circuit is generated after 10 seconds.
+# Change the Tor circuit again.
+# Continue user activities after another random period has elapsed.
+
+= Specialized topics =
+
+== --no-install-recommends ==
+Debian's installation default is <code>--install-recommends</code>. Debian packages have various metadata fields such as:
+
+* <code>Depends:</code> dependencies or dependency packages
+* <code>Recommends:</code> "recommended" packages
+* <code>Suggests:</code> "suggested" packages
+
+When installing a package using <code>apt</code>, dependencies (<code>Depends:</code>) are always installed. The Debian default is for "recommended" packages (<code>Recommends:</code>) to also be installed alongside the primary package (unless installed previously). To avoid that outcome, it is possible to use the <code>apt</code> command line parameter <code>--no-install-recommends</code>; this is in most cases optional.
+
+Debian's default for suggested packages (<code>Suggests:</code>) is <code>--no-install-suggests</code> i.e. not to install suggested packages. Users can optionally use <code>--install-suggests</code>, but there are no known cases where this would be useful at the time of writing. A host of other [https://manpages.debian.org/{{Stable project version based on Debian codename}}/apt/apt.8.en.html#OPTIONS command line options] are also available.
+
+If a package is installed using <code>apt --no-install-recommends install package-name</code>, then re-running <code>apt</code> without any parameters or even with <code>--install-recommends</code> will not result in installation of the "recommended" packages. To accomplish a "late" installation of "recommended" packages (<code>Recommends:</code>), the simplest method is first uninstalling the package. Alternatively, the list of <code>Recommends:</code> can be viewed using <code>apt-cache package-name</code> or by checking the package on https://www.debian.org/distrib/packages.
+
+A brief Q&A regarding the potential impacts of the "recommended" field is outlined below.
+
+'''Table:''' ''<code>--no-install-recommends</code> Impacts''
+
+{|   class="wikitable"
+
+! '''Question'''
+! '''Answer'''
+|-
+
+! Why does {{project_name_short}} documentation often suggest <code>--no-install-recommends</code>?
+| [[Documentation|{{project_name_short}} documentation]] uses <code>--no-install-recommends</code> whenever appropriate. It has been specifically crafted by developers with the goal of installing all required packages.
+|-
+
+! Can using <code>--no-install-recommends</code> lead to security issues?
+| No. <ref>
+There are no known examples at the time of writing.
+</ref>
+|-
+
+! Can using <code>--no-install-recommends</code> lead to missing or broken functionalities?
+| Yes. For example, [https://packages.debian.org/search?keywords=mmdebstrap mmdebstrap] uses <code>Recommends:</code> and <code>Suggests:</code> [https://gitlab.mister-muffin.de/josch/mmdebstrap/issues/5 for various optional dependencies providing various functionality].
+|-
+
+! Can omitting <code>--no-install-recommends</code> lead to security issues?
+| In corner cases, yes. For example consider a [[Host Operating System Selection|host operating system]] without a [[Host Firewall]]. <ref>
+Most people nowadays are behind a NAT router which blocks unsolicited incoming connections by default. While that protects from outside Internet-based attacks, it does not protect against attacks launched from inside the local area network (LAN) (devices that use the same router). This is specifically dangerous when using shared WiFi hotspots.
+</ref> By omitting <code>--no-install-recommends</code> -- which results in using Debian's default <code>--install-recommends</code> -- packages might be installed that open [[Ports|ports]], which can significantly increase attack surface.
+|-
+
+! Should <code>--no-install-recommends</code> be used?
+| The answer depends on the specific package. Advanced users who know exactly which packages are needed can use <code>--no-install-recommends</code> and afterwards manually add any wanted/additional packages <ref>
+Perhaps including some "recommended" packages (<code>Recommends:</code>).
+</ref> to the <code>apt</code> installation command. Otherwise, there might be corner cases of missing optional dependencies or limited functionality. In general, whether users should use <code>--no-install-recommends</code> for package installation is unspecific to {{project_name_short}} and should be resolved as per [[Self_Support_First_Policy|Self Support First Policy]].
+|-
+
+! Should {{project_name_short}} set the default to <code>--no-install-recommends</code>? <ref>
+See: [https://forums.whonix.org/t/set-apt-get-no-install-recommends-by-default/11890 set apt --no-install-recommends by default]
+</ref>
+| This is a good question. It is a big change and could lead to a lot of broken functionality for user-installed packages. At the moment, {{project_name_short}} user [[support]] is manageable because redirection to the [[Self_Support_First_Policy|Self Support First Policy]] is possible. If <code>--no-install-recommends</code> was the {{project_name_short}} default, then a lot of functionality might work out of the box in Debian but not in {{project_name_short}}, therefore invalidating the Self Support First Policy.
+
+For these reasons, such suggestions should first be raised at Debian's issue tracker after first searching for existing discussions on Debian mailing lists. Search [https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=apt;dist=unstable Debian APT issue tracker] for <code>recommend</code> first to avoid duplicate issues. For this change to be implemented, it would probably require a lot of research, good examples and a very well written feature request. <ref>
+This wiki chapter has been authored so it may be a useful resource in the future.
+</ref>
+|-
+
+! How to install <code>Recommends:</code> after previously using <code>--no-install-recommends</code> to install a package?
+| '''Scenario:'''
+
+You previously installed a package using the command:
+
+<code>apt install --no-install-recommends diffoscope</code>
+
+'''User Story:'''
+
+- Initially, the absence of <code>Recommends:</code> was intentional and desired.
+- Later, the realization occurs that the missing <code>Recommends:</code> are needed after all.
+
+'''Attempts:'''
+
+'''1.''' Running:
+
+<code>apt install diffoscope</code>
+
+* '''Expected Result''' <code>Recommends:</code> are installed now.
+* '''Actual Result:''' The <code>Recommends:</code> are not installed.
+
+'''2.''' Running:
+
+<code>sudo apt satisfy diffoscope</code>
+
+or even:
+
+<code>sudo apt install --install-recommends diffoscope</code>
+
+Outcome: The <code>Recommends:</code> still do not get installed.
+
+'''Workaround:'''
+
+The only effective method discovered so far is to remove the package first:
+
+<code>sudo apt remove diffoscope</code>
+
+Then reinstall it with the <code>--install-recommends</code> flag:
+
+<code>sudo apt install --install-recommends diffoscope</code>
+
+'''Related Information:'''
+
+Refer to the following Debian APT bug report/feature request:
+
+[https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=894976 apt-get --install-recommends --reinstall install x should install recommends for already installed package]
+|-
+
+|}
+
+== Default APT Sources ==
+APT sources configuration,
+
+* <code>/etc/apt/sources.list</code> file and
+* <code>/etc/apt/sources.list.d</code> folder
+
+work same as on Debian. This is [[unspecific|unspecific to {{project_name_short}}]]. The only {{project_name_short}} specific difference is that file <code>/etc/apt/sources.list</code> exists but is empty by default. Debian APT sources reside in file [https://github.com/Kicksecure/anon-apt-sources-list  <code>/etc/apt/sources.list.d/debian.list</code>], which is provided by the [https://github.com/Kicksecure/anon-apt-sources-list anon-apt-sources-list] package.
+
+== Foreign Sources ==
+
+For most use cases the extensive software range available from the official Debian repositories should be sufficient. A selection of nearly 60,000 programs <ref>https://www.debian.org/intro/why_debian</ref> can be installed within a couple of steps. These packages are constantly maintained for bug/security fixes and are tightly integrated to provide a stable distribution.
+
+To guarantee stability, no new versions are uploaded to Debian stable archives to avoid breaking the system. This makes Debian stable a dependable distribution and an excellent base for downstream distributions. However, the Linux software scene is very dynamic and sometimes users will want software that is not yet packaged in Debian. In this case it may be necessary to install software from separate sources; either from third party repositories, as a stand-alone precompiled <i>.deb</i> binary, or directly compiled source packages. <ref>https://www.debian.org/doc/manuals/debian-faq/pkg-basics.en.html</ref>
+
+=== Risks ===
+Foreign sources should be used infrequently because it can cause problems. Note this is simply a warning about the worst case scenario and not a predetermined outcome of installing third party software.
+
+==== Security Issues ====
+Foreign sources pose important security implications for the affected system. Installing software is tantamount to granting root privileges to the developers. Software originating from dubious sources could replace important system components with malicious versions that allow backdoors or [https://en.wikipedia.org/wiki/Trojan_horse_%28computing%29 Trojan horses] to be installed on the system.
+
+In general, the installation of software is a matter of trust. The fact is every installed software source must be trusted. This trust is two-fold: firstly that the developers have integrity, and secondly that the community will notice any suspicious code, which might indicate compromise of the developers' machines. <ref>With reproducible package builds on the horizon, the security risk from the second factor will be minimal in the future.</ref>
+
+==== Dependency Hell ====
+Manually installed packages can contain library versions that are unavailable in the standard repositories. This causes problems with dependency resolution when installing additional software from the official repository. Individual applications are less critical in this context, but when important system libraries in the third-party software are considered, complications are inevitable.
+
+Depending on the severity of the complications, upgrades to the next version of the operating system might fail, or the system may become unbootable or generally unstable.
+
+==== Mitigation ====
+
+To reduce [[#Security Issues|security risks]] and eliminate [[#Dependency Hell|the risk of making the workstation unusable]], utilize Multiple {{project_name_short}}.
+
+{{q_project_name_short}} users: For installation inside Qubes templates, the risk can only be minimized by using Multiple {{q_project_name_short}} Templates.
+
+=== Installation Source - Upstream Original Developers versus Repository ===
+Installation from Upstream Original Developers versus Repository? Which one is more secure?
+
+That depends on the user's knowledge. If the user has a strong understanding of computer security in general, specifically fully understands the threat model behind digital software verification, then downloading software from original upstream developers is probably safer (because that removes one intermediary) than installing from other sources such as flatpak. However, this is a very big "IF."
+
+related knowledge:
+
+* [[Verifying Software Signatures]]
+* [[Software Signature Verification Usability Issues and Proposed Solutions]]
+* [[Mental Model]]
+* [[Social Engineering]]
+
+== GUI Applications with Root Rights ==
+Moved to [[root#Graphical Applications with Root Rights|Safely Use Root Commands: Graphical Applications with Root Rights]].
 
 = Footnotes =
 {{reflist|close=1}}
