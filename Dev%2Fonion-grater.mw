@@ -19,7 +19,11 @@ According to [https://gitlab.tails.boum.org/tails/tails/-/blob/master/config/chr
 
 Contrary to Tails, the fields user and per-application (AppArmor profile) are ignored using the wildcard <code>'*'</code> to include everything. This is due to {{project_name_long}}'s design of separating user space and the Tor daemon, which makes these methods not feasible. Instead, greater security to further separate applications and their requests to Tor's Control Protocol can be achieved by using [[Multiple_Whonix-Workstation|Multiple_Whonix-Workstation]], where you can control per-{{project_name_workstation_short}} access using the <code>hosts</code> directive in the onion-grater profile to match the {{project_name_workstation_short}} LAN IP. Since using multiple {{project_name_workstation_short}} instances requires more effort (as the {{project_name_gateway_short}} does not know all {{project_name_workstation_short}} LAN IPs), the default setting is <code>hosts: '*'</code>. To minimize the attack surface from {{project_name_workstation_short}} to the {{project_name_gateway_short}} Tor Controller, you can configure the <code>hosts</code> directive to match your chosen {{project_name_workstation_short}} LAN IP.
 
-Tor's control port, in the context of {{project_name_short}}, has dangerous features. The answer to the Tor control command <code>GETINFO address</code> will reveal the real external IP of the Tor client. Other dangerous commands include <code>SETCONF</code>, <code>LOADCONF</code>, <code>GETCONF</code>, and <code>GETINFO ns/id/&lt;relay-fingerprint&gt;</code>.
+Tor's control port, in the context of {{project_name_short}}, has dangerous features.
+
+* The answer to the Tor control command <code>GETINFO address</code> will reveal the real external IP of the Tor client.
+* <code>add_onion</code> - [[Onion_Services#Onion_Services_Security|Onion Services Security]]
+* Other dangerous commands include <code>SETCONF</code>, <code>LOADCONF</code>, <code>GETCONF</code>, and <code>GETINFO ns/id/&lt;relay-fingerprint&gt;</code>.
 
 These dangerous commands can only be limited with a proxy, as the feature request [https://gitlab.torproject.org/legacy/trac/-/issues/8369 Option to limit information Tor's control port discloses] against Tor has not been implemented. This Tor control port feature also makes a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO/BridgeFirewall Bridge Firewall] impossible.
 
@@ -145,6 +149,9 @@ https://forums.whonix.org/t/workstation-hardcoded-ip-changes/21595
 = Application Support =
 
 Some applications that use the commands and events whitelisted by default don't need to worry about setting profiles. Some applications might already be covered by profiles for other applications.
+
+== Whonix Default Onion-Grater Profile ==
+* '''Profile''': [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/onion-grater-merger.d/30_whonix-default.yml /etc/onion-grater-merger.d/30_whonix-default.yml]
 
 == Tor Browser ==
 * '''Page''': [[Tor Browser]]
@@ -500,6 +507,34 @@ Direct links to profiles using similar regex:
 * https://github.com/Whonix/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_bisq.yml
 * https://github.com/Whonix/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_onionshare.yml
 
+= Tor Control Protocol Commands Considerations =
+If developers thought that a Tor control protocol command was always safe by default for all users, they might whitelist that command by default. (However, to save development time, developers are not whitelisting as many commands as possible. Also, to keep the source code smaller.)
+
+* The most dangerous known forbidden (not whitelisted) command:
+** <blockquote>The answer to the Tor control command <code>GETINFO address</code> will reveal the real external IP of the Tor client.</blockquote>
+* The most dangerous known command not whitelisted by default:
+** <code>add_onion</code>: See [[Onion_Services#Onion_Services_Security|Onion Services Security]].
+*** But used by most onion-grater profiles. In that case, the documentation will show [[onion-grater#onion-grater_Warning|onion-grater warning]].
+* For other non-default, opt-in commands (those that get enabled when enabling onion-grater profiles):
+** See onion-grater profiles source code.
+** See also [[Dev/onion-grater#Application_Support|Application Support]].
+** {{kicksecure_wiki
+|wikipage=Dev/git#Search_the_Source_Code
+|text=Search the Source Code
+}} and {{kicksecure_wiki
+|wikipage=Dev/git#Find_Files
+|text=Find Files
+}}: <code>onion-grater-merger</code>
+** For example, see [https://github.com/Whonix/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_onion_authentication.yml /usr/share/doc/onion-grater-merger/examples/40_onion_authentication.yml]. Quote: <ref>
+{{PreBox|
+## Onion Authentication
+## Not default when one workstation would login, this would login all workstations.
+## Therefore potential cross VM linking identifier.
+## https://blog.torproject.org/new-release-tor-browser-95
+}}
+</ref>
+** For most other commands, no additional commentary by Whonix is available. For example, [https://github.com/Whonix/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_onionshare.yml /usr/share/doc/onion-grater-merger/examples/40_onionshare.yml] contains <code>onions/current</code>. These can be looked up in the [https://spec.torproject.org/control-spec/commands.html Tor Control Protocol].
+
 = Functionality support =
 
 == Indicator for current Circuit Status and Exit IP ==
@@ -850,7 +885,7 @@ Fork by {{project_name_short}}:
 * [[Onion-grater]]
 * [[Tor_Controller]]
 * [[Dev/anon-ws-disable-stacked-tor]]
-* [https://gitweb.torproject.org/torspec.git?a=blob_plain;hb=HEAD;f=control-spec.txt Tor Control Protocol]
+* [https://spec.torproject.org/control-spec/commands.html Tor Control Protocol]
 
 = Footnotes =
 {{reflist|close=1}}
