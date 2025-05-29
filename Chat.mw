@@ -216,7 +216,7 @@ A recommendation if any can be made depends on the threat model, priorities of t
 
 OMEMO encryption has amazing security properties but it's opt-in in all known chat programs, which is a huge usability issue. Meaning users could easily forget to enable it or due to bugs getting disabled. It is also XMPP-specific, therefore there are no instant messengers that are serverless (and thereby hiding the user's social graph) as well as at the same time support OMEMO encryption. OMEMO is built on top of the double-ratchet encryption algorithm however, and there are a variety of messengers that support double-ratchet encryption.
 
-The most secure instant messenger would be serverless, peer to peer (p2p) over Tor onions with well-audited double-ratchet end-to-end encryption enabled by default. No such instant messenger combining all security properties is currently known. The user can either choose a server dependent (jabber) OMEMO encrypted chat or serverless Tor onion to onion instant messenger.
+The most secure instant messenger would be serverless, peer to peer (p2p) over Tor onions with well-audited double-ratchet end-to-end encryption enabled by default — only [[Cwtch]] meets these criteria (but has not had a security audit at the time of writing). Another safe and recommended option is a messenger without a permanent user ID, with local data storage and quantum resistance to double-ratchet end-to-end encryption enabled by default — only [[SimpleX]] meets this criterion.
 
 = Instant Messenger Security Properties Comparison =
 '''Table:''' ''Instant Messenger Security Properties Comparison''
@@ -370,7 +370,7 @@ Applications discussed in this chapter are listed in order of best usability and
 
 It should be noted that no single application listed here has a superior feature set. Users must make a choice based on personal preferences and their [https://www.kicksecure.com/wiki/Threat_Modeling self-assessed threat model]:
 # [[SimpleX]] has a high level of security and anonymity: post-quantum encryption, does not require a phone number or email for registration, protects against metadata collection, data is stored locally, incognito mode allows for the creation of separate chats with random names, etc.
-# [[Cwtch]] has a high  anonymity and protection against metadata collection: does not require a phone number or email for registration, all communication is end-to-end encrypted and takes place over Tor (there is no “Cwtch service” or “Cwtch network”).
+# [[Cwtch]] has a high  anonymity and protection against metadata collection: does not require a phone number or email for registration, all communication is end-to-end encrypted and takes place over Tor (there is no “Cwtch service” or “Cwtch network”). Not undergone an independent security audit at the time of writing.
 # [[#Dino_IM|Dino IM]] It provides good UX, a modern and clean look and OMEMO support. On the downside, it requires a Jabber server which weakens anonymity.
 # [[#Gajim|Gajim]] has more Jabber users, is written in memory-safe python, supports offline messages, and can provide OMEMO encryption. On the downside, it requires a Jabber server which weakens anonymity.
 # [[OnionShare]] provides a serverless (hosted using a Tor onion service), secure, ephemeral and anonymous chat feature. It is particularly useful because it does not require account creation, is encrypted end-to-end and reduces the risk of messages being stored locally.
@@ -509,6 +509,10 @@ While Matrix does support end-to-end encryption in both one-on-one and group cha
 * libolm, which was previously the primary library used to provide encryption functionality for Matrix, had multiple dangerous security flaws that would potentially have allowed Matrix's encryption to be compromised.<ref>https://soatok.blog/2024/08/14/security-issues-in-matrixs-olm-library/</ref> This library has since been deprecated.
 
 While not technically a shortcoming, most rooms on the Matrix network do not have encryption enabled.
+
+Cryptography specialist Soatok discovered a vulnerability, CVE-2024-45191, in Matrix’s Olm Library in 2024.<ref>
+https://nvd.nist.gov/vuln/detail/CVE-2024-45191
+</ref>
 
 Many different Matrix clients exists, Element being the most commonly used client.
 See other Matrix clients here: 
