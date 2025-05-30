@@ -216,24 +216,28 @@ A recommendation if any can be made depends on the threat model, priorities of t
 
 OMEMO encryption has amazing security properties but it's opt-in in all known chat programs, which is a huge usability issue. Meaning users could easily forget to enable it or due to bugs getting disabled. It is also XMPP-specific, therefore there are no instant messengers that are serverless (and thereby hiding the user's social graph) as well as at the same time support OMEMO encryption. OMEMO is built on top of the double-ratchet encryption algorithm however, and there are a variety of messengers that support double-ratchet encryption.
 
-The most secure instant messenger would be serverless, peer to peer (p2p) over Tor onions with well-audited double-ratchet end-to-end encryption enabled by default — only [[Cwtch]] meets these criteria (but has not had a security audit at the time of writing). Another safe and recommended option is a messenger without a permanent user ID, with local data storage and quantum resistance to double-ratchet end-to-end encryption enabled by default — only [[SimpleX]] meets this criterion.
+The most secure instant messenger would be serverless with local data storage, peer to peer (p2p) over Tor onions or another metadata protection-resistant onion routing, without a permanent user ID,  with well-audited quantum resistance to double-ratchet end-to-end encryption enabled by default — only [[SimpleX]] and [[Cwtch]] are closest to these criteria.
 
 = Instant Messenger Security Properties Comparison =
 '''Table:''' ''Instant Messenger Security Properties Comparison''
 
 * <u>TODO:</u> unfinished
-* <u>Wiki editors notice:</u> Please do not expand this table without prior discussion. To keep maintenance effort low, this table shall be a curated list with most suitable choices only. Messengers that are discouraged in context of anonymity such as Telegram and Signal (due to the [[Phone Number Validation]] issue), shall not be added to this list.
+* <u>Wiki editors notice:</u> Please do not expand this table without prior discussion. To keep maintenance effort low, this table shall be a curated list with most suitable choices only. Messengers that are discouraged in context of anonymity such as [[Telegram]] and [[Signal]] (due to the [[Phone Number Validation]] issue), shall not be added to this list.
 
 {| class="wikitable"
 |-
 
 ! <!-- feature --> '''Feature'''
+! <!-- SimpleX --> [[SimpleX]]
+! <!-- Cwtch --> [[Cwtch]]
 ! <!-- Dino IM --> Dino IM
 ! <!-- Gajim --> Gajim
 ! <!-- OnionShare --> [[OnionShare]]
 |-
 
 ! <!-- feature --> Network
+| <!-- SimpleX --> SimpleX Network
+| <!-- Cwtch --> Tor onion
 | <!-- Dino IM --> XMPP ("Jabber")
 | <!-- Gajim --> XMPP ("Jabber")
 | <!-- OnionShare --> Tor onion
@@ -243,6 +247,8 @@ The most secure instant messenger would be serverless, peer to peer (p2p) over T
 |-
 
 ! <!-- feature --> Serverless / peer to peer / onion to onion
+| <!-- SimpleX --> {{Yes}}, client to unidirectional SimpleX routing (server does not store data)<ref>https://simplex.chat/blog/20240604-simplex-chat-v5.8-private-message-routing-chat-themes.html</ref>
+| <!-- Cwtch --> {{Yes}}, client to onion (server)
 | <!-- Dino IM --> {{No}}
 | <!-- Gajim --> {{No}}
 | <!-- OnionShare --> {{Yes}}, client to onion (server)
@@ -251,12 +257,16 @@ The most secure instant messenger would be serverless, peer to peer (p2p) over T
 ! <!-- feature --> No risks introduced for hosting an Onion Service <ref>
 There are more de-anonymization attacks against onion services than against Tor users who only use Tor as a client since it is possible to make onion services talk.
 </ref>
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> ? {{No}}
 | <!-- Dino IM --> {{Yes}}
 | <!-- Gajim --> {{Yes}}
 | <!-- OnionShare --> {{No}}
 |-
 
 ! <!-- feature --> End-to-end encryption (E2E) by default
+| <!-- SimpleX --> {{Yes}}, quantum resistance
+| <!-- Cwtch --> {{Yes}}
 | <!-- Dino IM --> {{No}}
 | <!-- Gajim --> {{No}}
 | <!-- OnionShare --> {{Yes}}
@@ -265,102 +275,137 @@ There are more de-anonymization attacks against onion services than against Tor 
 ! <!-- feature --> No usability issues that might lead to catastrophic event <ref>
 Users assuming encryption was used while it actually has not been used.
 </ref>
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> {{Yes}}
 | <!-- Dino IM --> {{No}}
 | <!-- Gajim --> {{No}}
 | <!-- OnionShare --> {{Yes}}
 |-
 
 ! <!-- feature --> Verifiability
+| <!-- SimpleX --> {{Yes}} (SimpleX Chat Protocol)
+| <!-- Cwtch --> {{Yes}} (Tapir Protocol)
 | <!-- Dino IM --> {{Yes}} (OMEMO)
 | <!-- Gajim --> {{Yes}} (OMEMO)
 | <!-- OnionShare --> ?
 |-
 
 ! <!-- feature --> Deniability
+| <!-- SimpleX --> {{Yes}} (SimpleX Chat Protocol)
+| <!-- Cwtch --> {{Yes}} (Tapir Protocol)
 | <!-- Dino IM --> {{Yes}} (OMEMO)
 | <!-- Gajim --> {{Yes}} (OMEMO)
-| <!-- OnionShare --> ?
+| <!-- OnionShare --> {{No}}
 |-
 
 ! <!-- feature --> Perfect Forward Secrecy (PFS)
+| <!-- SimpleX --> {{Yes}} (SimpleX Chat Protocol)
+| <!-- Cwtch --> {{Yes}}, Tor provides forward secrecy
 | <!-- Dino IM --> {{Yes}} (OMEMO)
 | <!-- Gajim --> {{Yes}} (OMEMO)
-| <!-- OnionShare --> {{Yes}}, Tor provides forward secrecy.
+| <!-- OnionShare --> {{Yes}}, Tor provides forward secrecy
 |-
 
 ! <!-- feature --> Written in memory safe language
+| <!-- SimpleX --> {{Yes}} (Haskell, Kotlin)
+| <!-- Cwtch --> {{Yes}} (Go, Rust)
 | <!-- Dino IM --> {{No}} (C)
 | <!-- Gajim --> {{Yes}} (python)
 | <!-- OnionShare --> {{Yes}} (python)
 |-
 
 ! <!-- feature --> Metadata resistant
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> {{Yes}}
 | <!-- Dino IM --> {{No}}
 | <!-- Gajim --> {{No}}
 | <!-- OnionShare --> {{Yes}}
 |-
 
 ! <!-- feature --> Audited protocol/crypto/client
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{Yes}}, protocol/crypto/client (Trail of Bits: 2022, 2024)
+| <!-- Cwtch --> {{No}}
+| <!-- Dino IM --> {{Yes}}, protocol/crypto (Radically Open Security: 2016)
+| <!-- Gajim --> {{Yes}}, protocol/crypto (Radically Open Security: 2016)
+| <!-- OnionShare --> {{Yes}}, protocol/crypto/client (Radically Open Security and IHTeam: 2021)
 |-
 
 ! <!-- feature --> Signed application releases
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{Yes}}<ref>
+*https://github.com/simplex-chat/simplex-chat/releases
+*https://github.com/simplex-chat/simplexmq/releases
+</ref>
+| <!-- Cwtch --> {{No}}<ref>https://git.openprivacy.ca/cwtch.im/cwtch-ui/releases</ref>
+| <!-- Dino IM --> {{No}}<ref>https://github.com/dino/dino/releases</ref>
+| <!-- Gajim --> {{No}}<ref>https://dev.gajim.org/gajim/gajim/-/releases</ref>
+| <!-- OnionShare --> {{No}}<ref>https://github.com/onionshare/onionshare/releases/</ref>
 |-
 
 ! <!-- feature --> Signed source code
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{Yes}}<ref>https://github.com/simplex-chat/simplex-chat/commits/stable/</ref>
+| <!-- Cwtch --> {{No}}/Partially<ref>https://git.openprivacy.ca/cwtch.im/cwtch-ui/commits/branch/trunk</ref>
+| <!-- Dino IM --> {{No}}/Partially<ref>https://github.com/dino/dino/commits/master/</ref>
+| <!-- Gajim --> {{No}}<ref>https://dev.gajim.org/gajim/gajim/-/commits/master</ref>
+| <!-- OnionShare --> {{Yes}}<ref>https://github.com/onionshare/onionshare/commits/main/</ref>
 |-
 
 ! <!-- feature --> Reproducible builds
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{No}}
+| <!-- Cwtch --> {{Yes}}<ref>https://docs.cwtch.im/blog/cwtch-bindings-reproducible/</ref>
+| <!-- Dino IM --> {{Yes}}<ref>https://github.com/dino/dino/wiki/Build</ref>
+| <!-- Gajim --> {{Yes}}<ref>https://dev.gajim.org/gajim/gajim/#building</ref>
+| <!-- OnionShare --> {{No}}
 |-
 
 ! colspan="4" <!-- usability feature header --> | '''Usability Property'''
 |-
 
 ! <!-- feature --> Multiple Devices Support
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> {{Yes}}
+| <!-- Dino IM --> {{No}}
+| <!-- Gajim --> {{No}}
+| <!-- OnionShare --> {{Yes}}
 |-
 
 ! <!-- feature --> Offline Messages / Backlog
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{No}}
+| <!-- Cwtch --> {{No}}
+| <!-- Gajim --> {{No}}
+| <!-- Gajim --> {{No}}
+| <!-- OnionShare --> {{No}}
 |-
 
 ! <!-- feature --> File Transfer
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> {{Yes}}
+| <!-- Dino IM --> {{Yes}}
+| <!-- Gajim --> {{Yes}}
+| <!-- OnionShare --> {{Yes}}
 |-
 
 ! <!-- feature --> Voice Messages
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> {{No}}
+| <!-- Dino IM --> {{No}}
+| <!-- Gajim --> {{Yes}}
+| <!-- OnionShare --> {{No}}
 |-
 
 ! <!-- feature --> Voice Chat
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> {{No}}
+| <!-- Dino IM --> {{Yes}}
+| <!-- Gajim --> {{No}} (with plugin)
+| <!-- OnionShare --> {{No}}
 |-
 
 ! <!-- feature --> Video Chat
-| <!-- Dino IM --> 
-| <!-- Gajim --> 
-| <!-- OnionShare --> 
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> {{No}}
+| <!-- Dino IM --> {{Yes}}
+| <!-- Gajim --> {{No}} (with plugin)
+| <!-- OnionShare --> {{No}}
 |-
 
 |}
@@ -375,6 +420,14 @@ It should be noted that no single application listed here has a superior feature
 # [[#Gajim|Gajim]] has more Jabber users, is written in memory-safe python, supports offline messages, and can provide OMEMO encryption. On the downside, it requires a Jabber server which weakens anonymity.
 # [[OnionShare]] provides a serverless (hosted using a Tor onion service), secure, ephemeral and anonymous chat feature. It is particularly useful because it does not require account creation, is encrypted end-to-end and reduces the risk of messages being stored locally.
 # [[#Nheko_Reborn|Nheko Reborn]] is another desktop IM client for the Matrix protocol and can be used for IRC channels. The developers do not recommend it as a daily driver due to possible implementation bugs.
+
+= SimpleX =
+{{Anchor|SimpleX Chat}}
+[[File:SimpleX_Logo_Small.png|thumb|128px|SimpleX logo]]
+See [[SimpleX]].
+
+= Cwtch =
+See [[Cwtch]].
 
 = Dino IM =
 [[File:Dinologo.png|border]]
@@ -487,15 +540,15 @@ The following changes are recommended for better security and privacy.
 }}
 Gajim cannot be installed by default in {{project_name_short}} yet, as there is more development work TODO; see [[Dev/Gajim]].
 
-= IRC Client =
-
-[[Undocumented]]
-
 = OnionShare =
 
 [[File:OnionShare_logo.png|128px|thumb|OnionShare logo]]
 
 See [[OnionShare]].
+
+= IRC Client =
+
+[[Undocumented]]
 
 = Matrix clients =
 Matrix is a federated chat protocol and server network. It is similar to XMPP in that one can create an account on any Matrix server to access chatrooms and communicate with users on the Matrix network, even if the other users being communicated with are using a different Matrix server.
@@ -510,7 +563,7 @@ While Matrix does support end-to-end encryption in both one-on-one and group cha
 
 While not technically a shortcoming, most rooms on the Matrix network do not have encryption enabled.
 
-Cryptography specialist Soatok discovered a vulnerability, CVE-2024-45191, in Matrix’s Olm Library in 2024.<ref>
+In 2024, a vulnerability CVE-2024-45191 was discovered in Matrix’s Olm Library.<ref>
 https://nvd.nist.gov/vuln/detail/CVE-2024-45191
 </ref>
 
@@ -572,14 +625,6 @@ Refer to the [https://github.com/Nheko-Reborn/nheko Nheko Reborn GitHub README] 
 {{Install Package
 |package=nheko
 }}
-
-= Cwtch =
-See [[Cwtch]].
-
-= SimpleX =
-{{Anchor|SimpleX Chat}}
-[[File:SimpleX_Logo_Small.png|thumb|128px|SimpleX logo]]
-See [[SimpleX]].
 
 = Web Browser / JavaScript Clients =
 
