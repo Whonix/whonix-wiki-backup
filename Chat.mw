@@ -258,7 +258,7 @@ The most secure instant messenger would be serverless with local data storage, p
 There are more de-anonymization attacks against onion services than against Tor users who only use Tor as a client since it is possible to make onion services talk.
 </ref>
 | <!-- SimpleX --> {{Yes}}
-| <!-- Cwtch --> ? {{No}}
+| <!-- Cwtch --> ? {{Yes}}
 | <!-- Dino IM --> {{Yes}}
 | <!-- Gajim --> {{Yes}}
 | <!-- OnionShare --> {{No}}
@@ -287,7 +287,7 @@ Users assuming encryption was used while it actually has not been used.
 | <!-- Cwtch --> {{Yes}} (Tapir Protocol)
 | <!-- Dino IM --> {{Yes}} (OMEMO)
 | <!-- Gajim --> {{Yes}} (OMEMO)
-| <!-- OnionShare --> ?
+| <!-- OnionShare --> {{Yes}} (Onion E2EE authentication)
 |-
 
 ! <!-- feature --> Deniability
@@ -295,6 +295,17 @@ Users assuming encryption was used while it actually has not been used.
 | <!-- Cwtch --> {{Yes}} (Tapir Protocol)
 | <!-- Dino IM --> {{Yes}} (OMEMO)
 | <!-- Gajim --> {{Yes}} (OMEMO)
+| <!-- OnionShare --> {{No}}
+|-
+
+! <!-- feature --> Message padding <ref>
+Attacker able to observe even approximate message sizes can use these sizes as an additional signal for machine learning to de-anonymise the users and to categorize the relationships between the users.
+If a messenger conceals the routing of the messages to hide the transport identities (IP addresses) of senders and recipients, message sizes can be used by traffic observers to confirm the fact of communication with a much higher degree of certainty.
+</ref>
+| <!-- SimpleX --> {{Yes}}
+| <!-- Cwtch --> {{Yes}}
+| <!-- Dino IM --> {{Yes}}
+| <!-- Gajim --> {{Yes}}
 | <!-- OnionShare --> {{No}}
 |-
 
@@ -327,7 +338,7 @@ Users assuming encryption was used while it actually has not been used.
 | <!-- Cwtch --> {{No}}
 | <!-- Dino IM --> {{Yes}}, protocol/crypto (Radically Open Security: 2016)
 | <!-- Gajim --> {{Yes}}, protocol/crypto (Radically Open Security: 2016)
-| <!-- OnionShare --> {{Yes}}, protocol/crypto/client (Radically Open Security and IHTeam: 2021)
+| <!-- OnionShare --> {{Yes}}, protocol/crypto/client (Radically Open Security: 2021)
 |-
 
 ! <!-- feature --> Signed application releases
@@ -343,8 +354,8 @@ Users assuming encryption was used while it actually has not been used.
 
 ! <!-- feature --> Signed source code
 | <!-- SimpleX --> {{Yes}}<ref>https://github.com/simplex-chat/simplex-chat/commits/stable/</ref>
-| <!-- Cwtch --> {{No}}/Partially<ref>https://git.openprivacy.ca/cwtch.im/cwtch-ui/commits/branch/trunk</ref>
-| <!-- Dino IM --> {{No}}/Partially<ref>https://github.com/dino/dino/commits/master/</ref>
+| <!-- Cwtch --> {{No}}<ref>https://git.openprivacy.ca/cwtch.im/cwtch-ui/commits/branch/trunk</ref>
+| <!-- Dino IM --> {{No}}<ref>https://github.com/dino/dino/commits/master/</ref>
 | <!-- Gajim --> {{No}}<ref>https://dev.gajim.org/gajim/gajim/-/commits/master</ref>
 | <!-- OnionShare --> {{Yes}}<ref>https://github.com/onionshare/onionshare/commits/main/</ref>
 |-
@@ -352,8 +363,14 @@ Users assuming encryption was used while it actually has not been used.
 ! <!-- feature --> Reproducible builds
 | <!-- SimpleX --> {{No}}
 | <!-- Cwtch --> {{Yes}}<ref>https://docs.cwtch.im/blog/cwtch-bindings-reproducible/</ref>
-| <!-- Dino IM --> {{Yes}}<ref>https://github.com/dino/dino/wiki/Build</ref>
-| <!-- Gajim --> {{Yes}}<ref>https://dev.gajim.org/gajim/gajim/#building</ref>
+| <!-- Dino IM --> {{Yes}}<ref>
+*https://github.com/dino/dino/wiki/Build
+*https://reproduce.debian.net/amd64/#dino-im
+</ref>
+| <!-- Gajim --> {{Yes}}<ref>
+*https://reproduce.debian.net/amd64/#dino-im
+*https://dev.gajim.org/gajim/gajim/#building
+</ref>
 | <!-- OnionShare --> {{No}}
 |-
 
@@ -419,7 +436,6 @@ It should be noted that no single application listed here has a superior feature
 # [[#Dino_IM|Dino IM]] It provides good UX, a modern and clean look and OMEMO support. On the downside, it requires a Jabber server which weakens anonymity.
 # [[#Gajim|Gajim]] has more Jabber users, is written in memory-safe python, supports offline messages, and can provide OMEMO encryption. On the downside, it requires a Jabber server which weakens anonymity.
 # [[OnionShare]] provides a serverless (hosted using a Tor onion service), secure, ephemeral and anonymous chat feature. It is particularly useful because it does not require account creation, is encrypted end-to-end and reduces the risk of messages being stored locally.
-# [[#Nheko_Reborn|Nheko Reborn]] is another desktop IM client for the Matrix protocol and can be used for IRC channels. The developers do not recommend it as a daily driver due to possible implementation bugs.
 
 = SimpleX =
 {{Anchor|SimpleX Chat}}
@@ -546,6 +562,7 @@ Gajim cannot be installed by default in {{project_name_short}} yet, as there is 
 
 See [[OnionShare]].
 
+
 = IRC Client =
 
 [[Undocumented]]
@@ -651,6 +668,32 @@ However, there are advantages to web clients too. Websites are much less privile
 == Converse.js ==
 
 [https://conversejs.org/ Converse.js] is an OMEMO browser client which is provided by some XMPP hosting services. However, chat encryption is only available on "Trusted Devices".
+
+= Briar =
+
+Not recommended due to [https://www.whonix.org/wiki/Tips_on_Remaining_Anonymous#Refrain_from_.22Tor_over_Tor.22_Scenarios tor over tor scenario] at the time of writing. 
+
+See forum discussion: 
+https://forums.whonix.org/t/briar-desktop-in-whonix/9565/21
+
+= Session =
+
+Not recommended for these reasons: 
+* Only one account with a permanent ID in the desktop client
+* Encryption issues identified in 2025 <ref>
+*https://soatok.blog/2025/01/14/dont-use-session-signal-fork/
+*https://soatok.blog/2025/01/20/session-round-2/
+</ref>
+* [https://github.com/oxen-io/session-desktop/issues/2321 session private messenger does not consider supply chain attacks yet? #2321]
+* [https://github.com/oxen-io/session-desktop/issues/2322 security: NPM found 91 vulnerabilities #2322]
+* Does not have PFS (Perfect Forward Secrecy)
+
+{{quotation
+|quote=A detailed blog post on why Session removed PFS (Perfect Forward Secrecy), and what that means for users can be found [https://getsession.org/session-protocol-technical-information here].
+|context=[https://getsession.org/a-response-to-recent-claims-about-sessions-security-architecture A Response to Recent Claims About Session's Security Architecture]
+}}
+
+See forum discussion: https://forums.whonix.org/t/session-private-messenger/13264
 
 = Deprecated Chat Clients =
 == Introduction ==
