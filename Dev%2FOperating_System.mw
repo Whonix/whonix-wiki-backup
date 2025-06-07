@@ -790,8 +790,11 @@ Since most distributions have it, this is considered minimum criteria. If not av
 * Commitment to Freedom Software (not only Open Source)
 * Commitment to user freedom
 * No anti-features
+* The Update Framework (TUF) threat model Pass / Secure Package Manager
 
 == Comparison Table ==
+'''<u>Note:</u>''' Do '''not''' add new operating systems to this table without prior discussion. '''Edits might get rejected.''' See also [[Dev/Operating_System#Requesting_a_Port_to_a_Different_Base_Operating_System|Requesting a Port to a Different Base Operating System]].
+
 '''Figure:''' ''Base Operating Systems Criteria Comparison Table''
 
 {| class="wikitable" style="background-color: #fff;text-align: center; .Systemd: red;"
@@ -802,6 +805,19 @@ Since most distributions have it, this is considered minimum criteria. If not av
 ! <!-- Alpine Column Header --> Alpine Linux
 ! <!-- openSUSE Tumbleweed Column Header --> openSUSE
 ! <!-- GNU Guix Column Header --> GNU Guix
+! <!-- Gentoo Column Header --> Gentoo
+|-
+
+! <!-- Feature --> Review Accuracy of this Wiki Column
+| <!-- Debian --> Higher
+| <!-- Void --> Higher
+| <!-- Alpine --> Higher
+| <!-- openSUSE --> Higher
+| <!-- GNU Guix --> Higher
+| <!-- Gentoo --> Lower. Unreliable. <ref>
+* Initially anonymously contributed: https://www.whonix.org/w/index.php?title=Dev%2FOperating_System&diff=104399&oldid=104274
+* Not a priority for {{project_name_short}}.
+</ref>
 |-
 
 ! <!-- Feature --> Good Usability
@@ -810,6 +826,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{Yes}} <ref>Stable and brand new, plays along with new hardware without breaking. The default system snapshots and easy rollbacks. Everything can be configured with YaST, arguably the most powerful installation and configuration tool on GNU/Linux. Being able to configure the system in detail using a GUI very rare and valuable for usability for desktop GNU/Linux.</ref>
 | <!-- GNU Guix --> {{No}} ?
+| <!-- Gentoo --> {{No}}
 |-
 
 ! <!-- Feature --> [https://theupdateframework.io/security/ The Update Framework (TUF) threat model] Pass / Secure Package Manager
@@ -818,7 +835,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{Yes}} ?
 | <!-- GNU Guix --> {{Yes}} ?
-|-
+| <!-- Gentoo --> ?
 
 |-
 ! <!-- Feature --> Minimal Number of Services by Default <ref>
@@ -830,6 +847,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{Yes}} <ref>Since there is no default per se</ref>
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{Yes}} <ref>Since there is no default per se</ref>
+| <!-- Gentoo --> {{Yes}} <ref>Since there is no default per se</ref>
 |-
 
 |-
@@ -839,7 +857,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{No}}
-|-
+| <!-- Gentoo --> {{No}} <ref>Gentoo provides SELinux profiles to build and install packages with SELinux support and their corresponding policies</ref>
 
 |-
 ! <!-- Feature --> Transactional updates by default / auto-upgrades not risking broken boot
@@ -848,7 +866,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{No}}
-|-
+| <!-- Gentoo --> {{No}}
 
 |-
 ! <!-- Feature --> Option to secure rollback after update by default
@@ -857,7 +875,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{No}}
-|-
+| <!-- Gentoo --> {{No}}
 
 |-
 ! <!-- Feature --> Distribution package source code signed by distribution package maintainer
@@ -866,7 +884,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> ?
-|-
+| <!-- Gentoo --> ?
 
 |-
 ! <!-- Feature --> Package maintainer digital signature is verified by the distribution's build server.
@@ -875,6 +893,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
 |-
 
 ! <!-- Feature --> Package Manager Explicitly Uses HTTPS only
@@ -883,6 +902,8 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{No}} <ref>Can be configured to be this way</ref>
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+
 |-
 
 ! <!-- Feature --> [https://reproducible-builds.org Reproducible Builds] (deterministic builds)
@@ -891,6 +912,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}} <ref>Alpine was taking action on this from 2019-2020, but https://reproducible-builds.org/citests/ has Alpine currently listed as Disabled due to its continuous testing longer being maintained.</ref>
 | <!-- openSUSE --> ? <ref>Is there are reproducible ISO?</ref>
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{No}} <ref>Work stalled https://wiki.gentoo.org/wiki/User:OstCollector/Reproducible_Build</ref>
 |-
 
 ! <!-- Feature --> Source-based distribution
@@ -899,6 +921,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{Yes}} <ref>Also binary on demand.</ref>
+| <!-- Gentoo --> {{Yes}} <ref>Also binary on demand.</ref>
 |-
 
 ! <!-- Feature --> {{kicksecure_wiki 
@@ -910,6 +933,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> ?
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
 |-
 
 ! <!-- Feature --> {{kicksecure_wiki
@@ -921,14 +945,16 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{Yes}}?
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{No}}
 |-
 
 ! <!-- Feature --> Non-systemd Init
 | <!-- Debian --> {{No}}
 | <!-- Void --> {{Yes}}
-| <!-- Alpine --> {{Yes}} <ref>Alpine uses OpenRC, see [https://wiki.alpinelinux.org/wiki/OpenRC the Alpine wiki page].</ref>
+| <!-- Alpine --> {{Yes}} <ref>Alpine uses OpenRC. See [https://wiki.alpinelinux.org/wiki/OpenRC the Alpine wiki page].</ref>
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{Yes}} <ref>The default profiles use OpenRC. See [https://wiki.gentoo.org/wiki/OpenRC the Gentoo wiki page].</ref>
 |-
 
 ! <!-- Feature --> Musl Libc
@@ -937,6 +963,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{Yes}} <ref>Alpine says on their [https://alpinelinux.org/about/ organization home page] that it runs on musl and BusyBox.</ref>
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{Yes}}? <ref>Gentoo provies experimental musl profiles</ref>
 |-
 
 ! <!-- Feature --> Hardened Memory Allocator
@@ -945,6 +972,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}}
 |-
 
 ! <!-- Feature --> Hardened Kernel
@@ -953,6 +981,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> ?
 |-
 
 ! <!-- Feature --> Microkernel
@@ -961,6 +990,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}}
 |-
 
 ! <!-- Feature --> Clang CFI
@@ -969,6 +999,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{Yes}} <ref>Gentoo provides LLVM profiles with which Clang's CFI can be used.</ref>
 |-
 
 ! <!-- Feature --> Rolling Release
@@ -977,6 +1008,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{Yes}} <ref>Alpine offers repositories for stable branch as well as their edge rolling release branch, as described in their wiki [https://wiki.alpinelinux.org/wiki/Repositories here]</ref>
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{Yes}}
 |-
 
 ! <!-- Feature --> No packages with many unfixed high severity security issues
@@ -984,8 +1016,8 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Void --> ?
 | <!-- Alpine --> {{Yes}}
 | <!-- openSUSE --> {{Yes}} <ref>This problem is only relevant for stable release distros, where the trust to keep things secure is on distro maintainers. A rolling release being always upstream does not suffer from such problems. Only way this would be possible is if the distro provides abandoned packages in their repositories, which openSUSE does not.</ref>
-
 | <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{Yes}}
 |-
 
 ! <!-- Feature --> No packages security issues which are exploited in-the-wild
@@ -994,6 +1026,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{Yes}}
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{No}} <ref>Despite being up-to-date, not having the proprietary firmware blobs and cpu microcode updates means no update can fix some vulnurabilities</ref>
+| <!-- Gentoo --> {{Yes}}
 |-
 
 ! <!-- Feature --> VirtualBox Available
@@ -1002,6 +1035,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}}
 |-
 
 ! <!-- Feature --> KVM Available
@@ -1010,6 +1044,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{Yes}} <ref> https://wiki.alpinelinux.org/wiki/KVM</ref>
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{Yes}}
 |-
 
 ! <!-- Feature --> flatpak Available
@@ -1018,6 +1053,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> ?
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}}
 |-
 
 ! <!-- Feature --> Tor Browser available as a package
@@ -1026,6 +1062,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> ?
 | <!-- openSUSE --> ?
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}} <ref> https://github.com/gentoo-mirror/torbrowser</ref>
 |-
 
 ! <!-- Feature --> EFI Booting Available
@@ -1034,6 +1071,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{Yes}} <ref>https://wiki.alpinelinux.org/wiki/Bootloaders</ref>
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}} <ref>https://wiki.gentoo.org/wiki/EFI_stub</ref>
 |-
 
 ! <!-- Feature --> Secure Boot Compatibility with Firmware Default Keys <ref>
@@ -1045,6 +1083,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{Yes}} <ref>The binary distribution package is pres-signed https://wiki.gentoo.org/wiki/Project:Distribution_Kernel#Secure_Boot</ref>
 |-
 
 ! <!-- Feature --> LibreSSL by Default<ref>
@@ -1057,6 +1096,7 @@ https://voidlinux.org/news/2021/02/OpenSSL.html
 | <!-- Alpine --> {{No}} <ref> Setting libressl as default is under consideration per [https://gitlab.alpinelinux.org/alpine/tsc/-/issues/28 here] </ref>
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}} <ref>https://www.gentoo.org/support/news-items/2021-01-05-libressl-support-discontinued.html</ref>
 |-
 
 ! <!-- Feature --> [[Dev/Stateless|Stateless/Immutable]]
@@ -1067,6 +1107,7 @@ https://voidlinux.org/news/2021/02/OpenSSL.html
 * Tumbleweed: No.
 * MicroOS: Yes.
 | <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}}
 |-
 
 ! <!-- Feature --> [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942303 Weak Dependencies] (to avoid [[Debian_Packages#Technical_Information|the metapackage issue]])
@@ -1075,6 +1116,7 @@ https://voidlinux.org/news/2021/02/OpenSSL.html
 | <!-- Alpine --> ?
 | <!-- openSUSE --> {{Yes}} <ref>https://en.opensuse.org/openSUSE:Package_dependencies#Strong_and_Weak_dependencies</ref>
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
 |-
 
 ! <!-- Feature --> no legal issues (such as [[#Ubuntu_Legal_Issues|this]]) / not forbidden for derivatives to use upstream repositories <ref>
@@ -1085,6 +1127,7 @@ For example, derivatives of Debian such as {{project_name_short}} are permitted 
 | <!-- Alpine --> {{Yes}}
 | <!-- openSUSE --> ?
 | <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> ?
 |-
 
 ! <!-- Feature --> On [https://www.gnu.org/distros/free-system-distribution-guidelines.en.html GNU FSDG] [https://www.gnu.org/distros/free-distros.html good list] and not on [https://www.gnu.org/distros/common-distros.en.html bad list]
@@ -1093,6 +1136,7 @@ For example, derivatives of Debian such as {{project_name_short}} are permitted 
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{No}}
 |-
 
 ! <!-- Feature --> Up-to-date Compile Time Flags Hardening
@@ -1101,6 +1145,7 @@ For example, derivatives of Debian such as {{project_name_short}} are permitted 
 | <!-- Alpine --> ?
 | <!-- openSUSE --> ?
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}} <ref> https://wiki.gentoo.org/wiki/Hardened/Toolchain</ref>
 |-
 
 ! <!-- Feature --> Onion Repositories
@@ -1109,6 +1154,7 @@ For example, derivatives of Debian such as {{project_name_short}} are permitted 
 | <!-- Alpine --> ?
 | <!-- openSUSE --> ?
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
 |-
 
 ! <!-- Feature --> Architecture Support (Intel/AMD64, ARM64, POWER9, RISC-V)
@@ -1117,6 +1163,7 @@ For example, derivatives of Debian such as {{project_name_short}} are permitted 
 | <!-- Alpine --> ?
 | <!-- openSUSE --> ?
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}}
 |-
 
 ! <!-- Feature --> offline installation
@@ -1125,6 +1172,7 @@ For example, derivatives of Debian such as {{project_name_short}} are permitted 
 | <!-- Alpine --> ?
 | <!-- openSUSE --> ?
 | <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
 |-
 
 |}
