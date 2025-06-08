@@ -438,14 +438,15 @@ Applications discussed in this chapter are listed in order of best usability and
 
 It should be noted that no single application listed here has a superior feature set. Users must make a choice based on personal preferences and their [https://www.kicksecure.com/wiki/Threat_Modeling self-assessed threat model]:
 # [[SimpleX]] has a high level of security and anonymity: post-quantum encryption, does not require a phone number or email for registration, protects against metadata collection, data is stored locally, incognito mode allows for the creation of separate chats with random names, etc.
-# [[Cwtch]] has a high  anonymity and protection against metadata collection: does not require a phone number or email for registration, all communication is end-to-end encrypted and takes place over Tor (there is no “Cwtch service” or “Cwtch network”). Not undergone an independent security audit at the time of writing.
+# [[Cwtch]] has a high  anonymity and protection against metadata collection: does not require a phone number or email for registration, data is stored locally, all communication is end-to-end encrypted and takes place over Tor (there is no “Cwtch service” or “Cwtch network”). Not undergone an independent security audit at the time of writing.
 # [[#Dino_IM|Dino IM]] provides a good UX, a modern and clean look and OMEMO support. On the downside, it requires a Jabber server which weakens anonymity.
 # [[#Gajim|Gajim]] has more Jabber users, is written in memory-safe python, supports offline messages, and can provide OMEMO encryption. On the downside, it requires a Jabber server which weakens anonymity.
 # [[OnionShare]] provides a serverless (hosted using a Tor onion service), secure, ephemeral and anonymous chat feature. It is particularly useful because it does not require account creation, is encrypted end-to-end and reduces the risk of messages being stored locally.
 
 = SimpleX =
 {{Anchor|SimpleX Chat}}
-[[File:SimpleX_Logo_Small.png|thumb|128px|SimpleX logo]]
+[[File:SimpleX_Logo_Small.png|border|SimpleX logo]]
+
 See [[SimpleX]].
 
 = Cwtch =
@@ -564,10 +565,9 @@ Gajim cannot be installed by default in {{project_name_short}} yet, as there is 
 
 = OnionShare =
 
-[[File:OnionShare_logo.png|128px|thumb|OnionShare logo]]
+[[File:OnionShare_logo.png|128px||border|OnionShare logo]]
 
 See [[OnionShare]].
-
 
 = IRC Client =
 
@@ -584,17 +584,22 @@ While Matrix does support end-to-end encryption in both one-on-one and group cha
 * Support for encryption varies between Matrix clients, and oftentimes isn't implemented at all.
 * libolm, which was previously the primary library used to provide encryption functionality for Matrix, had multiple dangerous security flaws that would potentially have allowed Matrix's encryption to be compromised.<ref>https://soatok.blog/2024/08/14/security-issues-in-matrixs-olm-library/</ref> This library has since been deprecated.
 
-While not technically a shortcoming, most rooms on the Matrix network do not have encryption enabled.
+* The Matrix protocol itself theoretically supports forward secrecy<ref>https://gitlab.matrix.org/matrix-org/olm/blob/master/docs/megolm.md#partial-forward-secrecy</ref>, but certain clients, such as Element, may not have this feature. Users should review the client's documentation before starting a chat.
 
-In 2024, a vulnerability CVE-2024-45191 was discovered in Matrix’s Olm Library.<ref>
-https://nvd.nist.gov/vuln/detail/CVE-2024-45191
-</ref>
+* The Matrix protocol has been criticized for several practically-exploitable cryptographic vulnerabilities that, together, invalidate the confidentiality and authentication guarantees claimed by Matrix against a malicious server.<ref>https://eprint.iacr.org/2023/485.pdf</ref>
+
+While not technically a shortcoming, most rooms on the Matrix network do not have encryption enabled.
 
 Many different Matrix clients exists, Element being the most commonly used client.
 See other Matrix clients here: 
 https://matrix.org/ecosystem/clients/
 
 == Element ==
+Not recommended for these reason: Element do not have forward secrecy at the time of writing. Any key compromise among message recipients would affect the confidentiality of all past communications.<ref>
+* https://web.archive.org/web/20250402144326/https://www.privacyguides.org/en/real-time-communication/#additional-options
+* https://github.com/element-hq/element-meta/issues/1296
+</ref>
+
 === Notices ===
 {{Third_Party_Repository}}
 
@@ -610,7 +615,7 @@ element-desktop
 
 == Quaternion ==
 
-[[File:quaternion.png|border]]
+[[File:quaternion.png|128px|border]]
 
 === Overview ===
 
@@ -632,7 +637,7 @@ https://matrix.org/bridges/
 
 == Nheko Reborn ==
 
-[[File:Nhekologo.png|128px|thumb|Nheko Reborn logo]]
+[[File:Nhekologo.png|128px|border]]
 
 === Overview ===
 
