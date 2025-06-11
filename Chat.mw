@@ -95,6 +95,14 @@ Each network user has a unique XMPP address called a JID (Jabber ID). The JID is
 
 Safely using the protocol requires proper use of encryption (such as OMEMO), because it is unwise to trust server connections are properly encrypted between each other. Jabber privacy is also limited, as various adversaries are capable of observing which accounts are communicating. Jabber and Tor combined only guarantee pseudonymous communications, as while the user's current location is hidden, the social graph can still expose their true identity. For tips on operational security when chatting anonymously, see this [https://archive.ph/n116i article] by [https://theintercept.com/2015/07/14/communicating-secret-watched/ The Intercept]. Also see: [https://forums.whonix.org/t/why-is-icq-considered-unsafe-through-tor/1096 Why prefer open protocols such as Jabber/XMPP over proprietary ones such as ICQ?]
 
+OMEMO encryption has been criticized for using outdated versions in most clients and issues with truncating the authentication tag in versions above 0.7.0.<ref>https://soatok.blog/2024/08/04/against-xmppomemo/</ref> It is also noteworthy that versions above 0.4.0 are in an experimental state and not recommended by the XMPP Standards Foundation at the time of writing.<ref>
+* https://xmpp.org/extensions/attic/xep-0384-0.4.0.html
+* https://xmpp.org/extensions/attic/xep-0384-0.7.0.html
+* https://xmpp.org/extensions/xep-0384.html
+</ref>
+You can check the OMEMO version used by different clients on this page:
+https://xmpp.org/extensions/#xep-0384-implementations
+
 == IRC ==
 
 When using IRC (Internet Relay Chat) inside {{project_name_workstation_long}}, the [https://en.wikipedia.org/wiki/Ident_protocol Ident Protocol] is automatically blocked because {{project_name_workstation_long}} is firewalled. Therefore the associated daemon will not identify the username which is linked with a particular TCP connection, as is normally the case.
@@ -244,7 +252,15 @@ The most secure instant messenger would be serverless with local data storage, p
 | <!-- OnionShare --> Tor onion
 |-
 
-! colspan="4" <!-- security feature header --> | '''Security Property'''
+! <!-- feature --> End-to-end encryption (E2E) protocol
+| <!-- SimpleX --> Simplex Messaging Protocol (SMP) v9<ref>https://github.com/simplex-chat/simplexmq/blob/stable/protocol/simplex-messaging.md</ref>
+| <!-- Cwtch --> Tapir Protocol v0.2.1<ref>https://pkg.go.dev/cwtch.im/tapir</ref>
+| <!-- Dino IM --> OMEMO v0.3.0<ref>https://xmpp.org/software/dino/</ref>
+| <!-- Gajim --> OMEMO v0.3.0<ref>https://xmpp.org/software/gajim/</ref>
+| <!-- OnionShare --> Tor onion protocol v3<ref>https://spec.torproject.org/tor-spec/index.html</ref>
+|-
+
+! colspan="6" <!-- security feature header --> | '''Security Property'''
 |-
 
 ! <!-- feature --> Serverless / peer to peer / onion to onion
@@ -381,7 +397,7 @@ If a messenger conceals the routing of the messages to hide the transport identi
 | <!-- OnionShare --> {{No}}
 |-
 
-! colspan="4" <!-- usability feature header --> | '''Usability Property'''
+! colspan="6" <!-- usability feature header --> | '''Usability Property'''
 |-
 
 ! <!-- feature --> Multiple Devices Support
