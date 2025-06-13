@@ -18,9 +18,60 @@ A decentralized exchange (DEX) that enables atomic swaps, allowing users to exch
 * BTC &rarr; XMR: Selling Bitcoin (BTC) and buying Monero (XMR). Users act as takers by default, meaning the BTC transaction must be initiated first.
 * XMR &rarr; BTC: Selling Monero (XMR) and buying Bitcoin (BTC). Selling XMR requires additional effort, as manual sales are not possible. Instead, users can only post an offer to sell XMR if they have set up a "maker" client.
 
+= Installation =
+
+The client should work out-of-box and [https://github.com/UnstoppableSwap/core/pull/391 integrate with the {{project_name_short}} Tor daemon directly].
+
+The <code>asb</code> daemon hosts an onion service, so it needs additional set-up,
+
+== {{project_name_gateway_long}} Installation Steps ==
+=== onion-grater Profile ===
+{{onion-grater-warning}}
+
+{{Control_Port_Filter_Python_Profile_Add
+|filename_new=40_unstoppableswap
+}}
+
+== {{project_name_workstation_long}} Installation Steps ==
+=== Installation ===
+Before installing OnionShare:
+
+* A separate {{project_name_workstation_short}} ([[Qubes|{{q_project_name_long}}]]: <code>anon-whonix</code> App Qube) is also recommended. The reason is the OnionShare installation will persist in this configuration and it is best practice to separate different, anonymous activities in distinct VMs (App Qubes). See [[Multiple Whonix-Workstation]].
+* Installation using {{kicksecure_wiki
+|wikipage=Install_Software#Flatpak
+|text=<code>flatpak</code>
+}} or <code>snap</code> is discouraged because it leads to [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]].
+* Installation from Debian package sources as documented below is recommended.
+
+Inside {{project_name_workstation_short}}.
+
+{{Install_Package
+|package=unstoppableswap
+}}
+
+=== Firewall Settings ===
+Modify the {{project_name_workstation_short}} (<code>anon-whonix</code>) user firewall settings and reload them.
+
+{{box|text=
+{{Firewall_Settings_Workstation}}
+
+Add. <ref>
+As per https://github.com/UnstoppableSwap/core/pull/391 <code>asb</code> uses local port 9939 for hosting the onion service.
+</ref>
+
+{{CodeSelect|code=
+EXTERNAL_OPEN_PORTS+=" 9939 "
+}}
+
+Save.
+
+{{Reload_Firewall_ws}}
+}}
+
 = Tickets =
 * https://github.com/UnstoppableSwap/core/issues/261
 * https://github.com/UnstoppableSwap/core/pull/239
+* https://github.com/UnstoppableSwap/core/pull/391
 
 = Forum Discussion =
 * https://forums.whonix.org/t/unstoppableswaps-gui-and-whonix/21440
