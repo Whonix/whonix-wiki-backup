@@ -6,115 +6,42 @@
 {{intro|
 Instructions to build {{project_name_short}} Virtual Machine Images from Source Code.
 }}
-= Docker =
-The use of a docker image to containerize the build process is also an available option.
+= Introduction =
+This page documents how to <u>build {{project_name_short}}</u> VM (<u>V</u>irtual <u>M</u>achine) images for [[VirtualBox]] ({{Code2|.ova}}) or [[KVM]] ({{Code2|.qcow2}}) [[Trust#Builds_from_Source_Code_versus_Builds_including_Binary_Packages|<u>"from source code"</u>]] using {{kicksecure_wiki
+|wikipage=Dev/Derivative-Maker
+|text=derivative-maker
+}}. Most users do not build {{project_name_short}} from source code but instead [[Download|download {{project_name_short}}]].
 
-<code>derivative-maker-docker</code> already ships with the current source code, allowing for quick and simple deployment with pre-defined user scripts.
+For [[Qubes|{{q_project_name_long}}]], see [[Dev/Qubes#Build_{{q_project_name_short}}_Templates|{{q_project_name_long}} Build Documentation]].
 
-== Overview ==
-{{mbox
-| image   = [[File:Ambox_notice.png|40px|alt={{project_name_short}} default admin password is: changeme]]
-| text    = Source Path: derivative-maker/docker
+Building from source code has security advantages (see [[Trust]]).
 
-'''1.''' Common sense is required when choosing the right version number.
+The goal of this build documentation is to be usable by as many users as possible. Therefore written as easy as possible with no prior knowledge of tools used required.
 
-'''2.''' For example, the latest available git tag version number is not necessarily the most stable or suitable. 
+The high level summary is:
 
-'''3.''' Follow the [[Stay Tuned|{{project_name_short}} News Blog]] as it might contain information.
+# Host preparation.
+# Get derivative-maker source code.
+# Run derivative-maker.
+# Done, build of {{project_name_short}} has been completed.
 
-'''4.''' This documentation will be using <code>{{VersionNew}}-stable</code> as an example. Replace <code>{{VersionNew}}-stable</code> with the actual version chosen for the build.
-
-'''5.''' Git tags by convention:
-
-* have one of the following appendixes <code>stable</code>, <code>testers-only</code> or <code>developers-only</code> version.
-* For example:
-** <code>{{VersionNew}}-stable</code>
-** <code>{{VersionNew}}-testers-only</code>
-** <code>{{VersionNew}}-developers-only</code>
-* all represent the very same source code. <ref>
-{{CodeSelect|code=
-git diff {{VersionNew}}-stable {{VersionNew}}-developers-only
-}}
+Advanced users that already know how to use <code>git</code> and how to perform digital software verification using OpenPGP (<code>gpg</code>) do not need to strictly follow this documentation. See footnote(s) for details. <ref>
+For example, these instructions fetch only a specific git tag. If you know how to use git, you are of course free to <code>git clone</code> the whole repository and then use <code>git verify-tag</code>, <code>git verify-commit</code>, <code>git checkout --quiet</code> and <code>git</code> generally as per usual. The reason why more specific commands are being used on this page is to simplify the process for laymen, to make these instructions as fail-safe as possible.
 </ref>
 
-'''6.''' If there is only git tag <code>{{VersionNew}}-developers-only</code> available but a stable release announcement has been published, then there is no need to wait for the creation of <code>{{VersionNew}}-stable</code> since it actually has already been blessed stable, would contain the identical source code anyhow but just have a different git tag name.
-}}
+Due to digital software verification instructions and [[Software_Signature_Verification_Usability_Issues_and_Proposed_Solutions|Software Signature Verification Usability Issues]] these instructions might look more complicated then they actually are.
 
-== Usage ==
-{{Expand_or_Collapse_All}}
-<div class="toccolours mw-collapsible mw-collapsed">
-* <u>operating system:</u> You need to build on a '''Debian''' <u><code>{{Stable project version based on Debian codename}}</code></u> based operating system, such as {{project_name_workstation_long}} <code>{{VersionShort}}</code> or a Debian <code>{{Stable project version based on Debian codename}}</code> VM.
-* <u>disk space:</u> You need ~ <code>30</code> GB free disk space.
-* <u>RAM:</u> You need ~ <code>4</code> GB free RAM.
-** Might actually work with a lot less RAM.
-** Might actually work with less RAM if you have swap.
-* <u>linux user account:</u> Do not build under user <code>root</code>. Login regular as user <code>user</code>. Do not use <code>sudo</code> to run <code>derivative-maker</code> because becoming root when necessary is handled by the build script.
-* <u>build place notice:</u> You cannot build on {{project_name_gateway_long}} (due to networking issues).
-* <u>build logs:</u> Build logs: If using a GUI (graphical user interface) it is recommended to set your terminal (for example <code>xfce4-terminal</code>) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
-<div class="mw-collapsible-content">
-...
-</div>
-</div>
-<div class="toccolours mw-collapsible mw-collapsed">
-* <u>private files in source code warning:</u> Do not add private files to {{project_name_short}} source code folder! [...]
-<div class="mw-collapsible-content">
-Unless you know what you are doing. Technically, it would work. This is recommended against. Those files would get managed by the respective package. When you later update {{project_name_short}} debian packages, your files would get deleted by the package manager. Also adding private files to {{project_name_short}} source code folder, later contributing to {{project_name_short}} development and accidentally pushing the wrong git branch would be a disaster. Better add your private files to {{project_name_short}} after building {{project_name_short}}. Or add a custom build step adding your files, which then get copied from a folder outside of {{project_name_short}} source folder. See "Source Code Changes" in "Optional Build Configuration" below.
-</div>
-</div>
-<div class="toccolours mw-collapsible mw-collapsed">
-* <u>parallel builds unsupported warning:</u> Do not try to build {{project_name_gateway_short}} and {{project_name_workstation_short}} at the same time!
-<div class="mw-collapsible-content">
-Building {{project_name_gateway_short}} and {{project_name_workstation_short}} at the same time is not supported due to limitations in the build script. In other words, do not try to run for example {{Code|~/derivative-maker/derivative-maker --flavor whonix-gateway -- --target virtualbox}} and {{Code|~/derivative-maker/derivative-maker --flavor whonix-workstation -- --target virtualbox}} at the same time. The build would probably fail.
-</div>
-</div>
-<div class="toccolours mw-collapsible mw-collapsed">
-* <u>CI warning:</u> Do not use images created inside Continuous Integration (CI) environments for anything besides testing!
-<div class="mw-collapsible-content">
-Usually you are not using [https://en.wikipedia.org/wiki/Continuous_integration CI] environments without knowing.
+{{always_verify_signatures_reminder}}
 
-You can find out if you are running inside a CI environment by running.
+Steps concerning digital software verification are pointed out as "This step is recommended for better security, but is not strictly required. (See [[Trust]].)"
 
-{{CodeSelect|code=
-echo "$CI"
-}}
+When verifying digital software signatures, these instructions will be slightly more complicated but therefore even more secure.
 
-If it shows nothing, i.e.
-
-<pre>
-
-</pre>
-
-Everything is fine.
-
-Otherwise, if it were to show.
-
-<pre>
-true
-</pre>
-
-Then do not use these images for anything besides testing.
-
-Reason:
-https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/1200_prepare-build-machine
-</div>
-</div>
-
-<div class="toccolours mw-collapsible mw-collapsed">
-* <u>official builds:</u> In case of creating official builds to be redistributed on <code>{{project_clearnet}}</code> and not for personal use, press expand on the right side.
-<div class="mw-collapsible-content">
-Prepend the following variable:
-{{CodeSelect|code=
-dist_build_redistributable=true
-}}
-
-sets:
-
-* <code>--repo true</code>
-* <code>--tb closed</code>
-
-See also: [[Dev/Redistribution]]
-</div>
-</div>
+# Host preparation.
+# Get derivative-maker source code.
+# Verify digital software signatures.
+# Run derivative-maker.
+# Done, build of {{project_name_short}} has been completed.
 
 = Host Preparation =
 <!--
