@@ -2,11 +2,14 @@
 {{#seo:
 |description=extracting time from Tor consensus
 }}
+{{intro|
+extracting time from Tor consensus
+}}
 
 = anondate-get =
-Diagnostic utility. <code>anondate-<u>get</u></code>. A "higher level" easier to use tool than the "lower level" <code>anondate</code>.
+Diagnostic utility. <code>anondate-<u>get</u></code>. A higher level and easier to use tool than the lower level <code>anondate</code>.
 
-Usage of <code>anondate-get</code> should be safe. It does not use networking. It does not change time. Only looks at locally available information.
+Usage of <code>anondate-get</code> should be safe. It does not use networking. It does not change the time. It only looks at locally available information.
 
 {{CodeSelect|code=
 sudo anondate-get
@@ -48,12 +51,12 @@ sudo anondate-set
 ===== Introduction =====
 
 * TODO: documentation on anondate is outdated
-* anondate interface description as per latest git master:
+* The anondate interface description as per the latest git master:
 * https://github.com/{{project_name_short}}/helper-scripts/blob/master/usr/sbin/anondate
 * See also: [[#Tor Consensus Method]]
 * Needs access to either:
-** <code>/var/run/tor/log</code> [only default in {{project_name_long}} specific] [Tor Project Upstream Feature Request: [https://gitlab.torproject.org/legacy/trac/-/issues/16821 additional /var/run/tor/log default log]] This is better, because it only contains Tor's log since last boot. More relevant information. Easier for anondate to parse.
-** Or access to <code>/var/log/tor/log</code>. Configurable through the environment variable <code>TOR_LOG</code>.  (<code>export TOR_LOG=/var/log/tor/log</code>) (Or we can change the default in the code.)
+** <code>/var/run/tor/log</code> (default only in {{project_name_long}}).  [Tor Project upstream feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/16821 additional /var/run/tor/log default log]] This is preferable because it contains only Tor's log since the last boot, which is more relevant and easier for <code>anondate</code> to parse.
+** Or access to <code>/var/log/tor/log</code>. This is configurable through the environment variable <code>TOR_LOG</code> (<code>export TOR_LOG=/var/log/tor/log</code>). (Alternatively, we could change the default in the code.)
 
 ===== Consensus Related Options =====
 
@@ -68,31 +71,31 @@ sudo anondate-set
 ===== Simple Status Checking =====
 ====== anondate --has-consensus ======
 
-Useful for checking if asking for any [[#Date Ranges Output]] is worthwhile.
+Useful for checking whether requesting any of the [[#Date Ranges Output]] values is worthwhile.
 
 * yes:
 ** exit <code>0</code>
 * no:
 ** exit <code>1</code>
 <br />
-Can be replaced by Tor ControlPort / python-stem?
+Could be replaced by Tor ControlPort / python-stem?
 
 * verified-only: Yes. (<code>consensus/valid-after</code>)
 * unverified: No.
 
 ====== anondate --current-time-in-valid-range ======
 
-Useful for a sanity test before setting the time for the first time and before setting the time to a newly fetched timestamp.
+Useful as a sanity test before setting the time for the first time and before updating it with a newly fetched timestamp.
 
 * yes:
 ** exit <code>0</code>
 * no:
 ** exit <code>1</code>
 <br />
-Can be replaced by Tor ControlPort / python-stem?
+Could be replaced by Tor ControlPort / python-stem?
 
 * verified-only: Yes. (See below.)
-* unverified: No. Tor Project Upstream Feature Request: [https://gitlab.torproject.org/legacy/trac/-/issues/16845 make unverified consensus ISOTime accessible through Tor's ControlPort]
+* unverified: No. Tor Project upstream feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/16845 make unverified consensus ISOTime accessible through Tor's ControlPort]
 
 ===== Date Ranges Output =====
 ====== anondate --show-valid-after ======
@@ -103,12 +106,12 @@ Can be replaced by Tor ControlPort / python-stem?
 * no:
 ** exit <code>1</code>
 <br />
-Can be replaced by Tor ControlPort / python-stem?
+Could be replaced by Tor ControlPort / python-stem?
 
 * verified-only: Yes. <code>consensus/valid-after</code>
-* unverified: No. Tor Project Upstream Feature Request: [https://gitlab.torproject.org/legacy/trac/-/issues/16845 make unverified consensus ISOTime accessible through Tor's ControlPort]
+* unverified: No. Tor Project upstream feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/16845 make unverified consensus ISOTime accessible through Tor's ControlPort]
 
-====== anondate --show-valid-until  ======
+====== anondate --show-valid-until ======
 
 * yes:
 ** output: <code>2015-08-16 01:00:00</code>
@@ -116,10 +119,10 @@ Can be replaced by Tor ControlPort / python-stem?
 * no:
 ** exit <code>1</code>
 <br />
-Can be replaced by Tor ControlPort / python-stem?
+Could be replaced by Tor ControlPort / python-stem?
 
 * verified-only: Yes. <code>consensus/valid-until</code>
-* unverified: No. Tor Project Upstream Feature Request: [https://gitlab.torproject.org/legacy/trac/-/issues/16845 make unverified consensus ISOTime accessible through Tor's ControlPort]
+* unverified: No. Tor Project upstream feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/16845 make unverified consensus ISOTime accessible through Tor's ControlPort]
 
 ====== anondate --show-middle-range ======
 
@@ -132,7 +135,7 @@ Can be replaced by Tor ControlPort / python-stem?
 (A scripted calculation of the above.)
 
 ===== Certificate Validity =====
-When clock is several months or years fast or slow, Tor cannot even download Tor consensus. Tor however always should be providing a certificate lifetime. For security discussion, see also [[Dev/TimeSync#Tor_Certificate_Lifetime|Tor Certificate Lifetime]].
+When the clock is several months or years fast or slow, Tor cannot even download the Tor consensus. Tor, however, should always provide a certificate lifetime. For a security discussion, see also [[Dev/TimeSync#Tor_Certificate_Lifetime|Tor Certificate Lifetime]].
 
 ====== anondate --tor-cert-lifetime-valid ======
 <pre>
@@ -146,15 +149,15 @@ Sep 03 10:32:59.000 [warn] (certificate lifetime runs from Aug 16 00:00:00 2014 
 * no:
 ** exit <code>1</code>
 
-Can be replaced by Tor ControlPort / python-stem? No. Tor Project Upstream Feature Request: [https://gitlab.torproject.org/legacy/trac/-/issues/16822 make certificate lifetime accessible through Tor's ControlPort]
+Could this be replaced by Tor ControlPort / python-stem? No. Tor Project upstream feature request: [https://gitlab.torproject.org/legacy/trac/-/issues/16822 make certificate lifetime accessible through Tor's ControlPort]
 
 ====== anondate --tor-cert-valid-after ======
 
-Similar to above, but less output.
+Similar to the above, but provides less output.
 
 * output: <code>Jun 16 00:00:00 2014 GMT</code>
 * Exit codes unreliable.
-* Don't use without using the above first.
+* Don't use without invoking the above first.
 * (Could be fixed in the code if worthwhile.)
 
 {{Footer}}
