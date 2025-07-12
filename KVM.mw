@@ -1281,7 +1281,9 @@ https://forums.whonix.org/t/p-s2-mouse-movement-in-cutom-debian-workstation/1998
 Follow these steps to move data between the guest and host. It is recommended to create/assign a unique directory per snapshot to keep shared content belonging to different security domains separate.
 
 {{Box|text=
-'''1.''' On the host run the following command in a terminal (Start Menu &rarr; Applications &rarr; System &rarr; Terminal).
+'''1.''' Ensure the virtual machine is powered down.
+
+'''2.''' Host folder preparation: On the host operating system, create a folder to be shared with the {{VM}}. For example, on a Linux host operating system:
 
 Replace user name <code>user</code> with your actual user name.
 
@@ -1289,7 +1291,7 @@ Replace user name <code>user</code> with your actual user name.
 mkdir /home/user/shared
 }}
 
-'''2.''' Adjust permissions on the host to allow read and write access to the folder with chmod.
+'''3.''' Adjust permissions on the host to allow read and write access to the folder with chmod.
 
 Replace user name <code>user</code> with your actual user name.
 
@@ -1297,25 +1299,34 @@ Replace user name <code>user</code> with your actual user name.
 chmod 777 /home/user/shared
 }}
 
-'''3.''' Enable shared folders in VirtManager.
+'''4.''' Click <code>virt-manager</code> &rarr; double-click on VM &rarr; <code>View</code> &rarr; <code>Details</code> &rarr; <code>Add Hardware</code>.
 
-<code>VirtManager</code> &rarr; <code>Select VM</code> &rarr; <code>Edit</code> &rarr; <code>Virtual Machine Details</code> &rarr; <code>Details</code> &rarr; <code>Add Hardware</code> &rarr; <code>File System</code>
-</pre>
+'''5.''' Click the <code>Filesystem</code> device in the list of devices on the left side of the window that pops up.
 
-'''4.''' Choose the following settings.
+'''6.''' Choose the following settings.
 
 Replace user name <code>user</code> with your actual user name.
 
-* <u>Mode:</u> Mapped <ref>The file sharing mode {{Code2|mapped}} is just an example, using squash or passthrough is possible by selecting them from the drop down menu. Mapped is recommended for security.</ref>
-* <u>Driver:</u> Default
-* <u>Source Path:</u> <code>/home/user/shared</code>
+* <u>Driver:</u> virtio-9p
+* <u>Source path:</u> <code>/home/user/shared</code>
 * <u>Target Path:</u> <code>shared</code>
+** Note: This field must contain the word <code>shared</code>, regardless of the name of the folder being shared with the VM. This is because this name is used to identify and mount the shared folder in {{project_name_short}}.
 
-'''5.''' Click finish.
+'''7.''' Ensure <code>Export filesystem as readonly mount</code> is unchecked. <ref>
+If you do not wish to write to that folder from within the VM, you are free to check/enable this setting.
+</ref>
 
-'''6.''' Done.
+'''8.''' Click <code>Finish</code>.
 
-{{project_name_workstation_short}} should automatically find and mount the shared folder under <code>/mnt/shared</code> once it's created on the host and enabled in VirtManager.
+'''9.''' Click <code>View</code> &rarr; <code>Console</code>, then click the play button in the toolbar to start the VM.
+
+'''10.''' Done.
+
+The shared folder will be accessible as <code>/mnt/shared</code>. <ref>This is hardcoded in [https://github.com/{{project_name_short}}/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>].</ref> The folder can be opened using a [[Software#File Manager|file manager]] such as Thunar, for example. To open it using the command line, run:
+
+{{CodeSelect|code=
+cd /mnt/shared
+}}
 }}
 
 === Mandatory Access Control ===
