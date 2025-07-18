@@ -1,11 +1,13 @@
 {{Box|text=
 '''Introduction'''
 
-{{project_name_gateway_short}} uses the sysctl parameter <code>net.ipv4.conf.*.arp_ignore=2</code> to prevent network information leaks, such as VPN IP address leaks on the local network.<ref>https://github.com/mullvad/mullvadvpn-app/blob/main/audits/2024-12-10-X41-D-Sec.md#mllvd-cr-24-03-virtual-ip-address-of-tunnel-device-leaks-to-network-adjacent-participant-severity-medium</ref> This is known to interfere with advanced configurations, such as routing a VPN through {{project_name_gateway_short}} or using a {{project_name_customworkstation_short}}. Therefore, the configuration must be made more lenient for these use cases.
+{{project_name_gateway_short}} uses the sysctl parameter <code>net.ipv4.conf.*.arp_ignore=2</code> to prevent network information leaks, such as VPN IP address leaks on the local network.<ref>https://github.com/mullvad/mullvadvpn-app/blob/main/audits/2024-12-10-X41-D-Sec.md#mllvd-cr-24-03-virtual-ip-address-of-tunnel-device-leaks-to-network-adjacent-participant-severity-medium</ref> This is known to interfere with advanced configurations, such as routing a VPN through {{project_name_gateway_short}} or using a {{project_name_customworkstation_short}}. It might also cause issues in other, yet unknown, cases. Therefore, the configuration must be made more lenient for these use cases.
 
-Changing <code>arp_ignore=2</code> to <code>arp_ignore=1</code> will resolve these issues. Doing so may allow some additional data about {{project_name_gateway_short}}'s network configuration to be leaked to other machines on the local network (or other VMs on the same Qubes OS machine), but it should not allow leaking information such as VPN IP addresses to other machines.
+Changing <code>arp_ignore=2</code> to <code>arp_ignore=1</code> will resolve these issues. Doing so may allow some additional data about {{project_name_gateway_short}}'s network configuration to be leaked to other machines on the local network (or to other VMs on the same Qubes OS machine), but it should not allow leakage of information such as VPN IP addresses to other machines.
 
-To change <code>arp_ignore=2</code> in {{project_name_gateway_short}} to <code>arp_ignore=1</code>:<ref>
+'''Downgrade <code>arp_ignore</code>'''
+
+To change <code>arp_ignore=2</code> in {{project_name_gateway_short}} to <code>arp_ignore=1</code>: <ref>
 {{kicksecure_wiki
 |wikipage=Networking#ARP_sysctl_settings
 |text=ARP sysctl settings
@@ -14,17 +16,19 @@ To change <code>arp_ignore=2</code> in {{project_name_gateway_short}} to <code>a
 
 '''1.''' Launch a terminal in {{project_name_gateway_short}}. (If using Qubes OS, launch a terminal in the <code>whonix-gateway-17</code> template.)
 
-'''2.''' Run: <code>sudo nano /etc/sysctl.d/99_user.conf</code>
+'''2.''' {{Open with root rights|filename=
+/etc/sysctl.d/99_user.conf
+}}
 
-'''3.''' Type:
+'''3.''' Paste.
 
 {{CodeSelect|code=
 net.ipv4.conf.*.arp_ignore=1
 }}
 
-'''4.''' Press <code>Ctrl+S</code> to save, followed by <code>Ctrl+X</code> to exit.
+'''4.''' Save and exit.
 
-'''5.''' Reboot {{project_name_gateway_short}}. (If using Qubes OS, shut down the <code>whonix-gateway-17</code> template and reboot all qubes based on that template.)
+'''5.''' Reboot {{project_name_gateway_short}}. (If using Qubes OS, shut down the <code>whonix-gateway-17</code> template and reboot all Qubes based on that template.)
 
 '''6.''' Done.
 
