@@ -1281,19 +1281,33 @@ https://forums.whonix.org/t/p-s2-mouse-movement-in-cutom-debian-workstation/1998
 Follow these steps to move data between the guest and host. It is recommended to create/assign a unique directory per snapshot to keep shared content belonging to different security domains separate.
 
 {{Box|text=
+{{IconSet|true|X}} '''Special Notice: Upgrade Required'''
+
+[[Upgrade|Update]] your system first. <ref>
+This is due to a bug in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code> that has been fixed in the all repositories.
+</ref>
+
+{{sysmaint_notice}}
+
+In [[System_Maintenance_Panel|System Maintenance Panel]], press <code>Install Updates</code> or upgrade using command line.
+
+{{CodeSelect|code=
+sudo apt update && sudo apt dist-upgrade
+}}
+
 '''1.''' Ensure the virtual machine is powered down.
 
 '''2.''' Host folder preparation: On the host operating system, create a folder to be shared with the {{VM}}. For example, on a Linux host operating system:
 
-Replace user name <code>user</code> with your actual user name.
+<u>Note:</u> Replace user name <code>user</code> with your actual user name.
 
 {{CodeSelect|code=
 mkdir /home/user/shared
 }}
 
-'''3.''' Adjust permissions on the host to allow read and write access to the folder with chmod.
+'''3.''' Adjust permissions on the host to allow read and write access to the folder with <code>chmod</code>.
 
-Note: Replace user name <code>user</code> with your actual user name.
+<u>Note:</u> Replace user name <code>user</code> with your actual user name.
 
 {{CodeSelect|code=
 chmod 777 /home/user/shared
@@ -1322,7 +1336,9 @@ If you do not wish to write to that folder from within the VM, you are free to c
 
 '''10.''' Done.
 
-The shared folder will be accessible as <code>/mnt/shared</code>. <ref>This is hardcoded in [https://github.com/{{project_name_short}}/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>].</ref> The folder can be opened using a [[Software#File Manager|file manager]] such as Thunar, for example. To open it using the command line, run:
+The shared folder will be accessible as <code>/mnt/shared</code>. <ref>
+This is hardcoded in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>].
+</ref> The folder can be opened using a [[Software#File Manager|file manager]] such as Thunar, for example. To open it using the command line, run:
 
 {{CodeSelect|code=
 cd /mnt/shared
@@ -1331,11 +1347,11 @@ cd /mnt/shared
 
 === Mandatory Access Control ===
 
-<u>Note:</u> If your system is configured to use a Mandatory Access Control framework then it might be necessary to configure exceptions to allow the confined guests to communicate with the shared folder on the host.
+<u>Note:</u> If your system is configured to use a Mandatory Access Control framework, then it might be necessary to configure exceptions to allow the confined guests to communicate with the shared folder on the host.
 
-Tests with Apparmor have shown it operates transparently with shared folders, without the need for a manual exception configuration.
+Tests with AppArmor have shown it operates transparently with shared folders, without the need for manual exception configuration.
 
-On the host, chmod must be applied to the shared folder's contents to access the files.
+On the host, <code>chmod</code> must be applied to the shared folder's contents to access the files.
 
 Replace user name <code>user</code> with your actual user name.
 
@@ -1343,11 +1359,16 @@ Replace user name <code>user</code> with your actual user name.
 sudo chmod 777 -R /home/user/shared
 }}
 
-If SELinux is disabled then everything should be functional. If SELinux is enabled, it is necessary to add a policy for files under the shared folder on the host. SELinux will not allow this folder to be shared until it is labeled <code>svirt_image_t</code>. To achieve this add the following policy on the host using semanage. Note that these steps must be re-applied every time something is transferred. <ref>https://nts.strzibny.name/how-to-set-up-shared-folders-in-virt-manager/</ref> <ref>https://unix.stackexchange.com/questions/60799/selinux-interfering-with-host-guest-file-sharing-using-kvm</ref>
+If SELinux is disabled, then everything should be functional. If SELinux is enabled, it is necessary to add a policy for files under the shared folder on the host. SELinux will not allow this folder to be shared until it is labeled <code>svirt_image_t</code>. To achieve this, add the following policy on the host using <code>semanage</code>. Note that these steps must be re-applied every time something is transferred. <ref>
+https://nts.strzibny.name/how-to-set-up-shared-folders-in-virt-manager/
+</ref> <ref>
+https://unix.stackexchange.com/questions/60799/selinux-interfering-with-host-guest-file-sharing-using-kvm
+</ref>
 
 {{CodeSelect|code=
 sudo semanage fcontext -a -t svirt_image_t "/home/user/shared(/.*)?"
 }}
+
 {{CodeSelect|code=
 restorecon -vR /home/user/shared
 }}
@@ -1364,7 +1385,7 @@ Or, more safely, you can set it just for virt-manager. The name <code>libvirt-qe
 sudo setfacl -m u:libvirt-qemu:x /home/user
 }}
 
-If you are using the command line instead of virt-manager to edit the vm's device settings, add this next section to the xml.
+If you are using the command line instead of virt-manager to edit the VM's device settings, add this next section to the xml.
 
 <pre style="white-space: pre-wrap;">
 <filesystem type='mount' accessmode='mapped'>
