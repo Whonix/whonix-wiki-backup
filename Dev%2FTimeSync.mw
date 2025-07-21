@@ -167,7 +167,7 @@ In addition to the above problems, time information will inevitably leak to the 
 by using CPU utilization itself as a signalling channel. Preventing such problems would require completely isolated virtual time which may not track real time any longer. This may be useful in certain security or QA contexts, but in general is not recommended for real-world deployment scenarios.
 </blockquote>
 
-Therefore we want a completely isolated virtual time.
+Therefore ideally we would want a completely isolated virtual time. However, this is not possible with thorough x86 virtualization (at least with KVM) due to the extreme complexities of emulating time sources used in x86 hardware (the issue is deeper than the "wall clock" time that sdwdate concerns itself with). However, we do want to have guest wall clocks entirely independent from the host's wall clock if at all possible.
 
 = {{project_name_short}} Time Synchronization Mechanism =
 == Overview ==
