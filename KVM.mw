@@ -1065,7 +1065,10 @@ tar -Sczvf whonix.tar.gz <multiple file names separated by spaces>
 
 == Adding vCPUs ==
 
-The pinning parameter <code>cpuset='1'</code> must be removed in the <code>vcpu</code> tag in the XML settings to allow adding more cores to a VM, otherwise performance issues and lockups will occur. CPU pinning is done to safeguard processes in other VMs that run cryptographic operations from side-channel attacks in case of a vulnerability in a cryptographic library.
+The pinning parameter <code>cpuset='1'</code> must be removed in the <code>vcpu</code> tag in the XML settings to allow adding more cores to a VM, otherwise performance issues and lockups will occur. CPU pinning is done to safeguard processes in other VMs that run cryptographic operations from side-channel attacks in case of a vulnerability in a cryptographic library. <ref>
+* https://forums.whonix.org/t/guest-systems-sees-cpu-of-the-host/1413/28
+* https://forums.whonix.org/t/guest-systems-sees-cpu-of-the-host/1413/30
+</ref>
 
 To add more vcpus, increase the number in between the opening and closing <code>vcpu</code> tags. Alternatively, use the hardware 'Details' pane in virtual Machine Manager.
 
@@ -1658,7 +1661,7 @@ if ret == -1: raise libvirtError (‘virDomainCreate() failed’, dom=self)
 libvirt.libvirtError: cannot set CPU affinity on process 1994: invalid argument
 </pre>
 
-Setting `cpuset='1'` is a default to minimize impact of sidechannel attacks on cryptographic operations in case the VM has been compromised. This might not be compatible with some older hardware.
+Setting <code>cpuset='1'</code> is a default to minimize impact of sidechannel attacks on cryptographic operations in case the VM has been compromised. This might not be compatible with some older hardware.
 
 '''1.''' [[KVM#VM_Settings_Modification|VM Settings Modification]]
 
