@@ -77,26 +77,61 @@ Derivatives of Debian are even encouraged to use Debian infrastructure. See [htt
 Mac OS X cannot be used for legal reasons. Even if that were not an issue, it is still a proprietary, closed-source operating system. We do not support their attitude or how they (do not) communicate with the security community. Also see: [https://krebsonsecurity.com/2011/11/apple-took-3-years-to-fix-finfisher-trojan-hole/ Apple Took 3+ Years to Fix FinFisher Trojan Hole] and [[Host_Operating_System_Selection#macOS_Hosts|macOS Hosts]].
 
 == Fedora ==
-Fedora has '''not''' failed the {{project_name_short}} threat model and could be considered as a host, as well as a future or alternative {{project_name_gateway_short}}/Workstation operating system. Qubes OS, an operating system focusing on security through isolation, is also based on Fedora.
+<u>Repository metadata:</u>
 
-Potential blocker:
+{{quotation
+|quote=Signed repositories
+
+The Fedora Project does not sign our package repositories (yet), even though this has been requested a lot of times. One of the main reasons for this is that DNF/YUM repodata has no “ValidUntil” or sortalike attribute. Additionally, librepo — which DNF uses to download and verify repodata– regards expired GPG signatures as fully valid. This means that there is no way at all to mark repository data as valid for a limited amount of time.
+
+As such, while it can protect against modification of the repository data, it does not protect against attackers (or outdated mirrors) shipping ancient repositories with known-vulnerable software.
+|context=Fedora Magazine: [https://fedoramagazine.org/fedora-secures-package-delivery/ How Fedora Secures Package Delivery]
+}}
+
+* https://github.com/QubesOS/qubes-issues/issues/1919#issuecomment-691545936
+* https://github.com/QubesOS/qubes-issues/issues/1919#issuecomment-689245921
+* https://discussion.fedoraproject.org/t/comment-about-fedora-security-and-unsigned-repository-metadata/137370
+
+<u>Reproducible builds:</u>
+
+For historical relevance.
+
+{{quotation
+|quote=Fedora project leader Matthew Millar told Ars that he thinks reproducible builds are interesting, but "it hasn't been a big initiative." He noted that, unlike Debian packages, which are typically built on individual developer's laptops, "Fedora requires all packages to be built in our central system, from source, using scripts in a version-controlled repository. And, that central build system is all itself open source and we distribute the Ansible playbooks to deploy it in production."
+
+"That means we already have a transparent, traceable pathway from binary packages back to source code," he added.
+
+Transparent to the Fedora Project, perhaps, but not to end users. A central build system is also a central point of failure. How does the Fedora build system ensure trustworthy binaries in the face of intelligence agencies who wish to insert compile-time backdoors? Millar did not respond to this question, or further e-mails.
+
+Given that Red Hat is a US-based company, and thus subject to secret court orders from the US government, can we be sure that Red Hat has not been compelled to insert compile-time backdoors?
+
+"Red Hat has never intentionally inserted a back door in our products, and we have never received a court order to do so," Wonderlick told Ars.
+|context=Ars Technica: [https://arstechnica.com/information-technology/2016/12/how-to-make-linux-more-trustworthy/ How to make Linux more trustworthy - Reproducible builds are a good step, but Red Hat and Ubuntu don't want to join in.]
+}}
+
+This situation has improved. Reproducible builds is now a goal.
+
+* https://docs.fedoraproject.org/en-US/reproducible-builds/
+* https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/NRRAH67FZXVKGERYTBSVL6QIQ57BXXBG/
+* https://pagure.io/fedora-reproducible-builds/project
+* https://pagure.io/fedora-reproducible-builds/project/issues
+* https://www.youtube.com/watch?v=5c4gfXVPAbU
+
+<u>Information:</u>
+
+* Qubes dom0 is based on Fedora.
+
+<u>Potential blocker:</u>
 
 * [[Dev/Operating_System#Community_Project_versus_Corporate_Project|Community Project versus Corporate Project]]
 * https://www.reddit.com/r/Fedora/comments/157sngv/discussion_is_fedora_really_a_corporate_distro/
+* https://docs.fedoraproject.org/en-US/council/
 
-See also:
+<u>Potential phone-home issue:</u>
 
-* [[Dev/Fedora]]
+* [https://github.com/QubesOS/qubes-issues/issues/1814 sys-net phones home to fedoraproject.org for captive portal detection #1814] - "might have fixed itself"
 
-Phone-home issue (marked as closed but reportedly unfixed):
-
-* https://github.com/QubesOS/qubes-issues/issues/1814
-* https://github.com/QubesOS/qubes-issues/issues/1919#issuecomment-691545936
-* https://github.com/QubesOS/qubes-issues/issues/1919#issuecomment-689245921
-* https://arstechnica.com/information-technology/2016/12/how-to-make-linux-more-trustworthy/
-* https://forums.whonix.org/t/port-whonix-to-fedora-as-base-operating-system/16528
-
-Notes:
+<u>Notes:</u>
 
 * Fedora Linux used to use its flawed home-grown OpenPGP parser. In Fedora 38 the internal PGP parser was replaced with Sequoia PGP, improving security and standards-compliance.
 ** [https://fedoraproject.org/wiki/Changes/RpmSequoia#Benefit_to_Fedora Changes/RpmSequoia - Fedora Project Wiki]
@@ -105,12 +140,16 @@ Notes:
 ** [https://wiki.debian.org/OpenPGP/Sequoia OpenPGP/Sequoia - Debian Wiki]
 ** Note, that signing RPM packages is not the same as signing repository metadata.
 
-Repository metadata:
+<u>See also:</u>
 
-* TODO: Investigate whether Fedora is GPG-signing repository metadata
-** https://discussion.fedoraproject.org/t/comment-about-fedora-security-and-unsigned-repository-metadata/137370
+* [[Dev/Fedora]]
+
+<u>Discussion:</u>
+
+* https://forums.whonix.org/t/port-whonix-to-fedora-as-base-operating-system/16528
 
 == secureblue ==
+* based on [[Dev/Operating_System#Fedora|Fedora]]
 * {{kicksecure_wiki
 |wikipage=Dev/secureblue
 |text=Comparison of secureblue with Kicksecure and Development Notes

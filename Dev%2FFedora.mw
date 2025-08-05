@@ -1,4 +1,7 @@
 {{Header}}
+{{title|title=
+Dev/Fedora
+}}
 {{#seo:
 |description=Development Notes about Fedora
 }}
@@ -7,27 +10,27 @@ Development Notes about Fedora
 }}
 = Fedora =
 
-Consideration for recommending Fedora as a host operating system...
+Considerations for recommending Fedora as a host operating system...
 
 Website
 
 * Looks much more friendly and modern.
 * It is available over SSL.
 * [https://getfedora.org/security/ Verification instructions] are also available over SSL.
-* GPG signing key is available over SSL.
+* The GPG signing key is available over SSL.
 
 Package Manager
 
-* yum is as safe as apt according to the theupdateframework.com people
+* yum is considered as safe as apt according to the theupdateframework.com people.
 
-Consideration for using it as Virtual Machine Guest
+Considerations for using it as a Virtual Machine Guest
 
 (i.e. for {{project_name_gateway_long}} and {{project_name_workstation_long}})
 
 * Is there a tool to create virtual machine images like there is grml-debootstrap for Debian?
-** The feature set of grml-debootstrap seems to be a one-liner solution to getting a fully working install.
-** Fedora supports kickstart files, which are the equivalent of Debian preseeding. It should conceivably not be too difficult to achieve a grml-debootstrap experience using kickstart files plus some minimal scripting (if one does not exist already). Fedora has automated builds for Docker images.
-* The more restrictive approach taken by SELinux (which is default in Fedora) might offer some security benefits.
+** The feature set of grml-debootstrap seems to provide a one-liner solution for getting a fully working install.
+** Fedora supports kickstart files, which are equivalent to Debian preseeding. It should conceivably not be too difficult to achieve a grml-debootstrap experience using kickstart files plus some minimal scripting (if one does not already exist). Fedora has automated builds for Docker images.
+* The more restrictive approach taken by SELinux (which is the default in Fedora) might offer some security benefits.
 
 In-Place Release Upgrades:
 
@@ -38,25 +41,25 @@ Release Cycle:
 * <blockquote>Fedora has a relatively short life cycle: each version is usually supported for at least 13 months, where version X is supported only until 1 month after version X+2 is released and with approximately 6 months between most versions.</blockquote>
 * Can {{project_name_long}} keep up with that?
 
-Conflict of interest:
+Conflict of Interest:
 
-* Fedora won't really get stable since that would obsolete RHEL?
+* Fedora won't really become stable since that would obsolete RHEL?
 
-Package repository:
+Package Repository:
 
 * Smaller than Debian?
 
 apt-transport-tor:
 
-* DNF equivalent is python3-dnf-plugin-torproxy.
+* The DNF equivalent is python3-dnf-plugin-torproxy.
 
 Fedora doesn't seem to care about [https://fedoraproject.org/wiki/Reproducible_Builds Reproducible Builds].
 
-Other stuff:
+Other considerations:
 
 * Has not been considered yet.
-* What would be particularly interesting is if {{project_name_short}} could provide a generalized set of scripts to set up the target environment in as much of a distro-agnostic way as possible (perhaps by leveraging Ansible, or similar). Making a working Fedora version in addition to Debian might be a start toward that. &rarr; Unrealistic. Would require a dedicated [[Contribute#Contributor|contributor]]. A port causes a huge amount of work.
-* Also interesting would be a containerized version of the {{project_name_gateway_short}} that could be easily deployed on a host OS (this provides less anonymity than what {{project_name_short}} is mainly aiming at, but has different use cases): for example, setting up an OnionPi-style hotspot. Current solutions, like the Adafruit OnionPi tutorial, are (1) not very easily deployable, (2) not as feature-full - for example, limited to HTTP or particular protocols - not full isolating proxies, and (3) tend to have a large footprint on the host/root OS. -- ideally, one Raspi could be used both for providing a Tor Hotspot and for numerous other functions, with the Tor hotspot functions contained in one LXC and using only a handful of ports and hardware interfaces from the host OS. &rarr; Same as above.
+* What would be particularly interesting is if {{project_name_short}} could provide a generalized set of scripts to set up the target environment in a distro-agnostic way (perhaps by leveraging Ansible or similar). Creating a working Fedora version in addition to Debian might be a step toward that. &rarr; Unrealistic. Would require a dedicated [[Contribute#Contributor|contributor]]. A port causes a huge amount of work.
+* Also interesting would be a containerized version of the {{project_name_gateway_short}} that could be easily deployed on a host OS (this provides less anonymity than what {{project_name_short}} mainly aims for, but serves different use cases): for example, setting up an OnionPi-style hotspot. Current solutions, like the Adafruit OnionPi tutorial, are (1) not very easily deployable, (2) not as feature-rich, for example, limited to HTTP or specific protocols, not full isolating proxies, and (3) tend to have a large footprint on the host/root OS. -- ideally, one Raspi could be used both for providing a Tor Hotspot and for numerous other functions, with the Tor hotspot functions contained in one LXC and using only a handful of ports and hardware interfaces from the host OS. &rarr; Same as above.
 
 = Debugging Scriptlets =
 1) Add the prerun scriptlet to a file by running the following command (credit<ref>Thanks to airfishey for the [https://unix.stackexchange.com/questions/214192/whats-the-fedora-equivalent-of-var-lib-dpkg-info-prerm/214193#214193 answer] on unix.stackexchange.</ref>):
@@ -65,7 +68,7 @@ Other stuff:
 rpm -q --queryformat '%{PREUN}\n' qubes-template-whonix-gw-experimental > ~/qubes-template-whonix-gw-experimental.preun
 </pre>
 
-2) Run that script as root while having {{Code2|errexit}}, {{Code2|xtrace}} enabled and output exit code:
+2) Run that script as root while having {{Code2|errexit}}, {{Code2|xtrace}} enabled and output the exit code:
 
 <pre>
 sudo sh -ex ~/qubes-template-whonix-gw-experimental.preun 0 ; echo $?
@@ -79,14 +82,14 @@ The file name {{Code2|qubes-template-whonix-gw-experimental.preun}} actually doe
 sudo yum langinstall de
 </pre>
 
-Requires newer yum. So at the moment the easiest is using a Fedora based VM as UpdateVM.
+Requires a newer version of yum. So at the moment, the easiest solution is using a Fedora-based VM as UpdateVM.
 
 <pre>
 sudo qubes-dom0-update langinstall de
 </pre>
 
 = Issues =
-phone home issue (says closed but is unfixed):
+Phone home issue (says closed but remains unfixed):
 
 https://github.com/QubesOS/qubes-issues/issues/1814
 
