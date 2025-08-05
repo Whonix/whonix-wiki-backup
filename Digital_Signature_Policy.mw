@@ -1,0 +1,107 @@
+{{Header}}
+{{title|title=
+{{project_name_short}} Digital Signature Policy
+}}
+{{#seo:
+|description=todo
+}}
+{{verification_tools_mininav}}
+{{intro|
+todo
+}}
+
+= {{project_name_short}} Source Code - Digital Signature Policy =
+* <u>Signed git head:</u> The git head should always be signed by a core developer.
+* <u>Signed git tags:</u> All git tags should always be signed.
+* <u>Source code digital signatures policy:</u> All source code used to build {{project_name_short}} has security level [[Verifying_Software_Signatures#System_Security_Level|System Security Level]] <code>Always use software signatures verification</code>.
+** <u>Source code by {{project_name_short}} developers:</u> Must be signed at least after merge.
+** <u>Signed git tag policy:</u> Git tags in all source code repositories must always be signed and point to signed commits.
+** <u>Signed commits policy:</u> The head of git commits in all source code repositories must always be signed.
+
+= {{project_name_short}} Build System - Digital Signature Policy =
+* <u>Build source code signature verification:</u> All source code used to build {{project_name_short}} using [[Dev/Derivative-Maker|Derivative-Maker]] must always verify all digital software signatures.
+* <u>Unsigned code execution prohibition:</u> Executing unsigned code is prohibited.
+* <u>Unsigned code deployment prohibition:</u> Deployment of unsigned code is prohibited.
+* <u>Software build digital signatures policy:</u> All source code used to build {{project_name_short}} must always use software digital signature verification.
+** <u>Download signature verification during build:</u> When [[Dev/Derivative-Maker|Derivative-Maker]] downloads software (such as dependency packages, default installed packages) for the creation of binary images, all software must always come with digital signatures that are verified before executing the code and/or before adding the software to the image.
+* <u>Failure reaction:</u> If software signature verification fails, the build must be aborted.
+* <u>Exception policy:</u> Hardcoding strong hashsums might be appropriate in exceptional cases where digital software signatures are unavailable.
+
+= {{project_name_short}} Downloads - Digital Signature Policy =
+* <u>Image signing:</u> All images must always be signed.
+* <u>Repository signing:</u> The package repository must always be signed.
+
+= {{project_name_short}} Documentation - Digital Signature Policy =
+* <u>Documentation digital signatures policy:</u> All documentation on the topic of software installation and updating should always contain recommendations (and if feasible, detailed instructions) to verify digital signatures. Wiki templates such as [[Template:Always_verify_signatures]] and [[Template:unsigned_software]] should be used.
+** <u>Automatic verification notice exemption:</u> If digital software verification is automatic, such as in the case of installing packages from <code>packages.debian.org</code> using APT default repositories, then a superfluous special notice is not required.
+* <u>Prohibition examples:</u>
+** <u>curl bash pipe:</u> For example, Derivative-Maker using a [[Dev/curl_bash_pipe|curl bash pipe]] <code><nowiki>curl some-domain.com | bash</nowiki></code> (i.e. downloading an executable from a remote server and executing it without prior digital software signature verification) is prohibited.
+** <u>Unverified software installation:</u> As a hypothetical example: "<code>wget virtualbox.org/virtualbox.deb && dpkg --install virtualbox.deb</code>" (in this example, downloading a VirtualBox Debian package from the VirtualBox website and installing it without digital software verification) is prohibited.
+* <u>Manual verification reminder requirement:</u> If digital signature verification is not automated (such as by using APT when using Debian default repositories), then [[Template:Always verify signatures reminder]] must always be used.
+
+{{quotation
+|quote=
+{{Always verify signatures reminder}}
+|context=[[Template:Always verify signatures reminder]] used on the following wiki pages: [[Special:WhatLinksHere/Template:Always verify signatures reminder]]
+}}
+
+* <u>Unsigned software documentation policy:</u> If documented software does not provide digital signatures, then [[Template:Unsigned_software]] must always be used.
+
+{{quotation
+|quote=
+{{Unsigned_software}}
+|context=[[Template:Unsigned_software]] used on the following wiki pages: [[Special:WhatLinksHere/Template:Unsigned_software]]
+}}
+
+= Effective Date =
+* <u>Date of enforcement:</u> This policy has always been enforced for {{project_name_long}}. However, this elaborate technical description was added in April 2025. It was moved to its own dedicated wiki page at the end of July 2025.
+
+= Appendix =
+== Upstream Feature Request - Signed Git ==
+<pre>
+signed git tags / signed git commits
+</pre>
+
+<pre>
+For better security, could you please sign all upcoming git commits and git tags?
+
+It's useful in case github [gets hacked](http://www.extremetech.com/computing/120981-github-hacked-millions-of-projects-at-risk-of-being-modified-or-deleted) again in case [SSL CA's](https://en.wikipedia.org/wiki/DigiNotar) get [hacked](http://www.scmagazine.com/two-more-comodo-resellers-owned-in-ssl-hack/article/199620/) again.
+
+> What about commits from other developers that submit pull requests?
+
+In that case you just sign the merge commit. Therefore git master will always be some git commit signed by you, no matter if you merged commits by other developers.
+
+References:
+
+* https://github.com/blog/2144-gpg-signature-verification
+* https://help.github.com/articles/signing-commits-with-gpg/
+* http://mikegerwitz.com/papers/git-horror-story
+* https://forums.whonix.org/t/security-git-general-verification-verifying-whonix-submodules/513/11
+
+I think this makes sense. I've been signing my git commits by default lately, ever since I discovered I could my my ~/.gitconfig look like this:
+
+~/.gitconfig
+
+[user]
+    name = Your Name
+    email = example@example.com
+    signingkey = signing-key-fingerprint
+
+## Qubes
+#[gpg]
+    #program = qubes-gpg-client-wrapper
+
+[commit]
+    gpgsign = true
+</pre>
+
+== List of Upstream Feature Requests - Signed Git ==
+* https://github.com/onionshare/onionshare/issues/221
+* https://github.com/annealmail/annealmail/issues/11
+
+= Footnotes =
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]
+[[Category:Development]]
+[[Category:MultiWiki]]
