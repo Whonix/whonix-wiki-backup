@@ -11,6 +11,7 @@
 
 <!--{assign var="urlIs" value="general"}-->
 <!--{if $url|regex_replace:"/^https?:\/\/[^\.\/]+\.?[^\.\/]+\.onion(\/|$)/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="onion"}--><!--{/if}-->
+<!--{if $url|regex_replace:"/^https:\/\/github.com/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="github"}--><!--{/if}-->
 <!--{if $url|regex_replace:"/^https:\/\/web\.archive\.org/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="aOrg"}--><!--{/if}-->
 <!--{if $url|regex_replace:"/^https:\/\/archive\.(today|fo|is|li|md|ph|vn)/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="aToday"}--><!--{/if}-->
 
@@ -28,12 +29,14 @@ aria-label="External link<!--{if isset($text) && $text != ""}--> to: <!--{$text}
 
 <!--{if $urlsCount == 1}-->
 <!--{if $urlIs == "onion"}--><!--{assign var="linkTitle" value="This is an .onion link"}-->
+<!--{elseif $urlIs == "github"}--><!--{assign var="linkTitle" value="This is a link to a live GitHub page"}-->
 <!--{elseif $urlIs == "aOrg"}--><!--{assign var="linkTitle" value="This is an archived link on archive.org"}-->
 <!--{elseif $urlIs == "aToday"}--><!--{assign var="linkTitle" value="This is an archived link on archive.today"}-->
 <!--{else}--><!--{assign var="linkTitle" value="This is an archive link on an alternative archive storage"}-->
 <!--{/if}-->
 <!--{else}-->
 <!--{if $urlIs == "onion"}--><!--{assign var="linkTitle" value="Alternative .onion link"}-->
+<!--{elseif $urlIs == "github"}--><!--{assign var="linkTitle" value="This is a link to a live GitHub page"}-->
 <!--{elseif $urlIs == "aOrg"}--><!--{assign var="linkTitle" value="Link to an archived version on archive.org"}-->
 <!--{elseif $urlIs == "aToday"}--><!--{assign var="linkTitle" value="Link to an archived version on archive.today"}-->
 <!--{else}--><!--{assign var="linkTitle" value="Link to an archived version on an alternative archive"}-->
@@ -43,6 +46,7 @@ aria-label="External link<!--{if isset($text) && $text != ""}--> to: <!--{$text}
 <sup class="ext-link-to-archive<!--{if $url@iteration < $urlsCount}--> has-sibling<!--{/if}-->">
 <a href="<!--{$url|escape:"html"}-->" target="_blank" rel="noreferrer noopener<!--{if $urlIs == "onion"}--> nofollow<!--{/if}-->" title="<!--{$linkTitle}-->" aria-label="<!--{$linkTitle}-->">
 <!--{if $urlIs == "onion"}--><img src="/w/images/thumb/a/a8/Iconfinder_tor_386502.png/40px-Iconfinder_tor_386502.png" width="16" height="16" alt="Onion network Logo" />
+<!--{elseif $urlIs == "github"}--><img src="/w/images/a/af/Github-mark.svg" width="14" height="16" alt="GitHub Logo" />
 <!--{elseif $urlIs == "aOrg"}--><img src="/w/images/7/73/Internet_Archive_logo.png" width="14" height="16" alt="Internet Archive Logo" />
 <!--{elseif $urlIs == "aToday"}--><img src="/w/images/8/8f/Archive-today-logo-homage.svg" width="12" height="16" alt="Archive.today logo homage" />
 <!--{else}--><img src="/w/images/4/4e/General-archive-logo.svg" width="12" height="16" alt="General archive symbol" />
