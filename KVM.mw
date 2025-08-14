@@ -1397,6 +1397,55 @@ If you are using the command line instead of virt-manager to edit the VM's devic
 </filesystem>
 </pre>
 
+=== Shared Folder in Live Mode ===
+<!-- WIKI EDITORS NOTICE:
+This is almost a duplicate of:
+https://www.kicksecure.com/wiki/VirtualBox/Guest_Additions#Shared_Folder_in_Live_Mode
+-->
+
+In [[Live Mode]], the shared folder will not be mounted by default. (This behavior was implemented starting from version <code>17.4.4.6</code> and might be subject to change in a future version.) <ref>
+[[grub-live]]:
+
+* <code>/usr/lib/systemd/system/mnt-shared-vbox.service.d/30_grub-live.conf</code>
+* <code>/usr/lib/systemd/system/mnt-shared-kvm.service.d/30_grub-live.conf</code>
+</ref>
+
+If the user wishes to enable shared folder with read and write access in live mode, follow the instructions below.
+
+Untested! Please test and leave feedback.
+
+{{IconSet|true|1}} '''Instructions from above chapter need to be applied first.'''
+
+Option specific.
+
+* If you are using Kicksecure (or a derivative such as Whonix), follow the steps below.
+* If you are using Other Operating Systems or Generic VirtualBox Method, then this is not applicable. <ref>
+Because not using the <code>mnt-shared-vbox.service</code> systemd unit by {{project_name_short}}.
+</ref>
+
+{{IconSet|true|2}} {{sysmaint_notice}}
+
+{{IconSet|true|3}} {{Open with root rights|filename=
+/usr/lib/systemd/system/mnt-shared-kvm.service.d/50_user.conf
+}}
+
+{{IconSet|true|4}} '''Paste.'''
+
+{{CodeSelect|code=
+[Unit]
+ConditionKernelCommandLine=
+}}
+
+{{IconSet|true|5}} '''Save.'''
+
+{{IconSet|true|6}} '''Reboot.'''
+
+{{IconSet|true|7}} '''Done.'''
+
+Shared folder should now also be available with read-write access after booting into live mode.
+
+forum discussion: [https://forums.whonix.org/t/shared-folder-blank-running-in-live-mode-after-update/22056 Shared folder blank running in live mode after update]
+
 == USB Passthrough ==
 
 {{mbox
