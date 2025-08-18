@@ -53,11 +53,11 @@ Disposables work especially well with {{project_name_gateway_long}}. <ref>Becaus
 |+ ''Disposable Warnings''
 |-
 
-! scope="col"| '''Category'''
-! scope="col"| '''Warning'''
+! '''Category'''
+! '''Warning'''
 |-
 
-! scope="row"| Amnesic Capability
+! Amnesic Capability
 |
 * All changes to a Qubes Disposable's file system are discarded upon shutdown. However, Disposables are similar to snapshots insofar as they can leave traces of their activity on storage and in memory. <u>These traces may be later recoverable through data forensics.</u>
 ** This is Qubes issue. The feature requests exist since year 2013. The issue is [[unspecific|unspecific to {{project_name_short}}]].
@@ -97,14 +97,14 @@ Live ISO:
 * This is further justification for using [[Full_Disk_Encryption|full disk encryption]] on the Qubes host and completely shutting down the system when it is not in use. Laptop users may wish to remove batteries to ensure that power to the RAM is definitely disconnected.
 |-
 
-! scope="row"| Ephemeral {{project_name_gateway_short}} ProxyVMs
+! Ephemeral {{project_name_gateway_short}} ProxyVMs
 | Using Disposables for both the {{project_name_short}} Gateway and Workstation in Qubes <u>does not</u> increase security without any corresponding privacy downside, for the following reasons: <ref>[[#Warnings|Disposables are not Amnesic]].</ref> <ref>https://github.com/QubesOS/qubes-issues/issues/904</ref> <ref>[[Tor_Entry_Guards|Tor Entry Guards]].</ref>
 * Disposables are not amnesic. In practice this means traces of their activity can be left on storage or in memory, making them vulnerable to forensic operations. <ref>This is another reminder of why full disk encryption should always be used on the host.</ref>
 * Using a Disposable for the {{project_name_gateway_short}} results in [[Tor_Entry_Guards#Configure_Non-Persistent_Entry_Guards|non-persistent entry guards]] to the Tor network; behavior unlike the default configurations for {{project_name_short}}, Tor, and the Tor Browser Bundle. Mathematically speaking, end-to-end correlation attacks are ''more'' likely to succeed when a user chooses many random entry and exit points in the Tor network, rather than semi-permanent entry guards which are only rotated every few months. <ref>https://gitlab.torproject.org/legacy/trac/-/issues/8240</ref> <ref>The reason is there are both malicious and benign guards in the Tor network. The more often the user "rolls the dice" (changes guards), the greater the chance of striking out.</ref>
 * See additional footnote. <ref>The solution to the first problem is only allowing [https://github.com/QubesOS/qubes-issues/issues/904 in-RAM execution of Disposables], but this is not planned for implementation in the short-term. There is no perfect solution to the second problem. That said, there is an actual unstated security-privacy trade-off by running this configuration. Theoretically, an ephemeral {{project_name_gateway_short}} ProxyVM is only able to be infected for a single session (via the ''/home'', ''/usr/local'' and ''/rw'' directories), since it is discarded upon shutdown. This provides a counterbalance to the increased threat of malicious guards, as [https://gitlab.tails.boum.org/tails/blueprints/-/wikis/persistent_Tor_state/ {{project_name_short}} becomes more "Tails-like"].</ref>
 |-
 
-! scope="row"| Spawning Disposables
+! Spawning Disposables
 |
 * Word definition. What does Spawning Disposables mean? For example using <code>qvm-open-in-dvm</code> or right click context menu in certain file manages for which Qubes provides integration.
 * If a Disposable is spawned from within a VM that is not connected to {{project_name_gateway_short}}, the new Disposable may route its traffic over clearnet. <ref>
@@ -121,7 +121,7 @@ qvm-open-in-dvm
 * If the calling VM is connected to {{project_name_gateway_short}}, this step is not necessary and the Disposable's traffic will be routed over Tor. See: [https://github.com/QubesOS/qubes-issues/issues/1954 {{project_name_short}} default NetVM settings fixes].
 |-
 
-! scope="row"| Named Disposables: Manual Shutdown
+! Named Disposables: Manual Shutdown
 | Unlike Disposables spawned from the {{project_name_short}} default Disposable Template, <ref>
 See [[#User_Tips|Disposable Shutdown]] for more on this.
 </ref> named Disposables do <u>not</u> automatically shutdown when the first user process is terminated. If a fresh Named Disposable is needed, users must first shutdown the named Disposable and start a new Disposable instance. <ref>
@@ -129,20 +129,20 @@ This is because named Disposables are created using a similar method to that whi
 </ref> Failure to do so could lead to session data from previous activities persisting until the Disposable is properly shutdown.
 |-
 
-! scope="row"| Tor Browser in a Disposable Template
+! Tor Browser in a Disposable Template
 | Do not start Tor Browser in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]]. Only start Tor Browser in App Qubes or Disposables, see: [[Qubes/Disposables#Start_Tor_Browser_in_a_Disposable|Start Tor Browser in a Disposable]].
 |-
-! scope="row"| Tor Browser Updater in a Disposable Template
+! Tor Browser Updater in a Disposable Template
 | Do not start Tor Browser Updater in a Disposable Template! For reasons why, see: [[Tor_Browser/Advanced_Users#tb-updater_in_Qubes_Disposable_Template|tb-updater in Qubes Disposable Template]]. Instead, run [[#Keep Tor Browser Up-to-date|Tor Browser Downloader]] by {{project_name_short}} developers in {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>).
 |-
 
-! scope="row"| Tor Browser Version
+! Tor Browser Version
 |
 * When using Disposables, use the [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] daily to check the browser is up-to-date!
 * To learn about recent Tor Browser versions, follow [https://blog.torproject.org The Tor Project blog]. Tor Browser's version number can also be checked manually: <code>Tor Browser</code> &rarr; <code>Menu</code> &rarr; <code><u>H</u>elp</code> &rarr; <code>About Tor Browser</code>. See [[#Keep Tor Browser Up-to-date|Keep Tor Browser Up-to-date]].
 |-
 
-! scope="row"| Verify Disposable Status
+! Verify Disposable Status
 |
 * Use caution when spawning a Disposable for the first time when it is based on a freshly created Disposable Template. There could be serious consequences if an application like Tor Browser was started in a Disposable Template and used extensively for web browsing. Compromise of the Disposable Template would mean all Disposables spawned from it would be similarly compromised; see [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template|Running Tor Browser in Qubes Template]]. <ref>
 There was a Qubes bug in the past which has been fixed since Qubes R4.2:
@@ -153,7 +153,7 @@ There was a Qubes bug in the past which has been fixed since Qubes R4.2:
 * To check the freshly started VM is a Disposable, verify it is named <i>[disp xxxx]</i> where <i>xxxx</i> is the number assigned to that Disposable. If the Disposable Template was started instead, then it should be shut down immediately. If the Disposable Template is ever inadvertently used for a dangerous activity like web browsing, then delete it and create a new one.
 |-
 
-! scope="row"| {{project_name_gateway_short}} Linkability
+! {{project_name_gateway_short}} Linkability
 | The Tor Project developer Teor has stated that [[Tor]] caches {{Code|DNS, HS descriptors, pre-emptive circuits, etc.}} <ref>https://lists.torproject.org/pipermail/tor-dev/2016-October/011591.html</ref> which may lead to linkage between App Qubes and Disposables sharing the same {{project_name_gateway_short}}. The extent to which this is a threat for {{project_name_short}} users has now been documented; see [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_short}}]].
 |-
 
@@ -365,34 +365,34 @@ With either kind of VM, Qubes' VM integration tools like [https://www.qubes-os.o
 |+ ''Disposable User Tips''
 |-
 
-! scope="col"| '''Category'''
-! scope="col"| '''Recommendation'''
+! '''Category'''
+! '''Recommendation'''
 |-
 
-! scope="row"| Data Storage
+! Data Storage
 |
 * In Qubes, it is unrecommended to store any valuable data in an untrusted VM. This perspective is reinforced by the Tor Browser design which similarly does not remember bookmarks or credentials. Best practice is to store sensitive data in an offline vault VM; for instance, when accessing passwords with a password manager. <br />
 * @rustybird has announced a new "split-tor-browser" <ref>[https://github.com/rustybird/qubes-app-split-browser Github: Split Browser]</ref> package that can retrieve urls and credentials from a trusted VM for use in a Disposable's browser. This package is yet to be tested or endorsed by {{project_name_short}}, but it looks promising.
 |-
 
-! scope="row"| Disposable Shutdown
+! Disposable Shutdown
 | A Disposable automatically shuts down when the <u>first</u> user-launched process is terminated. For example, if a new Disposable is created by launching Tor Browser and a user simultaneously starts typing in an editor later on, all this work will be lost after Tor Browser is closed. To avoid this, first launch a terminal in the Disposable and then launch additional applications from the terminal. This way the Disposable is only destroyed after exiting the terminal.
 |-
 
-! scope="row"| Offline Disposables
+! Offline Disposables
 |
 * Use utmost caution if deciding to re-establish network connectivity for off-line Disposables! No mechanism is currently available to prevent connections to a clearnet NetVM. <br />
 * Non-networked Disposables are useful for opening untrusted files that potentially might try to use the network maliciously. Like all Qubes VMs, the NetVM for a Disposable can be changed dynamically while the VM is still running. Simply set the NetVM to "none" using Qube Manager or the command line interface. <ref>On the command line (dom0), run.{{CodeSelect|code=qvm-prefs disp<1 {{!}} 2 {{!}} ...> netvm none}}</ref>
 |-
 
-! scope="row"| Shortcuts
+! Shortcuts
 |
 * Disposables can be created directly by launching programs from the application menu using shortcuts; [[#Add_a_Desktop_Shortcut|see below for instructions]]. <br />
 * Disposables can also be spawned by using context-menus or the command line interface in other App Qubes. Refer to the [https://www.qubes-os.org/doc/how-to-use-disposables/ Qubes Disposable documentation] for instructions on different methods. <br />
 * Note the [[#Warnings|relevant warning]] concerning shortcuts in this chapter ("Spawning Disposables").
 |-
 
-! scope="row"| Spawning Disposables from other App Qubes
+! Spawning Disposables from other App Qubes
 |
 * There are several ways to spawn Disposables from App Qubes. In fact, in addition to the dom0 terminal and application menu, users can also spawn Disposables from the App Qube terminal emulator or context-menu. <ref>See: [https://www.qubes-os.org/doc/how-to-use-disposables/ Qubes Disposables].</ref> These tools provide a safe and convenient way to open files and email attachments that could contain malicious code. There is also an option to convert potentially dangerous [https://en.wikipedia.org/wiki/PDF PDFs] into trusted PDFs and open it in a Disposable. <ref>See Micahflee's blog on [https://micahflee.com/2016/07/how-qubes-makes-handling-pdfs-way-safer/ How Qubes makes handling pdfs way safer].</ref> <br />
 * The most commonly used methods to spawn Disposables from App Qubes are listed below. It is recommended to read the [[#Warnings|"Spawning Disposables" warning]] detailing Disposable network settings before proceeding: <br />

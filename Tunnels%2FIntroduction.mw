@@ -38,15 +38,15 @@ Anonymity can be negatively affected under some circumstances by using an additi
 |+ ''Tunnel Warnings''
 |-
 
-! scope="col"| '''Configuration'''
-! scope="col"| '''Description'''
+! '''Configuration'''
+! '''Description'''
 |-
 
-! scope="row"| Individual Tunnel Links
+! Individual Tunnel Links
 | Individual tunnel-links should only be used for a single configuration and never reused in any other tunnel-link chains. If this advice is ignored, any anonymous identities associated with the tunnel-link might be tied to the user's ISP-assigned IP address.
 |-
 
-! scope="row"| Qubes Tunnel Configuration
+! Qubes Tunnel Configuration
 | It is not recommended to run the tunnel software from within a Template. This is because the <code>{{project_name_gateway_template}}</code> Template acts more like a workstation since it is behind <code>{{project_name_gateway_vm}}</code> and is <u>not</u> <code>{{project_name_gateway_vm}}</code> itself.
 
 If <code>openvpn</code> is used inside {{project_name_gateway_long}} (<code>{{project_name_gateway_vm}}</code>) or {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>) as per the {{project_name_short}} documentation, <code>openvpn</code> will not start inside the <code>{{project_name_gateway_template}}</code> or <code>{{project_name_workstation_template}}</code> Template. <ref>This is because file [https://github.com/{{project_name_short}}/usability-misc/blob/master/usr/lib/systemd/system/openvpn%40openvpn.service.d/50_unpriv.conf /lib/systemd/system/openvpn@openvpn.service.d/50_unpriv.conf] checks the following condition:
@@ -56,7 +56,7 @@ ConditionPathExists=!/var/run/qubes-service/whonix-template
 This means if file <code>/var/run/qubes-service/whonix-template</code> exists, which is the case in {{project_name_short}} Templates, the {{Code2|openvpn@openvpn}} service will not start.</ref> In Qubes R4 and above, by default the [https://github.com/QubesOS/qubes-issues/issues/1858 Templates's NetVM is purposely set to <code>none</code>]. (They are upgraded through the qrexec-based updates proxy that is running on <code>{{project_name_gateway_vm}}</code>.)
 |-
 
-! scope="row"| Tunnel Provider / Configuration
+! Tunnel Provider / Configuration
 | Do not use the same tunnel provider / configuration in more than one place at the same time. For example, do not use the same tunnel setup inside {{project_name_gateway_short}} as well as inside {{project_name_workstation_short}}. Also do not use the same tunnel setup on the host {{Os}} (outside any {{VM}}) and inside a {{project_name_gateway_short}} or {{project_name_workstation_short}} at the same time.
 
 Example:
@@ -88,11 +88,11 @@ https://gist.github.com/joepie91/5a9909939e6ce7d09e29
 https://web.archive.org/web/20220609222239/https://matt.traudt.xyz/posts/2016-11-12-vpn-tor-not-net-gain/</ref>
 |-
 
-! scope="col"| '''Domain'''
-! scope="col"| '''Description'''
+! '''Domain'''
+! '''Description'''
 |-
 
-! scope="row"| Anonymity
+! Anonymity
 |
 * In the <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration or <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code> configuration, anonymous payments with Bitcoin, cash and other methods does not improve anonymity because a user is still connecting to the service from their own IP address (which can be logged).
 * In the <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration or <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration the use of shared IP addresses does not confuse modern surveillance systems which have a many additional [[Data_Collection_Techniques|fingerprinting methods]] (like user agents) to identify persons of interest.
@@ -105,12 +105,12 @@ https://forums.whonix.org/t/hiding-tor-whonix-is-difficult-beyond-practicality/7
 * Apart from a few exceptions (see Use Case Exceptions), VPNs do not provide additional privacy -- it is still possible for adversaries to tap your connection, except at a different point (where traffic leaves the VPN server).
 |-
 
-! scope="row"| Malware
+! Malware
 |
 * Adversaries who can break Tor Browser to make web requests not travel over Tor are probably also capable of: running arbitrary commands as a non-root user, gaining root privileges, or ultimately performing a VM escape from {{project_name_short}}. In this case a VPN is useless in providing additional security.
 |-
 
-! scope="row"| Tor + VPN
+! Tor + VPN
 |
 * The <code>User</code> &rarr; <code>Tor</code> &rarr; <code>VPN</code> &rarr; <code>Internet</code> configuration attempts to display an IP address that is not associated with Tor.
 * This throws away many of the anonymity and security benefits associated with Tor and places sole trust in the VPN provider where the traffic exits.
@@ -120,7 +120,7 @@ https://forums.whonix.org/t/hiding-tor-whonix-is-difficult-beyond-practicality/7
 * This configuration slows down connection speed because there is a TCP stream (OpenVPN) inside of a TCP stream (Tor). <ref>If any of these streams detect packet loss, then there is backing off of the transmission rates and re-transmitting of packets thought to be lost.</ref>
 |-
 
-! scope="row"| VPN + Tor
+! VPN + Tor
 |
 * It is questionable the <code>User</code> &rarr; <code>VPN</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code> configuration adds any additional protection; see this [https://security.stackexchange.com/questions/125005/why-is-home-vpn-tor-worse-than-home-tor/125008#125008 stackexchange discussion].
 * If Tor is blocked for whatever reason it is simpler to configure a [[Bridges|bridge]] with a pluggable transport to try and bypass it. <ref>
@@ -143,11 +143,11 @@ It is essential to consider the following factors when selecting a tunnel-link p
 |+ ''Provider Selection Considerations''
 |-
 
-! scope="col"| '''Domain'''
-! scope="col"| '''Description'''
+! '''Domain'''
+! '''Description'''
 |-
 
-! scope="row"| End-to-end Correlation (Confirmation) Attacks
+! End-to-end Correlation (Confirmation) Attacks
 |
 * Tor avoids using more than one relay belonging to the same operator in the circuits it is building. Legitimate Tor relay operators adhere to Tor's relay operator practices of announcing which relays belong to them by declaring this in the Tor relay family setting. Tor also avoids using Tor relays that are within the same network by not using relays within the same /16 subnet. <ref>
 https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes-for-circuit-creation/114#114
@@ -158,18 +158,18 @@ https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes
 * In essence, you must avoid using the same network/operator as your first and last Tor relays since this would open up [[Warning#Confirmation_Attacks|Confirmation Attacks]].
 |-
 
-! scope="row"| Shared IP Addresses
+! Shared IP Addresses
 |
 * Many tunnel providers use shared IP addresses which means that many users share the same external IP address. On the one hand this configuration is beneficial, since it is similar to Tor whereby many users share the same Tor exit relays. On the other hand, in some circumstances this may result in making you, more unique, easier to track because the IP address is known to belong to a VPN provider but only few users are using it.
 |-
 
-! scope="row"| Operator/Network Shared Infrastructure
+! Operator/Network Shared Infrastructure
 |
 * It is possible to host (run) Tor relays -- including bridges, entry, middle or exit relays -- behind VPNs or tunnel-links. For example, there are VPN providers that support [https://proprivacy.com/vpn/guides/vpn-port-forwarding-guide VPN port forwarding]. This is an interesting way to contribute to Tor while not exposing oneself to too much legal risk. This also means in certain situations a VPN or other tunnel-link could be hosted by the same operator providing support to Tor relays, in the same network or even on the same IP address.
 * In an economy with deep labor division, certain operators are providing a service to host servers (VPS etc.), while others provide VPN and other tunnel-link services and rent such servers. It is therefore not uncommon for diverse customers to run or share the same IP address. This is another situation where a VPN or other tunnel-link could be hosted by the same operator supporting Tor relays, in the same network or even on the same IP address.
 |-
 
-! scope="row"| Tunnel-link Connection Chain Risk
+! Tunnel-link Connection Chain Risk
 |
 * Based on the section immediately above, it follows that adding arbitrary tunnel-links might lead to the same operator/network being used twice in your connection chain. Consider the scenarios below.
 * <u>Scenario 1</u>:
@@ -182,7 +182,7 @@ https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes
 ** The user is now using the same IP address as the first and last proxy, meaning overall anonymity is reduced in this scenario.
 |-
 
-! scope="row"| Tunnel Provider Criteria
+! Tunnel Provider Criteria
 |
 * Consider the physical location of networks/servers and the legal jurisdiction(s) they are operating in.
 * Perhaps avoid using VPN or SSH providers that support port forwarding.
@@ -191,7 +191,7 @@ https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes
 * See also [[Whonix_versus_VPNs#Criteria_for_Reviewing_VPN_Providers|Criteria for Reviewing VPN Providers]] which equally applies for other tunnel-links.
 |-
 
-! scope="row"| Tor Relay Selection
+! Tor Relay Selection
 |
 * It might be safer to manually select your Tor relay(s), specifically the [[Tor_Entry_Guards|Entry Guard(s)]] or [[Bridges|Bridge(s)]] in operation.
 * Tor documentation generally discourages tampering with Tor's routing algorithm by manually choosing relays. However, if you have decided to extend the length of the Tor chain -- despite the difficulty of this endeavor and potential adverse anonymity impacts -- then it might make sense to pick the entry guard(s) by hand.
@@ -205,6 +205,9 @@ https://tor.stackexchange.com/questions/113/how-does-a-tor-client-pick-tor-nodes
 
 = Comparison Table =
 {| class="wikitable"
+|+ Comparison of Tunnel Combinations
+|-
+
 |
 ! [[#Connecting_to_a_Tunnel-link_(Proxy/VPN/SSH)_before_Tor|<code>User</code> &rarr; <code>Proxy</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>]]
 ! [[#Connecting_to_Tor_before_a_Tunnel-link_(Proxy/VPN/SSH)|<code>User</code> &rarr; <code>VPN / SSH</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>]]
@@ -307,15 +310,15 @@ SSH: [[Tunnel_UDP_over_Tor#SSH_Method|<span style="background:{{Yellow}}">Undocu
 |+ ''Pre-Tor Tunnel-link''
 |-
 
-! scope="col"| '''Domain'''
-! scope="col"| '''Description'''
+! '''Domain'''
+! '''Description'''
 |-
 
-! scope="row"| Connection Scheme
+! Connection Scheme
 | '''<code>User</code> &rarr; <code>proxy/VPN/SSH</code> &rarr; <code>Tor</code> &rarr; <code>Internet</code>'''
 |-
 
-! scope="row"| Network Traffic
+! Network Traffic
 | In this case, your Internet traffic will:
 # pass through the ISP as proxy/VPN/SSH traffic; <br />
 # exit the proxy/VPN/SSH server as encrypted Tor traffic; <br />
@@ -323,14 +326,14 @@ SSH: [[Tunnel_UDP_over_Tor#SSH_Method|<span style="background:{{Yellow}}">Undocu
 # exit the Tor network at a Tor exit node as normal Internet traffic (encrypted or unencrypted).
 |-
 
-! scope="row"| Use Cases
+! Use Cases
 |
 * You must connect to a VPN or proxy to access the Internet. <br />
 * Your ISP blocks Tor and Tor bridges but does not block the tunnel-link. <br />
 * Concerns exist over de-anonymizing attacks against the Tor network and a user believes a VPN or proxy may help protect their identity in such a case.
 |-
 
-! scope="row"| Warnings <ref>These warnings are not specific to {{project_name_short}}, but are general issues with combining Tor and various tunnel-links.</ref>
+! Warnings <ref>These warnings are not specific to {{project_name_short}}, but are general issues with combining Tor and various tunnel-links.</ref>
 |
 * A VPN or proxy that knows your identity and/or location may be more willing and able to compromise your privacy than an ISP. <br />
 * If the software configuration does not block all traffic if/when the VPN connection suddenly disconnects, all encrypted Tor traffic will pass through the ISP without warning. This is the default for most VPN configurations and not a {{project_name_short}}-specific issue. Workarounds are described in the links below. <br />
@@ -352,29 +355,29 @@ SSH: [[Tunnel_UDP_over_Tor#SSH_Method|<span style="background:{{Yellow}}">Undocu
 |+ ''Post-Tor Tunnel-link''
 |-
 
-! scope="col"| '''Domain'''
-! scope="col"| '''Description'''
+! '''Domain'''
+! '''Description'''
 |-
 
-! scope="row"| Connection Scheme
+! Connection Scheme
 | '''<code>User</code> &rarr; <code>Tor</code> &rarr; <code>proxy/VPN/SSH</code> &rarr; <code>Internet</code>'''<br />
 |-
 
-! scope="row"| Network Traffic
+! Network Traffic
 | In this case, your Internet traffic will: <br />
 # pass through the ISP as encrypted Tor traffic; <br />
 # exit the Tor network at a Tor exit node as proxy/VPN/SSH traffic; and <br />
 # exit the proxy/VPN/SSH as normal Internet traffic (encrypted or unencrypted).
 |-
 
-! scope="row"| Use Cases
+! Use Cases
 |
 * It is necessary to use a VPN or proxy anonymously for a specific reason. <br />
 * It is necessary to connect to an Internet server who bans Tor exit nodes. <br />
 * Concerns exist over de-anonymizing attacks against the Tor network and a user believes a VPN or proxy may help protect their identity in such a case.
 |-
 
-! scope="row"| Warnings <ref>These warnings are not specific to {{project_name_short}}, but are general issues with combining Tor and various tunnel-links.</ref>
+! Warnings <ref>These warnings are not specific to {{project_name_short}}, but are general issues with combining Tor and various tunnel-links.</ref>
 |
 * Even though Tor will hide the IP address from the VPN or proxy, you can still be located via payment methods, usage logs, or other identifying information the tunnel-link service holds. <br />
 * This configuration prevents access to Tor onion ({{Code2|.onion}}) services. <ref>When configuring <code>User</code> &rarr; <code>Tor</code> &rarr; <code>proxy/VPN/SSH</code> &rarr; <code>Internet</code>, it is impossible to connect to [[Onion Services]] because the last server is not a Tor relay. The only exception is running another Tor client on top, but this would lead to a [[Tips_on_Remaining_Anonymous#Prevent_Tor_over_Tor_scenarios|Tor over Tor scenario]] which is discouraged for security reasons.</ref>

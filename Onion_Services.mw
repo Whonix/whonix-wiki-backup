@@ -140,79 +140,79 @@ The <code>Nginx</code> web server is a recommended alternative to <code>Apache</
 {| class="wikitable"
 |+ ''Onion Service Security Recommendations''
 |-
-! scope="col"| '''Domain'''
-! scope="col"| '''Recommendation'''
+! '''Domain'''
+! '''Recommendation'''
 |-
 
-! scope="row"| ALPaCA
+! ALPaCA
 | An advanced website fingerprinting client/server mitigation named ALPaCA is in development that applies server-side padding to requests sent out to Tor Browser. When finalized, service operators can run it to protect against this class of correlation attacks. <ref>https://github.com/camelids/</ref> <ref>
 [https://petsymposium.org/2017/papers/issue2/paper54-2017-2-source.pdf Website Fingerprinting Defenses at the Application Layer]</ref> <ref>https://web.archive.org/web/20170421225506/https://www.esat.kuleuven.be/cosic/?p=6743</ref>
 |-
 
-! scope="row"| Application Level Leaks
+! Application Level Leaks
 | Beware of application level leaks; see [[Protocol-Leak-Protection and Fingerprinting-Protection|Protocol Leak Protection and Fingerprinting Protection]] for a definition.
 |-
 
-! scope="row"| Captcha
+! Captcha
 | [https://forums.whonix.org/t/mcaptcha-org-floss-captcha/16769 mCaptcha.org - FLOSS Captcha]
 |-
 
-! scope="row"| Dedicated Onion Service Address
+! Dedicated Onion Service Address
 | Each service you host should get its own dedicated onion address to prevent correlation between multiple instances running in the same VM.
 |-
 
-! scope="row"| Dedicated SSH Server Onion Address
+! Dedicated SSH Server Onion Address
 | If hosting onion services on remote servers: Each server you host remotely should get its own dedicated onion address different from its service onion address. For example if xxx.onion is your onion web service then yyy.onion should be your private SSH server onion address. This is to increase the probability of still being able remote administrate your server through SSH should your separate onion service address be under DDOS (flood overload, resource exhaustion attack). See also recommendations for [[Remote Administration]].
 |-
 
-! scope="row"| Denial of Service (DoS) Attack Defense
+! Denial of Service (DoS) Attack Defense
 | [https://hackerfactor.com/blog/index.php?/archives/897-Tor-0day-Crashing-the-Tor-Network.html A researcher has posted his experience keeping their onion up during a massive DDoS]. <ref>
 https://forums.whonix.org/t/ship-or-document-ddos-resistant-torrc-settings/10417
 </ref>
 |-
 
-! scope="row"| Disable Banners
+! Disable Banners
 | Disable banners for SSH, FTP, SMTP and HTTP servers which leak information about the daemon's name and version. If the SSH instance is for private use, use it with an Authenticated Onion Service to protect the server from brute-force and remote exploitation.
 |-
 
-! scope="row"| General Hardening
+! General Hardening
 | Additional pointers for hardening can be found in the Basic Security Guide and Advanced Security Guide sections of the [[Documentation]].
 |-
 
-! scope="row"| Hide IP Address
+! Hide IP Address
 |
 * IP hiding instructions for the specific server software should be applied.
 * The reason is because a combination of a webserver that forwards IP addresses to certain web applications such as mediawiki would be a discouraged use case. In mediawiki's case, by default it puts IP addresses of anonymous editors in the public accessible editor logs. The IP address would be <code>10.152.152.10</code>. Although that information cannot be used to identify you because it is not your real external IP address, it would still identify the server as an onion service behind a {{project_name_gateway_short}}. <ref>Since it is easy to confirm that the internal LAN IP <code>10.152.152.10</code> is normally used by {{project_name_gateway_short}}.</ref>
 |-
 
-! scope="row"| Mitigate DoS Attacks
+! Mitigate DoS Attacks
 | It is good practice to setup access to your site through reverse proxies to mitigate [https://web.archive.org/web/20200314071622/http://ddosattackprotection.org/blog/layer-7-ddos-attack/ layer 7 DoS attacks]. See for example [https://www.nginx.com/blog/mitigating-ddos-attacks-with-nginx-and-nginx-plus/ Mitigating DDoS Attacks with NGINX and NGINX Plus]. That way it may also be possible to block information leaks about your setup.
 |-
 
-! scope="row"| OnionBalance
+! OnionBalance
 | [https://onionbalance.readthedocs.io/en/latest/ OnionBalance] can help to prevent de-anonymization of an onion service by protecting it from becoming unavailable through denial of service attacks (DDOS). OnionBalance is mentioned in the [https://github.com/mikeperry-tor/vanguards/blob/master/README_SECURITY.md security readme] by vanguards author and Tor developer Mike Perry where he discusses attacks against onion services and defenses. [https://onionbalance.readthedocs.io/en/latest/v3/tutorial-v3.html OnionBalance] is now available for onion v3 services <ref>
 * https://github.com/DonnchaC/onionbalance/issues/69#issuecomment-58108608
 * [https://lists.torproject.org/pipermail/tor-dev/2020-January/014142.html Tor development mailing list - Request for onionbalance v3 pre-alpha testing]
 </ref>, see: [https://blog.torproject.org/cooking-onions-reclaiming-onionbalance Cooking with Onions: Reclaiming the Onionbalance]. See also [[#OnionBalance|{{project_name_short}} OnionBalance documentation]].
 |-
 
-! scope="row"| Onion v3
+! Onion v3
 | No longer use onion v2; see [https://lists.torproject.org/pipermail/tor-dev/2020-May/014322.html here].
 |-
 
-! scope="row"| Server Software Hardening
+! Server Software Hardening
 | If any instructions for hardening the server instructions are available it is recommended to apply them, even though {{project_name_short}} is designed to prevent IP/DNS leaks.
 |-
 
-! scope="row"| Vanguards
+! Vanguards
 | Vanguards protect against guard discovery and related traffic analysis attacks and is installed by default in {{project_name_short}}. <ref>Since {{project_name_short}} version <code>15.0.0.8.7</code>.</ref> See [[Vanguards]] for further information.
 |-
 
-! scope="row"| <code>HiddenServiceExportCircuitID</code>
+! <code>HiddenServiceExportCircuitID</code>
 | Consider using Tor configuration option <code>HiddenServiceExportCircuitID</code>. Please refer to Tor upstream documentation until this is documented. Help welcome.
 |-
 
-! scope="row"| <code>HiddenServicePoWDefensesEnabled</code>
+! <code>HiddenServicePoWDefensesEnabled</code>
 | Consider using Tor configuration option <code>HiddenServicePoWDefensesEnabled</code>. Please refer to Tor upstream documentation until this is documented. Help welcome. <ref>
 * https://forum.torproject.net/t/alpha-release-0-4-8-1-alpha/7816
 * https://forums.whonix.org/t/tor-0-4-8-interesting-features/16768
@@ -649,6 +649,8 @@ The following notes are here for clarification. However, should these notes add 
 * This is also illustrated in the following table.
 
 {| class="wikitable"
+|+ OnionBalance - {{project_name_gateway_short}} versus {{project_name_workstation_short}}
+|-
 
 |
 !Frontend

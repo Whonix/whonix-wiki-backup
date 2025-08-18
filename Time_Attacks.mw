@@ -17,16 +17,16 @@ Insecure time synchronization and the leaking of time data exposes the user to a
 {| class="wikitable"
 |+ ''Time Attack Vectors''
 |-
-! scope="col"| '''Attack Vector'''
-! scope="col"| '''Description'''
+! '''Attack Vector'''
+! '''Description'''
 |-
-! scope="row"| Application-level Traffic
+! Application-level Traffic
 | Unlike privacy software developed by The Tor Project, Internet-facing applications can leak clock information in their traffic; for example, JavaScript in browsers and timestamps in emails.
 |-
-! scope="row"| Denial of Service
+! Denial of Service
 | The UDP-based NTP protocol can be abused to cause much larger replies than normal, causing systems to be overwhelmed. These are known as amplification attacks. <ref>See [https://blog.hboeck.de/archives/863-Dont-update-NTP-stop-using-it.html Don't update NTP - stop using it] and [https://netpatterns.blogspot.com/2016/01/the-rising-sophistication-of-network.html The Rising Sophistication of Network Scanning].</ref>
 |-
-! scope="row"| Locating Onion Services
+! Locating Onion Services
 | Timers can leak CPU data. Under some circumstances, related activity data can lead to deanonymization of an onion service: <ref>
 * [https://murdoch.is/papers/ccs06hotornot.pdf Hot or Not: Revealing Hidden Services by their Clock Skew]
 * [https://web.archive.org/web/20220515221639/http://caia.swin.edu.au/talks/CAIA-TALK-080728A.pdf An improved clock-skew measurement technique for revealing onion services]
@@ -34,13 +34,13 @@ Insecure time synchronization and the leaking of time data exposes the user to a
 * [https://netpatterns.blogspot.com/2016/01/the-rising-sophistication-of-network.html The Rising Sophistication of Network Scanning]
 </ref>
 |-
-! scope="row"| Remote Code Execution
+! Remote Code Execution
 | NTP is a buggy and ancient protocol. Flaws in NTP clients can be remotely exploited to allow an adversary control over the system. The unencrypted and unauthenticated nature of NTP makes this attack trivial for network adversaries of any size. <ref>https://blog.hboeck.de/archives/863-Dont-update-NTP-stop-using-it.html</ref> <ref>https://www.cvedetails.com/vulnerability-list/vendor_id-2153/NTP.html</ref>
 |-
-! scope="row"| Remote Device Fingerprinting
+! Remote Device Fingerprinting
 | Clock leaks arising from either software on the host or application-level protocols on {{project_name_workstation_long}} (<code>{{project_name_workstation_vm}}</code>) allow a passive adversary to easily link anonymous and non-anonymous traffic to the same machine. Active clock skew attacks can be trivially mounted to deanonymize users. <ref>See https://catalog.caida.org/details/paper/2005_fingerprinting and Tor Browser upstream bug #3059 for the kind of application-level leaks that can happen: [https://gitlab.torproject.org/legacy/trac/-/issues/3059 Find some way to deal with time-based fingerprints].</ref>
 |-
-! scope="row"| Replay Attacks
+! Replay Attacks
 | Replaying an older time allows an adversary to: <ref>
 This is possible because cryptographic verification depends on an accurate system clock. For example, a clock set to two years in the past will accept certificates or updates which have already expired or been revoked.</ref>
 * Feed an old Tor consensus. <ref>https://tails.boum.org/contribute/design/Time_syncing/</ref>
@@ -54,23 +54,23 @@ Certain protocol properties leak clock information.
 {| class="wikitable"
 |+ ''Clock Leak Vectors'' <ref>https://web.archive.org/web/20220324134410/http://caia.swin.edu.au/talks/CAIA-TALK-080728A.pdf</ref>
 |-
-! scope="col"| '''Leak Vector'''
-! scope="col"| '''Description'''
+! '''Leak Vector'''
+! '''Description'''
 |-
-! scope="row"| ICMP Timestamps
+! ICMP Timestamps
 | Leak host time in query replies. <ref>https://web.archive.org/web/20120626055435/http://www.networksorcery.com/enp/protocol/icmp/msg13.htm</ref>
 |-
-! scope="row"| NTP Clients
+! NTP Clients
 | Leak host time <ref>https://gitlab.torproject.org/legacy/trac/-/issues/16659#comment:13</ref> and expose the system to every attack outlined above.
 |-
-! scope="row"| TCP Initial Sequence Numbers (ISNs)
+! TCP Initial Sequence Numbers (ISNs)
 | Even when timers do not fully leak the host's clock, they can allow side-channel attacks because sensitive information about a system's CPU activity is leaked. <ref>
 https://gitlab.torproject.org/legacy/trac/-/issues/16659#comment:10
 </ref> This information is leaked in any traffic sent over clearnet. It can therefore be linked to maliciously induced load patterns on an onion site, resulting in deanonymization. <ref>
 https://gitlab.torproject.org/legacy/trac/-/issues/16659
 </ref>
 |-
-! scope="row"| TCP Timestamps
+! TCP Timestamps
 | Included in every TCP packet, these leak system information down to the millisecond, as well as system uptime. They also permit fingerprinting of devices behind a router. <ref>https://web.archive.org/web/20170201160732/https://mailman.boum.org/pipermail/tails-dev/2013-December/004520.html</ref>
 |}
 

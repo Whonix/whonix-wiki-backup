@@ -70,11 +70,11 @@ In addition to protocol leaks, there are also a range of identifiers that can be
 {| class="wikitable"
 |+ ''Software Identifiers''
 |-
-! scope="col"| '''Category'''
-! scope="col"| '''Description'''
+! '''Category'''
+! '''Description'''
 |-
 
-! scope="row"| Color depth
+! Color depth
 | The default color depth is 24-bit for all {{project_name_short}} users. <ref>
 To check the color depth run the following command in console.
 
@@ -92,7 +92,7 @@ fc-list
 </ref>
 |-
 
-! scope="row"| Desktop Resolution
+! Desktop Resolution
 |
 * {{non_q_project_name_long}} VM users: The desktop resolution setting set to <code>1920x1080</code> with the (virtual) refresh rate set to <code>60</code>. <ref>
 https://github.com/Kicksecure/vm-config-dist/blob/master/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/displays.xml
@@ -107,11 +107,11 @@ xrandr
 </ref>
 |-
 
-! scope="row"| Fonts
+! Fonts
 | All {{project_name_short}} users have the same list of fonts installed. <ref>So long as the user or any additional software packages do not install further packages.</ref> <ref>Only three common fonts (monospace, serif, times new roman) can be detected for all Tor Browser users. </ref> <ref>Robert Ransom previously suggested {{project_name_short}} should share the same list of fonts as Tails if possible. Since Tor Browser no longer leaks which fonts are installed, lead {{project_name_short}} developer Patrick Schleizer does not see any advantage of this action (follow-up enquiry ignored).</ref>
 |-
 
-! scope="row"| Hostname
+! Hostname
 | The hostname is set to <code>host</code>. <ref>To check the hostname, run.
 
 {{CodeSelect|code=
@@ -120,7 +120,7 @@ host
 
 </ref>
 |-
-! scope="row"| Internal (virtual LAN) IP address
+! Internal (virtual LAN) IP address
 |
 * [[Qubes|{{q_project_name_short}}]]: The same range exists for all [[Qubes|{{q_project_name_short}}]] users. ([https://github.com/QubesOS/qubes-issues/issues/1143 related ticket])
 * [[VirtualBox]] / [[KVM]]: This is the same for all {{project_name_short}} users. <ref>
@@ -132,7 +132,7 @@ sudo ifconfig
 </ref>
 |-
 
-! scope="row"| Long host name (FQDN)
+! Long host name (FQDN)
 | The long host name (FQDN) is set to host.localdomain <ref>To check the long host name, run.
 
 {{CodeSelect|code=
@@ -141,11 +141,11 @@ hostname --fqdn
 </ref>
 |-
 
-! scope="row"| Operating system updates
+! Operating system updates
 | Operating system (apt) updates are routed through their own circuit ([[Stream Isolation]]) to prevent accidental leakage of software packages and versions (if any custom software is installed) which could then be correlated with other anonymous activity. Also see: [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#software-updates Software updaters] and [[Install Software | Software installation {{project_name_workstation_short}}]].
 |-
 
-! scope="row"| Time
+! Time
 |
 * {{project_name_workstation_short}}, {{project_name_gateway_short}} and the host time are all different from each other.
 * Time zone (local time) is set to UTC. <ref>
@@ -159,7 +159,7 @@ cat /etc/timezone
 * See [[Dev/TimeSync|{{project_name_short}} Time Synchronization Mechanism]] for further information.
 |-
 
-! scope="row"| User name
+! User name
 | The user name is set to <code>user</code>.
 |-
 ! scope="row" | RAM
@@ -169,14 +169,16 @@ cat /etc/timezone
 |}
 
 {| class="wikitable"
-|- style="background-color: #f9f9f9"
-| style="height: 35px"|
+|+ Identical software packages
+|-
+
+|
 | '''Qubes'''
 | '''Virtualbox'''
 | '''KVM'''
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Identical software packages <ref>By default, all {{project_name_short}} users have the same set of software packages installed. However, if additional software packages are installed, this advantage is lost. See also: [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#software-updates Software updaters].</ref>
+| Identical software packages <ref>By default, all {{project_name_short}} users have the same set of software packages installed. However, if additional software packages are installed, this advantage is lost. See also: [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#software-updates Software updaters].</ref>
 | style="background-color: {{Yellow}}"| Differs from [[Non-Qubes-Whonix|{{non_q_project_name_short}}]]
 | style="background-color: {{Yellow}}"| Differs from [[Qubes|{{q_project_name_short}}]]
 | style="background-color: {{Yellow}}"| Differs from [[Qubes|{{q_project_name_short}}]]
@@ -185,6 +187,7 @@ cat /etc/timezone
 |}
 
 {{Anchor|Minor Identifiers}}
+
 == Hardware Identifiers ==
 These identifiers are less important because an adversary can only collect them if the user installed malicious software (for example, some copyright enforcement and anti-cheat tools collect them), or if the adversary achieves remote access by compromising a user or in some cases the root account.
 
@@ -192,14 +195,14 @@ Hardware identifiers are virtualizer specific issues were all virtualizers are a
 
 {| class="wikitable"
 |+ ''Hardware Identifiers that require local code execution''
-|- style="background-color: #f9f9f9"
-| style="height: 35px"|
+|-
+|
 | '''Qubes'''
 | '''VirtualBox'''
 | '''KVM'''
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden CPU model and capabilities
+| Hidden CPU model and capabilities
 | {{No}}
 | {{No}} <ref>
 These were hidden by VirtualBox "Synthetic CPU" in the past but that feature was removed from VirtualBox. (Even then the clock speed of your host CPU was visible to all code (applications or malware) inside {{project_name_workstation_short}}.) [https://phabricator.whonix.org/T408 The parameters <code>--cpuid-portability-level</code> or <code>--cpuidremoveall</code> have been tested and do not hide CPU model and capabilities either.]
@@ -219,7 +222,7 @@ A workaround in theory could be to use an emulator instead of a virtualizer such
 </ref>
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden hardware serial numbers <ref>Hardware serial numbers which any applications could collect are hidden due to the Virtual Machine.</ref> <ref>
+| Hidden hardware serial numbers <ref>Hardware serial numbers which any applications could collect are hidden due to the Virtual Machine.</ref> <ref>
 It is possible to check the visible hardware yourself with the following commands.
 
 {{CodeSelect|code=
@@ -246,13 +249,13 @@ Then compare the results with your host.
 |-
 
 {{Anchor|CPUID}}
-| style="height: 27px;background-color: #f9f9f9"| Hidden {{kicksecure_wiki|wikipage=CPUID|text=CPUID}} (CPU model and capabilities) processor instruction
+| Hidden {{kicksecure_wiki|wikipage=CPUID|text=CPUID}} (CPU model and capabilities) processor instruction
 | {{No}}
 | {{No}}
 | {{No}}
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden graphic card information
+| Hidden graphic card information
 | {{Yes}} <ref>
 {{CodeSelect|code=
 sudo lshw -C display
@@ -285,13 +288,13 @@ No output, which is good.
 | ?
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Same amount of RAM assignment
+| Same amount of RAM assignment
 | style="background-color: {{Yellow}}"| Dynamically assigned
 | {{Yes}}, fixed
 | {{Yes}}, fixed
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden sensor information <ref>CPU temperature, HDD temperature, [https://en.wikipedia.org/wiki/Self-Monitoring,_Analysis_and_Reporting_Technology S.M.A.R.T.]</ref> <ref>Fortunately virtualizers hide them from the guest VM by not implementing them.</ref> <ref>To check the sensor information, run.
+| Hidden sensor information <ref>CPU temperature, HDD temperature, [https://en.wikipedia.org/wiki/Self-Monitoring,_Analysis_and_Reporting_Technology S.M.A.R.T.]</ref> <ref>Fortunately virtualizers hide them from the guest VM by not implementing them.</ref> <ref>To check the sensor information, run.
 
 Using <code>hddtemp</code>.
 
@@ -316,7 +319,7 @@ sudo sensors-detect
 | {{Yes}}
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden battery information <ref>To check the battery information, run.
+| Hidden battery information <ref>To check the battery information, run.
 
 {{CodeSelect|code=
 acpi -V
@@ -327,7 +330,7 @@ acpi -V
 | {{Yes}}
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden BIOS DMI information <ref name=biosdmi>To check the BIOS DMI information, run.
+| Hidden BIOS DMI information <ref name=biosdmi>To check the BIOS DMI information, run.
 
 {{CodeSelect|code=
 sudo dmidecode
@@ -339,7 +342,7 @@ sudo dmidecode
 | {{Yes}}
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden virtual BIOS DMI information and Virtual HDD and CD serial numbers <ref name=biosdmi /> <ref>
+| Hidden virtual BIOS DMI information and Virtual HDD and CD serial numbers <ref name=biosdmi /> <ref>
 To see disk ids that are in use, run.
 
 {{CodeSelect|code=
@@ -357,7 +360,7 @@ Then compare the result with the host.
 | {{Yes}}, only virtual ones
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden VM UUID <ref>As in explained in [https://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvdi VBoxManage modifyhd], this value has no relation to the host by default.</ref> <ref>To check the VM UUID, run.
+| Hidden VM UUID <ref>As in explained in [https://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvdi VBoxManage modifyhd], this value has no relation to the host by default.</ref> <ref>To check the VM UUID, run.
 
 {{CodeSelect|code=
 sudo dmidecode
@@ -368,7 +371,7 @@ sudo dmidecode
 | {{Yes}}
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden [https://learn.microsoft.com/en-us/previous-versions/windows/hardware/design/dn653305(v=vs.85) SLIC table] <ref>
+| Hidden [https://learn.microsoft.com/en-us/previous-versions/windows/hardware/design/dn653305(v=vs.85) SLIC table] <ref>
 To check the SILC table, run.
 
 {{CodeSelect|code=
@@ -382,7 +385,7 @@ Inside the virtualizer and on the host. On the host there may or may not be not 
 | {{Yes}}, not present
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| HDD UUIDs are different from the host <ref>To check the HDD UUID, run.
+| HDD UUIDs are different from the host <ref>To check the HDD UUID, run.
 
 * Qubes: {{CodeSelect|code=
 sudo hdparm -i /dev/xvda
@@ -399,7 +402,7 @@ sudo hdparm -i /dev/vda
 | {{Yes}}
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| CD-ROM UUID is identical for all {{project_name_short}} users <ref>To check the CD-ROM UUID, run.
+| CD-ROM UUID is identical for all {{project_name_short}} users <ref>To check the CD-ROM UUID, run.
 
 {{CodeSelect|code=
 udisks --show-info /dev/cdrom
@@ -410,13 +413,13 @@ udisks --show-info /dev/cdrom
 | {{Yes}}
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden disk UUIDs <ref>Real hardware UUIDs are hidden by the virtualizer.</ref>
+| Hidden disk UUIDs <ref>Real hardware UUIDs are hidden by the virtualizer.</ref>
 | {{Yes}}
 | {{Yes}}
 | {{Yes}}
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| Hidden [https://en.wikipedia.org/wiki/Extended_Display_Identification_Data EDID] <ref>Virtualizers routinely hide extended display identification data.</ref>
+| Hidden [https://en.wikipedia.org/wiki/Extended_Display_Identification_Data EDID] <ref>Virtualizers routinely hide extended display identification data.</ref>
 | {{Yes}} <ref>See: [[#Qubes|Qubes EDID]].</ref>
 | {{Yes}} <ref>See: [[#VirtualBox|VirtualBox EDID]].</ref> <ref>
 * [https://www.virtualbox.org/ticket/10976 document all virtual hardware serial numbers implemented by VirtualBox]
@@ -425,19 +428,22 @@ udisks --show-info /dev/cdrom
 | {{Yes}} <ref>See: [[#KVM|KVM EDID]].</ref>
 |-
 
-| style="height: 27px;background-color: #f9f9f9"| See Also
+| See Also
 !colspan="3"| [[VM Fingerprinting]]
 |-
 
 |}
 
 {| class="wikitable"
-|-
-! scope="col"| '''Category'''
-! scope="col"| '''Description'''
+|+ MAC address
 |-
 
-! scope="row"| MAC address
+|-
+! '''Category'''
+! '''Description'''
+|-
+
+! MAC address
 | The [https://en.wikipedia.org/wiki/MAC_address MAC address] is different from the host. See also [[MAC Address]]. <ref>
 To check {{project_name_workstation_short}}'s MAC address, run.
 

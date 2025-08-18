@@ -94,19 +94,19 @@ Qubes feature request: [https://github.com/QubesOS/qubes-issues/issues/7586 docu
 {| class="wikitable"
 |+ ''Fingerprinting Domains''
 |-
-! scope="col"| '''Domain'''
-! scope="col"| '''Description'''
+! '''Domain'''
+! '''Description'''
 |-
 
-! scope="row"| Network Stack Hardening
+! Network Stack Hardening
 | {{project_name_short}} has implemented various [https://github.com/Kicksecure/security-misc security hardening] measures like disabling TCP timestamps, ICMP redirections, firewalling invalid packages, and more. Unfortunately these measures can increase the risk of ISP or Local Network fingerprinting. Despite this, security hardening has been prioritized.
 |-
 
-! scope="row"| Random ISN Generation
+! Random ISN Generation
 | {{project_name_short}} prevents [https://dl.acm.org/doi/10.1145/1180405.1180410 de-anonymization of Tor onion services] through [https://github.com/Kicksecure/tirdad Tirdad kernel module for random ISN generation]. De-anonymization resistance unfortunately reduces ISP or Local Network fingerprinting resistance. Despite this, resistance against de-anonymization has been prioritized.
 |-
 
-! scope="row"| Tor Enforcement
+! Tor Enforcement
 |
 {{project_name_short}} solely generates Tor activity on the network. All traffic from both the {{project_name_workstation_long}} (<code>{{project_name_workstation_template}}</code>) and {{project_name_gateway_long}} (<code>{{project_name_gateway_template}}</code>) such as TBB <ref name="tbb" />, updates, and sdwdate pass through Tor. Establishing an online connection is the task of the host, so the host <ref>In case of Default/Download version, it is the host's task to establish an online connection. In the case of [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]], it is the gateway's task to establish an online connection. </ref> is most likely using DHCP to obtain a local IP address. <br />
 
@@ -116,27 +116,27 @@ In contrast, usually TBB <ref name="tbb" /> users have additional network activi
 * A browser is also used on the host. <ref>This comes with the attendant risk of the user confusing one browser with another.</ref>
 |-
 
-! scope="row"| Tor Entry Guards
+! Tor Entry Guards
 | {{project_name_short}} uses an unmodified version of Tor, <ref>[[Tor#Does_{{project_name_short}}_Modify_Tor? | {{project_name_short}} uses an unmodified version of Tor]]</ref> so [[Tor_Entry_Guards|entry guards]] are used as the default mechanism to connect to the Tor network. <ref>https://support.torproject.org/#about_entry-guards</ref> Consequently, a Tor user will maintain the same relay as the first hop for an extended period, <ref>Typically the entry guards are rotated after a few months.</ref> which is a security feature.
 
 One addition which is unique to {{project_name_short}} is its Tor configuration <ref>https://github.com/{{project_name_short}}/anon-gw-anonymizer-config</ref> for the <code>Stream Isolation</code><ref>[[Stream Isolation]]</ref> security feature.
 |-
 
-! scope="row"| Time Synchronization
+! Time Synchronization
 | When {{project_name_short}} is started, the system clock is synchronized to make sure it slightly differs from the host clock via <code>[[sdwdate]]</code>. <ref>
 It is unknown if an ISP can detect whether a user has many different Tor circuits open. On the other hand, Tor seems to only open X entry guards and maintain them for a period, thus not opening as many entry guards as streams.
 </ref>
 |-
 
-! scope="row"| systemcheck
+! systemcheck
 | <code>[[systemcheck]]</code> also issues some network traffic over Tor to check for updates and [[Systemcheck#Warrant_Canary_Check|Warrant Canary Check]], which all passes through different circuits. Traffic passes through different circuits. This behavior might be specific to {{project_name_short}}.
 |-
 
-! scope="row"| [[Fingerprint#Website Traffic Fingerprinting|Website Traffic Fingerprinting]]
+! [[Fingerprint#Website Traffic Fingerprinting|Website Traffic Fingerprinting]]
 | Website traffic fingerprinting is also an open Tor research question, which is unspecific to {{project_name_short}}. <ref>See [https://2019.www.torproject.org/projects/torbrowser/design/ Tor Browser Design] for further exploration of this issue.</ref> A related and unresearched issue is whether fingerprinting risks also apply to other traffic, such as <code>apt</code> traffic.
 |-
 
-! scope="row"| [[Whonix-Host]]
+! [[Whonix-Host]]
 | Once Whonix-Host is available it will exclusively generate Tor traffic in the default configuration. <ref>
 [https://forums.whonix.org/t/should-whonix-host-be-fully-torified-by-default/7404 Should {{project_name_short}} host be fully torified by default?]
 </ref> This is very different from other operating systems, for example a Microsoft Windows host running Tor Browser.
