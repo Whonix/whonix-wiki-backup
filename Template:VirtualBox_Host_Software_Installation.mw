@@ -12,7 +12,7 @@
 |text=Download VirtualBox for Windows (FREE!)
 |os=windows
 |fontsize=18px
-|url=https://download.virtualbox.org/virtualbox/7.2.0/VirtualBox-7.2.0-170228-Win.exe
+|url=https://download.virtualbox.org/virtualbox/7.2.2/VirtualBox-7.2.2-170484-Win.exe
 }}
 
 <div class="toccolours mw-collapsible mw-collapsed" data-expandtext="Learn More" data-collapsetext="Show Less">
@@ -78,7 +78,7 @@ Select your hardware platform.
 |text=Download VirtualBox for macOS (Intel) (FREE!)
 |os=osx
 |fontsize=18px
-|url=https://download.virtualbox.org/virtualbox/7.2.0/VirtualBox-7.2.0-170228-OSX.dmg
+|url=https://download.virtualbox.org/virtualbox/7.2.2/VirtualBox-7.2.2-170484-OSX.dmg
 }} <!-- Intel-based Mac download link -->
 }} <!-- close tab: Intel-based MacBook -->
 
@@ -90,7 +90,7 @@ Select your hardware platform.
 |text=Download VirtualBox for macOS (Apple Silicon, M1, M2, ...) (FREE!)
 |os=osx
 |fontsize=18px
-|url=https://download.virtualbox.org/virtualbox/7.2.0/VirtualBox-7.2.0-170228-macOSArm64.dmg
+|url=https://download.virtualbox.org/virtualbox/7.2.2/VirtualBox-7.2.2-170484-macOSArm64.dmg
 }} <!-- Intel-based Mac download link -->
 
 {{mbox
@@ -121,7 +121,9 @@ See also Apple's official documentation [https://support.apple.com/en-us/HT20249
 |title= === Ubuntu ===
 |image=[[File:Logo-ubuntusvg.png|alt=Logo Ubuntu|50px]]
 |content=
-'''For Ubuntu host operating systems''' {{VirtualBox_Host_Software_Installation_Option
+'''For Ubuntu host operating systems'''
+
+{{VirtualBox_Host_Software_Installation_Option
 |who=Ubuntu users
 }}
 
@@ -158,7 +160,19 @@ sudo apt install --no-install-recommends {{{virtualbox_package_debian}}} linux-h
 sudo adduser $(whoami) vboxusers
 }}
 
-{{IconSet|h3|5}} '''Done.'''
+{{IconSet|h3|5}} '''Prevent KVM from conflicting with VirtualBox.'''
+
+This is necessary if your system uses Linux 6.12 or higher.
+
+{{CodeSelect|code=
+echo 'options kvm enable_virt_at_load=0' {{!}} sudo tee /etc/modprobe.d/disable-kvm-virt-at-load.conf
+}}
+
+{{IconSet|h3|6}} '''Reboot.'''
+
+To ensure KVM configuration takes effect.
+
+{{IconSet|h3|7}} '''Done.'''
 
 The procedure of installing the VirtualBox host software is complete.
 }} <!-- close tab : Ubuntu command line -->
@@ -185,7 +199,9 @@ The procedure of installing the VirtualBox host software is complete.
 |image=[[File:Kicksecure-logo-rectangle.svg|50px]]
 |content=
 {{Box|text=
-'''{{Kicksecure}} host operating systems''' {{VirtualBox_Host_Software_Installation_Option
+'''{{Kicksecure}} host operating systems'''
+
+{{VirtualBox_Host_Software_Installation_Option
 |who={{Kicksecure}} users
 }}
 
@@ -235,6 +251,7 @@ The procedure of installing the VirtualBox host software is complete.
 '''Hosts using a non-Debian operating system:'''
 
 * '''Install VirtualBox as per the normal mechanism for your Linux distribution'''. No special instructions for {{project_name_short}} are required. The installation of a recent VirtualBox host software is [[Unspecific|unspecific to {{project_name_short}}]]. Consult the documentation of your Linux distribution.
+* '''You may need to disable KVM's "enable virt at load" feature if your system uses kernel 6.12 or later.''' This will prevent KVM from taking over virtualization-related features on the system automatically. This will not prevent KVM virtual machines from being used. Add <code>kvm.enable_virt_on_load=0</code> to your system's kernel command line, or add <code>options kvm enable_virt_at_load=0</code> to your system's modprobe configuration, using the appropriate mechanism for your distribution.
 * {{project_name_short}} has has been tested with, expects VirtualBox version <code>{{{virtualbox_version}}}</code>.
 * For example the outdated VirtualBox version <code>5.2.18</code> is incompatible.
 }}

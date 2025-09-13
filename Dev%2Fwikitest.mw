@@ -22,6 +22,8 @@ This is the first line of the content text outside the intro template.
 
 == Anchor (Template) ==
 
+'''Invisible Anchor jump test'''
+
 Click the link below and it should jump to the "Jump point". There is the id "test-anchor-template"
 
 {{Anchor|test-anchor-template}}
@@ -30,6 +32,22 @@ Jump point
 Paragraph to jump over
 
 [[#test-anchor-template]]
+
+'''Visible Anchor'''
+
+{{Anchor|test-anchor-template2|show=true}}
+
+'''Visible Anchor with extra text'''
+
+{{Anchor|test-anchor-template3|show=true|text=My Overwrite Text}}
+
+'''Visible Anchor with text but no Id (error message expected)'''
+
+{{Anchor|show=true|text=My Overwrite Text}}
+
+'''Invisible Anchor with no Id (error message expected)'''
+
+{{Anchor}}
 
 == Blockquote & Quotation Tests ==
 
@@ -528,8 +546,8 @@ Different archive link tests, wrapped in div.info-box to prevent over-width on m
 * No text, icons=none, 1 url
 ** expected: url as text, url as main link, no icons
 ** {{ExtLink|icons=none|https://www.whonix.org}}
-* text, 6 urls (6th = onion)
-** expected: First url only used as main link, then icon links: 1x archive.org, 1x archive.today, 2x pseudo archives, 1x onion
+* text, 7 urls (6th = onion, 7th = GitHub)
+** expected: First url only used as main link, then icon links: 1x archive.org, 1x archive.today, 2x pseudo archives, 1x onion, 1x GitHub
 ** {{ExtLink
 |text=Main Link
 |https://www.kicksecure.com/
@@ -538,6 +556,7 @@ Different archive link tests, wrapped in div.info-box to prevent over-width on m
 |https://whonix.org/kicksecure-backup
 |https://whonix.org/kicksecure-backup2
 |http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/
+|https://github.com/Kicksecure/
 }}
 * text, 4 urls (second = onion) - typical (maximum!) use case
 ** expected: First url only used as main link, then icon links: 1x onion, 1x archive.org, 1x archive.today
@@ -558,6 +577,17 @@ Different archive link tests, wrapped in div.info-box to prevent over-width on m
 ** expected: url used for text and as main link and for first icon
 ** {{ExtLink
 |http://www.w5j6stm77zs6652pgsij4awcjeel3eco7kvipheu6mtr623eyyehj4yd.onion/
+}}
+* text, 1 GitHub url
+** expected: GitHub url used for main link and for first icon, icon is GitHub icon
+** {{ExtLink
+|text=Kicksecure GitHub link
+|https://github.com/Kicksecure/
+}}
+* no text, 1 GitHub url
+** expected: GitHub url used for text and as main link and for first icon, icon is GitHub icon
+** {{ExtLink
+|https://github.com/Kicksecure/
 }}
 </div>
 
@@ -601,15 +631,24 @@ File:Linuxkerneltux.png|thumb|100px|Linux logo
 
 == Github_link Template ==
 
-* <code><nowiki>{{Github_link|repo=tirdad}}</nowiki></code>
-** Expected: gituser set to {{project_name_short}}, text set to "Kicksecure GitHub tirdad repository"
-** Result: {{Github_link|repo=tirdad}}
-* <code><nowiki>{{Github_link|gituser=debian|repo=apt}}</nowiki></code>
-** Expected: gituser set to debian, text set to "debian GitHub apt repository"
-** Result: {{Github_link|gituser=debian|repo=apt}}
-* <code><nowiki>{{Github_link|repo=tirdad|text=Check out our tirdad repo!}}</nowiki></code>
-** Expected: gituser set to {{project_name_short}}, text set to "Check out our tirdad repo!"
-** Result: {{Github_link|repo=tirdad|text=Check out our tirdad repo!}}
+# <code><nowiki>{{Github_link|repo=tirdad}}</nowiki></code>
+#* Expected: gituser set to {{project_name_short}}, auto text set to "Kicksecure GitHub tirdad repository"
+#* Result: {{Github_link|repo=tirdad}}
+# <code><nowiki>{{Github_link}}</nowiki></code>
+#* Expected: gituser set to {{project_name_short}}, no repo, text set to "{{project_name_short}} GitHub"
+#* Result: {{Github_link}}
+# <code><nowiki>{{Github_link|gituser=debian|repo=apt}}</nowiki></code>
+#* Expected: gituser set to debian, auto text set to "debian GitHub apt repository"
+#* Result: {{Github_link|gituser=debian|repo=apt}}
+# <code><nowiki>{{Github_link|gituser=debian|repo=apt|path=/tree/main/test}}</nowiki></code>
+#* Expected: gituser set to debian, auto text set to "debian GitHub apt repository subpath"
+#* Result: {{Github_link|gituser=debian|repo=apt|path=/tree/main/test}}
+# <code><nowiki>{{Github_link|repo=tirdad|text=Check out our tirdad repo!}}</nowiki></code>
+#* Expected: gituser set to {{project_name_short}}, text set to "Check out our tirdad repo!"
+#* Result: {{Github_link|repo=tirdad|text=Check out our tirdad repo!}}
+# <code><nowiki>{{Github_link|path=/?q=apparmor&type=all&language=&sort=}}</nowiki></code>
+#* Expected: gituser set to {{project_name_short}}, auto text set to "{{project_name_short}} GitHub subpath"
+#* Result: {{Github_link|path=/?q=apparmor&type=all&language=&sort=}}
 
 == GoogleOff (Template) ==
 
@@ -733,6 +772,24 @@ Intro like text
 and newlines
 }}
 
+== Keypress template ==
+
+no key given
+
+{{Keypress}}
+
+1 key given
+
+{{Keypress|Ctrl}}
+
+2 keys given
+
+{{Keypress|Ctrl|Alt|Delete}}
+
+3 keys given, no 1 and no 2 as Links
+
+{{Keypress|[[Donate|Ctrl]]|[[Donate|Alt]]|Del}}
+
 == LeftRightImageText ==
 
 Left example, promo style
@@ -782,6 +839,18 @@ Box with icon and text test
 | text = My Text here
 }}
 
+Nested info box with ib-dark
+
+{{mbox
+| icon = fa-solid fa-info cs-red-light
+| text =
+{{mbox
+| icon = fa-solid fa-info cs-red-light
+| text = Nested box with ib-dark here
+| addToClass = ib-dark
+}}
+}}
+
 == Mini Modal ==
 
 Open MiniModal below by clicking this button
@@ -823,6 +892,33 @@ Below is a mininav with the class for 2 lines and with the special dark look cla
 * [[Download]]
 * [[Download]]
 </div>
+</div>
+
+Mininav with info paragraph
+
+<div class="mininav">
+This navigation is special
+* [[About]]
+* [[FAQ]]
+</div>
+
+Mininav with info paragraph and mn-dark
+
+<div class="mininav mn-dark">
+This navigation is special
+* [[About]]
+* [[FAQ]]
+</div>
+
+Mininav using (1) an external link and (2) a marked internal link
+
+<div class="mininav">
+* <hr> [[About]]
+* [[FAQ]]
+* {{whonix_wiki
+|wikipage=Comparison_with_Kicksecure
+|text=Comparison with Whonix
+}}
 </div>
 
 == PayViaPaypal ==
@@ -921,6 +1017,23 @@ Simple example, but strange optic = correct, because it needs to be in #siteNoti
 |html=<img class="icon" src="/w/images/0/0b/Grow-symbol.png" width="53" height="40" alt="grow symbol"><span>Want to help us grow?</span>
 }}
 
+== StyledText Template ==
+
+{{StyledText
+|Font Size 20px, color red, style ib
+|fontSize=20px
+|color=red
+|style=ib
+}}
+
+{{StyledText
+|Font Size 30px, addToClass cs-yellow-light, useDiv true, css text-align right
+|fontSize=30px
+|addToClass=cs-yellow-light
+|useDiv=true
+|css=text-align: right;
+}}
+
 == Subdomain Link ==
 
 Please test those links on the onion the Tor browser as well
@@ -956,13 +1069,21 @@ SVG without width or height
 
 {{SVG|Kicksecure-logo-rectangle.svg}}
 
-SVG with width 50
+SVG with width 100
 
-{{SVG|Kicksecure-logo-rectangle.svg|width=50}}
+{{SVG|Kicksecure-logo-rectangle.svg|width=100}}
+
+SVG with width 100 but as second anonymous parameter
+
+{{SVG|Kicksecure-logo-rectangle.svg|100}}
 
 SVG with height 50
 
 {{SVG|Kicksecure-logo-rectangle.svg|height=50}}
+
+SVG with 100px as second anonymous parameter and 80px as height parameter. No "px" should be in either the width or height attribute
+
+{{SVG|Kicksecure-logo-rectangle.svg|100px|height=80px}}
 
 == Tab Controller ==
 
@@ -999,7 +1120,7 @@ The second tab is selected (active)
 
 === Tab Controller NO selected tab Test ===
 
-No tab has the active parameter. Therefore no content should be shown
+No tab has the active parameter. Therefore no content and "Choose Tab" should be shown
 
 {{Tab
 |type=controller
@@ -1018,7 +1139,7 @@ No tab has the active parameter. Therefore no content should be shown
 
 === Tab Controller Link test ===
 
-All link tabs below (not Title 01 and Title 02) should be actual links for js users
+All link tabs below (not Title 01 and Title 02) should be actual links for js users. No "active" tab, "Choose tab" shown
 
 {{Tab
 |type=controller
@@ -1247,6 +1368,43 @@ For the tests to be succcessful
 }}
 }}
 
+== TableExpandModal and Button ==
+
+Small table : Expand button should be to the right of the table, NOT to the right of the content area
+
+{| class="wikitable"
+|+ short table
+! c1 !! c2 !! c3 !! c4
+|-
+| 11 || 22 || 33 || 44
+|}
+
+Small table without caption: No Expand button should be seen as tables without caption are considered content-incomplete and invalid
+
+{| class="wikitable"
+! c1 !! c2 !! c3 !! c4
+|-
+| 11 || 22 || 33 || 44
+|}
+
+normal table : Expand button should be to the right of the table which is also right of the content are
+
+{| class="wikitable"
+|+ Medium wide table
+! c1 !! c2 !! c3 !! c4
+|-
+| 11111111 1111111111111 1111111111 || 22222222222 222222222  || 333333333 33333333 333333 || 44444444444 444444444 4444444444
+|}
+
+overlength table : Expand button should be to the right of the table which is also right of the content are, NOT outside the content area
+
+{| class="wikitable"
+|+ Overwide table
+! c1 !! c2 !! c3 !! c4
+|-
+| <pre>1111111111111111111111111111111111111</pre> || <pre>222222222222222222222222222222222222222</pre>  || <pre>3333333333333333333333333333333333333333333333333333333</pre> || <pre>444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444</pre>
+|}
+
 == ThumbGallery (Template) ==
 
 Below a thumb gallery with 3 thumb images. Normal mode, so it only changes to gallery mode below 540px screen width
@@ -1304,6 +1462,20 @@ Video should be available on all 3 given platforms (click icons)
 Video style subtle
 
 {{VideoLink|style=subtle|videoid=6nHufztdkUI|text=Test video}}
+
+== Vspacer template ==
+
+'''30px space between the text'''
+
+test1
+{{Vspacer|30}}
+/test1
+
+'''0px space, but also -21 margin (overlapping)'''
+
+test2
+{{Vspacer|vmargin=-21}}
+/test2
 
 = CSS features =
 
