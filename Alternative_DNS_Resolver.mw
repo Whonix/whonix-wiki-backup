@@ -1,52 +1,58 @@
 {{Header}}
+{{title|title=
+Alternative DNS Resolver
+}}
 {{#seo:
 |description=Authenticated/Encrypted DNS over Tor, DNSSEC over Tor, DNSCrypt by OpenDNS, httpsdnsd by JonDos
 |image=Connect-20333640.jpg
 }}
-[[File:Connect-20333640.jpg|thumb]]
+[[File:Connect-20333640.jpg|thumb|200px]]
 {{intro|
 Authenticated/Encrypted DNS over Tor, DNSSEC over Tor, DNSCrypt by OpenDNS, httpsdnsd by JonDos
 }}
 = Introduction =
-By {{project_name_long}} default, Tor is used for DNS resolution. If you suspect a Tor exit relay to tamper with DNS, you can get a second opinion from another non-Tor DNS server. This may also be useful, in special cases if you want to resolve types of DNS over Tor, which are unsupported by Tor itself, such as MX <ref>
+By {{project_name_long}} default, Tor is used for DNS resolution. If you suspect a Tor exit relay of tampering with DNS, you can get a second opinion from another non-Tor DNS server. This may also be useful in special cases if you want to resolve DNS record types over Tor that are unsupported by Tor itself, such as MX <ref>
 Was required for some Mixmaster servers over Tor when Mixmaster was still available.
-</ref>, SRV or DNSSEC. <ref>
+</ref>, SRV, or DNSSEC. <ref>
 * https://gitlab.torproject.org/tpo/core/tor/-/issues/7829
 * Tor feature request: [https://gitlab.torproject.org/tpo/core/tor/-/issues/34004 Support for full DNS and DNSSEC resolution]
 * Some Tor exit relays provide DNSSEC? https://docs.pi-hole.net/guides/misc/tor/dnssec/
 </ref>
 
-It is recommended against to use non-Tor DNS resolvers for an extended amount of time. Although it is technically possible to completely replace DNS resolution (not using Tor for DNS resolution anymore), it is recommended against. That would add too much power to a single DNS server. Using a permanent DNS server is recommended against just as using a permanent Tor exit relay is recommended against.
+It is recommended against to use non-Tor DNS resolvers for an extended period. Although it is technically possible to completely replace DNS resolution (not using Tor for DNS resolution at all), this is discouraged. Doing so would grant too much power to a single DNS server. Using a permanent DNS server is discouraged for the same reason as using a permanent Tor exit relay is discouraged.
 
-Note, that even if you correctly set up all settings, it might happen that this won't work. Sometimes Tor or the DNS server causes a timeout. This gets even worse, when you additionally tunnel the DNS request through an additional proxy (for example: Tor &rarr; JonDonym &rarr; DNS server).
+Note that even if you correctly configure everything, it might still fail. Sometimes Tor or the DNS server causes a timeout. This becomes even worse when the DNS request is tunneled through an additional proxy (for example: Tor &rarr; JonDonym &rarr; DNS server).
 
 Read first: [[Stream Isolation]].
 
 Required knowledge:
 
 * Difference between encryption and authentication.
-* {{TorifiedGateway}} (<-- read the footnotes)
+* {{TorifiedGateway}}
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
 | text    =
-Note that most applications, such as [[Tor Browser]], will '''not''' ''automatically'' profit from setting up an alternative DNS resolver.
+Note that most applications, such as [[Tor Browser]], will '''not''' ''automatically'' benefit from setting up an alternative DNS resolver.
 
-* This is because applications in {{project_name_short}} are configured to use <code>SocksPort</code> instead of <code>Trans</code>- or <code>DnsPort</code>, see [[Stream Isolation]] for details.
-* Another reason is, that many applications do not yet make use of authenticated DNS (DNSSEC).
+* This is because applications in {{project_name_short}} are configured to use <code>SocksPort</code> instead of <code>Trans</code>- or <code>DnsPort</code>. See [[Stream Isolation]] for details.
+* Another reason is that many applications do not yet support authenticated DNS (DNSSEC).
 
-However, you could use alternative DNS revolvers with these applications when [[Stream_Isolation/Disable_Easy|deconfiguring]] socks proxy settings.
+However, you can use alternative DNS resolvers with these applications when [[Stream_Isolation/Disable_Easy|deconfiguring]] socks proxy settings.
 }}
 
-For example, Tor Browser would be unaffected by these changes alone. In theory, a user that intended to change Tor Browser DNS settings would have to enable transparent proxying in Tor Browser which however is discouraged as this changes the web [[fingerprint]].
+For example, Tor Browser would be unaffected by these changes alone. In theory, a user who wanted to change Tor Browser DNS settings would have to enable transparent proxying in Tor Browser, which is discouraged as it alters the web [[fingerprint]].
 
 '''Advanced users only!'''
 
 = Recursive Authenticated DNSSEC over Tor =
 == Introduction ==
-DNSSEC aware, <u>DNSSEC validating</u>, recursive DNS resolution over TCP, over Tor using <code>Unbound</code>. <u>Unencypted</u>, because [https://en.wikipedia.org/wiki/Root_name_server Root name servers] [https://root-servers.org/media/news/Statement_on_DNS_Encryption.pdf do not support encryption yet], there is a [https://www.kicksecure.com/wiki/DNS_Security#DNS_Security_Optimization_Problem DNS Security Optimization Problem].
+DNSSEC-aware, <u>DNSSEC validating</u>, recursive DNS resolution over TCP, over Tor using <code>Unbound</code>. <u>Unencrypted</u>, because [https://en.wikipedia.org/wiki/Root_name_server Root name servers] [https://root-servers.org/media/news/Statement_on_DNS_Encryption.pdf do not support encryption yet]. There is a {{kicksecure_wiki
+|wikipage=DNS_Security#DNS_Security_Optimization_Problem
+|text=DNS Security Optimization Problem
+}}.
 
-These instructions completely replace Tor's DNS resolver the whole {{Project_name_workstation_long}}. Not recommended for a longer amount of time, see warning above.
+These instructions completely replace Tor's DNS resolver on the whole {{Project_name_workstation_long}}. Not recommended for long-term use, see the warning above.
 
 == Installation ==
 Everything inside {{project_name_workstation_long}}.
@@ -77,7 +83,7 @@ server:
 ## Please use search engines, see unbound documentation,
 ## find out how to fix this and improve this documentation!
 ##
-## Optional to leave resolving onion to Tor.
+## Optional: leave resolving onion to Tor.
 ## Feel free to comment the following 4 lines out,
 ## but this would break onion resolving since unbound
 ## cannot resolve '.onion' domains.
@@ -97,17 +103,20 @@ dnssec-trigger
 
 '''6.''' Done.
 
-'''7.''' [https://www.kicksecure.com/wiki/DNS_Security#Testing_DNSSEC Testing DNSSEC]
+'''7.''' {{kicksecure_wiki
+|wikipage=DNS_Security#Testing_DNSSEC
+|text=Testing DNSSEC
+}}
 
 = DNSCrypt =
 == Introduction ==
-DNSCrypt supports encryption, DNSSEC but [https://github.com/DNSCrypt/dnscrypt-proxy/discussions/1954 DNSCrypt does not validate DNSSEC signatures yet]. <ref>
+DNSCrypt supports encryption and DNSSEC but [https://github.com/DNSCrypt/dnscrypt-proxy/discussions/1954 DNSCrypt does not validate DNSSEC signatures yet]. <ref>
 Quote https://github.com/DNSCrypt/dnscrypt-proxy/issues/167#issuecomment-367689381
 
 <blockquote>dnscrypt-proxy doesn't validate dnssec signatures yet :)</blockquote>
 </ref>
 
-These instructions completely replace Tor's DNS resolver with a dnscrypt-enabled resolver for all users and the whole {{Project_name_workstation_long}}. Not recommended for a longer amount of time, see warning above.
+These instructions completely replace Tor's DNS resolver with a DNSCrypt-enabled resolver for all users and the whole {{Project_name_workstation_long}}. Not recommended for long-term use, see the warning above.
 
 == Installation ==
 Apply all instructions inside your {{project_name_workstation_short}}.
@@ -124,11 +133,11 @@ dnscrypt-proxy
 /etc/dnscrypt-proxy/dnscrypt-proxy.toml
 }}
 
-Add the following text <u>at the very top of the file</u>. Note: The default server did not work for the author of this page. Therefore the following instructions advice to comment that server out and add a random alternative server was chosen which worked. <ref>Test was done using:
+Add the following text <u>at the very top of the file</u>. Note: The default server did not work for the author of this page. Therefore, the following instructions advise commenting that server out and adding a random alternative server that worked. <ref>Test was done using:
 {{CodeSelect|code=
 dig +dnssec google.com
 }}
-</ref> This is not an endorsement or non-endorsement of any server. Pick your own server. DNSCrypt publishes a list of servers [https://dnscrypt.info/public-servers/ here].
+</ref> This is not an endorsement or rejection of any server. Pick your own server. DNSCrypt publishes a list of servers [https://dnscrypt.info/public-servers/ here].
 
 {{CodeSelect|code=
 force_tcp = true
@@ -144,7 +153,7 @@ Comment out:
 server_names = ['cloudflare']
 }}
 
-In other words, rewrite <code>server_names = ['cloudflare']</code> to <code>#server_names = ['cloudflare']</code> by adding a hash <code>#</code> in front of it. So it would look like this.
+In other words, rewrite <code>server_names = ['cloudflare']</code> to <code>#server_names = ['cloudflare']</code> by adding a hash <code>#</code> in front of it. So it would look like this:
 
 {{CodeSelect|code=
 #server_names = ['cloudflare']
@@ -169,7 +178,7 @@ sudo systemctl restart dnscrypt-proxy.socket
 }}
 
 4) Comment out everything and add <ref>
-<code>options use-vc</code> is optional as in it also works without it.
+<code>options use-vc</code> is optional, as it also works without it.
 </ref> (It is <u>not</u> <code>127.0.0.1</code>. It really is <code>127.0.'''2'''.1</code>.):
 
 {{CodeSelect|code=
@@ -199,21 +208,21 @@ Test again. Now it is expected to work.
 
 == FAQ ==
 === Why not Use DNSCrypt by Default in {{project_name_short}}? ===
-[https://dnscrypt.info/ DNSCrypt] may have good use cases for clearnet activities. However, it is not useful in {{project_name_short}} and therefore should not be installed and activated by default for everyone. Although some users may have high expectations, DNSCrypt does not magically solve all DNS-related security issues, nor does it implement end-to-end DNS encryption to the destination server. <ref>Conceptually, end-end DNS encryption is illogical. If the IP address of the destination server was known in advance, then DNS would not be required in the first place.</ref> Most important of all, the server will still see all DNS requests in cleartext. <ref>https://security.stackexchange.com/questions/162601/what-are-the-privacy-advantages-of-a-dns-encryption-service-such-as-dnscrypt</ref>
+[https://dnscrypt.info/ DNSCrypt] may have good use cases for clearnet activities. However, it is not useful in {{project_name_short}} and therefore should not be installed or activated by default. Although some users may have high expectations, DNSCrypt does not magically solve all DNS-related security issues, nor does it implement end-to-end DNS encryption to the destination server. <ref>Conceptually, end-to-end DNS encryption is illogical. If the IP address of the destination server was already known, then DNS would not be required in the first place.</ref> Most importantly, the server will still see all DNS requests in cleartext. <ref>https://security.stackexchange.com/questions/162601/what-are-the-privacy-advantages-of-a-dns-encryption-service-such-as-dnscrypt</ref>
 
-There are several other reasons why DNSCrypt is not activated by default. Firstly, Tor distributes trust because the DNS server changes as circuits are rotated. For pre-installed applications, circuits are also stream-isolated and change every ten minutes by default. Notably, in early 2018 there are [https://github.com/DNSCrypt/dnscrypt-resolvers/blob/0449410030b784334c53006cf043ccba911fb88b/v1/dnscrypt-resolvers.csv 78 open resolvers] that support the protocol.
+There are several other reasons why DNSCrypt is not activated by default. Firstly, Tor distributes trust because the DNS server changes as circuits are rotated. For pre-installed applications, circuits are also stream-isolated and change every ten minutes by default. Notably, in early 2018 there were [https://github.com/DNSCrypt/dnscrypt-resolvers/blob/0449410030b784334c53006cf043ccba911fb88b/v1/dnscrypt-resolvers.csv 78 open resolvers] that supported the protocol.
 
-Public resolvers supporting DNSCrypt have not yet acted in a way to cause mistrust. However, even if the operators were absolutely trustworthy, complete confidence is also needed in their servers - it is unwise to let the DNS security for all {{project_name_short}} users depend on a few servers. Another consideration is load balancing. If {{project_name_short}} relied upon a DNSCrypt supporting server by default, DNS would break for all users if that server ever decided to forbid connections from the Tor network <ref>Due to the Tor network abuse such as DDOS attacks on their servers.</ref> or if the servers went down for maintenance.
+Public resolvers supporting DNSCrypt have not yet acted in a way that caused mistrust. However, even if the operators were absolutely trustworthy, complete confidence is also needed in their servers. It is unwise to let the DNS security for all {{project_name_short}} users depend on a few servers. Another consideration is load balancing. If {{project_name_short}} relied upon a DNSCrypt-supporting server by default, DNS would break for all users if that server ever decided to forbid connections from the Tor network <ref>Due to Tor network abuse such as DDOS attacks on their servers.</ref> or if the servers went down for maintenance.
 
-Would result in a unique [[Fingerprint#Visited_Websites|web fingerprint]], i.e. visited websites can distinguish {{project_name_short}} users using DNSCrypt from other Tor users using Tor to resolve DNS.
+This would result in a unique [[Fingerprint#Visited_Websites|web fingerprint]], i.e. visited websites could distinguish {{project_name_short}} users using DNSCrypt from other Tor users relying on Tor for DNS resolution.
 
 === Can I Use DNSCrypt on the Host or Router for Clearnet? ===
 This configuration is possible; read the next section before proceeding.
 
 === Does DNSCrypt on the Host or Router Harm Anonymity when Using Tor / {{project_name_short}}? ===
-The short answer to this question is no. The longer answer is DNSCrypt on the host or in the router only affects clearnet activities. Tor assumes in advance that a user's local network and ISP are completely unsafe and untrustworthy. Tor and {{project_name_short}} are unaffected by DNS settings that are made on the host or in the router.
+The short answer is no. The longer answer is that DNSCrypt on the host or in the router only affects clearnet activities. Tor assumes in advance that a user's local network and ISP are completely unsafe and untrustworthy. Tor and {{project_name_short}} are unaffected by DNS settings made on the host or in the router.
 
-It is debatable whether DNSCrypt is useful or not for clearnet activities since there are various pros and cons. It is useful when using foreign or untrusted Wi-Fi networks that are shared with others, since DNS requests could potentially be modified or read. That said, trust is just shifted from the ISP to a DNSCrypt-supporting DNS server, such as OpenDNS. If the DNS server supporting DNSCrypt leaks a user's network address and/or logs queries as part of their business model, then it might actually be worse than using the ISP! It is hard to mount an argument for which party is more trustworthy, the ISP or a third party provider.
+It is debatable whether DNSCrypt is useful or not for clearnet activities, since there are various pros and cons. It is useful when using foreign or untrusted Wi-Fi networks shared with others, since DNS requests could potentially be modified or read. That said, trust is simply shifted from the ISP to a DNSCrypt-supporting DNS server, such as OpenDNS. If the DNS server supporting DNSCrypt leaks a user's network address and/or logs queries as part of their business model, then it might actually be worse than using the ISP. It is hard to argue which party is more trustworthy, the ISP or a third-party provider.
 
 = Footnotes =
 {{reflist|close=1}}
