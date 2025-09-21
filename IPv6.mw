@@ -5,42 +5,69 @@ IPv6 support in {{project_name_long}}
 {{#seo:
 |description=Enabling and using IPv6 in {{project_name_short}}.
 }}
+<div class="mininav">
+* [[IPv6|IPv6 - User Documentation]]
+* [[Dev/ipv6|IPv6 - Developers]]
+</div>
 {{intro|
 Enabling and using IPv6 in {{project_name_short}}.
 }}
 
 = Introduction =
-* <u>Protocol overview:</u> IPv6 is a general-purpose Internet communication protocol. Similar to IPv4, it allows two computers on a network (or over the Internet) to locate each other and send binary data back and forth.
-* <u>Main advantage:</u> IPv6 provides vastly more available IP addresses compared to IPv4.
-* <u>Adoption issues:</u> Many networks do not support IPv6 at all; some networks only support IPv6; and many networks support both.
+
+* <u>Protocol overview:</u> IPv6 is the newer version of the Internet's addressing system. Like the older IPv4, it helps devices find and talk to each other over a network or the Internet.
+* <u>Main advantage:</u> IPv6 offers many more unique addresses than IPv4, which helps solve the problem of running out of IP addresses.
+* <u>Adoption issues:</u> Some networks still only support IPv4. Others support both IPv4 and IPv6. A few newer networks only support IPv6, which can cause connection problems for older systems or software that don’t support IPv6.
 
 = Whonix IPv6 Status =
-* <u>{{project_name_short}} 17 and below:</u> Limited IPv6 support.
-* <u>{{project_name_short}} 18 and higher:</u> Fully supports IPv6.
+
+* <u>{{project_name_short}} 17 and below:</u> Only partial support for IPv6.
+* <u>{{project_name_short}} 18 and higher:</u> Full IPv6 support built in.
 
 = Support in {{project_name_short}} =
 
-{{project_name_short}} 17 has limited support for IPv6:
+'''In {{project_name_short}} 17 (older version):'''
 
-* <u>{{project_name_short}} 17: Tor Browser access:</u> {{project_name_workstation_short}} can reach websites and services via IPv6 with Tor Browser.
-* <u>{{project_name_short}} 17: Workstation to Gateway communication:</u> Communication between {{project_name_workstation_short}} and {{project_name_gateway_short}} occurs over IPv4 only.
-* <u>{{project_name_short}} 17: Gateway to Tor network:</u> {{project_name_gateway_short}} can only communicate with the Tor network via IPv4. IPv6 is completely disabled. (This does not prevent {{project_name_workstation_short}} from accessing IPv6 services because Tor can tunnel IPv6 connections.)
-* <u>{{project_name_short}} 17: Command-line utilities:</u> Tools in {{project_name_workstation_short}} generally do not support connecting to IPv6 services without workarounds.
+* <u>Tor Browser access:</u> Websites and services that use IPv6 can be reached with Tor Browser from {{project_name_workstation_short}}.
+* <u>Workstation to Gateway communication:</u> The connection between {{project_name_workstation_short}} and {{project_name_gateway_short}} still uses IPv4 only.
+* <u>Gateway to Tor network:</u> {{project_name_gateway_short}} connects to the Tor network using only IPv4. IPv6 is completely disabled here. However, Tor can still access IPv6 websites by tunneling through the IPv4 network.
+* <u>Command-line utilities:</u> Most tools used in the terminal on {{project_name_workstation_short}} don’t work with IPv6 unless special workarounds are used.
 
-{{project_name_short}} 18 features significantly improved IPv6 support:
+'''In {{project_name_short}} 18 (newer version):'''
 
-* <u>{{project_name_short}} 18: Tor Browser access:</u> {{project_name_workstation_short}} can reach websites and services via IPv6 with Tor Browser.
-* <u>{{project_name_short}} 18: Workstation to Gateway communication:</u> Communication between {{project_name_workstation_short}} and {{project_name_gateway_short}} occurs over IPv4 by default, but applications in {{project_name_workstation_short}} can use IPv6 to connect to the Tor instance running in {{project_name_gateway_short}}.
-* <u>{{project_name_short}} 18: Gateway to Tor network:</u> {{project_name_gateway_short}} can communicate with the Tor network via either IPv4 or IPv6. IPv4 is preferred, but if Tor is configured to use IPv6 only, or if the network does not support IPv4, {{project_name_gateway_short}} will use IPv6 to connect to the Tor network. This requires that the virtualizer in use supports IPv6 NAT and autoconfiguration.
-* <u>{{project_name_short}} 18: Command-line utilities:</u> In {{project_name_workstation_short}}, <code>curl</code> can connect to IPv6 services transparently. Other command-line utilities may require workarounds to connect to IPv6 services.
+* <u>Tor Browser access:</u> Websites and services that use IPv6 can be accessed without issues from {{project_name_workstation_short}}.
+* <u>Workstation to Gateway communication:</u> Still uses IPv4 by default, but applications inside {{project_name_workstation_short}} can connect to {{project_name_gateway_short}} over IPv6 to access Tor.
+* <u>Gateway to Tor network:</u> {{project_name_gateway_short}} can use either IPv4 or IPv6 to reach the Tor network. It prefers IPv4, but will use IPv6 if configured that way or if IPv4 isn't available. This only works if your virtualization software supports IPv6 NAT and autoconfiguration.
+* <u>Command-line utilities:</u> Tools like <code>curl</code> in {{project_name_workstation_short}} can access IPv6 sites without extra setup. Other tools may still need manual configuration or workarounds.
+
+= Host Networking IPv4 versus IPv6 Connectivity Status =
+
+Not sure if your Internet connection supports IPv6, IPv4, or both? Use the following websites to check.
+
+<u>Notes:</u>
+
+* <u>Run tests on host:</u> You must visit these websites on the host operating system (not inside {{project_name_short}}).
+* <u>Link disclaimer:</u> [[Terms_of_Service#Links_To_Other_Web_Sites|These links]] are [[Terms_of_Service#Non-Endorsement|not endorsements]]. They are only examples. Many similar test websites exist.
+
+* <u>Tests overview:</u>
+** <u>Normal Test:</u> Checks if your connection supports both IPv4 and IPv6.
+** <u>IPv4 only Test:</u> If this doesn't work, it may mean your network only supports IPv6, or something is misconfigured.
+** <u>IPv6 only Test:</u> If this doesn't work, that’s usually okay.
+
+* <u>Example test websites:</u>
+** ip6.me
+*** [https://ip6.me/ ip6.me: Normal Test]
+*** [https://ip4.me/ ip6.me: IPv4 only Test]
+*** [https://ip6only.me/ ip6.me: IPv6 only Test]
+** [https://test-ipv6.com test-ipv6.com]: Provides a detailed test of IPv4 and IPv6 connectivity.
 
 = Enabling IPv6 support in virtualizers =
+
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
 | text    =
-<u>Version-specific notice:</u> These instructions are intended for {{project_name_short}} 18 and higher only.
-
-Following them with {{project_name_short}} 17 VMs will either have no useful effect, or may break networking.
+<u>Version-specific notice:</u> These instructions are for {{project_name_short}} 18 or later only.
+Trying this on {{project_name_short}} 17 won't work, and might break networking.
 }}
 
 {{mbox
@@ -48,51 +75,56 @@ Following them with {{project_name_short}} 17 VMs will either have no useful eff
 | text    = <u>Platform specific notice.</u> Not all virtualizers supported by {{project_name_short}} will allow {{project_name_gateway_short}} to configure IPv6 routing automatically. If the virtualizer does not properly support IPv6, {{project_name_gateway_short}} will only be able to communicate to the Tor network via IPv4. This will block connectivity for users on IPv6-only networks.
 }}
 
-The following instructions can be used to enable proper IPv6 support for each virtualizer supported by {{project_name_short}}.
+The steps below explain how to enable IPv6 support in each virtualization platform supported by {{project_name_short}}.
 
 == VirtualBox ==
 
-* <u>Versions prior to 7.1:</u> Did not support IPv6 NAT at all. Only IPv4 connectivity was possible when using a NAT network.
-** <u>Workaround before 7.1:</u> Reconfiguring {{project_name_gateway_short}} to use a bridged network could enable IPv6, but this exposes {{project_name_gateway_short}} to the local network and increases its attack surface. This approach is not recommended.
-* <u>Versions 7.1 and higher:</u> Support IPv6 NAT out of the box. No special steps are required for IPv6 to work.
-** <u>Confirmed working:</u> Verified to function correctly in VirtualBox 7.2.2.
+* <u>Versions before 7.1:</u> Do not support IPv6 NAT. Only IPv4 connections work when using NAT.
+** <u>Workaround before 7.1:</u> You could try switching {{project_name_gateway_short}} to a bridged network to allow IPv6. But this exposes it to your local network and increases risk. Not recommended.
+* <u>Versions 7.1 and later:</u> IPv6 NAT works by default. No changes needed.
+** <u>Confirmed working:</u> IPv6 has been successfully tested with VirtualBox 7.2.2.
 
 == libvirt (KVM) ==
-libvirt has supported IPv6 NAT since version 6.5.0. <ref>https://libvirt.org/news.html#v6-5-0-2020-07-03</ref> To determine the version of libvirt your host system has installed, run:
+
+libvirt supports IPv6 NAT starting with version 6.5.0. <ref>https://libvirt.org/news.html#v6-5-0-2020-07-03</ref>
+
+To check your installed libvirt version:
 
 {{CodeSelect|code=
 virsh --version
 }}
 
-With {{project_name_short}} 18's default network configuration, '''IPv6 autoconfiguration will not work out of the box.''' This is because {{project_name_short}} disables the use of <code>dnsmasq</code> on the host system for {{project_name_short}} VMs. This reduces the host's attack surface. <ref>https://forums.whonix.org/t/whonix-kvm-dnsmasq-listen-port-on-host-operating-system-attack-surface-reduction/15973</ref> However, <code>dnsmasq</code> is responsible for sending the router advertisement messages that allow IPv6 autoconfiguration to work, so disabling it also breaks IPv6 Internet connectivity in {{project_name_gateway_short}}.
+However, by default, IPv6 autoconfiguration does **not** work in {{project_name_short}} 18. This is because {{project_name_short}} disables the use of <code>dnsmasq</code> on the host for {{project_name_short}} VMs. This improves security by reducing the risk of attacks from VMs to the host. <ref>https://forums.whonix.org/t/whonix-kvm-dnsmasq-listen-port-on-host-operating-system-attack-surface-reduction/15973</ref>
 
-To enable <code>dnsmasq</code> for the {{project_name_short}} VMs:
+But disabling <code>dnsmasq</code> also prevents IPv6 autoconfiguration from working. <code>dnsmasq</code> is the tool that sends the “router advertisement” signals needed to automatically set up IPv6 in {{project_name_gateway_short}}.
+
+To fix this, you can re-enable <code>dnsmasq</code> for {{project_name_short}}'s virtual networks by following these steps:
 
 {{Box|text=
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    = These instructions will increase the host system's attack surface, increasing the ability for a compromised VM or unrelated compromised devices on the local network to attack the host. Carefully consider your threat model before following these instructions.
+| text    = These changes will make the host more vulnerable to attacks from compromised VMs or other devices on your local network. Carefully consider your threat model before following these instructions.
 }}
 
-'''1.''' Ensure <code>dnsmasq-base</code> (or the equivalent package for your host system's distribution) is installed on the host.
+'''1.''' Make sure <code>dnsmasq-base</code> (or the equivalent package for your host operating system) is installed.
 
-'''2.''' Open virt-manager ("Virtual Machine Manager") on the host system.
+'''2.''' Launch "Virtual Machine Manager" (<code>virt-manager</code>) on the host.
 
 '''3.''' Click <code>Edit</code> &rarr; <code>Preferences</code>.
 
-'''4.''' Check the <code>Enable XML editing</code> box.
+'''4.''' Enable <code>Enable XML editing</code> by checking the box.
 
 '''5.''' Click <code>Close</code>.
 
 '''6.''' Click <code>Edit</code> &rarr; <code>Connection Details</code>.
 
-'''7.''' Click the <code>Virtual Networks</code> tab.
+'''7.''' Go to the <code>Virtual Networks</code> tab.
 
-'''8.''' Click the <code>{{project_name_short}}-External</code> network.
+'''8.''' Select the <code>{{project_name_short}}-External</code> network.
 
 '''9.''' In the settings viewer on the right side of the connection details window, click the <code>XML</code> tab.
 
-'''10.''' Remove the following line:
+'''10.''' Remove this line:
 
 {{CodeSelect|code=
 <dns enable="no"/>
@@ -104,9 +136,9 @@ To enable <code>dnsmasq</code> for the {{project_name_short}} VMs:
 
 '''13.''' Click the <code>Start Network</code> button underneath the connection details window's left sidebar. (This button is the second button from the left.)
 
-'''14.''' Click the <code>{{project_name_short}}-Internal</code> network.
+'''14.''' Select the <code>{{project_name_short}}-Internal</code> network.
 
-'''15.''' Remove the following line:
+'''15.''' Remove the same line again:
 
 {{CodeSelect|code=
 <dns enable="no"/>
@@ -114,11 +146,11 @@ To enable <code>dnsmasq</code> for the {{project_name_short}} VMs:
 
 '''16.''' Click <code>Apply</code>.
 
-'''17.''' Click the <code>Stop Network</code> button underneath the connection details window's left sidebar.
+'''17.''' Stop this network too.
 
-'''18.''' Click the <code>Start Network</code> button underneath the connection details window's left sidebar.
+'''18.''' Start it again.
 
-'''19.''' Fully shut down both the {{project_name_gateway_short}} and {{project_name_workstation_short}} virtual machines, then restart them.
+'''19.''' Fully shut down and restart both the {{project_name_gateway_short}} and {{project_name_workstation_short}} VMs.
 
 '''20.''' Done.
 
@@ -126,7 +158,8 @@ IPv6 autoconfiguration should now work in libvirt.
 }}
 
 == Qubes OS ==
-IPv6 is supported by Qubes OS, but is disabled by default. To enable it, follow the steps outlined in the [https://doc.qubes-os.org/en/latest/developer/system/networking.html#ipv6 Qubes OS networking documentation].
+
+Qubes OS does support IPv6, but it is turned off by default. To turn it on, follow the guide in the [https://doc.qubes-os.org/en/latest/developer/system/networking.html#ipv6 Qubes OS networking documentation].
 
 = Footnotes =
 {{reflist|close=1}}
