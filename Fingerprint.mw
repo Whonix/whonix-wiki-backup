@@ -46,12 +46,11 @@ The {{project_name_short}} Fingerprint wiki page is forked from the Tails Finger
 
 In this chapter, the term ''fingerprint'' refers to the specific way {{project_name_short}} behaves on the Internet. Those specificities could be used to determine whether a particular user is running {{project_name_short}} or not.
 
-As explained on the [[Warning]] page, the default {{project_name_short}} configuration does not hide Tor use from network observers. However, the {{project_name_short}} design attempts to make {{project_name_short}} users indistinguishable from the rest of the Tor population, particularly Tor Browser (TB) <ref name="tbb" /> users. If {{project_name_short}} and TBB <ref name=tbb>TBB stands for [https://www.torproject.org/download/ Tor Browser Bundle]. It is included in {{project_name_short}}, see [[Tor Browser]].</ref> users have distinct fingerprints, then this information significantly degrades anonymity because the {{project_name_short}} user base is far smaller than the broader Tor population. <ref>Certainly less than 50,000 users, although [https://phabricator.whonix.org/T689 an exact figure] is yet to be published.</ref>
+As explained on the [[Warning]] page, the default {{project_name_short}} configuration does not [[Hide Tor from your Internet Service Provider|hide Tor use from network observers]]. However, the {{project_name_short}} design attempts to make {{project_name_short}} users indistinguishable from the rest of the Tor population, particularly [[Tor Browser]] (TB or TBB) users have distinct fingerprints, then this information significantly degrades anonymity because the {{project_name_short}} user base is far smaller than the broader Tor population.
 
 This section briefly addresses possible {{project_name_short}} fingerprinting issues and how adversaries might use this information to verify {{project_name_short}} is in use.
 
 {{Anchor|web fingerprint}}
-
 {{Anchor|web_fingerprint}}
 
 = Fingerprinting Information =
@@ -62,7 +61,7 @@ This section briefly addresses possible {{project_name_short}} fingerprinting is
 | text    = '''Tip:''' A unique fingerprint makes the user [[Tips_on_Remaining_Anonymous#Study:_Anonymity_and_Pseudonymity_are_not_the_same|pseudonymous rather than anonymous]].
 }}
 
-Various types of information can be leaked about the user's browser, (host) operating system and hardware depending on the external party in question.
+Various types of information can be leaked about the user's browser, (host) {{os}} and hardware depending on the external party in question.
 
 == Entry Guards or Bridges ==
 
@@ -108,9 +107,11 @@ Qubes feature request: [https://github.com/QubesOS/qubes-issues/issues/7586 docu
 
 ! Tor Enforcement
 |
-{{project_name_short}} solely generates Tor activity on the network. All traffic from both the {{project_name_workstation_long}} (<code>{{project_name_workstation_template}}</code>) and {{project_name_gateway_long}} (<code>{{project_name_gateway_template}}</code>) such as TBB <ref name="tbb" />, updates, and sdwdate pass through Tor. Establishing an online connection is the task of the host, so the host <ref>In case of Default/Download version, it is the host's task to establish an online connection. In the case of [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]], it is the gateway's task to establish an online connection. </ref> is most likely using DHCP to obtain a local IP address. <br />
+{{project_name_short}} solely generates Tor activity on the network. All traffic from both the {{project_name_workstation_long}} (<code>{{project_name_workstation_template}}</code>) and {{project_name_gateway_long}} (<code>{{project_name_gateway_template}}</code>) such as Tor Browser Bundle (TBB), updates, and sdwdate pass through Tor. Establishing an online connection is the task of the host, so the host <ref>
+In case of Default/Download version, it is the host's task to establish an online connection. In the case of [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]], it is the gateway's task to establish an online connection.
+</ref> is most likely using DHCP to obtain a local IP address.
 
-In contrast, usually TBB <ref name="tbb" /> users have additional network activity outside of Tor, either from another web browser or other applications. This means the proportion or volume of Tor activity might be feasible identifiers to predict whether a user is running {{project_name_short}} or the TBB <ref name="tbb" />. It is probably harder for the ISP to determine whether a single user is solely generating Tor traffic (and potentially using {{project_name_short}}) if:
+In contrast, usually TBB users have additional network activity outside of Tor, either from another web browser or other applications. This means the proportion or volume of Tor activity might be feasible identifiers to predict whether a user is running {{project_name_short}} or the TBB. It is probably harder for the ISP to determine whether a single user is solely generating Tor traffic (and potentially using {{project_name_short}}) if:
 
 * The Internet connection is shared with other users that do not run {{project_name_short}}.
 * A browser is also used on the host. <ref>This comes with the attendant risk of the user confusing one browser with another.</ref>
@@ -144,9 +145,9 @@ It is unknown if an ISP can detect whether a user has many different Tor circuit
 
 |}
 
-In conclusion, the ability of the ISP or local network administrator to distinctly identify users who utilize Tor Browser Bundle, {{project_name_short}}, Tails, a custom transparent Tor proxy or similar project, depends on how differently a system is configured. Anonymity/security/privacy-focused operating systems will inevitably differ from other Tor users using popular operating systems. For example, somebody using Tails or {{project_name_short}} will have a different network fingerprint than a Microsoft Windows user utilizing Tor Browser Bundle since that will be paired with standard clearnet traffic. This is a necessary tradeoff to advance the state of technological privacy relative to the status quo.
+In conclusion, the ability of the ISP or local network administrator to distinctly identify users who utilize Tor Browser Bundle (TBB), {{project_name_short}}, Tails, a custom transparent Tor proxy or similar project, depends on how differently a system is configured. Anonymity/security/privacy-focused operating systems will inevitably differ from other Tor users using popular operating systems. For example, somebody using Tails or {{project_name_short}} will have a different network fingerprint than a Microsoft Windows user utilizing Tor Browser Bundle (TBB) since that will be paired with standard clearnet traffic. This is a necessary tradeoff to advance the state of technological privacy relative to the status quo.
 
-Improved fingerprinting resistance in the near term is unlikely. This would require choosing and emulating the most popular host operating system in combination with the most widespread method of accessing Tor, which is probably Tor Browser on Microsoft Windows. Without running this setup, it is infeasible the Microsoft Windows network fingerprint could be sufficiently emulated in order to fool an ISP or local network observer. Putting aside the many [[Windows Hosts|reasons to not use Windows]], even after lots of effort it could not be proven effective.
+Improved fingerprinting resistance in the near term is unlikely. This would require choosing and emulating the most popular host operating system in combination with the most widespread method of accessing Tor, which is probably Tor Browser Bundle (TBB) on Microsoft Windows. Without running this setup, it is infeasible the Microsoft Windows network fingerprint could be sufficiently emulated in order to fool an ISP or local network observer. Putting aside the many [[Windows Hosts|reasons to not use Windows]], even after lots of effort it could not be proven effective.
 
 A related topic is the potential to [[Hide_Tor_from_your_Internet_Service_Provider|Hide Tor use from the Internet Service Provider]]. It has been concluded it is possible to circumvent censorship, but hiding Tor is impractical. This is especially true with respect to global passive adversaries who can record and store all relevant traffic.
 
@@ -247,7 +248,7 @@ An example of an implementation is the supercookie project at https://github.com
 </ref>
 </div>
 
-To make it difficult to distinguish {{project_name_short}} and TBB <ref name="tbb" /> users, TBB <ref name="tbb" /> is included on the platform. Therefore, {{project_name_short}} should provide the same information as TBB <ref name="tbb" /> in order to generate very similar fingerprints.
+To make it difficult to distinguish {{project_name_short}} and Tor Browser Bundle (TBB) users, Tor Browser (TB) is included on the platform. Therefore, {{project_name_short}} should provide the same information as TBB in order to generate very similar fingerprints.
 
 = Website Traffic Fingerprinting =
 
