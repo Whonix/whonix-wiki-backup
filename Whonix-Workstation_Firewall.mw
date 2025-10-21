@@ -228,16 +228,20 @@ Firewall rules should now be automatically load after reboot. It would be pruden
 
 = Ping =
 
-Ping commands should <u>not</u> work for external addresses from the {{project_name_workstation_short}}. The reason is [https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol ICMP traffic] is not proxied and it is filtered by {{project_name_short}} Firewall (<code>{{W_Firewall}}</code>) because [[Tor#UDP|Tor does not support UDP]]. For example, <code>ping google.com</code> will not work. To make ping functional, see the [[#Allow UDP|Allow UDP]] chapter.
-
-[[SUID Disabler and Permission Hardener]] disables the SUID from <code>ping</code> to reduce the attack surface since it would not work anyway. <ref>
-https://github.com/Whonix/anon-apps-config/blob/master/etc/permission-hardener.d/30_ping.conf
-
-In the future, capability removal of <code>CAP_NET_RAW</code> might be useful if Debian starts doing that.
-</ref> When that occurs, to re-enable <code>ping</code> functionality refer to the  [[SUID_Disabler_and_Permission_Hardener#Whitelist_Specific_Capability_Binaries|Whitelist Specific Capability Binaries]] chapter. This of course does not resolve the issue that Tor does not support UDP.
-
-Forum discussion: <br />
-[https://forums.whonix.org/t/ping-operation-permitted/11056/ Ping operation permitted?]
+* <u>Ping is blocked by design:</u> Ping commands should <u>not</u> work for external addresses from the {{project_name_workstation_short}}.
+** <u>Example failure:</u> For example, <code>ping google.com</code> will not work.
+** <u>ICMP is not supported:</u> The reason is [https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol ICMP traffic] (UDP) is not proxied.
+*** <u>Firewall filtering:</u> It is filtered by the {{project_name_short}} Firewall (<code>{{W_Firewall}}</code>),
+*** <u>No UDP support in Tor:</u> Ping required UDP (ICMP) but [[Tor#UDP|Tor does not support UDP]].
+*** <u>Reference:</u> See also: [[#Allow UDP|Allow UDP]] chapter.
+* <u>Security measure - SUID bit removed:</u> [[SUID Disabler and Permission Hardener]] disables the SUID bit from <code>ping</code> to reduce the attack surface since it would not work anyway. <ref>
+* <u>Source code file:</u> https://github.com/Whonix/anon-apps-config/blob/master/etc/permission-hardener.d/30_ping.conf
+* <u>Potential future enhancement:</u> In the future, capability removal of <code>CAP_NET_RAW</code> might be useful if Debian starts doing that.
+</ref>
+* <u>Re-enable ping:</u> Optional. To re-enable <code>ping</code> functionality - in so far as re-adding the SUID bit - refer to the [[SUID_Disabler_and_Permission_Hardener#Whitelist_Specific_Capability_Binaries|Whitelist Specific Capability Binaries]] chapter.
+** <u>For experimentation:</u> Only useful in case you wish to experiment with <code>ping</code>.
+** <u>Limitation remains:</u> This of course does not resolve the connectivity issue that Tor does not support UDP.
+* <u>Forum discussion:</u> [https://forums.whonix.org/t/ping-operation-permitted/11056/ Ping operation permitted?]
 
 = Allow UDP =
 
