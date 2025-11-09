@@ -1307,13 +1307,13 @@ This guide explains how to configure and use shared folders in {{project_name_sh
 Follow these steps to move data between the guest and host. It is recommended to create or assign a unique directory per snapshot to keep shared content from different security domains separate.
 
 {{Box|text=
-{{IconSet|true|X}} '''Special Notice: Upgrade Required'''
+{{IconSet|true|1}} '''Upgrade Required'''
+
+{{sysmaint_notice}}
 
 [[Upgrade|Update]] your system first. <ref>
 This is due to a bug in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>] that has been fixed in all repositories.
 </ref>
-
-{{sysmaint_notice}}
 
 In [[System_Maintenance_Panel|System Maintenance Panel]], press <code>Install Updates</code> or upgrade using the command line:
 
@@ -1321,9 +1321,13 @@ In [[System_Maintenance_Panel|System Maintenance Panel]], press <code>Install Up
 sudo apt update && sudo apt dist-upgrade
 }}
 
-'''1.''' Ensure the virtual machine is powered down.
+{{IconSet|true|2}} '''Shutdown VM'''
 
-'''2.''' Host folder preparation: On the host operating system, create a folder to be shared with the {{VM}}. For example, on a Linux host:
+Ensure the virtual machine is powered down.
+
+{{IconSet|true|3}} '''Create Shared Folder on Host'''
+
+On the host operating system, create a folder to be shared with the {{VM}}. For example, on a Linux host:
 
 <u>Note:</u> Replace account <code>user</code> with your actual account.
 
@@ -1331,7 +1335,9 @@ sudo apt update && sudo apt dist-upgrade
 mkdir /home/user/shared
 }}
 
-'''3.''' Adjust permissions on the host to allow read and write access to the folder with <code>chmod</code>:
+{{IconSet|true|4}} '''Set Permissions on Host Folder'''
+
+Adjust permissions on the host to allow read and write access to the folder with <code>chmod</code>:
 
 <u>Note:</u> Replace account <code>user</code> with your actual account.
 
@@ -1339,11 +1345,15 @@ mkdir /home/user/shared
 chmod 777 /home/user/shared
 }}
 
-'''4.''' Click <code>virt-manager</code> &rarr; double-click on VM &rarr; <code>View</code> &rarr; <code>Details</code> &rarr; <code>Add Hardware</code>.
+{{IconSet|true|5}} '''Open virt-manager and Add Hardware'''
 
-'''5.''' Click the <code>Filesystem</code> device in the list of devices on the left side of the window.
+Click <code>virt-manager</code> &rarr; double-click on VM &rarr; <code>View</code> &rarr; <code>Details</code> &rarr; <code>Add Hardware</code>.
 
-'''6.''' Choose the following settings.
+{{IconSet|true|6}} '''Select Filesystem Device'''
+
+Click the <code>Filesystem</code> device in the list of devices on the left side of the window.
+
+{{IconSet|true|7}} '''Configure Filesystem Settings'''
 
 * <u>Driver:</u> <code>virtio-9p</code>
 * <u>Source path:</u> <code>/home/user/shared</code>
@@ -1351,23 +1361,43 @@ chmod 777 /home/user/shared
 * <u>Target Path:</u> <code>shared</code>
 ** <u>Note:</u> This field must contain the word <code>shared</code>, regardless of the folder name. This is because this identifier is used to mount the shared folder in {{project_name_short}}.
 
-'''7.''' Ensure <code>Export filesystem as readonly mount</code> is unchecked. <ref>
+{{IconSet|true|8}} '''Disable Read-only Option'''
+
+Ensure <code>Export filesystem as readonly mount</code> is unchecked. <ref>
 If you do not wish to write to the folder from within the VM, you are free to enable this setting.
 </ref>
 
-'''8.''' Click <code>Finish</code>.
+{{IconSet|true|9}} '''Finalize Device Configuration'''
 
-'''9.''' Click <code>View</code> &rarr; <code>Console</code>, then click the play button in the toolbar to start the VM.
+Click <code>Finish</code>.
 
-'''10.''' Done.
+{{IconSet|true|10}} '''Start the VM'''
+
+Click <code>View</code> &rarr; <code>Console</code>, then click the play button in the toolbar to start the VM.
+
+{{IconSet|true|11}} '''Optional: Mandatory Access Control'''
+
+Using Mandatory Access Control? See chapter [[#Mandatory Access Control]] below.
+
+{{IconSet|true|12}} '''Optional: Live Mode Use'''
+
+Want to use the shared folder also in live mode? See chapter [[#Shared Folder in Live Mode]].
+
+{{IconSet|true|13}} '''Access Shared Folder in VM'''
 
 The shared folder will be accessible as <code>/mnt/shared</code>. <ref>
 This is hardcoded in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>].
-</ref> The folder can be opened using a [[Software#File Manager|file manager]] such as Thunar. To open it using the command line, run:
+</ref>
+
+To access it via command line:
 
 {{CodeSelect|code=
 cd /mnt/shared
 }}
+
+{{IconSet|true|13}} '''Done.'''
+
+The process of setting up a shared folder has been completed.
 }}
 
 === Mandatory Access Control ===
