@@ -204,7 +204,7 @@ Technically, kloak anonymizes input device signals by introducing random delays 
 * https://github.com/vmonaco/kloak/pull/38
 * https://github.com/vmonaco/kloak/pull/50#issuecomment-1657250132
 * https://arxiv.org/pdf/2101.09087.pdf
-</ref> '''Kloak is better at hiding keyboard behavior than mouse behavior. See [[Keystroke_and_Mouse_Deanonymization#Limitations|Limitations]].'''
+</ref> '''In Whonix 17 and earlier, Kloak is better at hiding keyboard behavior than mouse behavior. See [[Keystroke_and_Mouse_Deanonymization#Limitations|Limitations]].''' In Whonix 18 and later, Kloak's mouse anonymization is much improved.
 
 * [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] includes kloak by default.
 * [[Qubes|{{q_project_name_long}}]] support unavailable. <ref>
@@ -229,24 +229,29 @@ Another benefit of kloak is that it helps protect your search queries even if th
 * https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slides_monaco.pdf
 </ref>
 
-kloak is designed to stymie adversary attempts to identify and/or impersonate users' biometric traits. The GitHub site succinctly describes kloak's purpose and the tradeoff between usability and the level of privacy. Notably, shorter time delays between keystrokes and release events reduces overall anonymity: <ref>
+kloak is designed to stymie adversary attempts to identify and/or impersonate users' biometric traits. The GitHub site succinctly describes kloak's purpose and the tradeoff between usability and the level of privacy. Notably, shorter time delays between keystrokes and release events reduce overall anonymity: <ref>
 https://github.com/Whonix/kloak
 </ref>
 
-<blockquote>kloak is a privacy tool that makes keystroke biometrics less effective. This is accomplished by obfuscating the time intervals between key press and release events, which are typically used for identification. <b>This project is experimental.</b>
+<blockquote>kloak has two goals in mind:
+
+* Make it difficult for an adversary to identify a user
+* Make it difficult for an adversary to replicate a user's typing behavior
 
 ...
 
-kloak works by introducing a random delay to each key press and release event. This requires temporarily buffering the event before it reaches the application (e.g., a text editor).
+The time between key press and release events are typically used to identify users by their typing behavior. The pattern of mouse movements and clicks can be used in a similar fashion. kloak obfuscates these time intervals and patterns by introducing a random delay between the physical input events and the arrival of input events at the application, for example a web browser. For mice, the number of input events is also obfuscated by combining many small mouse move events into a few mouse jumps. This also obfuscates the exact shape of the mouse movement path.
 
-The maximum delay is specified with the -d option. This is the maximum delay (in milliseconds) that can occur between the physical key events and writing key events to the user-level input device. The default is 100 ms, which was shown to achieve about a 20-30% reduction in identification accuracy and doesn't create too much lag between the user and the application (see the paper below). As the maximum delay increases, the ability to obfuscate typing behavior also increases and the responsive of the application decreases. This reflects a tradeoff between usability and privacy.</blockquote>
+kloak grabs the input device and sends delayed input events to the Wayland compositor using emulated input protocols. Grabbing the device disables any other application from reading the events. Events are scheduled to be released at a later time as they are received, and a semi-random delay is introduced before they are sent to the compositor.</blockquote>
 
-While kloak makes it hard for adversaries to identify individuals or to replicate their typing behavior -- for example to overcome two-factor authentication based on keystroke biometrics -- it is not perfect and has [[#Limitations]].
+While kloak makes it hard for adversaries to identify individuals or to replicate their typing behavior -- for example to overcome two-factor authentication based on keystroke biometrics -- it is not perfect and has [[Keystroke_and_Mouse_Deanonymization#Limitations|limitations]].
 
 === Rescue Keys ===
 Kloak by default recognizes a "rescue key" sequence, which will terminate the kloak process.
 
-The default rescue key sequence is <code>KEY_LEFTSHIFT + KEY_RIGHTSHIFT + KEY_ESC</code> (i.e. left shift + right shift + escape).
+In Whonix 17 and earlier, the default rescue key sequence is <code>KEY_LEFTSHIFT + KEY_RIGHTSHIFT + KEY_ESC</code> (i.e. right shift + escape).
+
+In Whonix 18 and later, the default rescue key sequence when kloak is running as a daemon is <code>KEY_RIGHTSHIFT + KEY_ESC</code>. There is no default rescue key when kloak is run manually.
 
 Depending on how kloak is run:
 
@@ -254,7 +259,7 @@ Depending on how kloak is run:
 * '''B)''' <u>manual</u>: If you are running kloak in a terminal, this will ''terminate'' kloak, which then will be no longer anonymizing keyboard and mouse actions.
 
 ==== Rescue Keys Customization ====
-Kloak rescue keys may be customized by using the <code>-k</code> option, which takes a comma-separated list of key codes as an argument. The full list of supported key codes can be seen at [https://github.com/Whonix/kloak/blob/master/src/keycodes.c <code>keycodes.c</code>].
+Kloak rescue keys may be customized by using the <code>-k</code> option, which takes a comma-separated list of key codes as an argument. The full list of supported key codes can be seen at [https://github.com/Whonix/kloak/blob/d53d214631804d04999ea014341f95c4f0b362d5/src/kloak.c#L110 <code>kloak.c</code>].
 
 For instance, to run kloak with the rescue key set to <code>KEY_LEFTSHIFT + KEY_ESC</code>, run:
 
@@ -286,7 +291,7 @@ To make this change permanent, see [[Keystroke_and_Mouse_Deanonymization#Setting
 
 ==== Disabling rescue keys ====
 
-Some users have reported that they are unable to use certain keyboard shortcuts on account of the rescue key functionality. To disable the rescue key feature entirely, you may use the <code>-p</code> option. Be warned that this will prevent you from terminating or restarting kloak using the rescue key sequence! To run kloak with the rescue key feature disabled:
+Some users have reported that they are unable to use certain keyboard shortcuts on account of the rescue key functionality. In Whonix 17 and earlier, to disable the rescue key feature entirely, you may use the <code>-p</code> option. Be warned that this will prevent you from terminating or restarting kloak using the rescue key sequence! To run kloak with the rescue key feature disabled:
 
 '''1.''' Stop background kloak process first.
 
@@ -314,8 +319,16 @@ To make this change permanent, see [[Keystroke_and_Mouse_Deanonymization#Setting
 
 '''6.''' Done.
 
+In Whonix 18 and later, rescue keys can be disabled by simply not specifying them on the kloak command line. If running kloak as a daemon, see [[Keystroke_and_Mouse_Deanonymization#Setting_persistent_kloak_settings|setting persistent kloak settings]] to remove the rescue keys from the command line configured in systemd.
+
 === Kloak Debug Mode ===
 If you are experiencing problems with kloak, generating debug logs can be useful for determining what's going wrong.
+
+{{mbox
+|type = notice
+|image = [[File:Ambox_notice.png|40px|alt=Info]]
+|text = This feature no longer exists in Whonix 18 and later. Debug mode is only available in Whonix 17 and earlier. Debug mode may be re-added at a later time if there is a need for it.
+}}
 
 {{mbox
 |icon=fa-solid fa-exclamation cs-red
@@ -358,21 +371,32 @@ To make this change permanent, see [[Keystroke_and_Mouse_Deanonymization#Setting
 === Setting persistent kloak settings ===
 Notes:
 
-* Kloak's verbose mode can be enabled as a persistent setting by following these instructions. However, verbose mode generates copious amounts of data, which may consume large amounts of disk space or cause wear-and-tear on the disks. Enabling verbose mode as a persistent setting is not recommended.
+* Kloak's verbose mode in Whonix 17 and earlier can be enabled as a persistent setting by following these instructions. However, verbose mode generates copious amounts of data, which may consume large amounts of disk space or cause wear-and-tear on the disks. Enabling verbose mode as a persistent setting is not recommended.
 
 If you use kloak as a systemd service and wish to use some of its options, you may do so by adding a configuration file for kloak. To do this:
 
 '''1.''' {{Open with root rights|filename=
-/lib/systemd/system/kloak.service.d/50_user.conf
+/usr/lib/systemd/system/kloak.service.d/50_user.conf
 }}
 
 '''2.''' Paste.
 
 <u>Note:</u> Replace <code>&lt;options&gt;</code> with the options you wish to pass to kloak.
 
+<u>Note:</u> Kloak moved from /usr/sbin to /usr/bin in Whonix 18.
+
+For Whonix 17 and earlier:
+
 {{CodeSelect|code=
 [Service]
 ExecStart=/usr/sbin/kloak <options>
+}}
+
+For Whonix 18 and later:
+
+{{CodeSelect|code=
+[Service]
+ExecStart=/usr/bin/kloak <options>
 }}
 
 '''3.''' Save and exit.
@@ -433,6 +457,7 @@ sudo systemctl status kloak
 }}
 
 == Qubes Event Buffering ==
+Qubes Event Buffering is Kloak-alike software.
 
 {{mbox
 |type = notice
@@ -448,9 +473,12 @@ This is a feature built into Qubes OS.
 </ref>
 }}
 
-Qubes Event Buffering is Kloak-alike software.
+Qubes OS is incompatible with Kloak. <ref>
+* The old kloak X11 version was incompatible due to the fact that most VMs in Qubes OS do not use <code>evdev</code> to receive input.
+* The new kloak Wayland version is incompatible with Qubes OS because Qubes hasn't been ported to Wayland yet at the time of writing. And even if Qubes was using Wayland ... TODO
+</ref>
 
-Qubes OS is incompatible with Kloak, due to the fact that most VMs in Qubes OS do not use <code>evdev</code> to receive input. To provide the same benefits as Kloak despite these limitations, Qubes OS R4.3 provides a feature known as "event buffering". Whereas Kloak would run within each individual VM, intercepting and buffering <code>evdev</code> input events, Qubes event buffering runs on dom0, catching X11 input events intended for a particular VM and buffering them before sending them to the VM. Qubes event buffering uses the same underlying algorithms as Kloak, and should be similarly effective.
+To provide the same benefits as Kloak despite these limitations, Qubes OS R4.3 provides a feature known as "event buffering". Whereas Kloak would run within each individual VM, intercepting and buffering <code>evdev</code> input events, Qubes event buffering runs on dom0, catching X11 input events intended for a particular VM and buffering them before sending them to the VM. Qubes event buffering uses the same underlying algorithms as Kloak, and should be similarly effective.
 
 '''Qubes event buffering does not mask mouse movement behavior as well as it masks typing behavior, see [[Keystroke_and_Mouse_Deanonymization#Limitations|Limitations]] below.'''
 
@@ -494,7 +522,8 @@ Discussion:
 
 Both Kloak and Qubes event buffering have some limitations users '''MUST''' be aware of before relying on them for security:
 
-* '''Mouse events are cloaked, but not as effectively as keyboard events.''' Pointing devices (mice, touchpads, trackballs, etc.) produce a very large number of events when the pointer is being moved by the user. Both Kloak and Qubes event buffering use a scheduling system that queues events as they arrive and tries to ensure no event is delayed longer than the set maximum delay value. Because pointing devices flood the queue with events when the pointer is moved, this usually results in almost all of the events involved in a pointer movement being delayed for exactly the maximum delay time. This removes almost all anonymizing jitter and may allow an adversary to fingerprint and identify the user via mouse movements even if Kloak or event buffering is being used.
+* '''Mouse events are cloaked, but not as effectively as keyboard events.''' Pointing devices (mice, touchpads, trackballs, etc.) produce a very large number of events when the pointer is being moved by the user. Some pointing devices generate a similarly large number of events when scrolling, and may send scroll events with different scroll lengths depending on hardware. Both Kloak and Qubes event buffering use a scheduling system that queues events as they arrive and tries to ensure no event is delayed longer than the set maximum delay value. Because pointing devices flood the queue with events when the pointer is moved, this usually results in almost all of the events involved in a pointer movement being delayed for exactly the maximum delay time. This removes almost all anonymizing jitter and may allow an adversary to fingerprint and identify the user via mouse movements even if Kloak or event buffering is being used.
+** This is fixed in Non-Qubes Whonix 18 and later. This issue is still present in Whonix 17 and earlier, and in all versions of Qubes OS.
 * '''Typing may be substantially more difficult.''' Because Kloak and event buffering both queue, delay, and release keystrokes at semi-randomly chosen times, typing is not as easy when using Kloak. Lag is usually noticeable and unpredictable. Shorter maximum delay times can improve usability, but only at the cost of providing less anonymity.
 * '''Biometric software can tell that you're using Kloak.''' When using Kloak, one's typing rhythm will appear very unnatural and strange to biometric software, which is a clear indicator that one is using Kloak or similar software. Kloak makes no attempt to mask its use; it only ensures that all Kloak and Kloak-alike users appear similar to each other. This is similar to the limitations of Tor - one cannot tell which Tor user is accessing a resource or the true identity of the Tor user, but they can very easily tell that the resource is being accessed over Tor. ([[Keystroke_and_Mouse_Deanonymization#Shared_Personality|Shared Personality]])
 * '''Legitimate uses of biometric software will break.''' If you use software that relies on keystroke biometrics to identify you, it will almost certainly fail to do so if you are using Kloak. This may require you to temporarily disable Kloak before using certain services.
@@ -515,7 +544,6 @@ The following limitations apply only to Qubes event buffering, not Kloak:
 
 * '''Event buffering is not available in any version of Qubes R4.2 or earlier.''' It will be present in Qubes R4.3.0 and later.
 * '''There is no easy way to enable or configure event buffering.''' The only way to enable and configure event buffering is using the <code>qvm-features</code> command in a dom0 terminal. A configuration feature for event buffering may be added to Qube Manager in the future.
-* '''Event buffering is not enabled by default on Qubes-Whonix-Workstation.''' It must be explicitly enabled by the end user. This is expected to be fixed. See [https://github.com/QubesOS/qubes-issues/issues/9771 Enable X11 event buffering in Whonix by default].
 
 = Defense Testing =
 You can test that kloak actually works by trying a keystroke test website. https://vmonaco.com/device-fingerprinting/ is a good choice as it is free, open source, and requires no personal data or signup process to use. The code is visible at https://github.com/vmonaco/device-fingerprinting.
@@ -546,6 +574,7 @@ Previously KeyTrac was recommended for testing kloak. However, the KeyTrac demo 
 {| class="wikitable"
 |+ ''Sample KeyTrac versus Kloak Test Results''
 |-
+
 ! '''Kloak Configuration'''
 ! '''Results and Interpretation'''
 |-
@@ -575,11 +604,15 @@ Previously KeyTrac was recommended for testing kloak. However, the KeyTrac demo 
 
 Without Kloak users can be identified with very high certainty. The second set of tests show that Kloak definitely obfuscates typing behavior, making it difficult to authenticate or identify a particular user. Third set: users running Kloak may look "similar" to other users running Kloak. That is, it might be possible to identify Kloak users from non-Kloak users. These results are similar to the results obtained using vmonaco's device fingerprinting test.
 
+https://fractalglider.github.io/fun/2018/02/13/testing-mouse-scroll-wheel.html
+
 = Potential future development research =
 
 * Do X11 or Wayland provide hooks that would allow intercepting input events as read by the Wayland compositor or X server, before those events are sent directly to applications? This would allow Kloak to work even with setups that don't use <code>evdev</code>.
 * Could a "toggle" feature be added to Kloak to allow temporarily enabling and disabling it without having to stop the Kloak service entirely? This would be useful for users who have high anonymity requirements but also have to use systems that use keystroke biometrics as a legitimate method of authentication.
-* Can mouse events be obfuscated better? It might be possible to randomly select times at which to deliver mouse events, then deliver all queued mouse events at once at those selected times, with intermediate events "squashed" together so that the mouse simply jumps to the position it would have ended up in had all mouse events been processed normally. If this is done, mouse events should probably be handled in a separate queue from keyboard events. Planned: https://forums.whonix.org/t/better-mouse-obfuscation/21445
+* Can mouse events be obfuscated better? It might be possible to randomly select times at which to deliver mouse events, then deliver all queued mouse events at once at those selected times, with intermediate events "squashed" together so that the mouse simply jumps to the position it would have ended up in had all mouse events been processed normally. If this is done, mouse events should probably be handled in a separate queue from keyboard events.
+** Planned: https://forums.whonix.org/t/better-mouse-obfuscation/21445
+** Implemented in Non-Qubes Whonix 18 and later. Still pending for Qubes OS.
 
 = Resources =
 * [http://jcarlosnorte.com/security/2016/03/06/advanced-tor-browser-fingerprinting.html Advanced Tor Browser Fingerprinting] (2016)
