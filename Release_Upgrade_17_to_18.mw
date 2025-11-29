@@ -63,28 +63,56 @@ This method is still possible. All the automated {{Github_link|repo=legacy-dist|
 
 # Backup all data - ideally have a copy of the VM(s) so it is possible to try again (if necessary).
 # Perform the usual [[Operating_System_Software_and_Updates#Standard_Upgrade_Steps|standard ("everyday") update instructions]].
-# Release Upgrade {{project_name_workstation_short}} (<code>whonix-workstation-17</code>).
-# Power off {{project_name_workstation_short}} (<code>whonix-workstation-17</code>).
-# Release Upgrade {{project_name_gateway_short}} (<code>whonix-gateway-17</code>).
-# Restart {{project_name_gateway_short}} (<code>whonix-gateway-17</code>).
-# Restart {{project_name_workstation_short}} (<code>whonix-ws-workstation</code>).
+# Platform specific notice. Qubes users only: Release Upgrade Qubes from version R4.2 to R4.3.
+# Release Upgrade {{project_name_workstation_short}} from version 17 to 18.
+# Update derivative APT repository configuration.
+# Power off {{project_name_workstation_short}}
+# Release Upgrade {{project_name_gateway_short}}
+# Restart {{project_name_gateway_short}}
 
 = Platform Specific Notices =
 * [[{{project_name_short}}|{{project_name_short}}]]: No special notice.
 * [[{{q_project_name_short}}|{{q_project_name_short}}]]:
-** Qubes R4.2: [[Unsupported]] for Qubes R4.2. <ref>
+** Qubes R4.2: Unavailable, [[unsupported]] for Qubes R4.2. <ref>
 * [https://github.com/QubesOS/qubes-issues/issues/10219 decide availability of Kicksecure, and Whonix 18 (Debian trixie based) on Qubes R4.2 versus R4.3]
-* {{project_name_short}} 18 issue in Qubes R4.2 sdwdate-gui: [https://forum.qubes-os.org/t/whonix-18-denied-sdwdate-connectcheck/36098 qrexec <code>sdwdate.ConnectCheck</code> denied messages] (despite the name, sdwdate-gui issue, not sdwdate issue)
-* Technically,
-<code>sudo release-upgrade --force</code> might work for Qubes R4.2, but this is [[unsupported]].
+* {{project_name_short}} 18 issue in Qubes R4.2 sdwdate-gui:
+[https://forum.qubes-os.org/t/whonix-18-denied-sdwdate-connectcheck/36098 qrexec <code>sdwdate.ConnectCheck</code> denied messages] (despite the name, sdwdate-gui issue, not sdwdate issue)
 </ref>
 ** Qubes R4.3: Available for Qubes R4.3 and above only.
+
+== Qubes Specific ==
+<u>Notes:</u>
+
+* <u>Qubes applicability:</u> Only applicable if using Qubes. Non-Qubes users should ignore this wiki chapter.
+* <u>Required host version:</u> Host operating system must be Qubes R4.3. See Qubes documentation: [https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/upgrade/4_3.html How to upgrade to Qubes 4.3]
+* <u>Template upgrade note:</u> When Qubes R4.3 is in dom0 with an old Qubes R4.2 Template, that Template must be upgraded to Qubes R4.3 first. The following quotes from the Qubes documentation explain how to upgrade all Templates from R4.2 to R4.3.
+
+{{quotation
+|quote=
+Install the qubes-dist-upgrade tool. This is the in-place upgrade tool, which is not what we’re doing. However, it will be needed in order to upgrade the templates to the 4.3 version. You install it with the following command in the dom0 terminal:
+
+{{CodeSelect|code=
+sudo qubes-dom0-update -y qubes-dist-upgrade
+}}
+|context=[https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/upgrade/4_3.html How to upgrade to Qubes 4.3]
+}}
+
+{{quotation
+|quote=
+Change your templates to use the 4.3 repositories instead of the 4.2 ones. You do this with the following command in the dom0 terminal:
+
+{{CodeSelect|code=
+sudo qubes-dist-upgrade --releasever=4.3 --template-standalone-upgrade
+}}
+|context=[https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/upgrade/4_3.html How to upgrade to Qubes 4.3]
+}}
+
+<u>Note:</u> The word "<code>standalone</code>" in the option "<code>--template-standalone-upgrade</code>" does not refer to "<code>Standalone VMs</code>". Instead, this is a command that can be used alone (standalone) to upgrade Qubes Templates from R4.2 to R4.3.
 
 = Release Upgrade =
 
 # Backup all data, ideally have a clone of the VM(s) so it is possible to try again (if necessary).
 # Perform the usual [[Operating_System_Software_and_Updates#Standard_Upgrade_Steps|standard ("everyday") update instructions]].
-# Consider running the optional [[#Sanity Tests|sanity tests]].
 # Run {{kicksecure_wiki
 |wikipage=systemcheck
 |text=systemcheck
@@ -94,6 +122,7 @@ cat /usr/sbin/release-upgrade {{!}} grep version=
 }}
 # Check <code>release-upgrade</code> command version. It should be a minimum of <code>3.3</code>, and display <code>version="3.3"</code>.
 # Consider keeping the full release upgrade log output. It will be required for [[Support]] in case there are issues.
+# Read [[Release_Upgrade_17_to_18#Platform_Specific_Notices|Platform Specific Notices]].
 # Perform the automated [[Release Upgrade|release upgrade]] using the <code>release-upgrade</code> command: {{CodeSelect|inline=true|code=
 sudo release-upgrade
 }}
