@@ -12,32 +12,32 @@ Instructions to build {{project_name_short}} Virtual Machine Images from Source 
 This page documents how to <u>build {{project_name_short}}</u> VM (<u>V</u>irtual <u>M</u>achine) images for [[VirtualBox]] ({{Code2|.ova}}) or [[KVM]] ({{Code2|.qcow2}}) [[Trust#Builds_from_Source_Code_versus_Builds_including_Binary_Packages|<u>"from source code"</u>]] using {{kicksecure_wiki
 |wikipage=Dev/Derivative-Maker
 |text=derivative-maker
-}}. Most users do not build {{project_name_short}} from source code but instead [[Download|download {{project_name_short}}]].
+}}. Most users do not build {{project_name_short}} from source code, but instead [[Download|download {{project_name_short}}]].
 
 For [[Qubes|{{q_project_name_long}}]], see [[Dev/Qubes#Build_{{q_project_name_short}}_Templates|{{q_project_name_long}} Build Documentation]].
 
 Building from source code has security advantages (see [[Trust]]).
 
-The goal of this build documentation is to be usable by as many users as possible. Therefore written as easy as possible with no prior knowledge of tools used required.
+The goal of this build documentation is to be usable by as many users as possible. Therefore it is written as simply as possible, with no prior knowledge of the tools used required.
 
-The high level summary is:
+The high level summary is as follows:
 
 # Host preparation.
 # Get derivative-maker source code.
 # Run derivative-maker.
 # Done, build of {{project_name_short}} has been completed.
 
-Advanced users that already know how to use <code>git</code> and how to perform digital software verification using OpenPGP (<code>gpg</code>) do not need to strictly follow this documentation. See footnote(s) for details. <ref>
+Advanced users who already know how to use <code>git</code> and how to perform digital software verification using OpenPGP (<code>gpg</code>) do not need to strictly follow this documentation. See footnote(s) for details. <ref>
 For example, these instructions fetch only a specific git tag. If you know how to use git, you are of course free to <code>git clone</code> the whole repository and then use <code>git verify-tag</code>, <code>git verify-commit</code>, <code>git checkout --quiet</code> and <code>git</code> generally as per usual. The reason why more specific commands are being used on this page is to simplify the process for laymen, to make these instructions as fail-safe as possible.
 </ref>
 
-Due to digital software verification instructions and [[Software_Signature_Verification_Usability_Issues_and_Proposed_Solutions|Software Signature Verification Usability Issues]] these instructions might look more complicated then they actually are.
+Due to digital software verification instructions and [[Software_Signature_Verification_Usability_Issues_and_Proposed_Solutions|Software Signature Verification Usability Issues]], these instructions might look more complicated than they actually are.
 
 {{always_verify_signatures_reminder}}
 
 Steps concerning digital software verification are pointed out as "This step is recommended for better security, but is not strictly required. (See [[Trust]].)"
 
-When verifying digital software signatures, these instructions will be slightly more complicated but therefore even more secure.
+When verifying digital software signatures, these instructions will be slightly more complicated, but therefore even more secure.
 
 # Host preparation.
 # Get derivative-maker source code.
@@ -62,9 +62,9 @@ When making changes here, please consider also making changes there.
 * <u>RAM:</u> You need ~ <code>4</code> GB free RAM.
 ** Might actually work with a lot less RAM.
 ** Might actually work with less RAM if you have swap.
-* <u>linux user account:</u> Do not build under user <code>root</code>. Login regular as user <code>user</code>. Do not use <code>sudo</code> to run <code>derivative-maker</code> because becoming root when necessary is handled by the build script.
+* <u>linux user account:</u> Do not build under user <code>root</code>. Log in as regular account <code>user</code>. Do not use <code>sudo</code> to run <code>derivative-maker</code> because becoming root when necessary is handled by the build script.
 * <u>build place notice:</u> You cannot build on {{project_name_gateway_long}} (due to networking issues).
-* <u>build logs:</u> Build logs: If using a GUI (graphical user interface) it is recommended to set your terminal (for example <code>xfce4-terminal</code>) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
+* <u>build logs:</u> If using a GUI (graphical user interface) it is recommended to set your terminal (for example <code>qterminal</code>) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
 <div class="mw-collapsible-content">
 ...
 </div>
@@ -86,7 +86,7 @@ Building {{project_name_gateway_short}} and {{project_name_workstation_short}} a
 <div class="mw-collapsible-content">
 Usually you are not using [https://en.wikipedia.org/wiki/Continuous_integration CI] environments without knowing.
 
-You can find out if you are running inside a CI environment by running.
+You can find out if you are running inside a CI environment by running:
 
 {{CodeSelect|code=
 echo "$CI"
@@ -100,7 +100,7 @@ If it shows nothing, i.e.
 
 Everything is fine.
 
-Otherwise, if it were to show.
+Otherwise, if it were to show:
 
 <pre>
 true
@@ -148,7 +148,7 @@ Choose either Option A <u>or</u> Option B.
 <u>Option A:</u> Set up passwordless sudo.
 
 * Abstract task overview: Setup passwordless sudo for your Linux user account name.
-* Detailed task overview: Setup sudo and add your linux user account to the linux user group <code>sudo</code>. The following instructions use Linux user account name <code>user</code> as an example. If the user is using a different Linux user account name such as <code>myname</code> then the commands below have to be adjusted accordingly.
+* Detailed task overview: Setup sudo and add your Linux user account to the Linux user group <code>sudo</code>. The following instructions use Linux user account name <code>user</code> as an example. If the user is using a different Linux user account name such as <code>myname</code> then the commands below have to be adjusted accordingly.
 * Unspecific: Configuration of sudo is [[unspecific|unspecific to {{project_name_short}}]].
 * {{project_name_short}} specific: When building inside {{project_name_short}}, user <code>user</code> is already a member of group <code>sudo</code> by default. Therefore the following step "1." can be skipped.
 * Detailed steps:
@@ -180,7 +180,7 @@ The process of setting up passwordless sudo has been completed.
 
 '''1.''' {{Sudo_Setup}}
 
-'''2. ''' Configure user <code>user</code> to be able to use sudo without a password.
+'''2. ''' Configure <code>sudo</code> to use a longer password timeout.
 
 {{CodeSelect|code=
 echo 'Defaults timestamp_timeout=30' {{!}} sudo EDITOR=tee visudo -f /etc/sudoers.d/dist-build-sudo-timeout >/dev/null
@@ -193,7 +193,8 @@ The process of setting up a longer sudo timeout has been completed.
 }}
 
 = Special Notice =
-None.
+* Version 17: {{Gui}} builds are using <code>xfce</code>. Building is no longer recommended as release of version 18 is happening soon.
+* Version 18: GUI builds are using <code>lxqt</code>.
 
 = Choose Version =
 {{mbox
@@ -221,7 +222,7 @@ git diff {{VersionNew}}-stable {{VersionNew}}-developers-only
 }}
 </ref>
 
-'''6.''' If there is only git tag <code>{{VersionNew}}-developers-only</code> available but a stable release announcement has been published, then there is no need to wait for the creation of <code>{{VersionNew}}-stable</code> since it actually has already been blessed stable, would contain the identical source code anyhow but just have a different git tag name.
+'''6.''' If there is only git tag <code>{{VersionNew}}-developers-only</code> available but a stable release announcement has been published, then there is no need to wait for the creation of <code>{{VersionNew}}-stable</code> since it has already been blessed as stable and contains identical source code, but just has a different git tag name.
 }}
 
 {{mbox
@@ -230,9 +231,9 @@ git diff {{VersionNew}}-stable {{VersionNew}}-developers-only
 
 '''1.''' Go to https://forums.{{project_clearnet}}/c/news/ and look for the latest stable version number.
 
-'''2.''' Compare with the stable version number mentioned in the wiki.
+'''2.''' Compare this with the stable version number mentioned in the wiki.
 
-'''3.''' For example, if <code>{{VersionNew}}</code> has been announced in the forums and is available from the wiki, git tag <code>{{VersionNew}}-developers-only</code> is avaialble but <code>{{VersionNew}}-stable</code> is not, then <code>{{VersionNew}}-developers-only</code> can be safely used.
+'''3.''' For example, if <code>{{VersionNew}}</code> has been announced in the forums and is available from the wiki, git tag <code>{{VersionNew}}-developers-only</code> is available but <code>{{VersionNew}}-stable</code> is not, then <code>{{VersionNew}}-developers-only</code> can be safely used.
 }}
 
 = Get the Signing Key =
@@ -242,7 +243,7 @@ git diff {{VersionNew}}-stable {{VersionNew}}-developers-only
 {{Build_Documentation_Get_Source}}
 
 = Change Directory =
-Change directory to the <code>derivative-maker</code> source code folder because later on package build commands using <code>./derivative-maker</code> are expected to be run from the root of the source folder.
+Change directory to the <code>derivative-maker</code> source code folder because later on, package build commands using <code>./derivative-maker</code> are expected to be run from the root of the source folder.
 
 {{CodeSelect|code=
 cd derivative-maker
@@ -268,8 +269,8 @@ Build Documentation Choose Version
 
 <u>Mandatory</u> The following build targets are available.
 
-Choose a <code>--target</code>. Either option '''A)''', '''B)''', '''C)''' <u>or</u> '''D)'''. <ref>
-Multiple build targets at the same time are also possible.
+Choose a <code>--target</code>. Either option '''A)''', '''B)''', '''C)''', '''D)''' <u>or</u> '''E)'''. <ref>
+Multiple build targets can also be selected simultaneously.
 
 {{CodeSelect|code=
 --target virtualbox --target qcow2 --target raw
@@ -300,14 +301,14 @@ Multiple build targets at the same time are also possible.
 
 | '''B)'''
 | [[KVM]] (and [[QEMU]])
-| KVM: Stable.; QEMU: [[unsupported]]
+| KVM: Stable; QEMU: [[unsupported]]
 | {{nowrap|<code>.qcow2</code>}}
 | {{CodeSelect|code=--target qcow2}}
 |-
 
 | '''C)'''
 | raw images
-| Mostly interesting for developers / porters.
+| Mostly relevant for developers / porters.
 | <code>.raw</code>
 | {{CodeSelect|code=--target raw}}
 |-
@@ -317,14 +318,14 @@ Multiple build targets at the same time are also possible.
 * [[MacOS#M1]]
 * https://forums.whonix.org/t/whonix-on-mac-m1-arm/11310
 </ref>
-| Tested on Mac M1, M2, ... testers only, <code>--arch <u>arm64</u></code>.
+| Developers only, <code>--arch <u>arm64</u></code>.
 | <code>.raw</code>
 | {{CodeSelect|code=--target utm}}
 |-
 
 | '''E)'''
 | [[ISO]]
-| Testers only.
+| Developers only.
 | <code>.iso</code>
 | {{CodeSelect|code=--target iso}}
 |-
@@ -348,8 +349,8 @@ Multiple build targets at the same time are also possible.
 |-
 
 | '''B)'''
-|{{project_name_gateway_short}} Xfce
-|<code>--flavor {{project_name_short_lowercase}}-<u>gateway</u>-<u>xfce</u></code>
+|{{project_name_gateway_short}} LXQt
+|<code>--flavor {{project_name_short_lowercase}}-<u>gateway</u>-<u>lxqt</u></code>
 |-
 
 | '''C)'''
@@ -358,8 +359,8 @@ Multiple build targets at the same time are also possible.
 |-
 
 | '''D)'''
-|{{project_name_workstation_short}} Xfce
-|<code>--flavor {{project_name_short_lowercase}}-<u>workstation</u>-<u>xfce</u></code>
+|{{project_name_workstation_short}} LXQt
+|<code>--flavor {{project_name_short_lowercase}}-<u>workstation</u>-<u>lxqt</u></code>
 |-
 
 |}
@@ -400,7 +401,7 @@ Multiple build targets at the same time are also possible.
 | Others.
 | Potentially.
 | <ref>
-* Build script parameter <code>--arch</code> results in setting the <code>BUILD_TARGET_ARCH</code> build variable. If you inspect ([[Dev/git#grep|<code>grep</code> tip]]) the build scripts for the variable name you can see other architectures might work but are untested.
+* Build script parameter <code>--arch</code> results in setting the <code>BUILD_TARGET_ARCH</code> build variable. If you inspect ([[Dev/git#grep|<code>grep</code> tip]]) the build scripts for the variable name, you can see other architectures might work but are untested.
 * [[Dev/Porting|porting {{project_name_short}} to other platforms]]
 </ref>
 |-
@@ -410,15 +411,15 @@ Multiple build targets at the same time are also possible.
 '''4.''' {{project_name_short}} APT repository choice.
 
 <u>Optional</u>. Enable [[Project-APT-Repository|{{project_name_short}} APT repository]] inside the images. <ref>
-<code>--repo true</code> will set <code>export build_remote_repo_enable="true"</code> which results in setting
+<code>--repo true</code> will set <code>export build_remote_repo_enable="true"</code>, which results in setting:
 
 <pre>
 DERIVATIVE_APT_REPOSITORY_OPTS="--enable --codename $derivative-maker_apt_stable_release"
 export DERIVATIVE_APT_REPOSITORY_OPTS
 </pre>
 
-<code>derivative-maker_apt_stable_release</code> defaults to <code>{{Stable project version based on Debian codename}}</code> and could optionally through a [[Dev/Source_Code_Intro#Build_Configuration|build configuration]] set to <code>{{Stable project version based on Debian codename}}-proposed-updates</code>, <code>{{Stable project version based on Debian codename}}-testers</code> or <code>{{Stable project version based on Debian codename}}-developers</code>.
-</ref> See [[Trust]]. This is done for official {{project_name_short}} [[Dev/Redistribution|redistributeable]] builds.
+<code>derivative-maker_apt_stable_release</code> defaults to <code>{{Stable project version based on Debian codename}}</code> and can optionally be set via [[Dev/Source_Code_Intro#Build_Configuration|build configuration]] to <code>{{Stable project version based on Debian codename}}-proposed-updates</code>, <code>{{Stable project version based on Debian codename}}-testers</code>, or <code>{{Stable project version based on Debian codename}}-developers</code>.
+</ref> See [[Trust]]. This is done for official {{project_name_short}} [[Dev/Redistribution|redistributable]] builds.
 
 {{CodeSelect|code=
 --repo true
@@ -435,15 +436,47 @@ export DERIVATIVE_APT_REPOSITORY_OPTS
 
 '''7.''' Build a {{project_name_gateway_short}} virtual machine image. {{Code2|build command}}:
 
-{{CodeSelect|code=
-~/derivative-maker/derivative-maker --flavor {{project_name_short_lowercase}}-gateway-xfce --target virtualbox --repo true
+{| class="wikitable"
+! <b>Platform</b>
+! <b>Architecture</b>
+! <b>Command</b>
+|-
+
+| VirtualBox
+| Intel / AMD64 (stable)
+| {{CodeSelect|code=
+~/derivative-maker/derivative-maker --arch amd64 --flavor {{project_name_short_lowercase}}-gateway-lxqt --target virtualbox --repo true
 }}
+|-
+
+| VirtualBox
+| ARM64 (Mac <code>M#</code>, testers-only)
+| {{CodeSelect|code=
+~/derivative-maker/derivative-maker --arch arm64 --flavor {{project_name_short_lowercase}}-gateway-lxqt --target virtualbox --repo true
+}}
+|}
 
 '''8.''' Build a {{project_name_workstation_short}} virtual machine image. {{Code2|build command}}:
 
-{{CodeSelect|code=
-~/derivative-maker/derivative-maker --flavor {{project_name_short_lowercase}}-workstation-xfce --target virtualbox --repo true
+{| class="wikitable"
+! <b>Platform</b>
+! <b>Architecture</b>
+! <b>Command</b>
+|-
+
+| VirtualBox
+| Intel / AMD64 (stable)
+| {{CodeSelect|code=
+~/derivative-maker/derivative-maker --arch amd64 --flavor {{project_name_short_lowercase}}-workstation-lxqt --target virtualbox --repo true
 }}
+|-
+
+| VirtualBox
+| ARM64 (Mac <code>M#</code>, testers-only)
+| {{CodeSelect|code=
+~/derivative-maker/derivative-maker --arch arm64 --flavor {{project_name_short_lowercase}}-workstation-lxqt --target virtualbox --repo true
+}}
+|}
 
 ----
 
@@ -456,11 +489,11 @@ Mostly useful in case of build issues where sharing the build log is necessary f
 
 If using:
 
-* '''A)''' <u>GUI (graphical user interface):</u> It is recommended to set your terminal (for example xfce4-terminal) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
+* '''A)''' <u>GUI (graphical user interface):</u> It is recommended to set your terminal (for example qterminal) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
 * '''B)''' <u>CLI (command line user interface):</u> In case there are build issues, it is recommended to redirect the build log to a text file. To do that, for example {{CodeSelect|code=
 >> ~/build-log 2>&1
 }} could be appended to the very end of the {{Code2|build command}} to redirect the build output to {{Code2|build log file}} <code>~/build-log</code>.
-** Note: when using that command there will be no output in the terminal until the build is completed. This is as per Linux default and [[unspecific|unspecific to {{project_name_short}}]]. The build might not complete. In that case, that command would hang forever. To see if the build is stuck, it would be possible to open the {{Code2|build log file}} with a text editor. In that case, the file would have to be re-opened or refreshed to with F5 key to see new build output appended to the build log file. Or by using for example {{CodeSelect|code=
+** Note: when using that command there will be no output in the terminal until the build is completed. This is as per Linux default and [[unspecific|unspecific to {{project_name_short}}]]. The build might not complete. In that case, that command would hang forever. To see if the build is stuck, it would be possible to open the {{Code2|build log file}} with a text editor. In that case, the file would have to be re-opened or refreshed with the F5 key to see new build output appended to the build log file. Or by using for example {{CodeSelect|code=
 tail -n 100 -f ~/build-log 2>&1
 }}
 
@@ -469,7 +502,7 @@ tail -n 100 -f ~/build-log 2>&1
 * <u>VirtualBox</u>: The resulting <code>.ova</code> images can be found in <code>~/derivative-binary</code> folder.
 * <u>KVM, QEMU, raw images</u>: The resulting <code>.qcow2</code> and/or <code>.raw</code> images can be found in <code>~/derivative-binary</code> folder.
 
-Most users have completed the build process at this point, can start using {{project_name_short}} and skip the rest of this page.
+Most users have completed the build process at this point and can start using {{project_name_short}} and skip the rest of this page.
 
 = Prepare Release =
 [https://github.com/{{project_name_short}}/developer-meta-files/blob/master/usr/bin/dm-prepare-release dm-prepare-release] is useful for:
@@ -488,10 +521,10 @@ Most users have completed the build process at this point, can start using {{pro
 * Adding the disclaimer.
 * [[Dev/Redistribution|Redistribution]].
 * Example: {{CodeSelect|code=
-dm-prepare-release --build --target virtualbox --flavor kicksecure-xfce
+dm-prepare-release --build --target virtualbox --flavor kicksecure-lxqt
 }}
 
-For private builds, i.e. for builds which are not supposed to be redistributed to others, none of this is important. If any of this was important, it could also be done manually.
+For private builds, i.e. for builds which are not supposed to be redistributed to others, none of this is important. If any of this is important, it can also be done manually.
 
 = Footnotes =
 {{reflist|close=1}} {{Footer}} [[Category:Development]]
