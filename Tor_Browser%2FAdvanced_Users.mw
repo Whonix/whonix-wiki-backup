@@ -282,7 +282,7 @@ If the user wants to save files in the shared folder, there are multiple options
 * '''E)''' Deactivate AppArmor. Recommended against since totally unnecessary and it this lowers security.
 
 == Tor Browser AppArmor Permit Shared Folder ==
-By applying the following instructions, Tor Browser write access to folder <code>/media/sf_shared</code> folder would be permitted by AppArmor.
+By applying the following instructions, Tor Browser write access to folder <code>/mnt/shared</code> folder would be permitted by AppArmor.
 
 '''1.''' {{Open with root rights|filename=
 /etc/apparmor.d/local/home.tor-browser.firefox
@@ -291,8 +291,8 @@ By applying the following instructions, Tor Browser write access to folder <code
 '''2.''' Paste.
 
 {{CodeSelect|code=
-/media/sf_shared/        r,
-/media/sf_shared/**      rwl,
+/mnt/shared        r,
+/mnt/shared**      rwl,
 }}
 
 '''3.''' Reload the Tor Browser AppArmor profile.
@@ -323,8 +323,8 @@ KeePassXC Browser Extension developers did at time of writing not address bug re
 '''2.''' Paste.
 
 {{CodeSelect|code=
-/home/user/.mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json rix,
 /usr/bin/keepassxc-proxy rix,
+/home/user/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/Browser/TorBrowser/Data/Browser/.mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json rix,
 }}
 
 '''3.''' Save.
@@ -335,11 +335,11 @@ KeePassXC Browser Extension developers did at time of writing not address bug re
 sudo aa-enforce /etc/apparmor.d/home.tor-browser.firefox
 }}
 
-'''5.''' Symlink.
+'''5.''' Symlink the KeepassXC extension's <code>.mozilla</code> folder to the Tor Browser's folder.
 
-TODO
-
-Symlink {{CodeSelect|inline=true|code=~/.mozilla/native-messaging-hosts}} to {{CodeSelect|inline=true|code=~/.local/opt/tor-browser/app/Browser/TorBrowser/Data/Browser/.mozilla/native-messaging-hosts}}? TODO: path needs adjustment
+{{CodeSelect|code=
+ln -s /home/user/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/Browser/TorBrowser/Data/Browser/.mozilla /home/user/.tb/tor-browser/Browser/TorBrowser/Data/Browser
+}}
 
 See also:
 
