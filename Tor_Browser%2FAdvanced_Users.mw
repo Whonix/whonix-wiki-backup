@@ -307,7 +307,7 @@ sudo aa-enforce /etc/apparmor.d/home.tor-browser.firefox
 
 '''4.''' Done.
 
-Tor Browser should now have write access to the <code>/media/sf_shared</code> folder.
+Tor Browser should now have write access to the <code>/mnt/shared</code> folder.
 
 = KeePassXC Browser Extension =
 Untested / [[unsupported]].
@@ -1136,12 +1136,12 @@ Another issue is that Tor Browser mixes binaries and user data into the same fol
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = Prerequisite knowledge: see [[Tor_Browser/Advanced_Users#Running_Tor_Browser_in_Qubes_Template_or_Disposable_Template|Qubes R4 Inheritance and Persistence]].
+| text    = Prerequisite knowledge: see [[todo|Qubes Inheritance and Persistence]].
 }}
 
 The Tor Project requires Tor Browser to be installed inside of the home folder as explained earlier; see [[#Linux_Generally|Linux Generally]]. Qubes' App Qubes have their own home folder, independent from the Template they are based on. This means updates of a Qubes' Template will not update Tor Browser which is already installed in a Qubes App Qube's home folder. In short, Tor Browser updates are a more cumbersome task in Qubes OS due to Qubes-specific design choices and technical limitations.
 
-Due to these restrictions, the safest configuration that {{project_name_short}} has [https://phabricator.whonix.org/T417 implemented] is to ensure that <u>new</u> App Qubes and [[Qubes/Disposables|Disposables]] are created with a copy of the latest Tor Browser version. In essence:
+Due to these restrictions, the safest configuration that {{project_name_short}} has [todo T417 implemented] is to ensure that <u>new</u> App Qubes and [[Qubes/Disposables|Disposables]] are created with a copy of the latest Tor Browser version. In essence:
 
 * When tb-updater is run in a Qubes Template, it stores Tor Browser in folder <code>/var/cache/tb-binary</code>.
 * When a App Qube starts and it has never copied Tor Browser before (likely only at first boot), and there is no copy of Tor Browser in <code>/home/user</code>, Tor Browser is copied from <code>/var/cache/tb-binary</code> to <code>/home/user</code>.
@@ -1192,8 +1192,8 @@ related: {{kicksecure_wiki
 == Tor Browser vs Firewalls Based Filtering ==
 As mentioned above, Tor Browser uses a Tor <code>SocksPort</code> by default as per upstream default.
 
-<code>iptables</code> and its successor <code>nftables</code> however does not inherently understand application-layer protocols like SOCKS. This is why <code>nftables</code> firewalls are unable to filter Tor Browser's traffic. See {{kicksecure_wiki
-|wikpage=Socks_firewalling
+<code>nftables</code> (and its predecessor <code>iptables</code>) however does not inherently understand application-layer protocols like SOCKS. This is why <code>nftables</code> firewalls are unable to filter Tor Browser's traffic. See {{kicksecure_wiki
+|wikipage=socks_firewalling
 |text=SOCKS Firewalling
 }} for a detailed technical explanation.
 
