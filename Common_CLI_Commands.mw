@@ -27,10 +27,7 @@ __TOC__
 |
 * To change the keyboard layout:
 ** {{CodeSelect|code=
-sudo dpkg-reconfigure keyboard-configuration
-}}
-** {{CodeSelect|code=
-sudo dpkg-reconfigure console-data
+sudo set-system-keymap --interactive
 }}
 * Make the reconfigured keyboard-configuration change take effect:
 ** {{CodeSelect|code=
@@ -40,11 +37,11 @@ sudo setupcon
 
 ! Circumvent uwt Wrapper Use <ref name=experts_only>Experts / debugging only!</ref>
 |
-* /usr/bin/apt-get.anondist-orig
-* /usr/bin/wget.anondist-orig
-* /usr/bin/curl.anondist-orig
-* /usr/bin/gpg.anondist-orig
-* /usr/bin/ssh.anondist-orig
+* <code>/usr/bin/apt-get.anondist-orig</code>
+* <code>/usr/bin/wget.anondist-orig</code>
+* <code>/usr/bin/curl.anondist-orig</code>
+* <code>/usr/bin/gpg.anondist-orig</code>
+* <code>/usr/bin/ssh.anondist-orig</code>
 |-
 
 ! Connection Wizard (Enable/Disable Tor)
@@ -73,7 +70,7 @@ sudoedit /usr/local/etc/torrc.d/50_user.conf
 sudoedit /etc/{{project_name_short_lowercase}}_firewall.d/50_user.conf
 }}
 * Important configuration folders:
-** /etc/{{project_name_short_lowercase}}_firewall.d/
+** <code>/etc/{{project_name_short_lowercase}}_firewall.d/</code>
 |-
 
 ! Important Logs
@@ -85,7 +82,7 @@ sudo tail -f /var/log/syslog
 sdwdate-log-viewer
 }}
 * {{CodeSelect|code=
-sudo tail -f /var/run/tor/log
+sudo journalctl -u tor@default.service -f
 }}
 |-
 
@@ -123,8 +120,8 @@ sudo apt update && sudo apt full-upgrade
 * Only as either,
 - as clearnet user or<br />
 - after activation of transparent proxying for Whonix-Gateway<br />
-- in /etc/whonix_firewall.d/ or<br />
-- after allowing Whonix-Gateways root sending non-Tor traffic in /etc/whonix_firewall.d/<br />
+- in <code>/etc/whonix_firewall.d/</code> or<br />
+- after allowing Whonix-Gateways root sending non-Tor traffic in <code>/etc/whonix_firewall.d/</code><br />
 * nslookup check.torproject.org</blockquote></ref>
 |
 * {{CodeSelect|code=
@@ -134,7 +131,7 @@ sudo su clearnet
 
 ! systemcheck
 |
-* Network Time Synchronization and Tor Connection Check:
+* System Health Check:
 {{CodeSelect|code=
 systemcheck
 }}
@@ -167,36 +164,30 @@ echo "Wed Dec 04 06:20:13 UTC 2019" {{!}} /usr/bin/clock-random-manual-cli
 
 ! Tor
 |
-* Restart Network:
-{{CodeSelect|code=
-sudo service networking restart
-}}
 * Restart Tor:
 {{CodeSelect|code=
-sudo service tor restart
+sudo systemctl restart tor@default.service
 }}
 * Stop Tor:
 {{CodeSelect|code=
-sudo systemctl stop tor@default
+sudo systemctl stop tor@default.service
 }}
 * Check the Tor version:
 {{CodeSelect|code=
-anon-info
+tor-ctrl GETINFO version
 }}
 * Check the Tor configuration:
-{{CodeSelect|code=
-anon-verify
+** {{CodeSelect|code=
+leaprun tor-verify-config
 }}
-{{CodeSelect|code=
-sudo -u debian-tor tor --verify-config
-}}
+** Or, use <code>systemcheck</code>, mentioned above.
 |-
 
 ! Virtual Consoles
 |
-* Text console: Press <code>Alt + Crtl + F1</code>
-** Additional text consoles: Press <code>Alt + Crtl + F2</code> or <code>F3</code> and so on.
-* Graphical console: Press <code>Alt + Crtl + F7</code>
+* Text console: Press <code>Alt + Ctrl + F1</code>
+** Additional text consoles: Press <code>Alt + Ctrl + F2</code> or <code>F3</code> and so on.
+* Graphical console: Press <code>Alt + Ctrl + F7</code>
 |-
 
 ! VM Operations
@@ -233,22 +224,24 @@ cat /etc/{{project_name_short_lowercase}}_version
 
 ! Change Keyboard Layout
 |
-* {{CodeSelect|code=
-sudo dpkg-reconfigure keyboard-configuration
+* To change the keyboard layout:
+** {{CodeSelect|code=
+sudo set-system-keymap --interactive
 }}
-* {{CodeSelect|code=
-sudo dpkg-reconfigure console-data
+* Make the reconfigured keyboard-configuration change take effect:
+** {{CodeSelect|code=
+sudo setupcon
 }}
 |-
 
 ! Circumvent uwt Wrapper Use <ref name=experts_only />
 |
-* /usr/bin/apt-get.anondist-orig
-* /usr/bin/wget.anondist-orig
-* /usr/bin/curl.anondist-orig
-* /usr/bin/gpg.anondist-orig
-* /usr/bin/git.anondist-orig
-* /usr/bin/ssh.anondist-orig
+* <code>/usr/bin/apt-get.anondist-orig</code>
+* <code>/usr/bin/wget.anondist-orig</code>
+* <code>/usr/bin/curl.anondist-orig</code>
+* <code>/usr/bin/gpg.anondist-orig</code>
+* <code>/usr/bin/git.anondist-orig</code>
+* <code>/usr/bin/ssh.anondist-orig</code>
 |-
 
 ! Default Username and Password <ref name=both_VMs />
@@ -267,31 +260,22 @@ nslookup check.torproject.org
 ! GnuPG (OpenPGP)
 |
 * Retrieve keys (example):
-* Display key fingerprint (example):
 {{CodeSelect|code=
-sudo apt-key adv --fingerprint A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+sudo gpg --recv-keys EF6E286DDA85EA2A4BA7DE684E2C6E8793298290
 }}
 * Check file signatures (example):
 {{CodeSelect|code=
-gpg --verify tor-browser-linux64-8.5_en-US.tar.xz.asc tor-browser-linux64-8.5_en-US.tar.xz
-}}
-|-
-
-! HexChat
-|
-* Reset HexChat identity:
-{{CodeSelect|code=
-hexchat-reset
+gpg --verify tor-browser-linux-x86_64-15.0.3.tar.xz.asc tor-browser-linux-x86_64-15.0.3.tar.xz
 }}
 |-
 
 ! Important Configuration Folders and Logs
 |
 * Important configuration folders:
-** /etc/{{project_name_short_lowercase}}_firewall.d/
+** <code>/etc/{{project_name_short_lowercase}}_firewall.d/</code>
 * Important logs:
 ** {{CodeSelect|code=
-sudo tail -f /var/log/syslog
+sudo journalctl -f
 }}
 ** {{CodeSelect|code=
 sdwdate-log-viewer
@@ -302,13 +286,6 @@ sdwdate-log-viewer
 |
 * {{CodeSelect|code=
 leaktest
-}}
-|-
-
-! Network Restart
-|
-* {{CodeSelect|code=
-sudo service networking restart
 }}
 |-
 
@@ -332,7 +309,7 @@ sudo apt -t {{Stable_project_version_based_on_Debian_codename}}-backports instal
 
 ! systemcheck
 |
-* Network Time Synchronization and Tor Connection Check: <ref>Additionallly in {{project_name_workstation_short}}, notifications are made regarding OS updates, the {{project_name_short}} version and news.</ref>
+* System Health Check:
 {{CodeSelect|code=
 systemcheck
 }}
@@ -342,7 +319,7 @@ systemcheck
 |
 * Manually set the system clock:
 {{CodeSelect|code=
-sudo date -s "17 FEB 2019 24:00:00" && sudo hwclock -w
+sudo date -s "17 FEB 2025 24:00:00" && sudo hwclock -w
 }}
 |-
 
@@ -372,9 +349,9 @@ update-torbrowser
 
 ! Virtual Consoles
 |
-* Text console: Press <code>Alt + Crtl + F1</code>
-** Additional text consoles: Press <code>Alt + Crtl + F2</code> or <code>F3</code> and so on.
-* Graphical console: Press <code>Alt + Crtl + F7</code>
+* Text console: Press <code>Alt + Ctrl + F1</code>
+** Additional text consoles: Press <code>Alt + Ctrl + F2</code> or <code>F3</code> and so on.
+* Graphical console: Press <code>Alt + Ctrl + F7</code>
 |-
 
 ! VM Operations
