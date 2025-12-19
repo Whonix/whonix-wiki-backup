@@ -26,19 +26,26 @@ https://www.{{project_clearnet}}
 
 {{project_name_short}} is produced independently from the Tor (r) anonymity software and carries no guarantee from The Tor Project about quality, suitability or anything else.
 
-Type: "{{project_name_short_lowercase}}" <enter> for help.
-uwt INFO: Stream isolation for some applications enabled. uwt / torsocks will be automatically prepended to some commands. What is that? See:
-uwt INFO: https://www.whonix.org/wiki/Stream_Isolation/Easy</blockquote>
+{{project_name_short}} is a research project.
+
+default user account: user
+default password: No password required. (Passwordless login.)
+
+Type: "{{project_name_short_lowercase}}" <enter> for help.</blockquote>
 
 To disable the banner, follow these steps.
 {{Box|text=
-'''1.''' {{Open_a__product_ws_terminal}}
+'''1.''' If <code>user-sysmaint-split</code> is installed, boot into [[Sysmaint|<code>PERSISTENT Mode | SYSMAINT Session | system maintenance tasks</code>]].
 
-'''2.''' Run the following command.
+'''2.''' {{Open_a__product_ws_terminal}}
+
+'''3.''' Run the following command.
 
 {{CodeSelect|code=
-cp /etc/skel/.bashrc.{{project_name_short_lowercase}}-orig ~/.bashrc
+sudo chmod -x /etc/update-motd.d/30_dist-base-files
 }}
+
+'''4.''' Done.
 
 The process is now complete.
 }}
@@ -54,20 +61,25 @@ sudo poweroff
 
 Alternatively, use the menu option:
 
-* [[Qubes|{{q_project_name_long}}]]: <code>Blue Q button</code> &rarr; <code>{{project_name_gateway_vm}}</code> &rarr; <code>Shutdown</code>
-* [[Non-Qubes-Whonix|{{non_q_project_name_short}}]]: <code>Start</code> &rarr; <code>Leave...</code>
+* [[Non-Qubes-Whonix|{{non_q_project_name_short}}]]:
+** In user sessions: <code>Start Menu</code> &rarr; <code>Log Out</code> &rarr; <code>Shut Down</code>
+** In sysmaint sessions: click the <code>Shut Down</code> button in the System Maintenance Panel
+* [[Qubes|{{q_project_name_long}}]]: <code>Blue Q button</code> &rarr; <code>Qubes Tools</code> &rarr; <code>Qubes Manager</code> &rarr; <code>{{project_name_gateway_vm}}</code> &rarr; <code>Shutdown</code>
 
 == Virtual Consoles ==
 === On the Host ===
 [https://en.wikipedia.org/wiki/Virtual_console Virtual consoles] is a feature inherited from Debian GNU/Linux which is unfamiliar to many users. The following keyboard shortcuts activate the Debian (not {{project_name_short}}) feature:
 
-* Text console: Press <code>Alt + Crtl + F1</code>
-** Additional text consoles: Press <code>Alt + Crtl + F2</code> or <code>F3</code> and so on. Try these in case <code>F1</code> is not functional.
-* Graphical console: Press <code>Alt + Crtl + F7</code>
+* Text console: Press <code>Alt + Ctrl + F1</code>
+** Additional text consoles: Press <code>Alt + Ctrl + F2</code> or <code>F3</code> and so on. Try these in case <code>F1</code> is not functional.
+* Graphical console: Press <code>Alt + Ctrl + F7</code>
+
+See also [[Protection_Against_Physical_Attacks#Virtual_Consoles|Protection against Physical Attacks, Virtual Consoles]].
 
 === Virtual Machines ===
 {| class="wikitable"
 |+ ''Virtual Console Activation''
+
 |-
 ! '''Platform'''
 ! '''Steps'''
@@ -76,7 +88,7 @@ Alternatively, use the menu option:
 | The desired virtual console key shortcut can be selected under the <code>Send Key</code> option in a VM's graphical window.
 |-
 ! Qubes dom0
-| Qubes dom0 inherited the same feature (<code>Alt + Crtl + F1</code>...).
+| Qubes dom0 inherited the same feature (<code>Alt + Ctrl + F1</code>...).
 |-
 ! Qubes VMs
 | In order to access VMs in dom0, run: <ref>
@@ -124,25 +136,29 @@ The <code>login</code> program unfortunately does not provide this option.
 
 This process is similar to [[#Disable Terminal Emulator Banner|Disable Terminal Emulator Banner]].
 
-'''1.''' Open a [[#Virtual Consoles|virtual console]].
+'''1.''' If <code>user-sysmaint-split</code> is installed, boot into [[Sysmaint|<code>PERSISTENT Mode | SYSMAINT Session | system maintenance tasks</code>]].
 
-'''2.''' Run the following command to restore the original bashrc (untested). <ref>
-Please leave feedback if this step works correctly.
-</ref>
+'''2.''' Open a [[#Virtual Consoles|virtual console]].
 
-{{CodeSelect|code=
-cp /etc/skel/.bashrc.whonix-orig ~/.bashrc
-}}
-
-<ref>
-Run the following command.
+'''3.''' Move the <code>/etc/issue.{{project_name_short_lowercase}}</code> file out of the way.
 
 {{CodeSelect|code=
-sudo unlink /etc/motd
+sudo mv /etc/issue.{{project_name_short_lowercase}} /etc/issue.{{project_name_short_lowercase}}.bak
 }}
-</ref>
 
-'''3.''' Done.
+'''4.''' Create an empty file in its place.
+
+{{CodeSelect|code=
+sudo touch /etc/issue.{{project_name_short_lowercase}}
+}}
+
+'''5.''' (Optional) Divert <code>/usr/lib/issue.d/20_security-misc.issue</code> to prevent the unauthorized access warning from being displayed either.
+
+{{CodeSelect|code=
+sudo dpkg-divert --divert /usr/lib/issue.d/20_security-misc.issue.bak --rename /usr/lib/issue.d/20_security-misc.issue
+}}
+
+'''6.''' Done
 
 The procedure is complete.
 
@@ -151,62 +167,56 @@ The procedure is complete.
 == Disable Autologin ==
 Not very useful inside VMs, see also [[Protection_Against_Physical_Attacks#Login_Screen|Login Screen]].
 
-This requires configuration of both GDM (old versions) and LightDM (newer versions) of {{project_name_short}}.
+Autologin is enabled by default in the login manager by {{project_name_short}}.
 
-'''1.''' {{Open with root rights|filename=
-/etc/gdm3/daemon.conf.dist
-}}
-
-'''2.''' Search for the following.
-
-<pre>
-AutomaticLoginEnable=true
-AutomaticLogin=user
-</pre>
-
-'''3.''' Modify.
-
-Out-comment, add a hash symbol ("<code>#</code>") in front of the two lines. Or replace the content, copy/paste the following which does the same.
-
-{{CodeSelect|code=
-#AutomaticLoginEnable=true
-#AutomaticLogin=user
-}}
-
-'''4.''' Save.
-
-'''5.''' Disable LightDM autologin.
-
-{{CodeSelect|code=
-sudo rm /etc/lightdm/lightdm.conf.d/30_autologin.conf
-}}
-
-{{CodeSelect|code=
-sudo rm /etc/lightdm/lightdm.conf.d/40_autologin.conf
-}}
-
-'''7.''' Reboot.
-
-'''7.''' Done.
-
-Autologin should be disabled after reboot.
-
+See [[Login#Configuring_GUI_Autologin]] for detailed instructions on disabling autologin.
 == RAM Adjusted Desktop Starter ==
 {{RAM_Adjusted_Desktop_Starter}}
 
 For more information, see [[RAM Adjusted Desktop Starter]].
 
-== Disable Graphical Desktop Environment ==
-TODO
+== Disable the Graphical Desktop Environment ==
+This is for advanced users only.
+
+To stop the graphical desktop environment.
+
+{{CodeSelect|code=
+sudo systemctl stop greetd
+}}
+
+To disable automatic start at boot of the graphical desktop environment.
+
+{{CodeSelect|code=
+sudo systemctl disable greetd
+}}
+
+To restart the graphical desktop environment.
+
+{{CodeSelect|code=
+sudo systemctl start greetd
+}}
+
+To re-enable automatic start at boot of the graphical desktop environment.
+
+{{CodeSelect|code=
+sudo systemctl enable greetd
+}}
+
+Do not attempt to uninstall the graphical desktop environment. This would require removal of {{project_name_short}} meta packages, and {{project_name_short}} meta packages [[Debian Packages#Packages_FAQ|are not designed to be removed]]. If you want a {{project_name_short}} server installation, download the {{project_name_short}} CLI version or build it from source code. See [[VirtualBox#CLI]] and [[KVM#CLI]].
+
+related: Using [[Other Desktop Environments|{{project_name_short}} with Other Desktop Environments such as GNOME, KDE, LXDE, MATE, ...)]]
 
 == Use Full-screen Mode ==
-It is recommended to work in full-screen; this feature is also inherited from [[VirtualBox]]. To activate and deactivate full-screen mode, press the VirtualBox Host Key + F. The current Host Key is visible in the bottom right corner of VirtualBox. The VirtualBox default is <code>Right Ctrl + F</code>.
+It is recommended to work in full-screen mode; this feature is also inherited from [[VirtualBox]] and [[KVM]]. When full-screen mode is enabled, the {{project_name_short}} virtual display will automatically increase its resolution to the host system's resolution.
+
+=== VirtualBox ===
+To activate and deactivate full-screen mode, press the VirtualBox Host Key + F. The current Host Key is visible in the bottom right corner of VirtualBox. The VirtualBox default is <code>Right Ctrl + F</code>.
 
 Host key can be changed using <code>VirtualBox</code> &rarr; <code>Global Settings</code> &rarr; <code>Input</code> &rarr; <code>Host Key</code>.
-
-Full-screen mode leads to the {{project_name_short}} (and Debian) default resolution and color depth of <code>1920x1080x24</code>. Having a common value for these identifiers reduces the [[Protocol-Leak-Protection_and_Fingerprinting-Protection#Major_Identifiers|fingerprinting risk]] to the user. Full-screen mode also helps to prevent users from accidentally launching applications on the host (such as a clearnet browser), instead of within {{project_name_short}}.
-
 {{Anchor|Whonixcheck / Timesync Writing to tty1}}
+
+=== KVM ===
+To activate full-screen mode when using virt-manager, open the VM window, then click <code>View</code> &rarr; <code>Fullscreen</code>. To deactivate full-screen mode, move the mouse pointer to the top middle of the screen, and click the <code>Leave fullscreen</code> button.
 
 {{Anchor|Xfce Scaling}}
 {{Anchor|XFCE Scaling}}
@@ -219,37 +229,29 @@ Full-screen mode leads to the {{project_name_short}} (and Debian) default resolu
 == Default Home Folder Configuration Files Reset ==
 Before following these instructions to wipe the whole LXQt settings folder and restore defaults, it is recommended to backup existing LXQt settings.
 {{Box|text=
-'''1.''' Open a [[Desktop#Virtual_Consoles|virtual console]].
+'''1.''' Logout from and stop LXQt by clicking <code>Application Menu</code> &rarr; <code>Power button</code> &rarr; <code>Logout</code> &rarr; <code>Yes</code>.
 
-'''2.''' Logout from and stop LXQt by halting {{project_name_short}} default <code>login manager</code> <code>gdm3</code>.
-
-{{CodeSelect|code=
-sudo systemctl stop gdm3
-}}
+'''2.''' Open a [[Desktop#Virtual_Consoles|virtual console]].
 
 '''3.''' Delete folder <code>~/.config/lxqt</code>.
 
 {{CodeSelect|code=
-rm -r ~/.config/lxqt
+safe-rm -rf ~/.config/lxqt
 }}
 
-'''4.''' Delete the <code>first-boot-skel.done</code> file.
+'''4.''' Delete folder <code>~/.config/pcmanfm-qt</code>.
 
 {{CodeSelect|code=
-sudo rm /var/cache/anon-base-files/first-boot-skel.done
+safe-rm -rf ~/.config/pcmanfm-qt
 }}
 
-'''5.''' Re-add {{project_name_short}} LXQt configuration files.
+'''5.''' Delete folder <code>~/.config/qterminal.org</code>.
 
 {{CodeSelect|code=
-sudo /usr/libexec/helper-scripts/first-boot-skel
+safe-rm -rf ~/.config/qterminal.org
 }}
 
-'''6.''' Restart lightdm to restart LXQt.
-
-{{CodeSelect|code=
-sudo systemctl restart gdm3
-}}
+'''6.''' Switch back to the login screen by pressing <code>Ctrl + Alt + F7</code>, then log in. LXQt will automatically regenerate its settings files as needed.
 
 '''7.''' Done.
 
@@ -260,7 +262,7 @@ The process has been completed.
 
 == Avoid VM Full Screen Mode ==
 
-It is unrecommended to allow [[Qubes|{{q_project_name_short}}]] or other VMs to [https://www.qubes-os.org/doc/how-to-enter-fullscreen-mode/ completely "own" the full screen]. Overriding Qubes' GUI virtualization daemon restrictions means the colored decorations drawn by each VM window will not be visible. In this case, a malicious application might not actually release the full screen (while it appears normal), or the full desktop may be emulated so users are tricked into entering sensitive information inside false "trusted" domains. <ref>https://www.qubes-os.org/doc/full-screen-mode/</ref>
+It is not recommended to allow [[Qubes|{{q_project_name_short}}]] or other VMs to [https://www.qubes-os.org/doc/how-to-enter-fullscreen-mode/ completely "own" the full screen]. Overriding Qubes' GUI virtualization daemon restrictions means the colored decorations drawn by each VM window will not be visible. In this case, a malicious application might not actually release the full screen (while it appears normal), or the full desktop may be emulated so users are tricked into entering sensitive information inside false "trusted" domains. <ref>https://www.qubes-os.org/doc/how-to-enter-fullscreen-mode/</ref>
 
 = See Also =
 * [[Keyboard Layout]]
