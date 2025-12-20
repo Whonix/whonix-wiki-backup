@@ -16,14 +16,14 @@ The system language used in {{project_name_long}} is easily changed. The technic
 
 = System =
 
-These instructions are sourced from the Debian wiki [https://wiki.debian.org/ChangeLanguage ChangeLanguage] and [https://wiki.debian.org/InputMethodBuster InputMethodBuster] entries. In LXQt, it is unnecessary to install additional language packs.
+These instructions are sourced from the Debian wiki [https://wiki.debian.org/ChangeLanguage ChangeLanguage] and [https://wiki.debian.org/InputMethodBuster InputMethodBuster] entries.
 
 == All Languages ==
 
 {{Box|text=
 '''1.''' Open a terminal in {{project_name_workstation_long}} ([[Qubes|{{q_project_name_long}}]]: in Template).
 
-<code>Start menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Terminal</code>
+{{Open a product ws terminal}}
 
 '''2.''' Check the language environment variable.
 
@@ -48,37 +48,44 @@ It is now possible to combine these codes to determine the language to export. F
 
 '''4.''' Reconfigure locales.
 
-Reconfigure locales with the following command.
+Reconfigure locales with the following command. <ref>Do not omit the <code>LC_ALL=C</code> component of the following command, as <code>dpkg-reconfigure</code> may crash without it in some instances.</ref>
 
 {{CodeSelect|code=
 sudo dpkg-reconfigure locales
 }}
 
-A window will prompt for the preferred the locale(s) to be made available. Select the preferred option(s) with the space bar -- multiple locales can be chosen.
+A window will prompt for the preferred locale(s) to be made available. Select the preferred option(s) with the space bar -- multiple locales can be chosen.
 
 '''5.''' Reboot {{project_name_workstation_short}}.
 
 This is required for the changes to take effect.
 
 '''Figure:''' ''Japanese Locale in {{project_name_short}}''
-[[File:Anonwhonixjapanese.png]]
+[[File:Whonix-terminal-japanese.png]]
 }}
 
 == Fonts ==
 
-Depending on the locale, it may be necessary to install [https://wiki.debian.org/Fonts additional fonts] in {{project_name_workstation_short}} so characters present correctly system-wide ([[Qubes|{{q_project_name_short}}]]: in Template):
+Depending on the locale, it may be necessary to install [https://wiki.debian.org/Fonts additional fonts] in {{project_name_workstation_short}} so characters present correctly system-wide.
+
+'''1.''' Platform specific notice.
+
+* [[{{project_name_short}}|{{project_name_short}}]]: No special notice.
+* [[{{q_project_name_short}}|{{q_project_name_short}}]]: In Template.
+
+'''2.''' Font installation.
+
 * [https://packages.debian.org/stable/fonts/ Debian stable fonts packages].
 * TrueType (TTF) and OpenType (OTF) fonts are generally recommended. These packages start with <code>fonts-</code>.
-* For Korean fonts, an anonymous [https://web.archive.org/web/20210114111944/https://sourceforge.net/projects/whonix/discussion/general/thread/fff34595/ forums] contributor previously recommended the following additional packages: <code>fonts-unfonts-core</code> (Korean TrueType fonts) and <code>nabi</code> (Korean X input method). After restarting {{project_name_workstation_short}} and starting nabi, the Korean script should be available system-wide for writing and reading. <ref>
+* For Korean fonts, an anonymous forums contributor previously recommended the following additional packages: <code>fonts-unfonts-core</code> (Korean TrueType fonts) and <code>nabi</code> (Korean X input method). After restarting {{project_name_workstation_short}} and starting nabi, the Korean script should be available system-wide for writing and reading. <ref>
 {{Install_Package|package=
 fonts-unfonts-core nabi
-}}
-</ref>
+}}</ref>
 
 For example to install Japanese TrueType fonts:
 
 {{Install_Package|package=
-fonts-ipaexfont
+fonts-noto-cjk
 }}
 
 '''Figure:''' ''Japanese Font Installation in {{project_name_short}}''
@@ -87,96 +94,83 @@ fonts-ipaexfont
 
 == Input Method ==
 
-The <code>ibus</code> package is recommended for languages other than English. As of 2021, this should work by default for the following languages:
-<div style="column-count:4;-moz-column-count:4;-webkit-column-count:4">
-* English
-* Arabic
-* Bulgarian
-* Catalan; Valencian
-* Croatian
-* Czech
-* Danish
-* Dutch; Flemish
-* Estonian
-* Finnish
-* French
-* German
-* Greek, Modern
-* Hebrew
-* Hungarian
-* Italian
-* Japanese
-* Korean
-* Latvian
-* Lithuanian
-* Malay
-* Mongolian
-* Norwegian
-* Polish
-* Portuguese
-* Romanian; Moldavian; Moldovan
-* Russian
-* Serbian
-* Slovak
-* Slovenian
-* Spanish; Castilian
-* Swedish
-* Turkish
-* Ukrainian
-</div>
+The <code>ibus</code> package is not recommended in {{project_name_short}} 18. It can interfere with both keyboard and mouse input in the default LXQt session. It is also non-trivial to configure. Most keyboard layouts are handled natively by labwc without issues.
+
+Some languages (like Japanese) require an input method application to write in the language's usual script. <code>fcitx</code> is known to work. To set it up:
 
 {{Box|text=
-'''1.''' Open a terminal in {{project_name_workstation_short}} ([[Qubes|{{q_project_name_short}}]]: in Template).
+'''1.''' Open a terminal in {{project_name_workstation_long}}.
 
-'''2.''' Install <code>ibus</code>.
+{{Open a product ws terminal}}
 
-{{Install_Package|package=
-ibus
-}}
-
-'''3.''' Launch <code>ibus-setup</code> ([[Qubes|{{q_project_name_short}}]]: in Template so changes are permanent).
+'''2.''' Install <code>fcitx</code>.
 
 {{CodeSelect|code=
-ibus-setup
+sudo apt install fcitx
 }}
 
-'''4.''' Add the preferred input method(s).
+'''3.''' Install an input method engine for your language. For Japanese, <code>fcitx-mozc</code> is known to work.
 
-Multiple language input methods can be selected at this step.
+{{CodeSelect|code=
+sudo apt install fcitx-mozc
+}}
 
-'''Figure:''' ''Input Method Option''
+'''4.''' Configure fcitx to autostart on login.
 
-[[File:Ibuslanguageselection.png]]
+Run:
 
-'''5.''' Select the preferred keyboard shortcut to change the input method.
+{{CodeSelect|code=
+mkdir -p ~/.config/labwc
+nano ~/.config/labwc/autostart
+}}
 
-'''Figure:''' ''Preferred Input Method Shortcut''
+Type in the following line at the end of the file:
 
-[[File:Languageinputshortcut.png]]
+{{CodeSelect|code=
+fcitx
+}}
 
-'''6.''' Reboot {{project_name_workstation_short}}.
+Save with <code>Ctrl + S</code>, then exit with <code>Ctrl + X</code>.
 
-In [[Qubes|{{q_project_name_short}}]]: shut down the Template and create a new AppVM based on the modified template.
+'''5.''' Configure applications to use fcitx as an input method.
 
-'''7.''' Test the preferred input method(s) functionality.
+Run:
 
-* Open a terminal in {{project_name_workstation_short}}.
-* Use either the language icon on the system tray or the keyboard shortcut to change the input method.
-* If the procedure was successful, languages other than English will present correctly.
+{{CodeSelect|code=
+nano ~/.config/labwc/environment
+}}
 
-'''Figure:''' ''Non-English Input Method in {{project_name_short}}''
+Type in the following lines at the end of the file:
 
-[[File:Manylanguageexample.png]]
+{{CodeSelect|code=
+XMODIFIERS=@im=fcitx
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+}}
 
-'''8.''' ''Optional:'' Asian input method(s).
+'''6.''' Log out and log back in. You should see a keyboard icon in the system tray; this indicates that <code>fcitx</code> is running.
 
-Preliminary tests reveal additional Input Method Engine (IME) packages must be installed for Chinese and Korean functionality; refer to the Debian [https://wiki.debian.org/InputMethodBuster InputMethodBuster] entry for further information. After installation of IME packages, follow steps 3-7.
+'''7.''' Right-click the <code>fcitx</code> icon in the system tray, and click <code>Configure</code>.
 
-'''Figure:''' ''Korean and Chinese Input Method in {{project_name_short}}''
+'''8.''' Click the <code>+</code> button in the lower-left corner of the window.
 
-[[File:Asianlanguageexample.png]]
+'''9.''' Uncheck <code>Only Show Current Language</code>.
 
-Unfortunately, this method does not appear to work for Japanese and Thai. Additional libraries, IME packages or fonts are likely necessary; for instance [https://forums.whonix.org/t/adding-language-support/1757 one {{project_name_short}} user] has reported that [https://www.ubuntubuzz.com/2019/07/mozc-and-fcitx-for-japanese-writings-on-debian-10-buster.html installing <code>fcitx-mozc</code>] allows Japanese input. Readers who successfully configure functional Japanese and Thai input methods are encouraged to edit this wiki entry.
+'''10.''' Search for the input method you installed (note that this is NOT the same as the name of the language you want to write text in!). For instance, if you installed <code>fcitx-mozc</code>, search for <code>mozc</code> here.
+
+'''11.''' Click the input method, then click <code>OK</code>.
+
+'''12.''' Close the <code>fcitx</code> configuration window.
+
+'''13.''' To switch between input methods, press <code>Ctrl + Space</code>. The newly chosen input method will be displayed on screen. Note that fcitx tracks input methods on a per-window basis. For example, if you have two Firefox windows open, and you switch to Japanese input via Mozc in one window, the other window will still be using an English (or other) input method.
+
+'''14.''' Done.
+
+Input method configuration is now complete.
+
+'''Figure:''' ''Japanese Input in {{project_name_short}}''
+
+[[File:Whonix-japanese-input-featherpad.png]]
 }}
 
 = Tor Browser =
@@ -186,7 +180,7 @@ Using <u>one</u> of the methods below is sufficient to change the language in [[
 == about:preferences Method ==
 
 # Type <code>about:preferences</code> in the URL bar.
-# Scroll down to the languages section and search for the preferred language: <code>Language</code> &rarr; <code>Search for more languages</code>
+# Scroll down to the languages section and search for the preferred language: <code>Language</code> &rarr; <code>Set Alternatives...</code>
 # Add the preferred language.
 # Restart Tor Browser.
 
@@ -198,22 +192,25 @@ Using <u>one</u> of the methods below is sufficient to change the language in [[
 
 [[File:Japanesetorbrowser.png]]
 
+<!-- arraybolt3: This method is broken as of 2025-12-19 on Whonix-Workstation 18. The steps can be completed but the browser starts in English at the end.
 == Config File Method ==
 
 Complete these steps in {{project_name_workstation_short}}.
 
-Thirty-six language packs are available for Tor Browser as of 2022:
+Forty-one language packs are available for Tor Browser as of late 2025:
 <div style="column-count:3;-moz-column-count:3;-webkit-column-count:3">
 * English (en-US)
 * Arabic (ar)
+* Belarusian (be)
+* Bulgarian (bg)
 * Catalan (ca)
 * Czech (cs)
 * Danish (da)
 * German (de)
 * Greek (el)
 * Spanish (es-ES)
-* Spanish - Argentina (es-AR)
 * Persian/Farsi (fa)
+* Finnish (fi)
 * French (fr)
 * Irish (ga-IE)
 * Hebrew (he)
@@ -232,10 +229,14 @@ Thirty-six language packs are available for Tor Browser as of 2022:
 * Dutch (nl)
 * Polish (pl)
 * Brazilian Portuguese (pt-BR)
+* Portugal Portuguese (pt-PT)
 * Romanian (ro)
 * Russian (ru)
+* Albanian (sq)
 * Swedish (sv-SE)
+* Thai (th)
 * Turkish (tr)
+* Ukranian (uk)
 * Vietnamese (vi)
 * Chinese (zh-CN)
 * Traditional Chinese (zh-TW)
@@ -268,7 +269,8 @@ Replace <code>vi</code> with <code>zh-CN</code> for Chinese and so on.
 
 After changing this setting, use [[Tor_Browser#Tor_Browser_Downloader_by_{{project_name_short}}|Tor Browser Downloader by {{project_name_short}}]] to install a new version. Afterwards, Tor Browser will support the user's native language.
 }}
-
+-->
+<!-- arraybolt3: This method is broken as of 2025-12-19 on Whonix-Workstation 18, because almost all fields in 'about:support' (including the Firefox version number) are blank.
 == Mozilla Firefox Language Pack Method ==
 
 Complete these steps in {{project_name_workstation_short}}.
@@ -291,7 +293,7 @@ Note: <code>91.13.0</code> in the above URL needs to be changed to match the Fir
 
 Tor Browser will now default to the user's native language.
 }}
-
+-->
 == Debian Firefox Language Pack Method ==
 {{mbox
 | type      = notice

@@ -34,6 +34,7 @@ WhonixSetup(.exe):
 * platform independent ( later linux/mac version possible )
 * installs VirtualBox and WhonixOVA
 * executes WhonixStarterSetup.msi (Windows only)
+* Optionally disables Hyper-V (to improve VirtualBox performance and stability, see https://www.kicksecure.com/wiki/VirtualBox/Green_Turtle_Issue)
 * checks installed and only reinstall missing components
 * does not uninstall or delete any component
 
@@ -49,7 +50,7 @@ Requirements:
 
 Build limitations:
 
-* needs Debian bookworm or above because of minimal wixl and lazarus version
+* needs Debian bookworm or above because of minihttps://www.whonix.org/w/index.php?title=Dev/Windows_Installer&stable=0mal wixl and lazarus version
 
 = flow chart =
 (1) Whonix-Starter:
@@ -308,7 +309,7 @@ Happening on Windows 10.
 
 <pre>
 Step 9 / 9 : Installing Whonix-Starter...
-Execute: msiexec /i "C:\Users\user\AppData\Local\Whonix-LXQt-17.2.0.1\WhonixStarter.msi"
+Execute: msiexec /i "C:\Users\user\AppData\Local\Whonix-LXQt-18.0.8.3\WhonixStarter.msi"
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 Error : Whonix-Starter could not be installed.
@@ -318,7 +319,7 @@ Error : Whonix-Starter could not be installed.
 
 '''Debugging Attempt 1: Double Clicking WhonixStarter.msi'''
 
-While this happened, user kept the Whonix-Installer open and then attempted to manually run <code>C:\Users\user\AppData\Local\Whonix-LXQt-17.2.0.1\WhonixStarter.msi</code> for debugging reasons. Result:
+While this happened, user kept the Whonix-Installer open and then attempted to manually run <code>C:\Users\user\AppData\Local\Whonix-LXQt-18.0.8.3\WhonixStarter.msi</code> for debugging reasons. Result:
 
 <pre>
 WhonixStarter
@@ -328,14 +329,14 @@ Another installation in progress. You must complete that installation before con
 Retry | Cancel
 </pre>
 
-What can we conclude from this? Maybe while Whonix installer is running, it cannot execute <code>msiexec /i "C:\Users\user\AppData\Local\Whonix-LXQt-17.2.0.1\WhonixStarter.msi"</code> because it is blocking itself?
+What can we conclude from this? Maybe while Whonix installer is running, it cannot execute <code>msiexec /i "C:\Users\user\AppData\Local\Whonix-LXQt-18.0.8.3\WhonixStarter.msi"</code> because it is blocking itself?
 
 -> perhaps obsolete due to previous fix?
 Strange: execution of "msiexec" is finnished when "Whonix-Starter could not be installed." appears.
 
 ''' Debugging Attempt 2: Starting WhonixStarter.msi from Terminal '''
 
-Starting <code>msiexec /i "C:\Users\user\AppData\Local\Whonix-LXQt-17.2.0.1\WhonixStarter.msi"</code> from terminal does not show any additional output.
+Starting <code>msiexec /i "C:\Users\user\AppData\Local\Whonix-LXQt-18.0.8.3\WhonixStarter.msi"</code> from terminal does not show any additional output.
 
 == ChatGPT AI based Code Review of whonixinstaller_main.pas ==
 === Thread Blocking Due to <code>Sleep</code> and <code>Application.ProcessMessages</code> ===
@@ -416,9 +417,9 @@ Error: (lazbuild) Invalid Lazarus directory "/usr/lib/lazarus/2.2.6/": directory
 * Test with Windows Pro, if possible.
 * documentation: https://www.kicksecure.com/wiki/VirtualBox/Green_Turtle_Issue
 
-== bug - Whonix-Gateway-LXQt9 matched Whonix-Gateway-LXQt - installer aborted ==
-* Patrick had VMs named Whonix-Gateway-LXQt'''9''' and Whonix-Workstation-LXQt'''9'''.
-** Bug: this prevented the Windows Installer from importing Whonix-Gateway-LXQt and matching it with Whonix-Workstation-LXQt.
+== bug - Whonix-Gateway-Xfce9 matched Whonix-Gateway-Xfce - installer aborted ==
+* Patrick had VMs named Whonix-Gateway-Xfce'''9''' and Whonix-Workstation-Xfce'''9'''.
+** Bug: this prevented the Windows Installer from importing Whonix-Gateway-Xfce and matching it with Whonix-Workstation-Xfce.
 ** Speculation: the grep might be overly zealous (matching too broadly).
 
 == review Whonix-Starter AI suggestions ==

@@ -18,7 +18,7 @@ For [[Qubes|{{q_project_name_long}}]], see [[Dev/Qubes#Build_{{q_project_name_sh
 
 Building from source code has security advantages (see [[Trust]]).
 
-The goal of this build documentation is to be usable by as many users as possible. Therefore it is written as simply as possible, with no prior knowledge of the tools used required.
+The goal of this build documentation is to be usable by as many users as possible. Therefore it is written as simply as possible and does not require prior knowledge of the tools used.
 
 The high level summary is as follows:
 
@@ -37,12 +37,12 @@ Due to digital software verification instructions and [[Software_Signature_Verif
 
 Steps concerning digital software verification are pointed out as "This step is recommended for better security, but is not strictly required. (See [[Trust]].)"
 
-When verifying digital software signatures, these instructions will be slightly more complicated, but therefore even more secure.
+When verifying digital software signatures, these instructions will be slightly more complicated, but even more secure.
 
 # Host preparation.
-# Get derivative-maker source code.
+# Get {{project_name_short}} source code (which includes {{project_name_short}} build script).
 # Verify digital software signatures.
-# Run derivative-maker.
+# Run {{project_name_short}} build script.
 # Done, build of {{project_name_short}} has been completed.
 
 = Host Preparation =
@@ -62,7 +62,7 @@ When making changes here, please consider also making changes there.
 * <u>RAM:</u> You need ~ <code>4</code> GB free RAM.
 ** Might actually work with a lot less RAM.
 ** Might actually work with less RAM if you have swap.
-* <u>linux user account:</u> Do not build under user <code>root</code>. Log in as regular account <code>user</code>. Do not use <code>sudo</code> to run <code>derivative-maker</code> because becoming root when necessary is handled by the build script.
+* <u>linux user account:</u> Do not build under user <code>root</code>. Log in as account <code>user</code>. Do not use <code>sudo</code> to run <code>derivative-maker</code> because becoming root when necessary is handled by the build script.
 * <u>build place notice:</u> You cannot build on {{project_name_gateway_long}} (due to networking issues).
 * <u>build logs:</u> If using a GUI (graphical user interface) it is recommended to set your terminal (for example <code>qterminal</code>) to unlimited scrollback, so you can watch the full build log and share it for support in case there are issues.
 <div class="mw-collapsible-content">
@@ -84,7 +84,7 @@ Building {{project_name_gateway_short}} and {{project_name_workstation_short}} a
 <div class="toccolours mw-collapsible mw-collapsed">
 * <u>CI warning:</u> Do not use images created inside Continuous Integration (CI) environments for anything besides testing!
 <div class="mw-collapsible-content">
-Usually you are not using [https://en.wikipedia.org/wiki/Continuous_integration CI] environments without knowing.
+Usually you are not using [https://en.wikipedia.org/wiki/Continuous_integration CI] environments without knowing it.
 
 You can find out if you are running inside a CI environment by running:
 
@@ -131,7 +131,23 @@ See also: [[Dev/Redistribution]]
 </div>
 
 == Host Preparation Steps ==
-<u>sudo setup</u>:
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = If you are building {{project_name_short}} on {{project_name_ws_short}}, you usually must boot into <code>PERSISTENT Mode {{!}} SYSMAINT Session {{!}} system maintenance tasks</code> for the build to succeed. Alternatively, you may enable [[unrestricted admin mode]]. See also [[Sysmaint]].
+}}
+
+'''1.''' <u>build dependencies:</u>
+
+{{Build_Dependencies}}
+'''2.''' <u>Platform specific notices</u>:
+
+* VirtualBox: Install VirtualBox on the build machine as per [[VirtualBox/Recommended_Version|recommended VirtualBox version]]. <ref>
+Due to technical challenges, see [[Dev/VirtualBox#VirtualBox_Installation_Challenges|VirtualBox Installation Challenges]].
+</ref>
+* Other platforms: No special notice.
+
+'''3.''' <u>sudo setup</u>:
 
 Choose either Option A <u>or</u> Option B.
 
@@ -147,15 +163,15 @@ Choose either Option A <u>or</u> Option B.
 |content=
 <u>Option A:</u> Set up passwordless sudo.
 
-* Abstract task overview: Setup passwordless sudo for your Linux user account name.
+* Abstract task overview: Setup passwordless sudo for your Linux user account.
 * Detailed task overview: Setup sudo and add your Linux user account to the Linux user group <code>sudo</code>. The following instructions use Linux user account name <code>user</code> as an example. If the user is using a different Linux user account name such as <code>myname</code> then the commands below have to be adjusted accordingly.
 * Unspecific: Configuration of sudo is [[unspecific|unspecific to {{project_name_short}}]].
-* {{project_name_short}} specific: When building inside {{project_name_short}}, user <code>user</code> is already a member of group <code>sudo</code> by default. Therefore the following step "1." can be skipped.
+* {{project_name_short}} specific: When building inside {{project_name_ws_short}}, account <code>user</code> is already a member of group <code>sudo</code> by default. Therefore the following step "1." can be skipped.
 * Detailed steps:
 
 '''1.''' {{Sudo_Setup}}
 
-'''2. ''' Configure user <code>user</code> to be able to use sudo without a password.
+'''2. ''' Configure account <code>user</code> to be able to use sudo without a password.
 
 {{CodeSelect|code=
 echo '%sudo ALL=(ALL:ALL) NOPASSWD:ALL' {{!}} sudo EDITOR=tee visudo -f /etc/sudoers.d/dist-build-sudo-passwordless >/dev/null
@@ -175,7 +191,7 @@ The process of setting up passwordless sudo has been completed.
 * Abstract task overview: Setup sudo with a longer timeout for your Linux user account name.
 * Detailed task overview: Setup sudo and increase the sudo password timeout (for all Linux user accounts or all users). The following instructions use Linux user account name <code>user</code> as an example. If the user is using a different Linux user account name such as <code>myname</code> then the commands below have to be adjusted accordingly.
 * Unspecific: Configuration of sudo is [[unspecific|unspecific to {{project_name_short}}]].
-* {{project_name_short}} specific: When building inside {{project_name_short}}, user <code>user</code> is already a member of group <code>sudo</code> by default. Therefore the following step "1." can be skipped.
+* {{project_name_short}} specific: When building inside {{project_name_ws_short}}, account <code>user</code> is already a member of group <code>sudo</code> by default. Therefore the following step "1." can be skipped.
 * Detailed steps:
 
 '''1.''' {{Sudo_Setup}}
@@ -210,12 +226,12 @@ Currently none.
 
 '''5.''' Git tags by convention:
 
-* have one of the following appendixes <code>stable</code>, <code>testers-only</code> or <code>developers-only</code> version.
+* have one of the following suffixes: <code>stable</code>, <code>testers-only</code> or <code>developers-only</code> version.
 * For example:
 ** <code>{{VersionNew}}-stable</code>
 ** <code>{{VersionNew}}-testers-only</code>
 ** <code>{{VersionNew}}-developers-only</code>
-* all represent the very same source code. <ref>
+* All represent the very same source code. <ref>
 {{CodeSelect|code=
 git diff {{VersionNew}}-stable {{VersionNew}}-developers-only
 }}
@@ -283,12 +299,14 @@ Multiple build targets can also be selected simultaneously.
 </ref>
 
 {| class="wikitable"
+|+ Build Target Options
+|-
 
-! <b>Option</b>
-! <b>Build Target</b>
-! <b>Comment</b>
-! <b>Image Type</b>
-! <b>Target Parameter</b>
+!  align="center" | <b>Option</b>
+!  align="center" | <b>Build Target</b>
+!  align="center" | <b>Comment</b>
+!  align="center" | <b>Image Type</b>
+!  align="center" | <b>Target Parameter</b>
 |-
 
 | '''A)'''
@@ -300,7 +318,7 @@ Multiple build targets can also be selected simultaneously.
 
 | '''B)'''
 | [[KVM]] (and [[QEMU]])
-| KVM: Stable; QEMU: [[unsupported]]
+| KVM: Stable. QEMU: [[unsupported]]
 | {{nowrap|<code>.qcow2</code>}}
 | {{CodeSelect|code=--target qcow2}}
 |-
@@ -430,8 +448,8 @@ export DERIVATIVE_APT_REPOSITORY_OPTS
 
 '''6.''' Notices.
 
-* These instructions assume you have the {{project_name_short}} source code in your home folder (<code>~/derivative-maker</code>), and
-* use VirtualBox as an example.
+* These instructions assume you have the {{project_name_short}} source code in your home folder (<code>~/derivative-maker</code>).
+* These instructions use VirtualBox as an example.
 
 '''7.''' Build a {{project_name_gateway_short}} virtual machine image. {{Code2|build command}}:
 
@@ -492,7 +510,7 @@ If using:
 * '''B)''' <u>CLI (command line user interface):</u> In case there are build issues, it is recommended to redirect the build log to a text file. To do that, for example {{CodeSelect|code=
 >> ~/build-log 2>&1
 }} could be appended to the very end of the {{Code2|build command}} to redirect the build output to {{Code2|build log file}} <code>~/build-log</code>.
-** Note: when using that command there will be no output in the terminal until the build is completed. This is as per Linux default and [[unspecific|unspecific to {{project_name_short}}]]. The build might not complete. In that case, that command would hang forever. To see if the build is stuck, it would be possible to open the {{Code2|build log file}} with a text editor. In that case, the file would have to be re-opened or refreshed with the F5 key to see new build output appended to the build log file. Or by using for example {{CodeSelect|code=
+** Note: When using that command there will be no output in the terminal until the build is completed. This is as per Linux default and [[unspecific|unspecific to {{project_name_short}}]]. The build might not complete. In that case, that command would hang forever. To see if the build is stuck, it would be possible to open the {{Code2|build log file}} with a text editor. In that case, the file would have to be re-opened or refreshed with the F5 key to see new build output appended to the build log file. Or by using for example {{CodeSelect|code=
 tail -n 100 -f ~/build-log 2>&1
 }}
 
@@ -501,7 +519,7 @@ tail -n 100 -f ~/build-log 2>&1
 * <u>VirtualBox</u>: The resulting <code>.ova</code> images can be found in <code>~/derivative-binary</code> folder.
 * <u>KVM, QEMU, raw images</u>: The resulting <code>.qcow2</code> and/or <code>.raw</code> images can be found in <code>~/derivative-binary</code> folder.
 
-Most users have completed the build process at this point and can start using {{project_name_short}} and skip the rest of this page.
+Most users have completed the build process at this point, and can start using {{project_name_short}} and skip the rest of this page.
 
 = Prepare Release =
 [https://github.com/{{project_name_short}}/developer-meta-files/blob/master/usr/bin/dm-prepare-release dm-prepare-release] is useful for:
@@ -510,7 +528,7 @@ Most users have completed the build process at this point and can start using {{
 * Creation of torrent files.
 * Creation of hash sum files.
 * Creation of digital software signatures.
-** [[OpenPGP]] (gpg) signatures
+** [[OpenPGP]] (<code>gpg</code>) signatures
 ** [[signify|signify]] signatures
 ** [https://forums.whonix.org/t/use-codecrypt-to-sign-whonix-releases/7844 soon] {{kicksecure_wiki
 |wikipage=PQCrypto#Codecrypt
@@ -525,5 +543,20 @@ dm-prepare-release --build --target virtualbox --flavor kicksecure-lxqt
 
 For private builds, i.e. for builds which are not supposed to be redistributed to others, none of this is important. If any of this is important, it can also be done manually.
 
+= Troubleshooting =
+== Build repeatedly errors out with hash sum mismatch ==
+
+If corrupted data is present on a Debian mirror during a build, apt will generate a hash sum mismatch error which will cause the build to fail. approx may also have cached the corrupted file, meaning all subsequent builds will fail until apt-cacher-ng's cache is purged.
+
+To purge the cache, run:
+
+{{CodeSelect|code=
+sudo safe-rm -rf /var/cache/approx-derivative-maker
+}}
+
+The cache has now been purged.
+
 = Footnotes =
-{{reflist|close=1}} {{Footer}} [[Category:Development]]
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Development]]
