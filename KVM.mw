@@ -3,7 +3,7 @@
 {{project_name_long}} for KVM
 }}
 {{#seo:
-|description=Using {{project_name_short}} with KVM (Kernel Virtual Machine)
+|description=Using {{project_name_short}} with KVM (Kernel-based Virtual Machine)
 |image=Kvm-new-logo.png
 }}
 {{Contributor|
@@ -16,14 +16,14 @@ only!]]
 }}
 {{kvm_logo}}
 {{intro|
-Using {{project_name_short}} with KVM (Kernel Virtual Machine)
+Using {{project_name_short}} with KVM (Kernel-based Virtual Machine)
 }}
 {{Community_Support|scope=page}}
 = General =
 == What is KVM? ==
 For an openly developed, free and open-source software (FOSS), GPL licensed hypervisor that can run Whonix, <ref>
 There are also [[Download|Download other platforms]].
-</ref> it is recommended to use [https://www.linux-kvm.org/page/Main_Page Kernel Virtual Machine (KVM)] that comes with the GNU/Linux OS. KVM combined with the [https://virt-manager.org/ Virtual Machine Manager] front-end should provide a familiar, intuitive and easy-to-use GUI. KVM uses [https://wiki.archlinux.org/title/libvirt '''libvirt'''].
+</ref> it is recommended to use [https://www.linux-kvm.org/page/Main_Page Kernel-based Virtual Machine (KVM)] that comes with the Linux kernel. KVM combined with the [https://virt-manager.org/ Virtual Machine Manager] front-end should provide a familiar, intuitive and easy-to-use GUI. Virtual Machine Manager uses [https://wiki.archlinux.org/title/libvirt '''libvirt'''] to manage KVM virtual machines.
 
 For a detailed view on KVM's security merits read the [https://web.archive.org/web/20240205091840/https://www.atsec.se/uploads/articles_and_whitepapers/kvm_security_comparison.pdf audit report] issued by an independent security auditing firm.
 
@@ -126,10 +126,10 @@ sudo adduser $USER libvirt-qemu
 |content=
 TODO: Is it possible to install only dnsmasq-base without the dnsmasq systemd unit, or does Arch Linux keep the systemd unit disabled by default?
 
-CRITIQUES: "safe-rm" and "xz-utils" are not Arch Linux packages. <code>tar</code> should pull in <code>xz-utils</code> if required. <code>safe-rm</code> has limited value.
+CRITIQUES: "safe-rm" is not an Arch Linux package. <code>tar</code> should pull in <code>xz</code> if required. <code>safe-rm</code> has limited value.
 
 {{CodeSelect|code=
-sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils safe-rm xz-utils
+sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils safe-rm xz
 }}
 
 {{CodeSelect|code=
@@ -327,14 +327,12 @@ Advanced users are encouraged to [[Dev/Build_Documentation|build]] {{project_nam
 
 It is strongly recommended to read and apply the steps outlined in this section. Applying a known and tested configuration provides better convenience and security.
 
-Be sure to use the qcow2 images provided by the {{project_name_short}} project instead of rolling your own <ref>
+Be sure to use the qcow2 images provided by the {{project_name_short}} project or built from scratch, instead of creating them from VirtualBox OVA files.<ref>
 Manually converting images from .ova to .qcow2 is no longer recommended, since .qcow images can be downloaded from the {{project_name_short}} project.
-</ref> because they contain important performance optimizations. <ref>
+</ref> The qcow2 images contain important performance optimizations for KVM. <ref>
 As per [https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/4400_convert-raw-to-qcow2 build-steps.d/4400_convert-raw-to-qcow2]
 
 , these are "-o cluster_size=2M" and "-o preallocation=metadata".
-</ref> The only exception is if images were [[Dev/Build_Documentation|created from source]]. <ref>
-Because the same performance optimizations are present.
 </ref>
 
 If problems are encountered with free disk space, using a file system that supports [[sparse files]] is recommended. Also refer to the following [https://forums.whonix.org/t/please-reduce-kvm-image-size/160 forum discussion].
@@ -706,7 +704,7 @@ sudo cp --sparse=always {{project_name_workstation_short}}*.qcow2 /var/lib/libvi
 
 Use <code>qemu-img</code> to interact with KVM disk images. This tool can resize virtual disks, convert them to other formats, and more. It is neither necessary nor recommended to modify the official images, so proceed cautiously and only if the procedure is well understood.
 
-For more commands, refer to the [https://linux.die.net/man/1/qemu-img qemu-img manual].
+Refer to the [https://linux.die.net/man/1/qemu-img qemu-img manual] for instructions.
 
 == Encrypted Containers ==
 
@@ -720,9 +718,12 @@ https://forums.whonix.org/t/cant-use-var-lib-libvirt-images-for-whonix-images-wh
 sudo chmod og+xr /run/media/private/user/$container_name
 }}
 
-After this, in the KVM XML configuration for both the Gateway and the Workstation, you must edit the XML and change the <code>source file</code> tag to: <code>source file="/run/media/private/user/Whonix-Gateway.qcow2"</code>.
+After this, in the KVM XML configuration for both the Gateway and the Workstation, you must edit the XML and change the <code>source file</code> tag to the appropriate value below:
 
-This ensures that the VM can open and run.
+* Gateway: <code>source file="/run/media/private/user/Whonix-Gateway.qcow2"</code>.
+* Workstation: <code>source file="/run/media/private/user/Whonix-Workstation.qcow2"</code>.
+
+This ensures that the VMs can open and run.
 
 == Cleanup ==
 After importing {{project_name_short}}, it is recommended to delete the archives ({{Code2|.libvirt.xz}} files) and the temporarily extracted folders, or move them into a custom location. This helps avoid conflicts and confusion if a new version of {{project_name_short}} is later downloaded.
@@ -745,7 +746,7 @@ If Virtual Machine Manager is familiar, there is nothing special about starting 
 
 === Using Whonix-Gateway with LXQt Desktop vs CLI Mode ===
 
-To start the desktop environment, the Whonix-Gateway virtual machine must be assigned at least 1 GB of RAM. Otherwise, it will only boot in CLI mode. To disable startup of the included desktop environment regardless of RAM allocation, configure the [[RAM_Adjusted_Desktop_Starter|RAM Adjusted Desktop Starter package settings]].
+To start the desktop environment, the Whonix-Gateway virtual machine must be assigned at least 768 MB of RAM. Otherwise, it will only boot in CLI mode. To disable startup of the included desktop environment regardless of RAM allocation, configure the [[RAM_Adjusted_Desktop_Starter|RAM Adjusted Desktop Starter package settings]].
 
 === Graphical User Interface (GUI) ===
 
@@ -761,6 +762,12 @@ Repeat the same steps for {{project_name_workstation_short}}.
 
 === Command Line Interface (CLI) ===
 The following instructions were re-tested in September 2024.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' If the guest may be compromised, do NOT follow this procedure! The guest will be able to write arbitrary ANSI sequences to the host's terminal emulator, which may exploit security vulnerabilities in the terminal and allow a VM escape.
+}}
 
 '''1.''' Open a terminal inside the VM that should be accessed through CLI.
 
@@ -802,15 +809,13 @@ Forum discussion: https://forums.whonix.org/t/how-do-i-enter-the-whonix-shell-fr
 
 == Adjust Display Resolution ==
 
-<code>Start Menu</code> &rarr; <code>Display</code> &rarr; <code>Select resolution</code> <ref>
+<code>Start Menu</code> &rarr; <code>Preferences</code> &rarr; <code>Displays</code> <ref>
 https://forums.whonix.org/t/no-auto-resize-with-qxl-driver/7145/3
 </ref>
 
 <u>Alternatively:</u>
 
 <code>GUI Console</code> &rarr; <code>View</code> &rarr; <code>Scale Display</code> &rarr; <code>Check: Always + Auto resize VM with window</code>.
-
-<u>Note:</u> For the setting to take effect, a reboot is required in every new session while the VM's GUI console is open and maximized.
 
 == After Installing ==
 
@@ -845,8 +850,6 @@ sudo virsh -c qemu:///system undefine {{project_name_workstation_short}}
 
 '''3.''' Shut down the KVM network {{Code2|{{project_name_short}}}}.
 
-<u>Warning:</u> {{project_name_short}} 14 and earlier versions used the network names "external" and "internal". This means the command must be changed accordingly. Try <code>virsh -c qemu:///system net-list</code> to list them all.
-
 {{CodeSelect|code=
 sudo virsh -c qemu:///system net-destroy {{project_name_short}}-External
 }}
@@ -855,8 +858,6 @@ sudo virsh -c qemu:///system net-destroy {{project_name_short}}-Internal
 }}
 
 '''4.''' Remove the KVM network {{Code2|{{project_name_short}}}}.
-
-<u>Warning:</u> {{project_name_short}} 14 and earlier versions used the network names "external" and "internal". This means the command must be changed accordingly. Try <code>sudo virsh -c qemu:///system net-list</code> to list them all.
 
 {{CodeSelect|code=
 sudo virsh -c qemu:///system net-undefine {{project_name_short}}-External
@@ -867,7 +868,7 @@ sudo virsh -c qemu:///system net-undefine {{project_name_short}}-Internal
 
 '''5.''' Delete the images.
 
-<u>Note:</u> All data will be lost unless it is backed up first.
+<u>Note:</u> All data will be lost unless it is backed up first. Adjust the paths to the images as appropriate.
 
 {{CodeSelect|code=
 sudo safe-rm /var/lib/libvirt/images/{{project_name_gateway_short}}.qcow2
@@ -941,6 +942,7 @@ Example command to shut down the {{project_name_short}} Workstation from a host 
 sudo virsh send-key Whonix-Workstation KEY_LEFTALT KEY_SYSRQ KEY_O
 }}
 
+<!-- arraybolt3: We need to take IPv6 into account now too, since Whonix 18 supports IPv6. However, I have not been able to find a way to get DHCPv6 to work with Whonix-Workstation, I run into failures similar to https://bugs.launchpad.net/ubuntu/+source/ifupdown/+bug/1447715. SLAAC can't be used either because we have dnsmasq disabled. On top of all of that, this configuration also appears to break even IPv4 networking nowadays.
 == DHCP ==
 
 Libvirt provides built-in DHCP functionality via a custom installation of the minimalist Dnsmasq DNS/DHCP daemon. <ref>
@@ -1043,7 +1045,7 @@ reboot
 
 '''9.''' Done.
 }}
-
+-->
 == Snapshot Migration ==
 
 If the VM has snapshots that you want to preserve, the snapshot XML files of the source VM should be dumped with the following commands. <ref>https://serverfault.com/questions/434064/correct-way-to-move-kvm-vm/648871#648871</ref>
@@ -1610,7 +1612,7 @@ The emulated tablet device normally prevents the mouse from being captured by th
 
 Press {{Keypress|Ctrl_L|Alt_L}}
 
-Todo: Re-test these instructions with Wayland.
+Todo: Re-test these instructions with Wayland running on the host.
 
 == Setting up gdb to work with qemu-kvm via libvirt ==
 
@@ -1674,10 +1676,10 @@ QCOW2 virtual disk images are the recommended and default storage format for KVM
 https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/virtualization_administration_guide/sect-virtualization-adding_storage_devices_to_guests-adding_hard_drives_and_other_block_devices_to_a_guest
 </ref>
 
-In the event a virtual disk is no longer used -- where the low-level view of the storage can be controlled -- data created by VMs can easily be recovered and exfiltrated by malicious forensics tools run in a VM at a later time. This is extremely dangerous and can expose all kinds of information originally created in a VM of higher trust level. This leads to deanonymization, past session linking and theft of sensitive information and keys. <ref>
+In the event a virtual disk was previously used by one VM and is then reused by another VM, data created by the first VM can easily be recovered and exfiltrated by malicious forensics tools run in the second VM at a later time. This is extremely dangerous and can expose all kinds of information originally created in a VM of higher trust level. This leads to deanonymization, past session linking and theft of sensitive information and keys. <ref>
 * https://github.com/fog/fog/issues/2525
 * https://news.ycombinator.com/item?id=6983097
-</ref> This setting is disabled in cloud tenancy environments.
+</ref>
 
 === HugePages ===
 
@@ -1687,8 +1689,8 @@ https://arxiv.org/pdf/1507.06955v1.pdf
 
 === Memory Ballooning ===
 
-Memory ballooning can potentially be abused by malicious guests to mount rowhammer attacks on the host. <ref>h
-ttps://www.whonix.org/pipermail/whonix-devel/2016-September/000746.html
+Memory ballooning can potentially be abused by malicious guests to mount rowhammer attacks on the host. <ref>
+https://www.whonix.org/pipermail/whonix-devel/2016-September/000746.html
 </ref>
 
 === Clipboard Sharing ===
@@ -1775,7 +1777,7 @@ wl-paste {{!}} DISPLAY=:0 xclip -selection clipboard
 
 === KSM ===
 
-KSM is a memory de-deuplication feature that conserves memory by combining identical pages across VM RAM, but it is not enabled by default. Enabling this feature is dangerous because it allows cross-VM snooping by a malicious process. <ref>
+KSM is a memory de-duplication feature that conserves memory by combining identical pages across VM RAM, but it is not enabled by default. Enabling this feature is dangerous because it allows cross-VM snooping by a malicious process. <ref>
 [https://www.ieee-security.org/TC/SP2016/papers/0824a987.pdf Dedup Est Machina: Memory Deduplication as an Advanced Exploitation Vector]
 </ref> It is capable of inferring what programs/pages are being visited outside the VM. <ref>
 https://web.archive.org/web/20130210040731/https://staff.aist.go.jp/c.artho/papers/EuroSec2011-suzaki.pdf
@@ -1944,21 +1946,12 @@ Verify that:
 Check services:
 
 {{CodeSelect|code=
-sudo service qemu-system-x86 restart ; echo $?
-sudo service libvirt-bin restart ; echo $?
-sudo service libvirt-guests restart ; echo $?
+sudo systemctl restart qemu-kvm.service ; echo $?
+sudo systemctl restart libvirtd.service ; echo $?
+sudo systemctl restart libvirt-guests.service ; echo $?
 }}
 
-Expected output:
-
-<pre>
-0
-[ ok ] Restarting libvirt management daemon: /usr/sbin/libvirtd.
-0
-
-Running guests on default URI: no running guests.
-0
-</pre>
+Expected output: Nothing.
 
 If this does not help, it may be a permissions problem.
 

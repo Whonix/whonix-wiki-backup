@@ -23,7 +23,7 @@ Many applications can also leak other problematic and/or sensitive data, such as
 * Your time zone (for example: IRC clients through CTCP)
 * Your user name (for example: ssh through login)
 * The name and version of the client or server you are using (for example: Apache web server leaks software name and version number; IRC clients leak client name and client version number through CTCP)
-* ​Metadata can be a risk. Click ​MAT and read 'What is a metadata?' and 'Why metadata can be a risk for your privacy?'
+* Metadata can be a risk. See [https://github.com/jvoisin/mat2?tab=readme-ov-file#metadata-and-privacy MAT2's metadata and privacy documentation].
 * Depending on your Mode Of Anonymity you obviously shouldn't mix your use of protected (anonymous) applications with applications not passing through the Tor network or some other form of anonymity. For example, if a login name or password of yours can be traced back to your personal identity, then you are defeating the purpose entirely. Tor can not protect you from this kind of activity
 * Even sending the contents of your RAM can be dangerous. (For example: error reporting, leading to Transparent Proxy Leaks)
 * A lot of information which the application sends on request from a server (for example: most web browsers beside the Tor Browser)
@@ -51,7 +51,7 @@ Developers have taken care to prevent common applications from leaking informati
 
 * <u>[[Stream Isolation]]</u>: Configuring applications to use their own SocksPort, thus preventing Identity correlation through circuit sharing.
 * <u>Browser fingerprinting</u>: {{project_name_short}} [[Tor Browser|includes Tor Browser]] by default. The browser fingerprint is as good (or bad) as using the normal Tor Browser bundle from torproject.org
-* <u>GPG</u>: <code>/home/user/gpg.conf</code> is optimized for privacy; see footnote. <ref>
+* <u>GPG</u>: <code>/home/user/.gnupg/gpg.conf</code> is optimized for privacy; see footnote. <ref>
 Adhering to [https://github.com/ioerror/torbirdy/pull/11 recommendations] as per the [https://github.com/ioerror/torbirdy/blob/master/gpg.conf torbirdy github repository], which prevents leakage of the operating system version (no-emit-version) and other variables ([https://github.com/{{project_name_short}}/security-misc/blob/master/etc/skel/.gnupg/gpg.conf on github]).</ref>
 * <u>ssh</u>: Without {{project_name_short}}, the syntax for ssh is user@hostname [...]. However, if a specific user is not nominated before @hostname, the operating system user name will be utilized instead. If that value is something identifiable, then anonymity is broken. Since {{project_name_short}} defaults the user name to <code>user</code>, in the worst case only the username <code>user</code> can be leaked, which is harmless. <ref>
 In this case it may appear that the syntax was simply copied from the manpage.</ref> <ref>
@@ -62,7 +62,7 @@ Many protocol leaks are already documented, see: [[Documentation]] and [https://
 
 = Identifiers =
 
-In addition to protocol leaks, there are also a range of identifiers that can be used for fingerprinting by adversaries for anonymity set reduction (for example, the time zone), or even for complete deanonymization (for example, if the user name was set to John Doe). Such identifiers are described below.
+In addition to protocol leaks, there are also a range of identifiers that can be used for fingerprinting by adversaries for anonymity set reduction (for example, the time zone), or even for complete deanonymization (for example, if the user name was set to the user's actual name). Such identifiers are described below.
 
 {{Anchor|Major Identifiers}}
 == Software Identifiers ==
@@ -82,7 +82,7 @@ To check the color depth run the following command in console.
 xdpyinfo | grep "of root"
 }}
 </ref> <ref name=fontlist>
-Do not rely on https://ip-check.info or similar websites to check the desktop resolution and color depth, because Tor Button changes these values to improve anonymity; refer to the TorButton specification and Tor trac for further details. See also [[Browser Tests]].
+Do not rely on https://ip-check.info or similar websites to check the desktop resolution and color depth, because Tor Button changes these values to improve anonymity. See also [[Browser Tests]].
 
 In order to check the list of installed fonts, run.
 
@@ -95,28 +95,27 @@ fc-list
 ! Desktop Resolution
 |
 * {{non_q_project_name_long}} VM users: The desktop resolution setting set to <code>1920x1080</code> with the (virtual) refresh rate set to <code>60</code>. <ref>
-TODO: update to LXQt:
-https://github.com/Kicksecure/vm-config-dist/blob/master/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/displays.xml
+Set by [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/lib/python3/dist-packages/wlr_resize_watcher/wlr_resize_watcher.py <code>wlr_resize_watcher</code>.]
 </ref> Virtualizer will scale down resolution deepening on host screen resolution.
 * {{q_project_name_long}} VM users: up to dom0 setting.
 * <ref>
 To check the desktop resolution and refresh rate, run the following command in console.
 
 {{CodeSelect|code=
-xrandr
+wlr-randr
 }}
 </ref>
 |-
 
 ! Fonts
-| All {{project_name_short}} users have the same list of fonts installed. <ref>So long as the user or any additional software packages do not install further packages.</ref> <ref>Only three common fonts (monospace, serif, times new roman) can be detected for all Tor Browser users. </ref> <ref>Robert Ransom previously suggested {{project_name_short}} should share the same list of fonts as Tails if possible. Since Tor Browser no longer leaks which fonts are installed, lead {{project_name_short}} developer Patrick Schleizer does not see any advantage of this action (follow-up enquiry ignored).</ref>
+| All {{project_name_short}} users have the same list of fonts installed. <ref>So long as the user or any additional software packages do not install further packages.</ref> <ref>Only fonts bundled within TBB can be detected for all Linux Tor Browser users, see https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/18097.</ref> <ref>Robert Ransom previously suggested {{project_name_short}} should share the same list of fonts as Tails if possible. Since Tor Browser no longer leaks which fonts are installed, lead {{project_name_short}} developer Patrick Schleizer does not see any advantage of this action (follow-up enquiry ignored).</ref>
 |-
 
 ! Hostname
 | The hostname is set to <code>host</code>. <ref>To check the hostname, run.
 
 {{CodeSelect|code=
-host
+hostname
 }}
 
 </ref>
@@ -211,7 +210,7 @@ These were hidden by VirtualBox "Synthetic CPU" in the past but that feature was
 | {{No}} <ref>
 https://forums.whonix.org/t/help-welcome-kvm-development-staying-the-course/166/403
 </ref> <ref>
-https://phabricator.whonix.org/T449
+https://forums.whonix.org/t/mask-more-proc-cpuinfo-output-in-kvm/18954
 </ref> <ref name=universal-virtualizer-issue>
 This is due to the design of virtualization platforms (VirtualBox, KVM, Xen, Qubes, VMware, etc.). Most virtualization platforms leak CPU model, capabilities and clock speed. Check.
 
@@ -373,7 +372,7 @@ sudo dmidecode
 |-
 
 | Hidden [https://learn.microsoft.com/en-us/previous-versions/windows/hardware/design/dn653305(v=vs.85) SLIC table] <ref>
-To check the SILC table, run.
+To check the SLIC table, run.
 
 {{CodeSelect|code=
 sudo cat /sys/firmware/acpi/tables/SLIC
