@@ -75,7 +75,7 @@ By copying the <code>control.authcookie</code> file from the gateway to {{projec
 Therefore this exercise might be a bit pointless. A better solution might be to use Tor Browser control protocol authentication using a Tor control password rather than Tor control auth cookie.
 
 {{Open with root rights|filename=
-/etc/X11/Xsession.d/50user
+/etc/profile.d/50_user.sh
 }}
 
 Paste the following contents.
@@ -89,11 +89,17 @@ Paste the following contents.
 export TOR_CONTROL_PASSWD='"password"'
 
 ## Overwrite what /usr/lib/anon-ws-disable-stacked-tor/torbrowser.sh /
-## /etc/X11/Xsession.d/20torbrowser is doing.
+## /etc/profile.d/20_torbrowser.sh is doing.
 export TOR_CONTROL_IPC_PATH="/run/anon-ws-disable-stacked-tor/127.0.0.1_9151.sock"
 }}
 
 Save.
+
+Ensure the file is executable:
+
+{{CodeSelect|code=
+chmod +x /etc/profile.d/50_user.sh
+}}
 
 This would have to be combined with Tor setting <code>HashedControlPassword</code> on the other gateway. Untested.
 

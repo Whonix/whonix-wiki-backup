@@ -40,8 +40,7 @@ Tor's binary was replaced (dpkg-diverted using config-package-dev) with dummy ex
 
 * Tor's default listening ports. I.e.:
 ** system [[Tor]]'s <code>SocksPort</code>s {{Code|127.0.0.1:9050}}, {{Code|127.0.0.1:9051}}, and
-** [[Tor Browser]]'s <code>SocksPort</code>s {{Code|127.0.0.1:9150}}, {{Code|127.0.0.1:9051}},
-** [[Tor Messenger]]'s <code>SocksPort</code> {{Code|127.0.0.1:9152}}
+** [[Tor Browser]]'s <code>SocksPort</code>s {{Code|127.0.0.1:9150}}, {{Code|127.0.0.1:9151}},
 
 These are redirected to the gateway.
 
@@ -54,7 +53,7 @@ These are redirected to Tor (actually control port filter proxy ([[onion-grater|
 
 * and others, see [https://github.com/{{project_name_short}}/anon-ws-disable-stacked-tor/blob/master/usr/libexec/anon-ws-disable-stacked-tor/systemd-unit-files-generator full list].
 * These listening ports are forwarded to {{project_name_gateway_short}}.
-* This prevents the default Tor Browser, Tor Messenger, and/or Tor package by The Tor Project from opening these default ports, which will result in Tor failing to open its listening port and therefore exiting, thus preventing Tor over Tor.
+* This prevents the default Tor Browser and/or Tor package by The Tor Project from opening these default ports, which will result in Tor failing to open its listening port and therefore exiting, thus preventing Tor over Tor.
 
 TODO: describe
 
@@ -193,7 +192,7 @@ Should show:
 
 Trying to use <code>curl</code> rather than <code>curl.anondist-orig</code> is a common mistake when debugging {{project_name_short}} network issues.
 
-<code>curl</code> is a symlink to <code>curl.anondist-orig</code>. In turn, this symlinks to <code>uwtwrapper</code>, which runs <code>curl</code> under <code>torsocks</code>. <code>torsocks</code> then forces Tor to run on <code>localhost</code> for stream isolation.
+<code>curl</code> is a symlink to <code>curl.anondist</code>. In turn, this symlinks to <code>uwtwrapper</code>, which runs <code>curl</code> under <code>torsocks</code>. <code>torsocks</code> then forces Tor to run on <code>localhost</code> for stream isolation.
 
 * The <code>uwt</code> stream isolation wrapper must be circumvented or disabled.
 * The command must be run under the user <code>clearnet</code>.

@@ -38,8 +38,8 @@ grep -i error /var/run/tor/log
 # Check for clock skew. {{CodeSelect|code=
 grep -i clock /var/run/tor/log
 }}
-# Test if arm is fully functional. {{CodeSelect|code=
-arm
+# Test if nyx is fully functional. {{CodeSelect|code=
+nyx
 }}
 # Test [[Bridges#How_to_Use_Bridges_in_{{project_name_short}}|obfsproxy bridge]] connectivity is functional.
 }}
@@ -59,11 +59,11 @@ ping 10.152.152.10
 https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol
 </ref> is not proxied, and filtered by {{project_name_short}} Firewall ({{W_Firewall}}) because [[Tor#UDP|Tor does not support UDP]]. For more information on ping inside {{project_name_workstation_short}}, see [[Whonix-Workstation_Firewall#Ping|Whonix-Workstation Firewall, ping]].
 # Use Tor Browser to visit an onion address - try the [http://{{torproject_web_onion}} torproject.org onion service].
-# Test Tor Button's New Identity Feature.
+# Test Tor Browser's New Identity Feature.
 # {{Code2|dig google.com}} must only return a single IP; compare that with the output on {{project_name_gateway_short}} or Host. {{CodeSelect|code=
 dig google.com
 }}
-# See if syste gets autostarted.
+# See if system gets autostarted.
 # Setup an [[Onion Services|Onion Service]].
 # Test the onion service by connecting to its address with Tor Browser.
 # Run [https://www.kicksecure.com/wiki/Systemcheck systemcheck] leak tests. {{CodeSelect|code=
@@ -236,7 +236,7 @@ It should open and ask for confirmation to open that file in Tor Browser. Check 
 test
 </pre>
 
-2. Open Thunar (default file manager) and double-click on that file.
+2. Open PCManFM-Qt (default file manager) and double-click on that file.
 
 3. Check if it opens and asks for confirmation to open that file in Tor Browser.
 }}
@@ -376,7 +376,7 @@ Check the boot clock randomization log.
 cat /var/log/bootclockrandomization.log
 }}
 {{CodeSelect|code=
-sudo service bootclockrandomization status
+sudo systemctl status bootclockrandomization.service
 }}
 {{CodeSelect|code=
 echo $?
@@ -397,7 +397,7 @@ cat /var/log/timesanitycheck.log
 Confirm the time sanity check status.
 
 {{CodeSelect|code=
-sudo service timesanitycheck status
+sudo systemctl status timesanitycheck.service
 }}
 {{CodeSelect|code=
 echo $?
@@ -419,30 +419,30 @@ cat /var/log/sdwdate.log
 Check the sdwdate status.
 
 {{CodeSelect|code=
-sudo service sdwdate status
+sudo systemctl status sdwdate.service
 }}
 {{CodeSelect|code=
 echo $?
 }}
 </ref>
 
-2. Test the re-installation of x11-common.
+2. Test the re-installation of base-files.
 
 {{CodeSelect|code=
-sudo apt install --reinstall x11-common
+sudo apt install --reinstall base-files
 }}
 }}
 == Display Manager ==
 [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] only.
 
-Check lightdm stops and restarts correctly.
+Check greetd stops and restarts correctly.
 
 {{CodeSelect|code=
-sudo service lightdm stop
+sudo systemctl stop greetd.service
 }}
 
 {{CodeSelect|code=
-sudo service lightdm start
+sudo systemctl start greetd.service
 }}
 
 = Footnotes =
