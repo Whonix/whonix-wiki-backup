@@ -186,18 +186,33 @@ Run. <ref>
 Alternatively, users who like torify over clearnet can add <code>tor+</code>.
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb tor+https://deb.debian.org/debian {{Stable_project_version_based_on_Debian_codename}}-backports main contrib non-free' > /etc/apt/sources.list.d/backports.list"
+sudo su -c "echo -e 'Types: deb
+URIs: tor+https://deb.debian.org/debian
+Suites: {{Stable_project_version_based_on_Debian_codename}}-backports
+Components: main contrib non-free
+Enabled: yes
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' > /etc/apt/sources.list.d/backports.sources"
 }}
 
 Alternatively, users who like [[Onionizing Repositories]] can use the onion instead.
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb tor+http://{{Debian_onion}}/debian {{Stable_project_version_based_on_Debian_codename}}-backports main contrib non-free' > /etc/apt/sources.list.d/backports.list"
+sudo su -c "echo -e 'Types: deb
+URIs: tor+http://{{Debian_onion}}/debian
+Suites: {{Stable_project_version_based_on_Debian_codename}}-backports
+Components: main contrib non-free
+Enabled: yes
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' > /etc/apt/sources.list.d/backports.sources"
 }}
 </ref>
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb https://deb.debian.org/debian {{Stable_project_version_based_on_Debian_codename}}-backports main contrib non-free' > /etc/apt/sources.list.d/backports.list"
+sudo su -c "echo -e 'Types: deb
+URIs: https://deb.debian.org/debian
+Suites: {{Stable_project_version_based_on_Debian_codename}}-backports
+Components: main contrib non-free
+Enabled: yes
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' > /etc/apt/sources.list.d/backports.sources"
 }}
 
 '''3.''' Done.
@@ -211,7 +226,7 @@ Most often this step applies before attempting major {{project_name_short}} upgr
 </ref> To proceed, run.
 
 {{CodeSelect|code=
-sudo rm /etc/apt/sources.list.d/backports.list
+sudo rm /etc/apt/sources.list.d/backports.sources
 }}
 
 == Enable Debian Fasttrack Repository ==
@@ -239,14 +254,24 @@ Run. <ref>
 Alternatively, users who like torify the clearnet repository can add <code>tor+</code>.
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb tor+https://fasttrack.debian.net/debian/ {{Stable_project_version_based_on_Debian_codename}}-fasttrack main contrib non-free' > /etc/apt/sources.list.d/fasttrack.list"
+sudo su -c "echo -e 'Types: deb
+URIs: tor+https://fasttrack.debian.net/debian/
+Suites: {{Stable_project_version_based_on_Debian_codename}}-fasttrack
+Components: main contrib non-free
+Enabled: yes
+Signed-By: /usr/share/keyrings/fasttrack-archive-keyring.gpg' > /etc/apt/sources.list.d/fasttrack.sources"
 }}
 
 [https://salsa.debian.org/fasttrack-team/support/-/issues/27 It is not yet possible to set an <i>.onion</i> mirror for fastrack.]
 </ref>
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb https://fasttrack.debian.net/debian/ {{Stable_project_version_based_on_Debian_codename}}-fasttrack main contrib non-free' > /etc/apt/sources.list.d/fasttrack.list"
+sudo su -c "echo -e 'Types: deb
+URIs: https://fasttrack.debian.net/debian/
+Suites: {{Stable_project_version_based_on_Debian_codename}}-fasttrack
+Components: main contrib non-free
+Enabled: yes
+Signed-By: /usr/share/keyrings/fasttrack-archive-keyring.gpg' > /etc/apt/sources.list.d/fasttrack.sources"
 }}
 
 '''4.''' Done.
@@ -260,7 +285,7 @@ Most often this step applies before attempting major {{project_name_short}} upgr
 </ref> To proceed, run.
 
 {{CodeSelect|code=
-sudo rm /etc/apt/sources.list.d/fasttrack.list
+sudo rm /etc/apt/sources.list.d/fasttrack.sources
 }}
 
 == Backports ==
@@ -354,20 +379,30 @@ It is recommended to complete this process in a [[Multiple {{project_name_workst
 {{Box|text=
 '''1.''' Boot the {{project_name_workstation_short}} (<code>{{project_name_workstation_template}}-debian-testing-mix</code>) Template.
 
-'''2.''' Add the current Debian testing codename <code>{{Debian_Codename_Testing}}</code> to ''sources.list''
+'''2.''' Add the current Debian testing codename <code>{{Debian_Codename_Testing}}</code> to ''sources''
 
 Note: this applies to {{project_name_short}} 16. Later {{project_name_short}} versions may use a codename different to <code>{{Debian_Codename_Testing}}</code>.
 
 In the {{project_name_workstation_short}} (<code>{{project_name_workstation_template}}-debian-testing-mix</code>) Template, run.
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb https://deb.debian.org/debian {{Debian_Codename_Testing}} main' > /etc/apt/sources.list.d/testing.list"
+sudo su -c "echo -e 'Types: deb
+URIs: https://deb.debian.org/debian
+Suites: {{Debian_Codename_Testing}}
+Components: main
+Enabled: yes
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' > /etc/apt/sources.list.d/testing.sources"
 }}
 
 Or alternatively use the <i>.onion</i> mirror.
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb tor+http://{{Debian_onion}}/debian {{Debian_Codename_Testing}} main' > /etc/apt/sources.list.d/testing.list"
+sudo su -c "echo -e 'Types: deb
+URIs: tor+http://{{Debian_onion}}/debian
+Suites: {{Debian_Codename_Testing}}
+Components: main
+Enabled: yes
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' > /etc/apt/sources.list.d/testing.sources"
 }}
 
 '''3.''' [[Update#Updates|Update]] the package lists.
@@ -391,7 +426,7 @@ The procedure is now complete.
 On occasion it is necessary to undo this configuration, for example when upgrading from Debian <code>{{Stable_project_version_based_on_Debian_codename}}</code> to <code>{{Debian_Codename_Testing}}</code>. <ref>Most often this step applies before attempting major {{project_name_short}} upgrades; upgrade instructions are also made available at that time (see [[Stay_Tuned|Follow {{project_name_short}} Developments]]).</ref> To proceed, run.
 
 {{CodeSelect|code=
-sudo rm /etc/apt/sources.list.d/testing.list
+sudo rm /etc/apt/sources.list.d/testing.sources
 }}
 }}
 
@@ -1251,7 +1286,7 @@ APT sources configuration,
 * <code>/etc/apt/sources.list</code> file and
 * <code>/etc/apt/sources.list.d</code> folder
 
-work same as on Debian. This is [[unspecific|unspecific to {{project_name_short}}]]. The only {{project_name_short}} specific difference is that file <code>/etc/apt/sources.list</code> exists but is empty by default. Debian APT sources reside in file [https://github.com/Kicksecure/anon-apt-sources-list  <code>/etc/apt/sources.list.d/debian.list</code>], which is provided by the [https://github.com/Kicksecure/anon-apt-sources-list anon-apt-sources-list] package.
+work same as on Debian. This is [[unspecific|unspecific to {{project_name_short}}]]. The only {{project_name_short}} specific difference is that file <code>/etc/apt/sources.list</code> exists but is empty by default. Debian APT sources reside in file [https://github.com/Kicksecure/anon-apt-sources-list  <code>/etc/apt/sources.list.d/debian.sources</code>], which is provided by the [https://github.com/Kicksecure/anon-apt-sources-list anon-apt-sources-list] package.
 
 == Foreign Sources ==
 

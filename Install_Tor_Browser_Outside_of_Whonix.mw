@@ -153,14 +153,24 @@ sudo cp ~/QubesIncoming/{{project_name_workstation_vm}}/derivative.asc /usr/shar
 
 '''2.''' Add the {{project_name_short}} stable APT repository. <ref>
 Alternatively use the stable onion APT repository: {{CodeSelect|code=
-echo "deb [signed-by=/usr/share/keyrings/derivative.asc] http://deb.{{project_onion}} {{Stable project version based on Debian codename}} main contrib non-free" {{!}} sudo tee /etc/apt/sources.list.d/derivative.list
+echo "Types: deb
+URIs: http://deb.{{project_onion}}
+Suites: {{Stable project version based on Debian codename}}
+Components: main contrib non-free
+Enabled: yes
+Signed-By: /usr/share/keyrings/derivative.asc" {{!}} sudo tee /etc/apt/sources.list.d/derivative.sources
 }}
 </ref> <ref>
 Note: <code>tor+http</code> does not work in this configuration.
 </ref>
 
 {{CodeSelect|code=
-echo "deb [signed-by=/usr/share/keyrings/derivative.asc] https://deb.{{project_clearnet}} {{Stable project version based on Debian codename}} main contrib non-free" {{!}} sudo tee /etc/apt/sources.list.d/derivative.list
+echo "Types: deb
+URIs: https://deb.{{project_clearnet}}
+Suites: {{Stable project version based on Debian codename}}
+Components: main contrib non-free
+Enabled: yes
+Signed-By: /usr/share/keyrings/derivative.asc" {{!}} sudo tee /etc/apt/sources.list.d/derivative.sources
 }}
 
 '''3.''' Update the package lists.

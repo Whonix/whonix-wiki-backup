@@ -23,7 +23,7 @@ Be aware that enabling onion repositories may cause system updates to periodical
 
 If the term "comment" is unfamiliar, please follow [https://www.howtogeek.com/118389/how-to-comment-out-and-uncomment-lines-in-a-configuration-file/ this link] to learn how to comment / uncomment lines in a configuration file.
 
-In this chapter, instructions are provided for onionizing sources on the [[#Debian|Debian]], [[#{{non_q_project_name_long}}|{{non_q_project_name_long}}]] and [[#Qubes|Qubes]] platforms.
+In this chapter, instructions are provided for onionizing sources on the [[#Debian|Debian]], [[#{{non_q_project_name_short}}|{{non_q_project_name_short}}]] and [[#Qubes|Qubes]] platforms.
 
 = Qubes =
 
@@ -89,7 +89,7 @@ sudo qubes-dom0-update --show-output --console
 
 == Debian Templates ==
 
-Debian templates can be updated exclusively over onion services. Simply edit both Qubes and Debian sources.list files so they point to the respective onion repositories.
+Debian templates can be updated exclusively over onion services. Simply edit the Qubes and Debian sources.list files so they point to the respective onion repositories.
 
 Note: to use the <code>tor+http</code> configuration below, {{kicksecure_wiki|wikipage=Advanced_Host_Security#apt-transport-tor|text=apt-transport-tor}} must be installed. <ref name=tor+http>For support in downloading APT packages anonymously via the Tor network. To install it:
 {{CodeSelect|code=
@@ -147,7 +147,7 @@ The <code>sources.list</code> file can be edited so it points to the Debian onio
 
 == {{project_name_short}} Templates ==
 
-{{project_name_short}} templates can be updated exclusively over onion services by editing the Qubes, Debian <ref name=Debian_onions /> and {{project_name_short}} <code>sources.list</code> files so they point to the respective onion repositories.
+{{project_name_short}} templates can be updated exclusively over onion services by editing the Qubes, Debian <ref name=Debian_onions /> and {{project_name_short}} <code>sources</code> files so they point to the respective onion repositories.
 
 Complete the following steps in <u>both</u> {{project_name_gateway_long}} and {{project_name_workstation_long}}.
 
@@ -190,32 +190,62 @@ upgrade-nonroot
 }}
 }}
 
-==== Onionize debian.list ====
+==== Onionize debian.sources ====
 
 {{Box|text=
-'''1.''' Open the Debian <code>sources.list</code> file using an editor with root rights.
+'''1.''' Open the Debian <code>sources</code> file using an editor with root rights.
 
 {{CodeSelect|code=
-sudoedit /etc/apt/sources.list.d/debian.list
+sudoedit /etc/apt/sources.list.d/debian.sources
 }}
 
-'''2.''' Uncomment the onionized Debian repositories.
+'''2.''' Enable the onionized Debian repositories and disable the clearnet repositories.
 
-Uncomment the following .onion mirrors and comment out (#) the corresponding https repositories (except the fasttrack repository).
+Enable the following .onion mirrors and disable the corresponding https repositories (except the fasttrack repository).
 
 {{CodeSelect|code=
-#deb tor+https://deb.debian.org/debian bullseye main contrib non-free
-#deb tor+https://deb.debian.org/debian bullseye-updates main contrib non-free
-#deb tor+https://deb.debian.org/debian-security bullseye-security main contrib non-free
-#deb tor+https://deb.debian.org/debian bullseye-backports main contrib non-free
-deb tor+https://fasttrack.debian.net/debian bullseye-fasttrack main contrib non-free
+######## ENABLED SOURCES ########
 
-deb tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian bullseye main contrib non-free
-deb tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian bullseye-updates main contrib non-free
-deb tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security bullseye-security main contrib non-free
-deb tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian bullseye-backports main contrib non-free
-## No onion for fasttrack yet:
-## https://salsa.debian.org/fasttrack-team/support/-/issues/27
+Types: deb
+URIs: tor+https://deb.debian.org/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Enabled: no                     # <<<<< change this line from "yes" to "no"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+https://deb.debian.org/debian-security
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Enabled: no                     # <<<<< change this line from "yes" to "no"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+https://fasttrack.debian.net/debian-fasttrack
+Suites: trixie-fasttrack trixie-backports-staging
+Components: main contrib non-free
+Enabled: yes                    # <<<<< keep this line saying "yes"
+Signed-By: /usr/share/keyrings/fasttrack-archive-keyring.gpg
+
+######## DISABLED BY DEFAULT SOURCES ########
+
+#### deb ####
+
+Types: deb
+URIs: tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Enabled: yes                    # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Enabled: yes                    # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+## No onion for fasttrack yet: https://salsa.debian.org/fasttrack-team/support/-/issues/27
 }}
 
 Save and exit.
@@ -223,12 +253,12 @@ Save and exit.
 '''3.''' Confirm the onionized repositories are functional.
 
 {{CodeSelect|code=
-sudo apt update && sudo apt full-upgrade
+upgrade-nonroot
 }}
 }}
 
-==== Onionize derivative.list ====
-Follow these steps to point the {{project_name_short}} <code>sources.list</code> file to the onion mirror. See [[Project-APT-Repository|{{project name short}} APT Repository overview]] for details on the four repository choices.
+==== Onionize derivative.sources ====
+Follow these steps to point the {{project_name_short}} <code>sources</code> file to the onion mirror. See [[Project-APT-Repository|{{project name short}} APT Repository overview]] for details on the four repository choices.
 
 This can be done using <code>repository-dist</code> {{cli}} tool with the <code>--transport onion</code> option.
 
@@ -304,40 +334,87 @@ Note: to use the <code>tor+http</code> configuration below, {{kicksecure_wiki|wi
 
 {{non_q_project_name_short}} VMs can be onionized by editing both the Debian <ref name=Debian_onions /> and {{project_name_short}} repository configuration files so they point to the corresponding onion mirrors. Complete the following steps in <u>both</u> {{project_name_gateway_short}} and {{project_name_workstation_short}}.
 
-=== Debian sources.list ===
+=== Debian sources ===
 
 {{Box|text=
-{{Onionize Debian Sources.list
-|filename=/etc/apt/sources.list.d/debian.list
-}}
-}}
-
-=== {{project_name_short}} sources.list ===
-
-Follow these steps to point the {{project_name_short}} <code>sources.list</code> file to the v3 onion mirror. <ref name=v2_v3>{{project_name_short}} no longer maintains v2 legacy onion addresses which were deprecated by The Tor Project in October 2021; see [https://support.torproject.org/onionservices/v2-deprecation/#topic_v2-deprecation here].</ref> <ref>The v3 onion protocol has been supported for clients and servers since Tor v0.3.2.1-alpha.</ref> See [[Project-APT-Repository#Whonix_APT_Repository_Overview|Whonix APT Repository overview]] for details on the four repository choices.
-
-{{Box|text=
-'''1.''' Open the {{project_name_short}} <code>sources.list</code> file using an editor with root rights.
+'''1.''' Open the Debian <code>sources</code> file using an editor with root rights.
 
 {{CodeSelect|code=
-sudoedit /etc/apt/sources.list.d/derivative.list
+sudoedit /etc/apt/sources.list.d/debian.sources
 }}
 
-'''2.''' Uncomment the onionized {{project_name_short}} repository.
+'''2.''' Enable the onionized Debian repositories and disable the clearnet repositories.
 
-Uncomment the following .onion mirror and comment out (#) the corresponding https repository.
+Enable the following .onion mirrors and disable the corresponding https repositories (except the fasttrack repository).
 
 {{CodeSelect|code=
-deb [signed-by=/usr/share/keyrings/derivative.asc] tor+http://deb.{{project_onion}} {{Stable project version based on Debian codename}} main contrib non-free
-#deb-src [signed-by=/usr/share/keyrings/derivative.asc] tor+http://deb.{{project_onion}} {{Stable project version based on Debian codename}} main contrib non-free
+######## ENABLED SOURCES ########
 
-#deb [signed-by=/usr/share/keyrings/derivative.asc] tor+https://deb.whonix.org {{Stable project version based on Debian codename}} main contrib non-free
-#deb-src [signed-by=/usr/share/keyrings/derivative.asc] tor+https://deb.whonix.org {{Stable project version based on Debian codename}} main contrib non-free
+Types: deb
+URIs: tor+https://deb.debian.org/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Enabled: no                     # <<<<< change this line from "yes" to "no"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+https://deb.debian.org/debian-security
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Enabled: no                     # <<<<< change this line from "yes" to "no"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+https://fasttrack.debian.net/debian-fasttrack
+Suites: trixie-fasttrack trixie-backports-staging
+Components: main contrib non-free
+Enabled: yes                    # <<<<< keep this line saying "yes"
+Signed-By: /usr/share/keyrings/fasttrack-archive-keyring.gpg
+
+######## DISABLED BY DEFAULT SOURCES ########
+
+#### deb ####
+
+Types: deb
+URIs: tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Enabled: yes                    # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Enabled: yes                    # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+## No onion for fasttrack yet: https://salsa.debian.org/fasttrack-team/support/-/issues/27
 }}
 
 Save and exit.
 
-'''3.''' Confirm the onionized repository is functional.
+'''3.''' Confirm the onionized repositories are functional.
+
+{{CodeSelect|code=
+upgrade-nonroot
+}}
+}}
+
+=== {{project_name_short}} sources ===
+
+Follow these steps to point the {{project_name_short}} <code>sources.list</code> file to the v3 onion mirror. <ref name=v2_v3>{{project_name_short}} no longer maintains v2 legacy onion addresses which were deprecated by The Tor Project in October 2021; see [https://support.torproject.org/onionservices/v2-deprecation/#topic_v2-deprecation here].</ref> <ref>The v3 onion protocol has been supported for clients and servers since Tor v0.3.2.1-alpha.</ref> See [[Project-APT-Repository#Whonix_APT_Repository_Overview|Whonix APT Repository overview]] for details on the four repository choices.
+
+This can be done using <code>repository-dist</code> {{cli}} tool with the <code>--transport onion</code> option.
+
+{{Box|text=
+'''1.''' Run the following command:
+
+{{CodeSelect|code=
+sudo repository-dist --enable --transport onion
+}}
+
+'''2.''' Confirm the onionized repository is functional.
 
 {{CodeSelect|code=
 upgrade-nonroot
