@@ -60,16 +60,21 @@ sudo systemctl mask anon-ws-disable-stacked-tor_autogen__run_anon-ws-disable-sta
 * Qubes-Whonix: In <code>{{project_name_workstation_template}}</code> Template.
 
 {{box|text=
-'''A)''' Add Debian source repository.
+'''A)''' Enable Debian source repository.
 
 {{Open with root rights|filename=
-/etc/apt/sources.list.d/debian-src.list
+/etc/apt/sources.list.d/debian.sources
 }}
 
-Paste.
+Find and edit the following stanza (around lines 69-74).
 
 {{CodeSelect|code=
-deb-src https://deb.debian.org/debian {{Stable_project_version_based_on_Debian_codename}} main contrib non-free
+Types: deb-src
+URIs: tor+https://deb.debian.org/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Enabled: yes                 # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyrings.gpg
 }}
 
 Save and exit.

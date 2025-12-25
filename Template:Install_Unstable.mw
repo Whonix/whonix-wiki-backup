@@ -14,13 +14,23 @@ sudo su -c "echo -e 'APT::Default-Release {{Stable_project_version_based_on_Debi
 '''3.''' Add the current Debian unstable codename <code>{{Debian_Codename_Unstable}}</code> to <i>sources.list.d</i>.
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb https://deb.debian.net/debian {{Debian_Codename_Unstable}} main' > /etc/apt/sources.list.d/unstable.list"
+sudo su -c "echo -e 'Types: deb
+URIs: https://deb.debian.net/debian
+Suites: {{Debian_Codename_Unstable}}
+Components: main
+Enabled: yes
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' > /etc/apt/sources.list.d/unstable.sources"
 }}
 
 Or alternatively use the <i>.onion</i> mirror.
 
 {{CodeSelect|code=
-sudo su -c "echo -e 'deb tor+http://{{Debian_onion}}/debian {{Debian_Codename_Unstable}} main' > /etc/apt/sources.list.d/unstable.list"
+sudo su -c "echo -e 'Types: deb
+URIs: tor+http://{{Debian_onion}}/debian
+Suites: {{Debian_Codename_Unstable}}
+Components: main
+Enabled: yes
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' > /etc/apt/sources.list.d/unstable.sources"
 }}
 
 '''4.''' [[Operating_System_Software_and_Updates#Updates|Update]] the package lists.
@@ -42,7 +52,7 @@ On occasion it is necessary to undo this configuration, for example when upgradi
 Delete Debian testing repository list.
 
 {{CodeSelect|code=
-sudo rm /etc/apt/sources.list.d/unstable.list
+sudo rm /etc/apt/sources.list.d/unstable.sources
 }}
 
 Delete apt Default-Release configuration.

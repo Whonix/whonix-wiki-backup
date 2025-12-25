@@ -1,53 +1,55 @@
-It is recommended to torrify APT's traffic on the host for several reasons:
+It is recommended to torify APT traffic on the host for several reasons:
 
 * Each machine has its own unique package selection. This allows location tracking, because systems can be fingerprinted across physical networks as system updates are performed.
-* System updates leak sensitive security information like package versions and the varying patch levels. This information aids targeted attacks.
+* System updates leak sensitive security information such as package versions and differing patch levels. This information can aid targeted attacks.
 
 Follow the instructions below to torify APT traffic in Debian. <ref>
 https://packages.debian.org/apt-transport-tor
 </ref>
 {{Box|text=
-'''1.''' Install apt-transport-tor from the Debian repository.
+{{IconSet|h1|1}} Install the <code>apt-transport-tor</code> package from the Debian repository so APT can route traffic through Tor.
 
 {{CodeSelect|code=
 sudo apt install apt-transport-tor
 }}
 
-'''2.'''Edit the sources.list to include only '''tor://''' URLs for every entry.
+{{IconSet|h1|2}} Edit the APT sources file so that all repository entries use only <code>tor://</code> URLs.
 
 {{Open with root rights|filename=
 /etc/apt/sources.list
 }}
 
-'''3.''' Save and exit.
+{{IconSet|h1|3}} Save the file and exit the editor to apply the changes.
 }}
 
 '''Other URL Configurations'''
 
-Alternatively, the '''tor+http://''' URL scheme is possible.
+Alternatively, the <code>tor+http://</code> URL scheme can be used.
 
-apt-transport-tor can also in theory be combined with apt-transport-https, leading to the '''tor+https://''' URL scheme. <ref>
+<code>apt-transport-tor</code> can also be combined with <code>apt-transport-https</code> if a repository supports it, resulting in the <code>tor+https://</code> URL scheme. <ref>
 https://lwn.net/Articles/672350/
-</ref> In practice at time of writing no major repository (such as the Debian repository) supported '''tor+https://'''.
+</ref>
 
-Note that changing <code>ftp.us.debian.org</code> to <code>http.debian.net</code> picks a mirror near to whichever Tor exit node is being used. Throughput is surprisingly fast. <ref>
+Note that changing <code>ftp.us.debian.org</code> to <code>http.debian.net</code> selects a mirror close to the Tor exit node in use. Throughput is often surprisingly fast. <ref>
 https://retout.co.uk/blog/2014/07/21/apt-transport-tor
-</ref> Also be aware that all public-facing debian.org FTP services were [https://www.debian.org/News/2017/20170425 shut down on November 1, 2017]. <ref>
+</ref> Also note that all public-facing debian.org FTP services were [https://www.debian.org/News/2017/20170425 shut down on November 1, 2017]. <ref>
 ftp://ftp.debian.org and ftp://security.debian.org
 </ref>
 
-Debian URLs can also be pointed to the available onion services <code>http://{{Debian_onion}}</code> and <code>http://sgvtcaew4bxjd7ln.onion</code>. This is the most secure option, as no package metadata ever leaves Tor. <ref>
+Debian repositories can also be accessed via onion services at <code>http://{{Debian_onion}}</code>. This is the most secure option, since no package metadata ever leaves Tor. <ref>
 https://web.archive.org/web/20190228232722/https://richardhartmann.de/blog/posts/2015/08/24-Tor-enabled_Debian_mirror/
-/</ref> <ref>
+</ref> <ref>
 https://onion.debian.org
 </ref> <ref>
 https://onion.torproject.org
-</ref> This URL scheme also protects from system compromise in the event APT has a critical security bug. The following entries should work in the sources list:
+</ref> This URL scheme also provides protection in the event APT has a critical security vulnerability.
+
+The following entries should work in the APT sources list:
 
 {{CodeSelect|code=
-deb  tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian          {{Stable_project_version_based_on_Debian_codename}}            main
-deb  tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian          {{Stable_project_version_based_on_Debian_codename}}-updates    main
-deb  tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security {{Stable_project_version_based_on_Debian_codename}}/updates    main
+deb  tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian           {{Stable_project_version_based_on_Debian_codename}}            main
+deb  tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian           {{Stable_project_version_based_on_Debian_codename}}-updates    main
+deb  tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security  {{Stable_project_version_based_on_Debian_codename}}/updates    main
 
-#deb tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian          {{Stable_project_version_based_on_Debian_codename}}-backports  main
+#deb tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian           {{Stable_project_version_based_on_Debian_codename}}-backports  main
 }}

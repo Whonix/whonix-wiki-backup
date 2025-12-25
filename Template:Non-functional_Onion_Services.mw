@@ -1,12 +1,26 @@
-Sometimes the Debian, {{project_name_short}} or Qubes onion servers are non-functional. This means updates cannot be completed automatically and an error message similar to below will appear.
+{{IntroLike|
+Sometimes the Debian and/or {{project_name_short}} onion servers are non-functional. This could be due to DDoS attacks on the Tor network. <ref>
+* https://blog.torproject.org/how-handle-millions-new-tor-clients/
+* https://lists.torproject.org/pipermail/tor-dev/2020-March/014211.html
+* https://lists.torproject.org/pipermail/tor-dev/2020-June/014381.html
+* https://forums.whonix.org/t/suspicious-rise-in-of-tor-users/4673
+</ref> As a result, updates cannot be completed automatically and an error message similar to the one below will appear.
+}}
+
+Command:
 
 {{CodeSelect|code=
-user@host:~$ sudo apt update
-Hit:1 https://deb.debian.org/debian-security {{Stable project version based on Debian codename}}-security InRelease
+sudo apt update
+}}
+
+Expected output:
+
+{{CodeSelect|code=
+Hit:1 https://security.debian.org {{Stable project version based on Debian codename}}/updates InRelease
 Hit:2 tor+http://deb.dds6qkxpwdeubwucdiaord2xgbbeyds25rbsgr73tbfpqpt4a6vjwsyd.onion {{Stable project version based on Debian codename}} InRelease
-Ign:3 https://deb.debian.org/debian {{Stable project version based on Debian codename}} InRelease
-Hit:4 https://deb.whonix.org {{Stable project version based on Debian codename}} InRelease
-Hit:5 https://deb.debian.org/debian {{Stable project version based on Debian codename}} Release
+Ign:3 https://ftp.us.debian.org/debian {{Stable project version based on Debian codename}} InRelease
+Hit:4 https://deb.{{project_clearnet}} {{Stable project version based on Debian codename}} InRelease
+Hit:5 https://ftp.us.debian.org/debian {{Stable project version based on Debian codename}} Release
 Err:7 tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion {{Stable project version based on Debian codename}}/updates InRelease
 SOCKS proxy socks5h://localhost:9050 could not connect to 5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion (0.0.0.0:0) due to: Host unreachable (6)
 Err:8 tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian {{Stable project version based on Debian codename}} InRelease
@@ -17,29 +31,66 @@ W: Failed to fetch tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5
 W: Some index files failed to download. They have been ignored, or old ones used instead.
 }}
 
-Until the onion service is re-established, complete the following steps in {{project_name_gateway_long}} (<code>{{project_name_gateway_template}}</code>) and {{project_name_workstation_long}} (<code>{{project_name_workstation_template}}</code>) to circumvent the issue. <ref>If similar issues occur with {{project_name_short}} or Qubes onion services then follow the same procedure and modify the <code>derivative.list</code> and <code>qubes-r4.list</code> files, respectively.</ref> <ref>https://forums.whonix.org/t/errors-updating-september-2018/6028</ref>
+Until the onion service is re-established, complete the following steps in {{project_name_gateway_long}} (<code>{{project_name_gateway_template}}</code>) and {{project_name_workstation_long}} (<code>{{project_name_workstation_template}}</code>) to circumvent the issue. <ref>
+If similar issues occur with {{project_name_short}} or Qubes onion services then follow the same procedure and modify the <code>derivative.sources</code> and <code>qubes-r4.list</code> files, respectively.
+</ref> <ref>
+https://forums.whonix.org/t/errors-updating-september-2018/6028
+</ref>
+
 {{Box|text=
-'''1.''' Open Debian ''sources.list'' in an editor.
+'''1.''' Open the Debian ''sources'' in an editor.
 
 {{Open with root rights|filename=
-/etc/apt/sources.list.d/debian.list
+/etc/apt/sources.list.d/debian.sources
 }}
 
-'''2.''' Comment (#) the .onion address lines and uncomment the clearnet address lines.
+'''2.''' Disable the onionized Debian repositories and enable the clearnet repositories.
 
-The code blocks should look like this; only these entries require editing. <ref>There is no Debian onion for fasttrack yet.</ref>
+The code blocks should look like this; only these entries require editing. <ref>https://salsa.debian.org/fasttrack-team/support/-/issues/27.</ref>
 
 {{CodeSelect|code=
-deb tor+https://deb.debian.org/debian bullseye main contrib non-free
-deb tor+https://deb.debian.org/debian bullseye-updates main contrib non-free
-deb tor+https://deb.debian.org/debian-security bullseye-security main contrib non-free
-deb tor+https://deb.debian.org/debian bullseye-backports main contrib non-free
-deb tor+https://fasttrack.debian.net/debian bullseye-fasttrack main contrib non-free
+######## ENABLED SOURCES ########
 
-#deb tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian bullseye main contrib non-free
-#deb tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian bullseye-updates main contrib non-free
-#deb tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security bullseye-security main contrib non-free
-#deb tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian bullseye-backports main contrib non-free
+Types: deb
+URIs: tor+https://deb.debian.org/debian
+Suites: {{Stable project version based on Debian codename}} {{Stable project version based on Debian codename}}-updates {{Stable project version based on Debian codename}}-backports
+Components: main contrib non-free non-free-firmware
+Enabled: yes                     # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+https://deb.debian.org/debian-security
+Suites: {{Stable project version based on Debian codename}}-security
+Components: main contrib non-free non-free-firmware
+Enabled: yes                     # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+https://fasttrack.debian.net/debian-fasttrack
+Suites: {{Stable project version based on Debian codename}}-fasttrack {{Stable project version based on Debian codename}}-backports-staging
+Components: main contrib non-free
+Enabled: yes                    # <<<<< keep this line saying "yes"
+Signed-By: /usr/share/keyrings/fasttrack-archive-keyring.gpg
+
+######## DISABLED BY DEFAULT SOURCES ########
+
+#### deb ####
+
+Types: deb
+URIs: tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian
+Suites: {{Stable project version based on Debian codename}} {{Stable project version based on Debian codename}}-updates {{Stable project version based on Debian codename}}-backports
+Components: main contrib non-free non-free-firmware
+Enabled: no                     # <<<<< change this line from "yes" to "no"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security
+Suites: {{Stable project version based on Debian codename}}-security
+Components: main contrib non-free non-free-firmware
+Enabled: no                     # <<<<< change this line from "yes" to "no"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+## No onion for fasttrack yet: https://salsa.debian.org/fasttrack-team/support/-/issues/27
 }}
 
 Save and exit.
@@ -52,5 +103,9 @@ sudo apt update
 
 '''4.''' ''Optional:'' Revert and update the package lists.
 
-Consider reverting these changes later on because onion repositories have various security advantages. Afterwards, apply [[#Updates|Updates]] to refresh the package lists.
-}}
+Consider reverting these changes later on, because onion repositories offer various security advantages. Afterwards, apply [[#Updates|Updates]] to refresh the package lists.
+}}<noinclude>
+<references />
+{{Header}}
+{{Footer}}
+</noinclude>
