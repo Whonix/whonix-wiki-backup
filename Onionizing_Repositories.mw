@@ -1,15 +1,15 @@
 {{Header}}
 {{title|title=
 Onionizing Repositories
-}}
+}} <!-- close Template:title -->
 {{#seo:
-|description=The guide explains how to configure Tor onion services for APT repositories to enhance security and privacy, but it may cause system updates to fail due to unreliability. The configuration provides protection against targeted and man-in-the-middle attacks and prevents tracking of installed programs.
+|description=The guide explains how to configure Tor onion services for APT repositories to enhance security and privacy, but it may cause system updates to fail due to unreliability. The configuration provides protection against targeted and man-in-the-middle attacks, and prevents tracking of installed programs.
 |image=Onionrepository23234.jpg
-}}
+}} <!-- close #seo -->
 [[File:Onionrepository23234.jpg|thumb]]
 {{intro|
-The guide explains how to configure experimental Tor onion services for APT repositories. The configuration provides additional security and privacy benefits, such as protection against targeted attacks, man-in-the-middle attacks and preventing tracking of installed programs, but it may cause system updates to fail due to unreliability.
-}}
+The guide explains how to configure experimental Tor onion services for APT repositories. The configuration provides additional security and privacy benefits, such as protection against targeted attacks, man-in-the-middle attacks, and preventing tracking of installed programs, but it may cause system updates to fail due to unreliability.
+}} <!-- close intro -->
 = Introduction =
 
 When software packages from Debian, {{project_name_long}}, Fedora, Qubes (and others) are downloaded prior to the installation of new packages or upgrades, the package repository sources default to the http / https transport protocol, which is non-ideal for security. Instead, experimental Tor onion services can be configured for a number of platforms, which provides several security and privacy benefits: <ref>https://blog.torproject.org/tor-heart-apt-transport-tor-and-debian-onions</ref>
@@ -23,181 +23,31 @@ Be aware that enabling onion repositories may cause system updates to periodical
 
 If the term "comment" is unfamiliar, please follow [https://www.howtogeek.com/118389/how-to-comment-out-and-uncomment-lines-in-a-configuration-file/ this link] to learn how to comment / uncomment lines in a configuration file.
 
-In this chapter, instructions are provided for onionizing sources on the [[#Debian|Debian]], [[#{{non_q_project_name_short}}|{{non_q_project_name_short}}]] and [[#Qubes|Qubes]] platforms.
+= Platform Specific =
+Select your platform.
 
-= Qubes =
+{{Tab
+|type=controller
+|content=
 
-Qubes <code>dom0</code> and VMs can be onionized by editing the repository configuration files so they point to the corresponding onion mirrors. <ref>At present, the [https://www.qubes-os.org/news/2019/04/17/tor-onion-services-available-again/ available Qubes onion service URLs] are:
-<blockquote>
-Website:   www.{{qubes_onion}} <br />
-Yum repo:  yum.{{qubes_onion}} <br />
-Deb repo:  deb.{{qubes_onion}} <br />
-ISOs:      iso.{{qubes_onion}}
-</blockquote></ref>
+{{Tab
+|type=section
+|linkid=hosts-nonqubes
+|addToClass=info-box
+|image=[[File:{{project_name_short}}-logo-icon.svg|25px]]
+|title= == {{non_q_project_name_short}} VMs ==
+|content=
+* <u>What to change:</u> {{non_q_project_name_short}} {{VMs}} can be onionized by editing both the Debian <ref name=Debian_onions /> and {{project_name_short}} repository configuration files so they point to the corresponding onion mirrors.
+* <u>Where to apply:</u> Complete the following steps in <u>both</u> {{project_name_gateway_short}} and {{project_name_workstation_short}}.
 
-Complete the following steps in [[#dom0|<code>dom0</code>]] and for each template -- not all templates can be completely onionized. The instructions below consider [[#Debian Templates|Debian Templates]], [[#{{project_name_short}} Templates|Whonix <sup>TM</sup> Templates]], and the [[#Fedora Template|Fedora Template]].
-
-== dom0 ==
-
-<code>dom0</code> can be updated exclusively over onion services.
-{{Box|text=
-'''1.''' In a <code>dom0</code> terminal, open the <code>qubes-dom0.repo</code> configuration file in a text editor.
-
-{{CodeSelect|code=
-sudoedit /etc/yum.repos.d/qubes-dom0.repo
-}}
-
-* comment the lines that contain <code>metalink</code>
-* uncomment the lines that contain <code>{{Qubes_onion}}</code>
-
-Once completed, each of the four code blocks will have http(s) repository lines similar to the following example.
-
-{{CodeSelect|code=
-#baseurl = https://yum.qubes-os.org/r$releasever/current/host/fc37
-baseurl = http://yum.{{Qubes_onion}}/r$releasever/current/host/fc37
-#metalink = https://yum.qubes-os.org/r$releasever/current/host/fc37/repodata/repomd.xml.metalink
-}}
-
-Save and exit.
-
-'''2.''' In a <code>dom0</code> terminal, open the <code>qubes-templates.repo</code> configuration file in a text editor.
-
-{{CodeSelect|code=
-sudoedit /etc/qubes/repo-templates/qubes-templates.repo
-}}
-
-* comment the lines that contain <code>metalink</code>
-* uncomment the lines that contain <code>{{Qubes_onion}}</code>
-
-Once completed, each of the two code blocks will have http(s) repository lines similar to the following example.
-
-{{CodeSelect|code=
-#baseurl = https://yum.qubes-os.org/r$releasever/templates-itl
-baseurl = http://yum.{{Qubes_onion}}/r$releasever/templates-itl
-#metalink = https://yum.qubes-os.org/r$releasever/templates-itl/repodata/repomd.xml.metalink
-}}
-
-Save and exit.
-
-'''3.''' In <code>dom0</code> terminal, confirm both onion repositories are functional.
-
-Using <code>--show-output --console</code> is optional but recommended because of a Qubes upstream bug. <ref>[https://github.com/QubesOS/qubes-issues/issues/7254 <code>qubes-dom0-update</code> shows <code>No updates available</code> in case of network is down / <code>qubes-dom0-update</code> fails to notice if repositories are unreachable / network is down]</ref><br />
-{{CodeSelect|code=
-sudo qubes-dom0-update --show-output --console
-}}
-}}
-
-== Debian Templates ==
-
-Debian templates can be updated exclusively over onion services. Simply edit the Qubes and Debian sources.list files so they point to the respective onion repositories.
-
-Note: to use the <code>tor+http</code> configuration below, {{kicksecure_wiki|wikipage=Advanced_Host_Security#apt-transport-tor|text=apt-transport-tor}} must be installed. <ref name=tor+http>For support in downloading APT packages anonymously via the Tor network. To install it:
-{{CodeSelect|code=
-sudo apt install --no-install-recommends apt-transport-tor
-}}</ref> Remove <code>tor+</code> from the code block if updates over Tor are unwanted.
-
-==== Onionize qubes-r4.list ====
-
-{{Box|text=
-'''1.''' In Debian TempateVM, open the <code>qubes-r4.list</code> file in a text editor.
-
-{{CodeSelect|code=
-sudoedit /etc/apt/sources.list.d/qubes-r*.list
-}}
-
-'''2.''' Comment the first line underneath "Main qubes updates repository".
-
-The first code block should look similar to this.
-
-{{CodeSelect|code=
-# Main qubes updates repository
-#deb [arch=amd64] https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
-#deb-src https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
-}}
-
-'''3.''' Uncomment the corresponding line underneath "Qubes Tor updates repositories".
-
-The first code block should look similar to this.
-
-{{CodeSelect|code=
-# Qubes Tor updates repositories
-# Main qubes updates repository
-deb [arch=amd64] tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
-#deb-src http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
-}}
-
-Save and exit.
-
-'''4.''' Confirm the onionized repositories are functional.
-
-{{CodeSelect|code=
-sudo apt update && sudo apt full-upgrade
-}}
-}}
-
-==== Onionize Debian sources.list ====
-
-The <code>sources.list</code> file can be edited so it points to the Debian onion mirror. <ref name=Debian_onions>https://onion.debian.org/</ref> This is a more secure method than clearnet for updates and software installation.
-
-{{Box|text=
-{{Onionize Debian Sources.list
-|filename=/etc/apt/sources.list
-}}
-}}
-
-== {{project_name_short}} Templates ==
-
-{{project_name_short}} templates can be updated exclusively over onion services by editing the Qubes, Debian <ref name=Debian_onions /> and {{project_name_short}} <code>sources</code> files so they point to the respective onion repositories.
-
-Complete the following steps in <u>both</u> {{project_name_gateway_long}} and {{project_name_workstation_long}}.
-
-==== Onionize qubes-r4.list ====
-
-{{Box|text=
-'''1.''' In {{project_name_short}} TempateVM, open <code>qubes-r4.list</code> in a text editor.
-
-{{CodeSelect|code=
-sudoedit /etc/apt/sources.list.d/qubes-r*.list
-}}
-
-'''2.''' Comment the first line underneath "Main qubes updates repository".
-
-The first code block should look similar to this.
-
-{{CodeSelect|code=
-# Main qubes updates repository
-#deb [arch=amd64] https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
-#deb-src https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
-}}
-
-'''3.''' Uncomment the corresponding line underneath "Qubes Tor updates repositories".
-
-The first code block should look similar to this.
-
-{{CodeSelect|code=
-# Qubes Tor updates repositories
-# Main qubes updates repository
-deb [arch=amd64] tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
-#deb-src tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
-}}
-
-Save and exit.
-
-'''4.''' Confirm the onionized repositories are functional.
-
-{{CodeSelect|code=
-upgrade-nonroot
-}}
-}}
-
-==== Onionize debian.sources ====
+=== Debian sources ===
 
 {{Box|text=
 '''1.''' Open the Debian <code>sources</code> file using an editor with root rights.
 
 {{CodeSelect|code=
 sudoedit /etc/apt/sources.list.d/debian.sources
-}}
+}} <!-- close CodeSelect -->
 
 '''2.''' Enable the onionized Debian repositories and disable the clearnet repositories.
 
@@ -246,19 +96,16 @@ Enabled: yes                    # <<<<< change this line from "no" to "yes"
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
 ## No onion for fasttrack yet: https://salsa.debian.org/fasttrack-team/support/-/issues/27
-}}
+}} <!-- close CodeSelect -->
 
-Save and exit.
+'''3.''' Save and exit.
+}} <!-- close box -->
 
-'''3.''' Confirm the onionized repositories are functional.
+=== derivative sources ===
 
-{{CodeSelect|code=
-upgrade-nonroot
-}}
-}}
+Follow these steps to point the {{project_name_short}} repository to the onion mirror. See [[Project-APT-Repository#Whonix_APT_Repository_Overview|Whonix APT Repository overview]] for details on the four repository choices.
 
-==== Onionize derivative.sources ====
-Follow these steps to point the {{project_name_short}} <code>sources</code> file to the onion mirror. See [[Project-APT-Repository|{{project name short}} APT Repository overview]] for details on the four repository choices.
+Note: On Whonix, <code>repository-dist</code> configures onion transport for the Whonix repository and the inherited Kicksecure repository (if enabled).
 
 This can be done using <code>repository-dist</code> {{cli}} tool with the <code>--transport onion</code> option.
 
@@ -267,16 +114,287 @@ This can be done using <code>repository-dist</code> {{cli}} tool with the <code>
 
 {{CodeSelect|code=
 sudo repository-dist --enable --transport onion
-}}
+}} <!-- close CodeSelect -->
 
 '''2.''' Confirm the onionized repository is functional.
 
 {{CodeSelect|code=
 upgrade-nonroot
-}}
-}}
+}} <!-- close CodeSelect -->
 
-== Fedora Template ==
+}} <!-- close box -->
+
+=== {{non_q_project_name_short}} Notes ===
+* Reminder: Onionize both, Whonix-Gateway and Whonix-Workstation.
+* Host operating system: If you are using a Debian (based) host or [[Kicksecure]], you could optionally also onionize the host operating system. See tab Debian below. If you are using a Kicksecure host, see also {{kicksecure_wiki
+|wikipage=Onionizing_Repositories
+|text=Kicksecure Onionizing Repositories
+}} <!-- close Template:kicksecure_wiki -->
+
+}} <!-- close Tab:section hosts-nonqubes -->
+
+{{Tab
+|type=section
+|linkid=hosts-qubes
+|addToClass=info-box
+|image=[[File:Qubes-logo-blue.png|25px]]
+|title= == {{q_project_name_short}} Hosts ==
+|content=
+* <u>What to change:</u> Qubes <code>dom0</code> and VMs can be onionized by editing the repository configuration files so they point to the corresponding onion mirrors. <ref>
+At present, the [https://www.qubes-os.org/news/2019/04/17/tor-onion-services-available-again/ available Qubes onion service URLs] are:
+<blockquote>
+Website:   www.{{qubes_onion}} <br />
+Yum repo:  yum.{{qubes_onion}} <br />
+Deb repo:  deb.{{qubes_onion}} <br />
+ISOs:      iso.{{qubes_onion}}
+</blockquote>
+</ref>
+* <u>Where to apply:</u> Complete the following steps in [[#dom0|<code>dom0</code>]] and for each template.
+* <u>Limitation:</u> Not all templates can be completely onionized.
+* <u>Templates covered:</u> The instructions below consider [[#Debian Templates|Debian Templates]], [[#{{project_name_short}} Templates|{{project_name_short}} Templates]], and the [[#Fedora Template|Fedora Template]].
+
+=== dom0 ===
+
+<code>dom0</code> can be updated exclusively over onion services.
+
+{{Box|text=
+'''1.''' In a <code>dom0</code> terminal, open the <code>qubes-dom0.repo</code> configuration file in a text editor.
+
+{{CodeSelect|code=
+sudoedit /etc/yum.repos.d/qubes-dom0.repo
+}} <!-- close CodeSelect -->
+
+* comment the lines that contain <code>metalink</code>
+* uncomment the lines that contain <code>{{Qubes_onion}}</code>
+
+Once completed, each of the four code blocks will have http(s) repository lines similar to the following example.
+
+{{CodeSelect|code=
+#baseurl = https://yum.qubes-os.org/r$releasever/current/host/fc37
+baseurl = http://yum.{{Qubes_onion}}/r$releasever/current/host/fc37
+#metalink = https://yum.qubes-os.org/r$releasever/current/host/fc37/repodata/repomd.xml.metalink
+}} <!-- close CodeSelect -->
+
+'''2.''' Save and exit.
+
+'''3.''' In a <code>dom0</code> terminal, open the <code>qubes-templates.repo</code> configuration file in a text editor.
+
+{{CodeSelect|code=
+sudoedit /etc/qubes/repo-templates/qubes-templates.repo
+}} <!-- close CodeSelect -->
+
+* comment the lines that contain <code>metalink</code>
+* uncomment the lines that contain <code>{{Qubes_onion}}</code>
+
+Once completed, each of the two code blocks will have http(s) repository lines similar to the following example.
+
+{{CodeSelect|code=
+#baseurl = https://yum.qubes-os.org/r$releasever/templates-itl
+baseurl = http://yum.{{Qubes_onion}}/r$releasever/templates-itl
+#metalink = https://yum.qubes-os.org/r$releasever/templates-itl/repodata/repomd.xml.metalink
+}} <!-- close CodeSelect -->
+
+'''3.''' Save and exit.
+
+'''4.''' In <code>dom0</code> terminal, confirm both onion repositories are functional.
+
+Using <code>--show-output --console</code> is optional but recommended because of a Qubes upstream bug. <ref>[https://github.com/QubesOS/qubes-issues/issues/7254 <code>qubes-dom0-update</code> shows <code>No updates available</code> in case of network is down / <code>qubes-dom0-update</code> fails to notice if repositories are unreachable / network is down]</ref><br />
+{{CodeSelect|code=
+sudo qubes-dom0-update --show-output --console
+}} <!-- close CodeSelect -->
+}} <!-- close box -->
+
+=== Debian Templates ===
+
+Debian templates can be updated exclusively over onion services. Simply edit the Qubes and Debian sources.list files so they point to the respective onion repositories.
+
+Note: to use the <code>tor+http</code> configuration below, {{kicksecure_wiki|wikipage=Advanced_Host_Security#apt-transport-tor|text=apt-transport-tor}} must be installed. <ref name=tor+http>For support in downloading APT packages anonymously via the Tor network. To install it:
+{{CodeSelect|code=
+sudo apt install --no-install-recommends apt-transport-tor
+}} <!-- close CodeSelect -->
+</ref> Remove <code>tor+</code> from the code block if updates over Tor are unwanted.
+
+==== Onionize qubes-r4.list ====
+
+{{Box|text=
+'''1.''' In Debian TemplateVM, open the <code>qubes-r4.list</code> file in a text editor.
+
+{{CodeSelect|code=
+sudoedit /etc/apt/sources.list.d/qubes-r*.list
+}} <!-- close CodeSelect -->
+
+'''2.''' Comment the first line underneath "Main qubes updates repository".
+
+The first code block should look similar to this.
+
+{{CodeSelect|code=
+# Main qubes updates repository
+#deb [arch=amd64] https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
+#deb-src https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
+}} <!-- close CodeSelect -->
+
+'''3.''' Uncomment the corresponding line underneath "Qubes Tor updates repositories".
+
+The first code block should look similar to this.
+
+{{CodeSelect|code=
+# Qubes Tor updates repositories
+# Main qubes updates repository
+deb [arch=amd64] tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
+#deb-src http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
+}} <!-- close CodeSelect -->
+
+Save and exit.
+
+'''4.''' Confirm the onionized repositories are functional.
+
+{{CodeSelect|code=
+sudo apt update && sudo apt full-upgrade
+}} <!-- close CodeSelect -->
+}} <!-- close box -->
+
+==== Onionize Debian sources.list ====
+
+The <code>sources.list</code> file can be edited so it points to the Debian onion mirror. <ref name=Debian_onions>https://onion.debian.org/</ref> This is a more secure method than clearnet for updates and software installation.
+
+{{Box|text=
+{{Onionize Debian Sources.list
+|filename=/etc/apt/sources.list
+}} <!-- close Template:Onionize Debian Sources.list -->
+}} <!-- close box -->
+
+=== {{project_name_short}} Templates ===
+
+{{project_name_short}} templates can be updated exclusively over onion services by editing the Qubes, Debian <ref name=Debian_onions /> and {{project_name_short}} <code>sources</code> files so they point to the respective onion repositories.
+
+Complete the following steps in <u>both</u> {{project_name_gateway_long}} and {{project_name_workstation_long}}.
+
+==== Onionize qubes-r4.list ====
+
+{{Box|text=
+'''1.''' In {{project_name_short}} TemplateVM, open <code>qubes-r4.list</code> in a text editor.
+
+{{CodeSelect|code=
+sudoedit /etc/apt/sources.list.d/qubes-r*.list
+}} <!-- close CodeSelect -->
+
+'''2.''' Comment the first line underneath "Main qubes updates repository".
+
+The first code block should look similar to this.
+
+{{CodeSelect|code=
+# Main qubes updates repository
+#deb [arch=amd64] https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
+#deb-src https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
+}} <!-- close CodeSelect -->
+
+'''3.''' Uncomment the corresponding line underneath "Qubes Tor updates repositories".
+
+The first code block should look similar to this.
+
+{{CodeSelect|code=
+# Qubes Tor updates repositories
+# Main qubes updates repository
+deb [arch=amd64] tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
+#deb-src tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
+}} <!-- close CodeSelect -->
+
+Save and exit.
+
+'''4.''' Confirm the onionized repositories are functional.
+
+{{CodeSelect|code=
+upgrade-nonroot
+}} <!-- close CodeSelect -->
+}} <!-- close box -->
+
+==== Onionize debian.sources ====
+
+{{Box|text=
+'''1.''' Open the Debian <code>sources</code> file using an editor with root rights.
+
+{{CodeSelect|code=
+sudoedit /etc/apt/sources.list.d/debian.sources
+}} <!-- close CodeSelect -->
+
+'''2.''' Enable the onionized Debian repositories and disable the clearnet repositories.
+
+Enable the following .onion mirrors and disable the corresponding https repositories (except the fasttrack repository).
+
+{{CodeSelect|code=
+######## ENABLED SOURCES ########
+
+Types: deb
+URIs: tor+https://deb.debian.org/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Enabled: no                     # <<<<< change this line from "yes" to "no"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+https://deb.debian.org/debian-security
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Enabled: no                     # <<<<< change this line from "yes" to "no"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+https://fasttrack.debian.net/debian-fasttrack
+Suites: trixie-fasttrack trixie-backports-staging
+Components: main contrib non-free
+Enabled: yes                    # <<<<< keep this line saying "yes"
+Signed-By: /usr/share/keyrings/fasttrack-archive-keyring.gpg
+
+######## DISABLED BY DEFAULT SOURCES ########
+
+#### deb ####
+
+Types: deb
+URIs: tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian
+Suites: trixie trixie-updates trixie-backports
+Components: main contrib non-free non-free-firmware
+Enabled: yes                    # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Enabled: yes                    # <<<<< change this line from "no" to "yes"
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+## No onion for fasttrack yet: https://salsa.debian.org/fasttrack-team/support/-/issues/27
+}} <!-- close CodeSelect -->
+
+Save and exit.
+
+'''3.''' Confirm the onionized repositories are functional.
+
+{{CodeSelect|code=
+upgrade-nonroot
+}} <!-- close CodeSelect -->
+}} <!-- close box -->
+
+==== Onionize derivative.sources ====
+Follow these steps to point the {{project_name_short}} <code>sources</code> file to the onion mirror. See [[Project-APT-Repository|{{project_name_short}} APT Repository overview]] for details on the four repository choices.
+
+This can be done using <code>repository-dist</code> {{cli}} tool with the <code>--transport onion</code> option.
+
+{{Box|text=
+'''1.''' Run the following command:
+
+{{CodeSelect|code=
+sudo repository-dist --enable --transport onion
+}} <!-- close CodeSelect -->
+
+'''2.''' Confirm the onionized repository is functional.
+
+{{CodeSelect|code=
+upgrade-nonroot
+}} <!-- close CodeSelect -->
+}} <!-- close box -->
+
+=== Fedora Template ===
 
 <u>Note:</u> Updating Fedora templates exclusively over [[Onion_Services|Onion Services]] is not possible -- only related Qubes repositories can be onionized. The reason is Fedora does not maintain onion service repositories.
 
@@ -285,7 +403,7 @@ upgrade-nonroot
 
 {{CodeSelect|code=
 sudoedit /etc/yum.repos.d/qubes-r*.repo
-}}
+}} <!-- close CodeSelect -->
 
 * comment the lines that contain <code>yum.qubes-os.org</code>
 * uncomment the lines that contain <code>{{Qubes_onion}}</code>
@@ -295,7 +413,7 @@ Once completed, each of the four code blocks will have http(s) repository lines 
 {{CodeSelect|code=
 #baseurl = https://yum.qubes-os.org/r4.2/current/vm/fc$releasever
 baseurl = http://yum.{{Qubes_onion}}/r4.2/current/vm/fc$releasever
-}}
+}} <!-- close CodeSelect -->
 
 Save and exit.
 
@@ -303,7 +421,7 @@ Save and exit.
 
 {{CodeSelect|code=
 sudo dnf update
-}}
+}} <!-- close CodeSelect -->
 
 '''3.''' Import the Qubes OS signing key if prompted.
 
@@ -315,120 +433,58 @@ Userid     : "Qubes OS Release 4.2 Signing Key"
 Fingerprint: 9C88 4DF3 F810 64A5 69A4 A9FA E022 E58F 8E34 D89F
 From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-4.2-primary
 Is this ok [y/N]:
-}}
-}}
+}} <!-- close CodeSelect -->
+}} <!-- close box -->
 
-= Debian =
+}} <!-- close Tab:section hosts-qubes -->
 
-Debian hosts and VMs can be onionized by editing the Debian <ref name=Debian_onions /> <ref>Also edit {{project_name_short}} <code>sources.list</code> if you are using [[Packages for Debian Hosts|{{project_name_short}} Packages for Debian Hosts]].</ref> repository configuration files so they point to the corresponding onion mirrors. Complete the following steps on Debian hosts or in Debian VMs.
-
-Note: to use the <code>tor+http</code> configuration below, {{kicksecure_wiki|wikipage=Advanced_Host_Security#apt-transport-tor|text=apt-transport-tor}} must be installed. <ref name=tor+http /> Remove "tor+" from the code block if updates over Tor are unwanted.
+{{Tab
+|type=section
+|linkid=hosts-debian
+|addToClass=info-box
+|image=[[File:Debian.png|25px]]
+|title= == Debian Hosts ==
+|content=
+* <u>What to change:</u> Debian hosts and VMs can be onionized by editing the Debian <ref name=Debian_onions /> <ref>
+Also edit {{project_name_short}} <code>sources.list</code> if you are using [[Packages for Debian Hosts|{{project_name_short}} Packages for Debian Hosts]].
+</ref> repository configuration files so they point to the corresponding onion mirrors.
+* <u>Where to apply:</u> Complete the following steps on Debian hosts or in Debian VMs.
+* <u>Requirement:</u> To use the <code>tor+http</code> configuration below, {{kicksecure_wiki|wikipage=Advanced_Host_Security#apt-transport-tor|text=apt-transport-tor}} must be installed. <ref name=tor+http />
+* <u>Optional:</u> Remove "tor+" from the code block if updates over Tor are unwanted.
 
 {{Box|text=
-{{Onionize Debian Sources.list
+{{Onionize_Debian_Sources.list
 |filename=/etc/apt/sources.list
-}}
-}}
+}} <!-- close Template:Onionize_Debian_Sources.list -->
+}} <!-- close box -->
 
-= {{non_q_project_name_short}} =
+}} <!-- close Tab:section hosts-debian -->
 
-{{non_q_project_name_short}} VMs can be onionized by editing both the Debian <ref name=Debian_onions /> and {{project_name_short}} repository configuration files so they point to the corresponding onion mirrors. Complete the following steps in <u>both</u> {{project_name_gateway_short}} and {{project_name_workstation_short}}.
+{{Tab
+|type=section
+|linkid=hosts-kicksecure
+|addToClass=info-box
+|image=[[File:Kicksecure-icon-logo.svg|25px]]
+|title= == Kicksecure Hosts ==
+|content=
+If your host operating system is Kicksecure, follow the Kicksecure documentation (separate project / separate wiki):
 
-=== Debian sources ===
+{{kicksecure_wiki
+|wikipage=Onionizing_Repositories
+|text=Kicksecure Onionizing Repositories
+}} <!-- close Template:kicksecure_wiki -->
+}} <!-- close Tab:section hosts-kicksecure -->
 
-{{Box|text=
-'''1.''' Open the Debian <code>sources</code> file using an editor with root rights.
-
-{{CodeSelect|code=
-sudoedit /etc/apt/sources.list.d/debian.sources
-}}
-
-'''2.''' Enable the onionized Debian repositories and disable the clearnet repositories.
-
-Enable the following .onion mirrors and disable the corresponding https repositories (except the fasttrack repository).
-
-{{CodeSelect|code=
-######## ENABLED SOURCES ########
-
-Types: deb
-URIs: tor+https://deb.debian.org/debian
-Suites: trixie trixie-updates trixie-backports
-Components: main contrib non-free non-free-firmware
-Enabled: no                     # <<<<< change this line from "yes" to "no"
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-
-Types: deb
-URIs: tor+https://deb.debian.org/debian-security
-Suites: trixie-security
-Components: main contrib non-free non-free-firmware
-Enabled: no                     # <<<<< change this line from "yes" to "no"
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-
-Types: deb
-URIs: tor+https://fasttrack.debian.net/debian-fasttrack
-Suites: trixie-fasttrack trixie-backports-staging
-Components: main contrib non-free
-Enabled: yes                    # <<<<< keep this line saying "yes"
-Signed-By: /usr/share/keyrings/fasttrack-archive-keyring.gpg
-
-######## DISABLED BY DEFAULT SOURCES ########
-
-#### deb ####
-
-Types: deb
-URIs: tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian
-Suites: trixie trixie-updates trixie-backports
-Components: main contrib non-free non-free-firmware
-Enabled: yes                    # <<<<< change this line from "no" to "yes"
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-
-Types: deb
-URIs: tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security
-Suites: trixie-security
-Components: main contrib non-free non-free-firmware
-Enabled: yes                    # <<<<< change this line from "no" to "yes"
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-
-## No onion for fasttrack yet: https://salsa.debian.org/fasttrack-team/support/-/issues/27
-}}
-
-Save and exit.
-
-'''3.''' Confirm the onionized repositories are functional.
-
-{{CodeSelect|code=
-upgrade-nonroot
-}}
-}}
-
-=== {{project_name_short}} sources ===
-
-Follow these steps to point the {{project_name_short}} <code>sources.list</code> file to the v3 onion mirror. <ref name=v2_v3>{{project_name_short}} no longer maintains v2 legacy onion addresses which were deprecated by The Tor Project in October 2021; see [https://support.torproject.org/onionservices/v2-deprecation/#topic_v2-deprecation here].</ref> <ref>The v3 onion protocol has been supported for clients and servers since Tor v0.3.2.1-alpha.</ref> See [[Project-APT-Repository#Whonix_APT_Repository_Overview|Whonix APT Repository overview]] for details on the four repository choices.
-
-This can be done using <code>repository-dist</code> {{cli}} tool with the <code>--transport onion</code> option.
-
-{{Box|text=
-'''1.''' Run the following command:
-
-{{CodeSelect|code=
-sudo repository-dist --enable --transport onion
-}}
-
-'''2.''' Confirm the onionized repository is functional.
-
-{{CodeSelect|code=
-upgrade-nonroot
-}}
-}}
+}} <!-- End Tab Controller -->
 
 = Onionize Tor Project Updates =
 
-For enhanced security, advanced users and testers can onionize Tor Project updates; see [[Tor_Versioning|Tor Versioning]] for further details.
+For enhanced security, advanced users and testers can onionize Tor Project updates; see {{kicksecure_wiki
+|wikipage=Tor_Versioning
+|text=Tor Versioning
+}} <!-- close Template:kicksecure_wiki --> for further details.
 
 = Footnotes =
-
-{{reflist|close=1}}
-
-{{Footer}}
-
+{{reflist|close=1}} <!-- close reflist -->
+{{Footer}} <!-- close Footer -->
 [[Category:Documentation]]
