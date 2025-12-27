@@ -15,8 +15,8 @@ Does Whonix use Tor? Yes. Why? See [[Why_does_Whonix_use_Tor|Why does Whonix use
 == Introduction ==
 <u>Essential Tor Configuration</u>:
 
-For enabling Tor, disabling Tor and using [[Bridges]] the user can use [[Anon Connection Wizard]]. <ref>
-[[Anon Connection Wizard]] stores its configuration file file <code>/usr/local/etc/torrc.d/40_tor_control_panel.conf</code>.
+To enable Tor, disable Tor, or use [[Bridges]], users can use [[Anon Connection Wizard]]. <ref>
+[[Anon Connection Wizard]] stores its configuration file <code>/usr/local/etc/torrc.d/40_tor_control_panel.conf</code>.
 </ref>
 
 <u>Advanced Tor Configuration</u>:
@@ -27,16 +27,16 @@ Tor configuration can also be modified by editing the Tor configuration file(s).
 | type      = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
 | text    = It is recommended for simplicity for most users that <u>all</u> unique user Tor configurations should be stored in Tor configuration file <code>/usr/local/etc/torrc.d/50_user.conf</code> and nowhere else. <ref>
-<code>/usr/local/etc/torrc.d/40_tor_control_panel.conf</code> is auto generated. It can be examined but changes should only be made to <code>/usr/local/etc/torrc.d/50_user.conf</code>.
+<code>/usr/local/etc/torrc.d/40_tor_control_panel.conf</code> is automatically generated. It can be examined but changes should only be made to <code>/usr/local/etc/torrc.d/50_user.conf</code>.
 </ref> Note that {{project_name_short}} will <u>not</u> modify <code>/usr/local/etc/torrc.d/50_user.conf</code> once it is created, therefore the user is responsible for adding or removing specific configurations in this file.
 }}
 
-[[Configuration_Files#Configuration_Drop-In_Folders|Configuration Drop-In Folders]] <code>/etc/torrc.d/</code> and <code>/usr/local/etc/torrc.d/</code> are a {{project_name_short}} specific feature. ([[Dev/Tor#Tor_Config_Files|technical details]]) Advanced users and packages specifically supporting {{project_name_short}} are free to use these folders, however other distributions such as Debian do not support it at time of writing. <ref>
+[[Configuration_Files#Configuration_Drop-In_Folders|Configuration Drop-In Folders]] <code>/etc/torrc.d/</code> and <code>/usr/local/etc/torrc.d/</code> are a {{project_name_short}} specific feature. ([[Dev/Tor#Tor_Config_Files|technical details]]) Advanced users and packages specifically supporting {{project_name_short}} are free to use these folders, however other distributions such as Debian do not support this at time of writing. <ref>
 Debian feature request: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=866187 add torrc.d configuration directory]
 </ref>
 
 == Edit Tor Configuration ==
-{{Open /usr/local/etc/torrc.d/50 user.conf}}
+{{Open_/usr/local/etc/torrc.d/50_user.conf}}
 
 == Configuration Check ==
 To discover if there are any Tor configuration syntax errors and to see which Tor configuration files are processed in which order, run the following command inside {{project_name_gateway_long}} ([[Qubes|{{q_project_name_long}}]]: <code>{{project_name_gateway_vm}}</code>).
@@ -73,9 +73,9 @@ Configuration was valid
 
 = Log Analysis =
 == Introduction ==
-Analysis of Tor's (and [[vanguards|vanguards]]'s) log can be useful if connectivity issues emerge.
+Analysis of Tor's <s>(and [[vanguards|vanguards]]'s)</s> log can be useful if connectivity issues emerge.
 
-Regarding log messages from vanguards, see also [[vanguards#Log_Analysis|vanguards, Log Analysis]].
+<s>Regarding log messages from vanguards, see also [[vanguards#Log_Analysis|vanguards, Log Analysis]].</s>
 
 == anon-log ==
 <code>anon-log</code> simplifies the manual [[#Dump Tor Log|dump Tor log]] command by only showing relevant log entries and no [[#Non-Issues|non-issues]].
@@ -182,7 +182,7 @@ sudo anondate-get
 sudo apt update
 }}
 
-If APT fails, it's a "lower level" issue, connectivity issue. ([[Qubes|{{q_project_name_short}}]]: no need to look into Template, tinyproxy.)
+If APT fails, it's a "lower level" issue, a connectivity issue. ([[Qubes|{{q_project_name_short}}]]: no need to look into Template, tinyproxy.)
 
 '''7.''' [[Whonix-Workstation_Firewall#Ping|"Forget" about <code>ping</code>.]]
 
@@ -190,7 +190,7 @@ If APT fails, it's a "lower level" issue, connectivity issue. ([[Qubes|{{q_proje
 
 '''9.''' [[Tor#Log_Analysis|Tor Log Analysis]].
 
-'''10.''' <s>[[vanguards|vanguards]] L[[Vanguards#Log_Analysis|og Analysis]]</s> (Not applicable at time of writing.)
+'''10.''' <s>[[vanguards|vanguards]] [[Vanguards#Log_Analysis|Log Analysis]]</s> (Not applicable at time of writing.)
 
 '''11.''' See also [[Network Obstacle]] and [[Bridges]].
 
@@ -210,7 +210,7 @@ Using Bridges if not really needed can cause connectivity issues. Users not livi
 = Tor not running =
 If it is reported that Tor is not running (such as by [https://www.kicksecure.com/wiki/Systemcheck systemcheck] <code>Tor Running Check</code>) then this means only that Tor is not running. This test result should not be over interpreted.
 
-Tor not running means that the Tor process/program is currently not running indeed. This is completely unrelated to any clock issues. Even if the clock was very wrong, very slow in year 1900 or super fast in year 2100 this would not lead to Tor not running. Connectivity is a different issue. Tor would be running but might be unable to connect. If that was the case, there would be a different error message.
+Tor not running means the Tor process/program is currently not running. This is completely unrelated to any clock issues. Even if the clock was very wrong, very slow in year 1900, or super fast in year 2100, this would not lead to Tor not running. Connectivity is a different issue. Tor would be running but might be unable to connect. If that was the case, there would be a different error message.
 
 To independently verify that Tor is not running, the following command can be used on {{project_name_gateway_short}}.
 
@@ -368,7 +368,7 @@ sudo anon-consensus-del
 }}
 
 <ref>
-[https://github.com/Kicksecure/helper-scripts/blob/master/usr/sbin/anon-consensus-del <code>anon-consensus-del</code>] (and its helper-script [https://github.com/Kicksecure/helper-scripts/blob/master/usr/sbin/anon-consensus-del-files <code>anon-consensus-del-files</code>]) is just a script to automate the following steps for better usability. It does in essence the following this:
+[https://github.com/Kicksecure/helper-scripts/blob/master/usr/sbin/anon-consensus-del <code>anon-consensus-del</code>] (and its helper-script [https://github.com/Kicksecure/helper-scripts/blob/master/usr/sbin/anon-consensus-del-files <code>anon-consensus-del-files</code>]) is just a script to automate the following steps for better usability. It does in essence the following:
 
 {{CodeSelect|code=
 sudo systemctl stop tor@default
@@ -396,13 +396,13 @@ sudo systemctl restart tor@default
 {{project_name_gateway_short}} can profit from RAM increase if a large number of circuits are created and Tor is kept busy. See [[RAM]] and [[Tuning]].
 
 == Additional SocksPorts ==
-Various custom <code>SocksPorts</code> have already been prepared. Those are documented [[Stream_Isolation#How_to_mitigate_identity_correlation|here]].
+Various custom <code>SocksPort</code>s have already been prepared. Those are documented [[Stream_Isolation#How_to_mitigate_identity_correlation|here]].
 
-Adding additional on top of that is usually not required. Setting a socks user name has the same effect of establishing stream isolation as mentioned on the [[Stream_Isolation|Stream Isolation]] wiki page [[Stream Isolation#IsolateSOCKSAuth|(<code>IsolateSOCKSAuth</code>)]]. Otherwise:
+Adding additional ones on top of that is usually not required. Setting a socks user name has the same effect of establishing stream isolation as mentioned on the [[Stream_Isolation|Stream Isolation]] wiki page [[Stream Isolation#IsolateSOCKSAuth|(<code>IsolateSOCKSAuth</code>)]]. Otherwise:
 
 {{Community_Support|scope=chapter}}
 
-Adding additional Tor <code>SocksPorts</code> to <code>/usr/local/etc/torrc.d/50_user.conf</code> is non-intuitive. <ref>
+Adding additional Tor <code>SocksPort</code>s to <code>/usr/local/etc/torrc.d/50_user.conf</code> is non-intuitive. <ref>
 https://gitlab.torproject.org/legacy/trac/-/issues/15261
 </ref>
 
@@ -419,7 +419,7 @@ https://gitlab.torproject.org/legacy/trac/-/issues/15261#comment:1
 <blockquote>So to make sure that the SocksPort in the torrc does what you want, write it as <code>+SocksPort</code>.</blockquote>
 
 {{Box|text=
-<u>Tor configuration for additional <code>SocksPorts</code>s.</u>
+<u>Tor configuration for additional <code>SocksPort</code>s.</u>
 
 '''1.''' [[Tor#Edit_Tor_Configuration|Edit Tor Configuration]]
 
@@ -441,7 +441,7 @@ Here is an example that needs adjustment.
 Notes:
 
 * Keep gateway internal IP <code>10.152.152.10</code> as is.
-* Replace port <code>9100</code> with the actual port for the additional <code>SocksPorts</code> you want to add.
+* Replace port <code>9100</code> with the actual port for the additional <code>SocksPort</code>s you want to add.
 * Adding <code>127.0.0.1</code> might not be strictly necessary but can be useful for testing.
 
 {{CodeSelect|code=
@@ -455,7 +455,7 @@ Notes:
 After adding custom ports, a user would also have to edit the {{project_name_short}} firewall.
 
 {{Box|text=
-<u>Firewall configuration for additional <code>SocksPorts</code>s.</u>
+<u>Firewall configuration for additional <code>SocksPort</code>s.</u>
 
 '''1.''' {{Firewall_Settings_Gateway}}
 
@@ -473,7 +473,7 @@ INTERNAL_OPEN_PORTS+=" port-number "
 
 Notes:
 
-* Replace port <code>9100</code> with the actual port for the additional <code>SocksPorts</code> you want to add.
+* Replace port <code>9100</code> with the actual port for the additional <code>SocksPort</code>s you want to add.
 
 {{CodeSelect|code=
 INTERNAL_OPEN_PORTS+=" 9100 "
@@ -488,7 +488,7 @@ Platform specific notice:
 
 * [[Non-Qubes-Whonix]]: No special notice.
 * [[Qubes-Whonix]]: Either a reboot <u>or</u> running <code>replace-ips</code> is required. <ref>
-[https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-whonix/replace-ips <code>/usr/lib/qubes-whonix/replace-ips</code>] is a script that automatically run at boot time in Qubes-Whonix which replaces the hardcoded IP <code>10.152.152.10</code> with Qubes dynamic automatically assigned internal IP.
+[https://github.com/Whonix/qubes-whonix/blob/master/usr/lib/qubes-whonix/replace-ips <code>/usr/lib/qubes-whonix/replace-ips</code>] is a script that automatically runs at boot time in Qubes-Whonix which replaces the hardcoded IP <code>10.152.152.10</code> with the Qubes dynamically assigned internal IP.
 </ref>
 ** {{CodeSelect|code=
 sudo /usr/lib/qubes-whonix/replace-ips
@@ -508,7 +508,7 @@ sudo netstat -tulpen {{!}} grep 9100
 Check if the <code>SocksPort</code> is reachable.
 
 {{CodeSelect|code=
-curl.anondist-orig --head $(qubesdb-read', '/qubes-netvm-gateway):9100
+curl.anondist-orig --head $(qubesdb-read /qubes-netvm-gateway):9100
 }}
 
 * Whonix-Gateway localhost:
@@ -553,11 +553,11 @@ TODO: document
 
 Mostly [[Unsupported|undocumented]].
 
-Extra complexity in Qubes due to non-persistence of root file system in App Qube which is undocumented.
+Extra complexity in Qubes due to non-persistence of the root file system in App Qubes, which is undocumented.
 
 [[Unsupported]]!
 
-The textual string <code>extradaemon1</code> used below is to be understood an example word. It's not a constant. In other words, it's not a hardcoded name. Feel free to replicate/replace with a different name such as <code>extradaemon2</code>.
+The textual string <code>extradaemon1</code> used below is to be understood as an example word. It's not a constant. In other words, it's not a hardcoded name. Feel free to replicate/replace with a different name such as <code>extradaemon2</code>.
 
 Create folder <code>/etc/tor/instances/extradaemon1/</code> and folder <code>/var/lib/tor-instances/extradaemon1</code>.
 
@@ -565,22 +565,22 @@ Create folder <code>/etc/tor/instances/extradaemon1/</code> and folder <code>/va
 sudo tor-instance-create "extradaemon1"
 }}
 
-If you do not wish to use tor-instance-create tool, you can do it manually creating the user who will run and own related files to tor's instance.
+If you do not wish to use the <code>tor-instance-create</code> tool, you can do it manually by creating the user who will run and own related files for the Tor instance.
 
 {{CodeSelect|code=
 adduser --quiet --system --disabled-password --home "/var/lib/tor-instances/extradaemon1" --no-create-home --shell /bin/false --group --force-badname "_tor-extradaemon1"
-install -Z -d -m 02700 -o "_tor-extradaemon1" -g "_tor-extradaemon1" "/var/lib/tor-instances/extradaemon1" # Set SELinux security context, permission mode and ownership to the created user and group to the homedirectory
+install -Z -d -m 02700 -o "_tor-extradaemon1" -g "_tor-extradaemon1" "/var/lib/tor-instances/extradaemon1" # Set SELinux security context, permission mode and ownership to the created user and group for the home directory
 install -d "/etc/tor/instances/extradaemon1"
 }}
 
-Change user ownership of the created folder for the new tor instance.
+Change user ownership of the created folder for the new Tor instance.
 
 {{CodeSelect|code=
 sudo chown --recursive "_tor-extradaemon1:_tor-extradaemon1" "/var/lib/tor-instances/extradaemon1"
 }}
 
 Firewall settings change required. <ref>
-On {{project_name_gateway_short}}, by default no linux username other than `debian-tor` are permitted to connect using clearnet. The Tor process is by default the only thing running under linux user name `debian-tor`. Therefore the new user under which the additional Tor daemon will run needs the same permission in [[Whonix-Gateway Firewall]].
+On {{project_name_gateway_short}}, by default no linux usernames other than <code>debian-tor</code> are permitted to connect using clearnet. The Tor process is by default the only thing running under linux user name <code>debian-tor</code>. Therefore the new user under which the additional Tor daemon will run needs the same permission in [[Whonix-Gateway Firewall]].
 </ref>
 
 {{Box|text=
@@ -601,13 +601,13 @@ TOR_USER="$(id -u debian-tor) $(id -u _tor-extradaemon1)"
 The procedure is complete.
 }}
 
-As we are creating a new tor instance we must to create a new torrc file inside our new tor instance directory.
+As we are creating a new Tor instance we must create a new torrc file inside our new Tor instance directory.
 
 {{CodeSelect|code=
 sudoedit /etc/tor/instances/extradaemon1/torrc
 }}
 
-Paste the following content. Example.
+Paste the following example content.
 
 {{CodeSelect|code=
 SocksPort 0
@@ -619,19 +619,19 @@ HiddenServiceVersion 3
 
 Save and exit.
 
-We create symlinks for auto-launch of the new instance
+We create symlinks to enable automatic launch of the new instance.
 
 {{CodeSelect|code=
 sudo systemctl enable "tor@extradaemon1.service"
 }}
 
-We start the new tor instance:
+Start the new Tor instance.
 
 {{CodeSelect|code=
 sudo systemctl restart "tor@extradaemon1.service"
 }}
 
-And we can check if the new instance is running
+Check if the new instance is running.
 
 {{CodeSelect|code=
 sudo systemctl status --no-block --no-pager "tor@extradaemon1.service"
@@ -647,7 +647,7 @@ forum discussion:
 https://forums.whonix.org/t/what-is-the-best-way-to-have-more-than-one-tor-instance-in-whonix-gateway/14124
 
 == Blacklist Outgoing Connections to Select Domains ==
-Advanced users might for unknown reasons select to blacklist outgoing connections to certain onion services. This can be done by instructing Tor to resolve a domain name to a dysfunctional, blackhole IP address. Since onion services do not have IP addresses and are only internally resolved by Tor through an IP address internal to Tor only, this blocking should be comprehensive.
+Advanced users might for their own reasons choose to blacklist outgoing connections to certain onion services. This can be done by instructing Tor to resolve a domain name to a dysfunctional blackhole IP address. Since onion services do not have IP addresses and are only internally resolved by Tor through an IP address internal to Tor, this blocking should be comprehensive.
 
 This procedure could also be applied for clearnet domain names. However, in case of blacklisting outgoing connections to clearnet domain names, the blocking would be incomplete. Only DNS resolution would be blocked. IP based connections would still be possible.
 
@@ -657,7 +657,7 @@ This procedure could also be applied for clearnet domain names. However, in case
 | text    = This procedure is experimental. Testers only.
 }}
 
-'''1.''' {{Open /usr/local/etc/torrc.d/50_user.conf}}
+'''1.''' {{Open_/usr/local/etc/torrc.d/50_user.conf}}
 
 '''2.''' Use the <code>MapAddress</code> configuration option.
 
@@ -753,8 +753,7 @@ The sample text for a complete {{Code2|obfs4}} torrc file is below. Check your f
 
 # Anything here will override {{project_name_short}} own Tor config customizations in /usr/share/tor/tor-service-defaults-torrc
 
-# Enable Tor through setup-dist or manually uncomment "DisableNetwork 0" by
-# removing the # in front of it.
+# Manually uncomment "DisableNetwork 0" by removing the # in front of it.
 DisableNetwork 0
 UseBridges 1
 ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
@@ -788,7 +787,7 @@ Bridge fte 300.100.300.80:23521 4352e58420e68f5e40bf7c74faddccd9d1349413
 
 <div class="toccolours mw-collapsible mw-collapsed">
 <div class="mw-collapsible-content">
-{{Code2|meek_lite}} bridges are available. To use them, simply add one more line to the {{Code2|/usr/local/etc/torrc.d/50_user.conf}} file. Take note the bridge type is called {{Code2|meek_lite}}, not {{Code2|meek}} which is used in Tor Browser Bundle. <ref>
+{{Code2|meek_lite}} bridges are available. To use them, simply add one more line to the {{Code2|/usr/local/etc/torrc.d/50_user.conf}} file. Note: the bridge type is called {{Code2|meek_lite}}, not {{Code2|meek}} which is used in Tor Browser Bundle. <ref>
 {{Code2|meek_lite}} actually uses a different implementation of {{Code2|obfs4proxy}}. Forum discussion: https://forums.whonix.org/t/censorship-circumvention-tor-pluggable-transports/2601/3
 </ref>
 {{Box|text=
@@ -894,7 +893,7 @@ For differences of Tor Browser by Tor Project compared to Tor Browser in {{proje
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = {{project_name_short}} does <u>not </u> modify the Tor package itself.
+| text    = {{project_name_short}} does <u>not</u> modify the Tor package itself.
 }}
 
 Although {{project_name_short}} does not modify Tor, the Tor configuration file ''has'' been adapted for {{project_name_short}}. To inspect the relevant files, check the following on {{project_name_gateway_short}}: <ref>Changes to the configuration file are made by the [https://github.com/{{project_name_short}}/anon-gw-anonymizer-config anon-gw-anonymizer-config] package.</ref>
@@ -904,7 +903,7 @@ Although {{project_name_short}} does not modify Tor, the Tor configuration file 
 * <code>/usr/local/etc/torrc.d/</code> folder.
 * <code>/usr/share/tor/tor-service-defaults-torrc</code> file.
 
-Tor is not patched and the normal Tor Debian package and [[vanguards]] is installed by default in {{project_name_short}}. ([[Dev/Tor#Tor_Version|technical details]])
+Tor is not patched and the normal Tor Debian package <s>and [[vanguards]]</s> are installed by default in {{project_name_short}}. ([[Dev/Tor#Tor_Version|technical details]])
 
 Any changes to the Tor routing algorithm should be proposed, discussed and eventually implemented upstream in Tor on torproject.org. <ref>This means changes occur for all Tor users and not a subset relying on a particular distribution.</ref> If proposed changes are not adopted by The Tor Project, then the option to create a Tor fork <ref name=fork>
 https://en.wikipedia.org/wiki/Fork_(software_development)
@@ -926,10 +925,10 @@ Yes. You can set preferred entry and exit nodes as well as inform Tor which node
 
 [...]
 
-'''We recommend you do <u>not</u> use these''' — they are intended for testing and may disappear in future versions. '''You get the best security that Tor can provide when you leave the route selection to Tor'''; overriding the entry / exit nodes can mess up your anonymity in ways we don't understand.
+'''We recommend you do <u>not</u> use these''' - they are intended for testing and may disappear in future versions. '''You get the best security that Tor can provide when you leave the route selection to Tor'''; overriding the entry / exit nodes can mess up your anonymity in ways we don't understand.
 </blockquote>
 
-To make changes to the Tor routing algorithm which benefit anonymity and not actually worsen anonymity it is required to be more clever than the Tor developers. Many questions, suggestions and discussions online only scratch the surface and are unaware of the informational resources:
+To make changes to the Tor routing algorithm which benefit anonymity and not actually worsen anonymity it is required to be more knowledgeable than the Tor developers. Many questions, suggestions and discussions online only scratch the surface and are unaware of the informational resources:
 
 * [https://www.freehaven.net/anonbib/ Anonymity Bibliography - Collection Anonymity Research]
 * Read the [https://blog.torproject.org Tor blog] as there are often blog posts discussing anonymity research such as blog post [https://blog.torproject.org/new-low-cost-traffic-analysis-attacks-mitigations new low cost traffic analysis attacks and mitigations].
@@ -956,7 +955,7 @@ Questions are often raised in forums about how other Tor-specific changes can be
 https://forums.whonix.org/t/how-to-set-an-exit-node-in-wonix-of-qubesos/9070
 </ref>
 
-In many cases, making such changes is already documented {{project_name_short}} [[Documentation]]. In other cases such changes are discouraged.
+In many cases, making such changes is already documented in {{project_name_short}} [[Documentation]]. In other cases such changes are discouraged.
 
 In all instances:
 
@@ -1014,7 +1013,7 @@ The following results in a manual reproduction of the [[Dev/Tor|{{project_name_s
 filename=/etc/tor/vanguards.conf
 }}
 
-'''2.''' change <code>control_socket = </code> to <code>control_socket = /run/tor/control</code>
+'''2.''' Change <code>control_socket = </code> to <code>control_socket = /run/tor/control</code>
 
 '''3.''' Save.
 
