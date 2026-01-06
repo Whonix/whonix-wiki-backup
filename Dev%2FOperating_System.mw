@@ -11,9 +11,9 @@ Comparison and Consideration of various Operating Systems as base for the {{proj
 = Introduction =
 This chapter applies to the host(s), {{project_name_gateway_long}} and {{project_name_workstation_long}}.
 
-''{{project_name_short}} Example Implementation'' is currently based on [[#Kicksecure|Kicksecure]] (which itself is based on [[#Debian|Debian]]. Historically, there have been development discussions about switching to BSD, Alpine Linux, or other (supposedly or really - depdening on viewpoint, criteria) secure operating systems.
+''{{project_name_short}} Example Implementation'' is currently based on [[#Kicksecure|Kicksecure]] (which itself is based on [[#Debian|Debian]]). Historically, there have been development discussions about switching to BSD, Alpine Linux, or other (supposedly or really - depending on viewpoint and criteria) secure operating systems.
 
-{{project_name_short}} cannot protect against malicious code inserted into the upstream operating system infrastructure. Debian provides some chain of trust, as it requires contributors to sign commits.
+{{project_name_short}} cannot protect against malicious code inserted into the upstream operating system infrastructure. Debian provides a chain of trust, as it requires contributors to sign commits.
 
 = Why not Use a Live CD/DVD as the {{project_name_workstation_short}} Operating System? =
 
@@ -44,7 +44,7 @@ General Base Operating System Requirements:
 * <u>popularity:</u> must be somewhat popular, because only that leads to sufficient public scrutiny and enough available documentation.
 * <u>legal:</u> For redistribution of {{project_name_short}}, there must be no legal/trademark issues, such as those with Ubuntu. See the [[#Ubuntu Legal Issues]] chapter below for details.
 * <u>package manager security:</u> Must have a secure operating system updater (package manager), i.e. must not fall through the [https://theupdateframework.io/security/ TUF Threat Model]. Not having a secure updater is [https://krebsonsecurity.com/2011/11/apple-took-3-years-to-fix-finfisher-trojan-hole/ very dangerous].
-* <u>binary distribution:</u> Source-based distributions take a long time for upgrading and installing packages, which users complain about. The same or even better security characteristics can be achieved with deterministic (reproducible) builds.
+* <u>binary distribution:</u> Source-based distributions take a long time to upgrade and install packages, which users complain about. The same or even better security characteristics can be achieved with deterministic (reproducible) builds.
 
 Debian provides a good balance of security and usability. [[#Kicksecure|Kicksecure]] is a security-hardened version of Debian.
 
@@ -96,7 +96,7 @@ Mac OS X cannot be used for legal reasons. Even if that were not an issue, it is
 {{quotation
 |quote=Signed repositories
 
-The Fedora Project does not sign our package repositories (yet), even though this has been requested a lot of times. One of the main reasons for this is that DNF/YUM repodata has no “ValidUntil” or sortalike attribute. Additionally, librepo — which DNF uses to download and verify repodata– regards expired GPG signatures as fully valid. This means that there is no way at all to mark repository data as valid for a limited amount of time.
+The Fedora Project does not sign our package repositories (yet), even though this has been requested a lot of times. One of the main reasons for this is that DNF/YUM repodata has no “ValidUntil” or sortalike attribute. Additionally, librepo - which DNF uses to download and verify repodata - regards expired GPG signatures as fully valid. This means that there is no way at all to mark repository data as valid for a limited amount of time.
 
 As such, while it can protect against modification of the repository data, it does not protect against attackers (or outdated mirrors) shipping ancient repositories with known-vulnerable software.
 |context=Fedora Magazine: [https://fedoramagazine.org/fedora-secures-package-delivery/ How Fedora Secures Package Delivery]
@@ -123,7 +123,7 @@ Given that Red Hat is a US-based company, and thus subject to secret court order
 |context=Ars Technica: [https://arstechnica.com/information-technology/2016/12/how-to-make-linux-more-trustworthy/ How to make Linux more trustworthy - Reproducible builds are a good step, but Red Hat and Ubuntu don't want to join in.]
 }}
 
-This situation has improved. Reproducible builds is now a goal.
+This situation has improved. Reproducible builds are now a goal.
 
 * https://docs.fedoraproject.org/en-US/reproducible-builds/
 * https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/NRRAH67FZXVKGERYTBSVL6QIQ57BXXBG/
@@ -150,9 +150,9 @@ This situation has improved. Reproducible builds is now a goal.
 * Fedora Linux used to use its flawed home-grown OpenPGP parser. In Fedora 38 the internal PGP parser was replaced with Sequoia PGP, improving security and standards-compliance.
 ** [https://fedoraproject.org/wiki/Changes/RpmSequoia#Benefit_to_Fedora Changes/RpmSequoia - Fedora Project Wiki]
 ** [https://sequoia-pgp.org/blog/2024/12/13/202412-sequoia-fedora/ Sequoia PGP in Fedora Linux - Sequoia PGP blog]
-** Sequoia PGP provides a complete implementation of OpenPGP as defined by RFC 9580 and RFC 4880 as well as some extensions (e.g., RFC 6637, which describes ECC cryptography for OpenPGP).
+** Sequoia PGP provides a complete implementation of OpenPGP as defined by RFC 9580 and RFC 4880, as well as some extensions (e.g., RFC 6637, which describes ECC cryptography for OpenPGP).
 ** [https://wiki.debian.org/OpenPGP/Sequoia OpenPGP/Sequoia - Debian Wiki]
-** Note, that signing RPM packages is not the same as signing repository metadata.
+** Note that signing RPM packages is not the same as signing repository metadata.
 
 <u>See also:</u>
 
@@ -242,7 +242,7 @@ https://groups.google.com/g/theupdateframework
 == NixOS ==
 
 * Does not use MAC/Namespaces by default.
-** (MAC: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=apparmor AppArmor] and Namespaces: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=firejail Firejail] are turned OFF by default, while SELinux is [https://github.com/NixOS/rfcs/pull/41 unsupported] as of yet.)
+** (MAC: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=apparmor AppArmor] and Namespaces: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=firejail Firejail] are turned off by default, while SELinux is [https://github.com/NixOS/rfcs/pull/41 unsupported] as of yet.)
 * https://forums.whonix.org/t/nixos-distro-preview/19883
 * [https://search.nixos.org/packages?channel=unstable&show=tor-browser&from=0&size=50&sort=relevance&type=packages&query=tor-browser Tor Browser packaged by NixOS]
 
@@ -339,7 +339,7 @@ One valid concern is that if a critical mass of users does not gravitate to Open
 * Further, {{project_name_short}} depends on free services which are available to anyone, ruling out a solution that requires a personal server.
 * Even if {{project_name_short}} used authenticated NTP, it has been [https://archive.ph/FobRy pointed out] that the clock could not be moved more than 600 seconds. This is better than nothing, but still inadequate for adversaries who are capable of moving the clock more than 600 seconds, harming anonymity/privacy in the process (see [[Dev/TimeSync]] for further details).</ref>
 
-In comparison, alternatives like Debian have a large user/contributor base, a similar [https://www.debian.org/security/ focus on security], renowned stability, and a solid reputation in security-critical environments such as web servers. <ref>In fact, Debian's popularity and large contributor base has resulted in its adoption in around [https://en.wikipedia.org/wiki/Usage_share_of_operating_systems#Market_share_by_category one-third of all Linux web servers] and led to an expansive software library of over 50,000 packages.</ref> It is also strongly contested that BSD variants have [https://www.openbsd.org/innovations.html innovative security improvements] that provide greater protection than modern platforms like Qubes OS; see [[Qubes/Why_use_Qubes_over_other_Virtualizers#Security|Qubes Security]].
+In comparison, alternatives like Debian have a large user/contributor base, a similar [https://www.debian.org/security/ focus on security], renowned stability, and a solid reputation in security-critical environments such as web servers. <ref>In fact, Debian's popularity and large contributor base has resulted in its adoption in around [https://en.wikipedia.org/wiki/Usage_share_of_operating_systems#Market_share_by_category one-third of all Linux web servers] and led to an expansive software library of over 50,000 packages.</ref> It is also strongly contested whether BSD variants have [https://www.openbsd.org/innovations.html innovative security improvements] that provide greater protection than modern platforms like Qubes OS; see [[Qubes/Why_use_Qubes_over_other_Virtualizers#Security|Qubes Security]].
 
 * https://isopenbsdsecu.re/
 * https://isopenbsdsecu.re/mitigations/
@@ -407,7 +407,7 @@ Other examples of Tails and {{project_name_short}} cooperation include:
 
 === Why {{project_name_short}} is a Separate Project ===
 
-Even though Tails is highly valued by {{project_name_short}} developers, it may not be clear to the reader why {{project_name_short}} remains a separate project and not just a contributor to Tails. There are several reasons for this decision: {{project_name_short}} cannot be merged into Tails by the {{project_name_short}} team on technical, skill, and political grounds; implementing features or changes in Tails is an unfamiliar process; and it is unknown when/if {{project_name_short}} priorities will be implemented in Tails — but it is known how to solve these in a separate project (at least with appropriate user documentation).
+Even though Tails is highly valued by {{project_name_short}} developers, it may not be clear to the reader why {{project_name_short}} remains a separate project and not just a contributor to Tails. There are several reasons for this decision: {{project_name_short}} cannot be merged into Tails by the {{project_name_short}} team on technical, skill, and political grounds; implementing features or changes in Tails is an unfamiliar process; and it is unknown when/if {{project_name_short}} priorities will be implemented in Tails - but it is known how to solve these in a separate project (at least with appropriate user documentation).
 
 Further examples are outlined in the table below. Note that some of these items are partially or nearly solved in Tails, but they have been kept to justify the prior decision not to merge projects.
 
@@ -525,7 +525,7 @@ It should be noted that by increasing usability, {{project_name_short}} actually
 An interesting analogy is [https://www.mixminion.net/ Mixminion], which was once touted as an alternative to Tor. <ref>Consider this interesting statement from Tor developer Roger Dingledine: [https://www.mail-archive.com/liberationtech@lists.stanford.edu/msg00022.html Mixminion vs Tor].</ref> Due to Mixminion being a high-latency remailer, with cover traffic and protection against traffic confirmation (end-to-end correlation attacks), it should ''theoretically'' have been more secure than Tor. The only problem was that Mixminion did not attract a critical mass of users. Without a sizable population to help disguise traffic, the putative anonymity benefits were seriously degraded - making it no more or less (in)secure than Tor. <ref>This is also the reason development was discontinued.</ref>
 
 = Usability =
-Define of usability of "Debian Linux" as "good" since it is a baseline, a starting point since {{project_name_short}} is currently based on it. There are Linux distributions which might have better usability such as Ubuntu, Elementary OS but also distributions which have worse usability by comparison. The definition of "good" here is not the usability of mainstream operating systems such as Android or iOS. See also {{kicksecure_wiki
+Define usability of "Debian Linux" as "good" because it is the baseline and starting point, since {{project_name_short}} is currently based on it. There are Linux distributions which might have better usability such as Ubuntu, Elementary OS but also distributions which have worse usability by comparison. The definition of "good" here is not the usability of mainstream operating systems such as Android or iOS. See also {{kicksecure_wiki
 |wikipage=Linux User Experience versus Commercial Operating Systems
 |text=Linux User Experience versus Commercial Operating Systems
 }}.
@@ -571,7 +571,7 @@ Regular upgrades on a rolling distribution help prevent attacks by fixing known 
 |context=https://www.bleepingcomputer.com/news/security/qbittorrent-fixes-flaw-exposing-users-to-mitm-attacks-for-14-years/
 }}
 
-See also {{Kicksecure wiki
+See also {{kicksecure_wiki
 |wikipage=Dev/Stable_vs_Rolling_Distributions
 |text=Stable vs Rolling Distributions - Security Analysis
 }}.
@@ -742,7 +742,7 @@ A long time ago, {{project_name_short}} was based on Debian Testing. Due to many
 
 * <u>Connectivity-breaking bugs:</u> Sometimes severe bugs are introduced in Debian Testing, such as the AppArmor [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=732578 bug], which prevented Tor from starting for everyone until a workaround was applied.
 * <u>Build process-breaking bugs:</u> Sometimes bugs are introduced that break derivative-maker (build script), such as [https://web.archive.org/web/20220322233757/https://ml.grml.org/pipermail/grml/2014-January/011546.html this] bug related to mount, which breaks grml-debootstrap and therefore derivative-maker, or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=734794 this] kpartx bug.
-* <u>Boot-breaking bugs:</u> Often other disturbing bugs are introduced, such as the grub bug (not able to reproduce and report upstream yet).
+* <u>Boot-breaking bugs:</u> Often other disturbing bugs are introduced, such as the grub bug (unable to reproduce and report upstream yet).
 * <u>VirtualBox Guest Additions-breaking bugs:</u> Non-functional [[VirtualBox/Guest_Additions|VirtualBox Guest Additions]] or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=728399 issues] with shared folders.
 * <u>Higher upgrade time effort:</u> Too often, too many packages are upgraded (not just security fixes), which costs lots of time to keep up, bandwidth, and system load.
 ** <u>Lack of security support:</u> Quote, [https://www.debian.org/security/faq.html#testing Debian Security FAQ]:
@@ -756,6 +756,7 @@ A long time ago, {{project_name_short}} was based on Debian Testing. Due to many
 *** https://bugs.debian.org/1066313
 *** https://web.archive.org/web/20240518161618/https://release.debian.org/britney/update_excuses.html#torsocks
 *** https://web.archive.org/web/20240520135347/https://qa.debian.org/excuses.php?package=torsocks
+*** https://web.archive.org/web/20240520135343/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1066313
 
 <blockquote>torsocks (- to 2.4.0-1)<br />
 Migration status for torsocks (- to 2.4.0-1): BLOCKED: Rejected/violates migration policy/introduces a regression<br />
@@ -898,6 +899,10 @@ Since most distributions have it, this is considered minimum criteria. If not av
 * Commitment to user freedom
 * No anti-features
 * The Update Framework (TUF) threat model Pass / Secure Package Manager
+* {{kicksecure_wiki
+|wikipage=Deep_scan_ready
+|text=Deep Scan Ready
+}}
 
 == Comparison Table ==
 '''<u>Note:</u>''' Do '''not''' add new operating systems to this table without prior discussion. '''Edits might get rejected.''' See also [[Dev/Operating_System#Requesting_a_Port_to_a_Different_Base_Operating_System|Requesting a Port to a Different Base Operating System]].
@@ -931,7 +936,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Debian --> {{Yes}} <ref>[[#Usability]]</ref>
 | <!-- Void --> {{No}}
 | <!-- Alpine --> {{No}}
-| <!-- openSUSE --> {{Yes}} <ref>Stable and brand new, plays along with new hardware without breaking. The default system snapshots and easy rollbacks. Everything can be configured with YaST, arguably the most powerful installation and configuration tool on GNU/Linux. Being able to configure the system in detail using a GUI very rare and valuable for usability for desktop GNU/Linux.</ref>
+| <!-- openSUSE --> {{Yes}} <ref>Stable and brand new, plays along with new hardware without breaking. The default system snapshots and easy rollbacks. Everything can be configured with YaST, arguably the most powerful installation and configuration tool on GNU/Linux. Being able to configure the system in detail using a GUI is very rare and valuable for usability for desktop GNU/Linux.</ref>
 | <!-- GNU Guix --> {{No}} ?
 | <!-- Gentoo --> {{No}}
 |-
@@ -1021,10 +1026,10 @@ Since most distributions have it, this is considered minimum criteria. If not av
 ! <!-- Feature --> [https://reproducible-builds.org Reproducible Builds] (deterministic builds)
 | <!-- Debian --> {{No}} <ref>Debian is working on it.</ref>
 | <!-- Void --> ?
-| <!-- Alpine --> {{No}} <ref>Alpine was taking action on this from 2019-2020, but https://reproducible-builds.org/citests/ has Alpine currently listed as Disabled due to its continuous testing longer being maintained.</ref>
-| <!-- openSUSE --> ? <ref>Is there are reproducible ISO?</ref>
+| <!-- Alpine --> {{No}} <ref>Alpine was taking action on this from 2019-2020, but https://reproducible-builds.org/citests/ has Alpine currently listed as Disabled due to its continuous testing no longer being maintained.</ref>
+| <!-- openSUSE --> ? <ref>Is there a reproducible ISO?</ref>
 | <!-- GNU Guix --> ?
-| <!-- Gentoo --> {{No}} <ref>Work stalled https://wiki.gentoo.org/wiki/User:OstCollector/Reproducible_Build</ref>
+| <!-- Gentoo --> {{No}} <ref>Work has stalled https://wiki.gentoo.org/wiki/User:OstCollector/Reproducible_Build</ref>
 |-
 
 ! <!-- Feature --> Source-based distribution
@@ -1075,7 +1080,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{Yes}} <ref>Alpine says on their [https://alpinelinux.org/about/ organization home page] that it runs on musl and BusyBox.</ref>
 | <!-- openSUSE --> {{No}}
 | <!-- GNU Guix --> {{No}}
-| <!-- Gentoo --> {{Yes}}? <ref>Gentoo provies experimental musl profiles</ref>
+| <!-- Gentoo --> {{Yes}}? <ref>Gentoo provides experimental musl profiles</ref>
 |-
 
 ! <!-- Feature --> Hardened Memory Allocator
@@ -1137,7 +1142,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Void --> ?
 | <!-- Alpine --> {{Yes}}
 | <!-- openSUSE --> {{Yes}}
-| <!-- GNU Guix --> {{No}} <ref>Despite being up-to-date, not having the proprietary firmware blobs and cpu microcode updates means no update can fix some vulnurabilities</ref>
+| <!-- GNU Guix --> {{No}} <ref>Despite being up-to-date, not having the proprietary firmware blobs and cpu microcode updates means no update can fix some vulnerabilities</ref>
 | <!-- Gentoo --> {{Yes}}
 |-
 
@@ -1195,7 +1200,7 @@ Since most distributions have it, this is considered minimum criteria. If not av
 | <!-- Alpine --> {{No}}
 | <!-- openSUSE --> {{Yes}}
 | <!-- GNU Guix --> {{No}}
-| <!-- Gentoo --> {{Yes}} <ref>The binary distribution package is pres-signed https://wiki.gentoo.org/wiki/Project:Distribution_Kernel#Secure_Boot</ref>
+| <!-- Gentoo --> {{Yes}} <ref>The binary distribution package is pre-signed https://wiki.gentoo.org/wiki/Project:Distribution_Kernel#Secure_Boot</ref>
 |-
 
 ! <!-- Feature --> LibreSSL by Default<ref>

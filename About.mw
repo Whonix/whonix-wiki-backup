@@ -209,6 +209,11 @@ In [[Qubes|{{q_project_name_short}}]], these VMs are named <code>{{project_name_
 | [[Tor Browser]]
 |-
 
+! TCP ISN / network stack fingerprinting
+| Some fingerprinting techniques analyze patterns in network packets such as TCP initial sequence numbers (ISN).
+| [https://github.com/Kicksecure/tirdad tirdad] (TCP ISN randomization)
+|-
+
 ! [[Fingerprint#Website_Traffic_Fingerprinting|Website Traffic Fingerprinting]]
 | Your {{isp}} knows which websites and when you visited but does not know the exact details. And that even if the website is using https and you are using VPN. <ref>
 [[Whonix_versus_VPNs#VPNs_do_not_even_hide_visited_websites_from_your_Internet_Service_Provider|VPNs do not even hide visited websites from your Internet Service Provider]]
@@ -218,14 +223,29 @@ For example, if you are posting to a discussion forum, your ISP or a man-in-the-
 | [[Why_does_Whonix_use_Tor|IP cloaking using Tor]]
 |-
 
+! Cross-application correlation
+| If multiple activities share the same Tor circuit, it can become easier to correlate different applications and identities to the same user.
+| [[Stream_Isolation/Easy|Stream Isolation]]
+|-
+
 ! [[Keystroke_and_Mouse_Deanonymization|Personal keyboard typing and mouse fingerprinting]]
-| Re-identification once you are typing on a website because of your personal typing style.
+| Re-identification once you are interacting with a website because of your personal typing style or mouse movement patterns. These behavioral fingerprints can be analyzed, including with modern machine learning.
 | [[Keystroke_and_Mouse_Deanonymization#Kloak|kloak (keystroke and mouse anonymizer)]]
 |-
 
 ! [[Time_Attacks|Time attacks]]
 | Individual computer time can give away your identity.
 | [[Boot Clock Randomization]] and secure network time synchronization through [[sdwdate]] (Secure Distributed Web Date)
+|-
+
+! Application misconfiguration and unsafe defaults
+| Many applications are not designed with anonymity in mind. Small configuration mistakes or unsafe defaults can have privacy consequences.
+| Researched, tested privacy and security defaults; [https://github.com/Whonix/anon-apps-config anon-apps-config]
+|-
+
+! Hardware identifiers and host file leaks
+| Some applications try to identify a system using hardware identifiers (such as serial numbers), or accidentally access host resources. This can weaken privacy and increase linkability across sessions.
+| [[Protocol-Leak-Protection_and_Fingerprinting-Protection|Virtualizer friendly abstraction layer]]
 |-
 
 ! Other threats.
@@ -242,24 +262,6 @@ For example, if you are posting to a discussion forum, your ISP or a man-in-the-
 
 == Based on Kicksecure ==
 {{upstream_wiki}}
-
-== {{project_name_short}} Version ==
-
-[[File:Whonix-logo-rectangle.png|thumb|130px|[[Dev/Logo|{{project_name_short}} rectangular logo]]|alt={{project_name_short}} rectangular logo]]
-Each {{project_name_short}} release is based on a particular version of Debian:
-
-{| class="wikitable"
-|-
-
-! <u>{{project_name_short}} version</u> !! ''Debian Version'' !! Debian Codename
-|-
-
-| {{project_name_short}} <code><u>{{VersionNew}}</u></code> || ''<code>{{Stable_project_version_based_on_Debian_version_short}}</code>'' || [https://www.debian.org/releases/{{Stable project version based on Debian codename}}/ <code>{{Stable project version based on Debian codename}}</code>]
-|-
-
-|}
-
-Users can manually check the {{project_name_short}} version at any time by following [[Post_Install_Advice#How_do_I_Check_the_Current_Whonix_Version.3F|this step]].
 
 == Security by Isolation ==
 
@@ -366,10 +368,10 @@ Each {{project_name_short}} release is based on a particular version of Debian:
 ! <u>{{project_name_short}} version</u> !! ''Debian Version'' !! ''Debian Codename'' !! Supported
 |-
 
-| {{project_name_short}} <code><u>17</u></code> || ''<code>12</code>'' || [https://www.debian.org/releases/bookworm/ <code>{{Stable project version based on Debian codename}}</code>] || {{Yes}}
+| {{project_name_short}} <code><u>17</u></code> || ''<code>12</code>'' || [https://www.debian.org/releases/bookworm/ <code>{{Stable project version based on Debian codename}}</code>] || Being deprecated.
 |-
 
-| {{project_name_short}} <code><u>18</u></code> || ''<code>13</code>'' || [https://www.debian.org/releases/trixie/ <code>trixie</code>] || In development.
+| {{project_name_short}} <code><u>18</u></code> || ''<code>13</code>'' || [https://www.debian.org/releases/trixie/ <code>trixie</code>] || {{Yes}}
 |-
 
 |}
@@ -404,11 +406,13 @@ Responsible for:
 * Qubes security issues -> Qubes project
 * {{project_name_short}} security issues -> {{project_name_short}} project
 </ref>
-** Version <code>18</code>: Supported even if Qubes <code>R4.<u>3</u></code> is only available as {{RC}}. <ref>
+** Version <code>18</code>: Supported. <!--
+even if Qubes <code>R4.<u>3</u></code> is only available as {{RC}}. <ref>
 This is because it includes much newer software packages. That is what developers are using and where the development focus is. {{project_name_short}} is a small project and does not have a dedicated team for <code>oldstable</code> support. Therefore, <code>oldstable</code> support is maintained as a side project.
 
 More details: [https://github.com/QubesOS/qubes-issues/issues/10219 decide availability of Kicksecure and Whonix 18 (Debian trixie based) on Qubes R4.2 versus R4.3 #10219]
 </ref>
+-->
 |-
 
 ! Deprecation Notices

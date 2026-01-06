@@ -21,17 +21,23 @@ Enabling and using IPv6 in {{project_name_short}}.
 
 = Whonix IPv6 Status =
 
-* <u>{{project_name_short}} 17 and below:</u> Only partial support for IPv6.
+* <u>{{project_name_short}} 17 and below:</u> <ref>
+{{project_name_short}} 17 and below:
+
+* Only partial support for IPv6.
+</ref>
 * <u>{{project_name_short}} 18 and higher:</u> Full IPv6 support built in.
 
 = Support in {{project_name_short}} =
 
+'''In {{project_name_short}} 17 (older version):''' <ref>
 '''In {{project_name_short}} 17 (older version):'''
 
 * <u>Tor Browser access:</u> Websites and services that use IPv6 can be reached with Tor Browser from {{project_name_workstation_short}}.
 * <u>Workstation to Gateway communication:</u> The connection between {{project_name_workstation_short}} and {{project_name_gateway_short}} still uses IPv4 only.
 * <u>Gateway to Tor network:</u> {{project_name_gateway_short}} connects to the Tor network using only IPv4. IPv6 is completely disabled here. However, Tor can still access IPv6 websites by tunneling through the IPv4 network.
 * <u>Command-line utilities:</u> Most tools used in the terminal on {{project_name_workstation_short}} don’t work with IPv6 unless special workarounds are used.
+</ref>
 
 '''In {{project_name_short}} 18 (newer version):'''
 
@@ -61,13 +67,15 @@ Not sure if your Internet connection supports IPv6, IPv4, or both? Use the follo
 *** [https://ip6only.me/ ip6.me: IPv6 only Test]
 ** [https://test-ipv6.com test-ipv6.com]: Provides a detailed test of IPv4 and IPv6 connectivity.
 
-= Enabling IPv6 support in virtualizers =
-
+= Enabling IPv6 Support =
+{{anchor|Enabling IPv6 support in virtualizers}}
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
 | text    =
-<u>Version-specific notice:</u> These instructions are for {{project_name_short}} 18 or later only.
-Trying this on {{project_name_short}} 17 won't work, and might break networking.
+<u>Version-specific notice:</u>
+
+* {{project_name_short}} 17: Trying this on {{project_name_short}} 17 won't work, and might break networking.
+* {{project_name_short}} 18: These instructions are for {{project_name_short}} 18 or later only.
 }}
 
 {{mbox
@@ -77,15 +85,35 @@ Trying this on {{project_name_short}} 17 won't work, and might break networking.
 
 The steps below explain how to enable IPv6 support in each virtualization platform supported by {{project_name_short}}.
 
-== VirtualBox ==
+Platform specific. Select your virtualizer.
 
-* <u>Versions before 7.1:</u> Do not support IPv6 NAT. Only IPv4 connections work when using NAT.
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= == VirtualBox ==
+|image=[[File:Virtualbox_logo.png|25px]]
+|addToClass=info-box
+|active=false
+|content=
+* <u>Versions before 7.1:</u> <ref>
+<u>Versions before 7.1:</u>
+
+* Do not support IPv6 NAT. Only IPv4 connections work when using NAT.
 ** <u>Workaround before 7.1:</u> You could try switching {{project_name_gateway_short}} to a bridged network to allow IPv6. But this exposes it to your local network and increases risk. Not recommended.
-* <u>Versions 7.1 and later:</u> IPv6 NAT works by default. No changes needed.
-** <u>Confirmed working:</u> IPv6 has been successfully tested with VirtualBox 7.2.2.
+</ref>
+* <u>Versions 7.1 and later:</u> IPv6 NAT works by default. No changes needed. <ref>
+<u>Confirmed working:</u> IPv6 has been successfully tested with VirtualBox 7.2.2.
+</ref>
 
-== libvirt (KVM) ==
+}} <!-- close tab: VirtualBox -->
 
+{{Tab
+|title= == KVM ==
+|image=[[File:Kvm-new-logo.png|25px]]
+|addToClass=info-box
+|active=false
+|content=
 libvirt supports IPv6 NAT starting with version 6.5.0. <ref>https://libvirt.org/news.html#v6-5-0-2020-07-03</ref>
 
 To check your installed libvirt version:
@@ -94,9 +122,9 @@ To check your installed libvirt version:
 virsh --version
 }}
 
-However, by default, IPv6 autoconfiguration does **not** work in {{project_name_short}} 18. This is because {{project_name_short}} disables the use of <code>dnsmasq</code> on the host for {{project_name_short}} VMs. This improves security by reducing the risk of attacks from VMs to the host. <ref>https://forums.whonix.org/t/whonix-kvm-dnsmasq-listen-port-on-host-operating-system-attack-surface-reduction/15973</ref>
+However, by default, IPv6 autoconfiguration does '''not''' work in {{project_name_short}} 18. This is because {{project_name_short}} disables the use of <code>dnsmasq</code> on the host for {{project_name_short}} VMs. This improves security by reducing the risk of attacks from VMs to the host. <ref>https://forums.whonix.org/t/whonix-kvm-dnsmasq-listen-port-on-host-operating-system-attack-surface-reduction/15973</ref>
 
-But disabling <code>dnsmasq</code> also prevents IPv6 autoconfiguration from working. <code>dnsmasq</code> is the tool that sends the “router advertisement” signals needed to automatically set up IPv6 in {{project_name_gateway_short}}.
+But disabling <code>dnsmasq</code> also prevents IPv6 autoconfiguration from working. <code>dnsmasq</code> is the tool that sends the "router advertisement" signals needed to automatically set up IPv6 in {{project_name_gateway_short}}.
 
 To fix this, you can re-enable <code>dnsmasq</code> for {{project_name_short}}'s virtual networks by following these steps:
 
@@ -106,60 +134,72 @@ To fix this, you can re-enable <code>dnsmasq</code> for {{project_name_short}}'s
 | text    = These changes will make the host more vulnerable to attacks from compromised VMs or other devices on your local network. Carefully consider your threat model before following these instructions.
 }}
 
-'''1.''' Make sure <code>dnsmasq-base</code> (or the equivalent package for your host operating system) is installed.
+{{IconSet|h1|1}} Make sure <code>dnsmasq-base</code> (or the equivalent package for your host operating system) is installed.
 
-'''2.''' Launch "Virtual Machine Manager" (<code>virt-manager</code>) on the host.
+{{IconSet|h1|2}} Launch "Virtual Machine Manager" (<code>virt-manager</code>) on the host.
 
-'''3.''' Click <code>Edit</code> &rarr; <code>Preferences</code>.
+{{IconSet|h1|3}} Click <code>Edit</code> &rarr; <code>Preferences</code>.
 
-'''4.''' Enable <code>Enable XML editing</code> by checking the box.
+{{IconSet|h1|4}} Enable <code>Enable XML editing</code> by checking the box.
 
-'''5.''' Click <code>Close</code>.
+{{IconSet|h1|5}} Click <code>Close</code>.
 
-'''6.''' Click <code>Edit</code> &rarr; <code>Connection Details</code>.
+{{IconSet|h1|6}} Click <code>Edit</code> &rarr; <code>Connection Details</code>.
 
-'''7.''' Go to the <code>Virtual Networks</code> tab.
+{{IconSet|h1|7}} Go to the <code>Virtual Networks</code> tab.
 
-'''8.''' Select the <code>{{project_name_short}}-External</code> network.
+{{IconSet|h1|8}} Select the <code>{{project_name_short}}-External</code> network.
 
-'''9.''' In the settings viewer on the right side of the connection details window, click the <code>XML</code> tab.
+{{IconSet|h1|9}} In the settings viewer on the right side of the connection details window, click the <code>XML</code> tab.
 
-'''10.''' Remove this line:
-
-{{CodeSelect|code=
-<dns enable="no"/>
-}}
-
-'''11.''' Click <code>Apply</code>.
-
-'''12.''' Click the <code>Stop Network</code> button underneath the connection details window's left sidebar. (This button is the third button from the left, hover over it to see the name of the button.)
-
-'''13.''' Click the <code>Start Network</code> button underneath the connection details window's left sidebar. (This button is the second button from the left.)
-
-'''14.''' Select the <code>{{project_name_short}}-Internal</code> network.
-
-'''15.''' Remove the same line again:
+{{IconSet|h1|10}} Remove this line:
 
 {{CodeSelect|code=
 <dns enable="no"/>
 }}
 
-'''16.''' Click <code>Apply</code>.
+{{IconSet|h1|11}} Click <code>Apply</code>.
 
-'''17.''' Stop this network too.
+{{IconSet|h1|12}} Click the <code>Stop Network</code> button underneath the connection details window's left sidebar. (This button is the third button from the left, hover over it to see the name of the button.)
 
-'''18.''' Start it again.
+{{IconSet|h1|13}} Click the <code>Start Network</code> button underneath the connection details window's left sidebar. (This button is the second button from the left.)
 
-'''19.''' Fully shut down and restart both the {{project_name_gateway_short}} and {{project_name_workstation_short}} VMs.
+{{IconSet|h1|14}} Select the <code>{{project_name_short}}-Internal</code> network.
 
-'''20.''' Done.
+{{IconSet|h1|15}} Remove the same line again:
+
+{{CodeSelect|code=
+<dns enable="no"/>
+}}
+
+{{IconSet|h1|16}} Click <code>Apply</code>.
+
+{{IconSet|h1|17}} Stop this network too.
+
+{{IconSet|h1|18}} Start it again.
+
+{{IconSet|h1|19}} Fully shut down and restart both the {{project_name_gateway_short}} and {{project_name_workstation_short}} VMs.
+
+{{IconSet|h1|20}} Done.
 
 IPv6 autoconfiguration should now work in libvirt.
 }}
 
-== Qubes OS ==
+}} <!-- close tab: KVM -->
 
+{{Tab
+|title= == Qubes OS ==
+|image=[[File:Qubes-logo-blue.png|25px]]
+|addToClass=info-box
+|active=false
+|content=
 Qubes OS does support IPv6, but it is turned off by default. To turn it on, follow the guide in the [https://doc.qubes-os.org/en/latest/developer/system/networking.html#ipv6 Qubes OS networking documentation].
+}} <!-- close tab: Qubes OS -->
+
+}} <!-- close Controller: VirtualBox, KVM, Qubes OS -->
+
+= Disabling IPv6 Support =
+* https://forums.whonix.org/t/how-to-disable-ipv6-in-whonix-18/22584
 
 = Footnotes =
 {{reflist|close=1}}

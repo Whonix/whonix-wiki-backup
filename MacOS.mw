@@ -12,13 +12,14 @@
 
 '''Select''' your hardware platform below.
 }}
+
 {{Tab
 |type=controller
 |content=
+
 {{Tab
 |title= = Intel-based MacBook =
 |image=[[File:Apple-with-intel-logo.jpg]]
-|addToClass=info-box
 |content=
 {{anchor|{{project_name_short}} on Intel-based MacBook}}
 [[File:Apple-with-intel-logo.jpg|thumb|100px]]
@@ -31,7 +32,6 @@ Follow the documentation on the '''[[VirtualBox]]''' wiki page.
 
 {{Tab
 |title= = Apple Silicon =
-|addToClass=info-box
 |image=[[File:Apple-mx-logo.jpg]]
 |content=
 {{Anchor|M1}}{{Anchor|M2}}{{Anchor|{{project_name_short}} on Apple Silicon}}
@@ -39,7 +39,7 @@ Follow the documentation on the '''[[VirtualBox]]''' wiki page.
 '''For Mac <u>M1</u>, <u>M2</u>, <u>M3</u>, <u>M4</u>, ...'''
 
 {{IntroLike|
-{{project_name_short}} is not yet available for Mac M1, M2, M3, M4, ... No {{ETA}}. No need to ask for status updates. Any updates would certainly be posted in the usual channels, see [[Stay Tuned]].
+{{project_name_short}} is not yet available for Mac M1, M2, M3, M4, ... There is no {{ETA}}. No need to ask for status updates. Any updates would certainly be posted in the usual channels, see [[Stay Tuned]].
 }}
 
 {{Unsupported}}
@@ -47,65 +47,132 @@ Follow the documentation on the '''[[VirtualBox]]''' wiki page.
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = At time of writing, running {{project_name_short}} on Apple Silicon is still for developers only!
+| text    = At the time of writing, running {{project_name_short}} on Apple Silicon is still for developers only!
 }}<!-- close mbox -->
 
+You need to build {{project_name_short}} using derivative-maker to get it running on Apple Silicon.
+
+Virtualizer specific. Select the virtualizer.
+
+{{Tab
+|type=controller
+|content=
+
+{{Tab
+|title= = VirtualBox =
+|image=[[File:Virtualbox logo.png|25px]]
+|content=
+Build environment.
+
+* build host (where derivative-maker needs to run): Intel/AMD64
+* target machine: Mac M# / Apple Silicon
+* future: It will hopefully be possible to build on any [[ARM64]] build host computer, which includes Debian ARM64 based VM running on Mac M# / Apple Silicon.
+
+Build commands.
+
+* {{CodeSelect|code=
+~/derivative-maker/derivative-maker --flavor whonix-gateway-lxqt --target virtualbox --arch arm64 --repo true
+}}
+* {{CodeSelect|code=
+~/derivative-maker/derivative-maker --flavor whonix-workstation-lxqt --target virtualbox --arch arm64 --repo true
+}}
+
+}}<!-- close tab: VirtualBox -->
+
+{{Tab
+|title= = UTM =
+|image=
+|content=
 {{Contributor|
 |status=[[Unsupported|Unmaintained]]. Development stalled.
-|about=About this For {{project_name_short}} on Apple Silicon Chapter
+|about=About this {{project_name_short}} on Apple Silicon using UTM chapter
 |difficulty=hard
 |contributor=Past: [https://github.com/GavinPacini Gavin Pacini] / Current: none
 |support=[https://forums.whonix.org/t/whonix-on-mac-m1-arm/11310 {{project_name_short}} on Mac M1 (ARM)]
 }}<!-- close box -->
 
-'''First things first'''
+{{IconSet|h1|1}} Environment Setup
 
-* Right now, you need to build {{project_name_short}} using the build script to get it running on Apple Silicon.
-* This can be improved in the future. If you want to help, please visit [https://forums.whonix.org/t/whonix-on-mac-with-arm-m1/11310 this forum thread].
+{{box|text=
+{{IconSet|h2|1}} Install UTM
 
-'''1. Environment Setup'''
+* Download [https://github.com/utmapp/UTM/releases/latest/download/UTM.dmg UTM] and install it.
+}}
 
-* download [https://github.com/utmapp/UTM/releases/latest/download/UTM.dmg UTM] and install
+{{box|text=
+{{IconSet|h2|2}} Create a Debian <code>arm64</code> VM
 
-and follow these instructions to install your own Debian <code>arm64</code> based VM
+Then follow these instructions to install your own Debian <code>arm64</code> based VM.
+
+{{IconSet|h3|1}} Get the installer image
 
 * Debian <code>{{Stable project version based on Debian codename}}</code> netinstall disc image
+
+{{IconSet|h3|2}} Start the VM creation wizard
+
 * open UTM
 * click "Create a new virtual machine"
 * click "Virtualize"
 * click "Linux"
-* click "browse" and select the downloaded netinstall image iso file
+
+{{IconSet|h3|3}} Select the ISO
+
+* click "Browse" and select the downloaded netinstall image ISO file
 * and then click "Next"
+
+{{IconSet|h3|4}} Hardware settings
+
 * on the "Hardware" screen just leave the defaults (4 GB RAM, 4 cores). GPU acceleration is not recommended at this time as it crashes randomly.
 * and then click "Next"
+
+{{IconSet|h3|5}} Storage
+
 * on "Storage" click "Next"
 * click "Browse". Choose the directory that you want the built {{project_name_short}} images to end up in.
 * and then click "Next"
+
+{{IconSet|h3|6}} Save and install
+
 * verify settings on the "Summary" page and then click "Save"
-* start the new VM and install linux by following the instructions on screen.
-* once installation is finished boot into VM again.
+* start the new VM and install Linux by following the instructions on screen.
+
+{{IconSet|h3|7}} Post-install steps
+
+* once installation is finished, boot into the VM again.
 * open a terminal and run <code>sudo apt install spice-vdagent spice-webdavd dosfstools</code>
-* change VM hostname to <code>host</code>
+* change the VM hostname to <code>host</code>
+}}
 
-Double click the utm file to import it.
+{{box|text=
+{{IconSet|h2|3}} Import the UTM file
 
-'''2. Initial Build'''
+Double click the UTM file to import it.
+}}
 
-Follow the [[Dev/Build_Documentation/images| build documentation here]] and be sure to set build parameters:
+{{IconSet|h1|2}} Initial Build
+
+{{box|text=
+{{IconSet|h2|1}} Follow build documentation
+
+Follow the [[Dev/Build_Documentation/images|build documentation here]] and be sure to set build parameters:
 
 * <code>--arch arm64</code> and <code>--target utm</code> when running the build script as part of the [[Dev/Build_Documentation/images#VM_Creation]] step.
-* <code>--tb open</code> will result in <code>tb-updater</code> (<code>update-torbrowser</code>) (Tor Browser Downloader by {{project_name_short}} developers) attempting to download Tor Browser during the build process but fail open (continue the build without error) should the download fail.
+* <code>--tb open</code> will result in <code>tb-updater</code> (<code>update-torbrowser</code>) (Tor Browser Downloader by {{project_name_short}} developers) attempting to download Tor Browser during the build process, but it will fail open (continue the build without error) if the download fails.
 * <code>--repo true</code> will result in [[Project-APT-Repository]] being enabled.
 * <code>--vmsize</code> defines the size of the virtual hard drive.
 ** <code>--vmsize 15G</code> will create 15 GB disk size for the gateway.
 ** <code>--vmsize 25G</code> will create 25 GB disk size for the workstation.
-** These numbers are arbitrarily chosen and not yet optimized. Feel free to use higher disk sizes. Lower disk sizes are ok too. In worst case, the build will fail or the disk will full up.
+** These numbers are arbitrarily chosen and not yet optimized. Feel free to use higher disk sizes. Lower disk sizes are ok too. In the worst case, the build will fail or the disk will fill up.
 ** It is possible to {{kicksecure_wiki
 |wikipage=Grow_Virtual_Harddisk
 |text=increase the virtual hard disk size later.
 }}
+}}
 
-Build commands should Look similar to:
+{{box|text=
+{{IconSet|h2|2}} Build commands
+
+Build commands should look similar to:
 
 * {{CodeSelect|code=
 ~/derivative-maker/derivative-maker --flavor whonix-gateway-lxqt --target utm --arch arm64 --tb open --repo true --vmsize 15G
@@ -113,28 +180,47 @@ Build commands should Look similar to:
 * {{CodeSelect|code=
 ~/derivative-maker/derivative-maker --flavor whonix-workstation-lxqt --target utm --arch arm64 --tb open --repo true --vmsize 25G
 }}
+}}
 
-Provided you have built correctly, you will now have two <code>.tar.gz</code> files in the <code>~/derivative-binary</code> (they will look something like <code>{{project_name_short}}-<flavour>-LXQt-{{VersionNew}}.utm.tar.gz</code>), one for the Workstation and one for the Gateway.
+{{IconSet|h1|3}} Transfer output files to macOS
 
-* move the .tar.gz files into the shared folder, so they are transferred to your Mac.
+If you have built correctly, you will now have two <code>.tar.gz</code> files in folder <code>~/derivative-binary</code> (they will look something like <code>{{project_name_short}}-<flavour>-LXQt-{{VersionNew}}.utm.tar.gz</code>), one for the Workstation and one for the Gateway.
 
-'''3. Import utm files'''
+* Move the <code>tar.gz</code> files into the shared folder, so they are transferred to your Mac.
 
-* unzip the tar.gz files
-* double click each utm file to import it
+{{IconSet|h1|4}} Import UTM files
 
-NOTE: The utm files are completely configured and use special networking. They will work as-is, but feel free to tweak memory, or other settings.
+{{box|text=
+{{IconSet|h2|1}} Unpack
 
-TODO:
+* unzip the <code>.tar.gz</code> files
+}}
+
+{{box|text=
+{{IconSet|h2|2}} Import
+
+* double click each UTM file to import it
+}}
+
+<u>Note:</u> The UTM files are completely configured and use special networking. They will work as-is, but feel free to tweak memory, or other settings.
+
+{{IconSet|h1|5}} Done.
+
+The process of building and important {{project_name_short}} UTM has been completed.
+
+{{IconSet|h1|6}} Development TODO.
 
 * [[Dev/UTM]]
 * https://forums.whonix.org/t/whonix-on-mac-m1-arm-development-discussion/14136/6
+}}<!-- close tab: UTM -->
+
+}}<!-- close tab controller: VirtualBox versus UTM -->
+
 }}<!-- close tab Apple Silicon -->
 
 {{Tab
 |title= = non-Apple Hardware Hackintosh =
 |image=[[File:Hackintosh-logo.svg]]
-|addToClass=info-box
 |content=
 {{anchor|{{project_name_short}} on non-Apple Hardware Hackintosh}}
 [[File:Hackintosh-logo.svg|thumb|100px]]
@@ -148,7 +234,7 @@ Virtualization on <code>osx86</code> aka "Hackintosh" machines with unmodified "
 
 = Miscellaneous macOS Advice =
 <div class="toccolours mw-collapsible mw-collapsed"  >
-For miscellaneous advice, please press on learn more on the right.
+For miscellaneous advice, please press "Learn More" on the right.
 <div class="mw-collapsible-content">
 {{Community_Support|scope=chapter}}
 
