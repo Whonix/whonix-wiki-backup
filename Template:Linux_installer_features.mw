@@ -1,51 +1,51 @@
-* '''Script Name Verification''': The installer checks for valid script names, such as <code>dist-installer-cli</code>, {{kicksecure_wiki
+* <u>Script name verification:</u> The installer checks for valid script names, such as <code>dist-installer-cli</code>, {{kicksecure_wiki
 |wikipage=VirtualBox/Installer
 |text=<code>virtualbox-installer-cli</code>
 }}, <code>{{project_name_short_lowercase}}-cli-installer-cli</code>, <code>{{project_name_short_lowercase}}-lxqt-installer-cli</code>.
-* '''Command-Line Parsing''': It parses any command-line options provided.
-* '''System Requirements Check''': The installer assesses if the system meets prerequisites like adequate disk space, RAM, and virtualization support. Users are informed if any of these criteria aren't met.
-* '''Package Installation''': Necessary packages for the script's operation, like <code>signify</code>, <code>curl</code>, <code>rsync</code>, and <code>vboxmanage</code> (for VirtualBox users) are installed using the distribution's package manager (APT or DNF).
-* '''Repository Settings''':
-** <u>Debian and Derivatives</u>:
-*** For <code>bookworm</code> (<code>oldstable</code>): Enables the Debian <code>backports</code> and <code>fasttrack</code> repositories.
-*** For <code>trixie</code> (<code>stable</code>): Enables the <code>virtualbox.org</code> (Oracle) repository.<ref>
+* <u>Command-line parsing:</u> The installer parses any command-line options provided.
+* <u>System requirements check:</u> The installer assesses if the system meets prerequisites like adequate disk space, RAM, and virtualization support. Users are informed if any of these criteria are not met.
+* <u>Package installation:</u> Necessary packages for the script's operation, like <code>signify</code>, <code>curl</code>, <code>rsync</code>, and <code>vboxmanage</code> (for VirtualBox users) are installed using the distribution's package manager (APT or DNF).
+* <u>Repository settings:</u> Repository selection and configuration depends on platform and distribution release.
+** <u>Debian and derivatives:</u> Repository logic depends on the Debian release in use.
+*** <u><code>bookworm</code> (<code>oldstable</code>):</u> Enables the Debian <code>backports</code> and <code>fasttrack</code> repositories.
+*** <u><code>trixie</code> (<code>stable</code>):</u> Enables the <code>virtualbox.org</code> (Oracle) repository.<ref>
 This is because Debian Trixie's <code>fasttrack</code> repository does not have VirtualBox yet, and Debian Sid's build of VirtualBox is not compatible with Trixie any longer.
 </ref>
-*** For <code>sid</code> (<code>unstable</code>): Installs from Debian <code>unstable</code> repository.
-** <u>Ubuntu</u>: Installs from the Ubuntu repository. <ref>
-Might sound complicated but it's actually quite simple in case of Ubuntu. Install from the usual, "normal", official <code>packages.ubuntu.com</code>. From the usual <code>suite</code>. For example, if using suite <code>jammy</code>, it installs from <code>jammy</code>. This is because [https://packages.ubuntu.com/search?keywords=virtualbox Ubuntu is packaging VirtualBox] for their usual stable suites. Debian doesn't. That's why Ubuntu does not require any special repository. (Debian required <code>backports</code> and <code>fasttrack</code> repositories at time of writing.)
+*** <u><code>sid</code> (<code>unstable</code>):</u> Installs from Debian <code>unstable</code> repository.
+** <u>Ubuntu:</u> Installs from the Ubuntu repository. <ref>
+Might sound complicated but it is actually quite simple in case of Ubuntu. Install from the usual, "normal", official <code>packages.ubuntu.com</code>. From the usual <code>suite</code>. For example, if using suite <code>jammy</code>, it installs from <code>jammy</code>. This is because [https://packages.ubuntu.com/search?keywords=virtualbox Ubuntu is packaging VirtualBox] for their usual stable suites. Debian does not. That is why Ubuntu does not require any special repository. (Debian required <code>backports</code> and <code>fasttrack</code> repositories at time of writing.)
 </ref>
-** <u>Fedora and Derivatives</u>: Enables the <code>virtualbox.org</code> (Oracle) repository.
-** <u>Updates</u>: The preferred repository for VirtualBox installation may vary in the future based on availability. Updated installers might fetch VirtualBox from the Debian <code>fasttrack</code> repository, <code>virtualbox.org</code> (Oracle) repository, or the {{Kicksecure}} repository. development discussion: [https://forums.whonix.org/t/whonix-virtualbox-integration-and-upgrades/11705 VirtualBox Integration and Upgrades])
-* '''Version Querying''': If no version is specified via command line, the {{project_name_short}} version number is fetched using the [[API]]. (Only if installing {{project_name_short}}.) (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only>
+** <u>Fedora and derivatives:</u> Enables the <code>virtualbox.org</code> (Oracle) repository.
+** <u>Updates:</u> The preferred repository for VirtualBox installation may vary in the future based on availability. Updated installers might fetch VirtualBox from the Debian <code>fasttrack</code> repository, <code>virtualbox.org</code> (Oracle) repository, or the {{Kicksecure}} repository. Development discussion: [https://forums.whonix.org/t/whonix-virtualbox-integration-and-upgrades/11705 VirtualBox Integration and Upgrades]
+* <u>Version querying:</u> If no version is specified via command line, the {{project_name_short}} version number is fetched using the [[API]]. (Only if installing {{project_name_short}}.) (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only>
 Because that is not required if only installing VirtualBox using <code>virtualbox-installer-cli</code>.)
 </ref>)
-* '''VirtualBox Configuration''': System configuration is automatically added to prevent VirtualBox from conflicting with KVM, without breaking functionality for either VirtualBox or KVM.
-* '''Virtual Machine Handling''':
-** <u>For previously imported VMs,</u> users are prompted to boot the virtual system(s). (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only />.)
-** <u>For previously downloaded VM files,</u> authenticity and integrity checks are run.  (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only />.)
-** <u>For first-time users,</u> the installer downloads the required files, conducts authenticity and integrity checks, imports the system(s), and then attempts to start the Virtual Machine(s).  (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only />.)
-* Inform user if VMs are already running and abort installation.  (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only />.)
+* <u>VirtualBox configuration:</u> System configuration is automatically added to prevent VirtualBox from conflicting with KVM, without breaking functionality for either VirtualBox or KVM.
+* <u>Virtual machine handling:</u> VM-related steps depend on whether VMs are already present and on installer mode.
+** <u>Previously imported VMs:</u> Users are prompted to boot the virtual system(s). (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only />.)
+** <u>Previously downloaded VM files:</u> Authenticity and integrity checks are run. (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only />.)
+** <u>First-time users:</u> The installer downloads the required files, conducts authenticity and integrity checks, imports the system(s), and then attempts to start the Virtual Machine(s). (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only />.)
+* <u>Running VM detection:</u> Inform user if VMs are already running and abort installation. (Not for <code>virtualbox-installer-cli</code>. <ref name=virtualbox-installer-only />.)
 
 '''Additional Features:'''
 
-* '''Download Resumption''': Utilizes <code>rsync</code> internally to enable download resumption capabilities.
-* '''Download from Oracle Repository''': When using <code>--oracle-repo</code> command line option, downloads VirtualBox from Oracle repository. This is the default for Fedora-based distributions. It's optional for Debian-based ones (including Ubuntu) but may be set by developers in the future if the Debian repository discontinues the VirtualBox package. The Oracle repository might at times provide a newer VirtualBox version.
-* '''Digital software signature verification:''' Uses APT (which verifies digital software signatures). When using the <code>--oracle-repo</code>, installs Oracle's repository and signing key.
-* '''Integrity Checking''': Offers a streamlined integrity verification process, facilitated by <code>rsync</code>.
-* '''Onion Support''': Allows for downloads from onion sources with the <code>--onion</code> command line option whenever possible. (For example Oracle does not provide an onion repository.)
-* '''Default Download Directory''': Files are saved in the <code>~/dist-installer-cli-download</code> folder.
-* '''Logging Mechanics''': For transparency, every command executed is logged in the download directory, accompanied by the specific script version used at the time.
-* '''Transparent System Modifications''': The installer’s operations are evident to the user. All persistent system alterations, especially those executed with administrative ("root") privileges, are prominently detailed in the installer's output.
-* '''Documentation''': Comprehensive details can be found in the {{Github_link|repo=usability-misc|path=/blob/master/man/dist-installer-cli.1.ronn|text=<code>dist-installer-cli</code> man page}}.
-* '''Checks''': [[Nested Virtualization]], secure boot enabled check.
+* <u>Download resumption:</u> Utilizes <code>rsync</code> internally to enable download resumption capabilities.
+* <u>Oracle repository downloads:</u> When using <code>--oracle-repo</code> command line option, downloads VirtualBox from Oracle repository. This is the default for Fedora-based distributions. It is optional for Debian-based ones (including Ubuntu) but may be set by developers in the future if the Debian repository discontinues the VirtualBox package. The Oracle repository might at times provide a newer VirtualBox version.
+* <u>Digital signature verification:</u> Uses APT (which verifies digital software signatures). When using the <code>--oracle-repo</code>, installs Oracle's repository and signing key.
+* <u>Integrity checking:</u> Offers a streamlined integrity verification process, facilitated by <code>rsync</code>.
+* <u>Onion support:</u> Allows for downloads from onion sources with the <code>--onion</code> command line option whenever possible. (For example, Oracle does not provide an onion repository.)
+* <u>Default download directory:</u> Files are saved in the <code>~/dist-installer-cli-download</code> folder.
+* <u>Logging mechanics:</u> For transparency, every command executed is logged in the download directory, accompanied by the specific script version used at the time.
+* <u>Transparent system modifications:</u> The installer's operations are evident to the user. All persistent system alterations, especially those executed with administrative ("root") privileges, are prominently detailed in the installer's output.
+* <u>Documentation:</u> Comprehensive details can be found in the {{Github_link|repo=usability-misc|path=/blob/master/man/dist-installer-cli.1.ronn|text=<code>dist-installer-cli</code> man page}}.
+* <u>Checks:</u> [[Nested Virtualization]], secure boot enabled check.
 
 '''Developer Information:'''
 
-* '''Source Code''': {{Github_link|repo=usability-misc|path=/blob/master/usr/bin/dist-installer-cli|text=<code>/usr/bin/dist-installer-cli</code>}}, {{Github_link|repo=usability-misc|path=/blob/master/.github/workflows/builds.yml|text=Continuous Integration Testing <code>.github/workflows/builds.yml</code>}}
-* '''Development Wiki Page''': [[Dev/Linux Installer]]
-* '''Development Discussion''': [https://forums.whonix.org/t/whonix-linux-installer-development-discussion/15917 forums discussion]
-* '''Security''': The <code>dist-installer-cli</code> script is not intended for curl bash piping. However, for a comprehensive discussion on security concerns related to this topic, see [[Dev/curl_bash_pipe|here]].<noinclude>
+* <u>Source code:</u> {{Github_link|repo=usability-misc|path=/blob/master/usr/bin/dist-installer-cli|text=<code>/usr/bin/dist-installer-cli</code>}}, {{Github_link|repo=usability-misc|path=/blob/master/.github/workflows/builds.yml|text=Continuous Integration Testing <code>.github/workflows/builds.yml</code>}}
+* <u>Development wiki page:</u> [[Dev/Linux_Installer|Dev/Linux Installer]]
+* <u>Development discussion:</u> [https://forums.whonix.org/t/whonix-linux-installer-development-discussion/15917 forums discussion]
+* <u>Security:</u> The <code>dist-installer-cli</code> script is not intended for curl bash piping. However, for a comprehensive discussion on security concerns related to this topic, see [[Dev/curl_bash_pipe|here]].<noinclude>
 = Footnotes =
 <references />
 {{header}}

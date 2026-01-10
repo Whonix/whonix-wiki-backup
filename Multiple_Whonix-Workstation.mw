@@ -134,36 +134,42 @@ Platform specific. Select your platform.
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=info]]
 | text    = '''Note:''' The following instructions only apply to Download/Default-{{project_name_workstation_short}} or {{project_name_short}} VMs built from source code. To use another operating system like Windows, other GNU/Linux, BSD etc. please see the [[Other Operating Systems]] chapter instead.
-}}
+}} <!-- close: mbox -->
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px|alt=warning]]
 | text    = Each additional {{project_name_workstation_short}} VM <u>must</u> have its own MAC address and internal LAN IP address.
-}}
+}} <!-- close: mbox -->
 
-'''1.''' Clone a fresh {{project_name_workstation_short}} VM.
+{{IconSet|h1|1}} '''Clone a fresh VM:'''
+
+Make a copy of a clean {{project_name_workstation_short}} VM, so you start from a known good state.
 
 * <u>VirtualBox</u>: In VirtualBox Manager, [https://dirkstrauss.com/clone-virtualbox-vm/ clone] a clean {{project_name_workstation_short}}.
 * <u>KVM</u>: In Virtual Machine Manager, clone a clean {{project_name_workstation_short}}: <code>Highlight {{project_name_workstation_short}}</code> &rarr; <code>Open</code> &rarr; <code>Virtual Machine</code> &rarr; <code>Clone</code>
 
-'''2.''' Assign a new MAC address to the cloned VM.
+{{IconSet|h1|2}} '''Assign a new MAC address:'''
+
+This avoids two VMs having the same network identity, which can cause network conflicts.
 
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=info]]
 | text    = '''Note:''' A new MAC address is necessary if an additional [[VirtualBox]] VM is imported.
-}}
+}} <!-- close: mbox -->
 
 * <u>VirtualBox</u>: In VirtualBox Manager, assign a new MAC address: <code>VirtualBox</code> &rarr; <code>Settings</code> &rarr; <code>Network</code> &rarr; <code>Adapter 1</code> &rarr; <code>Advanced</code> &rarr; <code>Mac Address</code> &rarr; <code>Create a new MAC address (press the green round arrow icon)</code> &rarr; <code>OK</code>
 * <u>KVM</u>: To change the internal network in KVM, see: [[KVM#Creating_Multiple_Internal_Networks|Creating Multiple Internal Networks]].
 
-'''3.''' {{sysmaint_notice}}
+{{IconSet|h1|3}} {{sysmaint_notice}}
 
-'''4.''' Edit the network interfaces file in {{project_name_workstation_short}}.
+{{IconSet|h1|4}} '''Edit the network interfaces file:'''
+
+Change the internal LAN IP address, so the cloned VM does not reuse the same IP as the original VM.
 
 {{CodeSelect|code=
 sudoedit /etc/network/interfaces.d/30_non-qubes-whonix
-}}
+}} <!-- close: CodeSelect -->
 
 Ignore all lines starting with a hashtag ("<code>#</code>"). That is because comments are only for documentation and notes. However, comments are ignored by the system.
 
@@ -171,13 +177,13 @@ Look for line <code>address 10.152.152.11</code>. Change the last octet. For exa
 
 Save and exit.
 
-'''5.''' Review your changes.
+{{IconSet|h1|5}} '''Review your changes:'''
 
-The following command is optional but handy to show all file contents without comments.
+This is optional, but it helps confirm the file looks correct and shows the contents without comment lines.
 
 {{CodeSelect|code=
 cat /etc/network/interfaces.d/30_non-qubes-whonix {{!}} grep --invert-match "#"
-}}
+}} <!-- close: CodeSelect -->
 
 That should show for example:
 
@@ -194,26 +200,34 @@ iface eth0 inet static
 
 It would even be possible to replace the contents of that config file with the above contents. When using more than 1 additional Whonix-Workstation however <code>10.152.152.12</code> should be changed to <code>10.152.152.13</code> and so forth.
 
-'''6.''' Reboot.
+{{IconSet|h1|6}} '''Reboot or restart networking:'''
+
+Apply the new IP settings by rebooting, or by restarting networking.
 
 Reboot the {{project_name_workstation_short}} or alternately restart the network.
 
 {{CodeSelect|code=
 sudo service networking restart
-}}
+}} <!-- close: CodeSelect -->
 
-'''7.''' Done.
+{{IconSet|h1|7}} '''Done.'''
 
-}} <!-- close tab: {{non_q_project_name_short}} -->
+The additional {{project_name_workstation_short}} VM should now have a unique MAC address and a unique internal LAN IP address.
+
+}} <!-- close: Tab, {{non_q_project_name_short}} -->
 
 {{Tab
 |title= == {{q_project_name_short}} ==
 |image=[[File:Qubes-logo-icon.png|25px]]
 |addToClass=info-box
 |content=
-'''1.''' Create an additional App Qube based on the {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>) and give it a distinctive name such as for example <code>{{project_name_workstation_vm}}2</code>. (A more distinctive name is desirable.)
+{{IconSet|h1|1}} '''Create a new App Qube:'''
 
-'''2.''' Confirm the new {{project_name_workstation_short}} App Qube is using a {{project_name_gateway_short}} (such as for example the default <code>{{project_name_gateway_vm}}</code>) as its [https://www.qubes-os.org/doc/glossary/#net-qube <code>net qube</code>].
+Create an additional App Qube based on the {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>) and give it a distinctive name such as for example <code>{{project_name_workstation_vm}}<u>-2</u></code>. (A more distinctive name is desirable.)
+
+{{IconSet|h1|2}} '''Confirm the net qube:'''
+
+Make sure the new {{project_name_workstation_short}} App Qube is using a {{project_name_gateway_short}} (such as for example the default <code>{{project_name_gateway_vm}}</code>) as its [https://www.qubes-os.org/doc/glossary/#net-qube <code>net qube</code>].
 
 If creating a new App Qube is unfamiliar, follow these step-by-step instructions:
 
@@ -222,38 +236,60 @@ If creating a new App Qube is unfamiliar, follow these step-by-step instructions
 
 [[File:Create_Qubes-Whonix-Workstation_AppVM.png|App Qube Creation using Qubes VM Manager (QVMM)]]
 
-'''A.)''' Create Qubes-{{project_name_workstation_short}} App Qube
+{{IconSet|h2|1}} '''Create Qubes-{{project_name_workstation_short}} App Qube:'''
 
-'''B.)''' Name and label: Name the App Qube. Don't include any personal information (if the App Qube is compromised, the attacker could run <code>qubesdb-read /name</code> to reveal the VM name). Name the App Qube something generic, for example: <code>{{project_name_workstation_vm}}<u>-2</u></code>.
+Create Qubes-{{project_name_workstation_short}} App Qube.
 
-'''C.)''' Color: Choose a color label for the {{project_name_workstation_short}} App Qube.
+{{IconSet|h2|2}} '''Name and label:'''
 
-'''D.)''' Use this template: Choose the {{project_name_workstation_short}} Template. For example: <code>{{project_name_workstation_template}}</code>.
+Name the App Qube. Don't include any personal information (if the App Qube is compromised, the attacker could run <code>qubesdb-read /name</code> to reveal the VM name). Name the App Qube something generic, for example: <code>{{project_name_workstation_vm}}<u>-2</u></code>.
 
-'''E.)''' Standalone: Leave the Standalone field unchecked, unless a persistent root filesystem is desired.
+{{IconSet|h2|3}} '''Choose a color label:'''
 
-'''F.)''' Type: Choose the type <code>App Qube</code>.
+Choose a color label for the {{project_name_workstation_short}} App Qube.
 
-'''G.)''' Allow networking: Choose the desired {{project_name_gateway_short}} ProxyVM from the list. For example: <code>{{project_name_gateway_vm}}</code>.
+{{IconSet|h2|4}} '''Select the template:'''
 
-'''H.)''' Press: <code>OK</code>.
+Use the {{project_name_workstation_short}} Template. For example: <code>{{project_name_workstation_template}}</code>.
 
-'''I.)''' Open a dom0 terminal.
+{{IconSet|h2|5}} '''Standalone setting:'''
 
-'''J.)''' Add qvm-tag <code>anon-vm</code> to the newly created App Qube. <ref>
+Leave the Standalone field unchecked, unless a persistent root filesystem is desired.
+
+{{IconSet|h2|6}} '''Set the type:'''
+
+Choose the type <code>App Qube</code>.
+
+{{IconSet|h2|7}} '''Allow networking:'''
+
+Choose the desired {{project_name_gateway_short}} ProxyVM from the list. For example: <code>{{project_name_gateway_vm}}</code>.
+
+{{IconSet|h2|8}} '''Confirm:'''
+
+Press: <code>OK</code>.
+
+{{IconSet|h2|9}} '''Open a dom0 terminal:'''
+
+You will run a <code>qvm-tags</code> command in <code>dom0</code>.
+
+{{IconSet|h2|10}} '''Add the anon-vm tag:'''
+
+Add qvm-tag <code>anon-vm</code>, <code>sdwdate-gui-client</code> to the newly created App Qube. <ref>
 [[Dev/Qubes#qvm-tags|Developer documentation about <code>qvm-tags</code>]]
 </ref>
 
 <u>Note:</u> Replace <code>{{project_name_workstation_vm}}<u>-2</u></code> with the actual name of the VM.
 
 {{CodeSelect|code=
-qvm-tags anon-whonix-2 add anon-vm
-}}
+qvm-tags anon-whonix-2 add anon-vm sdwdate-gui-client
+}} <!-- close: CodeSelect -->
 
-'''M.)''' Done.
-}} <!-- close tab: {{q_project_name_short}} -->
+{{IconSet|h2|11}} '''Done.'''
+}} <!-- close: box -->
 
-'''3.''' Depending on the <code>net qube</code> setting.
+{{IconSet|h1|3}} '''Choose the gateway scenario:'''
+
+Depending on the <code>net qube</code> setting.
 
 Select an option.
 
@@ -269,7 +305,7 @@ Select an option.
 
 If the {{project_name_workstation_short}} App Qube <u>is connected to <code>{{project_name_gateway_vm}}</code></u>: No special instructions required.
 
-}} <!-- close tab A -->
+}} <!-- close: Tab, default sys-whonix gateway -->
 
 {{Tab
 |title= === If you are using a gateway other than sys-whonix ===
@@ -282,55 +318,67 @@ The other gateway should be set up according to the instructions on the [[Multip
 {{box|text=
 <u>Note:</u> Inside the {{project_name_workstation_short}} App Qube.
 
-'''A.)''' Create folder <code>/usr/local/etc/sdwdate-gui.d</code>.
+{{IconSet|h2|1}} '''Create the config folder:'''
+
+Create folder <code>/usr/local/etc/sdwdate-gui.d</code>.
 
 {{CodeSelect|code=
 sudo mkdir -p /usr/local/etc/sdwdate-gui.d
-}}
+}} <!-- close: CodeSelect -->
 
-'''B.)''' Open with root rights.
+{{IconSet|h2|2}} '''Open the config file:'''
+
+Open with root rights.
 <!-- WIKI EDITORS NOTE: Template:Open_with_root_rights should not be used. -->
 
 {{CodeSelect|code=
 sudoedit /usr/local/etc/sdwdate-gui.d/50_user.conf
-}}
+}} <!-- close: CodeSelect -->
 
-'''C.)''' Add the following text.
+{{IconSet|h2|3}} '''Add the gateway setting:'''
+
+Add the following text.
 
 Note: The following example uses <code>{{project_name_gateway_vm}}<u>-2</u></code> as an example. Replace <code>{{project_name_gateway_vm}}<u>-2</u></code> with the name of the VM of {{project_name_gateway_short}} which this {{project_name_workstation_short}} App Qube uses as its <code>net qube</code>. For example, <code>{{project_name_gateway_vm}}<u>-3</u></code>.
 
 {{CodeSelect|code=
 gateway="{{project_name_gateway_vm}}-2"
-}}
+}} <!-- close: CodeSelect -->
 
-'''D.)''' Save the file.
+{{IconSet|h2|4}} '''Save the file:'''
 
-'''E.)''' Restart the VM. <ref>
+Save the file.
+
+{{IconSet|h2|5}} '''Restart the VM:'''
+
+Restart the VM. <ref>
 Or restart sdwdate-watcher (sdwdate-gui).
 
 {{CodeSelect|code=
 killall sdwdate-watcher
-}}
+}} <!-- close: CodeSelect -->
 
 {{CodeSelect|code=
 /usr/libexec/sdwdate-gui/start-maybe
-}}
+}} <!-- close: CodeSelect -->
 </ref>
 
-'''F.)''' In case of issues.
+{{IconSet|h2|6}} '''If there are issues:'''
 
 sdwdate-gui qrexec denied messages? See [[Qubes/Troubleshooting#sdwdate-gui_qrexec_settings|{{q_project_name_short}} troubleshooting, sdwdate-gui qrexec]].
-}} <!-- close box -->
+}} <!-- close: box -->
 
-}} <!-- close tab: Qubes-Whonix B -->
+}} <!-- close: Tab, non-default gateway -->
 
-'''4.''' Done.
+{{IconSet|h1|4}} '''Done:'''
 
 The process of setting up an additional {{project_name_workstation_short}} App Qube has been completed.
 
-}} <!-- close tab: Qubes-Whonix -->
-}} <!-- close tab controller: Qubes-Whonix A B -->
-}} <!-- close tab controller: platform selection -->
+}} <!-- close: Tab controller, gateway scenario -->
+
+}} <!-- close: Tab, {{q_project_name_short}} -->
+
+}} <!-- close: Tab controller, platform selection -->
 
 = How-to: Use more than one {{project_name_workstation_short}} - More Security =
 {{Anchor|Firewall}}

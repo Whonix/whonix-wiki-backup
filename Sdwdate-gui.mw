@@ -19,6 +19,90 @@ sdwdate-gui ensures the user knows whether network time synchronization has been
 
 sdwdate can optionally be configured to [[Network_Time_Synchronization#Block_Networking_until_sdwdate_Finishes|block networking until sdwdate finishes]], preventing potential leakage of the time before it is changed.
 
+= Troubleshooting =
+== Qubes Specific ==
+=== Denied sdwdate-gui.ConnectCheck from anon-whonix to sys-whonix ===
+
+This might happen when the required dom0 <code>qvm-tags</code> are missing. The fix is to make sure <code>sys-whonix</code> has the server tag and <code>anon-whonix</code> has the client tag.
+
+{{IconSet|h1|0}} '''In dom0:'''
+
+Open a <code>dom0</code> terminal.
+
+{{IconSet|h1|1}} '''Check sys-whonix tags:'''
+
+Show which tags are currently set for <code>sys-whonix</code>.
+
+{{CodeSelect|code=
+qvm-tags sys-whonix
+}}
+
+{{IconSet|h1|2}} '''Expected output:'''
+
+You should see <code>sdwdate-gui-server</code> in the list.
+
+<pre>
+anon-gateway
+audiovm-dom0
+created-by-dom0
+guivm-dom0
+sdwdate-gui-server
+</pre>
+
+{{IconSet|h1|3}} '''Add missing server tag:'''
+
+Only needed if <code>sdwdate-gui-<u>server</u></code> is missing. This command is idempotent, so it is OK to run it even if the tag already exists.
+
+{{CodeSelect|code=
+qvm-tags sys-whonix add anon-gateway sdwdate-gui-server
+}}
+
+{{IconSet|h1|4}} '''Multiple gateways:'''
+
+Repeat steps {{IconSet|h1|1}} to {{IconSet|h1|3}} for any [[Multiple Whonix-Gateway]], if any.
+
+{{IconSet|h1|5}} '''Check anon-whonix tags:'''
+
+Show which tags are currently set for <code>anon-whonix</code>.
+
+{{CodeSelect|code=
+qvm-tags anon-whonix
+}}
+
+{{IconSet|h1|6}} '''Expected output:'''
+
+You should see <code>sdwdate-gui-client</code> in the list.
+
+<pre>
+anon-vm
+audiovm-dom0
+created-by-dom0
+guivm-dom0
+sdwdate-gui-client
+</pre>
+
+{{IconSet|h1|7}} '''Add missing client tag:'''
+
+Only needed if <code>sdwdate-gui-<u>client</u></code> is missing. This command is idempotent, so it is OK to run it even if the tag already exists.
+
+{{CodeSelect|code=
+qvm-tags anon-whonix add anon-vm sdwdate-gui-client
+}}
+
+{{IconSet|h1|8}} '''Multiple workstations:'''
+
+Repeat steps {{IconSet|h1|5}} to {{IconSet|h1|7}} for any [[Multiple Whonix-Workstation]], if any.
+
+{{IconSet|h1|9}} '''Done.'''
+
+* Similar wiki chapter: [[Qubes/Troubleshooting#qvm-tags_verification|qvm-tags verification]]
+* Developer documentation: [[Dev/Qubes#qvm-tags|qvm-tags developer notes]]
+
+=== {{q_project_name_long}} - Unexpected Autostart of {{project_name_gateway_vm}} ===
+Follow instructions [[Multiple Whonix-Workstation#Qubes-Whonix|multiple {{q_project_name_short}} {{project_name_workstation_long}}]]. <ref>
+Qubes bug report: https://github.com/QubesOS/qubes-issues/issues/5253
+</ref>
+
 = Upstream =
 {{upstream_wiki}}
 

@@ -31,6 +31,7 @@ Platform specific. Select your virtualizer below.
 |type=controller
 |linkid=link1
 |content=
+
 {{Tab
 |title= == VirtualBox ==
 |image=[[File:Virtualbox_logo.png|25px]]
@@ -39,24 +40,25 @@ Platform specific. Select your virtualizer below.
 
 In VirtualBox Manager, it is necessary to change the name of the internal network for both {{project_name_gateway_short}} and {{project_name_workstation_short}}.
 
-'''1.''' Learn the default {{project_name_short}} internal network name.
+{{IconSet|h1|1}} '''Learn the default internal network name:'''
 
-It is <code>{{project_name_short}}</code>.
+The default internal network name is <code>{{project_name_short}}</code>.
 
-'''2.''' Pick an alternative internal network name.
+{{IconSet|h1|2}} '''Pick an alternative internal network name:'''
 
 For the second, third, or n<sup>th</sup> multiple {{project_name_gateway_short}}, another internal network name is required. Any name can be used, but make sure it is not reused in any other {{project_name_gateway_short}} that should be isolated from this one. The following example will use <code>{{project_name_short}}'''<u>2</u>'''</code>, however, it could be something completely different like <code>for-my-onion-web-server</code>.
 
-'''3.''' Change {{project_name_gateway_short}} internal network name.
+{{IconSet|h1|3}} '''Change {{project_name_gateway_short}} internal network name:'''
 
 * <code>VirtualBox</code> &rarr; {{project_name_gateway_short}} &rarr; <code>Settings</code> &rarr; <code>Network</code> &rarr; <code>Adapter '''<u>2</u>'''</code> &rarr; <code>Name:</code> &rarr; change <code>Whonix</code> to something else such as <code>{{project_name_short}}'''<u>2</u>'''</code> &rarr; <code>OK</code>
 
-'''4.''' Change {{project_name_workstation_short}} internal network name.
+{{IconSet|h1|4}} '''Change {{project_name_workstation_short}} internal network name:'''
 
 * <code>VirtualBox</code> &rarr; {{project_name_workstation_short}} &rarr; <code>Settings</code> &rarr; <code>Network</code> &rarr; <code>Adapter '''<u>1</u>'''</code> &rarr; <code>Name:</code> &rarr; change <code>Whonix</code> to the same internal network name as above &rarr; <code>OK</code>
 
-'''5.''' Done.
-}} <!-- close tab: VirtualBox -->
+{{IconSet|h1|5}} '''Done.'''
+
+}} <!-- close: Tab, VirtualBox -->
 
 {{Tab
 |title= == KVM ==
@@ -65,28 +67,33 @@ For the second, third, or n<sup>th</sup> multiple {{project_name_gateway_short}}
 |content=
 
 In this configuration, {{project_name_workstation_short}} will not be able to communicate with one another. This is recommended to keep different Tor activity profiles completely separate. To run multiple {{project_name_gateway_short}}, it is necessary to clone existing VMs; the steps below assume an existing {{project_name_short}} install.
+
 {{Box|text=
-'''1.''' Create clones of the Gateway and Workstation VMs rolled back to clean snapshots.
+{{IconSet|h1|1}} '''Create clean clones:'''
+
+Create clones of the Gateway and Workstation VMs rolled back to clean snapshots.
 
 In Virtual Machine Manager: <code>Highlight VM</code> &rarr; <code>Open</code> &rarr; <code>Virtual Machine</code> &rarr; <code>Clone...</code> &rarr; <code>Clone</code>
 
-'''2.''' Set up different external network interfaces.
+{{IconSet|h1|2}} '''Set up a different external network:'''
 
 The {{project_name_gateway_short}} lacks a DHCP client for security hardening reasons and so cannot be attached to the same external network without conflicting with other {{project_name_gateway_short}}s' traffic.
 
 {{CodeSelect|code=
 sudo virsh net-dumpxml Whonix-External > Whonix-External2.xml
-}}
+}} <!-- close: CodeSelect -->
 
-'''3.''' Edit the network configuration to make it unique.
+{{IconSet|h1|3}} '''Edit the external network config:'''
+
+Make the network unique, so it does not clash with the existing one.
 
 {{CodeSelect|code=
 sudo nano Whonix-External2.xml
-}}
+}} <!-- close: CodeSelect -->
 
 * Change the '''name''' and '''bridge name'''.
 * Delete the '''mac address''' and '''uuid''' parameters.
-* Change the '''IP Address''' used
+* Change the '''IP Address''' used.
 
 Or just replace the configuration with the example below (this assumes the only custom networks are {{project_name_short}}-related).
 
@@ -102,7 +109,8 @@ Or just replace the configuration with the example below (this assumes the only 
   <dns enable='no'/>
   <ip address='10.0.3.2' netmask='255.255.255.0'>
   </ip>
-</network></pre>
+</network>
+</pre>
 
 Save and exit.
 
@@ -112,19 +120,19 @@ y
 CTRL-M
 </pre>
 
-'''4.''' Import and start the new network.
+{{IconSet|h1|4}} '''Import and start the new external network:'''
 
 {{CodeSelect|code=
 virsh -c qemu:///system net-define Whonix-External2.xml
-}}
+}} <!-- close: CodeSelect -->
 
 {{CodeSelect|code=
 virsh -c qemu:///system net-autostart Whonix-External2
-}}
+}} <!-- close: CodeSelect -->
 
 {{CodeSelect|code=
 virsh -c qemu:///system net-start Whonix-External2
-}}
+}} <!-- close: CodeSelect -->
 
 Attach the Gateway and Workstation VM NICs to the new network.
 
@@ -135,17 +143,17 @@ To edit the VM virtual NIC settings: <br />
 
 * Note: <code>virbr1</code> is assigned to the <u>Whonix-External</u> network (default {{project_name_gateway_short}} external NAT NIC). Therefore, the network name was changed to <code>External2</code> and the bridge name to <code>virbr4</code>.
 
-'''5.''' Export {{project_name_short}} internal network settings.
+{{IconSet|h1|5}} '''Export {{project_name_short}} internal network settings:'''
 
 {{CodeSelect|code=
 sudo virsh net-dumpxml Whonix-Internal > Whonix-Internal2.xml
-}}
+}} <!-- close: CodeSelect -->
 
-'''6.''' Edit the network configuration to make it unique.
+{{IconSet|h1|6}} '''Edit the internal network config:'''
 
 {{CodeSelect|code=
 sudo nano Whonix-Internal2.xml
-}}
+}} <!-- close: CodeSelect -->
 
 * Change the '''name''' and '''bridge name'''.
 * Delete the '''mac address''' and '''uuid''' parameters.
@@ -170,21 +178,21 @@ CTRL-M
 
 * Note: <code>virbr2</code> is assigned to the <u>Whonix-Internal</u> network (default {{project_name_workstation_short}} internal NIC). Therefore, the network name was changed to <code>internal2</code> and the bridge name to <code>virbr3</code>.
 
-'''7.''' Import and start the new network.
+{{IconSet|h1|7}} '''Import and start the new internal network:'''
 
 {{CodeSelect|code=
 virsh -c qemu:///system net-define Whonix-Internal2.xml
-}}
+}} <!-- close: CodeSelect -->
 
 {{CodeSelect|code=
 virsh -c qemu:///system net-autostart Whonix-Internal2
-}}
+}} <!-- close: CodeSelect -->
 
 {{CodeSelect|code=
 virsh -c qemu:///system net-start Whonix-Internal2
-}}
+}} <!-- close: CodeSelect -->
 
-'''8.''' Attach the Gateway and Workstation VM NICs to the new network.
+{{IconSet|h1|8}} '''Attach VM NICs to the new internal network:'''
 
 To edit the VM virtual NIC settings: <br />
 <code>Highlight VM</code> &rarr; <code>Open</code> &rarr; <code>Settings (light bulb)</code> &rarr; <code>NIC virtual hardware</code> &rarr; Set Network Source to: <code>Virtual network 'Whonix-Internal2' : Isolated network</code>
@@ -193,15 +201,17 @@ To edit the VM virtual NIC settings: <br />
 
 * Note: The network is exclusively internal and does not communicate with the host in any way.
 
-'''9.''' Now, you need to change the network settings inside the Whonix-Gateway2 machine. While you could modify the 30_non-qubes-whonix file, it's better to avoid editing official Whonix files, as they may be overwritten during updates. Instead, create a new 50_custom-whonix file, which will partially override the settings in 30_non-qubes-whonix.
+{{IconSet|h1|9}} '''Adjust network settings inside Whonix-Gateway2:'''
+
+Now, you need to change the network settings inside the Whonix-Gateway2 machine. While you could modify the <code>30_non-qubes-whonix</code> file, it is better to avoid editing official Whonix files, as they may be overwritten during updates. Instead, create a new <code>50_custom-whonix</code> file, which will partially override the settings in <code>30_non-qubes-whonix</code>.
 
 * Boot the Whonix-Gateway2 VM from KVM and create a new file:
 
 {{CodeSelect|code=
 sudo nano /etc/network/interfaces.d/50_custom-whonix
-}}
+}} <!-- close: CodeSelect -->
 
-* Then Copy/Paste:
+* Then copy and paste:
 
 <pre>
 # Custom Whonix Gateway overrides (loaded after 30_non-qubes-whonix)
@@ -225,17 +235,18 @@ CTRL-M
 
 {{CodeSelect|code=
 sudo ifdown eth0 && sudo ifup eth0
-}}
+}} <!-- close: CodeSelect -->
 
 Related forum discussion: https://forums.whonix.org/t/do-multiple-whonix-gateways-require-different-whonix-external-virtual-nics/19903
 
-'''10.''' Change the number of pinned CPUs.
+{{IconSet|h1|10}} '''Change the number of pinned CPUs:'''
 
 It is recommended to [[KVM#A)_With_an_Editor|edit]] the cloned workstation's configuration and change the number of pinned CPUs to a different value (3 or 4) compared to the existing gateway and primary workstation. This only works if users have a quad-core system.
 
-'''11.''' Done.
-}}
-}} <!-- close tab: KVM -->
+{{IconSet|h1|11}} '''Done.'''
+}} <!-- close: Box -->
+
+}} <!-- close: Tab, KVM -->
 
 {{Tab
 |title= == {{q_project_name_long}} ==
@@ -273,19 +284,20 @@ To create a [[{{project_name_gateway_short}}|{{project_name_gateway_short}}]] Pr
 
 </ref>
 # Open a dom0 terminal.
-# Add qvm-tag <code>anon-gateway</code> to the newly created App Qube. <ref>
+# Add qvm-tag <code>anon-gateway</code>, <code>sdwdate-gui-server</code> to the newly created App Qube. <ref>
 [[Dev/Qubes#qvm-tags|Developer documentation about <code>qvm-tags</code>]]
 </ref>
 
 <u>Note:</u> Replace <code>{{project_name_gateway_vm}}<u>-2</u></code> with the actual name of the VM.
 
 {{CodeSelect|code=
-qvm-tags sys-whonix-2 add anon-gateway
-}}
+qvm-tags sys-whonix-2 add anon-gateway sdwdate-gui-server
+}} <!-- close: CodeSelect -->
 
 12. Done.
 }} <!-- close tab: Qubes-Whonix -->
-}} <!-- close tab controller: platform selection -->
+
+}} <!-- close: Tab controller, platform selection -->
 
 = See Also =
 

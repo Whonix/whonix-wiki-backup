@@ -39,13 +39,13 @@ Multiple [[Qubes|{{q_project_name_short}}]] Templates provides much greater flex
 
 Cloning templates in [[Qubes|{{q_project_name_short}}]] is easily accomplished via Qube Manager.
 
-'''1.''' Naming convention advice.
+{{IconSet|h1|1}} '''Naming convention advice:'''
 
 Be careful with naming conventions for both Templates and App Qubes (based on those templates) so they are not confused with each other. This will minimize the chance of basing an App Qube on the wrong template.
 
 When creating App Qubes based on cloned Templates, a purpose-based naming convention is sensible so there is no ambiguity regarding the intended function of an App Qube. For example, if an App Qube is created to tunnel UDP over Tor, appending <code>tunnel-udp</code> (the purpose) to the end of <code>{{project_name_workstation_vm}}</code> would lead to the name <code>{{project_name_workstation_vm}}-tunnel-udp</code>.
 
-'''2.''' Template cloning.
+{{IconSet|h1|2}} '''Template cloning:'''
 
 To clone [[Qubes|{{q_project_name_short}}]] Templates, follow the steps below in Qube Manager:
 
@@ -61,11 +61,11 @@ When prompted, give the newly cloned VM a name that is not easily confused with 
 
 [[File:Qubeclonerenaming.png]]
 
-'''3.''' Done.
+{{IconSet|h1|3}} '''Done.'''
 
 Cloning has been completed.
 
-'''4.''' UpdatesProxy Settings.
+{{IconSet|h1|4}} '''UpdatesProxy settings:'''
 
 The user might wish to customize the [[#UpdatesProxy Settings|UpdatesProxy Settings]].
 
@@ -82,122 +82,41 @@ Since Templates in Qubes R4 and above are supposed to be upgraded through qrexec
 * [https://www.qubes-os.org/doc/how-to-install-software/#technical-details Qubes documentation: How to install software - Technical details]
 * [https://github.com/QubesOS/qubes-issues/issues/1854 Qubes issues: implement qrexec based updates proxy]
 </ref>
-}}
+}} <!-- close: mbox -->
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px|alt=warning]]
-| text    = A cloned {{project_name_short}} Template will by default be upgraded through <code>{{project_name_gateway_vm}}</code>. <ref>
-Because [https://github.com/QubesOS/qubes-core-admin/blob/master/qubes-rpc-policy/qubes.UpdatesProxy.policy <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code>] contains:
-{{CodeSelect|code=
-$tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
-}}
-Quote:
-<blockquote>
-Note that policy parsing stops at the first match, [...]
-</blockquote>
-</ref> This is a known Qubes usability issue. <ref>
-* [https://github.com/QubesOS/qubes-issues/issues/3412 add UpdateVM setting to qubes-vm-settings]
-* [https://forums.whonix.org/t/cloned-whonix-templatevm-connects-upgrades-through-{{project_name_gateway_vm}}-even-if-netvm-is-set-to-a-different-whonix-gateway-proxyvm/5840 cloned {{project_name_short}} templateVM connects / upgrades through {{project_name_gateway_vm}} even if net qube is set to a different Whonix-Gateway net qube]
+| text    = A cloned {{project_name_short}} Template will by default be upgraded through <code>{{project_name_gateway_vm}}</code>. This is a known Qubes usability issue. <ref>
+* [https://github.com/QubesOS/qubes-issues/issues/3412 Qubes issue: add UpdateVM setting to qubes-vm-settings]
+* [https://forums.whonix.org/t/cloned-whonix-templatevm-connects-upgrades-through-{{project_name_gateway_vm}}-even-if-netvm-is-set-to-a-different-whonix-gateway-proxyvm/5840 Whonix forum discussion: cloned {{project_name_short}} templateVM upgrades through {{project_name_gateway_vm}} even if net qube is set to a different gateway]
 </ref>
-}}
+}} <!-- close: mbox -->
 
 If you would like to change the UpdatesProxy setting for any Template, apply the following steps.
 
-Choose either Option A (stable) or Option B (testers only). In doubt, choose Option A.
-
-=== Option A ===
-Qubes old qrexec policy format.
-
-{{Box|text=
-'''1.''' In dom0, open <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> with root rights.
-
-{{CodeSelect|code=
-sudo nano /etc/qubes-rpc/policy/qubes.UpdatesProxy
-}}
-
-'''2.''' Add <u>at the top of that file</u>.
-
-Syntax:
-
-<pre>
-name-of-template-vm $default allow,target=name-of-net-qube
-</pre>
-
-Example line entry example:
-
-Note: Replace <code>{{project_name_gateway_vm}}-cloned</code> with the actual name of the VM such as for example <code>{{project_name_gateway_vm}}2</code>.
-
-{{CodeSelect|code=
-whonix-workstation-{{VersionShort}}-clone-1 $default allow,target={{project_name_gateway_vm}}-cloned
-}}
-
-Full example:
-
-If the user already completed adding above line entry, the following is not required. It's just for illustrative purposes. A complete file could look like this.
-
-{{CodeSelect|code=
-## Note that policy parsing stops at the first match,
-## so adding anything below "$anyvm $anyvm action" line will have no effect
-
-## Please use a single # to start your custom comments
-
-# Upgrade all Templates through {{project_name_gateway_vm}}.
-#$type:TemplateVM $default allow,target={{project_name_gateway_vm}}
-
-# Upgrade whonix-gateway-{{VersionShort}}-clone-1 through {{project_name_gateway_vm}}-cloned.
-whonix-gateway-{{VersionShort}}-clone-1 $default allow,target={{project_name_gateway_vm}}-cloned
-
-# Upgrade whonix-workstation-{{VersionShort}}-clone-1 through {{project_name_gateway_vm}}-cloned.
-whonix-workstation-{{VersionShort}}-clone-1 $default allow,target={{project_name_gateway_vm}}-cloned
-
-# Upgrade {{project_name_short}} Templates through {{project_name_gateway_vm}}.
-$tag:whonix-updatevm $default allow,target={{project_name_gateway_vm}}
-
-# Deny {{project_name_short}} Templates using UpdatesProxy of any other VM.
-$tag:whonix-updatevm $anyvm deny
-
-# Default rule for all Templates - direct the connection to sys-net
-# Note: 'TemplateVM' not only 'Template' is correct. The 'VM' cannot be omitted.
-$type:TemplateVM $default allow,target=sys-net
-
-$anyvm $anyvm deny
-}}
-
-'''4.''' Save the file.
-
-<pre>
-<Ctrl-X> --> press Y --> <Enter>
-</pre>
-
-'''5.''' Done.
-
-The procedure is now complete.
-}}
-
-=== Option B ===
-Qubes new qrexec policy format.
-
 {{Box|text=
 
-'''1.''' Disable Qubes old-style UpdatesProxy qrexec configuration file.
+{{IconSet|h1|1}} '''Disable the old-style file:'''
 
-In dom0, move the Qubes old-style configuration file <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> out of the way. <ref>
-Qubes dom0 configuration folder <code>/etc/qubes-rpc/policy</code> is legacy. It was replaced with the new-style qrexec config folder <code>/etc/qubes/policy.d/</code> which is used here in the documentation. This is [[unspecific|unspecific to {{project_name_short}}.
+In <code>dom0</code>, move the Qubes old-style configuration file <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> out of the way. <ref>
+Qubes dom0 configuration folder <code>/etc/qubes-rpc/policy</code> is legacy. It was replaced with the new-style qrexec config folder <code>/etc/qubes/policy.d/</code> which is used here in the documentation. This is [[unspecific|unspecific to {{project_name_short}}]].
 </ref>
 
-If there is an error that this file no longer exists that is OK too. The only purpose of this step is to make sure <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> no longer exists.
+If there is an error that this file no longer exists, that is OK too. The only purpose of this step is to make sure <code>/etc/qubes-rpc/policy/qubes.UpdatesProxy</code> no longer exists.
 
 {{CodeSelect|code=
 sudo mv /etc/qubes-rpc/policy/qubes.UpdatesProxy ~/
-}}
+}} <!-- close: CodeSelect -->
 
-'''2.''' In dom0, open <code>/etc/qubes/policy.d/30-user.policy</code> with root rights.
+{{IconSet|h1|2}} '''Open the new-style policy file:'''
+
+In <code>dom0</code>, open <code>/etc/qubes/policy.d/30-user.policy</code> with root rights.
 
 {{CodeSelect|code=
 sudo nano /etc/qubes/policy.d/30-user.policy
-}}
+}} <!-- close: CodeSelect -->
 
-'''3.''' Learn the syntax.
+{{IconSet|h1|3}} '''Learn the syntax:'''
 
 Syntax: <ref>
 This works because as per Qubes default, Qubes parses configuration file <code>/etc/qubes/policy.d/30-user.policy</code> before <code>/etc/qubes/policy.d/90-default.policy</code>.
@@ -206,7 +125,7 @@ See also Qubes dom0 file <code>/etc/qubes/policy.d/90-default.policy</code>.
 
 {{CodeSelect|code=
 cat /etc/qubes/policy.d/90-default.policy
-}}
+}} <!-- close: CodeSelect -->
 
 <code>/etc/qubes/policy.d/90-default.policy</code> comes with the following comment on top.
 
@@ -220,39 +139,39 @@ cat /etc/qubes/policy.d/90-default.policy
 qubes.UpdatesProxy      *   name-of-template-vm    @default    allow target=name-of-net-qube
 </pre>
 
-'''4.''' See this example.
+{{IconSet|h1|4}} '''See an example rule:'''
 
 Example line entry example:
 
 {{CodeSelect|code=
 qubes.UpdatesProxy      *   whonix-workstation-{{VersionShort}}-clone-1    @default    allow target={{project_name_gateway_vm}}-cloned
-}}
+}} <!-- close: CodeSelect -->
 
 Full example:
 
-If the user already completed adding above line entry, the following is not required. It's just for illustrative purposes. A complete file could look like this.
+If the user already completed adding the above line entry, the following is not required. It is only for illustrative purposes. A complete file could look like this.
 
 {{CodeSelect|code=
 qubes.UpdatesProxy      *   whonix-gateway-{{VersionShort}}-clone-1    @default    allow target={{project_name_gateway_vm}}-cloned
 qubes.UpdatesProxy      *   whonix-workstation-{{VersionShort}}-clone-1    @default    allow target={{project_name_gateway_vm}}-cloned
-}}
+}} <!-- close: CodeSelect -->
 
-'''5.''' Add new entry to the file.
+{{IconSet|h1|5}} '''Add your new entry:'''
 
 Based on the syntax and examples above.
 
 Note: Replace <code>{{project_name_gateway_vm}}-cloned</code> with the actual name of the VM such as for example <code>{{project_name_gateway_vm}}2</code>.
 
-'''6.''' Save the file.
+{{IconSet|h1|6}} '''Save the file:'''
 
 <pre>
 <Ctrl-X> --> press Y --> <Enter>
 </pre>
 
-'''7.''' Done.
+{{IconSet|h1|7}} '''Done.'''
 
 The procedure is now complete.
-}}
+}} <!-- close: Box -->
 
 = See Also =
 

@@ -5,33 +5,33 @@
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    = <u>Note</u>: By proceeding, you acknowledge that you have read, understood and agreed to our [[Terms of Service|<span style="color:#FF1493;">Terms of Service</span>]] and [[License Agreement|<span style="color:#FF1493;">License Agreement</span>]]. [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = <u>Note</u>: By proceeding, you acknowledge that you have read, understood, and agreed to our [[Terms of Service|<span style="color:#FF1493;">Terms of Service</span>]] and [[License Agreement|<span style="color:#FF1493;">License Agreement</span>]].
 }}
 
-'''1.''' Install git.
+{{IconSet|h1|1}} Install <code>git</code>.
 
 {{CodeSelect|code=
 sudo apt update && sudo apt install git
 }}
 
-'''2.''' Get the source code including git submodules. <ref>
+{{IconSet|h1|2}} Get the source code including git submodules. <ref>
 Optional <code>git</code> parameters:
 
-* <code>--depth=1</code>: Used to speed up the download.
-* <code>--branch {{VersionNew}}-stable</code>: Usability. Used to speed up the download.
-* <code>--jobs=4</code>: Used to speed up the download.
-* <code>--recurse-submodules --shallow-submodules</code>: Usability.
+* <u><code>--depth=1</code>:</u> Speeds up the download by fetching only the latest commit.
+* <u><code>--branch {{VersionNew}}-stable</code>:</u> Usability. Checks out the stable branch directly.
+* <u><code>--jobs=4</code>:</u> Speeds up fetching submodules.
+* <u><code>--recurse-submodules --shallow-submodules</code>:</u> Ensures all required submodules are fetched efficiently.
 
-Knowledgeable <code>git</code> users are free to drop any of these optional parameters.
+Experienced <code>git</code> users may omit any of these optional parameters.
 </ref> <ref>
-Alternatively, this can be achieved with the following commands in several steps. This is useful if network issues arise.
+Alternatively, this can be achieved in several steps. This may be useful if network issues arise.
 
-* Over HTTPS:
+* <u>Over HTTPS:</u>
 ** {{CodeSelect|code=
-git clone --depth=1 --branch {{VersionNew}}-stable git@github.com:{{project_name_short}}/derivative-maker.git
+git clone --depth=1 --branch {{VersionNew}}-stable --jobs=4 --recurse-submodules --shallow-submodules https://github.com/{{project_name_short}}/derivative-maker.git
 }}
-* Over SSH.
-** Might work better over slow networks but requires a GitHub account and a configured SSH public key at GitHub. See footnote [A] below.
+* <u>Over SSH:</u>
+** Might work better over slow or unstable networks but requires a GitHub account and a configured SSH public key at GitHub. See footnote [A] below.
 ** {{CodeSelect|code=
 git clone --depth=1 --branch {{VersionNew}}-stable git@github.com:{{project_name_short}}/derivative-maker.git
 }}
@@ -48,46 +48,46 @@ git submodule update --init --recursive --progress --jobs=4
 
 [A] GitHub SSH public key setup.
 
-'''1.''' You need to create an SSH public key.
+{{IconSet|h1|1}} Create an SSH public key.
 
-Undocumented.
+See [[SSH]].
 
-'''2.''' You view your your SSH public key.
+{{IconSet|h1|2}} View your SSH public key.
 
 {{CodeSelect|code=
 cat ~/.ssh/id_ed25519.pub
 }}
 
-'''3.''' Copy it.
+{{IconSet|h1|3}} Copy the SSH public key.
 
-'''4.''' And paste the SSH public key on GitHub.
+{{IconSet|h1|4}} Paste the SSH public key into your GitHub account.
 
 https://github.com/settings/keys
 </ref>
 
-<u>Note:</u> Replace <code>{{VersionNew}}-stable</code> with the actual tag you want to build.
+<u>Note:</u> Replace <code>{{VersionNew}}-stable</code> with the actual tag or branch you intend to build.
 
 {{CodeSelect|code=
 git clone --depth=1 --branch {{VersionNew}}-stable --jobs=4 --recurse-submodules --shallow-submodules git@github.com:{{project_name_short}}/derivative-maker.git
 }}
 
-'''3.''' Check if above command succeeded.
+{{IconSet|h1|3}} Check if the above command succeeded.
 
-If there have been errors such as:
+If there were errors such as:
 
 <pre>
 fatal: unable to access 'https://github.com/.../': Could not resolve host: github.com
 </pre>
 
-Or.
+Or:
 
 <pre>
 fatal: unable to access 'https://github.com/.../': gnutls_handshake() failed: The TLS connection was non-properly terminated.
 </pre>
 
-Then the download probably failed.
+then the download likely failed.
 
-Checking if the download failed or succeeded can be done by checking the exit code.
+Verify success by checking the exit code.
 
 Choose your shell.
 
@@ -100,13 +100,13 @@ Choose your shell.
 |addToClass=info-box
 |active=true
 |content=
-If the last line contains something such as the following.
+If the last line contains something similar to:
 
 <pre>
 zsh: exit 1
 </pre>
 
-Then do not proceed and see footnote. <ref name=git-clone-fail>
+then do not proceed. See footnote. <ref name=git-clone-fail>
 Delete the <code>derivative-maker</code> source code folder and retry.
 
 <pre>
@@ -115,7 +115,7 @@ sudo rm -r derivative-maker
 </ref>
 }}
 {{Tab
-|title= ==bash and other Shells==
+|title= ==bash and other shells==
 |type=section
 |addToClass=info-box
 |active=false
@@ -126,7 +126,7 @@ Show the exit code.
 echo $?
 }}
 
-Output should show.
+The output should be:
 
 <pre>
 0
@@ -136,9 +136,10 @@ If any other exit code is shown, do not proceed and see footnote. <ref name=git-
 }}
 }}
 
-'''4.''' Done.
+{{IconSet|h1|4}} Done.
 
-Git repository cloning has been completed. <noinclude>
+Git repository cloning has been completed.
+<noinclude>
 = Footnotes =
 <references />
 {{Footer}}
