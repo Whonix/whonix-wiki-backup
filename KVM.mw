@@ -652,14 +652,14 @@ sudo virsh -c qemu:///system define {{project_name_workstation_short}}*.xml
 }}
 
 == Image File Installation ==
-The XML files are configured to point to the default storage location of <code>/var/lib/libvirt/images</code>. The image files can be moved or copied depending on storage constraints.
+The XML files are configured to use the default storage location of <code>/var/lib/libvirt/images</code>. The image files can be moved or copied, depending on storage constraints.
 
 <u>Notes:</u>
 
-* Changing the default location may cause conflicts with SELinux, which will prevent the machines from booting.
-* Administrative rights (<code>sudo</code>) are required because the copy or move operation targets a privileged system location.
+* <u>SELinux:</u> Changing the default location may cause SELinux conflicts, which can prevent the virtual machines from booting.
+* <u>Administrative rights:</u> Administrative rights (<code>sudo</code>) are required because the copy or move operation targets a privileged system location.
 
-The following steps move or copy the images so the machines can boot.
+The following steps move or copy the images so the virtual machines can boot.
 
 Either move <u>or</u> copy.
 {{Tab
@@ -670,7 +670,7 @@ Either move <u>or</u> copy.
 |type=section
 |active=true
 |content=
-Move.
+Move the image files.
 
 {{CodeSelect|code=
 sudo mv {{project_name_gateway_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_gateway_short}}.qcow2
@@ -683,12 +683,12 @@ sudo mv {{project_name_workstation_short}}*.qcow2 /var/lib/libvirt/images/{{proj
 {{Tab
 |title= === Copying {{project_name_short}} Image Files ===
 |content=
-Copy. {{Anchor|sparse files}}
+Copy the image files. {{Anchor|sparse files}}
 
 {{project_name_short}} disk images are {{kicksecure_wiki
 |wikipage=sparse files
 |text=sparse files
-}}, meaning they expand as data is written rather than allocating their entire size (100GB) outright. Sparse files require special commands when copied to ensure they retain this property; otherwise they will occupy the full disk space.
+}}, meaning they expand as data is written rather than allocating their entire size (100GB) outright. Sparse files require special commands when they are copied to ensure they retain this property; otherwise, they will occupy the full disk space.
 
 {{CodeSelect|code=
 sudo cp --sparse=always {{project_name_gateway_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_gateway_short}}.qcow2
