@@ -1,0 +1,149 @@
+{{Header}}
+{{title|title=
+wlr-resize-watcher
+}}
+{{#seo:
+|description=Dynamic screen resolution helper for virtual machines. Disabled by default in {{project_name_workstation_short}} for improved privacy.
+}}
+{{intro|
+<code>wlr-resize-watcher</code> can automatically adjust the Wayland compositor's screen resolution when the virtual graphics device reports a different native resolution (for example, after changing the VM window size in VirtualBox or KVM). For privacy reasons, dynamic resolution is disabled by default in {{project_name_workstation_short}}.
+}}
+= Introduction =
+<code>wlr-resize-watcher</code> watches for changes to the native display resolution of virtual displays and can updates the screen resolution to match.
+
+Dynamic screen resolution adjustment is disabled by default inside {{project_name_workstation_short}} to enhance anonymity and reduce fingerprinting risk. Unusual or frequently changing resolutions can be used as a fingerprinting signal if the VM is compromised or if an application can learn the current resolution. [[Tor Browser]] attempts to mitigate some screen-size fingerprinting with letterboxing, but it does not fully remove resolution-based fingerprinting. See also [[Screen#Tor_Browser_Window_Size|Tor Browser Window Size]] and [[Tor_Browser#Why_do_I_have_White_Bars_around_my_Tor_Browser_Content?|Why do I have White Bars around my Tor Browser Content?]].
+
+If you prefer usability over the privacy trade-off, you can enable dynamic resolution.
+
+= Enabling Dynamic Screen Resolution Adjustment =
+{{IconSet|h1|1}} {{sysmaint_notice}}
+
+{{IconSet|h1|2}} Configure dynamic resolution.
+
+{{IconSet|h2|A}} Using {{kicksecure_wiki
+|wikipage=System Maintenance Panel
+|text=System Maintenance Panel
+}}
+
+If you want to enable it, open the System Maintenance Panel and click <code>Dynamic Resolution</code>, which will start <code>configure-dynamic-resolution</code> with administrative ("[[root|root]]") rights.
+
+{{IconSet|h2|B}} From the command line.
+
+{{CodeSelect|code=
+sudo configure-dynamic-resolution
+}}
+
+{{IconSet|h1|3}} Enable dynamic resolution.
+
+When shown the configuration menu, type <code>1</code> and press Enter to select <code>Enable or disable dynamic resolution</code>. Then type <code>true</code> and press Enter to enable dynamic resolution.
+
+{{IconSet|h1|4}} Exit the configuration editor.
+
+Type <code>5</code> and press Enter to select <code>Exit configuration editor</code>.
+
+{{IconSet|h1|5}} Trigger a resize event such as by maximzing the virtualizer (such as VirtualBox or virt-manager) VM window.
+
+{{IconSet|h1|6}} Done.
+
+= Disabling Dynamic Screen Resolution Adjustment =
+If you want to disable it again, run the same configuration tool and select the option to disable dynamic resolution.
+
+{{CodeSelect|code=
+sudo configure-dynamic-resolution
+}}
+
+Alternatively, set <code>enable_dynamic_resolution=false</code> in your user configuration file (see below).
+
+= Configuration File Changes =
+<code>wlr-resize-watcher</code> can also be configured without <code>configure-dynamic-resolution</code>:
+
+{{Open with root rights|filename=
+/etc/wlr-resize-watcher.d/50_user.conf
+}}
+
+= Configuration File Options =
+<code>wlr-resize-watcher</code> uses a drop-in configuration folder. Do not edit distribution defaults. Instead, place custom settings in the user override file.
+
+{| class="wikitable"
+|+ Configuration Overview
+|-
+
+! <!-- Option --> Option
+! <!-- Description --> Description
+! <!-- Values --> Potential Values
+! <!-- Default --> Default
+|-
+
+! <!-- Option --> <code>enable_dynamic_resolution</code>
+| <!-- Description --> Enables or disables automatic resizing to the native resolution.
+| <!-- Values --> <code>true</code> or <code>false</code>
+| <!-- Default --> <code>false</code> in {{project_name_workstation_short}} (overrides the upstream default <code>true</code>)
+|-
+
+! <!-- Option --> <code>warn_on_dynamic_resolution_refuse</code>
+| <!-- Description --> Shows a one-time warning when a resolution change is detected but dynamic resolution is disabled.
+| <!-- Values --> <code>true</code> or <code>false</code>
+| <!-- Default --> <code>true</code>
+|-
+
+! <!-- Option --> <code>standard_default_resolution</code>
+| <!-- Description --> Default resolution used on most hypervisors when automatic resizing is not used.
+| <!-- Values --> A resolution string in the form <code>WIDTHxHEIGHT</code> (for example: <code>1920x1080</code>, <code>1600x900</code>, <code>1366x768</code>)
+| <!-- Default --> <code>1920x1080</code>
+|-
+
+! <!-- Option --> <code>small_default_resolution</code>
+| <!-- Description --> Default resolution used on hypervisors known to default to low VRAM (currently affects Xen).
+| <!-- Values --> A resolution string in the form <code>WIDTHxHEIGHT</code> (for example: <code>1024x768</code>, <code>1280x720</code>)
+| <!-- Default --> <code>1024x768</code>
+|-
+
+! <!-- Option --> <code>normal_wait_proc_list</code>
+| <!-- Description --> Process names to wait for before attempting the first resize in a normal user session.
+| <!-- Values --> A list of process names as seen in <code>ps axo comm</code> output. Example: <code>["pcmanfm-qt"]</code>
+| <!-- Default --> <code>["pcmanfm-qt"]</code>
+|-
+
+! <!-- Option --> <code>sysmaint_wait_proc_list</code>
+| <!-- Description --> Same as <code>normal_wait_proc_list</code>, but for the sysmaint session.
+| <!-- Values --> A list of process names as seen in <code>ps axo comm</code> output. Example: <code>[]</code>
+| <!-- Default --> <code>[]</code>
+|-
+
+! <!-- Option --> <code>wait_proc_timeout</code>
+| <!-- Description --> Maximum time (in seconds) to wait for required processes.
+| <!-- Values --> Integer number of seconds (for example: <code>0</code>, <code>5</code>, <code>10</code>, <code>30</code>)
+| <!-- Default --> <code>10</code>
+|-
+
+|}
+
+= Additional Information =
+* <u>Autostart:</u> The autostart entry is located at <code>/etc/xdg/autostart/wlr-resize-watcher.desktop</code>.
+* <u>Package source:</u> <code>wlr-resize-watcher</code> is part of [https://github.com/Kicksecure/vm-config-dist Kicksecure vm-config-dist].
+* <u>Configuration folder:</u> Configuration drop-ins are stored in <code>/etc/wlr-resize-watcher.d</code>.
+* <u>User override file:</u> Place local overrides in <code>/etc/wlr-resize-watcher.d/50_user.conf</code>.
+* <u>Configuration tool output:</u> {{CodeSelect|inline=true|code=configure-dynamic-resolution}} writes its configuration to <code>/etc/wlr-resize-watcher.d/45_configure-dynamic-resolution.conf</code>.
+* <u>Fallback default resolution:</u> If dynamic resolution is disabled or unsupported, <code>wlr-resize-watcher</code> can set displays to a comfortable default resolution using <code>standard_default_resolution</code> (for most users) or <code>small_default_resolution</code> (for Xen).
+* <u>one-time-popup status file location:</u> When file <code>~/.wlr-resize-watcher_one-time-popup</code> exists, no one-time-popup will be shown. However, a passive popup will still be shown unless disabled in configuration. (See setting <code>warn_on_dynamic_resolution_refuse</code>.)
+
+= Troubleshooting =
+* If no resizing happens after enabling dynamic resolution, try logging out and logging in again (or reboot).
+* If you are using an unsupported virtualizer, dynamic resolution may not work. In that case, the default resolution settings may still apply.
+* If you keep seeing a warning that resizing is not happening, check that <code>enable_dynamic_resolution</code> is set to <code>true</code> and that <code>warn_on_dynamic_resolution_refuse</code> is enabled only if you want the warning.
+
+= Debugging =
+Run as non-root user such as under account <code>user</code>.
+
+{{CodeSelect|code=
+systemctl --no-pager --user status wlr-resize-watcher.service
+}}
+
+{{CodeSelect|code=
+journalctl --boot --no-pager --user -u wlr-resize-watcher.service
+}}
+
+= Footnotes =
+{{reflist|close=1}}
+[[Category:Documentation]]
+{{Footer}}

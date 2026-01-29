@@ -1,12 +1,34 @@
 <noinclude>
 {{Header}}
-</noinclude>'''1.''' Install package <code>extrepo</code>.
+</noinclude>'''NOTE: <code>extrepo</code> is currently unavailable for enabling the {{project_name_short_lowercase}} repository.'''
+
+{{IconSet|h1|1}} Install package <code>extrepo</code>.
 
 {{CodeSelect|code=
 sudo apt install extrepo
 }}
 
-'''2.''' Enable the stable <code>{{project_name_short_lowercase}}</code> APT repository. (See footnote for other options.) <ref>
+{{IconSet|h2|2}} {{Open with root rights
+|filename=/etc/extrepo/config.yaml
+}}
+
+{{IconSet|h2|3}} Paste at the end.
+
+{{CodeSelect|code=
+- contrib
+- non-free
+}}
+
+<ref>
+The following comments in that file...
+<pre>
+# - contrib
+# - non-free
+</pre>
+...could be deleted, but that is completely optional.
+</ref>
+
+{{IconSet|h1|2}} Enable the stable <code>{{project_name_short_lowercase}}</code> APT repository. (See footnote for other options.) <ref>
 <code>stable-proposed-updates</code> repository:
 
 {{CodeSelect|code=
@@ -35,7 +57,7 @@ sudo extrepo enable {{project_name_short_lowercase}}_developers
 |image=[[File:{{project_name_short}}-logo-icon.svg]]
 |title={{Headline|h=3|content=A : {{non_q_project_name_long}}}} ===
 |content=
-<div>{{project_name_short}}</code></div>
+<div><code>{{project_name_short}}</code></div>
 {{CodeSelect|code=
 sudo extrepo enable {{project_name_short_lowercase}}
 }}
@@ -53,14 +75,14 @@ sudo http_proxy=http://127.0.0.1:8082 https_proxy=http://127.0.0.1:8082 extrepo 
 }}
 }} <!-- End Tab Controller -->
 
-'''3.''' Advanced options.
+{{IconSet|h1|3}} Advanced options.
 
 <div class="toccolours mw-collapsible mw-collapsed">
 For advanced options such as clearnet over Tor or onion. <ref>
 extrepo feature request: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1037254 extrepo apt-transport-tor and onion support]
 </ref>
 
-Please press on expand on the right side.
+Please press expand on the right side.
 <div class="mw-collapsible-content">
 Optional.
 
@@ -70,13 +92,13 @@ Install <code>apt-transport-tor</code>.
 apt-transport-tor
 }}
 
-Find out filename.
+Find out the filename.
 
 {{CodeSelect|code=
 ls -la /etc/apt/sources.list.d/extrepo_*
 }}
 
-NOTE: Filename will be different if using a repository other than the stable repository such as the testers repository.
+<u>Note:</u> The filename will be different if using a repository other than the stable repository such as the testers repository.
 
 {{Open with root rights|filename=
 /etc/apt/sources.list.d/extrepo_kicksecure.sources
@@ -84,16 +106,16 @@ NOTE: Filename will be different if using a repository other than the stable rep
 
 Choose either option '''A)''' <u>or</u> '''B)'''.
 
-* '''A)''' <u>Clearnet over Tor Repository:</u> To enable clearnet over Tor, <code>tor+</code> needs do be prepended in front of the <code>https</code>. The same in other words, look for {{CodeSelect|inline=true|code=Uris: https}} and replace it with {{CodeSelect|inline=true|code=Uris: tor+https}}.
-* '''B)''' <u>Onion Repository:</u> To enable onion, look for the line starting with <code>Uris:</code>. Delete the whole line. Or out-comment it by adding as hash ("<code>#</code>") in front of it. Then add a new line: {{CodeSelect|inline=true|code=
+* '''A)''' <u>Clearnet over Tor Repository:</u> To enable clearnet over Tor, <code>tor+</code> needs to be prepended in front of <code>https</code>. In other words, look for {{CodeSelect|inline=true|code=Uris: https}} and replace it with {{CodeSelect|inline=true|code=Uris: tor+https}}.
+* '''B)''' <u>Onion Repository:</u> To enable onion, look for the line starting with <code>Uris:</code>. Delete the whole line. Or comment it out by adding a hash ("<code>#</code>") in front of it. Then add a new line: {{CodeSelect|inline=true|code=
 Uris: tor+http://deb.{{project_onion}}
 }}
 </div>
 </div>
 
-'''4.''' Done.
+{{IconSet|h1|4}} Done.
 
-The {{project_name_short}} APT repository has been enabled <ref>
+The {{project_name_short}} APT repository has been enabled.<ref>
 forum discussion: [https://forums.whonix.org/t/extrepo-safely-adding-repos/8539 extrepo - safely adding repos]
 </ref><noinclude>
 = Footnotes =

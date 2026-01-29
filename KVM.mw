@@ -86,13 +86,13 @@ sudo apt update
 For '''Debian {{Stable project version based on Debian codename}}+''' on Intel / AMD, install:
 
 {{CodeSelect|code=
-sudo apt install --no-install-recommends qemu-kvm qemu-system-x86 libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm xz-utils
+sudo apt install --no-install-recommends qemu-system-x86 libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 qemu-system-gui qemu-system-modules-spice dnsmasq-base qemu-utils ovmf swtpm swtpm-tools safe-rm xz-utils
 }}
 
 For '''Debian {{Stable project version based on Debian codename}}+''' on PowerPC, install:
 
 {{CodeSelect|code=
-sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 dnsmasq-base qemu-utils iptables safe-rm xz-utils
+sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 qemu-system-gui qemu-system-modules-spice dnsmasq-base qemu-utils ovmf swtpm swtpm-tools safe-rm xz-utils
 }}
 }} <!-- close tab: Debian -->
 
@@ -102,7 +102,7 @@ sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon-system l
 |addToClass=info-box
 |content=
 {{CodeSelect|code=
-sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils libguestfs-tools genisoimage virtinst libosinfo-bin virt-manager dnsmasq-base iptables safe-rm xz-utils
+sudo apt install --no-install-recommends qemu-system-x86 libvirt-daemon-system libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 qemu-system-gui qemu-system-modules-spice dnsmasq-base qemu-utils ovmf swtpm swtpm-tools safe-rm xz-utils
 }}
 
 Add your user to KVM groups (1 of 2).
@@ -346,7 +346,7 @@ For simplicity, the {{project_name_short}} images should be downloaded and store
 <!-- Extra terms of service notice because KVM has no VM import dialog which could present TOS. -->
 {{tos}}
 
-'''{{free}}'''
+'''{{free}}''' 
 
 {{Tab
 |type=controller
@@ -469,7 +469,7 @@ cd ~/Downloads
 
 '''2.''' Do not use <code>unxz</code>! Extract the images using GNU <code>tar</code>.
 
-'''3.''' Make sure the <code>xz-utils</code> package is installed on your system.
+'''3.''' Make sure the <code>xz-utils</code> package is installed on your system. 
 <ref>
 https://forums.whonix.org/t/tar-child-xz-cannot-exec-no-such-file-or-directory-install-xz-utils-package/16708/7
 </ref>
@@ -1215,7 +1215,7 @@ sudo dmesg {{!}} grep -i drm
 [drm] virgl 3d acceleration enabled
 </pre>
 
-<u>Note:</u> DRM here refers to the [https://en.wikipedia.org/wiki/Direct_Rendering_Manager <u>D</u>irect <u>R</u>endering <u>M</u>anager].
+<u>Note:</u> DRM here refers to the [https://en.wikipedia.org/wiki/Direct_Rendering_Manager <u>D</u>irect <u>R</u>endering <u>M</u>anager].  
 This is unrelated to [https://www.defectivebydesign.org/ <u>D</u>igital <u>R</u>estrictions <u>M</u>anagement].
 
 {{Anchor|3D Graphics Acceleration - Testing - Performance}}
@@ -1289,7 +1289,7 @@ As per [https://libvirt.org/formatdomain.html#input-devices Domain XML format: I
   <input type='tablet' bus='virtio'/>
 }}
 
-Forum discussion:
+Forum discussion:  
 https://forums.whonix.org/t/p-s2-mouse-movement-in-cutom-debian-workstation/19985
 
 == Shared Folder ==
@@ -1335,7 +1335,10 @@ Cons of using virtio-9p:
 This is due to a bug in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>] that has been fixed in all repositories.
 </ref>
 
-In [[System_Maintenance_Panel|System Maintenance Panel]], press <code>Install Updates</code> or upgrade using the command line:
+In {{kicksecure_wiki
+|wikipage=System_Maintenance_Panel
+|text=System Maintenance Panel
+}}, press <code>Install Updates</code> or upgrade using the command line:
 
 {{CodeSelect|code=
 sudo apt update && sudo apt dist-upgrade
@@ -1446,7 +1449,10 @@ Cons of using virtiofs:
 This is due to the fact that vm-config-dist did not originally have the ability to use virtiofs shared folders.
 </ref>
 
-In [[System_Maintenance_Panel|System Maintenance Panel]], press <code>Install Updates</code> or upgrade using the command line:
+In {{kicksecure_wiki
+|wikipage=System_Maintenance_Panel
+|text=System Maintenance Panel
+}}, press <code>Install Updates</code> or upgrade using the command line:
 
 {{CodeSelect|code=
 sudo apt update && sudo apt dist-upgrade
@@ -1719,7 +1725,7 @@ The thumb drive should now be visible in the guest only.
 
 [[Hardware_Threat_Minimization#Microphones|Microphone]] input to guests can be useful for [[VoIP]] and similar applications, but it also introduces risks. It is good practice to disable the microphone on the host system in sound settings whenever it is not in active use.
 
-By default, the shipped configuration includes only a speaker (without a microphone) to prevent malware inside the VM from eavesdropping on the user.
+By default, the shipped configuration includes only a speaker (without a microphone) to prevent malware inside the VM from eavesdropping on the user.  
 
 To enable microphone input for specific guests, edit the VM configuration and change:
 
@@ -1727,17 +1733,17 @@ To enable microphone input for specific guests, edit the VM configuration and ch
 
 == Creating Multiple Internal Networks ==
 
-Open the {{project_name_short}} network XML file and change the <code>name</code> attribute to something different from the internal network that is currently running.
+Open the {{project_name_short}} network XML file and change the <code>name</code> attribute to something different from the internal network that is currently running.  
 
-For example: <code>Whonix-Internal2</code>, <code>Whonix-Internal3</code>, and so on.
+For example: <code>Whonix-Internal2</code>, <code>Whonix-Internal3</code>, and so on.  
 
 The default network name in use is <code>Whonix-Internal</code>.
 
 == Alternative Configurations ==
 
-Libvirt supports a variety of containment mechanisms. Currently supported mechanisms include KVM on the <code>x86_64</code> platform and QEMU, but more configurations may be added in the future.
+Libvirt supports a variety of containment mechanisms. Currently supported mechanisms include KVM on the <code>x86_64</code> platform and QEMU, but more configurations may be added in the future.  
 
-If hardware virtualization extensions are available, it is recommended to always use KVM.
+If hardware virtualization extensions are available, it is recommended to always use KVM.  
 
 To use another configuration, import its XML file with <code>virsh</code>.
 
@@ -2143,27 +2149,27 @@ ls -la /var/run/libvirt/libvirt-sock
 
 Example error messages:
 
-* <code>invalid argument: could not find capabilities for domaintype=kvm</code>
-* <code>invalid argument: could not get preferred machine for /usr/bin/qemu-system-x86_64 type=kvm</code>
+* <code>invalid argument: could not find capabilities for domaintype=kvm</code>  
+* <code>invalid argument: could not get preferred machine for /usr/bin/qemu-system-x86_64 type=kvm</code>  
 
 These errors occur when the host's hardware virtualization extensions are not available for KVM. Possible reasons include:
 
 <!-- Same as: https://www.kicksecure.com/wiki/VirtualBox/Troubleshooting#BIOS -->
-* '''A)''' Another hypervisor is running on the system.
-* '''B)''' An anti-virus suite is blocking virtualization.
-* '''C)''' Virtualization support is not present or not enabled in the machine BIOS.
+* '''A)''' Another hypervisor is running on the system.  
+* '''B)''' An anti-virus suite is blocking virtualization.  
+* '''C)''' Virtualization support is not present or not enabled in the machine BIOS.  
 
 '''Solution:'''
 
-'''1.''' Enter the BIOS/UEFI setup menu of your machine. For general guidance, see: [https://www.wikihow.com/Change-Computer-BIOS-Settings How to Change BIOS Settings].
+'''1.''' Enter the BIOS/UEFI setup menu of your machine. For general guidance, see: [https://www.wikihow.com/Change-Computer-BIOS-Settings How to Change BIOS Settings].  
 
-'''2.''' Enable hardware virtualization. This may be listed under different names depending on your system:
+'''2.''' Enable hardware virtualization. This may be listed under different names depending on your system:  
 
-* <code>VT-x</code>
-* <code>AMD-V</code>
-* <code>Virtualization</code>
-* <code>SVM mode</code>
-* <code>MIT</code> (sometimes under <code>Advanced Core</code> settings)
+* <code>VT-x</code>  
+* <code>AMD-V</code>  
+* <code>Virtualization</code>  
+* <code>SVM mode</code>  
+* <code>MIT</code> (sometimes under <code>Advanced Core</code> settings)  
 
 '''3.''' Save changes.
 
@@ -2174,12 +2180,12 @@ These errors occur when the host's hardware virtualization extensions are not av
 <u>Potential workaround if hardware virtualization is unavailable:</u> [[QEMU]]
 
 == VT-x vs VT-d ==
-* <u><code>VT-x</code> / <code>AMD-V</code>:</u> Required for {{project_name_short}} KVM. See [[#VT-x_/_SVM_Errors|VT-x / SVM Errors]] above.
+* <u><code>VT-x</code> / <code>AMD-V</code>:</u> Required for {{project_name_short}} KVM. See [[#VT-x_/_SVM_Errors|VT-x / SVM Errors]] above.  
 * <u><code>VT-d</code> / <code>IOMMU</code> / <code>AMD-Vi</code>:</u> [https://forums.whonix.org/t/help-welcome-kvm-development-staying-the-course/166/485 {{project_name_short}} KVM does not require VT-d.]
 
 == Add Version Numbers to Support Request ==
 
-If you encounter problems, always include the versions of the key virtualization packages in your support request.
+If you encounter problems, always include the versions of the key virtualization packages in your support request.  
 On Debian-based systems, you can check the versions of '''libvirt-bin''', '''qemu-kvm''', and '''virt-manager''' with:
 
 {{CodeSelect|code=
@@ -2193,7 +2199,7 @@ Run the following commands to verify your user and group memberships.
 whoami
 }}
 
-The output should be your Linux account user name (for example, <code>user</code>).
+The output should be your Linux account user name (for example, <code>user</code>).  
 It should not be <code>root</code>.
 
 {{CodeSelect|code=
