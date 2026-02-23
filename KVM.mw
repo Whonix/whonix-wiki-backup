@@ -126,7 +126,10 @@ sudo adduser $USER libvirt-qemu
 |content=
 TODO: Is it possible to install only dnsmasq-base without the dnsmasq systemd unit, or does Arch Linux keep the systemd unit disabled by default?
 
-CRITIQUES: "safe-rm" is not an Arch Linux package. <code>tar</code> should pull in <code>xz</code> if required. <code>safe-rm</code> has limited value.
+CRITIQUES:
+
+* <code>safe-rm</code> is not an Arch Linux package. <code>tar</code> should pull in <code>xz</code> if required. <code>safe-rm</code> has limited value.
+* <code>bridge-utils</code> is deprecated and removed from extra in Arch linux. Advised is to replace it with <code>iproute2</code> package.
 
 {{CodeSelect|code=
 sudo pacman -Syu qemu libvirt virt-manager qemu-full dnsmasq bridge-utils safe-rm xz
@@ -255,15 +258,25 @@ Readers are welcome to add detailed instructions for other distributions here!
 
 In order to manage virtual machines as a regular (non-root) user, that user must be added to the <code>libvirt</code> and <code>kvm</code> groups.
 
-* Debian (based) / Ubuntu:
-** The following commands work in Debian and assume the simple scenario where KVM is used by the currently logged-in user. For older Ubuntu versions, note that group names vary and ''libvirt'' may be called ''libvirtd'' instead. For Ubuntu 20.04, ''libvirt'' works.
-** {{CodeSelect|inline=true|code=
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= === Debian (based) / Ubuntu ===
+|image=[[File:Logo-debian.png|25px]]
+|addToClass=info-box
+|content=
+The following commands work in Debian and assume the simple scenario where KVM is used by the currently logged-in user. For older Ubuntu versions, note that group names vary and ''libvirt'' may be called ''libvirtd'' instead. For Ubuntu 20.04, ''libvirt'' works.
+
+{{CodeSelect|inline=true|code=
 sudo adduser "$(whoami)" libvirt
 }}
-** {{CodeSelect|inline=true|code=
+
+{{CodeSelect|inline=true|code=
 sudo adduser "$(whoami)" kvm
 }}
-** <ref>
+
+<ref>
 By default, Debian does not use <code>sudo</code>, so groups can be added using <code>usermod</code>. If your user is <code>foo</code>, the following commands will work.
 
 {{CodeSelect|code=
@@ -276,14 +289,49 @@ And:
 usermod -a -G kvm foo
 }}
 </ref>
-* Arch Linux:
-** {{CodeSelect|inline=true|code=
+}} <!-- close tab: Debian (based) / Ubuntu -->
+
+{{Tab
+|title= === Fedora ===
+|image=[[File:Fedora-logo.png|25px]]
+|addToClass=info-box
+|content=
+{{CodeSelect|code=
+sudo usermod -a -G libvirt <username>
+}}
+
+{{CodeSelect|code=
+sudo usermod -a -G kvm <username>
+}}
+
+Replace <username> with the actual username. You must log out and log back in for changes to take effect.
+}} <!-- close tab: Fedora -->
+
+{{Tab
+|title= === Arch Linux ===
+|image=[[File:Archlinux_logo.png|25px]]
+|addToClass=info-box
+|content=
+{{CodeSelect|inline=true|code=
 sudo gpasswd -a $USER libvirt
 }}
-** {{CodeSelect|code=
+
+{{CodeSelect|code=
 sudo gpasswd -a $USER kvm
 }}
-* Other Distributions: If another distribution is in use, refer to the distribution's manual. For example, Arch users should consult the [https://wiki.archlinux.org/title/libvirt Arch Linux libvirt wiki page].
+
+See also [https://wiki.archlinux.org/title/libvirt Arch Linux libvirt wiki page].
+}} <!-- close tab: Arch Linux -->
+
+{{Tab
+|title= === Other Distributions ===
+|image=[[File:Gnu_operating_system.png|25px]]
+|addToClass=info-box
+|content=
+If another distribution is in use, refer to the distribution's manual.
+}} <!-- close tab: Other Distributions -->
+
+}} <!-- close Controller: Everything -->
 
 == Restart libvirtd ==
 
@@ -1306,49 +1354,40 @@ This guide explains how to configure and use shared folders in {{project_name_sh
 '''Warning:''' Deleting files within the shared folder will move them to a hidden sub-directory called <code>.Trash-1000</code>. Make sure you reveal it and promptly delete it on the host to avoid data leakage across different VM sessions.
 }}
 
-Follow these steps to move data between the guest and host. It is recommended to create or assign a unique directory per snapshot to keep shared content from different security domains separate.
+Follow these steps to transfer data between the guest and host. It is recommended to create or assign a unique directory per snapshot to keep shared content from different security domains separate.
 
-Select a folder sharing method.
+{{IconSet|h1|1}} Select a folder sharing method.
 
 {{Tab
 |type=controller
 |content=
+
 {{Tab
 |title= === virtio-9p ===
 |addToClass=info-box
 |content=
-Pros of using virtio-9p:
-* It may be more secure (the guest cannot create executable or SUID-root files on the host, from the host's perspective).
-* It is slightly simpler to set up.
+{{IconSet|h1|2}} '''Notices.'''
 
-Cons of using virtio-9p:
-* It requires the shared folder to be world-readable for the guest to read the folder's contents.
-* It requires the shared folder to be world-writable for the guest to write to the shared folder.
-* Files written by the guest will not have their ownership and permission info reflected on the host, which may be problematic for some developer use cases.
-* It may be significantly slower than virtiofs.
+Advantages of using <code>virtio-9p</code>:
 
-{{IconSet|true|1}} '''Upgrade Required'''
+* <u>Reduced host risk:</u> From the host's perspective, the guest cannot create executable or {{kicksecure_wiki
+|wikipage=Dev/Strong_Linux_User_Account_Isolation#SUID_SGID
+|text=SUID
+}}-root files on the host, which may be more secure.
+* <u>Simpler setup:</u> It is slightly simpler to set up.
 
-{{sysmaint_notice}}
+Disadvantages of using <code>virtio-9p</code>:
 
-[[Upgrade|Update]] your system first. <ref>
-This is due to a bug in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>] that has been fixed in all repositories.
-</ref>
+* <u>Requires world readable permissions:</u> The shared folder must be world-readable for the guest to read its contents.
+* <u>Requires world writable permissions:</u> The shared folder must be world-writable for the guest to write to it.
+* <u>Permissions not preserved:</u> Files written by the guest will not have their ownership and permission info reflected on the host, which may be problematic for some developer use cases.
+* <u>Potentially slower:</u> It may be significantly slower than <code>virtiofs</code>.
 
-In {{kicksecure_wiki
-|wikipage=System_Maintenance_Panel
-|text=System Maintenance Panel
-}}, press <code>Install Updates</code> or upgrade using the command line:
-
-{{CodeSelect|code=
-sudo apt update && sudo apt dist-upgrade
-}}
-
-{{IconSet|true|2}} '''Shutdown VM'''
+{{IconSet|h1|3}} '''Shutdown VM'''
 
 Ensure the virtual machine is powered down.
 
-{{IconSet|true|3}} '''Create Shared Folder on Host'''
+{{IconSet|h1|4}} '''Create Shared Folder on Host'''
 
 On the host operating system, create a folder to be shared with the {{VM}}. For example, on a Linux host:
 
@@ -1358,7 +1397,7 @@ On the host operating system, create a folder to be shared with the {{VM}}. For 
 mkdir /home/user/shared
 }}
 
-{{IconSet|true|4}} '''Set Permissions on Host Folder'''
+{{IconSet|h1|5}} '''Set Permissions on Host Folder'''
 
 Adjust permissions on the host to allow read and write access to the folder with <code>chmod</code>:
 
@@ -1368,15 +1407,15 @@ Adjust permissions on the host to allow read and write access to the folder with
 chmod 777 /home/user/shared
 }}
 
-{{IconSet|true|5}} '''Open virt-manager and Add Hardware'''
+{{IconSet|h1|6}} '''Open virt-manager and Add Hardware'''
 
 Click <code>virt-manager</code> &rarr; double-click on VM &rarr; <code>View</code> &rarr; <code>Details</code> &rarr; <code>Add Hardware</code>.
 
-{{IconSet|true|6}} '''Select Filesystem Device'''
+{{IconSet|h1|7}} '''Select Filesystem Device'''
 
 Click the <code>Filesystem</code> device in the list of devices on the left side of the window.
 
-{{IconSet|true|7}} '''Configure Filesystem Settings'''
+{{IconSet|h1|8}} '''Configure Filesystem Settings'''
 
 * <u>Driver:</u> <code>virtio-9p</code>
 * <u>Source path:</u> <code>/home/user/shared</code>
@@ -1384,29 +1423,29 @@ Click the <code>Filesystem</code> device in the list of devices on the left side
 * <u>Target Path:</u> <code>shared</code>
 ** <u>Note:</u> This field must contain the word <code>shared</code>, regardless of the folder name. This is because this identifier is used to mount the shared folder in {{project_name_short}}.
 
-{{IconSet|true|8}} '''Disable Read-only Option'''
+{{IconSet|h1|9}} '''Disable Read-only Option'''
 
 Ensure <code>Export filesystem as readonly mount</code> is unchecked. <ref>
 If you do not wish to write to the folder from within the VM, you are free to enable this setting.
 </ref>
 
-{{IconSet|true|9}} '''Finalize Device Configuration'''
+{{IconSet|h1|10}} '''Finalize Device Configuration'''
 
 Click <code>Finish</code>.
 
-{{IconSet|true|10}} '''Start the VM'''
+{{IconSet|h1|11}} '''Start the VM'''
 
 Click <code>View</code> &rarr; <code>Console</code>, then click the play button in the toolbar to start the VM.
 
-{{IconSet|true|11}} '''Optional: Mandatory Access Control'''
+{{IconSet|h1|12}} '''Optional: Mandatory Access Control'''
 
 Using Mandatory Access Control? See chapter [[#Mandatory Access Control]] below.
 
-{{IconSet|true|12}} '''Optional: Live Mode Use'''
+{{IconSet|h1|13}} '''Optional: Live Mode Use'''
 
 Want to use the shared folder also in live mode? See chapter [[#Shared Folder in Live Mode]].
 
-{{IconSet|true|13}} '''Access Shared Folder in VM'''
+{{IconSet|h1|14}} '''Access Shared Folder in VM'''
 
 The shared folder will be accessible as <code>/mnt/shared</code>. <ref>
 This is hardcoded in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>].
@@ -1418,51 +1457,36 @@ To access it via command line:
 cd /mnt/shared
 }}
 
-{{IconSet|true|14}} '''Done.'''
+{{IconSet|h1|15}} '''Done.'''
 
-The process of setting up a shared folder with virtio-9p has been completed.
+The process of setting up a shared folder with <code>virtio-9p</code> has been completed.
 }} <!-- end tab -->
 
 {{Tab
 |title= === virtiofs ===
 |addToClass=info-box
 |content=
-{{mbox
-| image   = [[File:Ambox_notice.png|40px]]
-| text    = Support for virtiofs shared folders has not yet been merged into Whonix 18's stable repository. Do not expect these steps to work yet.
-}}
+{{IconSet|h1|2}} '''Notices.'''
 
-Pros of using virtiofs:
-* It may be faster than virtio-9p.
-* It works even if restrictive permissions are set on the shared folder on the host.
-* The permissions and ownership of files written by the guest is properly reflected in the host. This may be necessary for some development use cases.
+Advantages of using <code>virtiofs</code>:
 
-Cons of using virtiofs:
-* It requires the installation of <code>virtiofsd</code>, which may not be installed by default with virt-manager.
-* Because file permissions are reflected accurately on the host, the guest can write executable or even SUID-root executable files to the host. These may be used to compromise the host in in a social engineering attack, or to escalate privileges on the host if the host already has a compromised user account.
+* <u>Better performance:</u> It may be faster than <code>virtio-9p</code>.
+* <u>Works with restrictive host permissions:</u> It works even if restrictive permissions are set on the shared folder on the host.
+* <u>Preserves ownership and permissions:</u> The permissions and ownership of files written by the guest is properly reflected in the host. This may be necessary for some development use cases.
 
-{{IconSet|true|1}} '''Upgrade Required'''
+Disadvantages of using <code>virtiofs</code>:
 
-{{sysmaint_notice}}
+* <u>Requires <code>virtiofsd</code>:</u> It requires the installation of <code>virtiofsd</code>, which may not be installed by default with virt-manager.
+* <u>Higher host compromise risk:</u> Because file permissions are reflected accurately on the host, the guest can write executable or even {{kicksecure_wiki
+|wikipage=Dev/Strong_Linux_User_Account_Isolation#SUID_SGID
+|text=SUID
+}}-root executable files to the host. These may be used to compromise the host in a social engineering attack, or to escalate privileges on the host if the host already has a compromised user account.
 
-[[Upgrade|Update]] your system first. <ref>
-This is due to the fact that vm-config-dist did not originally have the ability to use virtiofs shared folders.
-</ref>
-
-In {{kicksecure_wiki
-|wikipage=System_Maintenance_Panel
-|text=System Maintenance Panel
-}}, press <code>Install Updates</code> or upgrade using the command line:
-
-{{CodeSelect|code=
-sudo apt update && sudo apt dist-upgrade
-}}
-
-{{IconSet|true|2}} '''Shutdown VM'''
+{{IconSet|h1|2}} '''Shutdown VM'''
 
 Ensure the virtual machine is powered down.
 
-{{IconSet|true|3}} '''Create Shared Folder on Host'''
+{{IconSet|h1|3}} '''Create Shared Folder on Host'''
 
 On the host operating system, create a folder to be shared with the {{VM}}. For example, on a Linux host:
 
@@ -1472,7 +1496,7 @@ On the host operating system, create a folder to be shared with the {{VM}}. For 
 mkdir /home/user/shared
 }}
 
-{{IconSet|true|4}} '''Install virtiofsd'''
+{{IconSet|h1|4}} '''Install <code>virtiofsd</code>'''
 
 On Debian-based hosts (Debian, Ubuntu, Kicksecure, etc.):
 
@@ -1482,7 +1506,7 @@ virtiofsd
 
 On other hosts: Install the appropriate package for your host OS.
 
-{{IconSet|true|5}} '''Open virt-manager and Enable Shared Memory'''
+{{IconSet|h1|5}} '''Open virt-manager and Enable Shared Memory'''
 
 {{mbox
 | image   = [[File:Ambox_notice.png|40px]]
@@ -1491,15 +1515,15 @@ On other hosts: Install the appropriate package for your host OS.
 
 Click <code>virt-manager</code> &rarr; double-click on VM &rarr; <code>View</code> &rarr; <code>Details</code> &rarr; <code>Memory</code> &rarr; <code>Enable shared memory</code> &rarr; <code>Apply</code>.
 
-{{IconSet|true|6}} '''Add Hardware in virt-manager'''
+{{IconSet|h1|6}} '''Add Hardware in virt-manager'''
 
 While still in <code>virt-manager</code>'s VM details window, click <code>Add Hardware</code>.
 
-{{IconSet|true|7}} '''Select Filesystem Device'''
+{{IconSet|h1|7}} '''Select Filesystem Device'''
 
 Click the <code>Filesystem</code> device in the list of devices on the left side of the window.
 
-{{IconSet|true|8}} '''Configure Filesystem Settings'''
+{{IconSet|h1|8}} '''Configure Filesystem Settings'''
 
 * <u>Driver:</u> <code>virtiofs</code>
 * <u>Source path:</u> <code>/home/user/shared</code>
@@ -1507,29 +1531,29 @@ Click the <code>Filesystem</code> device in the list of devices on the left side
 * <u>Target Path:</u> <code>shared</code>
 ** <u>Note:</u> This field must contain the word <code>shared</code>, regardless of the folder name. This is because this identifier is used to mount the shared folder in {{project_name_short}}.
 
-{{IconSet|true|9}} '''Disable Read-only Option'''
+{{IconSet|h1|9}} '''Disable Read-only Option'''
 
 Ensure <code>Export filesystem as readonly mount</code> is unchecked. <ref>
 If you do not wish to write to the folder from within the VM, you are free to enable this setting.
 </ref>
 
-{{IconSet|true|10}} '''Finalize Device Configuration'''
+{{IconSet|h1|10}} '''Finalize Device Configuration'''
 
 Click <code>Finish</code>.
 
-{{IconSet|true|11}} '''Start the VM'''
+{{IconSet|h1|11}} '''Start the VM'''
 
 Click <code>View</code> &rarr; <code>Console</code>, then click the play button in the toolbar to start the VM.
 
-{{IconSet|true|12}} '''Optional: Mandatory Access Control'''
+{{IconSet|h1|12}} '''Optional: Mandatory Access Control'''
 
 Using Mandatory Access Control? See chapter [[#Mandatory Access Control]] below.
 
-{{IconSet|true|13}} '''Optional: Live Mode Use'''
+{{IconSet|h1|13}} '''Optional: Live Mode Use'''
 
 Want to use the shared folder also in live mode? See chapter [[#Shared Folder in Live Mode]].
 
-{{IconSet|true|14}} '''Access Shared Folder in VM'''
+{{IconSet|h1|14}} '''Access Shared Folder in VM'''
 
 The shared folder will be accessible as <code>/mnt/shared</code>. <ref>
 This is hardcoded in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>].
@@ -1541,9 +1565,9 @@ To access it via command line:
 cd /mnt/shared
 }}
 
-{{IconSet|true|15}} '''Done.'''
+{{IconSet|h1|15}} '''Done.'''
 
-The process of setting up a shared folder with virtiofs has been completed.
+The process of setting up a shared folder with <code>virtiofs</code> has been completed.
 
 }} <!-- end tab -->
 }} <!-- end tab controller -->
@@ -1554,7 +1578,7 @@ The process of setting up a shared folder with virtiofs has been completed.
 
 Tests with AppArmor have shown it operates transparently with shared folders, without manual exception configuration.
 
-On the host, <code>chmod</code> must be applied to the shared folder contents to access the files.
+{{IconSet|h1|1}} On the host, <code>chmod</code> must be applied to the shared folder contents to access the files.
 
 <u>Note:</u> Replace account <code>user</code> with your actual account.
 
@@ -1570,27 +1594,39 @@ https://nts.strzibny.name/how-to-set-up-shared-folders-in-virt-manager/
 https://unix.stackexchange.com/questions/60799/selinux-interfering-with-host-guest-file-sharing-using-kvm
 </ref>
 
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+{{IconSet|h1|2}}
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
 {{CodeSelect|code=
 sudo semanage fcontext -a -t svirt_image_t "/home/user/shared(/.*)?"
 }}
+
+{{IconSet|h1|3}}
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
 
 {{CodeSelect|code=
 restorecon -vR /home/user/shared
 }}
 
-Setting execute permission on the user folder itself may be necessary for the guest to start without a permission error:
+{{IconSet|h1|4}} Setting execute permission on the user folder itself may be necessary for the guest to start without a permission error:
 
 {{CodeSelect|code=
 sudo chmod 701 /home/user
 }}
 
-Alternatively, set execute permission only for virt-manager. The name <code>libvirt-qemu</code> may vary depending on the distribution:
+{{IconSet|h1|5}} Alternatively, set execute permission only for virt-manager. The name <code>libvirt-qemu</code> may vary depending on the distribution:
 
 {{CodeSelect|code=
 sudo setfacl -m u:libvirt-qemu:x /home/user
 }}
 
-If you are using the command line instead of virt-manager to edit the VM’s device settings, add the following section to the XML:
+{{IconSet|h1|6}} If you are using the command line instead of virt-manager to edit the VM’s device settings, add the following section to the XML:
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
 
 <pre style="white-space: pre-wrap;">
 <filesystem type='mount' accessmode='mapped'>
@@ -1610,39 +1646,39 @@ A shared folder is a folder that is shared between the host {{os}} and the {{VM}
 In [[Live Mode]], the shared folder will not be mounted by default. (This behavior was implemented starting from version <code>17.4.4.6</code> and might be subject to change in a future version.) <ref>
 [[grub-live]]:
 
-* <code>/usr/lib/systemd/system/mnt-shared-vbox.service.d/30_grub-live.conf</code>
-* <code>/usr/lib/systemd/system/mnt-shared-kvm.service.d/30_grub-live.conf</code>
+* <u>VirtualBox unit override:</u> <code>/usr/lib/systemd/system/mnt-shared-vbox.service.d/30_grub-live.conf</code>
+* <u>KVM unit override:</u> <code>/usr/lib/systemd/system/mnt-shared-kvm.service.d/30_grub-live.conf</code>
 </ref>
 
 To enable the shared folder with read and write access in live mode, follow the instructions below.
 
-{{IconSet|true|1}} '''Instructions from the above chapter must be applied first.'''
+{{IconSet|h1|1}} '''Instructions from the above chapter must be applied first.'''
 
 Option-specific:
 
-* If you are using Kicksecure (or a derivative such as Whonix), follow the steps below.
-* If you are using other operating systems or the generic method, this is not applicable. <ref>
+* <u>Kicksecure or derivative:</u> If you are using Kicksecure (or a derivative such as Whonix), follow the steps below.
+* <u>Other operating systems:</u> If you are using other operating systems, or the generic method, this is not applicable. <ref>
 Because these systems do not use the <code>mnt-shared-kvm.service</code> systemd unit by {{project_name_short}}.
 </ref>
 
-{{IconSet|true|2}} {{sysmaint_notice}}
+{{IconSet|h1|2}} {{sysmaint_notice}}
 
-{{IconSet|true|3}} {{Open with root rights|filename=
+{{IconSet|h1|3}} {{Open with root rights|filename=
 /usr/lib/systemd/system/mnt-shared-kvm.service.d/50_user.conf
 }}
 
-{{IconSet|true|4}} '''Paste:'''
+{{IconSet|h1|4}} '''Paste:'''
 
 {{CodeSelect|code=
 [Unit]
 ConditionKernelCommandLine=
 }}
 
-{{IconSet|true|5}} '''Save.'''
+{{IconSet|h1|5}} '''Save.'''
 
-{{IconSet|true|6}} '''Reboot.'''
+{{IconSet|h1|6}} '''Reboot.'''
 
-{{IconSet|true|7}} '''Done.'''
+{{IconSet|h1|7}} '''Done.'''
 
 The shared folder should now also be available with read-write access after booting into live mode.
 

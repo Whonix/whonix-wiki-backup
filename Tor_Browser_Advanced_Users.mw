@@ -32,7 +32,7 @@ The Tor Browser design has carefully considered the goals, capabilities and type
 ! '''Description'''
 |-
 ! Anonymity Set Reduction (Fingerprinting)
-| To identify specific individuals, system data like the browser build,  timezone or display resolution is used to track down (or at least track) their activities.
+| To identify specific individuals, system data like the browser build, timezone or display resolution is used to track down (or at least track) their activities.
 |-
 ! Bypassing Proxy Settings
 | Directly compromising and bypassing Tor, or forcing connections to specific IP addresses.
@@ -114,7 +114,7 @@ The Tor Browser design has carefully considered the goals, capabilities and type
 ! Other Attacks
 |
 * <u>Creating arbitrary cached content</u>: Reading the browser cache which stores unique identifiers.<br />
-* <u>Observing request behavior</u>: Fingerprinting is aided by observing the user agent, Accept-* headers, pipeline usage, and request ordering. Fingerprinting is worsened by custom filters like AdBlock and UBlock Origin. <br />
+* <u>Observing request behavior</u>: Fingerprinting is aided by observing the user agent, Accept-* headers, pipeline usage, and request ordering. Fingerprinting is worsened by custom filters like AdBlock and uBlock Origin. <br />
 * <u>Fingerprinting</u>: Using the large number of browser attributes to reduce the anonymity set, or even uniquely fingerprinting individuals. <ref>For instance, there is an estimated 29 bit-identifier based on the browser and desktop window resolution information alone.</ref><br />
 * <u>Website traffic fingerprinting</u>: Attempting to recognize the encrypted traffic patterns of specific websites, either between the user and the Guard node, or at the Guard node itself. <ref>This attack is somewhat mitigated by the ocean of Tor traffic, which rapidly increases the rate of false positives when larger traffic sets are analyzed.</ref><br />
 * <u>Remotely or locally exploiting the browser and/or OS</u>: Exploiting the browser, plugin or OS vulnerabilities to install malware or surveillance software, or physically access the machine to do the same.
@@ -168,7 +168,7 @@ https://gitlab.torproject.org/legacy/trac/-/issues/523</ref> <ref name=new_ident
 </ref>
 
 <div style="column-count:2;-moz-column-count:2;-webkit-column-count:2">
-* Disables Javascript and plugins on all tabs and windows.
+* Disables JavaScript and plugins on all tabs and windows.
 * Stops all page activity for each tab.
 * Clears the Tor Browser state:
 ** OCSP state.
@@ -223,7 +223,7 @@ The Security Level preference tab and Tor Project manual describe the exact effe
 ! Safest
 |
 * Only website features required for basic services and static sites are allowed; images, media and scripts are affected. <br />
-* Javascript is disabled on all sites; some images, fonts, icons and math symbols are disabled. <br />
+* JavaScript is disabled on all sites; some images, fonts, icons and maths symbols are disabled. <br />
 * HTML5 media (like audio and video) are click-to-play.
 |}
 
@@ -277,25 +277,25 @@ If the user wants to save files in the shared folder, there are multiple options
 * '''C)''' Attempt the {{kicksecure_wiki
 |wikipage=AppArmor#Fix_Profiles
 |text=Fix AppArmor Profiles
-}} instructions once this issues appeared. [[Unsupported]].
+}} instructions once this issue has appeared. [[Unsupported]].
 * '''D)''' Deactivate the Tor Browser AppArmor profile. Recommended against since this lowers security.
-* '''E)''' Deactivate AppArmor. Recommended against since totally unnecessary and it this lowers security.
+* '''E)''' Deactivate AppArmor. Recommended against since totally unnecessary and since this lowers security.
 
 == Tor Browser AppArmor Permit Shared Folder ==
 By applying the following instructions, Tor Browser write access to folder <code>/mnt/shared</code> folder would be permitted by AppArmor.
 
-'''1.''' {{Open with root rights|filename=
+{{IconSet|h1|1}} {{Open with root rights|filename=
 /etc/apparmor.d/local/home.tor-browser.firefox
 }}
 
-'''2.''' Paste.
+{{IconSet|h1|2}} Paste.
 
 {{CodeSelect|code=
 /mnt/shared        r,
 /mnt/shared**      rwl,
 }}
 
-'''3.''' Reload the Tor Browser AppArmor profile.
+{{IconSet|h1|3}} Reload the Tor Browser AppArmor profile.
 
 Note: The following filename is different from above and correct. <ref>
 Should not include <code>/local/</code>.
@@ -305,7 +305,7 @@ Should not include <code>/local/</code>.
 sudo aa-enforce /etc/apparmor.d/home.tor-browser.firefox
 }}
 
-'''4.''' Done.
+{{IconSet|h1|4}} Done.
 
 Tor Browser should now have write access to the <code>/mnt/shared</code> folder.
 
@@ -314,32 +314,36 @@ Untested / [[unsupported]].
 
 Discouraged because this might change the browser fingerprint, see [[Tor_Browser#Non-default_Add-ons|Non-default Add-ons]].
 
-KeePassXC Browser Extension developers did at time of writing not address bug report [https://github.com/keepassxreboot/keepassxc/issues/10438 Problems with Tor Browser integration on Linux]. This issue is [[unspecific|unspecific to {{project_name_short}}]].
+KeePassXC Browser Extension developers did, at the time of writing, not address bug report [https://github.com/keepassxreboot/keepassxc/issues/10438 Problems with Tor Browser integration on Linux]. This issue is [[unspecific|unspecific to {{project_name_short}}]].
 
-'''1.''' {{Open with root rights
+{{IconSet|h1|1}} {{Open with root rights
 |filename=/etc/apparmor.d/local/home.tor-browser.firefox
 }}
 
-'''2.''' Paste.
+{{IconSet|h1|2}} Paste.
 
 {{CodeSelect|code=
 /usr/bin/keepassxc-proxy rix,
 /home/user/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/Browser/TorBrowser/Data/Browser/.mozilla/native-messaging-hosts/org.keepassxc.keepassxc_browser.json rix,
 }}
 
-'''3.''' Save.
+{{IconSet|h1|3}} Save.
 
-'''4.''' Reload the Tor Browser AppArmor profile.
+{{IconSet|h1|4}} Reload the Tor Browser AppArmor profile.
 
 {{CodeSelect|code=
 sudo aa-enforce /etc/apparmor.d/home.tor-browser.firefox
 }}
 
-'''5.''' Symlink the KeepassXC extension's <code>.mozilla</code> folder to the Tor Browser's folder.
+{{IconSet|h1|5}} Symlink the KeePassXC extension's <code>.mozilla</code> folder to the Tor Browser's folder.
 
 {{CodeSelect|code=
 ln -s /home/user/.local/share/torbrowser/tbb/x86_64/tor-browser_en-US/Browser/TorBrowser/Data/Browser/.mozilla /home/user/.tb/tor-browser/Browser/TorBrowser/Data/Browser
 }}
+
+{{IconSet|h1|6}} Done.
+
+KeePassXC Browser Extension permissions and the symlink should now be configured.
 
 See also:
 
@@ -577,39 +581,39 @@ A Tor Browser Hard Reset is usually not needed. If the user runs [[Tor_Browser#T
 The <code>--reset</code> parameter is usually not useful for fixing any Tor Browser issues.
 
 {{Box|text=
-'''1.''' Platform specific.
+{{IconSet|h1|1}} Platform specific.
 
 Apply the following steps...
 
 * {{non_q_project_name_long}}: in {{project_name_workstation_short}}.
 * {{q_project_name_long}}: in Template <code>{{project_name_workstation_template}}</code>.
 
-'''1.''' {{Open with root rights|filename=
+{{IconSet|h1|2}} {{Open with root rights|filename=
 /etc/torbrowser.d/50_user.conf
 }}
 
-'''3.''' Disable automatic deletion of the Tor Browser compressed archive after Tor Browser installation.
+{{IconSet|h1|3}} Disable automatic deletion of the Tor Browser compressed archive after Tor Browser installation.
 
-By default, the Tor Browser compressed archive after Tor Browser installation to save disk space. However, if the user wishes to later reinstall Tor Browser (hard reset) without re-downloading Tor Browser, this needs to be disabled. In order to disable this, add.
+By default, the Tor Browser compressed archive is deleted after Tor Browser installation to save disk space. However, if the user wishes to later reinstall Tor Browser (hard reset) without re-downloading Tor Browser, this needs to be disabled. In order to disable this, add.
 
 {{CodeSelect|code=
 TB_NO_CLEANUP=true
 }}
 
-'''4.''' Save the file and exit.
+{{IconSet|h1|4}} Save the file and exit.
 
-'''5.''' Platform specific.
+{{IconSet|h1|5}} Platform specific.
 
 * {{non_q_project_name_short}}: No special steps required.
-* {{q_project_name_short}}: Shut down Template. <code>update-torbrowser</code> in the correct price as per the usual {{q_project_name_short}} Tor Browser documentation.
+* {{q_project_name_short}}: Shut down Template. <code>update-torbrowser</code> in the correct place as per the usual {{q_project_name_short}} Tor Browser documentation.
 
-'''6.''' Use <code>update-torbrowser</code> with parameter <code>--reset</code>
+{{IconSet|h1|6}} Use <code>update-torbrowser</code> with parameter <code>--reset</code>
 
 {{CodeSelect|code=
 update-torbrowser --reset
 }}
 
-'''7.''' Done.
+{{IconSet|h1|7}} Done.
 
 Tor Browser should now be re-installed without prior re-download.
 }}
@@ -626,7 +630,7 @@ https://forums.whonix.org/t/tor-browser-downloader-anondist-suggestion-hard-rese
 
 According to [https://bugzilla.mozilla.org/show_bug.cgi?id=354493 this] Firefox ticket, JavaScript can be abused to scan internal networks, fingerprint devices, and make malicious commands to those devices if they have a web interface.
 
-In {{project_name_short}}, there are no embedded devices attached to an internal network; it is isolated and untrusted. However, malicious Javascript can reveal to an attacker that a service is running on a localhost port. Consequently, this can reduce the user's anonymity set. Further, daemons listening on the localhost can be maliciously misconfigured, but this has limited impact because traffic is still forced through {{project_name_gateway_short}}.
+In {{project_name_short}}, there are no embedded devices attached to an internal network; it is isolated and untrusted. However, malicious JavaScript can reveal to an attacker that a service is running on a localhost port. Consequently, this can reduce the user's anonymity set. Further, daemons listening on the localhost can be maliciously misconfigured, but this has limited impact because traffic is still forced through {{project_name_gateway_short}}.
 
 For further reading on this topic, see this related [https://forums.whonix.org/t/workaround-available-i2p-no-longer-works-with-the-latest-tor-browser/182/14 {{project_name_short}} Forum topic] and [https://gitlab.torproject.org/legacy/trac/-/issues/11493 Tor Browser bug report].
 
@@ -656,16 +660,17 @@ tor-launcher is not yet available for use in {{project_name_gateway_short}}. <re
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|40px]]
-| text    = Do not start Tor Browser in the <code>{{project_name_workstation_template}}</code> Template or <code>{{whonix-ws-dvm}}</code>Disposable Template! It is unexpected behavior and dangerous.
+| text    = Do not start Tor Browser in the <code>{{project_name_workstation_template}}</code> Template or <code>{{whonix-ws-dvm}}</code> Disposable Template! This is unexpected behavior and dangerous.
 }}
 
 <div class="toccolours mw-collapsible mw-collapsed">
-To understand why, please press on Expand on the right.
+To understand why, please click Expand on the right.
 <div class="mw-collapsible-content">
 * Tor Browser should be used in its stock configuration with as few modifications as possible. This is in accordance with upstream recommendations by The Tor Project.
-* Internet connections are established if Tor Browser is started in a Disposable Template -- this risks a compromise of the template and all Disposables based upon it.
-* Various files are created when Tor Browser starts -- these might make an individual  [[Tips_on_Remaining_Anonymous#Study:_Anonymity_and_Pseudonymity_are_not_the_same|pseudonymous rather than anonymous]], even if software has been designed against this. It is undesirable to have the same pseudonym linked to all App Qubes based on a singular Template.
-* It is far safer to start Tor Browser for the first time in a App Qube, rather than the Template. It is unrealistic to expect Tor Browser will perform perfectly, without any critical bugs being revealed later on. Current and past Tor Browser issues support this assertion; for example, see [https://gitlab.torproject.org/search?group_id=268&scope=issues&search=linkability&state=opened here] and [https://gitlab.torproject.org/search?group_id=268&repository_ref=&scope=issues&search=fingerprinting&snippets=&state=opened here].
+* Starting Tor Browser in a Disposable Template establishes internet connections -- this risks a compromise of the template and all Disposables based upon it.
+* Various files are created when Tor Browser starts -- these might make an individual [[Tips_on_Remaining_Anonymous#Study:_Anonymity_and_Pseudonymity_are_not_the_same|pseudonymous rather than anonymous]], even if software has been designed against this. It is undesirable to have the same pseudonym linked to all App Qubes based on a singular Template.
+* It is far safer to start Tor Browser for the first time in an App Qube, rather than the Template. It is unrealistic to expect Tor Browser to perform perfectly without any critical bugs being revealed later on. Current and past Tor Browser issues support this assertion; for example, see [https://gitlab.torproject.org/search?group_id=268&scope=issues&search=linkability&state=opened here] and [https://gitlab.torproject.org/search?group_id=268&repository_ref=&scope=issues&search=fingerprinting&snippets=&state=opened here].
+* Tor Browser gets installed in a user's home folder when the browser is run or updated in an AppVM. A Disposable Template is just an AppVM with a special use case. If Tor Browser were copied to the home folder in a Disposable Template, all DispVMs based on that Disposable Template would be locked to the version of Tor Browser present in the Disposable Template's home folder. The browser would then have to be updated separately in the Disposable Template, rather than being updated automatically when the "master" Whonix-Workstation TemplateVM receives a <code>tb-updater</code> package update. It can be hard to remember to update Tor Browser this way, which increases the chances that the user will accidentally use an outdated and vulnerable version of Tor Browser for normal browsing. Forum discussion: https://forums.whonix.org/t/update-torbrowser-and-disposable-templates/22842
 * See also [[Tor Browser#Unsafe Tor Browser Habits|Unsafe Tor Browser Habits]].
 </div>
 </div>
@@ -695,11 +700,11 @@ Actions of the tb-updater package can be optionally configured.
 ==== Disable Automatic Update Downloads ====
 
 {{Box|text=
-'''1.''' {{Open with root rights|filename=
+{{IconSet|h1|1}} {{Open with root rights|filename=
 /etc/torbrowser.d/50_user.conf
 }}
 
-'''2.''' Disable automatic downloads.
+{{IconSet|h1|2}} Disable automatic downloads.
 
 When the tb-updater package is upgraded in the Qubes-{{project_name_workstation_short}} Template, by default a hard-coded <ref>In the tb-updater package.</ref> version Tor Browser tarball and signature is automatically downloaded. In order to disable this, add.
 
@@ -707,7 +712,11 @@ When the tb-updater package is upgraded in the Qubes-{{project_name_workstation_
 tb_install_follow=false
 }}
 
-'''3.''' Save the file and exit.
+{{IconSet|h1|3}} Save the file and exit.
+
+{{IconSet|h1|4}} Done.
+
+Automatic Tor Browser download during <code>tb-updater</code> package upgrades should now be disabled.
 }}
 
 === Technical Details ===
@@ -855,7 +864,7 @@ Updating Tor Browser in Qubes' Template <code>{{project_name_workstation_templat
 == tb-updater Configuration ==
 Tor Browser Downloader by {{project_name_short}} has some configuration options.
 
-'''1.''' Learn about configuration options.
+{{IconSet|h1|1}} Learn about configuration options.
 
 Just open the file. Do not make any modifications.
 
@@ -863,24 +872,28 @@ Just open the file. Do not make any modifications.
 |filename=/etc/torbrowser.d/30_default.conf
 }}
 
-'''2.''' Close the file after having read it.
+{{IconSet|h1|2}} Close the file after having read it.
 
-'''3.''' Create a configuration file.
+{{IconSet|h1|3}} Create a configuration file.
 
 {{Open with root rights
 |filename=/etc/torbrowser.d/50_user.conf
 }}
 
 === Disable tb-updater downloading Tor Browser during tb-updater Package Upgrade ===
-'''4.''' Warning.
+{{IconSet|h1|4}} Warning.
 
 Discouraged! Not recommended for most users.
 
-'''5.''' Disable tb-updater downloading Tor Browser during tb-updater Package Upgrade.
+{{IconSet|h1|5}} Disable tb-updater downloading Tor Browser during tb-updater Package Upgrade.
 
 {{CodeSelect|code=
 tb_install_follow=false
 }}
+
+{{IconSet|h1|6}} Done.
+
+The <code>tb-updater</code> configuration file should now be created and (optionally) updated.
 
 == Template Customization ==
 Similar to [[#Disposable Template Customization|Disposable Template Customization]].
@@ -905,9 +918,9 @@ Forum discussion: [https://forums.whonix.org/t/how-do-i-customise-tor-browser-in
 Using this method, customization would only apply to the Disposable Template and any Disposables based on that Disposable Template.
 
 {{Box|text=
-'''1.''' Start {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>).
+{{IconSet|h1|1}} Start {{project_name_workstation_short}} Template (<code>{{project_name_workstation_template}}</code>).
 
-'''2.''' Disable Tor Browser Downloader Disposable Service. <ref>
+{{IconSet|h1|2}} Disable Tor Browser Downloader Disposable Service. <ref>
 * This is to prevent mounting <code>/var/cache/tb-binary/.tb</code> to <code>/home/user/.tb</code>.
 * <code>/lib/systemd/system/tb-updater-dispvm.service</code>
 * <code>/usr/lib/tb-updater/dispvm</code>
@@ -929,13 +942,13 @@ This is probably because Qubes mounts /usr/local too late to be regarded by syst
 sudo systemctl mask tb-updater-dispvm.service
 }}
 
-'''3.''' Shutdown Template.
+{{IconSet|h1|3}} Shutdown Template.
 
 {{CodeSelect|code=
 sudo poweroff
 }}
 
-'''4.''' Open a terminal emulator in {{project_name_workstation_short}} Disposable Template <code>{{project_name_workstation_template}}-dvm</code>.
+{{IconSet|h1|4}} Open a terminal emulator in {{project_name_workstation_short}} Disposable Template <code>{{project_name_workstation_template}}-dvm</code>.
 
 Run in dom0 terminal emulator.
 
@@ -943,7 +956,7 @@ Run in dom0 terminal emulator.
 qvm-run -a {{project_name_workstation_template}}-dvm qterminal
 }}
 
-'''5.''' Open Tor Browser Starter / Tor Browser Downloader (by {{project_name_short}} developers) configuration file.
+{{IconSet|h1|5}} Open Tor Browser Starter / Tor Browser Downloader (by {{project_name_short}} developers) configuration file.
 
 In {{project_name_workstation_short}} Disposable Template <code>{{project_name_workstation_template}}-dvm</code>:
 
@@ -960,7 +973,7 @@ Open file <code>/usr/local/etc/torbrowser.d/50_user.conf</code> in an editor wit
 sudoedit /usr/local/etc/torbrowser.d/50_user.conf
 }}
 
-'''6.''' Paste.
+{{IconSet|h1|6}} Paste.
 
 <pre>
 tb_qubes_dvm_template() {
@@ -968,9 +981,9 @@ tb_qubes_dvm_template() {
 }
 </pre>
 
-'''7.''' Save.
+{{IconSet|h1|7}} Save.
 
-'''8.''' Tor Browser in Disposable Template.
+{{IconSet|h1|8}} Tor Browser in Disposable Template.
 
 Running Tor Browser Starter / Tor Browser Downloader (by {{project_name_short}} developers) in Disposable Template is now possible. <ref>
 When running <code>torbrowser</code> (Tor Browser Starter by {{project_name_short}} developers) in Disposable Template it will first copy <code>/var/cache/tb-binary/.tb/tor-browser</code> to user home folder <code>/home/user/.tb/tor-browser</code>. (Folder <code>/var/cache/tb-binary/.tb/tor-browser</code> was previously created by Tor Browser Downloader (by {{project_name_short}} developers).) Second, it will start the Tor Browser binary from folder <code>/home/user/.tb/tor-browser</code>.
@@ -988,19 +1001,19 @@ Optional: Download a new version Tor Browser Downloader by {{project_name_short}
 update-torbrowser
 }}
 
-'''9.''' Customize Tor Browser.
+{{IconSet|h1|9}} Customize Tor Browser.
 
 Perform customization changes.
 
-'''10.''' Shut down Disposable Template.
+{{IconSet|h1|10}} Shut down Disposable Template.
 
 {{CodeSelect|code=
 sudo poweroff
 }}
 
-'''11.''' Start Tor Browser in Disposable.
+{{IconSet|h1|11}} Start Tor Browser in Disposable.
 
-'''12.''' Done.
+{{IconSet|h1|12}} Done.
 
 Customized Tor Browser should now be started in the Disposable.
 }}
@@ -1012,23 +1025,53 @@ Using this method, customization this way would apply to all App Qubes and Dispo
 {{Box|text=
 In {{project_name_workstation_short}} Template <code>{{project_name_workstation_template}}</code>.
 
-'''1.''' Open a terminal.
+{{IconSet|h1|1}} Open a terminal.
 
-'''2.''' Change ownership of Tor Browser.
+{{IconSet|h1|2}} Change ownership of Tor Browser.
+
+Select if you are using [[sysmaint|user-sysmaint-split]] (default, most users) or {{kicksecure_wiki
+|wikipage=Unrestricted_Admin_Mode
+|text=unrestricted admin mode
+}} (optional configuration).
+
+{{Tab
+|type=controller
+|linkid=tor-browser-template-method-ownership
+|content=
+
+{{Tab
+|title= ==== user-sysmaint-split ====
+|content=
+In case using user-sysmaint-split (default, most users):
+
+Change the ownership of the folder from <code>root</code> to <code>sysmaint</code> to be able to launch the browser from that folder.
+
+{{CodeSelect|code=
+sudo chown -R sysmaint:sysmaint /var/cache/tb-binary
+}}
+}} <!-- close tab: user-sysmaint-split -->
+
+{{Tab
+|title= ==== unrestricted admin mode ====
+|content=
+In case using unrestricted admin mode:
 
 Change the ownership of the folder from <code>root</code> to <code>user</code> to be able to launch the browser from that folder.
 
 {{CodeSelect|code=
 sudo chown -R user:user /var/cache/tb-binary
 }}
+}} <!-- close tab: unrestricted admin mode -->
 
-'''3.''' Change directory.
+}} <!-- close tab controller: tor-browser-template-method-ownership -->
+
+{{IconSet|h1|3}} Change directory.
 
 {{CodeSelect|code=
 cd /var/cache/tb-binary/.tb/tor-browser/Browser
 }}
 
-'''4.''' Start Tor Browser in debugging mode.
+{{IconSet|h1|4}} Start Tor Browser in debugging mode.
 
 {{CodeSelect|code=
 ./start-tor-browser --debug
@@ -1036,27 +1079,27 @@ cd /var/cache/tb-binary/.tb/tor-browser/Browser
 
 Note: Tor Browser can also be started manually without the <code>--debug</code> argument.
 
-'''5.''' Apply the desired modification.
+{{IconSet|h1|5}} Apply the desired modification.
 
-'''6.''' Close Tor Browser.
+{{IconSet|h1|6}} Close Tor Browser.
 
-'''7.''' Change back the ownership to <code>root</code>.
+{{IconSet|h1|7}} Change back the ownership to <code>root</code>.
 
 {{CodeSelect|code=
 sudo chown -R root:root /var/cache/tb-binary
 }}
 
-'''8.''' Disable automatic update downloads.
+{{IconSet|h1|8}} Disable automatic update downloads.
 
 Optional: Consider [[#Disable Automatic Update Downloads|Disable Automatic Update Downloads]] since these would overwrite any user modifications. <ref name=no-user-freedom-restrictions>
 [[#Tor_Browser_Update:_Technical_Details|Due to technical limitations.]] Because whole folder <code>/var/cache/tb-binary/.tb/tor-browser</code> is replaced. [[Reasons for Freedom Software#No_Intentional_User_Freedom_Restrictions|This is not an intentional user freedom restriction or security feature.]]
 </ref>
 
-'''9.''' Apply Tor Browser updates.
+{{IconSet|h1|9}} Apply Tor Browser updates.
 
-From time to time when updated for Tor Browser are available, re-apply this procedure and use [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] to update Tor Browser. Alternatively use any other update method as documented on the [[Tor Browser]] wiki page.
+From time to time when updates for Tor Browser are available, re-apply this procedure and use [[Tor_Browser#Tor_Browser_Internal_Updater|Tor Browser Internal Updater]] to update Tor Browser. Alternatively use any other update method as documented on the [[Tor Browser]] wiki page.
 
-'''10.''' Done.
+{{IconSet|h1|10}} Done.
 
 Tor Browser customization using Qubes Template Method has been completed.
 
@@ -1185,7 +1228,7 @@ The rationale for this behavior includes:
 It might be possible to restore the behavior of Tor Browser honoring <code>/etc/hosts</code> file, but this is discouraged, see [[Tor_Browser#Tor_Browser_Transparent_Proxying|Tor Browser Transparent Proxying]].
 
 == Tor Browser versus DNS over HTTPS ==
-At time of writing, Tor Browser does not use DNS over HTTPS (DOH). But if Tor Browser did use DOH, then this would also result in Tor Browser ignoring <code>/etc/hosts</code> file and might as well break DPI (deep package inspection) based DNS filtering.
+At time of writing, Tor Browser does not use DNS over HTTPS (DOH). But if Tor Browser did use DOH, then this would also result in Tor Browser ignoring <code>/etc/hosts</code> file and might as well break DPI (deep packet inspection) based DNS filtering.
 
 related: {{kicksecure_wiki
 |wikipage=DNS_Security
@@ -1203,14 +1246,14 @@ As mentioned above, Tor Browser uses a Tor <code>SocksPort</code> by default as 
 Firewall (IP, DNS) based filtering and would require either:
 
 * '''A)''' <u>Transparent Proxying:</u> Using system default networking, i.e. not using a Tor <code>SocksPort</code> and thereby breaking [[Stream Isolation]].
-* '''B)''' <u>DPI:</u> Deep package inspection in case using a firewall. This is [[undocumented]].
+* '''B)''' <u>DPI:</u> Deep packet inspection in case using a firewall. This is [[undocumented]].
 
 See also: https://forums.whonix.org/t/firewall-implementation-for-qubes-whonix/16726
 
 == Tor Browser Filtering Options ==
 Filtering is discouraged in [https://2019.www.torproject.org/projects/torbrowser/design/ Tor Browser's threat model] in chapter "No filters".
 
-* '''B)''' <u>DPI:</u> Deep package inspection in case using a firewall. This is [[undocumented]].
+* '''A)''' <u>DPI:</u> Deep packet inspection in case using a firewall. This is [[undocumented]].
 ** Would require Transparent Proxying, i.e. using system default networking, i.e. not using a Tor <code>SocksPort</code> and thereby breaking [[Stream Isolation]].
 * '''B)''' <u>Browser Add-on:</u> Some browser add-ons perform filtering. Also discouraged, see [[Tor_Browser#Non-default_Add-ons|Non-default Add-ons]].
 

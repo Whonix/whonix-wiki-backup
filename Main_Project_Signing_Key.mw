@@ -65,16 +65,16 @@ EDITORS NOTES:
 }}
 
 {{Box|text=
-Select your operating system.
+{{IconSet|h1|1}} Select your operating system.
 
 {{Tab
 |type=controller
 |content=
-{{Tab|active=true
+{{Tab
 |title= == Windows, macOS, Linux ==
 |image=[[File:Any12312.png|25px]]
 |content=
-'''1.''' [[Secure_Downloads|Securely]] download [[Patrick Schleizer]]'s (adrelanos') [[OpenPGP]] key. <ref>
+{{IconSet|h1|2}} [[Secure_Downloads|Securely]] download [[Patrick Schleizer]]'s (adrelanos') [[OpenPGP]] key. <ref>
 <!--
 WIKI EDITOR NOTE:
 
@@ -83,33 +83,31 @@ Wiki templates limitations. Wiki wide update of [[Template:Curl_Secure]] to --tl
 {{CodeSelect|code=
 curl --tlsv1.3 --proto =https --max-time 180 --output derivative.asc https://www.{{project_clearnet}}/keys/derivative.asc
 }}
-</ref> <ref>
-* https://www.{{project_clearnet}}/keys/derivative.asc
-* https://github.com/Whonix/qubes-template-whonix/blob/master/keys/whonix-developer-patrick.asc
-* https://github.com/QubesOS/qubes-builder/blob/master/keys/916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA.asc
-</ref>
+</ref> <ref name=public-key-sources />
 
 {{signing_key_main}}
 
-'''2.''' Store the key as <code>derivative.asc</code>.
+{{IconSet|h1|3}} Store the key as <code>derivative.asc</code>.
 
-'''3.''' Check fingerprints/owners without importing anything.
+{{IconSet|h1|4}} Check fingerprints/owners without importing anything.
 
 {{CodeSelect|code=
 gpg --keyid-format long --import --import-options show-only --with-fingerprint derivative.asc
 }}
 
-'''4.''' Verify the output.
+{{IconSet|h1|5}} Verify the output.
 
 The most important check is confirming the key fingerprint <u>exactly</u> matches the output below. <ref>
 Minor changes in the output such as new uids (email addresses) or newer expiration dates are inconsequential.
-</ref>
+</ref> (If you have an existing copy of the signing key, see the footnote: <ref>
+If you have an existing (potentially expired) copy of the signing key file, and wish to verify that a newer copy is valid, you may use the command <code>gpg --keyid-format long --import --import-options show-only --with-fingerprint /path/to/old/derivative.asc</code> to display the older key's fingerprint. If the fingerprint of the older copy matches the fingerprint of the newer copy, the newer copy is valid.
+</ref>)
 
 <pre>
       Key fingerprint = 916B 8D99 C38E AF5E 8ADC  7A2A 8D66 066A 2EEA CCDA
 </pre>
 
-The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. Advanced users can learn more about this [[#OpenPGP Web of Trust|below]].
+In case there is a message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. [[Advanced Users|Advanced users]] can learn more about this [[#OpenPGP Web of Trust|below]].
 
 {{mbox
 | image   = [[File:Ambox_warning_pn.svg.png|warning|40px]]
@@ -119,9 +117,9 @@ The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to m
 Do not continue if the fingerprint does not match! This risks using infected or erroneous files! The whole point of verification is to confirm file integrity.
 }}
 
-'''5.''' {{signing_key_main_increase_trust}}
+{{IconSet|h1|6}} {{signing_key_main_increase_trust}}
 
-'''6.''' Import the key.
+{{IconSet|h1|7}} Import the key.
 
 {{CodeSelect|code=
 gpg --import derivative.asc
@@ -145,17 +143,17 @@ gpg: Total number processed: 1
 gpg:              unchanged: 1
 </pre>
 
-'''7.''' Web of trust.
+{{IconSet|h1|8}} Web of trust.
 
-Advanced users can check [[#Web of Trust|Web of Trust]] further below for better security.
+[[Advanced Users|Advanced users]] can check [[#Web of Trust|Web of Trust]] further below for better security.
 }} <!-- close tab: Windows, Linux, Mac -->
 {{Tab
 |title= == Kicksecure or Whonix ==
 |image=[[File:{{project_name_short}}-logo-icon.svg|25px]]
 |content=
-'''1.''' {{signing_key_main_increase_trust}}
+{{IconSet|h1|2}} {{signing_key_main_increase_trust}}
 
-'''2.''' Import the key.
+{{IconSet|h1|3}} Import the key.
 
 Since the key is already available in Kicksecure or Whonix, importing the key is simpler than for other operating systems.
 
@@ -163,46 +161,61 @@ Since the key is already available in Kicksecure or Whonix, importing the key is
 gpg --import /usr/share/keyrings/derivative.asc
 }}
 
-The message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. Advanced users can learn more about this [[#OpenPGP Web of Trust|below]].
+In case there is a message <code>gpg: key 8D66066A2EEACCDA: 104 signatures not checked due to missing keys</code> is related to the [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]]. [[Advanced Users|Advanced users]] can learn more about this [[#OpenPGP Web of Trust|below]].
 
-'''3.''' Skip a few steps.
+{{IconSet|h1|4}} Skip a few steps.
 
-Steps '''4.''' to '''7.''' (which would be required for Windows, macOS and other Linux) can be skipped here. Proceed to step '''8.''' below.
+Steps {{IconSet|h1|2}} to {{IconSet|h1|8}} (which would be required for Windows, macOS and other Linux) can be skipped here. Proceed to step {{IconSet|h1|9}} below.
 }} <!-- close tab: Kicksecure or Whonix -->
 {{Tab
-|title= == Debian and Derivatives ==
+|title= == Debian ==
 |image=[[File:Debian.png|25px]]
 |content=
-'''1.''' Install <code>extrepo-offline-data</code>.
+{{IconSet|h1|2}} Install <code>extrepo</code>. <ref>
+The extrepo-offline-data Debian package unfortunately is too old and lacks the most recent (extended) version of the signing key.
 
-Because it contains the signing key.
-
-{{Install Package|package=
-extrepo-offline-data
-}}
-
-'''2.''' {{signing_key_main_increase_trust}}
-
-'''3.''' Import the key.
-
-Thanks to the <code>extrepo-offline-data</code> package, the key is already available on the local file system and can be imported into the user's keyring. <ref>
-Note to wiki editors:
-
-* Hardcoded to <code>whonix.asc</code>.
-* This is because at the time <code>kicksecure.asc</code> was not yet included in package <code>extrepo-offline-data</code>.
-* https://packages.debian.org/bullseye-backports/all/extrepo-offline-data/filelist
+* https://forums.whonix.org/t/extrepo-safely-adding-repos/8539
+* https://forums.whonix.org/t/expkeysig-error-gpg-key-whonix/22721
 </ref>
 
-{{CodeSelect|code=
-gpg --import /usr/share/extrepo/offline-data/debian/bullseye/whonix.asc
+Because it can fetch the signing key.
+
+{{Install Package|package=
+extrepo
 }}
 
-'''4.''' Skip a few steps.
+{{IconSet|h1|3}} {{signing_key_main_increase_trust}}
 
-Proceed to step '''8.''' below.
+{{IconSet|h1|4}} Enable the {{project_name_short}} repository.
+
+The purpose of this is to (temporarily) enable the {{project_name_short}} APT repository by utilizing Debian's extrepo to acquire the signing key. Once the repository is no longer needed, it can be disabled (removed), which is documented below. (Related: [[Packages for Debian Hosts]].)
+
+{{CodeSelect|code=
+sudo extrepo enable {{project_name_short_lowercase}}
+}}
+
+This will create two files. The repository file <code>/etc/apt/sources.list.d/extrepo_{{project_name_short_lowercase}}.sources</code> and the signing key <code>/var/lib/extrepo/keys/{{project_name_short_lowercase}}.asc</code>.
+
+{{IconSet|h1|5}} Import the public key.
+
+{{CodeSelect|code=
+gpg --import /var/lib/extrepo/keys/{{project_name_short_lowercase}}.asc
+}}
+
+{{IconSet|h1|6}} Disable the {{project_name_short}} APT repository.
+
+<u>Optional.</u> The {{project_name_short}} APT repository was only temporarily enabled to utilize Debian's extrepo to acquire the signing key. The repository is no longer needed. It can be disabled (removed).
+
+{{CodeSelect|code=
+sudo extrepo disable {{project_name_short_lowercase}}
+}}
+
+{{IconSet|h1|7}} Skip a few steps.
+
+Proceed to step {{IconSet|h1|9}} below.
 }} <!-- close tab: Debian and Derivatives -->
 }} <!-- close tab controller: operating system selection -->
-'''8.'''  Complete the {{project_name_short}} verification steps.
+{{IconSet|h1|9}}  Complete the {{project_name_short}} verification steps.
 
 If verifying {{project_name_short}} images, navigate to the relevant verification page below to finish the process:
 
@@ -218,15 +231,24 @@ If verifying {{project_name_short}} images, navigate to the relevant verificatio
 = Advanced Users =
 {{Anchor|Web of Trust}}
 == OpenPGP Web of Trust ==
+<u>Optional.</u>
+
 {{AdvancedUsersOnly}}
 
-A few people have signed [[Patrick Schleizer]]'s (adrelanos') OpenPGP key in [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]].
+If you have a good understanding of [[Verifying Software Signatures]], users can check the signing key for additional security.
 
-Jan Dittberner <ref>
-https://jan.dittberner.info/
-</ref> ({{Code2|Debian Developer}}) <ref>
-https://qa.debian.org/developer.php?login=Jan+Dittberner
-</ref> signed Patrick's key. So did intrigeri (Tails developer, {{Code2|Debian Developer}}); Peter Palfrader ({{Code2|Debian Developer}}); Richard King; and Michael Carbone (accessnow.org).
+Wiki page [[OpenPGP#The_OpenPGP_Web_of_Trust|The OpenPGP Web of Trust]] and chapter [[OpenPGP#Bootstrapping_OpenPGP_Keys_from_the_Internet|Bootstrapping OpenPGP Keys from the Internet]] may be helpful.
+
+Third-party signatures attached to the key file or acquired from OpenPGP keyservers are deprecated. For reasons and old documentation, see footnote. <ref>
+{{box|text=
+Deprecated. Kept for historical reasons.
+
+A few people have signed [[Patrick Schleizer]]'s (adrelanos') OpenPGP key.
+
+Jan Dittberner ({{Code2|Debian Developer}})
+
+* https://jan.dittberner.info/
+* https://qa.debian.org/developer.php?login=Jan+Dittberner signed Patrick's key. So did intrigeri (Tails developer, {{Code2|Debian Developer}}); Peter Palfrader ({{Code2|Debian Developer}}); Richard King; and Michael Carbone (accessnow.org).
 
 <u>Notes:</u>
 
@@ -235,22 +257,23 @@ https://qa.debian.org/developer.php?login=Jan+Dittberner
 ** key migration by signers,
 ** lack of a key transition message, or
 ** the lack of a key signer signing their new key with their old key.
+** signature algorithm SHA1 (<code>gpg</code> <code>--allow-weak-key-signatures</code>)
 
 Users relying on Debian or one of the many Debian derivatives (like Ubuntu) already trust apt, the APT repository of the relevant distribution. This means the Debian keyring can be installed as a trusted source for obtaining Jan's, intrigeri's or Peter's key, to check their signature on Patrick's key.
 {{Box|text=
-'''1.''' [[Update]] the package lists.
+{{IconSet|h1|1}} [[Update]] the package lists.
 
 {{CodeSelect|code=
 sudo apt update
 }}
 
-'''2.''' Install the Debian keyring.
+{{IconSet|h1|2}} Install the Debian keyring.
 
 {{CodeSelect|code=
 sudo apt install debian-keyring
 }}
 
-'''3.''' Extract a signer's key from the Debian keyring and import it into your own keyring.
+{{IconSet|h1|3}} Extract a signer's key from the Debian keyring and import it into your own keyring.
 
 Here is an example using Jan's key.
 
@@ -258,7 +281,7 @@ Here is an example using Jan's key.
 gpg --no-default-keyring --keyring /usr/share/keyrings/debian-keyring.gpg --armor --export B2FF1D95CE8F7A22DF4CF09BA73E0055558FB8DD {{!}} gpg --import
 }}
 
-'''4.''' ''Optional:'' Try to establish a better trust path to the signer by checking signatures on the signer's key.
+{{IconSet|h1|4}} <u>Optional.</u> Try to establish a better trust path to the signer by checking signatures on the signer's key.
 
 Check signatures on Patrick's key.
 
@@ -268,6 +291,34 @@ gpg --check-sigs 916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA
 
 The output of the above command should show signatures on Patrick's key, which should include the signer's signature.
 }}
+}}
+</ref>
+
+Nowadays a trust path to the key fingerprint can be established through Debian because Debian package [https://packages.debian.org/{{stable_project_version_based_on_Debian_codename}}/extrepo-offline-data extrepo-offline-data] contains file {{CodeSelect|inline=true|code=/usr/share/extrepo/offline-data/debian/{{stable_project_version_based_on_Debian_codename}}/{{project_name_short_lowercase}}.asc}}. <ref name=public-key-sources>
+* extrepo
+** https://forums.whonix.org/t/extrepo-safely-adding-repos/8539
+** https://salsa.debian.org/extrepo-team/extrepo-data/-/blob/master/repos/debian/kicksecure.yaml
+** https://salsa.debian.org/extrepo-team/extrepo-data/-/blob/master/repos/debian/whonix.yaml
+* Kicksecure:
+** https://www.kicksecure.com/keys/derivative.asc
+** https://github.com/derivative-maker/derivative-maker/blob/master/keys/derivative.asc
+** https://github.com/Kicksecure/repository-dist/blob/master/usr/share/keyrings/derivative.asc
+** https://github.com/Kicksecure/usability-misc/blob/master/usr/bin/repo-add-dist
+** https://github.com/Kicksecure/qubes-template-kicksecure/blob/master/keys/kicksecure-developer-patrick.asc
+** <code>/usr/share/keyrings/derivative.asc</code>
+* Whonix:
+** https://www.whonix.org/keys/derivative.asc
+** https://github.com/Whonix/qubes-template-whonix/blob/master/keys/whonix-developer-patrick.asc
+* Qubes:
+** https://github.com/adrelanos/qubes-builderv2/blob/main/qubesbuilder/plugins/fetch/keys/916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA.asc
+*** https://github.com/QubesOS/qubes-builderv2/pull/229
+** https://github.com/QubesOS/qubes-builderv2-github/blob/main/keys/916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA.asc
+*** https://github.com/QubesOS/qubes-builderv2-github/pull/29
+* Misc:
+** https://keys.openpgp.org/vks/v1/by-fingerprint/916B8D99C38EAF5E8ADC7A2A8D66066A2EEACCDA
+** https://keybase.io/adrelanos
+** https://api.github.com/users/adrelanos/gpg_keys
+</ref>
 
 == Download the signify Key ==
 [[File:Signify_Logo.svg|thumb|100px|signify]]
@@ -275,7 +326,7 @@ The output of the above command should show signatures on Patrick's key, which s
 {{mbox
 | type    = notice
 | image   = [[File:Ambox_notice.png|40px|alt=Info]]
-| text    = Advanced users only!
+| text    = [[Advanced Users|Advanced users]] only!
 }}
 
 <ref>
@@ -309,7 +360,7 @@ YlD+NW0yh7b2XBXsL4Xj0X1lrHBxFGHiaM7zC//pIPKTG7kfyJ4=
 {{signing_key_main_signify}}
 
 = Further Reading =
-* [https://en.wikipedia.org/wiki/GNU_Privacy_Guard GnuPG wikipedia] - free OpenPGP software.
+* [https://en.wikipedia.org/wiki/GNU_Privacy_Guard GnuPG wikipedia] - Freedom Software OpenPGP software.
 * [https://www.apache.org/dev/openpgp.html Apache: How To OpenPGP].
 * [https://www.debian.org/events/keysigning Debian: Keysigning] - a tutorial on signing keys of other people.
 * [https://www.rubin.ch/pgp/weboftrust.en.html rubin.ch: An explanation of the PGP web of trust].

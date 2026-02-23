@@ -176,8 +176,8 @@ This section explains when and how your unique typing or mouse behavior - also k
 
 There are two main threat scenarios:
 
-* '''1.''' A tracker can observe how you type or move your mouse both when you are using Tor and when you are using the regular internet (clearnet). They try to match your identity across both.
-* '''2.''' A tracker can only see your behavior on Tor, but still wants to tell you apart from other Tor users.
+* {{IconSet|h4|1}} A tracker can observe how you type or move your mouse both when you are using Tor and when you are using the regular internet (clearnet). They try to match your identity across both.
+* {{IconSet|h4|2}} A tracker can only see your behavior on Tor, but still wants to tell you apart from other Tor users.
 
 In both cases, the tracker can create a fingerprint based on how you type - using patterns described in the [[#Keystroke_Dynamics|Keystroke Dynamics]] section - and how you move your mouse. <ref>
 Mouse fingerprinting can analyze factors like cursor speed, scrolling style, pause durations, and path curvature. These traits can be just as unique as typing patterns.
@@ -196,14 +196,14 @@ This means that even without knowing your name or IP address, a website or attac
 == Kloak ==
 [[File:Mouse-anon-hp-promo.jpg|thumb]]
 Kloak is a privacy tool (input device anonymization tool) that hides your typing and mouse movement patterns, which can be used to identify you online. <ref>
-Technically, kloak anonymizes input device signals by introducing random delays in keyboard and mouse events, disrupting timing-based biometric identification. See:
+Technically, Kloak anonymizes input device signals by introducing random delays in keyboard and mouse events, disrupting timing-based biometric identification. See:
 
 * https://github.com/vmonaco/kloak/pull/38
 * https://github.com/vmonaco/kloak/pull/50#issuecomment-1657250132
 * https://arxiv.org/pdf/2101.09087.pdf
 </ref>
 
-* [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] includes kloak by default.
+* [[Non-Qubes-Whonix|{{non_q_project_name_short}}]] includes Kloak by default.
 * [[Qubes|{{q_project_name_long}}]] support unavailable. <ref>
 Ongoing development is stalled. See: https://github.com/vmonaco/kloak/pull/50
 
@@ -217,16 +217,16 @@ Deprecated issues:
 * https://github.com/QubesOS/qubes-issues/issues/9775
 </ref> Instead, see [[Keystroke_and_Mouse_Deanonymization#Qubes_Event_Buffering|Qubes Event Buffering]].
 
-Kloak is pre-installed in {{non_q_project_name_long}} {{project_name_workstation_long}}.
+Kloak is pre-installed in {{non_q_project_name_long}} [[{{project_name_workstation_short}}|{{project_name_workstation_long}}]].
 
-We recommend [[Packages for Debian Hosts|installing kloak on your host system]] as well, to keep it effective even if your {{project_name_workstation_short}} VM gets compromised. However, if you're accessing sites that use typing biometrics (like some banking sites), it might be better to only use kloak within {{project_name_long}} VMs.
+We recommend [[Packages for Debian Hosts|installing Kloak on your host system]] as well, to keep it effective even if your {{project_name_workstation_short}} VM gets compromised. However, if you're accessing sites that use typing biometrics (like some banking sites), it might be better to only use Kloak within {{project_name_long}} VMs.
 
-Another benefit of kloak is that it helps protect your search queries even if they are being analyzed in encrypted traffic using autocomplete leaks. <ref>
+Another benefit of Kloak is that it helps protect your search queries even if they are being analyzed in encrypted traffic using autocomplete leaks. <ref>
 * [https://vmonaco.com/papers/Feasibility%20of%20a%20Keystroke%20Timing%20Attack%20on%20Search%20Engines%20with%20Autocomplete.pdf Keystroke Timing Attack on Search Engines with Autocomplete]
 * https://www.usenix.org/sites/default/files/conference/protected-files/sec19_slides_monaco.pdf
 </ref>
 
-kloak is designed to stymie adversary attempts to identify and/or impersonate users' biometric traits. The GitHub site succinctly describes kloak's purpose and the tradeoff between usability and the level of privacy. Notably, shorter time delays between keystrokes and release events reduce overall anonymity: <ref>
+Kloak is designed to stymie adversary attempts to identify and/or impersonate users' biometric traits. The GitHub site succinctly describes Kloak's purpose and the tradeoff between usability and the level of privacy. Notably, shorter time delays between keystrokes and release events reduce overall anonymity: <ref>
 https://github.com/Whonix/kloak
 </ref>
 
@@ -241,7 +241,7 @@ The time between key press and release events are typically used to identify use
 
 kloak grabs the input device and sends delayed input events to the Wayland compositor using emulated input protocols. Grabbing the device disables any other application from reading the events. Events are scheduled to be released at a later time as they are received, and a semi-random delay is introduced before they are sent to the compositor.</blockquote>
 
-While kloak makes it hard for adversaries to identify individuals or to replicate their typing behavior -- for example to overcome two-factor authentication based on keystroke biometrics -- it is not perfect and has [[Keystroke_and_Mouse_Deanonymization#Limitations|limitations]].
+While Kloak makes it hard for adversaries to identify individuals or to replicate their typing behavior - for example to overcome two-factor authentication based on keystroke biometrics - it is not perfect and has [[Keystroke_and_Mouse_Deanonymization#Limitations|limitations]].
 
 === Rescue Keys ===
 Kloak by default recognizes a "rescue key" sequence, which will terminate the kloak process.
@@ -260,31 +260,33 @@ Kloak rescue keys may be customized by using the <code>-k</code> option, which t
 
 For instance, to run kloak with the rescue key set to <code>KEY_LEFTSHIFT + KEY_ESC</code>, run:
 
-'''1.''' Stop background kloak process first.
+{{IconSet|h1|1}} Stop background kloak process first.
 
 {{CodeSelect|code=
 sudo systemctl stop kloak
 }}
 
-'''2.''' Run kloak in terminal.
+{{IconSet|h1|2}} Run kloak in terminal.
 
 {{CodeSelect|code=
 sudo kloak -k KEY_LEFTSHIFT,KEY_ESC
 }}
 
-'''3.''' Terminate with Ctrl+C or rescue key sequence when done.
+{{IconSet|h1|3}} Terminate with Ctrl+C or rescue key sequence when done.
 
-'''4.''' Restart background kloak process.
+{{IconSet|h1|4}} Restart background kloak process.
 
 {{CodeSelect|code=
 sudo systemctl start kloak
 }}
 
-'''5.''' Persistent configuration change.
+{{IconSet|h1|5}} Persistent configuration change.
 
 To make this change permanent, see [[Keystroke_and_Mouse_Deanonymization#Setting_persistent_kloak_settings|setting persistent kloak settings]].
 
-'''6.''' Done.
+{{IconSet|h1|6}} Done.
+
+The rescue key sequence has been changed for this session.
 
 ==== Disabling rescue keys ====
 
@@ -313,43 +315,45 @@ Warning:
 * Only enable in case of issues when needing a log file for debugging or sharing with a trusted user.
 * Kloak acts as a keylogger when running in verbose mode! Logs contain detailed info of all keystrokes and mouse movements made while kloak is running. Sharing kloak logs with another individual reveals key logs, mouse activity logs, and keyboard/mouse biometrics to the receiving user. Do not do anything sensitive while kloak is generating debug logs! Under no circumstances should you share a kloak log with any user you do not fully trust! Do not publicize kloak logs, transmit them over an insecure channel, or store them online unencrypted!
 }}
-Kloak provides a <code>-v</code> option that is useful in these scenarios. Due to the volume of data kloak produces during logging, it is recommended that you run kloak in a terminal when gathering logs. To run kloak in verbose mode, run the following commands:
+Kloak provides a <code>-v</code> option that is useful in these scenarios. Due to the volume of data Kloak produces during logging, it is recommended that you run Kloak in a terminal when gathering logs. To run Kloak in verbose mode, run the following commands:
 
-'''1.''' Stop background kloak process first
+{{IconSet|h1|1}} Stop background kloak process first
 
 {{CodeSelect|code=
 sudo systemctl stop kloak
 }}
 
-'''2.''' Run kloak in terminal
+{{IconSet|h1|2}} Run kloak in terminal
 
 {{CodeSelect|code=
 sudo kloak -v
 }}
 
-'''3.''' Gather logs, then terminate with Ctrl+C or rescue key sequence.
+{{IconSet|h1|3}} Gather logs, then terminate with Ctrl+C or rescue key sequence.
 
-'''4.''' Restart background kloak process
+{{IconSet|h1|4}} Restart background kloak process
 
 {{CodeSelect|code=
 sudo systemctl start kloak
 }}
 
-'''5.''' Persistent configuration change.
+{{IconSet|h1|5}} Persistent configuration change.
 
 To make this change permanent, see [[Keystroke_and_Mouse_Deanonymization#Setting_persistent_kloak_settings|setting persistent kloak settings]].
 
-'''6.''' Done.
+{{IconSet|h1|6}} Done.
+
+Verbose logging has been completed and the background service has been restarted.
 </ref>
 
 === Setting persistent kloak settings ===
 If you use kloak as a systemd service and wish to use some of its options, you may do so by adding a configuration file for kloak. To do this:
 
-'''1.''' {{Open with root rights|filename=
+{{IconSet|h1|1}} {{Open with root rights|filename=
 /usr/lib/systemd/system/kloak.service.d/50_user.conf
 }}
 
-'''2.''' Paste.
+{{IconSet|h1|2}} Paste.
 
 <u>Note:</u> Replace <code>&lt;options&gt;</code> with the options you wish to pass to kloak.
 
@@ -358,21 +362,21 @@ If you use kloak as a systemd service and wish to use some of its options, you m
 ExecStart=/usr/bin/kloak <options>
 }}
 
-'''3.''' Save and exit.
+{{IconSet|h1|3}} Save and exit.
 
-'''4.''' Reload systemd manager configuration.
+{{IconSet|h1|4}} Reload systemd manager configuration.
 
 {{CodeSelect|code=
 sudo systemctl daemon-reload
 }}
 
-'''5.''' Restart kloak.
+{{IconSet|h1|5}} Restart kloak.
 
 {{CodeSelect|code=
 sudo systemctl restart kloak
 }}
 
-'''6.''' Done.
+{{IconSet|h1|6}} Done.
 
 Kloak will now run with custom options.
 
@@ -393,27 +397,50 @@ Recommendation - xrdp users should run kloak on the client machine to obfuscate 
 }}
 
 === Stop Kloak ===
-It is usually not required to stop kloak unless for testing, debugging.
+It is usually not required to stop Kloak unless for testing, debugging.
 
-Stop kloak until restart or reboot.
+<u>Warning:</u> Stopping Kloak stops keystroke and mouse deanonymization.
+
+* As a precaution, use a separate [[Whonix-Workstation]]. For instructions, see [[Multiple Whonix-Workstation]].
+* Disable networking for [[Whonix-Workstation]]. A simple way would be shutting down [[Whonix-Gateway]] while keeping [[Whonix-Workstation]] running.
+
+Stop <code>kloak</code> until restart or reboot.
+
+{{IconSet|h1|1}} {{sysmaint_notice}}
+
+{{IconSet|h1|2}} Stop <code>kloak</code>.
 
 {{CodeSelect|code=
 sudo systemctl stop kloak
 }}
 
-=== Start Kloak ===
-It is usually not required to start kloak as it is running by default.
+{{IconSet|h1|3}} Done.
 
-Start kloak.
+Kloak has been stopped until restart or reboot.
+
+=== Start Kloak ===
+It is usually not required to start Kloak as it is running by default.
+
+{{IconSet|h1|1}} (Re)start Kloak.
 
 {{CodeSelect|code=
 sudo systemctl restart kloak
 }}
 
+{{IconSet|h1|2}} Done.
+
+Kloak has been (re)started.
+
 === Kloak Status ===
+{{IconSet|h1|1}} Check Kloak status.
+
 {{CodeSelect|code=
 sudo systemctl status kloak
 }}
+
+{{IconSet|h1|2}} Done.
+
+Kloak status has been displayed.
 
 == Qubes Event Buffering ==
 Qubes Event Buffering is Kloak-alike software.
@@ -443,11 +470,13 @@ To provide the same benefits as Kloak despite these limitations, Qubes OS R4.3 p
 
 To enable event buffering for a particular VM:
 
-'''1.''' Determine the VM you want to enable event buffering on. We will use <code>whonix-workstation-18</code> as our example here.
+{{IconSet|h1|1}} Determine the VM you want to enable event buffering on. We will use <code>whonix-workstation-18</code> as our example here.
 
-'''2.''' Open a terminal in dom0.
+{{IconSet|h1|2}} Open a terminal in dom0.
 
-'''3.''' Run:
+{{IconSet|h1|3}} Run:
+
+<u>Note:</u> Replace <code>whonix-workstation-18</code> with the actual name of the VM.
 
 {{CodeSelect|code=
 qvm-features whonix-workstation-18 gui-events-max-delay 200
@@ -455,9 +484,9 @@ qvm-features whonix-workstation-18 gui-events-max-delay 200
 
 This will enable event buffering on <code>whonix-workstation-18</code>, with a maximum buffer time of 200ms. If you want a longer buffer time, specify a larger number as the last argument.
 
-'''4.''' This setting does not take effect on currently running VMs. If <code>whonix-workstation-18</code> or any DispVMs based on it are running, shut them down.
+{{IconSet|h1|4}} This setting does not take effect on currently running VMs. If <code>whonix-workstation-18</code> or any DispVMs based on it are running, shut them down.
 
-'''5.''' Done.
+{{IconSet|h1|5}} Done.
 
 Event buffering is now enabled for <code>whonix-workstation-18</code>. You should notice a delay in typing when you launch the VM next.
 
@@ -468,7 +497,7 @@ Prerequisite knowledge:
 * shared personality
 * virtual personality
 
-Please read [[Protocol-Leak-Protection_and_Fingerprinting-Protection#Identifiers_Design_Goals|Identifiers Design Goals]] first to acquire the perquisite knowledge.
+Please read [[Protocol-Leak-Protection_and_Fingerprinting-Protection#Identifiers_Design_Goals|Identifiers Design Goals]] first to acquire the prerequisite knowledge.
 
 In line with Identifiers Design Goals, a shared personality instead of a virtual personality has been implemented.
 
@@ -504,22 +533,22 @@ The following limitations apply only to Qubes event buffering, not Kloak:
 * '''There is no easy way to enable or configure event buffering.''' The only way to enable and configure event buffering is using the <code>qvm-features</code> command in a dom0 terminal. A configuration feature for event buffering may be added to Qube Manager in the future.
 
 = Defense Testing =
-You can test that kloak actually works by trying a keystroke test website. https://vmonaco.com/device-fingerprinting/ is a good choice as it is free, open source, and requires no personal data or signup process to use. The code is visible at https://github.com/vmonaco/device-fingerprinting.
+You can test that Kloak actually works by trying a keystroke test website. https://vmonaco.com/device-fingerprinting/ is a good choice as it is free, open source, and requires no personal data or signup process to use. The code is visible at https://github.com/vmonaco/device-fingerprinting.
 
 To use the test:
 
-* Ensure kloak is not running.
+* Ensure Kloak is not running.
 * Open the website.
 * Move the mouse around and click on random locations on the page. You will see a graph labeled "mousemove" start to update. As the mouse moves, the graph should eventually show a few (oftentimes only one) orange-marked spikes that act as a fingerprint for your device.
 * Click inside the text area and type for some amount of time. A graph labeled "keydown" should show one or more prominent orange-marked spikes after a bit of typing.
-* Start kloak. then refresh the page.
+* Start Kloak. then refresh the page.
 * Move the mouse around again. The graph will act erratically and fail to obtain an orange-marked spike for very long.
 * Click inside the text area and type for some amount of time. The graph should act erratically similar to the mouse graph.
 * By default, the website uses <code>event.timeStamp</code> as a time source for fingerprint extraction. If desired, repeat the above steps with the other time sources (<code>Date.now()</code>, <code>performance.now()</code>, and <code>Web Worker</code>).
 
-A device or biometric fingerprint can be obtained quickly and with high certainty when kloak is not used. The tests done with kloak enabled show that kloak obfuscated typing behavior, making it difficult to authenticate or identify a particular user.
+A device or biometric fingerprint can be obtained quickly and with high certainty when Kloak is not used. The tests done with Kloak enabled show that Kloak obfuscated typing behavior, making it difficult to authenticate or identify a particular user.
 
-Note that websites that observe typing behavior will likely see users running kloak as being distinctly different from other users (due to the randomized, unnatural typing rhythms and mouse movements). This is similar to how Tor users can be detected separately from internet users who do not use Tor, but telling individual Tor users from each other is very difficult. As more users use kloak, the anonymity set will increase.
+Note that websites that observe typing behavior will likely see users running Kloak as being distinctly different from other users (due to the randomized, unnatural typing rhythms and mouse movements). This is similar to how Tor users can be detected separately from internet users who do not use Tor, but telling individual Tor users from each other is very difficult. As more users use Kloak, the anonymity set will increase.
 
 Other potential tests (not recommended):
 
@@ -527,7 +556,7 @@ Other potential tests (not recommended):
 * https://github.com/topics/keystroke-dynamics
 * [https://forums.whonix.org/t/current-state-of-kloak/5605/60 forum discussion]
 
-Previously KeyTrac was recommended for testing kloak. However, the KeyTrac demo is no longer available. When KeyTrac did exist, the following results were obtained by training and testing KeyTrac with and without kloak:
+Previously KeyTrac was recommended for testing Kloak. However, the KeyTrac demo is no longer available. When KeyTrac did exist, the following results were obtained by training and testing KeyTrac with and without Kloak:
 
 {| class="wikitable"
 |+ ''Sample KeyTrac versus Kloak Test Results''
