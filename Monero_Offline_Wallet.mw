@@ -15,11 +15,11 @@ Keep Monero private keys offline and isolate the network part (monerod) from the
 = Introduction =
 '''UNFINISHED!'''
 
-This instructions document how to keep Monero private keys offline as well as how to isolate the network part (<code>monero<u>d</u></code>) from the wallet part (Monero Wallet) for better security. <code>monero<u>d</u></code> is the Monero daemon, a full blockchain verifying background process which downloads and verifies the whole blockchain.
+These instructions document how to keep Monero private keys offline as well as how to isolate the network part (<code>monero<u>d</u></code>) from the wallet part (Monero Wallet) for better security. <code>monero<u>d</u></code> is the Monero daemon, a full blockchain verifying background process which downloads and verifies the whole blockchain.
 
-That advantage of this setup is, should there ever be a vulnerability that allows the exploitation of Monero Wallet CLI's network source code and/or <code>monero<u>d</u></code> by malware, then all user funds would remain safe, since these would remain isolated in the Monero Wallet CLI in a different offline VM.
+The advantage of this setup is, should there ever be a vulnerability that allows the exploitation of Monero Wallet CLI's network source code and/or <code>monero<u>d</u></code> by malware, then all user funds would remain safe, since these would remain isolated in the Monero Wallet CLI in a different offline VM.
 
-If <code>monero<u>d</u></code> was ever compromised, then this setup would have the same issues as descried on the [[Monero]] wiki page in chapter [[Monero#Remote_Node_Security_and_Privacy_Considerations|Remote Node Security and Privacy Considerations]]. This is an issue unspecific to these instructions.
+If <code>monero<u>d</u></code> was ever compromised, then this setup would have the same issues as described on the [[Monero]] wiki page in chapter [[Monero#Remote_Node_Security_and_Privacy_Considerations|Remote Node Security and Privacy Considerations]]. This is an issue unspecific to these instructions.
 
 The connection scheme is <code>Monero Offline Wallet</code> &rarr; <code>Monero Online Wallet</code> &rarr; <code>monero<u>d</u></code> &rarr; <code>Tor</code> &rarr; <code>Monero network</code>.
 
@@ -44,15 +44,15 @@ Since this setup is more complex and for advanced users only, it is highly recom
 
 Exercising with small amount of value is recommended but not too small (below the dust level, unable to move funds due to funds being worth less than the required transaction fees). Exercising on Monero testnet first should also be considered. This is [[unspecific]] to {{project_name_short}}.
 
-'''1.''' Optional. How to use Monero Wallet GUI.
+{{IconSet|h1|1}} Optional. How to use Monero Wallet GUI.
 
-If the end-goal is using an offline (airgap) Monero Wallet, learning how to use Monero Wallet GUI would be expendable.
+If the end-goal is using an offline (air gap) Monero Wallet, learning how to use Monero Wallet GUI would be expendable.
 
-'''2.''' How to use Monero Wallet CLI.
+{{IconSet|h1|2}} How to use Monero Wallet CLI.
 
 Wallet creation, receiving funds, spending funds.
 
-'''3.''' How to use [[Monero Wallet Isolation]].
+{{IconSet|h1|3}} How to use [[Monero Wallet Isolation]].
 
 = Setup =
 == Qubes <code>dom0</code> Configuration ==
@@ -98,13 +98,13 @@ It is easier to use the exact same names as in the example below in this chapter
 === Qubes qrexec Policy Configuration ===
 In <code>dom0</code>.
 
-'''1.''' Create the file <code>/etc/qubes-rpc/policy/user.monerod</code>:
+{{IconSet|h1|1}} Create the file <code>/etc/qubes-rpc/policy/user.monerod</code>:
 
 {{CodeSelect|code=
 sudo nano /etc/qubes-rpc/policy/user.monerod
 }}
 
-'''2.''' Add the following line:
+{{IconSet|h1|2}} Add the following line:
 
 <u>Note</u>: If the user is using different names for the VMs other than <code>monero-wallet-ws</code> and <code>monero<u>d</u>-ws</code>, the next line would have to be modified accordingly. If the user is using the exact names as suggested in previous chapter "Create App Qubes", then no modifications are required.
 
@@ -112,28 +112,28 @@ sudo nano /etc/qubes-rpc/policy/user.monerod
 monero-wallet-ws monerod-ws allow
 }}
 
-'''3.''' Save and close file.
+{{IconSet|h1|3}} Save and close file.
 
-'''4.''' Done.
+{{IconSet|h1|4}} Done.
 
 Qubes <code>dom0</code> setup is complete.
 
 == <code>monero<u>d</u>-ws</code> VM Configuration ==
 '''Note:''' The following instructions should be applied in {{project_name_workstation_short}} ([[Qubes|{{q_project_name_short}}]]: App Qube <code>monero<u>d</u>-ws</code>).
 
-'''1.''' Create folder <code>~/.config/systemd/user</code>.
+{{IconSet|h1|1}} Create folder <code>~/.config/systemd/user</code>.
 
 {{CodeSelect|code=
 mkdir -p ~/.config/systemd/user
 }}
 
-'''2.''' Create file <code>~/.config/systemd/user/monero<u>d</u>.service</code>.
+{{IconSet|h1|2}} Create file <code>~/.config/systemd/user/monero<u>d</u>.service</code>.
 
 {{Open File|
 filename=~/.config/systemd/user/monerod.service
 }}
 
-'''3.''' Paste the following contents. <ref>
+{{IconSet|h1|3}} Paste the following contents. <ref>
 Do not use <code>--detach</code> - outdated style for daemons. Better error handling without.
 </ref>
 
@@ -164,49 +164,49 @@ PrivateTmp=true
 WantedBy=default.target
 }}
 
-'''4.''' Save and close file.
+{{IconSet|h1|4}} Save and close file.
 
-'''5.''' Reload systemd user instance.
+{{IconSet|h1|5}} Reload systemd user instance.
 
 {{CodeSelect|code=
 systemctl --user daemon-reload
 }}
 
-'''6.''' Optional: Enable autostart for the <code>monero<u>d</u></code> systemd user instance.
+{{IconSet|h1|6}} Optional: Enable autostart for the <code>monero<u>d</u></code> systemd user instance.
 
 {{CodeSelect|code=
 systemctl --user enable monerod
 }}
 
-'''7.''' Start <code>monero<u>d</u></code> systemd user instance.
+{{IconSet|h1|7}} Start <code>monero<u>d</u></code> systemd user instance.
 
 {{CodeSelect|code=
 systemctl --user restart monerod
 }}
 
-'''8.''' Create folder <code>/rw/usrlocal/etc/qubes-rpc</code>.
+{{IconSet|h1|8}} Create folder <code>/rw/usrlocal/etc/qubes-rpc</code>.
 
 {{CodeSelect|code=
 sudo mkdir -p /rw/usrlocal/etc/qubes-rpc
 }}
 
-'''9.''' {{Open with root rights
+{{IconSet|h1|9}} {{Open with root rights
 |filename=/rw/usrlocal/etc/qubes-rpc/user.monerod
 }}
 
-'''10.''' Add this line:
+{{IconSet|h1|10}} Add this line:
 
 {{CodeSelect|code=
 socat STDIO TCP:localhost:18081
 }}
 
-'''11.''' Make the <code>/rw/usrlocal/etc/qubes-rpc/user.monerod</code> script executable.
+{{IconSet|h1|11}} Make the <code>/rw/usrlocal/etc/qubes-rpc/user.monerod</code> script executable.
 
 {{CodeSelect|code=
 sudo chmod +x /rw/usrlocal/etc/qubes-rpc/user.monerod
 }}
 
-'''12.''' Done
+{{IconSet|h1|12}} Done.
 
 Creation and configuration of <code>monero<u>d</u></code> systemd user unit has been completed.
 
@@ -215,7 +215,7 @@ These instructions explain how to initially create the Monero private keys in th
 
 '''Note:''' The following instructions should be applied in {{project_name_workstation_short}} ([[Qubes|{{q_project_name_short}}]]: App Qube <code>monero-wallet-vault</code>).
 
-'''x.''' Generate a new Monero wallet file. <ref>
+{{IconSet|h1|1}} Generate a new Monero wallet file. <ref>
 File name <code>wallet1</code> and file path <code>~/wallet1</code> is arbitrary.
 </ref>
 
@@ -223,7 +223,7 @@ File name <code>wallet1</code> and file path <code>~/wallet1</code> is arbitrary
 monero-wallet-cli --offline --generate-new-wallet ~/wallet1
 }}
 
-'''x.''' Monero Wallet CLI will show:
+{{IconSet|h1|2}} Monero Wallet CLI will show:
 
 <pre>
 This is the command line monero wallet. It needs to connect to a monero
@@ -236,18 +236,18 @@ Specify wallet file name (e.g., MyWallet). If the wallet doesn't exist, it will 
 Wallet file name (or Ctrl-C to quit):
 </pre>
 
-'''x.''' Enter the name of the wallet, for example: <code>wallet1</code>
+{{IconSet|h1|3}} Enter the name of the wallet, for example: <code>wallet1</code>
 
-'''x.''' Monero Wallet CLI will ask:
+{{IconSet|h1|4}} Monero Wallet CLI will ask:
 
 <pre>
 No wallet found with that name. Confirm creation of new wallet named: wallet1
   (Y/Yes/N/No):
 </pre>
 
-'''x.''' Type <code>Y</code> and press enter.
+{{IconSet|h1|5}} Type <code>Y</code> and press enter.
 
-'''x.''' Monero Wallet CLI will ask:
+{{IconSet|h1|6}} Monero Wallet CLI will ask:
 
 <pre>
 Generating new wallet...
@@ -255,9 +255,9 @@ Enter a new password for the wallet:
 Confirm password:
 </pre>
 
-'''x.''' Enter a password or leave it empty. Arguably how useful it is when using [[Full Disk Encryption]] on the host operating system. Re-enter password to confirm.
+{{IconSet|h1|7}} Enter a password or leave it empty. Arguably how useful it is when using [[Full Disk Encryption]] on the host operating system. Re-enter password to confirm.
 
-'''x.''' Monero Wallet CLI will ask:
+{{IconSet|h1|8}} Monero Wallet CLI will ask:
 
 <pre>
 List of available languages for your wallet's seed:
@@ -277,9 +277,9 @@ If your display freezes, exit blind with ^C, then run again with --use-english-l
 Enter the number corresponding to the language of your choice:
 </pre>
 
-'''x.''' Enter <code>1</code> recommended. In the opinion of the author this is the most common language and least likely to suffer from potential restoration issues in a few decades. Optional: choose a language of your choice.
+{{IconSet|h1|9}} Enter <code>1</code> recommended. In the opinion of the author this is the most common language and least likely to suffer from potential restoration issues in a few decades. Optional: choose a language of your choice.
 
-'''x.''' Example printout:
+{{IconSet|h1|10}} Example printout:
 
 Note: Do not use address, keys or seed phrase from the example below!
 
@@ -308,25 +308,25 @@ Enabling this supports the network you are using, and makes you eligible for rec
 Do you want to do it now? (Y/Yes/N/No): :
 </pre>
 
-'''x.''' Press <code>n</code> to disable mining.
+{{IconSet|h1|11}} Press <code>n</code> to disable mining.
 
-'''x.''' Note the <code>standard address</code>.
+{{IconSet|h1|12}} Note the <code>standard address</code>.
 
 Note, in above example print out a line starting with <code>Generated new wallet:</code>. In above example, the wallet address is <code>496qfvthZzy99adqviEhoDdFivmwcDH3vBZvPRSX8V6VScBTkR2VuMdb8xEgeMjyPqCigRfBK4cfrEXiX6YEdkF55rWD2Rq</code>.
 
-This is also called <code>standard address</code> or <code>primary address</code>. It is important to know what the <code>standard address</code> / <code>primary address</code> is.
+This is also called <code>standard address</code> or <code>primary address</code>. It is important to know what the <code>standard address</code> or <code>primary address</code> is.
 
 There is no need to memorize it. A note in a text file in an offline vault VM should be made "my standard address is ...". Replace <code>...</code> with the actual <code>standard address</code>.
 
-'''x.''' Note the <code>view key</code>.
+{{IconSet|h1|13}} Note the <code>view key</code>.
 
-Note, in above example print out a line starting with <code>View key:</code>. In above example, the wallet address is <code>89298e00f35bd89928b23d8a199bcfb49c61d63e242ffe0ca6b235cc0ddb8706</code>. There is no need to memorize it.
+Note, in above example print out a line starting with <code>View key:</code>. In above example, the view key is <code>89298e00f35bd89928b23d8a199bcfb49c61d63e242ffe0ca6b235cc0ddb8706</code>. There is no need to memorize it.
 
-The <code>view key</code> is also sometimes called <code>secret view key</code>. It is important to memorize that <code>view key</code> is sometimes called <code>secret view key</code>.
+The <code>view key</code> is also sometimes called <code>secret view key</code>. It is important to remember that <code>view key</code> is sometimes called <code>secret view key</code>.
 
 A note in a text file in an offline vault VM should be made "my secret view key is ...". Replace <code>...</code> with the actual view key.
 
-'''x.''' Note the seed phrase.
+{{IconSet|h1|14}} Note the seed phrase.
 
 Note, in above example print out a line starting with <code>NOTE: the following 25 words can be used to recover access to your wallet. Write them down and store them somewhere safe and secure. Please do not store them in your email or on file storage services outside of your immediate control.</code>. In above example, wallet seed phrase is:
 
@@ -336,13 +336,13 @@ ajar cylinder sake gypsy comb dexterity ethics square
 sincerely fictional glide equip fierce january journal kisses zoom
 </pre>
 
-Do NOT use above seed phrase. A note in a text file in an offline vault VM should be made "my seed phrase is ... Replace <code>...</code> with the actual seed phrase. This is the most important thing to backup! Everything else can be lost (computer, view key, standard address). The only thing required for recovery is the seed phrase. It might be a good idea to memorize it.
+Do NOT use above seed phrase. A note in a text file in an offline vault VM should be made "my seed phrase is ...". Replace <code>...</code> with the actual seed phrase. This is the most important thing to backup! Everything else can be lost (computer, view key, standard address). The only thing required for recovery is the seed phrase. It might be a good idea to memorize it.
 
-'''x.''' Note.
+{{IconSet|h1|15}} Note.
 
 <code>[wallet 496qfv (no daemon)]: </code> represents the Monero Wallet CLI command prompt.
 
-'''x.''' Optional. Disable Monero Wallet CLI timeout. <ref>
+{{IconSet|h1|16}} Optional. Disable Monero Wallet CLI timeout. <ref>
 https://monero.stackexchange.com/questions/11737/how-can-i-slow-down-or-disable-cli-wallets-automatic-locking-due-to-inactivity
 </ref> Run the following command in the Monero Wallet CLI command prompt.
 
@@ -354,34 +354,34 @@ set inactivity-lock-timeout 0
 === socat setup ===
 '''Note:''' The following instructions should be applied in {{project_name_workstation_short}} ([[Qubes|{{q_project_name_short}}]]: App Qube <code>monero-wallet-ws</code>).
 
-'''1.''' {{Open with root rights
+{{IconSet|h1|1}} {{Open with root rights
 |filename=/rw/config/rc.local
 }}
 
-'''2.''' Append at the bottom.
+{{IconSet|h1|2}} Append at the bottom.
 
 {{CodeSelect|code=
 socat TCP-LISTEN:18081,fork,bind=127.0.0.1 EXEC:"qrexec-client-vm monerod-ws user.monerod"
 }}
 
-'''3.''' Save and close file.
+{{IconSet|h1|3}} Save and close file.
 
-'''4.''' Make the <code>/rw/config/rc.local</code> script executable.
+{{IconSet|h1|4}} Make the <code>/rw/config/rc.local</code> script executable.
 
 {{CodeSelect|code=
 sudo chmod +x /rw/config/rc.local
 }}
 
-'''5.''' Restart the <code>monero-wallet-ws</code> VM.
+{{IconSet|h1|5}} Restart the <code>monero-wallet-ws</code> VM.
 
-'''6.''' Done.
+{{IconSet|h1|6}} Done.
 
 Setting up automatically starting the <code>socat</code> process has been completed.
 
 === View-Only Wallet Setup ===
 '''Note:''' The following instructions should be applied in {{project_name_workstation_short}} ([[Qubes|{{q_project_name_short}}]]: App Qube <code>monero-wallet-ws</code>).
 
-'''1.''' Generate view-only wallet.
+{{IconSet|h1|1}} Generate view-only wallet.
 
 {{CodeSelect|code=
 monero-wallet-cli --generate-from-view-key ~/view1
@@ -389,9 +389,9 @@ monero-wallet-cli --generate-from-view-key ~/view1
 
 Monero Wallet CLI is more "clever" and automatically detects the already available <code>monero<u>d</u></code>. <ref>
 <code>monero-wallet-cli</code> detects that <code>monero<u>d</u></code>'s default port <code>18081</code> is open on localhost. The detection mechanism is port based. Not process based.
-</ref> Therefore as opposed to Monero Wallet GUI, no "remote node" configuration is neccessary.
+</ref> Therefore as opposed to Monero Wallet GUI, no "remote node" configuration is necessary.
 
-'''2.''' Monero will show:
+{{IconSet|h1|2}} Monero will show:
 
 <pre>
 This is the command line monero wallet. It needs to connect to a monero
@@ -403,17 +403,17 @@ Logging to monero-wallet-cli.log
 Standard address:
 </pre>
 
-'''3.''' Enter the <code>standard address</code>.
+{{IconSet|h1|3}} Enter the <code>standard address</code>.
 
-'''4.''' Monero will show:
+{{IconSet|h1|4}} Monero will show:
 
 <pre>
 Secret view key:
 </pre>
 
-'''5.''' Enter the <code>secret view key</code>.
+{{IconSet|h1|5}} Enter the <code>secret view key</code>.
 
-'''6.''' Example printout:
+{{IconSet|h1|6}} Example printout:
 
 <pre>
 Standard address: 496qfvthZzy99adqviEhoDdFivmwcDH3vBZvPRSX8V6VScBTkR2VuMdb8xEgeMjyPqCigRfBK4cfrEXiX6YEdkF55rWD2Rq
@@ -436,17 +436,17 @@ Background refresh thread started
 == Introduction ==
 '''Note:''' On the host (Qubes users: in <code>dom0</code>).
 
-The involved VMs need to be started using any usual method (using Qubes VM Manger (QVMM), starting a terminal emulator or otherwise).
+The involved VMs need to be started using any usual method (using Qubes VM Manager (QVMM), starting a terminal emulator or otherwise).
 
-'''1.''' Start <code>monero<u>d</u>-ws</code> VM.
+{{IconSet|h1|1}} Start <code>monero<u>d</u>-ws</code> VM.
 
-'''2.''' Expectations.
+{{IconSet|h1|2}} Expectations.
 
 Nothing is expected to happen. <code>monero<u>d</u></code> is a background service. To monitor it, see chapter [[Monero_Wallet_Isolation#Monitoring|monitoring]].
 
-'''3.''' Start <code>monero-wallet-ws</code> VM.
+{{IconSet|h1|3}} Start <code>monero-wallet-ws</code> VM.
 
-'''4.''' Start <code>monero-wallet-vault</code> VM.
+{{IconSet|h1|4}} Start <code>monero-wallet-vault</code> VM.
 
 == Receiving ==
 '''Note:''' The following instructions should be applied in {{project_name_workstation_short}} ([[Qubes|{{q_project_name_short}}]]: App Qube <code>monero-wallet-vault</code>).
@@ -457,7 +457,7 @@ Copy the <code>standard address</code> always from the <code>monero-wallet-vault
 monero-wallet-cli --offline --wallet-file ~/wallet1
 }}
 
-To show the <code>standard address</code> / <code>primary address</code> the Monero Wallet CLI prompt, run:
+To show the <code>standard address</code> or <code>primary address</code> the Monero Wallet CLI prompt, run:
 
 {{CodeSelect|code=
 address

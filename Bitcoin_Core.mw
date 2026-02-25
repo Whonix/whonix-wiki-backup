@@ -60,23 +60,27 @@ Unfortunately, it takes a very long time to download and verify the blockchain. 
 Compared to Electrum, some things are more difficult in Bitcoin Core such as:
 
 * Simple backups - unfortunately Bitcoin Core does not support mnemonic phrase backup.
-* Wallet configuration - it is not easy to set up a split offline wallet (cold storage) and online watch only wallet. However since Bitcoin Core v23.0 descriptor wallets are the default wallet type and makes it much easier to create an offline/air gap setup:
+* Wallet configuration - it is not easy to set up a split offline wallet (cold storage) and online watch only wallet. However since Bitcoin Core v23.0 descriptor wallets are the default wallet type and make it much easier to create an offline/air gap setup:
 
 [OFFLINE PC]: Create a wallet and export descriptors
-# <code>Window</code> &rarr; <code>Console</code>
+
+{{IconSet|h1|1}} <code>Window</code> &rarr; <code>Console</code>
+
 {{CodeSelect|code=
 listdescriptors
 }}
 
 [ONLINE PC]: Create a watch-only wallet and import descriptors:
-# <code>Window</code> &rarr; <code>Console</code>
+
+{{IconSet|h1|2}} <code>Window</code> &rarr; <code>Console</code>
+
 {{CodeSelect|code=
 importdescriptors
 }}
 
-After importing descriptors, the watch-only wallet will be functional, allowing you to create receiving addresses and create unsigned transactions. Unsigned transactions are copied by default to the clipboard but can also be saved in a .PSBT file (Partially signed bitcoin transaction) which can be transferred to the offline PC in order to sign. After signing just transfer the signed .PSBT file to the online PC to broadcast the transaction.
+After importing descriptors, the watch-only wallet will be functional, allowing you to create receiving addresses and create unsigned transactions. Unsigned transactions are copied by default to the clipboard but can also be saved in a .PSBT file (Partially signed bitcoin transaction) which can be transferred to the offline PC in order to sign. After signing, transfer the signed .PSBT file to the online PC to broadcast the transaction.
 
-Another way to do this activities are likely possible, but are [[Unsupported|undocumented]] here; refer to the footnotes for possible information sources. <ref>
+Other ways to do these activities are likely possible, but are [[Unsupported|undocumented]] here; refer to the footnotes for possible information sources. <ref>
 [[Terms_of_Service#Non-Endorsement|Non-Endorsement]]: these links have not been audited by {{project_name_short}}, but are worthy of further investigation:
 
 * https://github.com/JWWeatherman/yeticold
@@ -91,11 +95,11 @@ Another way to do this activities are likely possible, but are [[Unsupported|und
 Perform these steps inside {{project_name_workstation_long}} ({{q_project_name_long}}: <code>{{project_name_workstation_vm}}</code> App Qube).
 
 {{Box|text=
-'''1.''' Note.
+{{IconSet|h1|1}} Note.
 
 The installation process is [[unspecific|unspecific to {{project_name_short}}]].
 
-'''2.''' Retrieve, verify and add a signing key or multiple signing keys.
+{{IconSet|h1|2}} Retrieve, verify and add a signing key or multiple signing keys.
 
 Note: Any alternative method could be used. This is [[unspecific|unspecific to {{project_name_short}}]]. The following method is available for convenience. <ref>
 Thanks to [https://github.com/JKAbrams JKAbrams] for [https://github.com/Kicksecure/gpg-bash-lib/pull/2 Add example showcasing how multiple signatures can be checked]!
@@ -105,32 +109,32 @@ Thanks to [https://github.com/JKAbrams JKAbrams] for [https://github.com/Kicksec
 gpg --import /usr/share/gpg-bash-lib/misc/bitcoind-pub-keys.d/*
 }}
 
-'''3.''' Check version number.
+{{IconSet|h1|3}} Check version number.
 
-24.0.1 is used below. Was up to date at time of writing. Might be a different version now. Adjust the commands below accordingly. Useful resources to read:
+24.0.1 is used below. It was up to date at the time of writing. It might be a different version now. Adjust the commands below accordingly. Useful resources to read:
 
 * https://bitcoin.stackexchange.com/questions/116386/bitcoincore-22-1-or-24-0-1
 * https://bitcoincore.org/en/blog/
 
-'''4.''' Download the signed hash sum file.
+{{IconSet|h1|4}} Download the signed hash sum file.
 
 {{CodeSelect|code=
 scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMS
 }}
 
-'''5.''' Download the signed hash sum signature.
+{{IconSet|h1|5}} Download the signed hash sum signature.
 
 {{CodeSelect|code=
 scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/SHA256SUMS.asc
 }}
 
-'''6.''' Download Bitcoin.
+{{IconSet|h1|6}} Download Bitcoin.
 
 {{CodeSelect|code=
 scurl-download https://bitcoincore.org/bin/bitcoin-core-24.0.1/bitcoin-24.0.1-x86_64-linux-gnu.tar.gz
 }}
 
-'''7.''' Verify the hash sum digital signature.
+{{IconSet|h1|7}} Verify the hash sum digital signature.
 
 {{CodeSelect|code=
 gpg --verify SHA256SUMS.asc
@@ -146,7 +150,7 @@ This output might be followed by a warning as follows.
 
 {{Template:GnuPG-Warning}}
 
-'''8.''' Perform a hash sum check.
+{{IconSet|h1|8}} Perform a hash sum check.
 
 {{CodeSelect|code=
 sha256sum --check --ignore-missing SHA256SUMS
@@ -158,13 +162,13 @@ Expected output.
 bitcoin-24.0.1-x86_64-linux-gnu.tar.gz: OK
 </pre>
 
-'''9.''' Extract the tar file.
+{{IconSet|h1|9}} Extract the tar file.
 
 {{CodeSelect|code=
 tar xvf bitcoin-24.0.1-x86_64-linux-gnu.tar.gz
 }}
 
-'''10.''' Done.
+{{IconSet|h1|10}} Done.
 
 Download, digital signature verification and extraction of Bitcoin Core is complete.
 }}
@@ -172,28 +176,32 @@ Download, digital signature verification and extraction of Bitcoin Core is compl
 == Enable Stream Isolation ==
 
 {{Box|text=
-'''1.''' ''Optional:'' Disable networking for the virtual machine.
+{{IconSet|h1|1}} ''Optional:'' Disable networking for the virtual machine.
 
 This step is optional but recommended to ensure stream isolation is always used from the first connection. This step can be omitted if:
 
-* '''A)''' The {{project_name_short}} [[Stream_Isolation#Transparent_Proxy|transparent proxy]] feature has been [[Stream_Isolation#Disable_Transparent_Proxying|disabled]]; <ref>
+* {{IconSet|h2|A}} The {{project_name_short}} [[Stream_Isolation#Transparent_Proxy|transparent proxy]] feature has been [[Stream_Isolation#Disable_Transparent_Proxying|disabled]]; <ref>
 Because then Bitcoin Core cannot connect using transparent proxying anyhow.
 </ref> <u>and/or</u>
-* '''B)''' Proxy settings are configured using the Bitcoin Core configuration file <code>~/.bitcoin/bitcoin.conf</code> before the first start. <ref>
+* {{IconSet|h2|B}} Proxy settings are configured using the Bitcoin Core configuration file <code>~/.bitcoin/bitcoin.conf</code> before the first start. <ref>
 As part of the [[ElectrumX#Bitcoin-Qt_Configuration]] instructions.
 </ref>
 
-'''2.''' Start Bitcoin-Qt as documented further below.
+{{IconSet|h1|2}} Start Bitcoin-Qt as documented further below.
 
-'''3.''' Enable [[Stream_Isolation|Stream Isolation]] in the client.
+{{IconSet|h1|3}} Enable [[Stream_Isolation|Stream Isolation]] in the client.
 
-* '''A)''' navigate to the client settings
-* '''B)''' locate the Network tab
-* '''C)''' enable the SOCKS5 proxy (default proxy) as follows:
+* {{IconSet|h3|A}} navigate to the client settings
+* {{IconSet|h3|B}} locate the Network tab
+* {{IconSet|h3|C}} enable the SOCKS5 proxy (default proxy) as follows:
 ** Proxy IP: <code>10.152.152.10</code>
 ** Port: <code>9111</code>
 
-'''4.''' Re-enable networking for the virtual machine.
+{{IconSet|h1|4}} Re-enable networking for the virtual machine.
+
+{{IconSet|h1|5}} Done.
+
+Stream isolation configuration steps have been completed.
 }}
 
 == Add a bitcoin-qt Start Menu Entry ==
@@ -203,19 +211,19 @@ Perform the following steps to create a <code>bitcoin-qt</code> start menu entry
 {{Box|text=
 Inside {{project_name_workstation_short}} ({{q_project_name_short}}: <code>{{project_name_workstation_vm}}</code> App Qube).
 
-'''1.''' Create folder <code>~/.local/share/applications</code>.
+{{IconSet|h1|1}} Create folder <code>~/.local/share/applications</code>.
 
 {{CodeSelect|code=
 mkdir -p ~/.local/share/applications
 }}
 
-'''2.''' Open file <code>~/.local/share/applications/bitcoin.desktop</code> in an editor as a regular, non-root user.
+{{IconSet|h1|2}} Open file <code>~/.local/share/applications/bitcoin.desktop</code> in an editor as a regular, non-root user.
 
 {{CodeSelect|code=
 mousepad ~/.local/share/applications/bitcoin.desktop
 }}
 
-'''3.''' Paste the following contents.
+{{IconSet|h1|3}} Paste the following contents.
 
 {{CodeSelect|code=
 [Desktop Entry]
@@ -230,13 +238,13 @@ MimeType=x-scheme-handler/bitcoin;
 Categories=Finance;
 }}
 
-'''4.''' Save.
+{{IconSet|h1|4}} Save.
 
-'''5.''' {{q_project_name_short}}: perform platform-specific steps.
+{{IconSet|h1|5}} {{q_project_name_short}}: perform platform-specific steps.
 
 In <code>dom0</code>, refresh Qubes' appmenu: <code>VM settings</code> &rarr; <code>Applications</code> &rarr; <code>Refresh Applications</code> &rarr; <code>Add desktop shortcut</code>.
 
-'''6.''' Done.
+{{IconSet|h1|6}} Done.
 
 The <code>bitcoin-qt</code> start menu entry should now be available.
 }}
@@ -248,21 +256,21 @@ Perform these steps to automatically start <code>bitcoin-qt</code>; this step is
 {{Box|text=
 Inside {{project_name_workstation_short}} ({{q_project_name_short}}: <code>{{project_name_workstation_vm}}</code> App Qube).
 
-'''1.''' Apply the [[#Add a bitcoin-qt Start Menu Entry|Add a bitcoin-qt Start Menu Entry]] instructions first.
+{{IconSet|h1|1}} Apply the [[#Add a bitcoin-qt Start Menu Entry|Add a bitcoin-qt Start Menu Entry]] instructions first.
 
-'''2.''' Create folder <code>~/.config/autostart</code>.
+{{IconSet|h1|2}} Create folder <code>~/.config/autostart</code>.
 
 {{CodeSelect|code=
 mkdir -p ~/.config/autostart
 }}
 
-'''3.''' Create a symlink from <code>~/.local/share/applications/bitcoin.desktop</code> to <code>~/.config/autostart/bitcoin.desktop</code>.
+{{IconSet|h1|3}} Create a symlink from <code>~/.local/share/applications/bitcoin.desktop</code> to <code>~/.config/autostart/bitcoin.desktop</code>.
 
 {{CodeSelect|code=
 ln -s ~/.local/share/applications/bitcoin.desktop ~/.config/autostart/bitcoin.desktop
 }}
 
-'''4.''' Done.
+{{IconSet|h1|4}} Done.
 
 <code>bitcoin-qt</code> will now automatically start the next time the VM is booted.
 }}
@@ -277,15 +285,21 @@ To start <code>bitcoin-qt</code> (part of Bitcoin Core) from the command line, r
 
 == Creating a Watch-Only Wallet ==
 
-# Start <code>bitcoin-qt</code>.
-# <code>Window</code> &rarr; <code>Console</code>
-# Import address.
+{{IconSet|h1|1}} Start <code>bitcoin-qt</code>.
+
+{{IconSet|h1|2}} <code>Window</code> &rarr; <code>Console</code>
+
+{{IconSet|h1|3}} Import address.
 
 Note: replace <code>address</code> with the actual address to be watched.
 
 {{CodeSelect|code=
 importaddress address
 }}
+
+{{IconSet|h1|4}} Done.
+
+A watch-only address import has been completed.
 
 == Tor Control Protocol ==
 {{Community_Support|scope=chapter}}
@@ -295,28 +309,28 @@ TODO: document what this is useful for
 Tor control protocol access to Bitcoin Core can be optionally enabled.
 
 {{box|text=
-'''1.''' Note.
+{{IconSet|h1|1}} Note.
 
 '''Optional.''' It is not mandatory to use this. Bitcoin Core works without this.
 
-'''2.''' Warning.
+{{IconSet|h1|2}} Warning.
 
 If using this, see [[Onion-grater#onion-grater_Warning|onion-grater: a Tor Control Port Filter Proxy chapter onion-grater Warning]].
 
-'''3.''' Enable.
+{{IconSet|h1|3}} Enable.
 
 {{Control_Port_Filter_Python_Profile_Add
-|filename_new=40_bitcoind.yml
+|filename_new=40_bitcoind
 }}
 
-'''4.''' Additional information.
+{{IconSet|h1|4}} Additional information.
 
 Probably only needed in case of issues.
 
 * forum discussion: [https://forums.whonix.org/t/bitcoin-core-onion-grater-profile/6216 Bitcoin Core onion-grater profile]
 * for developers: [https://github.com/Whonix/onion-grater/blob/master/usr/share/doc/onion-grater-merger/examples/40_bitcoind.yml <code>/usr/share/doc/onion-grater-merger/examples/40_bitcoind.yml</code>]
 
-'''5.''' Done.
+{{IconSet|h1|5}} Done.
 
 The process of enabling Tor control protocol access to Bitcoin Core has been completed.
 }}
