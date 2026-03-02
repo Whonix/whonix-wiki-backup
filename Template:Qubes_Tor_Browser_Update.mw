@@ -1,0 +1,139 @@
+<!--
+WIKI EDITORS NOTE;
+https://github.com/{{project_name_short}}/tb-starter/blob/master/usr/bin/torbrowser links here. Therefore writing Tor Browser Downloader by {{project_name_short}} in full and hyperlinking it.
+-->
+==== Quick Rules ====
+{{mbox
+| image   = [[File:Ambox_notice.png|40px]]
+| text    = Updating '''Tor Browser''' can be more complex than regular system updates due to technical limitations outside of Whonix's control. <ref>[[Tor_Browser/Advanced_Users#Tor_Browser_Update:_Technical_Details|Tor Browser Update: Technical Details]]</ref> Use the table below and follow the instructions for your situation.
+}}
+
+{| class="wikitable"
+|+ ''Where to run what: yes (recommended) versus no (not recommended)''
+! Tool
+! Template<br />(<code>{{project_name_workstation_template}}</code>)
+! App Qube<br />(<code>{{project_name_workstation_vm}}</code>)
+! Disposable VM<br />(<code>disp####</code>)
+! Disposable Template<br />(<code>{{whonix-ws-dvm}}</code>)
+|-
+
+! Tor Browser
+| {{no}}
+| {{yes}}
+| {{yes}}
+| {{no}}
+|-
+
+! Tor Browser Downloader by {{project_name_short}}<br />(<code>update-torbrowser</code>)
+| {{yes}}
+| {{yes}} <ref>Useful for re-installing Tor Browser in that App Qube.</ref>
+| {{no}} <ref>Updates inside a Disposable VM do not persist after shutdown.</ref>
+| {{no}}
+|-
+
+|}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Do <u>not</u> run '''Tor Browser''' in a <u>Template</u> (<code>{{project_name_workstation_template}}</code>) or <u>Disposable Template</u> (<code>{{whonix-ws-dvm}}</code>)!
+}}
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px]]
+| text    = '''Quick rules:'''
+
+* Run '''Tor Browser''' only in <u>App Qubes</u> or <u>Disposable VMs</u> (Disposables).
+* Run '''Tor Browser Downloader by {{project_name_short}}''' (<code>update-torbrowser</code>) only in the <u>Template</u> and/or in an <u>App Qube</u>.
+* Never run '''Tor Browser''' or the '''downloader''' inside the '''Disposable Template''' (<code>{{whonix-ws-dvm}}</code>).
+}}
+
+==== Overview ====
+''Tip:'' If you are unsure, start with the '''Existing App Qubes''' row.
+
+{| class="wikitable"
+|+ ''Qubes VM Scenario and Instructions''
+! Scenario
+! Instructions
+! Common confusion about terms
+|-
+
+! {{Anchor|New App Qubes and Disposables}} New App Qubes and Disposables
+|
+Run '''Tor Browser Downloader by {{project_name_short}}''' (<code>update-torbrowser</code>). For instructions, see [[Tor_Browser#Tor_Browser_Downloader_by_{{project_name_short}}|Tor Browser Downloader by {{project_name_short}}]].
+
+Running '''Tor Browser Downloader by {{project_name_short}}''' inside the <u>Template</u> (<code>{{project_name_workstation_template}}</code>) ensures that <u>new</u> App Qubes and [[Qubes/Disposables|Disposables]] are created with a copy of the latest Tor Browser version.
+
+Tor Browser Downloader by {{project_name_short}} (<code>update-torbrowser</code>) also runs automatically when the {{project_name_workstation_long}} Template (<code>{{project_name_workstation_template}}</code>) package <code>tb-updater</code> is updated.
+
+| In Qubes terms, this row is about updating the <u>Template</u> (<code>{{project_name_workstation_template}}</code>) so that <u>new</u> App Qubes and Disposables start with the updated Tor Browser.
+
+"Disposables" here refers to spawned Disposable VM instances (often named <code>disp####</code>). This is <u>not</u> about the Disposable Template (<code>{{whonix-ws-dvm}}</code>).
+
+|-
+
+! {{Anchor|Disposable Template}} Disposable Template
+| {{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    = Do <u>not</u> run '''Tor Browser Downloader by {{project_name_short}}''' inside the <u>Disposable Template</u> (<code>{{whonix-ws-dvm}}</code>)! It should only be run in the <u>Template</u> (<code>{{project_name_workstation_template}}</code>) and/or in a <code>{{project_name_workstation_template}}</code>-based App Qube (<code>{{project_name_workstation_vm}}</code>). <ref>It is possible to run Tor Browser Downloader by {{project_name_short}} inside a Disposable as well, probably easiest using [[Tor_Browser#Tor Browser Internal Updater|Tor Browser Internal Updater]] and then restarting Tor Browser. However, these updates will not persist due to the Disposable design.</ref> <ref>See [[Tor_Browser/Advanced_Users#tb-updater_in_Qubes_Template|tb-updater in Qubes Template]] for technical details.</ref>
+}}
+
+For further information on installing, updating and using Tor Browser in Qubes Disposables, see: [[Qubes/Disposables|How to use Disposables in {{q_project_name_short}}]].
+|
+"Disposable Template" (<code>{{whonix-ws-dvm}}</code>) is the base VM used to <u>create</u> Disposables. By Qubes convention, a Disposable Template VM name often ends with <code>-dvm</code>.
+
+The "Disposable Template" is not the same as an actual Disposable VM instance. The warning is about not running Tor Browser or the downloader inside the Disposable Template itself.
+
+Tor Browser is meant to run in a spawned Disposable VM (often named <code>disp####</code>, for example <code>disp1234</code>) or in an App Qube.
+|-
+
+! {{Anchor|Existing App Qubes}} Existing App Qubes
+|
+Follow these steps to update Tor Browser in an <u>existing</u> {{project_name_workstation_short}} App Qube such as <code>{{project_name_workstation_vm}}</code>:
+
+* '''A)''' <u>Start Tor Browser:</u> <code>Qubes Start Menu</code> &rarr; <code>{{project_name_workstation_short}} App Qube (commonly called {{Code2|{{project_name_workstation_vm}}}})</code> &rarr; <code>Tor Browser</code>
+* '''B)''' <u>Update Tor Browser (recommended):</u> Use [[Tor_Browser#Tor Browser Internal Updater|Tor Browser Internal Updater]].
+* '''C)''' <u>Re-install Tor Browser (only if needed):</u> Use [[Tor_Browser#Tor_Browser_Downloader_by_Whonix|Tor Browser Downloader by {{project_name_short}}]].
+|
+"Update" (internal updater) and "re-install" (downloader) are different actions.
+
+Updating Tor Browser inside one <u>existing</u> App Qube affects only that App Qube. This does not automatically update other App Qubes, and this does not update the Template used for <u>new</u> App Qubes and Disposables.
+|-
+
+|}
+
+==== Summary ====
+{| class="wikitable"
+|+ ''Comparison of Applications, Recommended and Discouraged Use''
+! Tool
+! Recommended Use
+! Not Recommended
+|-
+
+! Tor Browser Downloader (by {{project_name_short}} developers)
+| 
+'''Useful to run inside:'''
+* <code>{{project_name_workstation_short}} Template</code> (<code>{{project_name_workstation_template}}</code>): to ensure that <u>new</u> App Qubes and [[Qubes/Disposables|Disposables]] are created with a copy of the latest Tor Browser version.
+* <code>{{project_name_workstation_short}} App Qube</code> (<code>{{project_name_workstation_vm}}</code>): to re-install the latest Tor Browser version in <u>existing</u> {{project_name_workstation_short}} App Qubes.
+
+'''Usually not useful if run inside:'''
+* Disposables: because upgrades will not persist
+| 
+* Disposable Template (<code>{{whonix-ws-dvm}}</code>)
+|-
+
+! Tor Browser
+|
+'''Useful to run in:'''
+* <code>{{project_name_workstation_short}} App Qube</code> (<code>{{project_name_workstation_vm}}</code>)
+* Disposables
+|
+* <code>{{project_name_workstation_short}} Template</code> (<code>{{project_name_workstation_template}}</code>)
+* Disposable Template (<code>{{whonix-ws-dvm}}</code>)
+|-
+
+|}<noinclude>
+= Footnotes =
+<references />
+{{Header}}
+{{Footer}}
+</noinclude>
