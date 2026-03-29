@@ -1,0 +1,652 @@
+{{Header}}
+<!--
+Copyright:
+
+   {{project_name_long}} Bridges wiki page Copyright (C) Amnesia <amnesia at boum dot org>
+   {{project_name_short}} Bridges wiki page Copyright (C) 2012 - 2025 ENCRYPTED SUPPORT LLC <adrelanos@whonix.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to:
+
+    Free Software Foundation, Inc.
+    51 Franklin St, Fifth Floor
+    Boston, MA 02110-1301, USA.
+
+On Debian GNU/Linux systems, the complete text of the GNU General Public
+License can be found in the /usr/share/common-licenses' directory.
+The complete text of the GNU General Public License can also be found online on gnu.org <https://www.gnu.org/licenses/gpl.html>, in {{project_name_short}} virtual machine images in /usr/share/common-licenses/GPL-3 file or on Github <https://github.com/{{project_name_short}}/derivative-maker/blob/master/GPLv3>.
+-->
+<!--
+This wiki page is a fork of the Tails Tor Bridge Mode page, from this exact source <https://git.immerda.ch/?p=amnesia.git;a=blob;f=wiki/src/doc/first_steps/startup_options/bridge_mode.mdwn;hb=b4c1868fc9d59b6a1cb6d0e956ece5c92059c653>.
+-->
+{{Title|title=
+Configure (Private) (Obfuscated) Tor Bridges
+}}
+{{#seo:
+|description=Censorship Circumvention. Get around network bans. Using {{project_name_short}} with (private) (obfuscated) bridges. Useful in case your Internet Service Provider (ISP) bans or throttles connections to the Tor public network.
+|image=Black-and-white-50272-640.jpg
+}}
+<div class="mininav">
+* [[Network_Obstacle|Network Obstacle]]
+* [[Bridges|Configure (Private) (Obfuscated) Tor Bridges]]
+* [[Hide_Tor_from_your_Internet_Service_Provider|Hide Tor use from the {{isp}}]]
+</div>
+[[File:bridge_page_custom.png|thumb]]
+{{intro|
+Censorship Circumvention. Get around network bans. Using {{project_name_short}} with (private) (obfuscated) bridges. Useful in case your Internet Service Provider (ISP) bans or throttles connections to the Tor public network.
+}}
+= Bridges Description and User Groups =
+
+== Introduction ==
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = If a website cannot be reached over Tor, this does not necessarily relate to network level censorship that requires a bridge to be configured; it may relate to blacklisting of all Tor exit IP addresses by the server. In that case, see [[Geo-blocking]] for circumventing censorship by destination servers.
+}}
+
+When Tor is used with {{project_name_short}} in the default configuration, anybody observing the properties of its application protocol can discover its presence. Potential observers include the Internet Service Provider (ISP), advanced adversaries, censorship enforcement bodies and other interested parties.
+
+[https://2019.www.torproject.org/docs/bridges Tor bridges ("Tor bridge relays")] are alternative entry points to the Tor network, acting as substitutes to regular Tor guards rather than an additional hop to the 3 hop journey. Not all bridges are obtainable publicly. Using a bridge makes it harder, but not impossible, for the ISP to determine if a user is connecting to Tor.
+
+== Intended User Groups ==
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = Tor non-functionality is often related to [https://2019.www.torproject.org/docs/faq.html.en#DoesntWork local configuration problems] rather than ISP or state-level censorship.
+}}
+
+For the majority of {{project_name_short}} users, connecting to Tor with the default configuration is appropriate and will work successfully. The minority of users requiring a bridge normally fall into three categories: <ref>https://blog.torproject.org/different-ways-use-bridge</ref>
+
+<blockquote>
+* Tor is blocked, and some way - any way - to reach the network has to be found. The adversary is not very dangerous, but very annoying.
+* Tor may or may not be blocked, but the users are trying to hide the fact they're using Tor. The adversary may be extremely dangerous.
+* Other bridge users: Testing whether the bridge works (automated or manual), probing, people using bridges without their knowledge because they came pre-configured in their bundle.</blockquote>
+
+The first group of users is only concerned with circumventing Tor censorship that is based on IP address or fingerprinting of protocols. Circumvention is necessary because {{project_name_short}} would otherwise be rendered useless for most activities except working offline on documents and so on, since all Internet traffic is routed through Tor by default. This group is not worried about hiding the use of Tor and will need to use bridges or possibly [[Censorship_Circumvention_Tools|other circumvention tools]].
+
+The second user group is unable to safely start {{project_name_short}} in the default configuration due to Tor being considered dangerous or suspicious in their locality. In this case [[Hide Tor from your Internet Service Provider|private bridges]] should be utilized instead of public obfuscated bridges, as this makes it ''harder'' (not impossible) to detect Tor. <ref>
+Over time, censors have gotten better at detecting Tor network traffic between the client and the first hop, even with the use of more advanced pluggable transports. There is a cyber-censorship arms race in effect.
+</ref>
+
+Note that the <code>meek_azure</code> pluggable transport may be necessary to deal with highly aggressive ISP censorship or national firewalls, like those found in China and the Middle East.
+
+The third group is only concerned with testing bridge connections.
+
+== Before Configuring a Bridge ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' Bridges are important tools that work in many cases but they are <u>not</u> an absolute protection against the technical progress an adversary might make in identifying Tor users. Using bridges <u>might</u> be advisable to prevent identification as a Tor user, but the Tor Project's [https://2019.www.torproject.org/docs/bridges bridges documentation] is primarily focused on censorship circumvention, that is, overcoming attempts by ISPs or government to block Tor use.
+}}
+
+Users falling into one of the three groups described above should consider using Tor bridges. Before taking this step, please review The Tor Project's [https://2019.www.torproject.org/docs/bridges dedicated bridges page] to better understand their design and operation. It is also recommended to review [https://2019.www.torproject.org/docs/pluggable-transports how Obfsproxy works], since it is the most commonly used application for connecting bridges.
+
+Always remember that bridges are not bullet-proof. The following is a reminder about bridge versus non-bridge anonymity:
+
+[https://lists.torproject.org/pipermail/tor-talk/2012-May/024378.html Quote] [https://www.torproject.org/about/people/ Roger Dingledine, cofounder] of [https://www.torproject.org Tor]:
+
+<blockquote>[...] Bridges are less reliable and tend to have lower performance than other entry points. If you live in a uncensored area, they are not necessarily more secure than entry guards. [...]</blockquote>
+
+Quote question:
+
+<blockquote>If that is true, that also means, that bridge users are sufficiently more vulnerable to attacks, which are circumvented by entry guards?</blockquote>
+
+[https://lists.torproject.org/pipermail/tor-talk/2012-May/024378.html Quote] Roger Dingledine, cofounder of Tor:
+
+<blockquote>[...] They're probably more vulnerable, but I don't know if I'd say "sufficiently". [...]</blockquote>
+
+If a user is only concerned with connectivity (getting {{project_name_short}} connected) and local ISPs do not usually hinder connections to the public Tor network, then something simpler than Bridges can be tried; see: [[Bridges#Better_Connectivity_without_Real_Censorship_Circumvention|Better Connectivity without Real Censorship Circumvention]].
+
+== Additional Information and Recommendations ==
+
+{{mbox
+| type      = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = For safety reasons, the first run of {{project_name_short}} <u>will not</u> automatically connect to the public Tor network. Instead, user networking decisions are guided by [[Anon_Connection_Wizard|Anon Connection Wizard]] which automatically starts.
+}}
+
+When deciding on the type of bridge to configure, it is recommended to:
+
+* Prefer [https://2019.www.torproject.org/docs/bridges#PluggableTransports {{Code2|obfuscated bridges}}], since they are harder to identify than other bridges.
+* Use less well-known bridges, since it is safer. <ref>
+Some bridge addresses are freely provided by the Tor website or by email upon request, meaning adversaries likely use these methods to obtain bridge information. The Tor Project has some protection against adversary threats, but they are far from perfect.
+</ref>
+* Avoid using a meek provider that also runs DNS core servers, like Google's (now defunct) bridge. <ref>Google sees forty percent of Tor Exits' DNS traffic and so using them as a bridge aids website fingerprinting attacks. That said, there is evidence that website fingerprinting is more difficult to mount than previously thought. See: [https://nymity.ch/tor-dns/tor-dns.pdf The Effect of DNS on Tor’s Anonymity]
+</ref>
+* Note that domain fronting [https://blog.torproject.org/domain-fronting-critical-open-web has been pulled by Google and Amazon], limiting the meek pluggable transport options to <code>meek_azure</code> only in Anon Connection Wizard.
+* For greater safety, use a {{Code2|private obfuscated bridge}} run by a trusted friend or organization in a different country. In this case "{{Code2|private}}" means that the bridge is configured with the option {{Code2|PublishServerDescriptor 0}}. <ref>
+[https://2019.www.torproject.org/docs/tor-manual.html.en#PublishServerDescriptor Tor manual: PublishServerDescriptor]
+Without this option set, The Tor Project can learn about the bridge and may distribute its address to others, potentially handing this information to an adversary seeking to generate a list of all known bridges.
+</ref>
+
+Please note that it has been assessed as difficult beyond practicality to [[Hide_Tor_from_your_Internet_Service_Provider|Hide Tor use from the Internet Service Provider]] with proxies, bridges, VPNs or SSH tunnels.
+
+= Finding a Bridge and Choosing the Right Protocol =
+In order to use bridges, the address of at least one bridge must be known in advance. It is preferable to have a {{Code2|private obfuscated bridge}} because the alternative -- {{Code2|public obfuscated bridges}} -- are more likely to be censored, since they are publicly listed. The Tor Project distributes {{Code2|public bridge}} addresses in several ways, including from their [https://bridges.torproject.org/ website] and via email. The easiest way to find a list of public bridges is from [https://bridges.torproject.org/options The Tor Project Bridge Database].
+
+In early 2017, The Tor Project advice regarding recommended bridges changed: <ref>
+https://gitlab.torproject.org/legacy/trac/-/issues/18072
+</ref> <ref>
+This pluggable transport has been deprecated by The Tor Project in favor of [https://2019.www.torproject.org/docs/pluggable-transports.html.en obfs4, meek, Format-Transforming Encryption (FTE) and ScrambleSuit].
+</ref>
+
+<blockquote>... in Tor Browser to obfs4, given that we now have several high capacity obfs4 bridges and obfs4 is more likely to work in more regions than obfs3."
+</blockquote>
+As time has gone on, more {{Code2|obfs4}} bridge operators have come online, and {{Code2|obfs4}} is now routinely recommended by Tor developers over {{Code2|obfs3}}, because the former: <ref>
+https://blog.torproject.org/recent-and-upcoming-developments-pluggable-transports#obfs2_deprecation
+</ref>
+<blockquote>
+... should be able to defend more effectively against active probing.
+</blockquote> As a consequence, obfs3 bridges have been deprecated as a configurable pluggable transport option in Tor Browser. <ref>https://2019.www.torproject.org/docs/bridges.html.en#PluggableTransports
+</ref> <ref>https://2019.www.torproject.org/docs/pluggable-transports.html.en</ref> Also see: [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/PluggableTransports/Obfs4Evaluation obfs4 Transport Evaluation]. <ref>
+<blockquote>The obfs4 protocol was developed and is in the process of being deployed by the Tor Project in response to the vulnerability of the obfs3 protocol to detection via active probing attacks. It is expected to supersede the obfs3 protocol as the front-line Pluggable Transport used by most Tor users.</blockquote>
+</ref>
+
+The Tor Project provides a database of [https://bridges.torproject.org/bridges?transport=obfs4 {{Code2|public obfs4 bridges}}]. A more exhaustive list of public obfuscated bridges is available at [https://bridges.torproject.org/options The Tor Project Bridge Database]. {{Code2|obfs}} and {{Code2|obfs2}} bridges are no longer available since they: <ref>https://tb-manual.torproject.org/circumvention/</ref>
+<blockquote>... are now deprecated and were replaced by {{Code2|obfs3}} . . . and {{Code2|obfs4}}.</blockquote>
+Do not select the "IPv6 compatible" check box when [https://bridges.torproject.org/options sourcing bridges] from the database, as they [https://phabricator.whonix.org/T509 cannot be used in {{project_name_short}}] yet.
+
+{{Anchor|How to Use Bridges in {{project_name_short}}}}
+= How to Use Bridges in {{project_name_short}} =
+
+It is possible to configure {{Code2|obfs4}} and {{Code2|meek_azure}} ([https://forums.whonix.org/t/meek-lite-a-new-pluggable-transport-in-whonix-14/4500 {{Code2|meek <u>lite</u>}}]) bridges.
+
+Two options. Choose either option '''A)''' <u>or</u> '''B)'''.
+
+* '''A)''' [[Anon_Connection_Wizard|Anon Connection Wizard]] GUI application - recommended for most users. See instructions below. <u>Or</u>,
+* '''B)''' [[Tor#Manual_Bridge_Configuration|Manual Bridge Configuration]] - advanced users.
+
+{{Box|text=
+{{IconSet|h1|1}} Start Anon Connection Wizard.
+
+{{Start_Anon_Connection_Wizard}}
+
+{{IconSet|h1|2}} Use the Bridge Configuration Page
+
+{{Anon_Connection_Wizard_Use_Bridges}}
+
+{{IconSet|h1|3}} Done.
+
+Bridge configuration in Anon Connection Wizard is complete.
+}}
+
+= Experimental Bridges =
+== lyrebird ==
+[https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird lyrebird] is the successor to the [https://packages.debian.org/sid/obfs4proxy obfs4proxy] package, which contains all stable [https://spec.torproject.org/pt-spec/index.html pluggable transports] maintained by the Tor Project. It is also known as Tor's anti-censorship plugin.
+
+Currently, it contains the <code>obfs4</code>, <code>Snowflake</code>, <code>meek</code> and <code>WebTunnel</code> pluggable transports.
+
+[[Bridges#Rationale_for_Unsupported_Bridges|It is currently not included]] in Whonix by default for several reasons.
+
+But you can install and use it manually by following this guide:
+
+{{Community_Support
+|scope=chapter
+}}
+
+{{IconSet|h1|1}} {{sysmaint_notice}}
+
+{{IconSet|h1|2}} Open the Tor AppArmor settings:
+
+{{Open with root rights|filename=
+/etc/apparmor.d/local/system_tor
+}}
+
+{{IconSet|h1|3}} Edit.
+
+Scroll down near the end of the file and find code containing <code>## obfsproxy</code>.
+
+Add an empty line above it, then add this:
+
+{{CodeSelect|code=
+## lyrebird
+  /usr/bin/lyrebird rix,
+}}
+
+{{IconSet|h1|4}} Close and save the file.
+
+{{IconSet|h1|5}} If you want to use the latest version of Tor, see {{kicksecure_wiki
+|wikipage=Tor_Versioning
+|text=Newer Tor Versions
+}}.
+
+{{IconSet|h1|6}} {{Whonix-Gateway System DNS over Clearnet}}
+
+{{IconSet|h1|7}} lyrebird download.
+
+Now you have to download and install lyrebird manually, because it is unavailable in any major package repositories.
+
+The easiest way to install it is to use a precompiled version by copying it from the Tor Expert Bundle, which you can download here:
+[https://www.torproject.org/download/tor/ Tor Project download page]
+
+You can also [https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird build the lyrebird executable yourself].
+
+Copy the correct "Stable" link for your device type and architecture, then use this command to download it:
+
+<u>Note:</u> Replace <code>https://replace_with_download_url/file-name.tar.gz</code> with the actual download link.
+
+* [[Non-Qubes-Whonix]]:
+** {{CodeSelect|code=
+scurl https://replace_with_download_url/file-name.tar.gz -o tor-expert-bundle.tar.gz
+}}
+* [[Qubes-Whonix]]:
+** {{CodeSelect|code=
+scurl --proxy http://127.0.0.1:8082 https://replace_with_download_url/file-name.tar.gz -o tor-expert-bundle.tar.gz
+}}
+
+{{IconSet|h1|8}} Signature verification.
+
+[https://www.kicksecure.com/wiki/Verifying%20Software%20Signatures This step is highly recommended.]
+
+After successfully downloading the zipped Tor Expert Bundle, verify the file's integrity.
+
+For that you first have to download the .asc file, which is created for the Tor Expert Bundle that you downloaded.
+Return to your previous command by clicking the "up" arrow key on your keyboard.
+Add <code>.asc</code> to both of your lines ending with <code>.tar.gz</code>:
+
+<code>https://replace_with_download_url/file-name.tar.gz.asc -o tor-expert-bundle.tar.gz.asc</code>
+
+Install the file and [https://support.torproject.org/tor-browser/getting-started/verifying-tor-browser/ follow the instructions here] to proceed with authentication. 
+The signature verification instructions in the link apply to the Tor Browser and the Tor Expert Bundle, so don't mind the text about verifying the Tor Browser and replace the filenames with yours. (<code>tor-expert-bundle.tar.gz</code> and <code>tor-expert-bundle.tar.gz.asc</code>)
+
+Proceed with the next steps after successfully verifying the main file.
+
+{{IconSet|h1|9}} Extraction.
+
+After verifying the signature, extract the bundle file:
+
+{{CodeSelect|code=
+tar -xvf tor-expert-bundle.tar.gz
+}}
+
+Run these commands from the directory in which you extracted the bundle:
+
+{{IconSet|h1|10}} Install lyrebird system-wide.
+
+{{CodeSelect|code=
+sudo cp tor/pluggable_transports/lyrebird /usr/bin/
+}}
+
+{{IconSet|h1|11}} Make lyrebird executable.
+
+{{CodeSelect|code=
+sudo chmod +x /usr/bin/lyrebird
+}}
+
+{{IconSet|h1|12}} Open the Tor configuration override file.
+
+{{Open_/usr/local/etc/torrc.d/50_user.conf}}
+
+{{IconSet|h1|13}} Add the following.
+
+<u>Note:</u> Input a bridge or several bridges that you have, or get one from the Tor Project using your preferred method of getting them: [https://support.torproject.org/tor-browser/circumvention/getting-bridges/ Tor Project instructions for obtaining bridges]
+
+{{CodeSelect|code=
+ClientTransportPlugin webtunnel,snowflake,meek,obfs4 exec /usr/bin/lyrebird
+
+Bridge webtunnel ...
+}}
+
+{{IconSet|h1|14}} Save the changes.
+
+{{IconSet|h1|15}} Optional: [[Tor#Configuration_Check|Tor Configuration Check]]
+
+{{IconSet|h1|16}} Shut down.
+
+Shut down the session.
+
+{{IconSet|h1|17}} Boot into user session.
+
+Check if your Tor connection works in the [[tor-control-panel|Tor Control Panel]]. Note: [[Troubleshooting#Unsuitable_Connectivity_Troubleshooting_Tools|Unsuitable Connectivity Troubleshooting Tools]]
+
+Pick <code>Bridges type</code>: <code>None</code> as a connection method there. As a result, Whonix's default configuration file will be overwritten by your custom <code>torrc</code> (Tor configuration file).
+
+{{IconSet|h1|18}} Updates.
+
+To update lyrebird, repeat the download steps above and replace the existing binary in Whonix-Gateway.
+
+{{IconSet|h1|19}} Done.
+
+lyrebird has been installed and configured for manual use.
+
+You can follow the Whonix forum thread related to this guide:
+[https://forums.whonix.org/t/adding-webtunnel-bridges-to-whonix/19675/19 Adding WebTunnel bridges to Whonix forum thread]
+
+== Snowflake ==
+=== Introduction of Snowflake ===
+Snowflake is: <ref>
+https://gitlab.torproject.org/legacy/trac/-/wikis/doc/Snowflake
+</ref>
+<blockquote>...a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/PluggableTransports pluggable transport] that proxies traffic through temporary proxies using ​[https://webrtc.org/ WebRTC], a peer-to-peer protocol with built-in NAT punching. It aims to work kind of like flash proxy, but without flash proxy's problems with NAT.</blockquote>
+
+=== Setup Snowflake ===
+
+{{Box|text=
+On Whonix-Gateway.
+
+{{IconSet|h1|1}} Edit the Tor configuration file.
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+{{IconSet|h1|2}} Paste the following setting. <ref>
+The line starting with <code>ClientTransportPlugin</code> was taken from the Tor Browser folder file.
+
+<code>
+grep "ClientTransportPlugin snowflake" ~/.tb/tor-browser/Browser/TorBrowser/Data/Tor/torrc-defaults
+</code>
+
+''What is the link to the <code>torrc-defaults</code> file The Tor Project git?''
+
+The path was adjusted from <code>./TorBrowser/Tor/PluggableTransports/snowflake-client</code> to <code>/usr/bin/snowflake-client</code> to be compatible with these instructions.
+
+The line starting with <code>Bridge</code> was taken from this command:
+
+<pre>
+~/tor-browser/Browser/TorBrowser/Data/Tor/torrc
+</pre>
+
+It was previously:
+
+<pre>
+Bridge snowflake 0.0.3.0:1 2B280B23E1107BB62ABFC40DDCC8824814F80A72
+</pre>
+</ref>
+
+{{CodeSelect|code=
+UseBridges 1
+ClientTransportPlugin snowflake exec /usr/bin/snowflake-client
+Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://1098762253.rsc.cdn77.org/ fronts=www.cdn77.com,www.phpmyadmin.net ice=stun:stun.l.google.com:19302,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.com:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.4:80 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://1098762253.rsc.cdn77.org/ fronts=www.cdn77.com,www.phpmyadmin.net ice=stun:stun.l.google.com:19302,stun:stun.antisip.com:3478,stun:stun.bluesip.net:3478,stun:stun.dus.net:3478,stun:stun.epygi.com:3478,stun:stun.sonetel.net:3478,stun:stun.uls.co.za:3478,stun:stun.voipgate.com:3478,stun:stun.voys.nl:3478 utls-imitate=hellorandomizedalpn
+}}
+
+{{IconSet|h1|3}} DNS resolving in Whonix-Gateway.
+
+Snowflake-client needs to resolve the <code>-front</code> domain to an IP address, in order to connect to the server; however, this DNS resolving will fail with [[Whonix-Gateway_System_DNS|the default Whonix gateway DNS configuration]].
+
+{{box|text=
+{{Whonix-Gateway_System_DNS_over_Clearnet}}
+}}
+
+{{IconSet|h1|4}} {{Restart_Tor}}
+
+{{IconSet|h1|5}} Done.
+
+The procedure is complete.
+}}
+
+<ref>
+AppArmor has appropriate permissions for Snowflake operation. [https://github.com/Whonix/anon-gw-anonymizer-config/blob/master/etc/apparmor.d/local/system_tor.anondist /etc/apparmor.d/local/system_tor] already contains <code>/usr/bin/snowflake-client ix,</code>.
+</ref>
+
+Snowflake forum discussion:
+
+* https://forums.whonix.org/t/replacing-meek-snowflake/5190
+* https://forums.whonix.org/t/use-snowflake-in-whonix-to-bypass-tor-censorship/13441
+
+=== Optional Snowflake Configuration ===
+==== Use AMP cache rendezvous for Snowflake ====
+Optional.
+
+wkrp [https://github.com/net4people/bbs/issues/109 stated in a post]:
+
+<blockquote>
+by default in Tor Browser, Snowflake does rendezvous using a domain-fronted HTTPS request. Now there is an alternative (backup) to domain fronting rendezvous: AMP cache rendezvous. If one rendezvous method is blocked, there is a chance the other will work.
+</blockquote>
+
+Replace the second line in <code>/usr/local/etc/torrc.d/50_user.conf</code> with:
+
+[[Undocumented]].
+
+=== Debugging Snowflake ===
+==== Snowflake Usage Verification ====
+Optional.
+
+Make sure Tor is using snowflake.
+
+To check if Tor is indeed using snowflake, we use <code>nyx</code> or <code>onioncircuits</code>. We are connecting to the Tor network through snowflake if:
+
+* In [[Tor_Controller#Nyx|<code>nyx</code>]], the guard node is a local address, like <code>192.168.0.1</code>;
+* or in [[Tor_Controller#Onion_Circuits|<code>onioncircuits</code>]], the guard node IP is Unknown.
+
+==== Snowflake log analysis ====
+Optional.
+
+{{IconSet|h1|1}} Enable and view Snowflake log.
+
+We can enable the snowflake log for debugging purposes by appending <code>-log snowflake.log -log-to-state-dir</code> to the <code>ClientTransportPlugin snowflake...</code> line in <code>/usr/local/etc/torrc.d/50_user.conf</code>.
+
+{{IconSet|h1|2}} We can view the snowflake log with:
+
+{{CodeSelect|code=
+sudo less /var/lib/tor/pt_state/snowflake.log
+}}
+
+{{IconSet|h1|3}} Tor data directory.
+
+Note that we can always find the Tor DataDirectory with the following command:
+
+{{CodeSelect|code=
+anon-verify -v | grep DataDirectory
+}}
+
+<code>DataDirectory /var/lib/tor</code>
+
+{{IconSet|h1|4}} Done.
+
+Snowflake log analysis steps have been documented.
+
+= Unsupported Pluggable Transport =
+== WebTunnel ==
+WebTunnel is an [[undocumented]] pluggable transport.
+
+== Rationale for Unsupported Bridges ==
+Why are some pluggable transports unsupported? This is a technical explanation. Users are free to skip it.
+
+The situation is similar to how it was for [[#Snowflake|Snowflake]] for [https://forums.whonix.org/t/replacing-meek-snowflake/5190 a long time]. WebTunnel is unavailable from packages.debian.org. It is therefore difficult and maintenance time-intensive for {{project_name_long}} to install WebTunnel in {{project_name_long}} by default. Related: [[Dev/Default_Application_Policy|Default Application Policy]].
+
+Without volunteer development contributions to {{project_name_long}}, this will probably take a few years, if it ever happens.
+
+References:
+
+* [https://forums.whonix.org/t/adding-webtunel-bridges-to-whonix/19675/1 Adding WebTunnel Bridges to Whonix - Whonix Forum]
+* [https://blog.torproject.org/introducing-webtunnel-evading-censorship-by-hiding-in-plain-sight/ Introducing WebTunnel: Evading Censorship by Hiding in Plain Sight - Tor Project Blog]
+* [https://community.torproject.org/relay/setup/webtunnel/ WebTunnel Setup Guide - Tor Project]
+
+= Warning: Bridged Networking =
+<u>Note:</u> While similar in name, there are two very different things.
+
+* '''A)''' <u>Bridges:</u> These are used for censorship circumvention, to get around {{isp}} level network bans. Documented on this wiki page. See above from beginning of this wiki page.
+* '''B)''' <u>Bridged Networking:</u> This is a virtualizer specific setting such as in [[VirtualBox]] that can in theory be changed on the host operating system.
+
+Do not change VirtualBox settings on the host operating system for {{project_name_gateway_short}}'s first or second network interface to a bridged network! This is [[unsupported|unsupported]], untested and should not be necessary. This is elaborated in wiki chapter [[Whonix-Gateway_Security#Warning:_Bridged_Networking|Whonix-Gateway Security, Warning: Bridged Networking]].
+
+= Troubleshooting =
+== Check Tor Network Connection is Using a Tor Bridge ==
+Concerned bridge users can complete a simple check.
+{{Box|text=
+{{IconSet|h1|1}} Open [[Tor_Controller#Nyx|Nyx]] as follows.
+
+{{Start_Arm}}
+
+{{IconSet|h1|2}} Use the right arrow button to navigate to page 2 of 5 in Nyx.
+
+{{IconSet|h1|3}} If a bridge is in use, the circuit information will be similar to this.
+
+<pre>
+192.168.0.1 UNKNOWN 1 / Guard
+</pre>
+
+{{IconSet|h1|4}} If a bridge is ''not'' in use, the circuit information will be similar to this.
+<pre>
+IP Nickname 1 / Guard
+</pre>
+The IP is the real IP (''not'' 192.168.0.1) of the Guard, and the Nickname is the name of that Guard relay.
+
+{{IconSet|h1|5}} Exit Nyx by pressing the following.
+<pre>
+q
+q
+</pre>
+
+{{IconSet|h1|6}} Done.
+
+The Tor bridge connection check is complete.
+}}
+
+== Connection Issues ==
+After configuration, connection problems can relate to firewall settings that block outgoing connections to the ports provided by the bridge. To check the {{Code2|port}} the bridge is using, see the following example.
+
+<pre>
+bridge 109.195.132.77:22321
+</pre>
+
+In this example, the IP address is {{Code2|109.195.132.77}}, while the the port is {{Code2|22321}}.
+
+Try using a (private) (obfuscated) bridge that uses port {{Code2|80}} or {{Code2|443}}, as these ports are mostly used for web browsing and therefore usually unblocked.
+
+== Trying Packet Size and Timing Obfuscation for obfs4 ==
+
+If a provided {{Code2|obfs4}} bridge does not work, the user can try enabling packet size and timing obfuscation by changing the <code>iat-mode</code> value in each last line to either <code>1</code> or <code>2</code>. <ref>
+ 1 = Enabled: ScrambleSuit-style with bulk throughput optimizations.
+ 2 = Paranoid: Each IAT write will send a length sampled from the length distribution (expensive). See: https://lists.torproject.org/pipermail/tor-commits/2014-August/079402.html</ref>
+
+== Better Connectivity without Real Censorship Circumvention ==
+
+If a user is only concerned with connectivity (getting {{project_name_short}} connected) and there is no need to ''attempt'' to [[Hide_Tor_from_your_Internet_Service_Provider|Hide Tor use from the Internet Service Provider]] and/or local ISPs do not usually hinder connections to the public Tor network, then something simpler than [[Bridges]] can be tried.
+
+The following setting only establishes Tor connections to public Tor network relays that listen on ports {{Code2|80}} and {{Code2|443}}.
+{{Box|text=
+{{IconSet|h1|1}} Edit the Tor configuration file.
+
+{{Open /usr/local/etc/torrc.d/50_user.conf}}
+
+{{IconSet|h1|2}} Add the following setting. <ref>
+https://support.torproject.org/#tbb_tbb-firewall-ports
+</ref>
+
+{{CodeSelect|code=
+FascistFirewall 1
+}}
+
+{{IconSet|h1|3}} Save the file and have the changes take effect.
+
+{{Reload_Tor}}
+
+{{IconSet|h1|4}} Done.
+
+The procedure is complete.
+}}
+
+== Missing ClientTransportPlugin Line ==
+When a user has configured the following.
+
+{{CodeSelect|code=
+bridge obfs4 ...:... ... cert=... iat-mode=0
+}}
+
+But forgot to add the corresponding line.
+
+{{CodeSelect|code=
+ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy
+}}
+
+Then warnings will only be shown in logs.
+
+<pre>
+[warn] We were supposed to connect to bridge '...:...' using pluggable transport 'obfs4', but we can't find a pluggable transport proxy supporting 'obfs4'. This can happen if you haven't provided a ClientTransportPlugin line, or if your pluggable transport proxy stopped running.
+</pre>
+
+== Missing ClientTransportPlugin Executable ==
+<pre>
+[warn] Could not launch managed proxy executable at '/usr/bin/obfs4proxy' ('No such file or directory').
+</pre>
+
+= Deprecated Tor Pluggable Transports =
+=== Scramblesuit ===
+{{Code2|scramblesuit}}: Unrecommended (see footnote). Use the provided {{Code2|obfs4}} instructions instead. <ref>
+[https://gitlab.tails.boum.org/tails/tails/-/issues/7909#note-8 Quote intrigeri] (Tails developer):
+<blockquote>On tor-talk we've been told "You shouldn't prioritise ScrambleSuit because it is superseded by obfs4", and there are now pressing plans in the Tor Project to deprecate obfs2 and obfs3 in favour of obfs4. Hence rejecting this ticket, and focusing on [https://gitlab.tails.boum.org/tails/tails/-/issues/7980 #7980] [obfs4 support] instead.</blockquote>
+
+[https://blog.torproject.org/recent-and-upcoming-developments-pluggable-transports Also see Tor Announcement under heading "obfs4 and scramblesuit"]
+
+* Old instructions: [[Deprecated#scramblesuit]]
+</ref>
+
+=== Flashproxy ===
+{{Code2|flashproxy}}: Unrecommended (see footnote). Use the provided {{Code2|obfs4}} instructions instead. <ref>
+[https://gitlab.torproject.org/legacy/trac/-/issues/17428 Flashproxy has been removed from Tor Browser], therefore it can be considered deprecated.
+
+* Old instructions: [[Deprecated#flashproxy]]
+</ref>
+
+= See Also =
+* [[Lantern]]: An alternative censorship circumvention tool documented for [[Qubes|{{q_project_name_long}}]] only.
+* ''Unfinished'': [[Censorship Circumvention Tools]] other than bridges.
+
+= Appendix =
+
+== Hosting Bridges ==
+
+While most of this chapter is dedicated to bridge use, this section clarifies a few concepts about Tor Bridge hosting, although detailed how-to instructions are not provided. To help others you must reside in a country that does not censor Tor and have a reasonably fast connection. The VM or host in use should have port forwarding enabled to allow direct connections because all bridge server types require this, including Snowflake.
+
+Volunteer Snowflake instances run proxies to the bridge and are <u>not</u> bridges themselves. These proxies can be run behind a NAT because clients use the built-in NAT punching properties of WebRTC to connect. The proxies then open a WebSocket connection to the Snowflake bridge and relay data between the WebRTC connection with the client and the bridge. The Snowflake bridges cannot run behind a NAT and are similar to all other existing pluggable transports in this regard. <ref>https://gitlab.torproject.org/legacy/trac/-/wikis/doc/Snowflake</ref>
+
+Using bridge users' traffic to mask your own onion service traffic is difficult to do properly. <ref>https://github.com/mikeperry-tor/vanguards/blob/master/README_SECURITY.md#the-best-way-to-run-tor-relays-or-bridges-with-your-service</ref> This may be of questionable efficacy if traffic is not heavy and the bridge traffic of other pluggable transports is easily able to be excluded by advanced adversarial traffic analysis.
+
+In order to implement a similar defense using a Snowflake proxy (as opposed to a bridge), a custom client needs to be written that would encapsulate your Tor traffic and send it through a TCP WebSocket connection to the Snowflake bridge. This measure is ineffective for the same reasons bridge cover traffic is not. For other traffic to provide effective cover, client traffic needs to be mixed with concurrent, relayed Tor relay traffic; this may require a relatively high speed main network relay to be in use frequently enough to help. Note that website fingerprinting of client traffic is not a severe enough threat to warrant this type of defense for clearnet-destined tor traffic, but it is helpful to protect against end-to-end correlation attacks. <ref>https://lists.torproject.org/pipermail/tor-dev/2020-January/014127.html</ref> <ref>https://2019.www.torproject.org/docs/faq.html.en#BetterAnonymity</ref>
+
+== Active Probing ==
+
+Various jurisdictions utilize active probing in order to block circumvention proxies, including different versions of Tor and the detection and blocking of bridges. Perhaps the most infamous example is the probing system used by the "Great Firewall of China" (GFW). The Tor Project first began exploring this issue in [https://gitlab.torproject.org/legacy/trac/-/issues/4185 October 2011]. At that time it was discovered that:
+<ref name=bridges_block>https://blog.torproject.org/knock-knock-knockin-bridges-doors</ref>
+<blockquote>...connections to US-based Tor bridge relays were being regularly cut off after a very short period of time. At the time we performed some basic experimentation and discovered that Chinese IPs (presumably at the behest of the Great Firewall of China, or GFW) would reach out to the US-based bridge and connect to it shortly after the Tor user in China connected, and, if successful, shortly thereafter the connection would be blocked by the GFW. There wasn't time for a detailed investigation and analysis at the time, but that kernel eventually grew into the investigation detailed below. We were, however, able to determine that limiting connections to the bridge relay to only the single IP expected to be its client would, in fact, block the probes and allow the connection to remain open for an extended period (>48 hours in our testing).</blockquote>
+
+The Tor Project identified two types of probing: <ref name=bridges_block />
+# <u>Garbage binary probes</u>: when an SSL connection took place, arbitrary binary data was sent to the non-China side of connections originating from China to TCP port 443 (HTTPS). [https://en.wikipedia.org/wiki/Deep_packet_inspection Deep packet inspection (DPI)] was suspected because the probe occured soon after the connection was established. <ref>At that time probing did not occur when the obfsproxy or plain-text protocols were used, presumably because a SSL handshake does not take place.</ref>
+# <u>Tor probes</u>: China-based Tor clients connecting to US-based bridge relays were probed at 15 minute intervals. The bridge received probes from China-based hosts that: established a TCP connection, performed a SSL negotiation, followed by a SSL renogotiation and the building of a one-hop circuit (including a <code>BEGIN_DIR</code> cell).
+
+To prevent probing, Tor developers then responded by changing the list of supported SSL ciphers included in the "hello" packet sent to Tor clients in China. <ref>They did note that ongoing Chinese censorship efforts would necessitate the development of new Tor protocols, handshakes and extensions over time, such as improved obfsproxy protocols.</ref>
+
+Further investigation of the GFW active probing system in 2015 revealed: <ref>https://blog.torproject.org/learning-more-about-gfws-active-probing-system</ref>
+* Bridges detected and blocked by the GFW remain blocked. However, a small window of opportunity was available around every 25 hours when Tor clients in China could connect to bridges.
+* TCP headers of active probes suggest the thousands of IP addresses are controlled by a single source and not independent computers.
+* The GFW also targets other circumvention systems like SoftEther and GoAgent. <ref>Suggesting the active probing system is modular in nature and can be configured to detect newer, proxy-based circumvention tools.</ref>
+* Bridges are probed by the GFW using the standard Tor protocol, as well as obfs2/3.
+* Tor probes had increased in frequency from 15 minute intervals to near real-time -- active probes emerged half a second after a bridge connection was established.
+* The GFW sensor is unable to reassemble TCP streams.
+
+In 2019, The Tor Project noted: <ref>https://blog.torproject.org/new-release-bridgedb-071</ref>
+<blockquote>When the Great Firewall's active probing attack discovered a bridge, the GFW used to block the bridge by its IP address ''and'' port, which conveniently left other transport protocols that ran on the same IP address, say obfs4, reachable. This behavior changed recently, and bridges are now blocked by their IP address. This means that a protocol that is vulnerable to the GFW’s active probing attack (e.g., vanilla Tor, fte, and obfs3) can get the entire bridge blocked—including obfs4, which is resistant to active probing! The new BridgeDB release addresses this issue by only handing out a bridge’s probing-resistant protocols if the bridge supports protocols that are both vulnerable ''and'' resistant to active probing. For example, if a bridge supports both vanilla Tor and obfs4, then we ''only'' hand obfs4 to users.</blockquote>
+
+Research suggests [https://www.cs.kau.se/philwint/scramblesuit/ ScrambleSuit] and [https://github.com/Yawning/obfs4/blob/master/doc/obfs4-spec.txt obfs4] can successfully defend against probing attacks, but their ongoing effectiveness will remain an open research question. The take-home message is that {{project_name_short}} users in heavily censored nations like China and Iran will require an obfs4 bridge or other probe-resistant protocols to try and circumvent censorship.
+
+For further reading on this topic, see:
+* [https://ensa.fi/active-probing/imc2015.pdf Examining How the Great Firewall Discovers Hidden Circumvention Servers]
+* [https://aaltodoc.aalto.fi/bitstream/handle/123456789/102539/master_Liubinskii_Pavel_2021.pdf?sequence=1&isAllowed=y The Great Firewall’s active probing circumvention technique with portknocking and SDN]
+* [https://medium.com/mobile-asia/demystifying-the-great-firewall-of-china-22f4a97550cc Demystifying the Great Firewall of China]
+* [https://www.usenix.org/system/files/conference/foci18/foci18-paper-dunna.pdf Analyzing China’s Blocking of Unpublished Tor Bridges]
+* [https://www.cs.kau.se/philwint/gfw/ How the Great Firewall of China is Blocking Tor]
+* [https://censorbib.nymity.ch/pdf/Frolov2020a.pdf Detecting Probe-resistant Proxies]
+
+= Footnotes =
+{{reflist|close=1}}
+
+= License =
+{{License_Amnesia|{{FULLPAGENAME}}}}
+
+{{Footer}}
+
+[[Category:Documentation]]
