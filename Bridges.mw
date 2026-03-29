@@ -185,9 +185,9 @@ Bridge configuration in Anon Connection Wizard is complete.
 
 = Experimental Bridges =
 == lyrebird ==
-[https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird lyrebird] is the successor to the [https://packages.debian.org/sid/obfs4proxy obfs4proxy] package, which contains all stable [https://spec.torproject.org/pt-spec/index.html pluggable transports] maintained by the Tor Project. It is also known as Tor's anti-censorship plugin.
+[https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird lyrebird] is the successor to the [https://packages.debian.org/sid/obfs4proxy obfs4proxy] package, which contained all stable [https://spec.torproject.org/pt-spec/index.html pluggable transports] maintained by the Tor Project. It is also known as Tor's anti-censorship plugin.
 
-Currently, it contains the <code>obfs4</code>, <code>Snowflake</code>, <code>meek</code> and <code>WebTunnel</code> pluggable transports.
+It currently includes the <code>obfs4</code>, <code>Snowflake</code>, <code>meek</code> and <code>WebTunnel</code> pluggable transports.
 
 [[Bridges#Rationale_for_Unsupported_Bridges|It is currently not included]] in Whonix by default for several reasons.
 
@@ -207,7 +207,7 @@ But you can install and use it manually by following this guide:
 
 {{IconSet|h1|3}} Edit.
 
-Scroll down near the end of the file and find code containing <code>## obfsproxy</code>.
+Scroll down near the end of the file and find the code containing <code>## obfsproxy</code>.
 
 Add an empty line above it, then add this:
 
@@ -225,42 +225,45 @@ Add an empty line above it, then add this:
 
 {{IconSet|h1|6}} {{Whonix-Gateway System DNS over Clearnet}}
 
-{{IconSet|h1|7}} lyrebird download.
+{{IconSet|h1|7}} Download lyrebird.
 
-Now you have to download and install lyrebird manually, because it is unavailable in any major package repositories.
+You must download and install lyrebird manually because it is unavailable in the major package repositories.
 
-The easiest way to install it is to use a precompiled version by copying it from the Tor Expert Bundle, which you can download here:
+The easiest way to install it is to use a precompiled version from the Tor Expert Bundle, which you can download here:
 [https://www.torproject.org/download/tor/ Tor Project download page]
 
 You can also [https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird build the lyrebird executable yourself].
 
 Copy the correct "Stable" link for your device type and architecture, then use this command to download it:
 
-<u>Note:</u> Replace <code>https://replace_with_download_url/file-name.tar.gz</code> with the actual download link.
+<u>Note:</u> Replace <code><nowiki>https://replace_with_download_url/file-name.tar.gz</nowiki></code> with the actual download link.
 
-* [[Non-Qubes-Whonix]]:
-** {{CodeSelect|code=
+* Platform specific.
+** [[Non-Qubes-Whonix]]:
+*** {{CodeSelect|code=
 scurl https://replace_with_download_url/file-name.tar.gz -o tor-expert-bundle.tar.gz
 }}
-* [[Qubes-Whonix]]:
-** {{CodeSelect|code=
+** [[Qubes-Whonix]]:
+*** {{CodeSelect|code=
 scurl --proxy http://127.0.0.1:8082 https://replace_with_download_url/file-name.tar.gz -o tor-expert-bundle.tar.gz
 }}
 
-{{IconSet|h1|8}} Signature verification.
+{{IconSet|h1|8}} Digital software signature verification.
 
-[https://www.kicksecure.com/wiki/Verifying%20Software%20Signatures This step is highly recommended.]
+{{kicksecure_wiki
+|wikipage=Verifying_Software_Signatures
+|text=Verifying Software Signatures
+}} is recommended for [[Advanced Users]].
 
-After successfully downloading the zipped Tor Expert Bundle, verify the file's integrity.
-
-For that you first have to download the .asc file, which is created for the Tor Expert Bundle that you downloaded.
+For that, you first have to download the <code>.asc</code> file, which is provided for the Tor Expert Bundle that you downloaded.
 Return to your previous command by clicking the "up" arrow key on your keyboard.
 Add <code>.asc</code> to both of your lines ending with <code>.tar.gz</code>:
 
-<code>https://replace_with_download_url/file-name.tar.gz.asc -o tor-expert-bundle.tar.gz.asc</code>
+<code><nowiki>https://replace_with_download_url/file-name.tar.gz.asc -o tor-expert-bundle.tar.gz.asc</nowiki></code>
 
-Install the file and [https://support.torproject.org/tor-browser/getting-started/verifying-tor-browser/ follow the instructions here] to proceed with authentication. 
-The signature verification instructions in the link apply to the Tor Browser and the Tor Expert Bundle, so don't mind the text about verifying the Tor Browser and replace the filenames with yours. (<code>tor-expert-bundle.tar.gz</code> and <code>tor-expert-bundle.tar.gz.asc</code>)
+Download the file and [https://support.torproject.org/tor-browser/getting-started/verifying-tor-browser/ follow the instructions here] to verify the signature.
+
+The signature verification instructions in the link apply to both the Tor Browser and the Tor Expert Bundle, so ignore the text about verifying the Tor Browser and replace the filenames with yours. (<code>tor-expert-bundle.tar.gz</code> and <code>tor-expert-bundle.tar.gz.asc</code>)
 
 Proceed with the next steps after successfully verifying the main file.
 
@@ -272,7 +275,7 @@ After verifying the signature, extract the bundle file:
 tar -xvf tor-expert-bundle.tar.gz
 }}
 
-Run these commands from the directory in which you extracted the bundle:
+Run the following commands from the directory in which you extracted the bundle:
 
 {{IconSet|h1|10}} Install lyrebird system-wide.
 
@@ -292,7 +295,10 @@ sudo chmod +x /usr/bin/lyrebird
 
 {{IconSet|h1|13}} Add the following.
 
-<u>Note:</u> Input a bridge or several bridges that you have, or get one from the Tor Project using your preferred method of getting them: [https://support.torproject.org/tor-browser/circumvention/getting-bridges/ Tor Project instructions for obtaining bridges]
+<u>Notes:</u>
+
+* Replace <code>Bridge webtunnel ...</code> with actual <code>Bridge</code> configuration because <code>...</code> is only a placeholder.
+* Enter one or more bridges that you already have, or get bridges from the Tor Project using your preferred method: [https://support.torproject.org/tor-browser/circumvention/getting-bridges/ Tor Project instructions for obtaining bridges]
 
 {{CodeSelect|code=
 ClientTransportPlugin webtunnel,snowflake,meek,obfs4 exec /usr/bin/lyrebird
@@ -310,9 +316,9 @@ Shut down the session.
 
 {{IconSet|h1|17}} Boot into user session.
 
-Check if your Tor connection works in the [[tor-control-panel|Tor Control Panel]]. Note: [[Troubleshooting#Unsuitable_Connectivity_Troubleshooting_Tools|Unsuitable Connectivity Troubleshooting Tools]]
+Check whether your Tor connection works in the [[tor-control-panel|Tor Control Panel]]. Note: [[Troubleshooting#Unsuitable_Connectivity_Troubleshooting_Tools|Unsuitable Connectivity Troubleshooting Tools]]
 
-Pick <code>Bridges type</code>: <code>None</code> as a connection method there. As a result, Whonix's default configuration file will be overwritten by your custom <code>torrc</code> (Tor configuration file).
+Select <code>Bridges type</code>: <code>None</code> as the connection method there. As a result, Whonix's default configuration file will be overwritten by your custom <code>torrc</code> (Tor configuration file).
 
 {{IconSet|h1|18}} Updates.
 
