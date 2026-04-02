@@ -1,0 +1,188 @@
+{{Header}} {{VirtualBox_CSS}}
+{{Title|
+title=How-to: Install {{q_project_name_long}}
+}}
+{{#seo:
+|description=Installation Instructions, Release Notices, Disposable Template Setup, Updates over Tor
+|image=Qubesinstall12312123.png
+}}
+{{qubes_mininav}}
+[[File:Qubesinstall12312123.png|200px|thumb]]
+{{intro|
+Getting started with {{q_project_name_short}} in 4 steps.
+
+Here you can find installation instructions, release notices, disposable template setup, updates over Tor, and more.
+}}
+{{Anchor|Remove_Old_Versions}}
+== {{IconSet|h1|1}} Notices ==
+{| class="wikitable"
+|+ ''[[Qubes|{{q_project_name_long}}]] Release Notices''
+|-
+! '''Notice'''
+! '''Description'''
+|-
+
+! Version Support
+|
+* Supported Qubes version: <code>R4.<b>2</b></code> | Supported Whonix version: <code>17</code> Discouraged. [https://forums.whonix.org/t/qubes-whonix-18-released-major-release-upgrade/22517 Upgrading to Qubes-Whonix 18 on Qubes R4.3 encouraged.]
+* Supported Qubes version: <code>R4.<b>3</b></code> | Supported Whonix version: <code>18</code>
+* See also: [[About#Qubes_Hosts|Qubes-Whonix version support policy]]
+|-
+
+! Footnotes
+|
+{{footnotes}}
+|-
+
+! Known Issues
+|
+* Qubes-Whonix 17: [https://github.com/QubesOS/qubes-issues/issues/7013 "Denied: whonix.SdwdateStatus" error message after DispVM has halted.]
+* Qubes-Whonix 18: None yet.
+|-
+
+! Other Issues
+|
+In case technical issues are experienced, such as a broken <code>dom0</code> or a broken <code>qubes-dom0-update</code>, these are Qubes issues and [[unspecific|unspecific to {{project_name_short}}]]. They should therefore either be reported to [https://github.com/QubesOS/qubes-issues/issues qubes-issues], or added as a comment to an existing issue there (if appropriate). This is further elaborated in [https://forums.whonix.org/t/what-to-post-in-this-qubes-whonix-forum-and-what-not/2275 What to post in this Qubes-Whonix forum and what not.]
+|-
+
+! Usability
+|
+The instructions on this wiki page have poor usability. These issues are mostly outside the control of the {{project_name_short}} project. See the footnote for more information. <ref>
+* specifically: Qubes feature request: [https://github.com/QubesOS/qubes-issues/issues/6948 self-contained Qubes Templates including meta scripts (salt) / improve Qubes-Whonix installation usability (#6948)]
+* generally: {{kicksecure_wiki
+|wikipage=Linux User Experience versus Commercial Operating Systems
+|text=Linux User Experience versus Commercial Operating Systems
+}}
+</ref>
+|-
+
+! {{q_project_name_short}} 17 to {{q_project_name_short}} 18 Release Upgrade
+| This is a notice for users who currently have {{q_project_name_short}} <u>17</u> installed.
+
+{{quotation
+|quote=
+<u>Availability and Qubes-Whonix Support: Qubes R4.2 versus Qubes R4.3?</u>
+
+* '''Qubes R4.2:''' '''Qubes-Whonix 18 unavailable.''' Qubes-Whonix 18 won't be available for Qubes R4.2.
+** '''Release status:''' Even though Qubes R4.3 is only available as a '''r'''elease '''c'''andidate (RC) at the time of writing,
+** '''Expected release:''' A stable release of Qubes R4.3 (and Qubes-Whonix 18) is probably not far away.
+** '''Upgrade recommendation:''' Qubes-Whonix 17 users on Qubes R4.2 are encouraged to consider upgrading to Qubes-Whonix 18 on Qubes R4.3 as soon as possible.
+** '''Maintenance situation:''' Qubes-Whonix 18 is what developers are using and where the development focus is. It comes with much newer packages. Qubes-Whonix is a small project and does not have a dedicated team for oldstable support. Therefore, oldstable support is maintained as a side project. More details: [https://github.com/QubesOS/qubes-issues/issues/10219 decide availability of Kicksecure and Whonix 18 (Debian trixie based) on Qubes R4.2 versus R4.3 #10219]
+* '''Qubes R4.3:''' Qubes-Whonix 18 is available.
+|context=[https://forums.whonix.org/t/qubes-whonix-18-for-qubes-r4-3-major-release-testers-wanted/22517 Qubes-Whonix 18 release announcement]
+}}
+
+* <u>Upgrade coexistence:</u> If {{q_project_name_short}} <u>17</u> is installed and you want to get {{q_project_name_short}} <u>18</u>, there is no need to uninstall {{q_project_name_short}} <u>17</u> before proceeding with the instructions on this wiki page. This is because the new Templates (<code>whonix-workstation-18</code>, <code>whonix-gateway-18</code>) will be installed alongside the old Templates (<code>whonix-workstation-17</code>, <code>whonix-gateway-17</code>).
+
+* <u>Template persistence:</u> In this case, App Qubes that were previously configured to use {{q_project_name_short}} <u>17</u> Templates will keep using them -- the Templates of any App Qubes are not automatically changed to the newly installed {{q_project_name_short}} <u>18</u> Templates. This is a Qubes default and [[unspecific]] to {{q_project_name_short}}. <ref>
+This is also true for other distribution Templates. For example, users of the Qubes <code>debian-12</code> Template will not have all their App Qubes updated to the new <code>debian-13</code> Template by default when it is downloaded.
+</ref>
+
+* <u>Manual change required:</u> Therefore, a manual change must be applied to the App Qubes' settings by the user. The rationale is to prevent unexpected changes of an App Qube's Template without the user's consent. <ref>
+For example, this could result in breakage if custom-installed applications in the old Template were not available in the new Template.
+</ref>
+
+* <u>Recommendation:</u> After the {{q_project_name_short}} installation has finished, it is recommended to manually change the settings of any App Qubes still using {{q_project_name_short}} <u>17</u> Templates to the {{q_project_name_short}} <u>18</u> Templates. <ref>
+* [https://github.com/QubesOS/qubes-issues/issues/5183 Qubes-Whonix ticket: Installing the new Whonix Template results in <code>{{project_name_gateway_vm}}</code> still using the old Whonix Template (#5183)]
+* [https://github.com/QubesOS/qubes-issues/issues/6904 Qubes ticket: improve process for migrating from older customized Template to newer (e.g. Debian 10->11, Fedora 33->34) (#6904)]
+</ref>
+
+* <u>Alternative:</u> A wholly different, alternative option is to ignore all the advice on this wiki page and instead perform a [[Release Upgrade]] according to the [[Release Upgrade_17_to_18|Release Upgrade {{project_name_short}} <u>17</u> to {{project_name_short}} <u>18</u>]] instructions.
+|-
+
+! Preexisting {{q_project_name_short}} 18 Installations
+|
+This is a notice for users who already have {{q_project_name_short}} <u>18</u> installed.
+
+* <u>Backup reminder:</u> If any user data was stored in {{q_project_name_short}} VMs, back up any existing data before re-installation.
+* <u>Uninstallation requirement:</u> If you are already running [[Qubes|{{q_project_name_short}}]] <u>18</u>, it must be [[Qubes/Uninstall|uninstalled]] before a complete <u>re-installation</u> is performed. This is also necessary when [[Qubes|{{q_project_name_short}}]] <u>18</u> is bundled as part of future Qubes releases, and auto-configuration is selected during the installation.
+* <u>Re-installation options:</u> Choose <u>re-installation</u> option '''A)''' <u>OR</u> '''B)'''. (Listed in order of preference)
+** '''A)''' [[Qubes/Uninstall|Uninstall {{q_project_name_short}}]] and then [[Qubes/Install|Install {{q_project_name_short}}]]; <u>OR</u>
+** '''B)''' [[Qubes/Reinstall|Reinstall the {{project_name_short}} Template]].
+|-
+
+|}
+
+== {{IconSet|h1|2}} Install Whonix through Qubes post-install setup interface ==
+
+{{box|text=
+This is the easiest way to set up [[Whonix]] on [https://www.qubes-os.org Qubes]. On a new Qubes OS installation, the installer can set up Whonix for you during the first boot setup.
+
+After the first boot, Qubes opens the initial setup screen. In the <code>Installation:</code> section of the <code>Templates Configuration</code> page, make sure <code>Whonix</code> is checked. If it is not checked, you can still install the Whonix templates later by following the later steps in this guide.
+
+Checking <code>Create Whonix Gateway and Workstation qubes (sys-whonix, anon-whonix)</code> creates the standard Whonix setup automatically (as shown in [[Qubes/Install#5_Download_and_Configure_Whonix_Templates|step 5]]). In simple terms, <code>sys-whonix</code> connects to Tor, and <code>anon-whonix</code> is the Qube where you use applications over Tor.
+
+Checking <code>Enable system and template updates over the Tor anonymity network using Whonix</code> sends all Template's and <code>dom0</code> update traffic through <code>sys-whonix</code>. The <code>sys-whonix</code> Qube becomes the system's [[Whonix-Gateway]] by default.
+
+For more information on Qubes installation, see the Qubes OS installation guide: [https://doc.qubes-os.org/en/latest/user/downloading-installing-upgrading/installation-guide.html Qubes OS installation guide]
+
+If you skipped Whonix installation at this step, check the later steps.
+}}
+
+== {{IconSet|h1|3}} Update dom0 ==
+
+{{box|text=
+{{Qubes_upgrade_dom0}}
+}}
+
+== {{IconSet|h1|4}} Configure salt using Qubes dom0 Community Testing Repository ==
+{{Qubes_testing}}
+
+== {{IconSet|h1|5}} Download and Configure {{project_name_short}} Templates ==
+{{box|text=
+{{Qubes_Download_Install
+|enablerepo=--enablerepo=qubes-templates-community
+}}
+
+{{IconSet|h2|6}} '''Next steps.'''
+
+See below for additional optional configurations and additional information.
+}}
+
+== {{IconSet|h1|6}} Support the Future of {{project_name_short}} ==
+{{box|text=
+
+{{donation_appeal_download}}
+}}
+
+= Optional Steps =
+
+== {{project_name_short}} Disposable Template ==
+
+{{Qubes_Install_DVM}}
+
+<ref>
+There was a [https://github.com/QubesOS/qubes-issues/issues/3574 Qubes bug that may cause the Disposable Template to run instead of the Disposable]. This might be fixed in Qubes R4.2 and above. [[Unspecific|Unspecific to {{project_name_short}}]]. If this happens, just log off and back on. There is no need to reinstall or set up anything.
+</ref>
+
+{{Anchor|Optional: Updates over Tor}}
+
+== Updates over Tor ==
+
+{{Qubes Install Updates over Tor}}
+
+== Enable AppArmor ==
+{{Qubes_AppArmor}}
+
+= Update and Launch Applications =
+
+{{Qubes Install Update and Launch Applications}}
+
+= Additional Information =
+
+== Warnings ==
+
+{{First_Time_User}}
+
+It is recommended to refer to the following additional references:
+
+* [[Known_Issues|Known Issues]]
+* {{Post_Install_Advice}}
+* [[Stay_Tuned|Follow {{project_name_short}} Developments]]
+
+= Footnotes =
+{{footnotes}}
+
+{{reflist|close=1}}
+{{Footer}}
+[[Category:Documentation]]
