@@ -1,0 +1,1449 @@
+{{Header}}
+{{title|title=
+Security-Focused Operating System Comparison as Base for {{project_name_short}}
+}}
+{{#seo:
+|description=Comparison and Consideration of various Operating Systems as base for the {{project_name_long}} Anonymous Operating System. Design Documentation.
+}}
+{{intro|
+Comparison and Consideration of various Operating Systems as base for the {{project_name_short}} Anonymous Operating System. Design Documentation.
+}}
+= Introduction =
+This chapter applies to the host(s), {{project_name_gateway_long}} and {{project_name_workstation_long}}.
+
+''{{project_name_short}} Example Implementation'' is currently based on [[#Kicksecure|Kicksecure]] (which itself is based on [[#Debian|Debian]]). Historically, there have been development discussions about switching to BSD, Alpine Linux, or other (supposedly or really - depending on viewpoint and criteria) secure operating systems.
+
+{{project_name_short}} cannot protect against malicious code inserted into the upstream operating system infrastructure. Debian provides a chain of trust, as it requires contributors to sign commits.
+
+= Why not Use a Live CD/DVD as the {{project_name_workstation_short}} Operating System? =
+
+This option was previously discussed in depth, and it was decided that Live CD/DVDs are not suitable for {{project_name_workstation_short}}.
+
+Advantages:
+
+* Often actively maintained.
+* Stable.
+* Hardened GNU/Linux distribution.
+* Advanced features.
+
+Disadvantages:
+
+* No timely security updates.
+* Limited persistence.
+* Inflexible design.
+
+Another serious disadvantage of Live CD/DVDs in the context of an anonymity-oriented OS is that they often include their own method of Tor enforcement. In {{project_name_short}}, this would result in a [[Tips_on_Remaining_Anonymous#Refrain_from_"Tor_over_Tor"_Scenarios|Tor over Tor]] scenario.
+
+= Why don't you use <your favorite most secure operating system> for {{project_name_short}}? =
+== Generally ==
+Why do you use Debian (Kicksecure), and not...?
+
+General Base Operating System Requirements:
+
+* <u>usability:</u> acceptable usability
+* <u>popularity:</u> must be somewhat popular, because only that leads to sufficient public scrutiny and enough available documentation.
+* <u>legal:</u> For redistribution of {{project_name_short}}, there must be no legal/trademark issues, such as those with Ubuntu. See the [[#Ubuntu Legal Issues]] chapter below for details.
+* <u>package manager security:</u> Must have a secure operating system updater (package manager), i.e. must not fall through the [https://theupdateframework.io/security/ TUF Threat Model]. Not having a secure updater is [https://krebsonsecurity.com/2011/11/apple-took-3-years-to-fix-finfisher-trojan-hole/ very dangerous].
+* <u>binary distribution:</u> Source-based distributions take a long time to upgrade and install packages, which users complain about. The same or even better security characteristics can be achieved with deterministic (reproducible) builds.
+
+Debian provides a good balance of security and usability. [[#Kicksecure|Kicksecure]] is a security-hardened version of Debian.
+
+Related: {{kicksecure_wiki
+|wikipage=Security_versus_Usability
+|text=Security versus Usability
+}}
+
+The following list of distributions either fail or pass the requirements for the [[Dev/Threat Model|{{project_name_short}} threat model]].
+
+== Kicksecure ==
+* Whonix is [[Based on Debian]].
+* Whonix is [[Based on Kicksecure]].
+* {{kicksecure_wiki
+|wikipage=Comparison_with_Others
+|text=Comparison of Kicksecure versus Debian
+}}
+
+== Ubuntu ==
+=== Ubuntu Introduction ===
+Ubuntu is not used as the {{project_name_gateway_short}}/Workstation operating system for legal reasons (see below) and has recently been negatively perceived due to {{Code2|privacy issues}}. <ref>
+[https://www.eff.org/deeplinks/2012/10/privacy-ubuntu-1210-amazon-ads-and-data-leaks Privacy in Ubuntu 12.10: Amazon Ads and Data Leaks]
+</ref> Therefore, it is also recommended against using it as the host operating system.
+
+{{project_name_short}} 0.4.4 and above is based on Debian. Previously, {{project_name_short}} was based on Ubuntu. From a technical perspective, Ubuntu was a good choice at the time. See [[Ubuntu Tips#About_Ubuntu|About Ubuntu]] if you are interested. The switch was due to Ubuntu trademark issues (see below).
+
+{{Anchor|Switch from Ubuntu to Debian}}
+
+=== Ubuntu Legal Issues ===
+[https://ubuntu.com/legal/intellectual-property-policy About Ubuntu Trademark] and [https://www.ubuntu.com/legal Ubuntu terms] are generally complicated. Since {{project_name_short}} changes go beyond a ''remix'' (as defined by Ubuntu Licensing), {{project_name_short}} would either have to ask for a license, which they reserve the right to revoke - a legally insecure state that is not acceptable - or {{project_name_short}} would have to rebrand Ubuntu. While theoretically possible, in practice it would require a lot of work to remove all Ubuntu textual references (strings). [https://lists.ubuntu.com/archives/ubuntu-users/2012-September/263760.html Even new apt mirrors would be required], which is far beyond the manpower of the {{project_name_short}} project.
+
+References:
+
+* https://mjg59.dreamwidth.org/37113.html
+* https://www.fsf.org/news/canonical-updated-licensing-terms
+* <blockquote>[https://www.cio.com/article/2949217/canonical-changes-licensing-terms-to-comply-with-gpl.html Later], the Linux Mint team ended up signing a deal with Canonical to use binaries for an undisclosed fee (if any).</blockquote>
+* https://www.infoworld.com/article/2703648/will-canonical-force-linux-mint-to-license-ubuntu-binary-packages.html
+
+Debian is much more libre and does not pose any legal issues. According to Debian project leader Stefano Zacchiroli (in private mail), there are no trademark issues as long as the derivative does not claim to be Debian. This is also clarified in the [https://www.debian.org/trademark Debian trademark policy], which is easy to comply with.
+
+Derivatives of Debian are even encouraged to use Debian infrastructure. See [https://wiki.debian.org/Derivatives/Guidelines Derivatives/Guidelines]. Debian actively supports derivatives, and there is extensive documentation available, including the [https://wiki.debian.org/Derivatives Derivatives] page and the [https://lists.debian.org/debian-derivatives/ debian-derivatives mailing list].
+
+== Mac OS X ==
+Mac OS X cannot be used for legal reasons. Even if that were not an issue, it is still a proprietary, closed-source operating system. We do not support their attitude or how they (do not) communicate with the security community. Also see: [https://krebsonsecurity.com/2011/11/apple-took-3-years-to-fix-finfisher-trojan-hole/ Apple Took 3+ Years to Fix FinFisher Trojan Hole] and [[Host_Operating_System_Selection#macOS_Hosts|macOS Hosts]].
+
+== Fedora ==
+<u>Repository metadata:</u>
+
+{{quotation
+|quote=Signed repositories
+
+The Fedora Project does not sign our package repositories (yet), even though this has been requested a lot of times. One of the main reasons for this is that DNF/YUM repodata has no “ValidUntil” or sortalike attribute. Additionally, librepo - which DNF uses to download and verify repodata - regards expired GPG signatures as fully valid. This means that there is no way at all to mark repository data as valid for a limited amount of time.
+
+As such, while it can protect against modification of the repository data, it does not protect against attackers (or outdated mirrors) shipping ancient repositories with known-vulnerable software.
+|context=Fedora Magazine: [https://fedoramagazine.org/fedora-secures-package-delivery/ How Fedora Secures Package Delivery]
+}}
+
+* https://github.com/QubesOS/qubes-issues/issues/1919#issuecomment-691545936
+* https://github.com/QubesOS/qubes-issues/issues/1919#issuecomment-689245921
+* https://discussion.fedoraproject.org/t/comment-about-fedora-security-and-unsigned-repository-metadata/137370
+
+<u>Reproducible builds:</u>
+
+For historical relevance.
+
+{{quotation
+|quote=Fedora project leader Matthew Millar told Ars that he thinks reproducible builds are interesting, but "it hasn't been a big initiative." He noted that, unlike Debian packages, which are typically built on individual developer's laptops, "Fedora requires all packages to be built in our central system, from source, using scripts in a version-controlled repository. And, that central build system is all itself open source and we distribute the Ansible playbooks to deploy it in production."
+
+"That means we already have a transparent, traceable pathway from binary packages back to source code," he added.
+
+Transparent to the Fedora Project, perhaps, but not to end users. A central build system is also a central point of failure. How does the Fedora build system ensure trustworthy binaries in the face of intelligence agencies who wish to insert compile-time backdoors? Millar did not respond to this question, or further e-mails.
+
+Given that Red Hat is a US-based company, and thus subject to secret court orders from the US government, can we be sure that Red Hat has not been compelled to insert compile-time backdoors?
+
+"Red Hat has never intentionally inserted a back door in our products, and we have never received a court order to do so," Wonderlick told Ars.
+|context=Ars Technica: [https://arstechnica.com/information-technology/2016/12/how-to-make-linux-more-trustworthy/ How to make Linux more trustworthy - Reproducible builds are a good step, but Red Hat and Ubuntu don't want to join in.]
+}}
+
+This situation has improved. Reproducible builds are now a goal.
+
+* https://docs.fedoraproject.org/en-US/reproducible-builds/
+* https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/NRRAH67FZXVKGERYTBSVL6QIQ57BXXBG/
+* https://pagure.io/fedora-reproducible-builds/project
+* https://pagure.io/fedora-reproducible-builds/project/issues
+* https://www.youtube.com/watch?v=5c4gfXVPAbU
+
+<u>Information:</u>
+
+* Qubes dom0 is based on Fedora.
+
+<u>Potential blocker:</u>
+
+* [[Dev/Operating_System#Community_Project_versus_Corporate_Project|Community Project versus Corporate Project]]
+* https://www.reddit.com/r/Fedora/comments/157sngv/discussion_is_fedora_really_a_corporate_distro/
+* https://docs.fedoraproject.org/en-US/council/
+
+<u>Potential phone-home issue:</u>
+
+* [https://github.com/QubesOS/qubes-issues/issues/1814 sys-net phones home to fedoraproject.org for captive portal detection #1814] - "might have fixed itself"
+
+<u>Notes:</u>
+
+* Fedora Linux used to use its flawed home-grown OpenPGP parser. In Fedora 38 the internal PGP parser was replaced with Sequoia PGP, improving security and standards-compliance.
+** [https://fedoraproject.org/wiki/Changes/RpmSequoia#Benefit_to_Fedora Changes/RpmSequoia - Fedora Project Wiki]
+** [https://sequoia-pgp.org/blog/2024/12/13/202412-sequoia-fedora/ Sequoia PGP in Fedora Linux - Sequoia PGP blog]
+** Sequoia PGP provides a complete implementation of OpenPGP as defined by RFC 9580 and RFC 4880, as well as some extensions (e.g., RFC 6637, which describes ECC cryptography for OpenPGP).
+** [https://wiki.debian.org/OpenPGP/Sequoia OpenPGP/Sequoia - Debian Wiki]
+** Note that signing RPM packages is not the same as signing repository metadata.
+
+<u>See also:</u>
+
+* [[Dev/Fedora]]
+
+<u>Discussion:</u>
+
+* https://forums.whonix.org/t/port-whonix-to-fedora-as-base-operating-system/16528
+
+== secureblue ==
+* based on [[Dev/Operating_System#Fedora|Fedora]]
+* {{kicksecure_wiki
+|wikipage=Dev/secureblue
+|text=Comparison of secureblue with Kicksecure and Development Notes
+}}
+* [https://forums.kicksecure.com/t/how-does-kicksecure-compare-to-silverblue/745 How does Kicksecure compare to Silverblue?]
+
+== Qubes ==
+Implemented as [[Qubes|{{q_project_name_long}}]].
+
+== Gentoo / Hardened Gentoo ==
+There was an effort to port Whonix to Gentoo a long time ago.
+
+* That effort has been abandoned.
+* Only preliminary research was done and a few contributions to [https://github.com/martinholovsky/Securix-Linux Securix-Linux] (a build script for Hardened Gentoo).
+* Was considered as an additional port of Whonix to Hardened Gentoo. Not necessarily leading to the deprecation of Debian-based Whonix.
+* Historical archive of that effort can be found here: https://github.com/Whonix/Gentoo-Port/issues
+* Started in December 2014.
+* Only 2 years after Whonix had been founded. By that time, Whonix had a much smaller feature set and its base distribution (Debian), user base, and focus on usability was much less enshrined at that time. In other words, Whonix was less established and more flexible at the time.
+* Ended in January 2015.
+* Something similar would most likely not be interesting anymore nowadays.
+
+Insecure package manager. Back then bug reports got closed down without much regard.
+
+* https://github.com/{{project_name_short}}/Gentoo-Port/issues/19 - https://bugs.gentoo.org/show_bug.cgi?id=539954
+* https://github.com/{{project_name_short}}/Gentoo-Port/issues/10 - https://archives.gentoo.org/gentoo-portage-dev/message/94425239fcaedcee6c49ef398f12aa85
+* https://forums.whonix.org/t/ask-about-alpine-linux-package-manager-security/19188
+* [gentoo-portage-dev] Security and Comparison of Portage with other Package Managers: https://archives.gentoo.org/gentoo-portage-dev/message/bda425ee6c676ec7a6b3c9500a9b00bf
+* [gentoo-portage-dev] Portage and Update Security: https://archives.gentoo.org/gentoo-portage-dev/message/94425239fcaedcee6c49ef398f12aa85
+
+In this regard, Hardened Gentoo does not differ from Gentoo.
+
+Due to the way these bug reports were handled, Gentoo was removed from the candidates of secure base operating systems.
+
+In Patrick's opinion, mortal users are unlikely to learn how to use them. <ref>
+Examples of usability issues.
+
+<pre>
+emerge firefox
+* There is NOT at least 4 GiB disk space at "/var/tmp/portage/www-client/firefox-31.5.0/temp"
+</pre>
+What to do? Increase tmpfs size as per [https://wiki.gentoo.org/wiki/Portage_TMPDIR_on_tmpfs wiki.gentoo.org/wiki/Portage_TMPDIR_on_tmpfs].
+</ref>
+
+== Alpine Linux ==
+Quote from https://www.alpinelinux.org/about/
+
+<blockquote>
+Alpine Linux was designed with security in mind. All userland binaries are compiled as Position Independent Executables (PIE) with stack smashing protection. These proactive security features prevent exploitation of entire classes of zero-day and other vulnerabilities.
+</blockquote>
+
+That does not sound particularly secure, since other distributions implement the same measures. Are there any other distinguishing security features?
+
+At first glance, Alpine's package manager appears to suffer from the same issues as Gentoo's (being vulnerable to indefinite freeze and downgrade attacks). TODO research: [https://forums.whonix.org/t/ask-about-alpine-linux-package-manager-security/19188 ask about Alpine Linux package manager security]
+
+The question to ask is: "Does the package manager pass the TUF Threat Model?"
+
+The Update Framework (TUF) - Attacks and Weaknesses:
+
+* https://theupdateframework.io/security/
+** Created by individuals who also contributed to the research paper [https://web.archive.org/web/20220330200223/http://www.cs.arizona.edu/stork/packagemanagersecurity/attacks-on-package-managers.html attacks on package managers], which, as far as understood, led to significant improvements in package manager security across many distributions.
+
+One can ask the TUF developers, who are generally very friendly and helpful, for their opinion via their mailing list:
+https://groups.google.com/g/theupdateframework
+
+== Arch Linux ==
+[https://forums.whonix.org/t/arch-linux-distro-preview/13387 Arch Linux Distro Preview]
+
+== Devuan ==
+
+* {{kicksecure_wiki
+|wikipage=Systemd#systemd_security_features
+|text=security features implemented in systemd
+}} are lacking in other non-systemd init systems.
+* {{kicksecure_wiki
+|wikipage=Systemd
+|text=systemd versus non-systemd
+}} opinion by Kicksecure, on which Whonix is based.
+* [https://linuxiac.com/devuan-forgot-to-renew-the-key-that-signs-system-updates/ Devuan forgot to renew the key that signs system updates]
+
+== NixOS ==
+
+* Does not use MAC/Namespaces by default.
+** (MAC: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=apparmor AppArmor] and Namespaces: [https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=firejail Firejail] are turned off by default, while SELinux is [https://github.com/NixOS/rfcs/pull/41 unsupported] as of yet.)
+* https://forums.whonix.org/t/nixos-distro-preview/19883
+* [https://search.nixos.org/packages?channel=unstable&show=tor-browser&from=0&size=50&sort=relevance&type=packages&query=tor-browser Tor Browser packaged by NixOS]
+
+== GuixOS ==
+
+MAC/Namespaces support doesn't exist in GuixOS yet.
+
+More: [https://forums.whonix.org/t/guixsd-distro-preview/11727 GuixSD Distro preview] and [[Dev/Default_Application_Policy#guix]]
+
+== Hyperbola ==
+* https://www.hyperbola.info
+* https://www.hyperbola.info/news/end-of-d-bus-support/
+* FSDG: yes
+* Package manager: pacman (Arch Linux also uses pacman) -> [[#Arch Linux]] package manager security?
+* Not reviewed yet. Would need to be added to [[#Criteria for Choosing a Base Distribution|Criteria for Choosing a Base Distribution]] for further consideration.
+
+== Voidlinux ==
+
+* Their main developer left the project; they [https://itsfoss.com/void-linux-crisis/ lost access to their resources] like GitHub, IRC, domain, etc. (regained access to only some of them)
+* Another sad loss for the project was the passing of [https://voidlinux.org/news/2021/03/In-memoriam-pullmoll.html Jürgen Buchmüller (pullmoll)], one of their main maintainers.
+* After almost 6 years, they [https://voidlinux.org/news/2021/02/OpenSSL.html switched back] from LibreSSL to OpenSSL.
+* They do not sandbox their packages with MAC/Namespaces by default. Only xbps-src, which is the package builder, but it is not used for sandboxing packages within their distro.
+
+== SubgraphOS ==
+
+There are several reasons why {{project_name_short}} has decided not to use the [https://subgraph.com/ Subgraph project] platform.
+
+{| class="wikitable"
+|+ ''{{project_name_short}} Rationale''
+|-
+! '''Domain'''
+! '''Reasoning'''
+|-
+
+! Development
+|
+* <u>Future Roadmap:</u> Basing {{project_name_short}} on Subgraph would tie our future to the viability of another project. It is not ideal to rely on an OS in alpha status, particularly when the Debian alternative is rock solid and has decades of development behind it.
+* <u>Features:</u> Subgraph has some [[Comparison_with_Others/SubgraphOS|undesirable feature additions]] that add no value. {{project_name_short}} cannot benefit from Subgraph's manpower if the goals for the development roadmap are fundamentally different.
+* <u>Bugs:</u> The plentiful [https://github.com/subgraph/subgraph-os-issues/issues Subgraph bugs] would become {{project_name_short}} bugs, and developers would depend on them for fixes.
+* <u>Programming Language:</u> Subgraph chose different programming languages (like Golang) that are unfamiliar to lead {{project_name_short}} developers, making customization or modification very difficult.
+* <u>Desktop Environment:</u> {{project_name_short}} Developer HulaHoop has noted that Subgraph features completely rely on the GNOME desktop environment. This is undesirable because it is visually unappealing, has an over-simplified interface, and would require any "cloud integration" elements to be removed. Configuring GNOME to approach the specifications already achieved in {{project_name_short}} would require a lot of effort.
+|-
+
+! Source Code / Software
+|
+* <u>Code Availability:</u> No full source code release to date (mid-2019). <ref>https://github.com/subgraph/subgraph-os-issues/issues/153</ref> <ref>https://github.com/subgraph/subgraph-os-issues/issues/250</ref>
+* <u>Packaging:</u> The publicly available software exists in a form that is not easily packaged. This would pose a significant maintenance burden for the {{project_name_short}} team.
+* <u>Constraints:</u> Arbitrary limitations are in place, such as repository choices. This can of course be changed, but it is an example of wasted effort in patching the base OS to adapt to our vision.
+* <u>Meta-packages:</u> There is no Subgraph meta package that can be installed using [https://github.com/subgraph/subgraph-os-issues/issues/239 "<code>sudo apt install subgraph-os</code>" / "<code>debootstrap</code> Subgraph OS"] in order to convert vanilla Debian into Subgraph OS. <ref>Subgraph is a Debian derivative.</ref> (Similar to {{kicksecure_wiki
+|wikipage=chroot
+|text=Install {{kicksecure}} inside a folder (chroot)
+}} or [[Dev/Installation_from_Repository|{{project_name_short}} Installation from {{project_name_short}} APT Repository]].)
+|-
+
+! Collaboration
+| To date, there has been no cooperation from the Subgraph project developers to correct any of the issues outlined in this section.
+|-
+
+|}
+{{Anchor|Why aren't you using OpenBSD, it is the most secure OS ever!!!1!}}
+
+== OpenBSD ==
+
+This FAQ entry addresses the suggestion that {{project_name_short}} should be based on OpenBSD rather than Debian. The opinion provided below is based on the perspective of {{project_name_short}} developers. <ref>Last updated in 2019.</ref>
+
+The OpenBSD FAQ states: [https://www.openbsd.org/faq/faq1.html#WhyUse source]
+<blockquote>
+OpenBSD is thought of by many security professionals as the most secure UNIX-like operating system, as the result of a never-ending comprehensive source code security audit.
+</blockquote>
+
+The landing page for OpenBSD also notes: <ref>https://www.openbsd.org/</ref>
+
+<blockquote>Only two remote holes in the default install, in a heck of a long time!</blockquote>
+
+To OpenBSD's credit, they have a solid reputation for taking security seriously. For example, the development team has adopted these principles: <ref>https://www.openbsd.org/security.html</ref>
+
+* A strong focus on cryptographic approaches towards fixing security problems.
+* Full disclosure of security bugs and speedy fixes.
+* An auditing team of 6-12 members (including ex-corporate security researchers) continuously searches for and fixes security holes; a process underway since 1996. <ref>This has resulted in the discovery of entire new classes of security problems.</ref>
+* Development of new technologies, such as additional memory protections.
+* Shipping the OS in a "Secure by Default" mode with all non-essential services disabled.
+* Contributing to research - a number of security papers have been written by OpenBSD team members.
+
+Despite these strengths, the primary downside to adopting OpenBSD relates to the estimated size of the user base:
+
+* [https://www.bsdstats.org/ bsdstats.org] suggests OpenBSD has few users. While bsdstats is not representative of the total population of OpenBSD users due to the opt-in data collection program, 9 systems at the time of writing is a very small figure. By comparison, TrueOS had over 15,000 users in 2019.
+* Although unscientific, [https://distrowatch.com/dwres.php?resource=popularity DistroWatch] also shows OpenBSD attracts far less interest than popular Linux distributions.
+* OpenBSD is estimated to have less than 10 percent of total BSD market share. <ref>https://en.wikipedia.org/wiki/Comparison_of_BSD_operating_systems#Popularity</ref>
+* Estimates of BSD market share across all categories (desktops, servers, etc.) are [https://en.wikipedia.org/wiki/Usage_share_of_operating_systems tiny].
+
+One valid concern is that if a critical mass of users does not gravitate to OpenBSD, then naturally fewer human resources ("eyeballs") in the population will be searching for, identifying, and remedying security flaws. While the audit team is skilled, a relatively small number of people must inspect code across an entire operating system. As a result, this could ''potentially'' aid targeted attacks or other exploits.
+<ref>One example previously cited is this years-old bug which remains unfixed: [https://web.archive.org/web/20170324012358/http://thread.gmane.org/gmane.os.openbsd.bugs/18754 security vulnerability - NTP not authenticated]. Possibly limited human resources have impacted this bug which affects everyone using the distribution.</ref> <ref>This bug would also impact {{project_name_short}} - the suggested solution was to authenticate the connection to the NTP server, but this would not be possible for several reasons:
+* The {{project_name_short}} design focuses on distributing trust and not using only one NTP server.
+* Further, {{project_name_short}} depends on free services which are available to anyone, ruling out a solution that requires a personal server.
+* Even if {{project_name_short}} used authenticated NTP, it has been [https://archive.ph/FobRy pointed out] that the clock could not be moved more than 600 seconds. This is better than nothing, but still inadequate for adversaries who are capable of moving the clock more than 600 seconds, harming anonymity/privacy in the process (see [[Dev/TimeSync]] for further details).</ref>
+
+In comparison, alternatives like Debian have a large user/contributor base, a similar [https://www.debian.org/security/ focus on security], renowned stability, and a solid reputation in security-critical environments such as web servers. <ref>In fact, Debian's popularity and large contributor base has resulted in its adoption in around [https://en.wikipedia.org/wiki/Usage_share_of_operating_systems#Market_share_by_category one-third of all Linux web servers] and led to an expansive software library of over 50,000 packages.</ref> It is also strongly contested whether BSD variants have [https://www.openbsd.org/innovations.html innovative security improvements] that provide greater protection than modern platforms like Qubes OS; see [[Qubes/Why_use_Qubes_over_other_Virtualizers#Security|Qubes Security]].
+
+* https://isopenbsdsecu.re/
+* https://isopenbsdsecu.re/mitigations/
+* https://isopenbsdsecu.re/quotes/
+
+== openSUSE ==
+* https://forums.whonix.org/t/port-to-opensuse/17400
+* https://forums.whonix.org/t/opensuse-tumbleweed-distro-preview/20561
+* https://github.com/Kicksecure/security-misc/issues/138
+* {{kicksecure_wiki
+|wikipage=Dev/openSUSE
+|text=Dev/openSUSE
+}}
+
+== PureOS ==
+* https://tracker.pureos.net/T305
+* https://tracker.pureos.net/project/profile/21/
+* {{kicksecure_wiki
+|wikipage=Dev/Default_Browser#PureBrowser
+|text=PureBrowser was unfortunately deprecated
+}}
+
+== FreeBSD ==
+
+This FAQ entry addresses the suggestion that {{project_name_short}} should be based on FreeBSD rather than Debian. The opinion provided below is based on the perspective of {{project_name_short}} developers. <ref>Last updated in January 2018.</ref>
+
+It is difficult and time-consuming to try and list all the disadvantages of using FreeBSD, such as highlighting non-existent security features. The onus is on FreeBSD proponents to manually search for relevant features (or lack thereof) and present an objective case for its adoption.
+
+To avoid presenting information that will quickly become outdated or that may insult FreeBSD adherents, it is better to avoid definitive security statements and instead ask appropriate questions which might affect the usability, security, anonymity, and wide-scale adoption of {{project_name_short}}. For instance:
+
+* Does FreeBSD have a secure-by-default update mechanism?
+* By default, will every (new) user download come from an existing ''signed'' repository?
+** If not, what special settings are required?
+** Are users expected to run their own repository?
+* Does FreeBSD defend against outdated metadata; for example, can a man-in-the-middle use a rollback or freeze attack against the repository?
+* Does FreeBSD defend against [https://www2.cs.arizona.edu/stork/packagemanagersecurity/attacks-on-package-managers.html various attacks on package managers?]
+* Does FreeBSD defend against attacks on the software update process by using the [https://theupdateframework.io/security/ TUF threat model]?
+
+Research which might provide a strong case for FreeBSD does not exclude the possibility of weaknesses or missing security features. The best way to determine the strength of the platform and its relative resilience is to directly ask the developers of that project. Honest replies can reasonably be expected from vibrant, open source communities. The only problem is, the Linux/BSD ecosystems have hundreds of distributions, and it is a daunting prospect to rank their merits in this way.
+
+Ultimately, the burden of proof falls on FreeBSD advocates (and not {{project_name_short}} developers) to prove that it is the most secure distribution available. Properly researched contributions that answer the questions above would be a good start, along with possibly approaching FreeBSD developers directly. Alternatively, research into why various aforementioned protections are not necessary to improve security would also be welcomed. Until claims about FreeBSD are substantiated, one should not take offense that it has not already been adopted.
+
+To check for FreeBSD security features see: https://wiki.freebsd.org/CategorySecurity
+
+== OpenWRT ==
+
+[https://openwrt.org/ OpenWRT] is not used for the same reasons outlined above. Further, in early 2018, OpenWRT [https://openwrt.org/packages/start did not have signed packages].
+
+== Tails ==
+=== How is {{project_name_short}} Different from Tails? ===
+
+See [[Comparison with Others]].
+
+=== Why not Merge with Tails and Collaborate? ===
+
+The following is a ''subjective'' opinion by lead {{project_name_short}} developer Patrick Schleizer. <ref>Last updated in September 2018.</ref> Feedback, corrections, and suggested improvements are welcome.
+
+[https://tails.boum.org/ Tails] is a respected project with similar goals to {{project_name_short}} - improved anonymity, privacy, and security. Tails has existed for many years and has multiple developers, significant experience, and a complete working infrastructure. {{project_name_short}} and Tails developers already cooperate to some degree and discuss matters of mutual interest on various developers mailing lists like whonix-devel, tails-devel, and secure-os.
+
+=== {{project_name_short}} and Tails Collaboration ===
+
+Several parts of {{project_name_short}} are based on Tails. For example, the development of [[sdwdate]] in {{project_name_short}} was reliant upon Tails' invention of tails_htp. {{project_name_short}} also benefits from Tails' previous efforts to upstream packaging and other changes in Debian, as well as current and historical discussions in various forums, Tails research, design documents, experience, feedback, and so on.
+
+Other examples of Tails and {{project_name_short}} cooperation include:
+
+* [[Dev/onion-grater#onion-grater_by_Tails|onion-grater]] - a whitelisting filter for dangerous Tor control protocol commands - was developed by Tails developer {{Code2|anonym}} with {{project_name_short}} in mind. {{project_name_short}} then [[Dev/onion-grater#onion-grater_by_Tails_forked_by_{{project_name_short}}|forked the Python code]] to add a few necessary improvements. <ref>https://github.com/{{project_name_short}}/onion-grater</ref>
+* Tails has expressed interest in using [[Anon Connection Wizard]] in the future.
+
+=== Why {{project_name_short}} is a Separate Project ===
+
+Even though Tails is highly valued by {{project_name_short}} developers, it may not be clear to the reader why {{project_name_short}} remains a separate project and not just a contributor to Tails. There are several reasons for this decision: {{project_name_short}} cannot be merged into Tails by the {{project_name_short}} team on technical, skill, and political grounds; implementing features or changes in Tails is an unfamiliar process; and it is unknown when/if {{project_name_short}} priorities will be implemented in Tails - but it is known how to solve these in a separate project (at least with appropriate user documentation).
+
+Further examples are outlined in the table below. Note that some of these items are partially or nearly solved in Tails, but they have been kept to justify the prior decision not to merge projects.
+
+{| class="wikitable"
+|+ ''{{project_name_short}} and Tails Design and Functionality Comparison''
+! <b>Tails Issue Tracker (TODO)</b>
+! <b>{{project_name_short}} Design / Instructions</b>
+|-
+
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/5551 Remember installed packages]
+| By design, everything persists <ref>This is actually a disadvantage for anonymity because it is the opposite of an amnesic system, which many users prefer.</ref>
+
+|-
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/5769 Applications Audit]
+| By design, protocol leaks cannot lead to deanonymization
+|-
+
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/5748 Two-layered, virtualized system]
+| By design, this is achieved by either software compartmentalization (VMs) or [[Dev/Build_Documentation/Physical_Isolation|Physical Isolation]]
+|-
+
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/5858 VPN support]
+| [[Features#Tunnel_Support|VPN / Tunnel support]]
+|-
+
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/6078 Freenet] over Tor
+| [[Freenet]]
+|-
+
+| [https://tails.boum.org/doc/anonymous_internet/tor/index.en.html obfsproxy] <ref>Bridges were not natively supported by Tails when {{project_name_short}} was founded.</ref>
+| [[Bridges]]
+
+|-
+| [https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html#fingerprint Can I hide the fact that I am using Tails?]
+| [[Hide Tor from your Internet Service Provider|Hide Tor and {{project_name_short}} from your ISP]]
+|-
+
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/12264 I2P over Tor] <ref>The I2P feature was [https://tails.boum.org/news/version_2.11/ removed in Tails 2.11] due to the developer effort required.</ref>
+| [[I2P]]
+|-
+
+| [https://tails.boum.org/contribute/design/Tor_enforcement/ Transparent Proxy as a fallback mechanism]
+| By design, everything not configured to use a SocksPort will automatically use Tor's TransPort
+|-
+
+| [https://tails.boum.org/doc/anonymous_internet/Tor_Browser/index.en.html Use Tor Browser]
+| [[Tor Browser]]
+|-
+
+| [https://tails.boum.org/contribute/design/stream_isolation/ Stream Isolation] <ref>Tails has basic stream isolation functionality compared to {{project_name_short}}.</ref>
+| [[Stream Isolation]]
+|-
+
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/5362 Evaluate web fingerprint] <ref>See also: https://tails.boum.org/contribute/design/#index19h2 The bundling of uncommon extensions in Tor Browser like ''uBlock Origin'' increases the likelihood of fingerprinting Tails users specifically.</ref>
+| Same as Tor Browser
+|-
+
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/5412 Unsafe browser fingerprint]
+| [[Logging in to captive portals]]
+|-
+
+| [https://gitlab.tails.boum.org/tails/blueprints/-/wikis/tails_server/ Location Hidden/IP Hidden Servers]
+| [[Hosting Location Hidden Services|Location/IP Hidden Servers]]
+|-
+
+| [https://gitlab.tails.boum.org/tails/tails/-/issues/5709 VoIP]
+| [[VoIP|VoIP]]
+
+|-
+| ...
+| ...
+|}
+
+=== Political and Design Considerations ===
+
+There are also significant differences in political and design decisions which prohibit a merger:
+
+* As a code contributor to Tails, Patrick Schleizer would need to accept decisions made via internal Tails decision-making processes. {{project_name_short}} would lose the autonomy to simply modify anything in line with personal preferences or favored solutions. <ref>One major advantage of free software is that developers are free to disagree about a project's direction, leading to the creation of a fork.</ref> At the time {{project_name_short}} was created, Schleizer did not favor a Live DVD/USB approach and personally found improving Tails to be far more difficult than starting a fresh project.
+* Source Code Merge Policy:
+** <u>Whonix:</u> A comprehensive merge policy has not yet been developed. This would be ideal, but it is not compulsory to formulate such a design or associated documentation.
+** <u>Tails:</u> In Schleizer's opinion, the [https://tails.boum.org/contribute/merge_policy/ Tails merge policy] is too strict. This is not a complaint or critique. No doubt there are good reasons for that decision, and it should be noted that Tails is still a popular and effective solution for many users. Anyone who does not agree has the freedom to contribute to another project or to start a new project, leading Schleizer to make use of that freedom.
+* Another major design difference is Tails' reliance on a Live DVD/USB, which inherits some restrictions and limitations. Tails must fit on a DVD/USB, while {{project_name_short}} does not have this requirement. {{project_name_short}} also has higher hardware requirements, but therefore more space to implement features. As a consequence, initially fewer people are able to use {{project_name_short}}, but this situation will improve in the future as available hardware improves. The {{project_name_short}} design is fluid, and new designs (both theoretical and practical) are being discovered over time. Depending on user feedback and general interest, eventually a Live DVD or Blu-ray might be created in {{project_name_short}}.
+* Schleizer has found it easier to cooperate with the security-by-isolation focused operating system [https://www.qubes-os.org Qubes OS], which resulted in [[Qubes|{{q_project_name_short}}]].
+
+== Deepin ==
+* https://security.opensuse.org/2025/05/07/deepin-desktop-removal.html
+* https://security.opensuse.org/2025/05/07/deepin-desktop-removal.html#2017-12-04-deepin-api-initial-review-of-d-bus-service-and-polkit-actions
+* https://forums.kicksecure.com/t/wayland-only-or-noland/1170/5
+
+= Minimal Distribution Disadvantages =
+
+The primary reason for the large size of the images is that small/er distributions do not meet {{project_name_short}} requirements; namely, the upstream distribution must have a proactive security policy. In addition:
+
+* Most minimal distributions are small projects. Consequently, there is no dedicated security team that audits packages and quickly releases security patches.
+* {{project_name_short}} requires a distribution that cryptographically signs all updates. <ref>This is always desirable, particularly when updating over untrusted exit relays.</ref>
+* The security of minimal distributions is premised on reducing the potential attack surface and not much else. {{project_name_short}} also has a small attack surface, due to only installing a few select applications and not having any network listening services by default. However, on the upside, a full distribution supports MAC, kernel patches, IDS, and much more.
+* Large, established projects have many users and developers - the many eyeballs on the code imply greater trustworthiness.
+* Debian has a significant number of [https://wiki.debian.org/Security/Features security features] that are unavailable in smaller distributions.
+* For further reading on this topic, see [[Dev/Operating_System|Operating System]].
+
+= Maintenance and Usability Concerns =
+
+Since {{project_name_short}} is based on Debian, it is a complete, anonymity-oriented, general-purpose operating system. This greatly improves [[Design|usability]] in comparison to minimal systems which lack a host of [[Features|features]].
+
+There are several other benefits of relying on Debian, rather than a minimal distribution:
+
+* A wider range of use cases is supported, such as hosting onion services. In contrast, small distributions usually have limited repositories.
+* Debian has comprehensive documentation about topics like security and hardening, unlike many small distributions.
+* Creating a slim system increases the maintenance burden because it is difficult and requires significant development time. This is not and should not be the primary focus of the {{project_name_short}} team.
+* Minimal projects do not usually focus on anonymity, privacy, and security-related matters - the core competence of the {{project_name_short}} project.
+* Attempts to slim down systems inevitably result in numerous "strange bugs". Users who are familiar with Debian or Ubuntu would then question why {{project_name_short}} is broken or lacks full functionality.
+
+It should be noted that by increasing usability, {{project_name_short}} actually improves security over time. This stems from a larger user pool, a more prominent profile in the press, increased development activity, and additional security audits and research. On the contrary, a slimmed-down system would only attract specialists or experts. <ref>This does not mean {{project_name_short}} cannot be significantly hardened, customized, or reduced in size by those with specialist knowledge.</ref>
+
+An interesting analogy is [https://www.mixminion.net/ Mixminion], which was once touted as an alternative to Tor. <ref>Consider this interesting statement from Tor developer Roger Dingledine: [https://www.mail-archive.com/liberationtech@lists.stanford.edu/msg00022.html Mixminion vs Tor].</ref> Due to Mixminion being a high-latency remailer, with cover traffic and protection against traffic confirmation (end-to-end correlation attacks), it should ''theoretically'' have been more secure than Tor. The only problem was that Mixminion did not attract a critical mass of users. Without a sizable population to help disguise traffic, the putative anonymity benefits were seriously degraded - making it no more or less (in)secure than Tor. <ref>This is also the reason development was discontinued.</ref>
+
+= Usability =
+Define usability of "Debian Linux" as "good" because it is the baseline and starting point, since {{project_name_short}} is currently based on it. There are Linux distributions which might have better usability such as Ubuntu, Elementary OS but also distributions which have worse usability by comparison. The definition of "good" here is not the usability of mainstream operating systems such as Android or iOS. See also {{kicksecure_wiki
+|wikipage=Linux User Experience versus Commercial Operating Systems
+|text=Linux User Experience versus Commercial Operating Systems
+}}.
+
+= Why don't you do what <other operating system> does? =
+
+[[Based_on_Kicksecure|{{project_name_short}} is based on Kicksecure]], which is a security-focused operating system.
+
+For example, initramfs-tools gets broken by libpam-tmpdir and /tmp mounted with noexec. Bugs have been reported to upstream distributions Debian and Ubuntu.
+
+* [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1062756 Debian: initramfs-tools broken by libpam-tmpdir and /tmp mounted with noexec]
+* [https://bugs.launchpad.net/ubuntu/+source/initramfs-tools/+bug/2053153/ Ubuntu: initramfs-tools broken by libpam-tmpdir and /tmp mounted with noexec]
+
+Upstream distributions did not notice this because upstream:
+
+* is not (considering) installing libpam-tmpdir by default,
+* is not (considering) mounting /tmp with noexec by default.
+
+Upstream presumably therefore did not notice this bug. These upstream bug reports did not receive any upstream replies and no action was taken upstream either. Potential reasons for this could be because upstream has no resources to look into it, has different priorities, or is not interested in that.
+
+Another example: the security issue [https://trojansource.codes Trojan Source - Invisible Source Code Vulnerabilities] ({{kicksecure_wiki
+|wikipage=Unicode
+|text=Invisible Malicious Unicode Risks
+}}) has been reported to Debian:
+
+* [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1014029 invisible malicious unicode in source code - detection and prevention]
+* Was automatically mirrored to the debian-development mailing list: [https://lists.debian.org/debian-devel/2022/06/msg00178.html Bug#1014029: invisible malicious unicode in source code - detection and prevention].
+
+The only action taken by Debian was closing the bug and locking further discussion.
+
+Debian:
+
+* trusts RDRAND by default, but really should not. Details here: [[Dev/Entropy#RDRAND|RDRAND]]
+* No action was taken on Debian feature request [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=927972 set jitterentropy_rng.ko to built-in]. See also [[Dev/Entropy#jitterentropy|jitterentropy]].
+
+Therefore, what another distribution does or does not do is by itself not an argument.
+
+= Rolling Distribution =
+Regular upgrades on a rolling distribution help prevent attacks by fixing known vulnerabilities, but they also increase the risk of introducing less-vetted packages, which might include malicious backdoors, such as the [https://en.wikipedia.org/wiki/XZ_Utils_backdoor XZ utils backdoor] incident. This creates a trade-off between maintaining up-to-date security and ensuring system integrity.
+
+{{quotation
+|quote=However, as security researcher Sharp Security highlighted in a blog post, the team fixed a notable flaw without adequately informing the users about it and without assigning a CVE to the problem.
+|context=https://www.bleepingcomputer.com/news/security/qbittorrent-fixes-flaw-exposing-users-to-mitm-attacks-for-14-years/
+}}
+
+See also {{kicksecure_wiki
+|wikipage=Dev/Stable_vs_Rolling_Distributions
+|text=Stable vs Rolling Distributions - Security Analysis
+}}.
+
+= Popularity =
+* https://www.wappalyzer.com/compare/fedora-vs-debian/
+* https://w3techs.com/technologies/comparison/os-debian,os-fedora
+* https://w3techs.com/technologies/comparison/os-debian,os-redhat
+* https://www.reddit.com/r/linux/comments/184c1ec/ubuntu_is_a_popular_distro_with_a_very_large_user/
+
+= Debian =
+== General ==
+[[Based_on_Kicksecure|{{project_name_short}} is based on Kicksecure]]. [[Based_on_Debian|Kicksecure is based on Debian]]. Therefore, [[Based_on_Debian|{{project_name_short}} is also based on Debian]].
+
+<u>Rationale for being based on Debian:</u>
+
+* <u>Stable release:</u> Debian is a stable distribution, making it suitable for a [[Stable_Version_User_Experience|Stable Version User Experience]].
+* <u>Maintainability:</u> Offers good {{kicksecure_wiki
+|wikipage=Dev/maintainability
+|text=Maintainability
+}} for long-term projects.
+* <u>Longevity:</u> Exists for many years and is expected to still be around in 10 years.
+* <u>Resilient to dissent:</u> Attempts to sow dissent in the project have failed. <ref>
+Debian is Free. Imagine how much money that must cost proprietary competitors, not all of whom necessarily play by the law.
+</ref>
+* <u>Broad architecture support:</u> Supports massive architecture variety beyond i386, amd64, and arm. <ref>
+If a platform becomes "evil", Debian as the universal operating system is most likely to port to new platforms.
+</ref>
+* <u>Secure package management:</u> Comes with a secure package manager by default.
+* <u>Kernel protection:</u> As per {{Code2|[https://www.trapkit.de/tools/checksec/ checksec.sh] --kernel}}, Debian enables GCC stack protector, read-only kernel data enforcement, and restrictions on <code>/dev/mem</code> and <code>/dev/kmem</code>.
+* <u>Repository snapshots:</u> https://snapshot.debian.org/, hosted and signed by a trusted third party (Debian) <ref>
+From the perspective of {{project_name_short}}.
+</ref>, enables robust build scripts <ref>
+Build scripts won't break due to upstream repository changes.
+</ref> and supports [[Verifiable_Builds|Verifiable Builds]].
+* <u>Configuration packages:</u> [https://packages.debian.org/{{Stable project version based on Debian codename}}/config-package-dev config-package-dev] allows creation of robust configuration packages.
+* <u>Bootable image creation:</u> [https://packages.debian.org/{{Stable project version based on Debian codename}}/grml-debootstrap grml-debootstrap] enables bootable raw image creation.
+* <u>Reproducible builds:</u> Debian actively works on [https://wiki.debian.org/ReproducibleBuilds ReproducibleBuilds].
+* <u>Knowledgeable community:</u> Huge community across Debian and derivatives (Stack Exchange, Debian forums, Ask Ubuntu, and more).
+* <u>Approachable developers:</u> Debian Developers are friendly and approachable at conferences.
+* <u>Tor alignment:</u> The Tor Project has ties to Debian.
+* <u>Tor friendly:</u> Debian packages Tor, Debian package repositories are accessible over Tor and Debian provides onion repositories. It seems therefore unlikely that Debian will block access over Tor.
+* <u>No trademark issues:</u> [[#Switch_from_Ubuntu_to_Debian|No legal/trademark issues]].
+* <u>Most forked distribution:</u> Debian is the most forked GNU/Linux distribution.
+* <u>Why many use Debian:</u> [https://upsilon.cc/~zack/blog/posts/2011/09/why_there_are_so_many_debian_derivatives/ Why there are so many Debian derivatives].
+
+{{quotation
+|quote=Debian has a long history and a well established community, which reduces the risk of "betting" the efforts of derivatives on a distro that might disappear anytime soon.
+}}
+
+{{quotation
+|quote=Debian is well known for its obsession with package quality
+}}
+
+{{quotation
+|quote=Debian is also well known for its obsession with licensing, at the point of being considered by many one of the authoritative sources for deciding what constitutes Free Software and what does not. For derivatives that implies that they do not need to worry---as long as they trust Debian, of course---neither about legal redistribution risks nor about software freedom claims on their distro.
+}}
+
+{{quotation
+|quote=One is quite subtle and applies mostly to commercial distributions. If you are designing one such commercial distro, you have to be based on an independent distro with no commercial interests, lest risking that petty (technical or otherwise) choices might be made just to undermine your business. Among "popular" GNU/Linux distros, Debian is essentially the only one which is both volunteer-based and not ascribable to any specific company.
+}}
+
+Also interesting:
+
+* [https://lists.debian.org/debian-security/2013/10/msg00065.html Debian APT Key Revocation Procedure]
+* [https://lists.debian.org/debian-security/2013/11/msg00019.html How (un)safe would Debian be when only using the security.debian.org repository?]
+
+Related:
+
+* [https://wiki.debian.org/Derivatives/Census/{{project_name_short}} Derivatives Census {{project_name_short}}]
+* {{kicksecure_wiki
+|wikipage=Dev/Relationship_With_Upstream
+|text=Dev/Relationship With Upstream
+}}
+
+See also:
+
+* {{kicksecure_wiki
+|wikipage=Dev/Debian
+|text=Dev/Debian
+}}
+
+{{Anchor|Why is {{project_name_short}} 8 based on Debian Stable, not Debian Testing?}}
+
+== Debian is Software Fork Friendly ==
+
+Debian does not oppose [https://en.wikipedia.org/wiki/Fork_(software_development) software forks], which means creating a new project by copying an existing one and developing it independently. In fact, Debian encourages and supports such projects, often called "forks".
+
+* [https://www.debian.org/derivatives/ Learn about Debian-based projects]
+* [https://wiki.debian.org/Derivatives/Census List of Debian-based projects]
+
+== Debian Security ==
+Debian is not (a | the most) security-focused Linux distribution. Under some threat models, Debian is judged insecure. Issues with Debian then would have to be considered deeper than technical - i.e., architectural, organizational, or ideological issues. To put it another way, (a lot | many | most) (?) Debian Developers do not prioritize security over everything else, readily compromising on other things such as package availability, features, usability, etc. That should not come as a surprise. Debian’s slogan is "the universal operating system" - not "attempting to be the most secure operating system" - and therefore Debian did not attract that mindset. Debian consists mostly of volunteers who need to attend to day jobs, which might arguably not be the best for security either.
+
+=== Debian - packages with many unfixed high severity security issues ===
+For a prolonged amount of time.
+
+{{quotation
+|quote=
+
+* 104 security issues in sid high
+* 104 security issues in buster high
+* 104 security issues in bullseye
+|context=[https://web.archive.org/web/20201022174657/https://tracker.debian.org/pkg/chromium Quote archived link at time of writing in 2020]
+}}
+
+=== Debian - packages security issues which are exploited in-the-wild ===
+
+For a prolonged amount of time.
+
+Debian version of Chromium reported to be exploited in the wild.
+
+{{quotation
+|quote=
+Patch Google Chrome with the latest updates – if you don't, you're vulnerable to a zero-day that is actively being exploited, the US Cybersecurity and Infrastructure Security Agency (CISA) has warned.
+
+Criminals are targeting users of Chrome with outdated installations, CISA said in an advisory note urging folk to update their browsers immediately.
+
+"Google has released Chrome version 86.0.4240.183 for Windows, Mac, and Linux addressing multiple vulnerabilities, including vulnerability '''CVE-2020-16009'''. Exploit code for this vulnerability exists in the wild," said the agency in a statement.
+|context=The Register: [https://www.theregister.com/2020/11/04/google_chrome_critical_updates/ If you're an update laggard, buck up: Chrome zero-days are being exploited in the wild]
+}}
+
+Debian affected by '''CVE-2020-16009''' at time of writing, see archived link [https://web.archive.org/web/20201109070427/https://security-tracker.debian.org/tracker/CVE-2020-16009 '''CVE-2020-16009'''].
+
+forum discussion: [https://forums.whonix.org/t/chromium-browser-for-kicksecure-discussions-not-whonix/10388/49 Chromium Browser for Kicksecure Discussions (not Whonix)]
+
+=== Debian Signed Packages ===
+Prerequisite knowledge:
+
+* https://blog.packagecloud.io/eng/2014/10/28/howto-gpg-sign-verify-deb-packages-apt-repositories/
+* http://unix.stackexchange.com/questions/285635/how-is-the-authenticity-of-debian-packages-guaranteed
+
+Summary:
+
+* Debian build servers sign repository metadata.
+* Debian maintainers must sign their source packages; otherwise, uploads are automatically rejected.
+* Individual <code>.deb</code> packages are not signed by Debian maintainers.
+
+Tools:
+
+* <code>debsign</code>: Signs the <code>.changes</code> before upload. Does not sign packages. Always used in Debian.
+* <code>debsig</code>: Embeds signatures into <code>.deb</code> packages. Not commonly used.
+* <code>dpkg-sig</code>: Embeds signatures into <code>.deb</code> packages. Not commonly used.
+
+[https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=762153 Steps toward making dpkg-sig sign all packages]
+
+There was once a bounty [https://web.archive.org/web/20201214130930/https://github.com/Whonix/Whonix/issues/400 Build Debian Packages from Source Code] worth $3000 USD, but no implementation was ever contributed.
+
+Forum discussion:<br />
+https://forums.whonix.org/t/end-to-end-signed-debs-debsign-debsig-and-dpkg-sig/3446
+
+=== Debian Installer ===
+There are two different Debian installers.
+
+* A) Debian-Installer (D-I),
+* B) Calamares.
+
+This is elaborated here: {{kicksecure_wiki
+|wikipage=Debian_Tips#Debian_Installer_Choices
+|text=Debian Installer Choices
+}}
+
+When building a Debian live ISO using live-build, while setting up D-I, there is a security issue.
+
+* [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=718225 live-build should authenticate files it downloads]
+* [https://gist.github.com/ArrayBolt3/99d1296a6d82b5a6f2453943eaf85520 Debian live-build MitM Proof of Concept]
+* forum discussion: [https://forums.kicksecure.com/t/debian-installer-d-i/649 Debian-Installer (D-I)]
+
+== Why is {{project_name_short}} based on Debian Stable, not Debian Testing? ==
+
+* <u>Experience:</u> A long time ago, {{project_name_short}} was based on Debian Testing. Due to many issues documented below, for many releases already, {{project_name_short}} is based on Debian Stable.
+* <u>Connectivity-breaking bugs:</u> Sometimes severe bugs are introduced in Debian Testing, such as the AppArmor [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=732578 bug], which prevented Tor from starting for everyone until a workaround was applied.
+* <u>Build process-breaking bugs:</u> Sometimes bugs are introduced that break derivative-maker (build script), such as [https://web.archive.org/web/20220322233757/https://ml.grml.org/pipermail/grml/2014-January/011546.html this (archived)] bug related to mount, which breaks grml-debootstrap and therefore derivative-maker, or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=734794 this] kpartx bug.
+* <u>Boot-breaking bugs:</u> Often other disturbing bugs are introduced, such as the grub bug (unable to reproduce and report upstream yet).
+* <u>VirtualBox Guest Additions-breaking bugs:</u> Non-functional [[VirtualBox/Guest_Additions|VirtualBox Guest Additions]] or [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=728399 issues] with shared folders.
+* <u>Higher upgrade time effort:</u> Too often, too many packages are upgraded (not just security fixes), which costs lots of time to keep up, bandwidth, and system load.
+* <u>Lack of security support:</u> Quote, [https://www.debian.org/security/faq.html#testing Debian Security FAQ]:
+** <blockquote>If you want to have a secure (and stable) server you are strongly encouraged to stay with stable.</blockquote>
+** Debian Stable receives security fixes faster than Debian Testing. For example:
+*** 12/15/2016 Debian Jessie was Debian Stable and Debian Stretch was Debian Testing. [https://lists.debian.org/debian-security-announce/2016/msg00316.html CVE-2016-1252] was fixed in Debian Stable but not in Debian Testing, as seen in the Debian security tracker by 12/15/2016.
+*** 01/30/2026 Debian Trixie was Debian Stable, Bookworm was oldstable and Bullseye was oldoldstable. OpenSSL [https://web.archive.org/web/20260130063346/https://security-tracker.debian.org/tracker/CVE-2025-15467 CVE-2025-15467 (archived)] was fixed in Debian oldoldstable, oldstable and stable but not in Debian testing.
+* <u>Permanent package removal:</u> Sometimes packages get entirely removed from Debian Testing. For example, Enigmail wasn't available for a while in Debian Testing.
+** <u>Support request overhead:</u> This is confusing and constantly creates support requests.
+* <u>(Temporary) package removal:</u> Sometimes packages are (temporarily) removed from Debian Testing.
+** For example, torsocks has been removed from Debian Bookworm.
+*** [https://bugs.debian.org/1066313 Debian bug #1066313]
+*** [https://web.archive.org/web/20240518161618/https://release.debian.org/britney/update_excuses.html#torsocks Britney update excuses: torsocks (archived)]
+*** [https://web.archive.org/web/20240520135347/https://qa.debian.org/excuses.php?package=torsocks QA excuses: torsocks (archived)]
+*** [https://web.archive.org/web/20240520135343/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1066313 Debian BTS: bug 1066313 (archived)]
+**** <blockquote>torsocks (- to 2.4.0-1)<br/>Migration status for torsocks (- to 2.4.0-1): BLOCKED: Rejected/violates migration policy/introduces a regression<br />Issues preventing migration:<br />Updating torsocks would introduce bugs in testing: [https://web.archive.org/web/20240520135343/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1066313 #1066313 (archived)]
+</blockquote>
+*** Quote: [https://web.archive.org/web/20240520134953/https://tracker.debian.org/pkg/torsocks Debian tracker: torsocks (archived)]
+**** <blockquote>The package has not entered testing even though the delay is over normal.<br/>The package has not entered testing even though the 5-day delay is over. Check why.</blockquote>
+*** Such package removal would break the {{project_name_short}} build process due to the missing dependency. ({{project_name_short}} package <code>uwt</code> (implements stream isolation) <code>Depends:</code> on <code>torsocks</code>.)
+*** <u>System upgrade-breaking bugs:</u> Such package removal can break system [[update]]s (<code>apt-get dist-upgrade</code>) due to missing dependencies. (Kicksecure or Whonix packages often depend on such packages.)
+* <u>Further reading:</u>
+** [https://lists.debian.org/debian-devel/2024/03/msg00299.html debian-devel thread (March 2024)]
+** [https://release.debian.org/doc/britney/short-intro-to-migrations.html Britney: short intro to migrations]
+
+== Debian Rolling ==
+Does not exist.
+
+https://lists.debian.org/debian-devel/2011/05/msg00111.html
+
+== Debian Feature Requests ==
+Debian priority wishlist.
+
+* [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=928362 Enable some kernel hardening by default]
+* {{kicksecure_wiki
+|wikipage=shim
+|text=shim
+}} related:
+** Debian shim feature request: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1102680 Offer a shim-signed variant signed by Debian's Secure Boot key]
+* [[Raspberry Pi|Raspberry Pi (RPi)]] related:
+** RPi: [https://salsa.debian.org/raspi-team/image-specs/-/issues/78 Support U-Boot + grub-efi boot flow]
+** raspi-firmware: [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1102607 Add support for U-Boot + grub-arm64-efi boot flow]
+* [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=849236 GNUnet stable-backport]
+
+== Debian GNU/Hurd ==
+Not ready for mainstream use; still in active development. The microkernel architecture makes device compatibility more difficult.
+
+== Popularity Contest ==
+The Debian ''popularity-contest'' (popcon) package is not installed on {{project_name_short}}.
+
+<s>Installing it is prevented by the [https://github.com/{{project_name_short}}/anon-meta-packages/blob/master/debian/control#L324 anon-banned-packages] package.</s>
+
+[https://popcon.debian.org/README popcon readme] | [https://popcon.debian.org/FAQ popcon FAQ] | [https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=popularity-contest popcon bugs] | [https://lists.alioth.debian.org/cgi-bin/mailman/listinfo/popcon-developers popularity contest mailing list] | [https://lists.alioth.debian.org/pipermail/popcon-developers/2012-October/002172.html popularity contest mailing list: Drop atime and ctime for privacy reasons possible?]
+
+Some privacy considerations and reasons why it is not installed:
+
+* The connection would obviously need to go over its own Tor circuit (stream isolation). At the moment, popcon tries to connect over HTTP, and if it fails (no internet connectivity), it goes into the mail queue (sendmail). Sendmail probably works through <code>TransPort</code>, but we do not know if it can be torified for proper stream isolation.
+* (From the popcon readme) "''Each popularity-contest host is identified by a random 128-bit uuid (<code>MY_HOSTID</code> in /etc/popularity-contest.conf).''" - This would allow a fairly accurate estimate of the number of {{project_name_short}} users.
+* <code>MY_HOSTID</code> would likely be created at {{project_name_short}} build time, meaning all {{project_name_short}} users would share the same <code>MY_HOSTID</code>, making it useless. A new <code>MY_HOSTID</code> would need to be created at first boot.
+* Popcon runs on a random day - good.
+* If the machine is powered on: it runs at 6:47, which is bad, because a local adversary (ISP or hotspot) could guess popcon is running over Tor, which would likely indicate a {{project_name_short}} user.
+* If the machine is powered off at 6:47, it sends the report later, but only if <code>anachron</code> is installed. It should not run immediately after powering on, also for fingerprinting reasons. The time would have to be truly randomized.
+* <s>The transmission is not encrypted, see [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=480860 popularity-contest should encrypt contents], and it is not planned to encrypt it. Malicious Tor exit relays could modify the transmission - a minor issue. Such malicious Tor exit relays could also send fake transmissions on their own.</s>
+* It is questionable whether, and for how long, Debian will accept popularity-contest transmissions from Tor exit relays. There is potential for electoral fraud.
+
+For these reasons, it is not a good idea to add popcon to {{project_name_short}}. If you have suggestions or a different view, please get in contact.
+
+= Criteria for Choosing a Base Distribution =
+== Community Project versus Corporate Project ==
+''todo: research''
+
+Under consideration.
+
+{{quotation
+|quote=Base distribution must be a community project. Not a corporate project.
+}}
+
+Corporations can quickly act against the interests of the Freedom Software community. Some examples of this are collected here:
+
+* [[Dev/Operating_System#Ubuntu_Legal_Issues|Ubuntu Legal Issues]]
+* https://www.reddit.com/r/openSUSE/comments/14571ig/is_anyone_else_concerned_about_the_future_of/
+* https://techcrunch.com/2023/08/18/suse-goes-private-again/
+* {{kicksecure_wiki
+|wikipage=Dev/openSUSE#Community_Project_versus_Corporate_Project
+|text=Community Project versus Corporate Project
+}}
+* RedHat
+** https://www.redhat.com/en/blog/red-hats-commitment-open-source-response-gitcentosorg-changes
+* RedHat versus CentOS
+** https://www.phoronix.com/news/Red-Hat-CentOS-Stream-Sources
+** https://itwire.com/business-it-news/open-source/red-hat-kills-off-centos,-users-frustrated-and-angry.html
+* RedHat versus Rocky Linux
+** https://rockylinux.org/news/2023-06-22-press-release
+* Novell made a patent deal with Microsoft to outflank RedHat.
+
+{{quotation
+|quote=
+Novell basically conceded that its implementation of Linux violated Microsoft patents and agreed its customers needed patent-enforcement protection.
+|context=https://www.zdnet.com/article/microsoft-and-novell-at-two-was-the-patent-pact-worth-it/
+}}
+
+* https://en.wikipedia.org/wiki/Stephen_Elop - keywords: Microsoft, Nokia, bankrupt
+* [https://www.zdnet.com/article/when-microsoft-met-suse-this-windows-linux-partnership-gets-stronger-every-day/ When Microsoft met SUSE: This Windows-Linux partnership gets stronger every day]
+* A Linux distribution company reliant on funding from Microsoft may see its decision-making and resources steered toward projects that benefit Microsoft and its cloud ecosystem. This redirection can detract from supporting and bankrolling independent, open-source initiatives that might otherwise strengthen the broader FLOSS (Free/Libre and Open Source Software) ecosystem.
+** https://en.wikipedia.org/wiki/Embrace,_extend,_and_extinguish
+
+== Original Base Distributions Only ==
+Tier 1 distributions only: original distributions such as Debian or Fedora - not forks of Debian or other base distributions. <ref>
+[[Kicksecure]] is an exception, because Kicksecure and [[Whonix]] are developed by the same [[contributors]].
+</ref> This is because too many derivatives have come and gone over the years.
+
+<u>Note:</u> Debian and Fedora are just illustrative examples to describe the meaning of "Original Base Distributions" / "Tier 1 distributions only".
+
+This is only one criteria. Distributions must also pass other criteria listed on this wiki page.
+
+== Previously Compared but Removed ==
+* Devuan: Not useful to compare if the only difference is a different init system.
+
+== Missing Criteria ==
+The following criteria are not yet part of the following comparison table but should be added:
+
+* Check all dependencies are up-to-date versus multiple versions of dependencies. [https://wiki.debian.org/EmbeddedCopies EmbeddedCopies]
+* This list is non-exhaustive. What else?
+
+Not applicable, valid, clear, or related - or suffers from a lack of information in general - to be covered in the table yet:
+
+* The user's package manager verifies the package maintainer's and upstream developer's digital signature.
+* End-to-end signed packages
+* Untrusted packages (similar to Debian proposal [https://wiki.debian.org/UntrustedDebs UntrustedDebs])
+
+== Previous Criteria ==
+* [[Vanguards]] available: dropped because it is unmaintained upstream
+* Onionbalance available: dropped because it is not too important; if needed, it can be manually installed
+
+== Minimum Criteria ==
+Since most distributions have it, this is considered minimum criteria. If not available, the distribution does not need to be added below.
+
+* Tor available
+* Tor friendly
+** Either by action: providing onion repositories
+** Or by statement: stating they do not intend to ban Tor and VPN users
+** Check if already using CDNs, since these often block Tor
+* Wayland available
+* PipeWire available
+* Low deplatforming risk
+* Commitment to Freedom Software (not only Open Source)
+* Commitment to user freedom
+* No anti-features
+* The Update Framework (TUF) threat model Pass / Secure Package Manager
+* {{kicksecure_wiki
+|wikipage=Deep_scan_ready
+|text=Deep Scan Ready
+}}
+
+== Comparison Table ==
+'''<u>Note:</u>''' Do '''not''' add new operating systems to this table without prior discussion. '''Edits might get rejected.''' See also [[Dev/Operating_System#Requesting_a_Port_to_a_Different_Base_Operating_System|Requesting a Port to a Different Base Operating System]].
+
+{| class="wikitable"
+|+ Base Operating Systems Criteria Comparison
+|-
+
+! <!-- Feature Column Header --> Feature
+! <!-- Debian Column Header --> Debian Linux
+! <!-- Void Column Header --> Void Linux
+! <!-- Alpine Column Header --> Alpine Linux
+! <!-- openSUSE Tumbleweed Column Header --> openSUSE
+! <!-- GNU Guix Column Header --> GNU Guix
+! <!-- Gentoo Column Header --> Gentoo
+|-
+
+! <!-- Feature --> Review Accuracy of this Wiki Column
+| <!-- Debian --> Higher
+| <!-- Void --> Higher
+| <!-- Alpine --> Higher
+| <!-- openSUSE --> Higher
+| <!-- GNU Guix --> Higher
+| <!-- Gentoo --> Lower. Unreliable. <ref>
+* Initially anonymously contributed: https://www.whonix.org/w/index.php?title=Dev%2FOperating_System&diff=104399&oldid=104274
+* Not a priority for {{project_name_short}}.
+</ref>
+|-
+
+! <!-- Feature --> Good Usability
+| <!-- Debian --> {{Yes}} <ref>[[#Usability]]</ref>
+| <!-- Void --> {{No}}
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE --> {{Yes}} <ref>Stable and brand new, plays along with new hardware without breaking. The default system snapshots and easy rollbacks. Everything can be configured with YaST, arguably the most powerful installation and configuration tool on GNU/Linux. Being able to configure the system in detail using a GUI is very rare and valuable for usability for desktop GNU/Linux.</ref>
+| <!-- GNU Guix --> {{No}} ?
+| <!-- Gentoo --> {{No}}
+|-
+
+! <!-- Feature --> [https://theupdateframework.io/security/ The Update Framework (TUF) threat model] Pass / Secure Package Manager
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{Yes}} ?
+| <!-- GNU Guix --> {{Yes}} ?
+| <!-- Gentoo --> ?
+
+|-
+! <!-- Feature --> Minimal Number of Services by Default <ref>
+* Daemons (systemd units) do not automatically start once package is installed.
+* https://forums.whonix.org/t/disable-newly-all-installed-services-by-default/9381
+</ref>
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{Yes}} <ref>Since there is no default per se</ref>
+| <!-- Alpine --> {{Yes}} <ref>Since there is no default per se</ref>
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> {{Yes}} <ref>Since there is no default per se</ref>
+| <!-- Gentoo --> {{Yes}} <ref>Since there is no default per se</ref>
+|-
+
+|-
+! <!-- Feature --> Mandatory Access Control Policy Enforced by Default
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}} <ref>Gentoo provides SELinux profiles to build and install packages with SELinux support and their corresponding policies</ref>
+
+|-
+! <!-- Feature --> Transactional updates by default / auto-upgrades not risking broken boot
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}}
+
+|-
+! <!-- Feature --> Option to secure rollback after update by default
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}}
+
+|-
+! <!-- Feature --> Distribution package source code signed by distribution package maintainer
+| <!-- Debian --> {{Yes}} <ref>
+* {{kicksecure_wiki
+|wikipage=https://www.kicksecure.com/wiki/Dev/Debian#Debian_Signed_Source_Packages
+|text=Debian Signed Source Packages
+}}
+</ref>
+| <!-- Void --> {{Yes}}
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+
+|-
+! <!-- Feature --> Package maintainer digital signature is verified by the distribution's build server.
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+|-
+
+! <!-- Feature --> Package Manager Explicitly Uses HTTPS only
+| <!-- Debian --> {{No}} <ref>Can be configured to be this way </ref>
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{No}} <ref>Can be configured to be this way</ref>
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+
+|-
+
+! <!-- Feature --> [https://reproducible-builds.org Reproducible Builds] (deterministic builds)
+| <!-- Debian --> {{No}} <ref>Debian is working on it.</ref>
+| <!-- Void --> ?
+| <!-- Alpine --> {{No}} <ref>Alpine was taking action on this from 2019-2020, but https://reproducible-builds.org/citests/ has Alpine currently listed as Disabled due to its continuous testing no longer being maintained.</ref>
+| <!-- openSUSE --> ? <ref>Is there a reproducible ISO?</ref>
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{No}} <ref>Work has stalled https://wiki.gentoo.org/wiki/User:OstCollector/Reproducible_Build</ref>
+|-
+
+! <!-- Feature --> Source-based distribution
+| <!-- Debian --> {{No}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{Yes}} <ref>Also binary on demand.</ref>
+| <!-- Gentoo --> {{Yes}} <ref>Also binary on demand.</ref>
+|-
+
+! <!-- Feature --> {{kicksecure_wiki
+|wikipage=Dev/bootstrappable_builds
+|text=Bootstrappable builds
+}}
+| <!-- Debian --> {{no}} <ref>[https://wiki.debian.org/DebianBootstrap DebianBootstrap]</ref>
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+|-
+
+! <!-- Feature --> {{kicksecure_wiki
+|wikipage=Verified_Boot
+|text=Verified Boot
+}}
+| <!-- Debian --> {{No}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{Yes}}?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{No}}
+|-
+
+! <!-- Feature --> Non-systemd Init
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{Yes}}
+| <!-- Alpine --> {{Yes}} <ref>Alpine uses OpenRC. See [https://wiki.alpinelinux.org/wiki/OpenRC the Alpine wiki page].</ref>
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{Yes}} <ref>The default profiles use OpenRC. See [https://wiki.gentoo.org/wiki/OpenRC the Gentoo wiki page].</ref>
+|-
+
+! <!-- Feature --> non-systemd init system with security features similar to {{kicksecure_wiki
+|wikipage=Systemd#systemd_security_features
+|text=systemd security features
+}}
+| <!-- Debian --> ?
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+|-
+
+! <!-- Feature --> Musl Libc
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{Yes}}
+| <!-- Alpine --> {{Yes}} <ref>Alpine says on their [https://alpinelinux.org/about/ organization home page] that it runs on musl and BusyBox.</ref>
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{Yes}}? <ref>Gentoo provides experimental musl profiles</ref>
+|-
+
+! <!-- Feature --> Hardened Memory Allocator
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}}
+|-
+
+! <!-- Feature --> Hardened Kernel
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> ?
+|-
+
+! <!-- Feature --> Microkernel
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}}
+|-
+
+! <!-- Feature --> Clang CFI
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{Yes}} <ref>Gentoo provides LLVM profiles with which Clang's CFI can be used.</ref>
+|-
+
+! <!-- Feature --> Rolling Release
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{Yes}}
+| <!-- Alpine --> {{Yes}} <ref>Alpine offers repositories for stable branch as well as their edge rolling release branch, as described in their wiki [https://wiki.alpinelinux.org/wiki/Repositories here]</ref>
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{Yes}}
+|-
+
+! <!-- Feature --> No packages with many unfixed high severity security issues
+| <!-- Debian --> {{No}} <ref>[[Dev/Operating_System#Debian_-_packages_with_many_unfixed_high_severity_security_issues|Debian - packages with many unfixed high severity security issues]]</ref>
+| <!-- Void --> ?
+| <!-- Alpine --> {{Yes}}
+| <!-- openSUSE --> {{Yes}} <ref>This problem is only relevant for stable release distros, where the trust to keep things secure is on distro maintainers. A rolling release being always upstream does not suffer from such problems. Only way this would be possible is if the distro provides abandoned packages in their repositories, which openSUSE does not.</ref>
+| <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{Yes}}
+|-
+
+! <!-- Feature --> No packages security issues which are exploited in-the-wild
+| <!-- Debian --> {{No}}
+| <!-- Void --> ?
+| <!-- Alpine --> {{Yes}}
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> {{No}} <ref>Despite being up-to-date, not having the proprietary firmware blobs and cpu microcode updates means no update can fix some vulnerabilities</ref>
+| <!-- Gentoo --> {{Yes}}
+|-
+
+! <!-- Feature --> VirtualBox Available
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> {{Yes}}
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}}
+|-
+
+! <!-- Feature --> KVM Available
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> {{Yes}}
+| <!-- Alpine --> {{Yes}} <ref> https://wiki.alpinelinux.org/wiki/KVM</ref>
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{Yes}}
+|-
+
+! <!-- Feature --> flatpak Available
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}}
+|-
+
+! <!-- Feature --> Tor Browser available as a package
+| <!-- Debian --> {{No}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}} <ref> https://github.com/gentoo-mirror/torbrowser</ref>
+|-
+
+! <!-- Feature --> EFI Booting Available
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> {{Yes}}
+| <!-- Alpine --> {{Yes}} <ref>https://wiki.alpinelinux.org/wiki/Bootloaders</ref>
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}} <ref>https://wiki.gentoo.org/wiki/EFI_stub</ref>
+|-
+
+! <!-- Feature --> Secure Boot Compatibility with Firmware Default Keys <ref>
+* for usability / hardware compatibility, not necessarily as a security feature
+* default key: Microsoft key
+</ref>
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> ?
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE --> {{Yes}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{Yes}} <ref>The binary distribution package is pre-signed https://wiki.gentoo.org/wiki/Project:Distribution_Kernel#Secure_Boot</ref>
+|-
+
+! <!-- Feature --> LibreSSL by Default<ref>
+https://forums.whonix.org/t/libressl-by-default/9024
+</ref>
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}} <ref>
+https://voidlinux.org/news/2021/02/OpenSSL.html
+</ref>
+| <!-- Alpine --> {{No}} <ref> Setting libressl as default is under consideration per [https://gitlab.alpinelinux.org/alpine/tsc/-/issues/28 here] </ref>
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}} <ref>https://www.gentoo.org/support/news-items/2021-01-05-libressl-support-discontinued.html</ref>
+|-
+
+! <!-- Feature --> [[Dev/Stateless|Stateless/Immutable]]
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE -->
+* Tumbleweed: No.
+* MicroOS: Yes.
+| <!-- GNU Guix --> {{No}}
+| <!-- Gentoo --> {{No}}
+|-
+
+! <!-- Feature --> [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942303 Weak Dependencies] (to avoid [[Debian_Packages#Technical_Information|the metapackage issue]])
+| <!-- Debian --> {{No}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> {{Yes}} <ref>https://en.opensuse.org/openSUSE:Package_dependencies#Strong_and_Weak_dependencies</ref>
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+|-
+
+! <!-- Feature --> no legal issues (such as [[#Ubuntu_Legal_Issues|this]]) / not forbidden for derivatives to use upstream repositories <ref>
+For example, derivatives of Debian such as {{project_name_short}} are permitted to use the <code>packages.debian.org</code> APT repository.
+</ref> / no excessive, complicated rebranding required / package name changes in the repository required
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> ?
+| <!-- Alpine --> {{Yes}}
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> ?
+|-
+
+! <!-- Feature --> On [https://www.gnu.org/distros/free-system-distribution-guidelines.en.html GNU FSDG] [https://www.gnu.org/distros/free-distros.html good list] and not on [https://www.gnu.org/distros/common-distros.en.html bad list]
+| <!-- Debian --> {{No}}
+| <!-- Void --> {{No}}
+| <!-- Alpine --> {{No}}
+| <!-- openSUSE --> {{No}}
+| <!-- GNU Guix --> {{Yes}}
+| <!-- Gentoo --> {{No}}
+|-
+
+! <!-- Feature --> Up-to-date Compile Time Flags Hardening
+| <!-- Debian --> ?
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}} <ref> https://wiki.gentoo.org/wiki/Hardened/Toolchain</ref>
+|-
+
+! <!-- Feature --> Onion Repositories
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+|-
+
+! <!-- Feature --> Architecture Support (Intel/AMD64, ARM64, POWER9, RISC-V)
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> {{Yes}}
+|-
+
+! <!-- Feature --> offline installation
+| <!-- Debian --> {{Yes}}
+| <!-- Void --> ?
+| <!-- Alpine --> ?
+| <!-- openSUSE --> ?
+| <!-- GNU Guix --> ?
+| <!-- Gentoo --> ?
+|-
+
+|}
+<noinclude>{{Header}}</noinclude>
+
+= ToDo List for Porting to another Base Distribution =
+Depending on the base distribution:
+
+* Make deprecation of Debian base clear to all {{project_name_short}} users
+* Porting deb packages to another package format
+* Rewrite systemd unit files for another init system, possibly including the use of Bubblewrap to sandbox these
+* List is non-exhaustive. What else?
+
+= Comparison of Hardening Compile Flags =
+Could be outdated!
+
+Debian <code>jessie</code>:
+
+<pre style="white-space: pre-wrap;
+white-space: -moz-pre-wrap;
+white-space: -pre-wrap;
+white-space: -o-pre-wrap;
+word-wrap: break-word;">
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/bin/curl
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Partial RELRO   Canary found      NX enabled    No PIE          No RPATH   No RUNPATH   /usr/bin/gpg
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/bin/gpg2
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Partial RELRO   Canary found      NX enabled    No PIE          No RPATH   No RUNPATH   /bin/sed
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /bin/grep
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/bin/tor
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Partial RELRO   Canary found      NX enabled    No PIE          No RPATH   No RUNPATH   /bin/bash
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Partial RELRO   Canary found      NX enabled    No PIE          No RPATH   No RUNPATH   /usr/bin/gwenview
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+No RELRO        Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/lib/iceweasel/iceweasel
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Partial RELRO   Canary found      NX enabled    No PIE          No RPATH   No RUNPATH   /usr/lib/icedove/icedove
+</pre>
+
+Securix (a derivative of Hardened Gentoo):
+
+<pre style="white-space: pre-wrap;
+white-space: -moz-pre-wrap;
+white-space: -pre-wrap;
+white-space: -o-pre-wrap;
+word-wrap: break-word;">
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/bin/curl
+
+Error: Not an ELF file: /usr/bin/gpg: symbolic link to gpg2
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/bin/gpg2
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /bin/sed
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /bin/grep
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/bin/tor
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /bin/bash
+
+TODO
+  /usr/bin/gwenview
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/lib64/firefox/firefox
+
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+Full RELRO      Canary found      NX enabled    PIE enabled     No RPATH   No RUNPATH   /usr/lib64/thunderbird/thunderbird
+</pre>
+
+= Requesting a Port to a Different Base Operating System =
+Would you like to propose a transition of {{project_name_short}} from Debian to another base distribution? Below are the procedural steps:
+
+'''1.''' Establishing Expectations:
+
+This is most likely not as simple as a feature request. At the time of writing:
+
+* [https://github.com/derivative-maker derivative-maker has 1 repository.]
+* [https://github.com/Kicksecure Kicksecure has 57 repositories.]
+* [https://github.com/Whonix Whonix has 17 repositories.]
+
+Porting these to a different base distribution would be a monumental effort. Therefore, the argument to change the base distribution would need to be compelling. The probability of this happening is, therefore, small.
+
+The probability would be higher if volunteers contributed to this goal through source code contributions. For example, by contributing to [https://github.com/Kicksecure/genmkfile genmkfile] (code review, bug fixing, unit tests, refactoring, adding support for other operating systems).
+
+As an analogy, {{project_name_short}} is similar to a supertanker. Once it's moving at speed, it is difficult to change direction. It is not a racing car that can perform stunts.
+
+'''2.''' Open an "informal" forum discussion.
+
+This is because input from the community is desirable, and there might be some distributions in theory where there would be instant rejection reasons - for example, a deprecated distribution or closed-source distributions.
+
+This is an example of how such a forum thread would go: [https://forums.whonix.org/t/porting-whonix-to-void-linux/9369 Porting Whonix to Void Linux]
+
+'''3.''' Add the base distribution to the comparison table.
+
+The first request the project lead developer would probably make is: "Please add it to the comparison table" here: [[Dev/Operating_System#Criteria_for_Choosing_a_Base_Distribution|Criteria for Choosing a Base Distribution]]
+
+Should this task appear excessively challenging, tedious, or unrealistic, then it needs to be discussed. Perhaps there are easier ways to edit such a comparison table.
+
+Related discussions:
+
+* https://github.com/Kicksecure/security-misc/issues/138
+* https://github.com/Kicksecure/security-misc/issues/162
+
+= See Also =
+https://ludocode.com/blog/flatpak-is-not-the-future
+
+* [[Deprecated/grsecurity|About grsecurity]]
+* [[Operating System Hardening]]
+* [[Dev/Default_Application_Policy|{{project_name_short}} Default Application Policy]]
+* See also {{kicksecure_wiki
+|wikipage=Linux User Experience versus Commercial Operating Systems
+|text=Linux User Experience versus Commercial Operating Systems
+}} to learn about organizational issues in the Open Source ecosystem.
+
+= Footnotes =
+{{reflist|close=1}}
+
+{{Footer}}
+
+[[Category:Design]]
