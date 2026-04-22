@@ -113,6 +113,35 @@ Various marker files are available:
 * {{project_name_gateway_short}}: <code>/usr/share/anon-gw-base-files/gateway</code>
 * {{project_name_workstation_long}}: <code>/usr/share/anon-ws-base-files/workstation</code>
 
+= Newer =
+== torS0X Stream Isolation ==
+Tor spec [https://spec.torproject.org/socks-extensions.html <code>torS0X</code> stream isolation]
+
+<code>torS0X</code> example how the Tor spec might be interpreted (and how it is currently used inside Whonix):
+
+* IP: <code>127.0.0.1</code>
+* port: <code>9050</code>
+** thanks to [[Dev/anon-ws-disable-stacked-tor]]
+* socks user name: <code><torS0X>0</code>
+* socks password: <code>application_name-wrapper_${random_socks_password}</code>
+
+<pre>
+## https://spec.torproject.org/socks-extensions.html
+random_socks_password="$(random_alpha_numeric 43)"
+extra_curl_args=(
+  '--proxy' "socks5h://${curl_proxy_addr}/"
+  '--proxy-user' "<torS0X>0:curl-wrapper_${random_socks_password}"
+ )
+</pre>
+
+<code>random_alpha_numeric</code> is a standalone shell function which can be found in [https://github.com/Kicksecure/helper-scripts/blob/master/usr/libexec/helper-scripts/strings.bsh <code>/usr/libexec/helper-scripts/strings.bsh</code>].
+
+Example how curl might be invoked. 
+
+<pre>
+curl --proxy socks5h://:9050 --proxy-user' "<torS0X>0:application_name-wrapper_${random_socks_password}"
+</pre>
+
 = See Also =
 * See also [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/Tor_friendly_applications_best_practices Tor friendly applications best practices on Tor Project Legacy Wiki].
 
