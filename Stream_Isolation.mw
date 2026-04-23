@@ -327,41 +327,107 @@ https://lists.torproject.org/pipermail/tor-talk/2012-September/025432.html
 </ref>
 
 == How to mitigate identity correlation ==
-=== Basic Protection ===
+=== Scope, Responsibilities, and User Expectations ===
+{{IntroLike|
+Whonix provides a Tor-routed platform, not perfect application-specific stream isolation for all third-party applications.
+}}
+
+* <u>What Whonix does:</u> Whonix provides [[Reliable IP Hiding]] by default, [[Stream_Isolation#Transparent_Proxy|transparent proxying]], and stream isolation for many preinstalled applications.
+* <u>User advice:</u>
+** <u>Prefer applications with built-in Tor support:</u> If an application comes with native Tor support, also referred to as "Tor friendly applications", that is often preferable. Application developers interested in supporting Tor and anonymity are in a better position to implement fine-grained stream isolation.
+** <u>When using applications without built-in Tor support:</u>
+*** If [[Advanced Users]] install custom applications without native Tor support and want to reduce the risk of {{Code2|identity correlation through Tor circuit sharing}}, then those applications usually require manual configuration, such as application-specific proxy settings or a socksifier such as <code>torsocks</code>.
+**** <u>Use a dedicated Tor <code>SocksPort</code> when possible:</u> Different applications should generally use different Tor <code>SocksPort</code>s.
+**** <u>Use a socksifier only when needed:</u> A socksifier such as <code>torsocks</code> can be useful for some applications, but behavior is application specific.
+** <u>For stronger assurance:</u> Disable transparent proxying and test whether the application still works only through the intended Tor <code>SocksPort</code>.
+** <u>For application-specific details:</u> Consult upstream application documentation and upstream developers.
+* <u>What Whonix developers generally cannot do:</u> Whonix developers generally cannot continuously develop, verify, leak test, and maintain perfect stream isolation instructions for every third-party application and every future application version.
+* <u>What application developers should do:</u> Application developers are best positioned to implement proper Tor support, such as native proxy settings, safe remote DNS behavior, and stream isolation aware integration.
+* <u>What Tor Project developers are responsible for:</u> Tor Project documentation and Tor developer guidance are the source of truth for Tor stream isolation features, Tor client behavior, and Tor network best practices.
+
+=== Tor friendly applications versus Applications without native Tor support ===
+{{IntroLike|
+Choose the tab that best matches the application.
+}}
+
+{{Tab
+|type=controller
+|linkid=stream-isolation-basic-protection
+|content=
+
+{{Tab
+|title= ==== Tor friendly applications ====
+|content=
+{{IntroLike|
+Applications <u>with</u> built-in Tor support are generally preferable. These applications are in a better position to implement fine-grained stream isolation and other Tor-specific behaviors.
+}}
+
+'''Technical guidance:'''
+
+* <u>Prefer applications with built-in Tor support:</u> If an application comes with native Tor support, that is often preferable.
+* <u>Why this is preferable:</u> Application developers interested in supporting Tor and anonymity are in a better position to implement fine-grained stream isolation.
+* <u>Use native application support:</u> Use the application's native proxy settings or other upstream Tor integration as documented by upstream.
+* <u>For application-specific details:</u> Consult upstream application documentation and upstream developers.
+* <u>Use of a dedicated Tor <code>SocksPort</code> is usually unnecessary:</u> Tor friendly applications should be using [[Stream_Isolation#IsolateSOCKSAuth|IsolateSOCKSAuth]]. In that case, a dedicated Tor <code>SocksPort</code> is usually unnecessary. <ref>
+This assumes the application properly supports Tor and uses stream isolation mechanisms such as <code>IsolateSOCKSAuth</code>.
+</ref>
+}} <!-- close tab: Tor friendly applications -->
+
+{{Tab
+|title= ==== Applications without native Tor support ====
+|content=
+{{IntroLike|
+Applications <u>without</u> native Tor support usually require manual user configuration. In this case, Whonix can provide the platform and general guidance, but application-specific correctness depends on the specific application and its behavior.
+}}
+
+'''Support and responsibilities:'''
+
+* <u>The legacy approach is less actively maintained:</u> The legacy approach of torification of arbitrary applications seems to have been largely given up. There are very few edits to the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO Torify HOWTO] over the years. Nowadays some application developers are providing Tor-safe by default applications, i.e. applications designed for use with Tor in mind and not as an afterthought. Examples include [[Tor Browser]] and [[OnionShare]]. Also if users are asking how to torify specific applications and make sure these are leak free, users are probably told "use Whonix".
+* <u>Up to date torification instructions are difficult to maintain:</u> Finding up to date instructions for torification is difficult because developing instructions for torification itself is a difficult process. Someone who understands networking needs to leak test whether the torification instructions are actually working. A leak would mean that portions of the application's traffic ignore proxy settings and/or circumvent the proxifier and are actually making external connections without using Tor. Such leaks would be much less severe in {{project_name_short}}. It would only result in {{Code2|identity correlation through Tor circuit sharing}} but not in a leak of the user's real IP address to the destination.
+* <u>Support requests are usually ineffective:</u> Asking for torification instructions for specific applications at {{project_name_short}} [[Support|Free Support]] is probably futile. {{project_name_short}} can document the platform and general stream isolation model, but application-specific stream isolation is usually the responsibility of the upstream application developers. One of the main reasons for the inception of {{project_name_short}} was that finding, developing and applying torification instructions is so difficult and one never really knows if it is 100% free of leaks. Even seriously reviewed torification instructions for one application would only apply to the exact version that was being reviewed. Not to future versions of the application.
+* <u>What Whonix developers do not generally do:</u> Maintain perfect, current stream isolation instructions for every third-party application. Application behavior changes over time, and developing correct guidance requires application-specific review and leak testing.
+
+'''Technical guidance:'''
+
 * <u>Manually configure custom applications:</u> If you install custom software on {{project_name_workstation_short}} that uses the internet, and you want to prevent {{Code2|identity correlation through Tor circuit sharing}} (which you should do), you have to manually configure it. This is not a {{project_name_short}} specific problem. <ref>
 If you used to use only one <code>SocksPort</code> with the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO common torification methods], the [https://lists.torproject.org/pipermail/tor-talk/2012-March/023535.html same thing happened].
 </ref> Read also [[Install Software|Software installation on {{project_name_workstation_short}}]].
+* <u>Use a dedicated <code>SocksPort</code> per custom application:</u> To protect against this, you have to set up and configure applications to use a dedicated Tor <code>SocksPort</code>. Each custom installed application has to be directed to a dedicated Tor <code>SocksPort</code>. For instructions how to do that, use the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO Torify HOWTO]. Generally, this can be done either by configuring the application's proxy settings or by using a proxifier (socksifier) such as <code>torsocks</code>.
+* <u>Use a socksifier only when needed:</u> A socksifier such as <code>torsocks</code> can be useful for some applications, but behavior is application specific.
+* <u>Do not share a <code>SocksPort</code> across applications:</u> If you redirect more than one application to the same <code>SocksPort</code>, {{Code2|identity correlation}} is at risk.
+* <u>Pre-prepared custom socks ports exist:</u> On {{project_name_gateway_short}} there are already a lot of custom socks ports prepared for use with custom installed applications. <ref>
+Tor configuration file <code>/etc/torrc.d/70_workstation.conf</code> <code>%include</code>s file <code>/usr/share/tor/tor-service-defaults-torrc.anondist</code>.
+</ref>
+** <u>Default range without isolation flags:</u> Without {{Code2|IsolateDestAddr}} and without {{Code2|IsolateDestPort}}: <code>SocksPort</code> <code>9153</code> to <code>9159</code>
+** <u>Range with destination address isolation:</u> With {{Code2|IsolateDestAddr}}, but without {{Code2|IsolateDestPort}}: <code>SocksPort</code> <code>9160</code> to <code>9169</code>
+** <u>Range with destination port isolation:</u> Without {{Code2|IsolateDestAddr}}, but with {{Code2|IsolateDestPort}}: <code>SocksPort</code>: <code>9170</code> to <code>9179</code>
+** <u>Range with both isolation flags:</u> With {{Code2|IsolateDestAddr}} and with {{Code2|IsolateDestPort}}: <code>SocksPort</code>: <code>9180</code> to <code>9189</code>
+** <u>Add more if needed:</u> If those are not enough, you can add your own.
+* <u>Isolation flags are usually unnecessary:</u> What are {{Code2|IsolateDestAddr}} and {{Code2|IsolateDestPort}}? You can learn about them in the [https://2019.www.torproject.org/docs/tor-manual.html.en Tor manual]. See also [https://lists.torproject.org/pipermail/tor-talk/2012-May/024403.html tor-talk mailing list: Tor's stream isolation features defaults]. Usually, unless you know better, you are better off not using {{Code2|IsolateDestAddr}} or {{Code2|IsolateDestPort}}.
+* <u>For stronger assurance:</u> Disable transparent proxying and test whether the application still works only through the intended Tor <code>SocksPort</code>.
+* <u>No universal best method exists:</u> What is better, configure the application's proxy settings or use a proxifier? There can be no generalized answer as this is highly application specific. The most comprehensive documentation of this is the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO Torify HOWTO]. Also, a web search can be performed on how to torify applications.
+}} <!-- close tab: Applications without native Tor support -->
+
+}} <!-- close tab controller: stream-isolation-basic-protection -->
+
+=== Basic Protection ===
+
 * <u>Use the pre-configured list where possible:</u> A [[#list]] of applications that come pre-installed with {{project_name_short}} are pre-configured to prevent {{Code2|identity correlation through circuit sharing}}.
 * <u>Be aware of <code>TransPort</code> pollution during tests:</u> Traffic going through <code>TransPort</code> by default includes [https://www.kicksecure.com/wiki/Systemcheck systemcheck] when manually testing the <code>TransPort</code> by using <code>systemcheck --leak-tests</code>. If that is of concern to you, see the following bullets.
 * <u>Optionally adjust systemcheck behavior:</u> It can be disabled in systemcheck, see [https://www.kicksecure.com/wiki/Systemcheck_Hardening#Prevent_Polluting_TransPort prevent polluting <code>TransPort</code>], but that might make little sense.
-* <u>Prefer to avoid the test instead:</u> Better to avoid the test instead.
+** <u>Prefer to avoid the test instead:</u> Better to avoid the test instead.
 * <u>Understand the default routing:</u> All custom installed applications' TCP traffic is routed through Tor's <code>TransPort</code> and all their DNS requests through Tor's <code>DnsPort</code>. This means different activities or "identities" in different applications (say browser, IRC, email) end up being routed through the same Tor circuit, thus {{Code2|identity correlation}} is at risk. <ref>
 What about UDP? See [[Tor#UDP]].
 </ref>
-* <u>Use a dedicated <code>SocksPort</code> per custom application:</u> To protect against this, you have to set up and configure applications to use a dedicated Tor <code>SocksPort</code>. Each custom installed application has to be directed to a dedicated Tor <code>SocksPort</code>. For instructions how to do that, use the [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO Torify HOWTO]. Generally, this can be done either by configuring the application's proxy settings or by using a proxifier (socksifier) such as <code>torsocks</code>.
 * <u>Multiple Workstations are automatically separated:</u> [[Multiple Whonix-Workstation|Multiple {{project_name_workstation_short}}]] are automatically stream isolated. <ref name=multiple-workstation />
-* <u>No universal best method exists:</u> What is better, configure the application's proxy settings or use a proxifier? There can be no generalized answer as this is highly application specific. The most comprehensive documentation of this is the Torify HOWTO. Also, a web search can be performed on how to torify applications.
 * <u>This adds stream isolation on top of torification:</u> Applications inside {{project_name_short}} are already torified but by applying these instructions inside {{project_name_short}} the user would go one step further, i.e. add stream isolation.
-* <u>Up to date torification instructions are difficult to maintain:</u> Finding up to date instructions for torification is difficult because developing instructions for torification itself is a difficult process. Someone who understands networking needs to leak test whether the torification instructions are actually working. A leak would mean that portions of the application's traffic ignore proxy settings and/or circumvent the proxifier and are actually making external connections without using Tor. Such leaks would be much less severe in {{project_name_short}}. It would only result in {{Code2|identity correlation through Tor circuit sharing}} but not in a leak of the user's real IP address to the destination.
-* <u>Support requests are usually ineffective:</u> Asking for torification instructions for specific applications at {{project_name_short}} [[Support|Free Support]] is probably futile. {{project_name_short}} is the wrong recipient for such support requests. One of the main reasons for the inception of the {{project_name_short}} was that finding, developing and applying torification instructions is so difficult and one never really knows if it is 100% free of leaks. Even seriously reviewed torification instructions for one application would only apply to the exact version that was being reviewed. Not to future versions of the application.
-* <u>The legacy approach is less actively maintained:</u> The legacy approach of torification of arbitrary applications on the host seems to have been largely given up. There are very few edits to the Torify HOWTO over the years. Nowadays some application developers are providing Tor-safe by default applications, i.e. applications designed for use with Tor in mind and not as an afterthought. Examples include [[Tor Browser]] and [[OnionShare]]. Also if users are asking how to torify specific applications and making sure these are leak free, users are probably told "use Whonix".
 * <u>Honor protocol warnings:</u> Protocol related warnings that you must honor still apply. You are still better off with {{project_name_short}}, as it offers best possible [[Protocol-Leak-Protection and Fingerprinting-Protection]].
-* <u>IP leak protection still applies:</u> {{project_name_short}} setup provides protection against IP leaks through [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#protocol-leaks protocol leaks].
-* <u>Misconfiguration has predictable outcomes:</u> If you do not correctly torify, either no connections will be possible or traffic will continue going through Tor's <code>TransPort</code> unless you [[#Better Protection|disable transparent torification]].
-* <u>Do not share a <code>SocksPort</code> across applications:</u> If you redirect more than one application to the same <code>SocksPort</code>, {{Code2|identity correlation}} is at risk.
+* <u>IP leak protection always applies:</u> {{project_name_short}} setup provides protection against IP leaks through [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorifyHOWTO#protocol-leaks protocol leaks].
+* <u>Misconfiguration has predictable outcomes:</u> No connections will be possible or traffic will continue going through Tor's <code>TransPort</code> unless you [[#Better Protection|disable transparent torification]].
 * <u>DNS warnings still matter:</u> DNS related [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/TorFAQ#i-keep-seeing-these-warnings-about-socks-and-dns-and-information-leaks-should-i-worry warnings] still apply, though to a lesser extent. An attack could only make correlations but still could not figure out your IP. To prevent that, see chapter [[#Better Protection|better protection]].
 * <u>Avoid local DNS resolvers:</u> Do not use a [https://gitlab.torproject.org/legacy/trac/-/wikis/doc/SupportPrograms#dns-resolvers local DNS resolver], as all DNS requests would be executed by the same Tor circuit.
 * <u>Some leak classes do not apply here:</u> Other leaks, such as applications not honoring the proxy settings / wrapper, ICMP or UDP leaks do not apply to {{project_name_short}}.
 * <u><code>SafeSocks</code> is optional:</u> The SafeSocks setting is for rejecting unsafe variants of socks that might cause DNS leaks. The {{project_name_short}} design model mitigates DNS leaks by redirecting all requests to Tor's <code>DnsPort</code>. Enabling this setting would give marginal benefit in this situation but would complicate debugging.
-* <u>Pre-prepared custom socks ports exist:</u> On {{project_name_gateway_short}} there are already a lot of custom socks ports prepared for use with custom installed applications. <ref>
-Tor configuration file <code>/etc/torrc.d/70_workstation.conf</code> <code>%include</code>s file <code>/usr/share/tor/tor-service-defaults-torrc.anondist</code>.
-</ref>
-* <u>Default range without isolation flags:</u> Without {{Code2|IsolateDestAddr}} and without {{Code2|IsolateDestPort}}: <code>SocksPort</code> <code>9153</code> to <code>9159</code>
-* <u>Range with destination address isolation:</u> With {{Code2|IsolateDestAddr}}, but without {{Code2|IsolateDestPort}}: <code>SocksPort</code> <code>9160</code> to <code>9169</code>
-* <u>Range with destination port isolation:</u> Without {{Code2|IsolateDestAddr}}, but with {{Code2|IsolateDestPort}}: <code>SocksPort</code>: <code>9170</code> to <code>9179</code>
-* <u>Range with both isolation flags:</u> With {{Code2|IsolateDestAddr}} and with {{Code2|IsolateDestPort}}: <code>SocksPort</code>: <code>9180</code> to <code>9189</code>
-* <u>Add more if needed:</u> If those are not enough, you can add your own.
-* <u>Isolation flags are usually unnecessary:</u> What are {{Code2|IsolateDestAddr}} and {{Code2|IsolateDestPort}}? You can learn about them in the [https://2019.www.torproject.org/docs/tor-manual.html.en Tor manual]. See also [https://lists.torproject.org/pipermail/tor-talk/2012-May/024403.html tor-talk mailing list: Tor's stream isolation features defaults]. Usually, unless you know better, you are better off not using {{Code2|IsolateDestAddr}} or {{Code2|IsolateDestPort}}.
 
 {{Box|text=
 '''Generic instructions for configuring custom installed applications for stream isolation for less than 7 custom applications'''
