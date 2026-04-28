@@ -15,9 +15,11 @@
       <!--{assign var="repo" value=$normalized_url|regex_replace:'/^https?:\/\/github\.com\/[^\/]+\/([^\/]+)\/.*/' : '$1'}-->
       <!--{assign var="path" value=$normalized_url|regex_replace:'/^https?:\/\/github\.com\/[^\/]+\/[^\/]+\/(?:blob|tree|raw)\/[^\/]+\//' : ''}-->
     
-      <a href="https://github.com/<!--{$username|escape:'html'}-->/<!--{$repo|escape:'html'}-->" target="_blank" rel="noopener"><code><!--{$repo|escape:'html'}--></code></a> (GitHub repo)
+      <a href="https://github.com/<!--{$username|escape:'html'}-->/<!--{$repo|escape:'html'}-->" target="_blank" rel="noopener" title="GitHub repository"><code><!--{$repo|escape:'html'}--></code></a>
       |
-      <a href="<!--{$normalized_url|escape:'html'}-->" target="_blank" rel="noopener"><code><!--{$path|escape:'html'}--></code></a> (file path)
+      <a href="<!--{$normalized_url|escape:'html'}-->" target="_blank" rel="noopener" title="GitHub file path"><code>/<!--{$path|escape:'html'}--></code></a>
+      |
+      <a href="<!--{$normalized_url|regex_replace:'/^(https?:\/\/github\.com\/[^\/]+\/[^\/]+\/)(blob|tree)(\/.*)$/':'$1raw$3'|escape:'html'}-->" target="_blank" rel="noopener" title="GitHub raw file path"><code>raw</code></a>
 
     <!--{else}-->
       <!--{* Case 2: Testing for url being a repo *}-->
@@ -25,7 +27,7 @@
       
       <!--{if $test_url == '@REPO'}-->
         <!--{assign var="repo" value=$normalized_url|regex_replace:'/^https?:\/\/github\.com\/[^\/]+\/([^\/]+).*/' : '$1'}-->
-        <a href="<!--{$normalized_url|escape:'html'}-->" target="_blank" rel="noopener"><code><!--{$repo|escape:'html'}--></code></a> (GitHub repo)
+        <a href="<!--{$normalized_url|escape:'html'}-->" target="_blank" rel="noopener" title="GitHub repository"><code><!--{$repo|escape:'html'}--></code></a>
 
       <!--{else}-->
         <!--{* Case 3: Everything starting with github.com interpreted as user profile *}-->
@@ -33,7 +35,7 @@
         
         <!--{if $test_url == '@USER'}-->
           <!--{assign var="username" value=$normalized_url|regex_replace:'/^https?:\/\/github\.com\/([^\/\?&#]+).*/' : '$1'}-->
-          <a href="<!--{$normalized_url|escape:'html'}-->" target="_blank" rel="noopener"><code><!--{$username|escape:'html'}--></code></a> (GitHub user)
+          <a href="<!--{$normalized_url|escape:'html'}-->" target="_blank" rel="noopener" title="GitHub user profile"><code><!--{$username|escape:'html'}--></code></a>
         
         <!--{else}-->
           <code>github-link-widget-no-valid-url</code>
