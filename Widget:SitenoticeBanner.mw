@@ -1,11 +1,50 @@
-<!--{if ! $expires || $expires > time() }-->
-<div class="sitenotice-banner robots-nocontent" <!--{if isset($id) && id }-->data-banner-id="<!--{$id}-->"<!--{/if}-->>
-<!--googleoff: index--><!--noindex-->
-<!--{if isset($href) && href }--><a href="<!--{$href}-->"><!--{/if}-->
-<div class="sitenotice-banner-content"><!--{$html}--></div>
-<!--{if isset($href) && $href }--></a><!--{/if}-->
-<!--/noindex--><!--googleon: index-->
-</div>
-<!--{/if}--><noinclude>
-[[Category:MultiWiki]]
-</noinclude>
+<!--{* WARNING: DO NOT CALL THIS WIDGET DIRECTLY. USE THE TEMPLATES. *}-->
+
+<!--{assign var="id" value=$id|default:''}-->
+<!--{assign var="html" value=$html|default:''}-->
+<!--{assign var="currentMonth" value=$currentMonth|default:''}-->
+<!--{assign var="page" value=$page|default:''}-->
+<!--{assign var="expires" value=$expires|default:''}-->
+<!--{assign var="href" value=$href|default:''}-->
+
+<!--{assign var="isEndOfYear" value=$id == 'end-of-year'}-->
+<!--{assign var="isDecember" value=$currentMonth == 12}-->
+<!--{assign var="isBannerTestpage" value=$page == 'TestpageForFlyInNotification'}-->
+<!--{assign var="hasMandatoryParams" value=$id !== '' && $html !== ''}-->
+
+<!--{assign var="showBanner" value=true}-->
+
+<!--{if $expires !== '' && $expires <= time() || $isEndOfYear && ! $isDecember && ! $isBannerTestpage}-->
+  <!--{assign var="showBanner" value=false}-->
+<!--{/if}-->
+
+<!--{if ! $hasMandatoryParams}-->
+  <!--{assign var="showBanner" value=true}-->
+<!--{/if}-->
+
+<!--{if $showBanner}-->
+
+  <div
+    class="sitenotice-banner robots-nocontent<!--{if $isEndOfYear}--> sitenotice-end-of-year donation-panel <!--{if $isBannerTestpage}-->force-show<!--{/if}--><!--{/if}-->"
+    data-banner-id="<!--{if $id !== ''}--><!--{$id|escape:'html'}--><!--{else}-->missing-id<!--{/if}-->"
+  >
+    <!--googleoff: index--><!--noindex-->
+    
+    <!--{if ! $hasMandatoryParams}-->
+    
+      <div class="error">Widget SitenoticeBanner Error: Missing mandatory parameters. Required: <code>id</code>, <code>html</code>.</div>
+      
+    <!--{else}-->
+    
+      <!--{if $href !== '' }--><a href="<!--{$href|regex_replace:'/^(javascript|data|vbscript|file)\s*:/i':'#blocked-$1:'|escape:'html'}-->"><!--{/if}-->
+      
+      <!--{$html}-->
+      
+      <!--{if $href !== '' }--></a><!--{/if}-->
+      
+    <!--{/if}-->
+    
+    <!--/noindex--><!--googleon: index-->
+  </div>
+  
+<!--{/if}-->
