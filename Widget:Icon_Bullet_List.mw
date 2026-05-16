@@ -7,13 +7,14 @@ of $item to create an $item-array. See /Dev/mediawiki#Widgets
 </noinclude>
 
 <<!--{if $span|default:false }-->span<!--{else}-->ul<!--{/if}-->
- class="icon-bullet-list <!--{$addClass|default:''}-->"
- <!--{if isset($fontSize)}-->style="font-size:<!--{$fontSize}-->;"<!--{/if}-->
+ class="icon-bullet-list <!--{$addClass|escape:'html'|default:''}-->"
+ <!--{if isset($fontSize)}-->style="font-size:<!--{$fontSize|regex_replace:'/[^0-9.a-zA-Z%-]/':''|escape:'html'}-->;"<!--{/if}-->
 >
 <!--{if isset( $item )}-->
 <!--{foreach from=$item item=i }-->
  <<!--{if $span|default:false }-->span<!--{else}-->li<!--{/if}-->>
-  <i class="<!--{$i|regex_replace:"/\,.*$/":""}-->"></i>
+  <i class="<!--{$i|regex_replace:"/\,.*$/":""|escape:'html'}-->"></i>
+  <!--{* Label half is intentionally raw HTML so callers like Template:Contact_icon_bullet_list can embed <a href="/wiki/..."> etc. MediaWiki's wikitext Sanitizer cleans editor-supplied content before it reaches the widget; the class half above is still escaped because it is never expected to contain HTML. *}-->
   <span><!--{$i|regex_replace:"/^[^\,]*\,/":""}--></span>
  </<!--{if $span|default:false }-->span<!--{else}-->li<!--{/if}-->>
 <!--{/foreach}-->

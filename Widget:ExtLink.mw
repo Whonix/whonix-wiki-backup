@@ -16,10 +16,10 @@
 <!--{if $url|regex_replace:"/^https:\/\/archive\.(today|fo|is|li|md|ph|vn)/":""|strlen < $url|strlen}--><!--{assign var="urlIs" value="aToday"}--><!--{/if}-->
 
 <!--{if $url@iteration == 1}-->
-<a target="_blank" href="<!--{$url|escape:"html"}-->" class="external template-extlink"
+<a target="_blank" href="<!--{$url|regex_replace:'/^(javascript|data|vbscript|file)\s*:/i':'#blocked-$1:'|escape:"html"}-->" class="external template-extlink"
 rel="noreferrer noopener<!--{if $urlIs == "onion"}--> nofollow<!--{/if}-->"
-aria-label="External link<!--{if isset($text) && $text != ""}--> to: <!--{$text}--><!--{/if}-->" >
-<!--{if isset($text) && $text != ""}--><!--{$text}--><!--{else}--><!--{$url}--><!--{/if}-->
+aria-label="External link<!--{if isset($text) && $text != ""}--> to: <!--{$text|escape:"html"}--><!--{/if}-->" >
+<!--{if isset($text) && $text != ""}--><!--{$text|escape:"html"}--><!--{else}--><!--{$url|escape:"html"}--><!--{/if}-->
 </a>
 <!--{/if}-->
 
@@ -44,7 +44,7 @@ aria-label="External link<!--{if isset($text) && $text != ""}--> to: <!--{$text}
 <!--{/if}-->
 
 <sup class="ext-link-to-archive<!--{if $url@iteration < $urlsCount}--> has-sibling<!--{/if}-->">
-<a href="<!--{$url|escape:"html"}-->" target="_blank" rel="noreferrer noopener<!--{if $urlIs == "onion"}--> nofollow<!--{/if}-->" title="<!--{$linkTitle}-->" aria-label="<!--{$linkTitle}-->">
+<a href="<!--{$url|regex_replace:'/^(javascript|data|vbscript|file)\s*:/i':'#blocked-$1:'|escape:"html"}-->" target="_blank" rel="noreferrer noopener<!--{if $urlIs == "onion"}--> nofollow<!--{/if}-->" title="<!--{$linkTitle}-->" aria-label="<!--{$linkTitle}-->">
 <!--{if $urlIs == "onion"}--><img src="/w/images/thumb/a/a8/Iconfinder_tor_386502.png/40px-Iconfinder_tor_386502.png" width="16" height="16" alt="Onion network Logo" />
 <!--{elseif $urlIs == "github"}--><img src="/w/images/a/af/Github-mark.svg" width="14" height="16" alt="GitHub Logo" />
 <!--{elseif $urlIs == "aOrg"}--><img src="/w/images/7/73/Internet_Archive_logo.png" width="14" height="16" alt="Internet Archive Logo" />

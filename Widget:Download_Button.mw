@@ -12,11 +12,11 @@ of $os to create an $os-array to loop over. See /Dev/mediawiki#Widgets
 <a
  rel="noreferrer"
  data-no-instant
- href="<!--{$url|default:''}-->"
+ href="<!--{$url|regex_replace:'/^(javascript|data|vbscript|file)\s*:/i':'#blocked-$1:'|escape:'html'|default:''}-->"
  class="download-button-v2 <!--{if isset($addToClass)}--><!--{$addToClass|escape:'html'}--><!--{/if}--> <!--{if isset($modal) }-->dlbtn-modal<!--{/if}-->"
  <!--{if isset($targetBlank) && $targetBlank|validate:boolean}-->target="_blank"<!--{/if}-->
- <!--{if isset($redirectUrl) }-->data-redirect="<!--{$redirectUrl}-->,1000"<!--{/if}-->
- <!--{if isset($fontsize) }-->style="font-size: <!--{$fontsize}-->;"<!--{/if}-->
+ <!--{if isset($redirectUrl) }-->data-redirect="<!--{$redirectUrl|regex_replace:'/^(javascript|data|vbscript|file)\s*:/i':'#blocked-$1:'|escape:'html'}-->,1000"<!--{/if}-->
+ <!--{if isset($fontsize) }-->style="font-size: <!--{$fontsize|regex_replace:'/[^0-9.a-zA-Z%-]/':''|escape:'html'}-->;"<!--{/if}-->
 >
  <span class="dbutton">
   <!--{if ! isset( $icon ) }-->
@@ -46,9 +46,10 @@ of $os to create an $os-array to loop over. See /Dev/mediawiki#Widgets
   </span>
  <!--{/if}-->
 
- <!--{if isset($onion) }-->
-  <a href="<!--{$onion}-->" class="onion-download" title="Onion link"></a>
- <!--{/if}-->
-</a><noinclude>
+</a>
+<!--{if isset($onion) }-->
+<a href="<!--{$onion|regex_replace:'/^(javascript|data|vbscript|file)\s*:/i':'#blocked-$1:'|escape:'html'}-->" class="onion-download" title="Onion link"></a>
+<!--{/if}-->
+<noinclude>
 [[Category:MultiWiki]]
 </noinclude>

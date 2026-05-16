@@ -9,6 +9,19 @@
 {{intro|
 This page outlines the digital signature policy of {{project_name_short}}, describing how signed git commits, tags, and images are required; how unsigned code is strictly prohibited in builds and deployments; and how documentation must encourage digital signature verification.
 }}
+= {{project_name_short}} Signing Key Policy - Digital Signature Policy =
+* <u>Local signing keys only:</u> The "primary" project [[Signing Key]] must always be kept local.
+* <u>No remote signing keys:</u> Uploading "primary" signing keys to remote (cloud) servers is strictly prohibited.
+** <u>Exception for remote signing keys:</u> If a separate signing key is "secondary" and only required to comply with external requirements such as Microsoft Windows code signing, keys managed by remote servers are acceptable. <ref>
+Such signing keys would only be used to satisfy Windows code signing requirements, which do not support decentralized OpenPGP signatures but instead rely on certificate authorities. This is in the context of potential future work, such as something similar to {{whonix_wiki
+|wikipage=Windows_Quick_Start_Testers_Only_Version
+|text=Windows Installer
+}}. Windows code signing has a completely different mechanism unrelated to OpenPGP. See also [[Authenticode|Authenticode (user documentation)]] and {{whonix_wiki
+|wikipage=Dev/Windows_Installer#code_signing
+|text=Windows Installer - Microsoft Windows code signing (developer documentation)
+}}.
+</ref>
+
 = {{project_name_short}} Source Code - Digital Signature Policy =
 * <u>Signed git head:</u> The git head should always be signed by a core developer.
 * <u>Signed git tags:</u> All git tags should always be signed.
@@ -58,10 +71,79 @@ This page outlines the digital signature policy of {{project_name_short}}, descr
 |context=[[Template:Unsigned_software]] used on the following wiki pages: [[Special:WhatLinksHere/Template:Unsigned_software]]
 }}
 
+= {{project_name_short}} Website =
+Having an OpenPGP Signed Website would be desirable, but that would require signing tools to sign the website and browsers which verify digital software signatures, which does not yet exist. See also [[Dev/OpenPGP_Signed_Website|Dev/OpenPGP Signed Website]].
+
 = Effective Date =
 * <u>Date of enforcement:</u> This policy has always been enforced for {{project_name_long}}. However, this elaborate technical description was added in April 2025. It was moved to its own dedicated wiki page at the end of July 2025.
 
 = Appendix =
+== Other Projects - Digital Signature Policy ==
+The following examples show that requiring digital signatures for source code, package uploads, packages, repositories, images, git tags, release artifacts, and build inputs is common in major free software projects. These examples are not identical to the {{project_name_short}} policy, but they show that strict digital signature requirements are neither unreasonable nor uncommon.
+
+* <u>Debian package uploads:</u> Debian FTP Master documents that unsigned <code>.dsc</code> files and files not signed with a key in the Debian keyring are rejected. Debian documents this as a requirement for both <code>.changes</code> and <code>.dsc</code> files. <ref>
+[https://ftp-master.debian.org/reject.html Debian FTP Master - Deciphering Rejection mails]
+</ref>
+* <u>Debian developer keys:</u> Debian's Developer Reference states that every developer needs an OpenPGP key in order to sign and verify package uploads. <ref>
+[https://www.debian.org/doc/manuals/developers-reference/developers-reference.en.html Debian Developer's Reference - Registering as a Debian member]
+</ref>
+* <u>Qubes OS source code signing:</u> Qubes OS requires all contributions to Qubes OS source code to be cryptographically signed by the author's PGP key. <ref>
+[https://doc.qubes-os.org/en/r4.3/developer/code/code-signing.html Qubes OS - Code signing]
+</ref>
+* <u>Qubes OS signed release artifacts:</u> Qubes OS documents that important project assets, including ISOs, RPMs, TGZs, and Git objects, are digitally signed by an official team member key or release signing key. These keys are signed by the Qubes Master Signing Key. <ref>
+[https://doc.qubes-os.org/en/latest/project-security/verifying-signatures.html Qubes OS - Verifying signatures]
+</ref>
+* <u>Qubes OS build source verification:</u> QubesBuilder verifies signed tags on every downloaded code by default. <ref>
+[https://doc.qubes-os.org/en/latest/developer/building/qubes-builder.html Qubes OS - QubesBuilder code verification keys management]
+</ref>
+* <u>Fedora package signing:</u> Fedora release engineering documentation states that Fedora creates release signing keys to prove the authenticity of packages built and distributed by Fedora, and that the key is used to sign all packages for public test and final releases. <ref>
+[https://fedoraproject.org/wiki/Create_release_signing_key Fedora Project Wiki - Create release signing key]
+</ref>
+* <u>Arch Linux package signing trust model:</u> Arch Linux uses master signing keys for developer and package maintainer keys. Arch documents that official developers and package maintainers responsible for packaging software should have their key signed by at least three master keys. <ref>
+[https://archlinux.org/master-keys/ Arch Linux - Master Signing Keys]
+</ref>
+* <u>Arch Linux package verification:</u> The <code>pacman.conf</code> manual documents <code>SigLevel</code>, <code>LocalFileSigLevel</code>, and <code>RemoteFileSigLevel</code> settings for package and database signature verification. <ref>
+[https://man.archlinux.org/man/pacman.conf.5.en Arch Linux manual pages - pacman.conf]
+</ref>
+* <u>Gentoo signed repository metadata:</u> Gentoo documents that thick Manifests add checksums for all files in the repository and an OpenPGP signature, providing integrity and authenticity checking when the repository is transmitted over insecure channels. <ref>
+[https://devmanual.gentoo.org/general-concepts/manifest/index.html Gentoo Development Guide - Manifest]
+</ref>
+* <u>Gentoo upstream signature verification:</u> Gentoo's <code>verify-sig.eclass</code> provides a standardized method to verify upstream signatures on distfiles, and its verification functions fail when signature verification fails. <ref>
+[https://devmanual.gentoo.org/eclass-reference/verify-sig.eclass/index.html Gentoo Development Guide - verify-sig.eclass]
+</ref>
+* <u>Linux kernel signed git tags and tarballs:</u> Linux kernel documentation states that git repositories provide PGP signatures on all tags and tarballs provide detached PGP signatures with all downloads. It also explicitly emphasizes trusting developers rather than infrastructure after the 2011 kernel.org compromise. <ref>
+[https://docs.kernel.org/process/maintainer-pgp-guide.html Linux kernel documentation - Kernel Maintainer PGP guide]
+</ref>
+* <u>Yocto Project signed git tags:</u> The Yocto Project signs release notes and git tags with a dedicated build and release GPG key. Its documentation also states that the key was generated on an air-gapped machine and that signing subkeys were transferred to Yubikey hardware tokens. <ref>
+[https://wiki.yoctoproject.org/wiki/GPG_sign_notes_%26_git_tags Yocto Project - GPG sign notes and git tags]
+</ref>
+* <u>Tails image signing key policy:</u> Tails documents that its signing key is used to sign released images and certify other public keys needed for development. Tails also documents that the secret key material will never be stored on an online server or on systems managed by anyone other than Tails core developers. <ref>
+[https://tails.net/doc/about/openpgp_keys/index.en.html Tails - OpenPGP keys]
+</ref>
+* <u>Tails download verification:</u> Tails documents that software verification is critical, that HTTPS alone is insufficient when relying on mirrors, and that Tails provides OpenPGP signatures of downloads. <ref>
+[https://tails.net/contribute/design/download_verification/ Tails - Download verification]
+</ref>
+* <u>Tor Browser release signing:</u> The Tor Browser team signs Tor Browser releases, and Tor Project documentation instructs users to verify the corresponding OpenPGP <code>.asc</code> signature file. <ref>
+[https://support.torproject.org/tor-browser/getting-started/verifying-tor-browser/ Tor Project - Verify Tor Browser's signature]
+</ref>
+* <u>Tor source code release signing:</u> Tor Project documentation states that digital signatures ensure that downloaded Tor source code was created by Tor developers and has not been tampered with. <ref>
+[https://support.torproject.org/little-t-tor/getting-started/verifying/ Tor Project - Verify tor source code]
+</ref>
+* <u>Nix binary cache signature enforcement:</u> The Nix manual documents <code>require-sigs</code>, which is enabled by default and requires store paths copied or substituted from a binary cache to have a signature by a trusted key. <ref>
+[https://nix.dev/manual/nix/2.19/command-ref/conf-file Nix Reference Manual - nix.conf require-sigs]
+</ref>
+* <u>openSUSE repository verification:</u> openSUSE's Zypper documentation states that repository metadata authenticity is verified by checking GPG signatures. If repository metadata are not signed, the GPG signature of each downloaded RPM package is checked before accepting it for installation. <ref>
+[https://en.opensuse.org/Archive:Zypper_manual openSUSE Wiki - Zypper manual]
+</ref>
+* <u>OpenBSD signed releases and packages:</u> OpenBSD documents that releases and packages are cryptographically signed with <code>signify</code>, that the installer verifies all sets before installing, and that <code>pkg_add</code> trusts only signed packages by default. <ref>
+[https://www.openbsd.org/55.html OpenBSD 5.5 release notes]
+</ref>
+* <u>FreeBSD signed release checksums:</u> FreeBSD release announcements and release pages provide PGP-signed checksums for release images. <ref>
+[https://www.freebsd.org/releases/14.4R/announce/ FreeBSD 14.4-RELEASE announcement]
+</ref> <ref>
+[https://www.freebsd.org/releases/14.2R/signatures/ FreeBSD 14.2 Release Checksum Signatures]
+</ref>
+
 == Upstream Feature Request - Signed Git ==
 <pre>
 signed git tags / signed git commits
