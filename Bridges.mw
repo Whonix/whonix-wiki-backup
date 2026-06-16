@@ -170,6 +170,13 @@ Two options. Choose either option '''A)''' <u>or</u> '''B)'''.
 * '''B)''' [[Tor#Manual_Bridge_Configuration|Manual Bridge Configuration]] - advanced users.
 
 {{Box|text=
+'''Warning:''' The Anon Connection Wizard GUI frontend utilizes a strict internal keyword whitelist for custom bridge verification. Attempting to paste a bridge line featuring newer or experimental transports (such as <code>webtunnel</code>) into the GUI input box will trigger a false validation block stating: 
+<code>Custom bridge list is blank or invalid</code>
+
+If you are using an unwhitelisted transport protocol, you must bypass the GUI entirely and configure the bridges manually within the configuration files as detailed in the sections below.
+}}
+
+{{Box|text=
 {{IconSet|h1|1}} Start Anon Connection Wizard.
 
 {{Start_Anon_Connection_Wizard}}
@@ -301,30 +308,44 @@ sudo chmod +x /usr/bin/lyrebird
 * Enter one or more bridges that you already have, or get bridges from the Tor Project using your preferred method: [https://support.torproject.org/tor-browser/circumvention/getting-bridges/ Tor Project instructions for obtaining bridges]
 
 {{CodeSelect|code=
+UseBridges 1
 ClientTransportPlugin webtunnel,snowflake,meek,obfs4 exec /usr/bin/lyrebird
-
 Bridge webtunnel ...
 }}
 
 {{IconSet|h1|14}} Save the changes.
 
-{{IconSet|h1|15}} Optional: [[Tor#Configuration_Check|Tor Configuration Check]]
+{{IconSet|h1|15}} Force a Complete Service Restart.
 
-{{IconSet|h1|16}} Shut down.
+'''Important Administrative Note:''' When modifying or shifting the active <code>ClientTransportPlugin</code> binary pathways (e.g., initializing <code>lyrebird</code> for the first time over an active <code>obfs4proxy</code> connection), a standard configuration reload is insufficient. Tor will refuse to kill the active proxy process tree while live. You must force the init system to terminate the old process tree and launch the new helper binary.
+
+Open a terminal and run:
+{{CodeSelect|code=
+sudo systemctl restart tor@default.service
+}}
+
+{{IconSet|h1|16}} Optional: [[Tor#Configuration_Check|Tor Configuration Check]]
+
+If you run the <code>anon-verify</code> tool, you may see the following warning in the report:
+<code>[warn] Option 'UseBridges' used more than once; all but the last value will be ignored.</code>
+
+'''Note:''' This warning is completely harmless and can be safely ignored. It simply means that Whonix already has <code>UseBridges 1</code> enabled by default in a global upstream configuration file. Tor is just letting you know it saw the command twice. As long as the tool reports <code>Configuration was valid</code> at the bottom, your setup is correct.
+
+{{IconSet|h1|17}} Shut down.
 
 Shut down the session.
 
-{{IconSet|h1|17}} Boot into user session.
+{{IconSet|h1|18}} Boot into user session.
 
 Check whether your Tor connection works in the [[tor-control-panel|Tor Control Panel]]. Note: [[Troubleshooting#Unsuitable_Connectivity_Troubleshooting_Tools|Unsuitable Connectivity Troubleshooting Tools]]
 
 Select <code>Bridges type</code>: <code>None</code> as the connection method there. As a result, Whonix's default configuration file will be overwritten by your custom <code>torrc</code> (Tor configuration file).
 
-{{IconSet|h1|18}} Updates.
+{{IconSet|h1|19}} Updates.
 
 To update lyrebird, repeat the download steps above and replace the existing binary in Whonix-Gateway.
 
-{{IconSet|h1|19}} Done.
+{{IconSet|h1|20}} Done.
 
 lyrebird has been installed and configured for manual use.
 
@@ -456,7 +477,8 @@ Snowflake log analysis steps have been documented.
 
 = Unsupported Pluggable Transport =
 == WebTunnel ==
-WebTunnel is an [[undocumented]] pluggable transport.
+WebTunnel is an [[undocumented]] pluggable transport.It is designed to mimic ordinary HTTPS traffic, making it highly effective against deep packet inspection (DPI) by hiding Tor connections inside standard web traffic.
+To manually install and deploy WebTunnel, you must follow the [[#lyrebird|lyrebird anti-censorship plugin installation guide]] documented above. WebTunnel cannot function without manually acquiring and configuring the lyrebird binary wrapper first.
 
 == Rationale for Unsupported Bridges ==
 Why are some pluggable transports unsupported? This is a technical explanation. Users are free to skip it.

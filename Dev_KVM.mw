@@ -25,6 +25,15 @@ https://stackoverflow.com/questions/26267173/converting-qemu-command-line-args-t
 virsh domxml-from-native qemu-argv
 }}
 
+* Requires the XML namespace be specified in the first line of the XML file
+
+<pre>
+<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+</pre>
+
+
+* Will most likely conflict with access control frameworks that confine QEMU since only the canonical/documented libvirt features are whitelisted and any other QEMU arguments are treated as opaque and arbitrary. This will cause the VM to be killed or prevent its startup.<ref>https://www.libvirt.org/kbase/qemu-passthrough-security.html</ref>
+
 = Blockers =
 None.
 
@@ -55,6 +64,20 @@ Should supercede the emulated TPM + swtpm-tools suggested here.
 
 * Opened a Debian RFP: https://lists.debian.org/debian-wnpp/2024/06/msg00422.html
 * Asked Canokey devs to clarify the security properties of the virtual implementation: https://github.com/canokeys/canokey-qemu/issues/8
+
+Renewed push for Debian packaging by Canokey maintainers
+https://github.com/canokeys/canokey-qemu/issues/6#issuecomment-4643349090
+
+== QEMU commands in Libvirt Schema ==
+
+    For qemu commandlines to be accepted in the file, the XML namespace needs to be included in the first line of the settings file (or the QEMU commands block)
+
+<pre>
+<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+</pre>
+
+* One will run into Apparmor issues when using QEMU commands since they are treated as arbitrary and not whitelisted by default libvirt 
+<ref>https://www.libvirt.org/kbase/qemu-passthrough-security.html</ref>
 
 == VirtIO Bluetooth ==
 Unsure about its usecases but cool to have anyhow.
@@ -235,9 +258,57 @@ https://www.phoronix.com/news/VirtIO-Video-2020
 
 KVM has recently added virtualized TPM support. They can be very valuable from a security standpoint  (and more trustworthy than hardware TPMs). A big thing is they can be used like virtual smartcards providing security like Qubes' split-gpg but for more types of software keys like OpenSSH, OpenSSL and more.
 
-To boot a VM after adding the emulated TPM virtual hardware, on the host install:
+After adding the emulated TPM virtual hardware in a VM install:
 
-sudo apt install swtpm-tools
+<pre>
+sudo apt install swtpm swtpm-tools
+</pre>
+
+Add to XML:
+
+<pre>
+    <tpm model='tpm-tis'>
+      <backend type='emulator' version='2.0'/>
+    </tpm>
+</pre>
+
+
+
+https://rainygarden.net/articles/LUKS_and_Clevis.html
+
+Test if it works:
+<pre>
+apt-get install tpm2-tools
+</pre>
+
+Run the following command to make sure that the sytstem has a TPM available and that it's being seen by the kernel during boot:
+<pre>
+dmesg | grep "ACPI: TPM2"
+</pre>
+
+The results should look something like these example outputs. These results are from a Dell system and within a QEMU virtual machine:
+<pre>
+[    0.009380] ACPI: TPM2 0x00000000D703C698 000034 (v03 DELL   CBX3     00000001 AMI  00000000)
+
+[    0.017976] ACPI: TPM2 0x000000007EB77000 00004C (v04 BOCHS  BXPC     00000001 BXPC 00000001)
+</pre>
+
+If there is no output, the system may lack a TPM, or it may be disabled in the firmware configuration (commonly if incorrectly called the "BIOS").
+
+Run the following command to have the Trusted Platform Module run a self-test:
+<pre>
+tpm2_selftest -f
+</pre>
+
+No output means the test has passed. If the test fails, the TPM may need to be enabled or reset in the system's firmware configuration.
+
+https://rainygarden.net/articles/LUKS_and_Clevis.html
+
+'''Update:''' 
+
+As of 2026 GPG's TPM support is widely reported to be broken.
+
+Also note that pcscd and scdaemon conflict with each other and one must choose either one to work with it to interface with a TPM not both. GnuPG's native process is scdaemon
 
 '''Update:''' 
 
@@ -597,6 +668,320 @@ sudo chmod ug+x /mnt/shared
 }}
 
 = Done =
+
+== Port to QEMU Session (unprivileged mode) ==
+
+
+=== KickSecure ===
+1. Use tar to decompress the archive:
+<pre>tar -xvf Kicksecure*.libvirt.xz</pre>
+
+2. Import Kicksecure image:
+<pre>virsh -c qemu:///session define Kicksecure*.xml</pre>
+
+3. Moving the Kicksecure ™ Image File
+<pre>mv Kicksecure*.qcow2 ~/.local/share/libvirt/images/Kicksecure.qcow2</pre>
+
+
+XML changes:
+
+* Change path in KS xml to redirect to to storage pool at: /home/user/.local/share/libvirt/images
+<pre>
+   <disk type="volume" device="disk">
+      <driver name="qemu" type="qcow2"/>
+      <source pool="default" volume="Kicksecure.qcow2"/>
+      <target dev="vda" bus="virtio"/>
+    </disk>
+</pre>
+
+
+
+https://libvirt.org/formatdomain.html#userspace-connection-using-passt
+
+
+
+* Change network to:
+
+<pre>
+ <interface type='user'>
+    <backend type='passt'/>
+    <ip family='ipv4' address='172.17.5.4' prefix='24'/>
+  </interface>
+</pre>
+
+  
+Must remove:
+ 
+<pre>
+  <blkiotune>
+    <weight>250</weight>
+  </blkiotune>
+</pre>
+  
+  
+ 
+* All network XMLs currently shipped are deprecated and superfluous under this new paradigm
+
+* Check is specifying connection is necessary when editing the settings when there's no duplicate VMs on the machine under system connection:
+
+<pre>
+virsh -c qemu:///session edit Kicksecure
+</pre>
+
+=== Whonix ===
+
+1. Extract Images:
+<pre>tar -xvf Whonix*.libvirt.xz</pre>
+
+
+
+2. Move Images:
+
+<pre>mv Whonix-Gateway*.qcow2 ~/.local/share/libvirt/images/Whonix-Gateway.qcow2</pre>
+
+<pre>mv Whonix-Workstation*.qcow2 ~/.local/share/libvirt/images/Whonix-Workstation.qcow2</pre>
+
+
+3. Define VMs:
+<pre>virsh -c qemu:///session define Whonix-Gateway*.xml</pre>
+
+<pre>virsh -c qemu:///session define Whonix-Workstation*.xml</pre>
+
+
+XML
+
+* Change paths in whonix vms xml to redirect to storage pool at: /home/user/.local/share/libvirt/images
+
+<pre>
+   <disk type="volume" device="disk">
+      <driver name="qemu" type="qcow2"/>
+      <source pool="default" volume="Whonix-Gateway.qcow2"/>
+      <target dev="vda" bus="virtio"/>
+    </disk>
+</pre>
+
+<pre>
+   <disk type="volume" device="disk">
+      <driver name="qemu" type="qcow2"/>
+      <source pool="default" volume="Whonix-Workstation.qcow2"/>
+      <target dev="vda" bus="virtio"/>
+    </disk>
+</pre>
+
+* must remove:
+<pre>
+    <blkiotune>
+    <weight>250</weight>
+  </blkiotune>
+</pre>
+
+  
+* Change GW network to:
+<pre>
+  <interface type='user'>
+    <backend type='passt'/>
+    <ip family='ipv4' address='172.17.5.4' prefix='24'/>
+  </interface>
+</pre>
+
+<pre>
+  <interface type="udp">
+    <source address="127.0.0.1" port="5577">
+    <local address="127.0.0.1" port="6688"/>
+    </source>
+    <model type="virtio"/>
+  </interface>
+</pre>
+
+* Change WS network to:
+<pre>
+  <interface type='udp'>
+    <source address='127.0.0.1' port='6688'>
+      <local address='127.0.0.1' port='5577'/>
+    </source>
+    <model type="virtio"/>
+  </interface>
+</pre>
+
+=== MISC Notes ===
+
+
+*Tunnel types vs vhost-user for internal networking: While vhost-user is theoretically safer, any attempt to use it caused the VMs it was added to to silently stall and die so a direct tunnel was selected. UDP tunnels were of choice because someone documented how restarting the "server" TCP tunnel VM would kill the connection and would force the need for restarting the client tunnel VM (Whonix-Workstation) too to restore connectivity. 
+https://linuxsimba.github.io/qemu-tunnel-types
+
+The virtio NIC has to be explicitly specified to avoid emulated ones
+
+
+*Tunnels will fix the OpenVPN killswitch problems and other conflicts on host networking because of its former bridge use like corridor:
+
+ Finally, it’s worth mentioning an unpleasant quirk of the UDP tunnels. They don’t use Linux interfaces, making it impossible to do simple packet capture on VM-to-VM links. QEMU does provide a traffic capture CLI command3 that saves packets into a file, and there might be a Wireshark plugin out there that strips the UDP header automatically (or you could create custom decoding rules). netlab uses a workaround: it politely tells you how to replace a UDP tunnel with a Linux bridge.
+
+https://blog.ipspace.net/2025/02/virtual-labs-p2p-links/
+
+
+*passt does not do internal isolated networking. Attempting to use it this way could complicate things drastically as unwanted behavior would need to be uncovered and disabled or risk leaks.
+
+*The complex and outdated QEMU SLiRP is a different code base than what is used to implement UDP tunnels
+
+
+*Disabling the ‘default’ network should disable dnsmasq and it was indeed the case as confirmed by ‘netstat -tulpen’. So by not creating or using a network that would use dnsmasq’s services it is never used and can be safely ignored.
+Attempting to remove the dnsmasq-base package out right would rip the guts out of the libvrit install.
+
+<pre>
+Disable the default network
+
+To prevent libvirt from altering the firewall, stop and disable the default network. Make sure there are no active virtual machines (VMs) still using this network.
+
+# virsh net-destroy default
+# virsh net-autostart --disable default
+</pre>
+https://jamielinux.com/docs/libvirt-networking-handbook/custom-nat-based-network.html
+
+
+
+* On vhost-user vs user - factoring in performance differences between both
+UPDATE: A speed test running in WS Tor Browser gave pretty identical results. I’d prefer going for user in his case since I’m iffy about using shared memory for anything, it could very well be coded with security in mind, but still any bugs can be pretty bad.
+
+
+* VSock sockets are not shared nor connectable to each other by KVM (circa 2026) and need host side sorcery with socat to route packets between them. Unsure how the security situation would compare between this setup and just using natively supported tunnels. Socat would need to be compared with peer apps on security merits and further host side confinement for it would be needed. 
+UPDATE: There's vsock-bridge authored by the dev behind vsock for this purpose
+
+https://lencerf.github.io/post/2023-05-28-virtio-vhost-vsock/
+https://www.linux-kvm.org/images/8/83/01x08-Stefan_Hajnoczi-virtio-vsock_Zero-configuration_hostguest_communication.pdf
+https://stefano-garzarella.github.io/posts/2019-11-08-kvmforum-2019-vsock/
+https://github.com/stefano-garzarella/vsock-bridge/tree/master
+
+
+  
+  https://libvirt.org/formatdomain.html#multicast-tunnel
+  https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/6/html/virtualization_administration_guide/sub-sub-section-libvirt-dom-xml-devices-network-interfaces-multicast-tunnel
+  
+  https://libvirt.org/formatdomain.html#vhost-user-connection
+  https://github.com/yangye-huaizhou/secure-vhost
+
+  
+QEMU netdev sockets vs vhost-user socket security:
+
+Vhost-user sockets provide enhanced security by allowing a backend process to handle data processing outside the kernel, reducing the attack surface compared to traditional QEMU netdev sockets, which operate within the kernel space. This separation helps mitigate risks associated with kernel vulnerabilities.
+
+
+***
+
+libvirt cannot process relative paths. I think the only easy solution that is readily implementable is to create a subdirectory under /opt/ with user accessible permissions and use that as the storage pool for QEMU sessionhttps://linuxvox.com/blog/linux-opt-folder-and-permissions/
+
+Someone on SE suggests using /srv/ instead for this purpose. Let’s decide on the cleanest way to use a generic dir for thishttps://unix.stackexchange.com/questions/70700/whats-the-most-appropriate-directory-where-to-place-files-shared-between-users#70708
+
+
+
+Storage pools in libvirt can use relative file paths when the pool type is directory-based, and the target directory path is specified without a leading slash.
+
+https://libvirt-python.readthedocs.io/storage-pools/
+https://libvirt.org/storage.html
+
+
+
+https://libvirt.org/formatdomain.html#hard-drives-floppy-disks-cdroms
+
+<pre>
+volume
+
+    The underlying disk source is represented by attributes pool and volume. Attribute pool specifies the name of the storage pool (managed by libvirt) where the disk source resides. Attribute volume specifies the name of storage volume (managed by libvirt) used as the disk source. The value for the volume attribute will be the output from the "Name" column of a virsh vol-list [pool-name] command.
+</pre>
+
+
+
+
+<pre>
+    <disk type="volume" device="disk">
+      <driver name="qemu" type="qcow2"/>
+      <source pool="default" volume="Whonix-Workstation.qcow2"/>
+      <target dev="vda" bus="virtio"/>
+    </disk>
+</pre>
+
+
+***
+
+Apparmor sVirt not in use when starting as qemu session. When in effect, each VM when running under qemu:///system has a AA profile that is auto-generated with its respective uid appended to the profile name at run time.
+
+<pre>sudo aa-status</pre>
+
+
+Gemini corroborates what I suspected:
+
+<pre>
+sVirt is not utilized when running VMs via qemu:///session.
+
+The qemu:///session URI connects to a libvirtd/virtqemud instance running under your exact user account. Consequently, the VM processes (and their disk images) share your user’s Linux permissions, bypassing mandatory access controls like SELinux or AppArmor.
+
+qemu:///session (User Sessions): sVirt is disabled. VMs are isolated strictly by standard discretionary access control (file permissions). Because all VMs run as your user, a compromised VM process could theoretically access the files of any other VM running under the same user session.
+
+qemu:///system (System Sessions): sVirt is enabled. VMs run with elevated root privileges, but sVirt enforces Mandatory Access Control (MAC) using SELinux or AppArmor. It gives each VM process and its virtual disks a unique, randomized security label (e.g., svirt_t:s0:c34,c44), preventing one compromised VM from accessing another VM’s data on the host.
+</pre>
+
+Also attempting to start qemu:///session VMs with seclabel apparmor results in:“Error starting domain: unsupported configuration: Security driver model ‘apparmor’ is not available”
+
+We are essentially sacrificing inter vm isolation, on the otherhand qemu is on the whole running in a less privileged manner than under qemu:///system
+
+Theoretically we can manually recreate what was lost and install the profiles, however it will need a lot of troubleshooting and modification in cases where custom setups are concerned
+
+https://rwmj.wordpress.com/2011/05/24/what-is-svirt/
+
+https://discussion.fedoraproject.org/t/howto-use-the-unprivileged-user-session-in-virt-manager-for-rootless-virtualization-with-qemu-and-kvm/127066/14
+
+Made a feature request for sVirt to support qemu session
+https://marc.info/?l=libvirt-users&m=178085072397634&w=2
+
+
+***
+
+qemu-bridge-helper DOES NOT WORK but documented out of completeness for those who want to troubleshoot
+
+https://apiraino.github.io/qemu-bridge-networking/
+
+
+Setting up qemu-bridge-helper
+
+Create the file /etc/qemu/bridge.conf with the content:
+
+sudo mkdir -p /etc/qemu 
+sudo touch /etc/qemu/bridge.conf
+sudo nano /etc/qemu/bridge.conf
+
+allow virbr0
+allow virbr1
+allow virbr2
+
+
+Restrict the permissions of this file to make sure it can’t be edited by regular users.
+
+# chown root:libvirt /etc/qemu/bridge.conf
+# chmod 755 /etc/qemu/bridge.conf
+
+Add setuid to the qemu-bridge-helper binary.
+
+# chmod u+s /usr/lib/qemu/qemu-bridge-helper
+
+If you do not correctly set this last step, then you will receive the following error when you attempt to connect a VM to the bridge:
+
+Error starting domain: internal error: /usr/lib/qemu/qemu-bridge-helper --use-vnet --br=virbr0 --fd=28: failed to communicate with bridge helper: Transport endpoint is not connected
+stderr=failed to create tun device: Operation not permitted
+
+
+
+
+
+original permissions:
+-rwxr-xr-x 1 root root  /usr/lib/qemu/qemu-bridge-helper
+
+
+
+
+https://www.libvirt.org/kbase/qemu-passthrough-security.html
+
+https://jonaspfannschmidt.com/libvirt_session.html
+https://mike42.me/blog/2019-08-how-to-use-the-qemu-bridge-helper-on-debian-10
+
 == cpumodel qemu64 ==
 Insecure. Therefore not using cpumodel qemu64.
 
@@ -2122,6 +2507,7 @@ See: <nowiki>https://www.whonix.org/old-forum/index.php/topic,690.msg6076.html#m
 <velope> and the "community" pays for it dearly with things like heartbleed
 </pre>
 
+= domxml-to-native =
 = Footnotes =
 <references />
 

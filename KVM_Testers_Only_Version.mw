@@ -1,1 +1,2323 @@
-#REDIRECT [[KVM]]
+{{Header}} {{hide_all_banners}}
+{{Title|title=
+{{project_name_long}} for KVM
+}}
+{{#seo:
+|description=Using {{project_name_short}} with KVM (Kernel-based Virtual Machine)
+|image=Kvm-new-logo.png
+}}
+{{Contributor|
+|status=stable
+|about=About this {{PAGENAME}} Page
+|difficulty=medium
+|contributor=[https://forums.whonix.org/u/hulahoop HulaHoop]
+|support=[[KVM/Support|Community support<br/>
+only!]]
+}}
+{{kvm_logo}}
+{{intro|
+Using {{project_name_short}} with KVM (Kernel-based Virtual Machine)
+}}
+{{Community_Support|scope=page}}
+= General =
+== What is KVM? ==
+For an openly developed, free and open-source software (FOSS), GPL licensed hypervisor that can run Whonix, <ref>
+There are also [[Download|Download other platforms]].
+</ref> it is recommended to use [https://www.linux-kvm.org/page/Main_Page Kernel-based Virtual Machine (KVM)] that comes with the Linux kernel. KVM combined with the [https://virt-manager.org/ Virtual Machine Manager] front-end should provide a familiar, intuitive and easy-to-use GUI. Virtual Machine Manager uses [https://wiki.archlinux.org/title/libvirt '''libvirt'''] to manage KVM virtual machines.
+
+For a detailed view of KVM's security merits, read the [https://web.archive.org/web/20240205091840/https://www.atsec.se/uploads/articles_and_whitepapers/kvm_security_comparison.pdf audit report] issued by an independent security auditing firm.
+
+== Why Use KVM Over VirtualBox? ==
+{{quotation
+|quote=The VirtualBox developer team has made the decision to switch out the BIOS in their hypervisor. However, it now comes with one that requires compilation by a toolchain that {{kicksecure_wiki
+|wikipage=Dev/VirtualBox#VirtualBox_Unavailable_in_Debian_main_due_to_Licensing_Issues
+|text=does not meet the definition of Free Software
+}} according to the guidelines of the Free Software Foundation. This move is considered problematic for free and open source software projects like Debian, on which {{project_name_short}} is based.
+
+The issues with the Open Watcom License are explained in [https://www.mail-archive.com/debian-legal@lists.debian.org/msg34687.html this thread] on the Debian mailing list. More references can be found {{kicksecure_wiki
+|wikipage=Dev/VirtualBox#VirtualBox_Unavailable_in_Debian_stable_and_backports_due_to_Debian_Stable_Security_Maintenance_Issues
+|text=here
+}}. In summary, there are issues surrounding the contradictory language of the license, the assertion of patents against software that relies upon it, and the imposition of certain restrictions on software usage. For these reasons, those who care about running FOSS and appreciate its ethical views are recommended to avoid running VirtualBox; also see [[Avoid_nonfreedom_software|avoid non-freedom software]].
+
+Besides this licensing issue, a more tangible reason to avoid VirtualBox is the security practices of Oracle, the producer of the software. Events and news in recent years (like the Snowden leaks) demonstrate there is an urgent need for increased transparency and verifiable trust in the digital world. Oracle is infamous for its lack of transparency in disclosing the details of security bugs, as well as discouraging full and public disclosure by third parties. [https://www.techopedia.com/definition/21985/security-through-obscurity-sto Security through obscurity] is Oracle's flawed [https://www.oracle.com/corporate/security-practices/assurance/vulnerability/disclosure.html modus operandi]. <ref>
+[https://web.archive.org/web/20220128154850/http://users.softlab.ntua.gr/~taver/security/secur3.html What is "security through obscurity"]: <blockquote>The basis of STO has always been to run your system on a "need to know" basis. If a person doesn't know how to do something which could impact system security, then s/he isn't dangerous. ... Nowadays there is also a greater need for the ordinary user to know details of how your system works than ever before, and STO falls down as a result. Many users today have advanced knowledge of how their operating system works, and because of their experience will be able to guess at the bits of knowledge that they didn't "need to know". This bypasses the whole basis of STO, and makes your security useless.</blockquote></ref>
+
+Not going public with the details of vulnerabilities only leads to laziness and complacency on the part of the company that fields the affected products. One example is this historical [https://en.wikipedia.org/wiki/Zero-day_(computing) 0day vulnerability] reported privately to Oracle in 2008 by an independent security researcher. Over four years later, the vulnerability [https://seclists.org/fulldisclosure/2012/Apr/343 remained unfixed], demonstrating Oracle's history of failing to provide timely patches to customers so they can protect themselves.
+
+On the VirtualBox bugtracker, ticket ''VirtualBox 5.2.18 is vulnerable to spectre/meltdown despite microcode being installed'' indicates {{kicksecure_wiki
+|wikipage=Spectre_Meltdown#VirtualBox
+|text=non-responsiveness
+}} and a lack of progress by upstream. Users must patiently wait for VirtualBox developers to fix this bug. <ref>
+https://forums.virtualbox.org/viewtopic.php?f=7&t=89395
+</ref>
+
+VirtualBox also contains significant functionality that is only available as a proprietary extension, such as USB / PCI passthrough and RDP connectivity. Based on Oracle's unfriendly track record with the FOSS community in the past -- examples include OpenSolaris and OpenOffice -- it would be unsurprising if users were charged for these restricted features in the future, or if the project was abandoned due to insufficient monetization.
+|context=Statement by [[Contribute#Contributor|contributor]] [https://forums.whonix.org/u/hulahoop HulaHoop].
+}}
+
+For the opposite viewpoint, see [[Dev/VirtualBox#Why_use_VirtualBox_over_KVM?|Why use VirtualBox over KVM?]]
+
+=  First-time User? =
+{{Default_Passwords}}
+{{First_Time_User}}
+
+= KVM Setup Instructions =
+
+== Install KVM ==
+Choose your host operating system.
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= === Debian ===
+|image=[[File:Logo-debian.png|25px]]
+|addToClass=info-box
+|content=
+
+{{Sudo_Setup}}
+
+Update package lists.
+
+{{CodeSelect|code=
+sudo apt update
+}}
+
+For '''Debian {{Stable project version based on Debian codename}}+''' on Intel / AMD, install:
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends qemu-system-x86 libvirt-daemon libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 qemu-system-gui qemu-system-modules-spice passt qemu-utils ovmf swtpm swtpm-tools safe-rm xz-utils
+}}
+
+For '''Debian {{Stable project version based on Debian codename}}+''' on PowerPC, install:
+
+{{CodeSelect|code=
+sudo apt install --no-install-recommends qemu-system-ppc libvirt-daemon libvirt-clients virt-manager gir1.2-spiceclientgtk-3.0 qemu-system-gui qemu-system-modules-spice passt qemu-utils ovmf swtpm swtpm-tools safe-rm xz-utils
+}}
+}} <!-- close tab: Debian -->
+
+{{Tab
+|title= === Ubuntu ===
+|image=[[File:Logo-ubuntusvg.png|25px]]
+|addToClass=info-box
+|content=
+{{CodeSelect|code=
+sudo apt install --no-install-recommends qemu-kvm qemu-system-x86 libvirt-daemon libvirt-clients virt-manager virt-viewer gir1.2-spiceclientgtk-3.0 qemu-system-gui qemu-system-modules-spice passt qemu-utils ovmf swtpm swtpm-tools xz-utils
+}}
+
+Add your user to KVM groups (1 of 2).
+
+{{CodeSelect|code=
+sudo adduser $USER libvirt
+}}
+
+Add your user to KVM groups (2 of 2).
+
+{{CodeSelect|code=
+sudo adduser $USER libvirt-qemu
+}}
+
+}} <!-- close tab: Ubuntu -->
+
+{{Tab
+|title= === Arch Linux ===
+|image=[[File:Archlinux_logo.png|25px]]
+|addToClass=info-box
+|content=
+
+{{CodeSelect|code=
+sudo pacman -Syu --needed qemu-system-x86 qemu-desktop qemu-img qemu-tools libvirt virt-manager virt-viewer spice-gtk passt edk2-ovmf swtpm xz
+}}
+
+{{CodeSelect|code=
+sudo systemctl enable libvirtd
+}}
+
+}} <!-- close tab: Arch Linux -->
+
+{{Tab
+|title= === Fedora ===
+|image=[[File:Fedora-logo.png|25px]]
+|addToClass=info-box
+|content=
+'''Check System Requirements'''
+
+As KVM requires a CPU with virtualization extensions, check whether the system has either Intel VT or AMD-V. If the following command prints nothing, the system does not support the required virtualization extensions.
+
+{{CodeSelect|code=
+egrep -E '^flags.*(vmx{{!}}svm)' /proc/cpuinfo
+}}
+
+'''Install Dependencies'''
+
+To install mandatory and default packages in the virtualization group, run:
+
+{{CodeSelect|code=
+sudo dnf install --setopt=install_weak_deps=False qemu-kvm qemu-system-x86 qemu-ui-gtk qemu-ui-spice-core qemu-ui-spice-app libvirt-daemon libvirt-daemon-kvm libvirt-daemon-config-network libvirt-client virt-manager virt-viewer spice-gtk3 spice-gtk-tools qemu-img qemu-tools passt passt-selinux edk2-ovmf swtpm swtpm-tools xz
+}}
+
+After installing packages, start the libvirtd service.
+
+{{CodeSelect|code=
+sudo systemctl start libvirtd
+}}
+
+To start the service on boot, run:
+
+{{CodeSelect|code=
+sudo systemctl enable libvirtd
+}}
+
+Verify that KVM kernel modules are loaded properly. If this command lists <code>kvm_intel</code> or <code>kvm_amd</code>, KVM is properly configured.
+
+<code>lsmod {{!}} grep kvm</code>
+
+'''Edit the libvirtd Configuration'''
+
+System administration is limited to the root user by default. To enable a regular user, run the following commands.
+
+Open the <code>/etc/libvirt/libvirtd.conf</code> file for editing.
+
+{{CodeSelect|code=
+sudo nano /etc/libvirt/libvirtd.conf
+}}
+
+Set the domain socket group ownership to libvirt.
+
+{{CodeSelect|code=
+unix_sock_group = "libvirt"
+}}
+
+Adjust the Unix socket permissions for the R/W socket.
+
+{{CodeSelect|code=
+unix_sock_rw_perms = "0770"
+}}
+
+Save and exit.
+
+To administer libvirt as a regular user, add the user to the libvirt group. <ref>
+Otherwise the sudo password is required every time virt-manager is started.
+</ref>
+
+{{CodeSelect|code=
+sudo usermod -a -G libvirt $(whoami)
+}}
+
+You must log out and log back in to apply the changes.
+
+}} <!-- close tab: Fedora -->
+
+{{Tab
+|title= === Other Distributions ===
+|image=[[File:Gnu_operating_system.png|25px]]
+|addToClass=info-box
+|content=
+
+The <code>qemu-kvm</code> and <code>libvirt-bin</code> packages are necessary. <code>virt-manager</code> is also required to use a graphical user interface (which most users want). <code>tar</code>, <code>xz-utils</code> are required to extract the {{project_name_short}} images. This software can most likely be installed using the usual distribution's package manager.
+
+If any of the following errors appear when later using <code>virsh define</code>:
+
+{{CodeSelect|code=
+error: Failed to define domain from {{project_name_gateway_short}}_kvm.xml
+error: internal error Unknown controller type 'pci
+}}
+
+{{CodeSelect|code=
+{{project_name_gateway_short}}_kvm.xml:24: element pm: Relax-NG validity error : Element domain has extra content: pm
+{{project_name_gateway_short}}_kvm.xml fails to validate
+}}
+
+{{CodeSelect|code=
+Relax-NG validity error : Extra element devices in interleave
+{{project_name_gateway_short}}_kvm.xml:24: element devices: Relax-NG validity error : Element domain failed to validate content
+{{project_name_gateway_short}}_kvm.xml fails to validate
+}}
+
+Then a more recent version of libvirt and KVM is likely needed.
+
+}} <!-- close tab: Other Distributions -->
+
+}} <!-- close Controller: Everything -->
+
+Readers are welcome to add detailed instructions for other distributions here!
+
+== Addgroup ==
+
+In order to manage virtual machines as a regular (non-root) user, that user must be added to the <code>libvirt</code> and <code>kvm</code> groups.
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= === Debian (based) / Ubuntu ===
+|image=[[File:Logo-debian.png|25px]]
+|addToClass=info-box
+|content=
+The following commands work in Debian and assume the simple scenario where KVM is used by the currently logged-in user. For older Ubuntu versions, note that group names vary and ''libvirt'' may be called ''libvirtd'' instead. For Ubuntu 20.04, ''libvirt'' works.
+
+{{CodeSelect|inline=true|code=
+sudo adduser "$(whoami)" libvirt
+}}
+
+{{CodeSelect|inline=true|code=
+sudo adduser "$(whoami)" kvm
+}}
+
+<ref>
+By default, Debian does not use <code>sudo</code>, so groups can be added using <code>usermod</code>. If your user is <code>foo</code>, the following commands will work.
+
+{{CodeSelect|code=
+usermod -a -G libvirt foo
+}}
+
+And:
+
+{{CodeSelect|code=
+usermod -a -G kvm foo
+}}
+</ref>
+}} <!-- close tab: Debian (based) / Ubuntu -->
+
+{{Tab
+|title= === Fedora ===
+|image=[[File:Fedora-logo.png|25px]]
+|addToClass=info-box
+|content=
+{{CodeSelect|code=
+sudo usermod -a -G libvirt <username>
+}}
+
+{{CodeSelect|code=
+sudo usermod -a -G kvm <username>
+}}
+
+Replace <username> with the actual username. You must log out and log back in for changes to take effect.
+}} <!-- close tab: Fedora -->
+
+{{Tab
+|title= === Arch Linux ===
+|image=[[File:Archlinux_logo.png|25px]]
+|addToClass=info-box
+|content=
+{{CodeSelect|inline=true|code=
+sudo gpasswd -a $USER libvirt
+}}
+
+{{CodeSelect|code=
+sudo gpasswd -a $USER kvm
+}}
+
+See also [https://wiki.archlinux.org/title/libvirt Arch Linux libvirt wiki page].
+}} <!-- close tab: Arch Linux -->
+
+{{Tab
+|title= === Other Distributions ===
+|image=[[File:Gnu_operating_system.png|25px]]
+|addToClass=info-box
+|content=
+If another distribution is in use, refer to the distribution's manual.
+}} <!-- close tab: Other Distributions -->
+
+}} <!-- close Controller: Everything -->
+
+== Restart libvirtd ==
+
+<u>Note</u>: Restarting libvirtd is required after:
+* KVM is installed.
+* Users are added to groups.
+
+{{CodeSelect|code=
+sudo systemctl restart libvirtd
+}}
+
+It may be necessary to reboot the computer on some systems.
+
+== Build from Scratch ==
+
+Advanced users are encouraged to [[Dev/Build_Documentation|build]] {{project_name_short}} images for high security assurance.
+
+= Information =
+
+It is strongly recommended to read and apply the steps outlined in this section. Applying a known and tested configuration provides better convenience and security.
+
+Be sure to use the qcow2 images provided by the {{project_name_short}} project or built from scratch, instead of creating them from VirtualBox OVA files.<ref>
+Manually converting images from .ova to .qcow2 is no longer recommended, since .qcow images can be downloaded from the {{project_name_short}} project.
+</ref> The qcow2 images contain important performance optimizations for KVM. <ref>
+As per [https://github.com/{{project_name_short}}/derivative-maker/blob/master/build-steps.d/4400_convert-raw-to-qcow2 build-steps.d/4400_convert-raw-to-qcow2]
+
+, these are "-o cluster_size=2M" and "-o preallocation=metadata".
+</ref>
+
+If problems are encountered with free disk space, using a file system that supports [[sparse files]] is recommended. Also refer to the following [https://forums.whonix.org/t/please-reduce-kvm-image-size/160 forum discussion].
+
+If {{project_name_short}} libvirt images already exist, then consider a [[#Cleanup|Cleanup]] first.
+
+For simplicity, the {{project_name_short}} images should be downloaded and stored in the home folder ({{Code2|/home/<your user name>}}) so the following commands can be copied/pasted without changes.
+
+= Download {{project_name_short}} =
+
+<!-- Extra terms of service notice because KVM has no VM import dialog which could present TOS. -->
+{{tos}}
+
+'''{{free}}''' 
+
+{{Tab
+|type=controller
+|content=
+
+<!-- ────────────────  SECTION 1  ──────────────── -->
+{{Tab
+|active=true
+|title= == GUI ==
+|image=[[File:Clipart-gui.svg|alt=Symbol representing GUI]]
+|content=
+
+  {{Tab                      <!-- nested controller -->
+  |type=controller
+  |addToClass=margin-top-10
+  |content=
+
+    {{Tab
+    |active=true
+    |title= === stable LXQt ===
+    |image=[[File:Rg1024_brick_tile.png]]
+    |content=
+        {{DownloadTableUnified
+            |project_name={{project_name_short}}
+            |os_keyword=kvm
+            |os_name=KVM
+            |version_type=stable
+            |flavor=LXQt
+            |after_slash=libvirt
+            |extension=Intel_AMD64.qcow2.libvirt.xz
+            |version={{Version_KVM}}
+        }} <!-- close DownloadTableUnified -->
+    }} <!-- close tab -->
+
+    {{Tab
+    |title= === testers LXQt ===
+    |image=[[File:Cornues.png]]
+    |content=
+        {{DownloadTableUnified
+            |project_name={{project_name_short}}
+            |os_keyword=kvm
+            |os_name=KVM
+            |version_type=testers
+            |flavor=LXQt
+            |after_slash=libvirt
+            |extension=Intel_AMD64.qcow2.libvirt.xz
+            |version={{VersionTesters}}
+        }} <!-- close DownloadTableUnified -->   }} <!-- close tab -->
+
+  }} <!-- close nested controller -->
+
+}} <!-- close tab: Section 1 -->
+
+<!-- ────────────────  SECTION 2  ──────────────── -->
+{{Tab
+|title= == CLI ==
+|image=[[File:Utilities-terminal.png|alt=Symbol representing CLI|50px]]
+|content=
+
+  {{Tab                      <!-- nested controller -->
+  |type=controller
+  |addToClass=margin-top-10
+  |content=
+
+    {{Tab
+    |active=true
+    |title= === stable CLI ===
+    |image=[[File:Rg1024_brick_tile.png]]
+    |content=
+        {{DownloadTableUnified
+            |project_name={{project_name_short}}
+            |os_keyword=kvm
+            |os_name=KVM
+            |version_type=stable
+            |flavor=CLI
+            |after_slash=libvirt
+            |extension=Intel_AMD64.qcow2.libvirt.xz
+            |version={{Version_KVM}}
+        }} <!-- close DownloadTableUnified -->   }} <!-- close tab -->
+
+    {{Tab
+    |title= === testers CLI ===
+    |image=[[File:Cornues.png]]
+    |content=
+        {{DownloadTableUnified
+            |project_name={{project_name_short}}
+            |os_keyword=kvm
+            |os_name=KVM
+            |version_type=testers
+            |flavor=CLI
+            |after_slash=libvirt
+            |extension=Intel_AMD64.qcow2.libvirt.xz
+            |version={{VersionTesters}}
+        }} <!-- close DownloadTableUnified -->
+    }} <!-- close tab -->
+  }} <!-- close nested controller -->
+
+}} <!-- close tab: Section 2 -->
+
+}} <!-- close top-level controller -->
+
+{{mbox
+|icon=fa-solid fa-exclamation cs-red
+|addToClass=cs-yellow-light
+|text=
+'''Note:''' Save your download to your usual <code>~/Downloads</code> folder.
+}} <!-- End mbox -->
+
+= Decompress =
+
+'''1.''' Change directory.
+
+The decompression command below must be run from within the folder where you downloaded the archive (most likely in <code>~/Downloads</code> or <code>~/</code> (home) folder).
+
+<u>Note:</u> Adjust the folder if you stored the archive elsewhere.
+
+{{CodeSelect|code=
+cd ~/Downloads
+}}
+
+'''2.''' Do not use <code>unxz</code>! Extract the images using GNU <code>tar</code>.
+
+'''3.''' Make sure the <code>xz-utils</code> package is installed on your system. 
+<ref>
+https://forums.whonix.org/t/tar-child-xz-cannot-exec-no-such-file-or-directory-install-xz-utils-package/16708/7
+</ref>
+
+If you followed the installation instructions above, this should already be the case.
+
+'''4.''' Decompress.
+
+If your filesystem <u>does</u> support {{kicksecure_wiki
+|wikipage=Sparse_Files
+|text=sparse files
+}} <ref>
+tar --extract --sparse --verbose --file=Whonix*.libvirt.xz
+</ref>:
+
+{{CodeSelect|code=
+tar -xSvf Whonix*.libvirt.xz
+}}
+
+If your filesystem does <u>not</u> support sparse files:
+
+{{CodeSelect|code=
+tar -xvf Whonix*.libvirt.xz
+}}
+
+'''5.''' Wait.
+
+Be aware that the extraction process may take an exceptionally long time to complete. It is recommended to allow the terminal to run uninterrupted after executing the command to ensure successful decompression.
+
+'''6.''' Done.
+
+= License Agreement =
+
+{{License_Read}}
+
+= VM Settings Modification =
+{{Anchor|Optional: XML Modification}}
+'''Optional.'''
+
+Select either Before VM Import or After VM Import.
+
+{{Tab
+|type=controller
+|content=
+
+{{Tab
+|title= === Before VM Import ===
+|active=true
+|addToClass=info-box
+|content=
+This section describes XML modifications before importing a virtual machine.
+
+Modifying a machine's XML file provides more fine-grained control over its settings than what is exposed through the virt-manager GUI. Unless you are knowledgeable about this process, editing configuration defaults is neither recommended nor necessary.
+
+{{Open_File|filename=
+{{project_name_gateway_short}}*.xml
+}} <!-- close: Open_File -->
+
+{{Open_File|filename=
+{{project_name_workstation_short}}*.xml
+}} <!-- close: Open_File -->
+}} <!-- close: tab Before VM Import -->
+
+{{Tab
+|title= === After VM Import ===
+|active=false
+|addToClass=info-box
+|content=
+For virtual machines that were already imported.
+
+Choose either option '''A)''' <u>or</u> '''B)'''.
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= ==== A) With an Editor ====
+|active=true
+|addToClass=info-box
+|content=
+'''1.''' Choose your favorite editor.
+
+Optional.
+
+Configure your preferred editor to make changes. The relevant software must already be installed, such as <code>kwrite</code>, <code>leafpad</code>, <code>kate</code>, <code>vi</code>, <code>nano</code>, <code>vim</code> and so on. This is done by setting the <code>VISUAL</code> environment variable.
+
+{{CodeSelect|code=
+export VISUAL=kwrite
+}}
+
+'''2.''' Edit.
+
+Use the <code>virsh</code> command to open the configuration file.
+
+{{Tab
+|type=controller
+|content=
+{{Tab
+|active=true
+|title= ===== {{project_name_gateway_short}} =====
+|addToClass=info-box
+|content=
+{{CodeSelect|code=
+sudo -E virsh -c qemu:///system edit {{project_name_gateway_short}}
+}}
+}}<!-- close tab: gateway -->
+{{Tab
+|title= ===== {{project_name_workstation_short}} =====
+|addToClass=info-box
+|content=
+{{CodeSelect|code=
+sudo -E virsh -c qemu:///system edit {{project_name_workstation_short}}
+}}
+}}<!-- close tab : workstation -->
+}} <!-- close controller : edit-xml-vm-type -->
+
+'''3.''' Save.
+
+'''4.''' Done.
+
+Editing an imported machine's XML configuration is now complete.
+}}<!-- close tab : A xml-edit -->
+{{Tab
+|title= ==== B) Using virt-manager ====
+|addToClass=info-box
+|content=
+In more recent versions of virt-manager, a second option is available:
+
+<code>Virtual Machine Manager</code> -> <code>Edit</code> -> <code>Preferences</code> -> <code>General</code> -> <code>Enable XML Editing</code>
+
+Under the <code>Details</code> view for a VM, a new XML tab appears in the GUI, allowing direct editing and saving from the VM viewer.
+}} <!-- close tab : B virt manager -->
+}} <!-- close controller : xml-edit -->
+}} <!-- close controller : controller Before and After VM import -->
+}}
+
+== Importing {{project_name_short}} VM Templates ==
+
+The first step after extracting the archive is to import the supplied XML files. They serve as a description for [https://wiki.archlinux.org/title/libvirt libvirt] and define the properties of the {{project_name_short}} VMs and the networking they should use.
+{{Box|text=
+'''1.''' Add the virtual networks. This step only needs to be done once, not with every upgrade.
+
+If the definition of a {{project_name_short}} network fails because the virtual bridge "virbrX" already exists, edit the <code>{{project_name_short}}_external*.xml</code> and <code>{{project_name_short}}_internal*.xml</code> files and change the name to one that does not exist, for example "virbr3".
+
+{{CodeSelect|code=
+virsh -c qemu:///session net-define {{project_name_short}}_external*.xml
+}}
+
+{{CodeSelect|code=
+virsh -c qemu:///session net-define {{project_name_short}}_internal*.xml
+}}
+
+'''2.''' Activate the virtual networks.
+
+{{CodeSelect|code=
+virsh -c qemu:///session net-autostart {{project_name_short}}-External
+}}
+
+{{CodeSelect|code=
+virsh -c qemu:///session net-start {{project_name_short}}-External
+}}
+
+{{CodeSelect|code=
+virsh -c qemu:///session net-autostart {{project_name_short}}-Internal
+}}
+
+{{CodeSelect|code=
+virsh -c qemu:///session net-start {{project_name_short}}-Internal
+}}
+
+'''3.''' Import the {{project_name_short}} Gateway and Workstation images.
+
+{{CodeSelect|code=
+virsh -c qemu:///session define {{project_name_gateway_short}}*.xml
+}}
+
+{{CodeSelect|code=
+virsh -c qemu:///session define {{project_name_workstation_short}}*.xml
+}}
+}}
+
+== Image File Installation ==
+The XML files are configured to use the default storage location of <code>/var/lib/libvirt/images</code>. The image files can be moved or copied, depending on storage constraints.
+
+<u>Notes:</u>
+
+* <u>SELinux:</u> Changing the default location may cause SELinux conflicts, which can prevent the virtual machines from booting.
+* <u>Administrative rights:</u> Administrative rights (<code>sudo</code>) are required because the copy or move operation targets a privileged system location.
+
+The following steps move or copy the images so the virtual machines can boot.
+
+Either move <u>or</u> copy.
+{{Tab
+|type=controller
+|content=
+{{Tab
+|title= === Moving {{project_name_short}} Image Files ===
+|type=section
+|active=true
+|content=
+Move the image files.
+
+{{CodeSelect|code=
+sudo mv {{project_name_gateway_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_gateway_short}}.qcow2
+}}
+
+{{CodeSelect|code=
+sudo mv {{project_name_workstation_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_workstation_short}}.qcow2
+}}
+}}
+{{Tab
+|title= === Copying {{project_name_short}} Image Files ===
+|content=
+Copy the image files. {{Anchor|sparse files}}
+
+{{project_name_short}} disk images are {{kicksecure_wiki
+|wikipage=sparse files
+|text=sparse files
+}}, meaning they expand as data is written rather than allocating their entire size (100GB) outright. Sparse files require special commands when they are copied to ensure they retain this property; otherwise, they will occupy the full disk space.
+
+{{CodeSelect|code=
+sudo cp --sparse=always {{project_name_gateway_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_gateway_short}}.qcow2
+}}
+
+{{CodeSelect|code=
+sudo cp --sparse=always {{project_name_workstation_short}}*.qcow2 /var/lib/libvirt/images/{{project_name_workstation_short}}.qcow2
+}}<!-- close CodeSelect -->
+}}<!-- close tab -->
+}}<!-- close controller -->
+
+== Manipulating QCOW2 Images ==
+
+Use <code>qemu-img</code> to interact with KVM disk images. This tool can resize virtual disks, convert them to other formats, and more. It is neither necessary nor recommended to modify the official images, so proceed cautiously and only if the procedure is well understood.
+
+Refer to the [https://linux.die.net/man/1/qemu-img qemu-img manual] for instructions.
+
+== Encrypted Containers ==
+
+It is possible to run image files from encrypted containers. sVirt protections have been confirmed to be in effect for image files stored at alternative locations.
+
+Change the permissions on the container mount point directory so Virtual Machine Manager can access the image. In ZuluCrypt, containers are mounted under <code>/run/media/private/user</code>: <ref>
+https://forums.whonix.org/t/cant-use-var-lib-libvirt-images-for-whonix-images-what-to-do-about-apparmor/7192/3
+</ref>
+
+{{CodeSelect|code=
+sudo chmod og+xr /run/media/private/user/$container_name
+}}
+
+After this, in the KVM XML configuration for both the Gateway and the Workstation, you must edit the XML and change the <code>source file</code> tag to the appropriate value below:
+
+* Gateway: <code>source file="/run/media/private/user/Whonix-Gateway.qcow2"</code>.
+* Workstation: <code>source file="/run/media/private/user/Whonix-Workstation.qcow2"</code>.
+
+This ensures that the VMs can access and run the images.
+
+== Cleanup ==
+After importing {{project_name_short}}, it is recommended to delete the archives ({{Code2|.libvirt.xz}} files) and the temporarily extracted folders, or move them into a custom location. This helps avoid conflicts and confusion if a new version of {{project_name_short}} is later downloaded.
+
+To delete the archives and temporary folders, run:
+
+<u>Note:</u> This may not work on some Linux distributions where <code>safe-rm</code> is unavailable. In that case, use <code>trash-put</code> (if the <code>trash-cli</code> package is available) or <code>rm</code> (always available) instead.
+
+{{CodeSelect|code=
+safe-rm {{project_name_short}}*
+}}
+
+{{CodeSelect|code=
+safe-rm -r WHONIX*
+}}
+
+== Start ==
+
+If Virtual Machine Manager is familiar, there is nothing special about starting {{project_name_short}} VMs compared to other VMs. First start {{project_name_gateway_long}}, then start {{project_name_workstation_long}}.
+
+=== Using Whonix-Gateway with LXQt Desktop vs CLI Mode ===
+
+To start the desktop environment, the Whonix-Gateway virtual machine must be assigned at least 768 MB of RAM. Otherwise, it will only boot in CLI mode. To disable startup of the included desktop environment regardless of RAM allocation, configure the [[RAM_Adjusted_Desktop_Starter|RAM Adjusted Desktop Starter package settings]].
+
+=== Graphical User Interface (GUI) ===
+
+Start Virtual Machine Manager:
+
+<code>Start Menu</code> &rarr; <code>Applications</code> &rarr; <code>System</code> &rarr; <code>Virtual Machine Manager</code>
+
+Start {{project_name_gateway_short}}:
+
+<code>click on {{project_name_gateway_short}}</code> &rarr; <code>click open</code> &rarr; <code>click the play symbol</code>
+
+Repeat the same steps for {{project_name_workstation_short}}.
+
+=== Command Line Interface (CLI) ===
+The following instructions were re-tested in September 2024.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' If the guest may be compromised, do NOT follow this procedure! The guest will be able to write arbitrary ANSI sequences to the host's terminal emulator, which may exploit security vulnerabilities in the terminal and allow a VM escape.
+}}
+
+'''1.''' Open a terminal inside the VM that should be accessed through CLI.
+
+This is required to set up the serial console VM settings.
+
+'''2.''' Install the package:
+
+{{Install Package|
+package=serial-console-enable
+}}
+
+'''3.''' Shut down the VM.
+
+'''4.''' Open a terminal on the host.
+
+'''5.''' To start {{project_name_gateway_short}}, run:
+
+{{CodeSelect|code=
+sudo virsh start {{project_name_gateway_short}}
+}}
+
+To start {{project_name_workstation_short}}, run:
+
+{{CodeSelect|code=
+sudo virsh start {{project_name_workstation_short}}
+}}
+
+'''6.''' To interact with {{project_name_workstation_short}} via serial console, run:
+
+{{CodeSelect|code=
+sudo virsh console {{project_name_workstation_short}}
+}}
+
+'''7.''' To exit the console session, press <code>Ctrl + ]</code> (Control and closing square bracket). This will return you to your host terminal while leaving the VM running.
+
+'''8.''' Done.
+
+Forum discussion: https://forums.whonix.org/t/how-do-i-enter-the-whonix-shell-from-cli/7271
+
+== Adjust Display Resolution ==
+Prerequisite knowledge: [[screen|{{project name short}} screen wiki page]]
+
+Option A: Use scaling instead.
+
+{{quotation
+|quote=Enable display scaling in virt-manager, disable automatic guest resizing, and then grow the window. Rather than increasing the resolution, it will just make everything bigger (and blurrier, but that’s unfortunately mostly unavoidable if you want the VM’s display bigger without the VM knowing that its display is bigger).
+|context=[https://forums.whonix.org/t/font-too-small-can-changing-lead-to-fingerprinting/23167 Font Too Small - Can Changing Lead to Fingerprinting?]
+}}
+
+Option B: Increase stream isolation (fingerprinting risk as documented on the [[screen|{{project name short}} screen wiki page]])
+
+<code>Start Menu</code> &rarr; <code>Preferences</code> &rarr; <code>Displays</code> <ref>
+https://forums.whonix.org/t/no-auto-resize-with-qxl-driver/7145/3
+</ref>
+
+<u>Alternatively:</u>
+
+<code>GUI Console</code> &rarr; <code>View</code> &rarr; <code>Scale Display</code> &rarr; <code>Check: Always + Auto resize VM with window</code>.
+
+== After Installing ==
+
+{{Post_Install_Advice}}
+
+== Uninstall ==
+
+<div class="toccolours mw-collapsible mw-collapsed">
+If you want to remove {{project_name_short}} KVM VMs, the {{project_name_short}} network, and {{project_name_short}} images, click Expand on the right.
+
+<div class="mw-collapsible-content">
+{{Box|text=
+'''1.''' Power off the VM you want to shut down. <ref>The command line can also be used to ensure the VM has been shut down.</ref>
+
+{{CodeSelect|code=
+sudo virsh -c qemu:///system destroy {{project_name_gateway_short}}
+}}
+
+{{CodeSelect|code=
+sudo virsh -c qemu:///system destroy {{project_name_workstation_short}}
+}}
+
+'''2.''' Remove the KVM VM settings.
+
+{{CodeSelect|code=
+sudo virsh -c qemu:///system undefine {{project_name_gateway_short}}
+}}
+
+{{CodeSelect|code=
+sudo virsh -c qemu:///system undefine {{project_name_workstation_short}}
+}}
+
+'''3.''' Shut down the KVM network {{Code2|{{project_name_short}}}}.
+
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-destroy {{project_name_short}}-External
+}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-destroy {{project_name_short}}-Internal
+}}
+
+'''4.''' Remove the KVM network {{Code2|{{project_name_short}}}}.
+
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-undefine {{project_name_short}}-External
+}}
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-undefine {{project_name_short}}-Internal
+}}
+
+'''5.''' Delete the images.
+
+<u>Note:</u> All data will be lost unless it is backed up first. Adjust the paths to the images as appropriate.
+
+{{CodeSelect|code=
+sudo safe-rm /var/lib/libvirt/images/{{project_name_gateway_short}}.qcow2
+}}
+
+{{CodeSelect|code=
+sudo safe-rm /var/lib/libvirt/images/{{project_name_workstation_short}}.qcow2
+}}
+}}
+</div>
+</div>
+
+= KVM Upgrade Instructions =
+
+It is strongly recommended to uninstall older {{project_name_short}} versions and always use the stable release. Note that {{project_name_short}} also supports in-place APT upgrades.
+
+# Move your data out of the VM using shared folders.
+# Perform the [[#Cleanup|Cleanup]] steps.
+# [[#Download_and_Extract|Install]] the new images.
+
+= Optional =
+== Fullscreen Mode ==
+
+* To enter fullscreen mode, click:
+
+[[File:enterfullscreenkvm.png|600px]]
+
+* To exit fullscreen mode, move your mouse to the top middle of the screen and click:
+
+[[File:exitfullscreenkvm.png|600px]]
+
+== Multiple {{project_name_gateway_short}} ==
+
+See: [[Multiple_{{project_name_gateway_short}}#KVM|Multiple {{project_name_gateway_short}}]].
+
+== Testing Upcoming Versions ==
+
+Download the test images from the latest folder listed [https://sourceforge.net/projects/whonix-kvm/files/libvirt/ here]. Apply the [[Multiple_{{project_name_gateway_short}}#KVM|Multiple {{project_name_gateway_short}} KVM steps]] to run {{project_name_short}} versions side by side, with the following differences:
+
+# Rename the test {{project_name_short}} images to something unique, preferably by appending the version number to the filename.
+# Edit the XML templates and change the VM names.
+# Import the images by following the [[KVM#Importing_{{project_name_short}}_VM_Templates|Importing {{project_name_short}}]] installation steps. Keep in mind the full names of the new images must be used, and do not import the network templates.
+
+== Convert Libvirt Templates to QEMU Commands ==
+
+'''1.''' Export the VM template as a file:
+
+{{CodeSelect|code=
+sudo virsh dumpxml {{project_name_gateway_short}} > {{project_name_gateway_short}}.xml
+}}
+
+'''2.''' Convert the XML file to a QEMU command:
+
+{{CodeSelect|code=
+sudo virsh domxml-to-native qemu-argv {{project_name_gateway_short}}.xml > {{project_name_gateway_short}}.args
+}}
+
+'''3.''' Repeat the steps for the {{project_name_workstation_short}}. Replace <code>{{project_name_gateway_short}}</code> with <code>{{project_name_workstation_short}}</code> in the commands above.
+
+== Magic SysRq Keys ==
+Magic SysRq keys are useful when the guest becomes unresponsive, particularly in cases where VMs are running headless and a GUI console is not available to force them to shut down from the host. <ref>
+https://dustymabe.com/2012/04/21/send-magic-sysrq-to-a-kvm-guest-using-virsh/
+</ref>
+
+Example command to shut down the {{project_name_short}} Workstation from a host console. The ''O'' at the end of ''KEY_O'' can be substituted with any other [https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html supported letter] listed in the kernel documentation. See also {{kicksecure_wiki
+|wikipage=SysRq
+|text=SysRq
+}}.
+
+{{CodeSelect|code=
+sudo virsh send-key Whonix-Workstation KEY_LEFTALT KEY_SYSRQ KEY_O
+}}
+
+<!-- arraybolt3: We need to take IPv6 into account now too, since Whonix 18 supports IPv6. However, I have not been able to find a way to get DHCPv6 to work with Whonix-Workstation, I run into failures similar to https://bugs.launchpad.net/ubuntu/+source/ifupdown/+bug/1447715. SLAAC can't be used either because we have dnsmasq disabled. On top of all of that, this configuration also appears to break even IPv4 networking nowadays.
+== DHCP ==
+
+Libvirt provides built-in DHCP functionality via a custom installation of the minimalist Dnsmasq DNS/DHCP daemon. <ref>
+https://forums.whonix.org/t/safer-dhcp-implementation-resolved/7499/7
+</ref> This is useful when running multiple Workstations concurrently that are attached to the same Gateway, and for custom Workstations such as Android x86.
+
+For privacy and traffic-leak prevention, Dnsmasq does not resolve DNS as implemented in Libvirt. <ref>
+[https://wiki.libvirt.org/page/Libvirtd_and_dnsmasq https://wiki.libvirt.org/page/Libvirtd_and_dnsmasq]: <blockquote>On Linux host servers, libvirtd uses dnsmasq to service the virtual networks, such as the default network. A new instance of dnsmasq is started for each virtual network, only accessible to guests in that specific network.</blockquote>
+</ref> <ref>
+Dnsmasq is visible to an nmap scan from the Workstation but little else. Manual test: a DNS request was sent with the following result:
+
+<pre style="white-space: pre-wrap;">
+    dig microsoft.com @10.152.152.0
+
+    ; <<>> DiG 9.11.5-P4-3-Debian <<>> microsoft.com @10.152.152.0
+    ;; global options: +cmd
+    ;; connection timed out; no servers could be reached
+</pre>
+</ref> DNS is not explicitly enabled for guests unless it is added to a network’s configuration. <ref>
+https://fabianlee.org/2018/10/22/kvm-using-dnsmasq-for-libvirt-dns-resolution/
+</ref> <ref>
+https://www.cyberciti.biz/faq/linux-kvm-libvirt-dnsmasq-dhcp-static-ip-address-configuration-for-guest-os/
+</ref> Even when DNS is enabled, the way Libvirt uses it does not increase the host's attack surface (for example, by using raw sockets). Likewise, DHCP does not increase the attack surface since it is bound to a specific NIC in this case. <ref>
+https://unix.stackexchange.com/questions/256061/is-libvirt-dnsmasq-exposed-to-the-network-if-i-run-fedora-without-a-firewall:
+
+<blockquote>So I can see an open TCP port. However it responds as if it’s “tcpwrapped”. That implies if you connect over a different interface from virbr0, dnsmasq closes the connection without reading any data. So data you send to it doesn’t matter; it can’t e.g. exploit a classic buffer overflow.</blockquote>
+</ref> Attempting to edit the Dnsmasq configuration files directly will fail, as settings are rewritten and enforced through Libvirt by design. <ref>
+https://serverfault.com/questions/840163/custom-dnsmasq-or-custom-options-with-libvrt
+</ref>
+
+{{Box|text=
+'''1.''' Edit the network configuration file:
+
+{{CodeSelect|code=
+sudo nano /etc/network/interfaces.d/30_non-qubes-whonix
+}}
+
+'''2.''' Modify the configuration.
+
+Comment out:
+
+{{CodeSelect|code=
+auto eth0
+iface eth0 inet static
+       address 10.152.152.11
+       netmask 255.255.192.0
+       gateway 10.152.152.10
+}}
+
+Comment in:
+
+{{CodeSelect|code=
+auto eth0
+iface eth0 inet dhcp
+}}
+
+Save the file.
+
+'''3.''' Edit the internal network settings:
+
+{{CodeSelect|code=
+sudo virsh net-edit Whonix-Internal
+}}
+
+<pre style="white-space: pre-wrap;">
+<ip address='10.152.152.0' netmask='255.255.192.0'>
+    <dhcp>
+      <range start='10.152.128.1' end='10.152.191.254'/>
+    </dhcp>
+</ip>
+</pre>
+
+'''4.''' Restart the internal network:
+
+{{CodeSelect|code=
+sudo virsh net-destroy Whonix-Internal
+}}
+
+{{CodeSelect|code=
+sudo virsh -c qemu:///system net-start Whonix-Internal
+}}
+
+'''5.''' Use <code>sudo ifconfig</code> to confirm that dynamic IP assignment is functional.
+
+'''6.''' ''Optional:'' Configure a static IP address.
+
+Libvirt also allows pairing a static IP from the DHCP server to a VM with a specific MAC address, which is useful if services in the Workstation depend on predictable IPs. See the [https://libvirt.org/formatnetwork.html#elementsAddress host attribute] under the <code>dhcp</code> element.
+
+'''7.''' Install a DHCP client on the Workstation.
+
+{{CodeSelect|code=
+sudo apt install isc-dhcp-client
+}}
+
+'''8.''' Reboot.
+
+{{CodeSelect|code=
+reboot
+}}
+
+'''9.''' Done.
+}}
+-->
+== Snapshot Migration ==
+
+If the VM has snapshots that you want to preserve, the snapshot XML files of the source VM should be dumped with the following commands. <ref>https://serverfault.com/questions/434064/correct-way-to-move-kvm-vm/648871#648871</ref>
+
+{{Box|text=
+'''1.''' List the snapshot names of the VM:
+
+{{CodeSelect|code=
+sudo virsh snapshot-list --name $dom
+}}
+
+'''2.''' Dump each snapshot you want to back up:
+
+{{CodeSelect|code=
+sudo virsh snapshot-dumpxml $dom $name > file.xml
+}}
+
+'''3.''' Restore snapshots at the destination:
+
+{{CodeSelect|code=
+sudo virsh snapshot-create --redefine $dom file.xml
+}}
+
+'''4.''' ''Optional:'' Identify the current snapshot.
+
+On the source VM, run:
+
+{{CodeSelect|code=
+sudo virsh snapshot-current --name $dom
+}}
+
+On the destination VM, run:
+
+{{CodeSelect|code=
+sudo virsh snapshot-current $dom $name
+}}
+}}
+
+== Nested KVM Virtualization ==
+
+It is possible to create nested KVM VMs on KVM hosts. Run the following commands as root.
+
+Check the current setting on the host. If the result is <code>[Y]</code>, then nested virtualization is enabled.
+
+{{CodeSelect|code=
+sudo cat /sys/module/kvm_intel/parameters/nested
+}}
+
+For AMD systems, use <code>kvm_amd</code> instead:
+
+{{CodeSelect|code=
+sudo cat /sys/module/kvm_amd/parameters/nested
+}}
+
+If the result is <code>[N]</code>, enable nested virtualization with the following command and then reboot the system.
+
+For Intel systems:
+
+{{CodeSelect|code=
+echo 'options kvm_intel nested=1' {{!}} sudo tee -a /etc/modprobe.d/qemu-system-x86.conf
+}}
+
+For AMD systems:
+
+{{CodeSelect|code=
+echo 'options kvm_amd nested=1' {{!}} sudo tee -a /etc/modprobe.d/qemu-system-x86.conf
+}}
+
+Host CPU instructions that include the <code>svm</code> and <code>vmx</code> extensions are passed through to the Workstation by default.
+
+== Compressing Disk Images ==
+
+Some users find it easier to move sparse image files after compressing them into a tarball.
+
+To re-compress files, run:
+
+{{CodeSelect|code=
+tar -Sczvf whonix.tar.gz <multiple file names separated by spaces>
+}}
+
+== Adding vCPUs ==
+
+The pinning parameter <code>cpuset='1'</code> must be removed from the <code>vcpu</code> tag in the XML settings to allow adding more cores to a VM; otherwise, performance issues and lockups may occur. CPU pinning is used to safeguard processes in other VMs that run cryptographic operations from side-channel attacks in case of a vulnerability in a cryptographic library. <ref>
+* https://forums.whonix.org/t/guest-systems-sees-cpu-of-the-host/1413/28
+* https://forums.whonix.org/t/guest-systems-sees-cpu-of-the-host/1413/30
+</ref>
+
+To add more vCPUs, increase the number between the opening and closing <code>vcpu</code> tags. Alternatively, use the hardware ''Details'' pane in Virtual Machine Manager.
+
+If preserving CPU pinning while increasing the core count is desired, pin the vCPUs to different numbered ones compared to other sensitive VMs. Map them in a 1:1 ratio to avoid overcommitting cores, which can lead to performance problems.
+
+== 3D Graphics Acceleration ==
+Having video issues? See [[KVM#Videos|Videos]] instead.
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' 3D acceleration under KVM may cause VM instability. The steps below may not work on all hardware. If issues are encountered such as display server crashes, application crashes, inability to boot VMs, or graphical glitches, you should turn 3D acceleration off.
+}}
+
+Enabling 3D acceleration is discouraged because it increases the attack surface. This is a general KVM issue and is [[unspecific|not specific to {{project_name_short}}]]. 3D acceleration is not needed to achieve reasonable graphics performance for desktop use cases, and enabling it likely will not provide a meaningful amount of additional desktop performance even if it does work.
+
+(Advanced users, see: [[Dev/KVM#Virgl3D|Dev/KVM#Virgl3D]])
+
+'''1.''' Ensure that your host GPU drivers are installed and functional. If your host lacks a dedicated GPU and relies on software rendering (CPU), install <code>libgl1-mesa-dri</code> and <code>mesa-utils</code> on the host (if it is Debian-based) to verify OpenGL functionality and enable software-based OpenGL rendering:
+
+{{CodeSelect|code=
+sudo apt install libgl1-mesa-dri mesa-utils
+}}
+
+'''2.''' Modify the VM settings before or after installation, as required:
+
+* [[KVM#VM_Settings_Modification|Before Installation]]
+* After Installation:
+
+{{CodeSelect|code=
+sudo virsh edit Whonix-Workstation
+}}
+
+'''3.''' Locate the following section in the XML and apply the necessary changes:
+
+* {{CodeSelect|inline=true|code=
+<listen type='none'/>
+}}: SPICE does not support TLS + OpenGL with remote connections, so it must be enabled locally.
+* {{CodeSelect|inline=true|code=
+<gl enable='yes'/>
+}}: Enable OpenGL.
+* {{CodeSelect|inline=true|code=
+<acceleration accel3d='yes'/>
+}}: Enable 3D acceleration.
+
+Here is a full example of the relevant XML sections:
+
+<pre>
+    <graphics type='spice'>
+      <listen type='none'/>
+      <clipboard copypaste='yes'/>
+      <filetransfer enable='no'/>
+      <gl enable='yes'/>
+    </graphics>
+    <audio id='1' type='spice'/>
+    <video>
+      <model type='virtio' heads='1' primary='yes'>
+        <acceleration accel3d='yes'/>
+      </model>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
+    </video>
+</pre>
+
+'''4.''' Restart your VMs if they are running.
+
+'''5.''' Notes:
+
+* '''SPICE Listen Type:''' Setting {{CodeSelect|inline=true|code=
+<listen type="socket"/>
+}} [https://forums.whonix.org/t/how-to-enable-3d-acceleration/16501/4 can also be used].
+
+'''6.''' Done.
+
+=== 3D Graphics Acceleration - Testing ===
+
+==== 3D Graphics Acceleration - Testing - Direct Rendering Manager ====
+{{Anchor|3D_Graphics_Acceleration_-_Testing_-_DRM}}
+
+<u>Source:</u> [https://wiki.archlinux.org/title/QEMU#virtio Arch Linux Wiki QEMU, virtio section]
+
+{{CodeSelect|code=
+sudo dmesg {{!}} grep -i drm
+}}
+
+<pre>
+[drm] pci: virtio-vga detected
+[drm] virgl 3d acceleration enabled
+</pre>
+
+<u>Note:</u> DRM here refers to the [https://en.wikipedia.org/wiki/Direct_Rendering_Manager <u>D</u>irect <u>R</u>endering <u>M</u>anager].  
+This is unrelated to [https://www.defectivebydesign.org/ <u>D</u>igital <u>R</u>estrictions <u>M</u>anagement].
+
+{{Anchor|3D Graphics Acceleration - Testing - Performance}}
+
+==== 3D Graphics Acceleration - Functionality Test ====
+{{Install Package|package=
+mesa-utils
+}}
+
+Run:
+
+{{CodeSelect|code=
+glxinfo {{!}} grep rendering
+}}
+
+The expected output is <ref>
+https://wiki.debian.org/Mesa#A3D_acceleration
+</ref>:
+
+<code>direct rendering: Yes</code>
+
+=== 3D Graphics Acceleration - Troubleshooting ===
+
+The following errors are common when dealing with 3D acceleration, especially on older hardware or when configurations are incomplete. Use these examples as references when troubleshooting.
+
+'''Case 1:''' OpenGL not found or not installed on the host (common if there is no dedicated GPU):
+
+<pre>
+Error starting domain: internal error: QEMU unexpectedly closed the monitor (vm='Whonix-Workstation'): 2024-09-04T04:29:19.732050Z qemu-system-x86_64: -device {"driver":"virtio-vga-gl","id":"video0","max_outputs":1,"bus":"pcie.0","addr":"0x1"}: opengl is not available
+...
+libvirt.libvirtError: internal error: QEMU unexpectedly closed the monitor (vm='Whonix-Workstation'): ... opengl is not available
+</pre>
+
+'''Case 2:''' Host lacks a dedicated GPU and uses an outdated CPU (GLSL version mismatch):
+
+<pre>
+Error starting domain: internal error: QEMU unexpectedly closed the monitor (vm='Whonix-Workstation'): qemu_gl_create_compile_shader: compile vertex error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+...
+libvirt.libvirtError: internal error: QEMU unexpectedly closed the monitor (vm='Whonix-Workstation'): qemu_gl_create_compile_shader: compile vertex error
+0:1(10): error: GLSL ES 3.00 is not supported. Supported versions are: 1.10, 1.20, and 1.00 ES
+</pre>
+
+'''Case 3:''' TLS enabled for remote SPICE together with 3D acceleration/OpenGL (unsupported combination):
+
+<pre>
+Error starting domain: internal error: process exited while connecting to monitor: 2024-09-04T04:34:37.668627Z qemu-system-x86_64: SPICE GL support is local-only for now and incompatible with -spice port/tls-port
+...
+libvirt.libvirtError: internal error: process exited while connecting to monitor: ... SPICE GL support is local-only for now and incompatible with -spice port/tls-port
+</pre>
+
+== Mouse Smoothness ==
+
+This setting can improve mouse movement.
+
+[[Untested]]
+
+As per [https://libvirt.org/formatdomain.html#input-devices Domain XML format: Input devices].
+
+'''1.''' Perform [[KVM#VM_Settings_Modification|VM Settings Modification]].
+
+'''2.''' Look for:
+
+{{CodeSelect|inline=true|code=
+<devices>
+}}
+
+'''3.''' Below it, append the following:
+
+{{CodeSelect|code=
+  <input type='tablet' bus='virtio'/>
+}}
+
+Forum discussion:  
+https://forums.whonix.org/t/p-s2-mouse-movement-in-cutom-debian-workstation/19985
+
+== Shared Folder ==
+{{Anchor|Shared Folders}}
+{{IntroLike|
+A shared folder allows you to access the same directory from both the host {{os}} and the {{VM}}.
+
+This guide explains how to configure and use shared folders in {{project_name_short}}.
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' Deleting files within the shared folder will move them to a hidden sub-directory called <code>.Trash-1000</code>. Make sure you reveal it and promptly delete it on the host to avoid data leakage across different VM sessions.
+}}
+
+Follow these steps to transfer data between the guest and host. It is recommended to create or assign a unique directory per snapshot to keep shared content from different security domains separate.
+
+{{IconSet|h1|1}} Select a folder sharing method.
+
+{{Tab
+|type=controller
+|content=
+
+{{Tab
+|title= === virtio-9p ===
+|addToClass=info-box
+|content=
+{{IconSet|h1|2}} '''Notices.'''
+
+Advantages of using <code>virtio-9p</code>:
+
+* <u>Reduced host risk:</u> From the host's perspective, the guest cannot create executable or {{kicksecure_wiki
+|wikipage=Dev/Strong_Linux_User_Account_Isolation#SUID_SGID
+|text=SUID
+}}-root files on the host, which may be more secure.
+* <u>Simpler setup:</u> It is slightly simpler to set up.
+
+Disadvantages of using <code>virtio-9p</code>:
+
+* <u>Requires world readable permissions:</u> The shared folder must be world-readable for the guest to read its contents.
+* <u>Requires world writable permissions:</u> The shared folder must be world-writable for the guest to write to it.
+* <u>Permissions not preserved:</u> Files written by the guest will not have their ownership and permission info reflected on the host, which may be problematic for some developer use cases.
+* <u>Potentially slower:</u> It may be significantly slower than <code>virtiofs</code>.
+
+{{IconSet|h1|3}} '''Shutdown VM'''
+
+Ensure the virtual machine is powered down.
+
+{{IconSet|h1|4}} '''Create Shared Folder on Host'''
+
+On the host operating system, create a folder to be shared with the {{VM}}. For example, on a Linux host:
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+{{CodeSelect|code=
+mkdir /home/user/shared
+}}
+
+{{IconSet|h1|5}} '''Set Permissions on Host Folder'''
+
+Adjust permissions on the host to allow read and write access to the folder with <code>chmod</code>:
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+{{CodeSelect|code=
+chmod 777 /home/user/shared
+}}
+
+{{IconSet|h1|6}} '''Open virt-manager and Add Hardware'''
+
+Click <code>virt-manager</code> &rarr; double-click on VM &rarr; <code>View</code> &rarr; <code>Details</code> &rarr; <code>Add Hardware</code>.
+
+{{IconSet|h1|7}} '''Select Filesystem Device'''
+
+Click the <code>Filesystem</code> device in the list of devices on the left side of the window.
+
+{{IconSet|h1|8}} '''Configure Filesystem Settings'''
+
+* <u>Driver:</u> <code>virtio-9p</code>
+* <u>Source path:</u> <code>/home/user/shared</code>
+** <u>Note:</u> Replace account <code>user</code> with your actual account.
+* <u>Target Path:</u> <code>shared</code>
+** <u>Note:</u> This field must contain the word <code>shared</code>, regardless of the folder name. This is because this identifier is used to mount the shared folder in {{project_name_short}}.
+
+{{IconSet|h1|9}} '''Disable Read-only Option'''
+
+Ensure <code>Export filesystem as readonly mount</code> is unchecked. <ref>
+If you do not wish to write to the folder from within the VM, you are free to enable this setting.
+</ref>
+
+{{IconSet|h1|10}} '''Finalize Device Configuration'''
+
+Click <code>Finish</code>.
+
+{{IconSet|h1|11}} '''Start the VM'''
+
+Click <code>View</code> &rarr; <code>Console</code>, then click the play button in the toolbar to start the VM.
+
+{{IconSet|h1|12}} '''Optional: Mandatory Access Control'''
+
+Using Mandatory Access Control? See chapter [[#Mandatory Access Control]] below.
+
+{{IconSet|h1|13}} '''Optional: Live Mode Use'''
+
+Want to use the shared folder also in live mode? See chapter [[#Shared Folder in Live Mode]].
+
+{{IconSet|h1|14}} '''Access Shared Folder in VM'''
+
+The shared folder will be accessible as <code>/mnt/shared</code>. <ref>
+This is hardcoded in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>].
+</ref>
+
+To access it via command line:
+
+{{CodeSelect|code=
+cd /mnt/shared
+}}
+
+{{IconSet|h1|15}} '''Done.'''
+
+The process of setting up a shared folder with <code>virtio-9p</code> has been completed.
+}} <!-- end tab -->
+
+{{Tab
+|title= === virtiofs ===
+|addToClass=info-box
+|content=
+{{IconSet|h1|2}} '''Notices.'''
+
+Advantages of using <code>virtiofs</code>:
+
+* <u>Better performance:</u> It may be faster than <code>virtio-9p</code>.
+* <u>Works with restrictive host permissions:</u> It works even if restrictive permissions are set on the shared folder on the host.
+* <u>Preserves ownership and permissions:</u> The permissions and ownership of files written by the guest is properly reflected in the host. This may be necessary for some development use cases.
+
+Disadvantages of using <code>virtiofs</code>:
+
+* <u>Requires <code>virtiofsd</code>:</u> It requires the installation of <code>virtiofsd</code>, which may not be installed by default with virt-manager.
+* <u>Higher host compromise risk:</u> Because file permissions are reflected accurately on the host, the guest can write executable or even {{kicksecure_wiki
+|wikipage=Dev/Strong_Linux_User_Account_Isolation#SUID_SGID
+|text=SUID
+}}-root executable files to the host. These may be used to compromise the host in a social engineering attack, or to escalate privileges on the host if the host already has a compromised user account.
+
+{{IconSet|h1|2}} '''Shutdown VM'''
+
+Ensure the virtual machine is powered down.
+
+{{IconSet|h1|3}} '''Create Shared Folder on Host'''
+
+On the host operating system, create a folder to be shared with the {{VM}}. For example, on a Linux host:
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+{{CodeSelect|code=
+mkdir /home/user/shared
+}}
+
+{{IconSet|h1|4}} '''Install <code>virtiofsd</code>'''
+
+On Debian-based hosts (Debian, Ubuntu, Kicksecure, etc.):
+
+{{Install Package|package=
+virtiofsd
+}}
+
+On other hosts: Install the appropriate package for your host OS.
+
+{{IconSet|h1|5}} '''Open virt-manager and Enable Shared Memory'''
+
+{{mbox
+| image   = [[File:Ambox_notice.png|40px]]
+| text    = Despite the name, this will not opt the VM into Kernel Samepage Merging (KSM), and should therefore be safe to use. KSM itself is dangerous and should not be enabled, see [[#KSM]].
+}}
+
+Click <code>virt-manager</code> &rarr; double-click on VM &rarr; <code>View</code> &rarr; <code>Details</code> &rarr; <code>Memory</code> &rarr; <code>Enable shared memory</code> &rarr; <code>Apply</code>.
+
+{{IconSet|h1|6}} '''Add Hardware in virt-manager'''
+
+While still in <code>virt-manager</code>'s VM details window, click <code>Add Hardware</code>.
+
+{{IconSet|h1|7}} '''Select Filesystem Device'''
+
+Click the <code>Filesystem</code> device in the list of devices on the left side of the window.
+
+{{IconSet|h1|8}} '''Configure Filesystem Settings'''
+
+* <u>Driver:</u> <code>virtiofs</code>
+* <u>Source path:</u> <code>/home/user/shared</code>
+** <u>Note:</u> Replace account <code>user</code> with your actual account.
+* <u>Target Path:</u> <code>shared</code>
+** <u>Note:</u> This field must contain the word <code>shared</code>, regardless of the folder name. This is because this identifier is used to mount the shared folder in {{project_name_short}}.
+
+{{IconSet|h1|9}} '''Disable Read-only Option'''
+
+Ensure <code>Export filesystem as readonly mount</code> is unchecked. <ref>
+If you do not wish to write to the folder from within the VM, you are free to enable this setting.
+</ref>
+
+{{IconSet|h1|10}} '''Finalize Device Configuration'''
+
+Click <code>Finish</code>.
+
+{{IconSet|h1|11}} '''Start the VM'''
+
+Click <code>View</code> &rarr; <code>Console</code>, then click the play button in the toolbar to start the VM.
+
+{{IconSet|h1|12}} '''Optional: Mandatory Access Control'''
+
+Using Mandatory Access Control? See chapter [[#Mandatory Access Control]] below.
+
+{{IconSet|h1|13}} '''Optional: Live Mode Use'''
+
+Want to use the shared folder also in live mode? See chapter [[#Shared Folder in Live Mode]].
+
+{{IconSet|h1|14}} '''Access Shared Folder in VM'''
+
+The shared folder will be accessible as <code>/mnt/shared</code>. <ref>
+This is hardcoded in [https://github.com/Kicksecure/vm-config-dist/blob/master/usr/libexec/vm-config-dist/mount-shared <code>/usr/libexec/vm-config-dist/mount-shared</code>].
+</ref>
+
+To access it via command line:
+
+{{CodeSelect|code=
+cd /mnt/shared
+}}
+
+{{IconSet|h1|15}} '''Done.'''
+
+The process of setting up a shared folder with <code>virtiofs</code> has been completed.
+
+}} <!-- end tab -->
+}} <!-- end tab controller -->
+
+=== Mandatory Access Control ===
+
+<u>Note:</u> If your system is configured with a Mandatory Access Control framework, it might be necessary to configure exceptions to allow guests to communicate with the shared folder on the host.
+
+Tests with AppArmor have shown it operates transparently with shared folders, without manual exception configuration.
+
+{{IconSet|h1|1}} On the host, <code>chmod</code> must be applied to the shared folder contents to access the files.
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+{{CodeSelect|code=
+sudo chmod 777 -R /home/user/shared
+}}
+
+If SELinux is disabled, everything should work. If SELinux is enabled, a policy must be added for files under the shared folder on the host. SELinux will not allow sharing until the folder is labeled <code>svirt_image_t</code>. To achieve this, add the following policy on the host using <code>semanage</code>.
+
+<u>Note:</u> These steps must be re-applied every time files are transferred. <ref>
+https://nts.strzibny.name/how-to-set-up-shared-folders-in-virt-manager/
+</ref> <ref>
+https://unix.stackexchange.com/questions/60799/selinux-interfering-with-host-guest-file-sharing-using-kvm
+</ref>
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+{{IconSet|h1|2}}
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+{{CodeSelect|code=
+sudo semanage fcontext -a -t svirt_image_t "/home/user/shared(/.*)?"
+}}
+
+{{IconSet|h1|3}}
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+{{CodeSelect|code=
+restorecon -vR /home/user/shared
+}}
+
+{{IconSet|h1|4}} Setting execute permission on the user folder itself may be necessary for the guest to start without a permission error:
+
+{{CodeSelect|code=
+sudo chmod 701 /home/user
+}}
+
+{{IconSet|h1|5}} Alternatively, set execute permission only for virt-manager. The name <code>libvirt-qemu</code> may vary depending on the distribution:
+
+{{CodeSelect|code=
+sudo setfacl -m u:libvirt-qemu:x /home/user
+}}
+
+{{IconSet|h1|6}} If you are using the command line instead of virt-manager to edit the VM’s device settings, add the following section to the XML:
+
+<u>Note:</u> Replace account <code>user</code> with your actual account.
+
+<pre style="white-space: pre-wrap;">
+<filesystem type='mount' accessmode='mapped'>
+    <source dir='/home/user/shared'/>
+    <target dir='shared'/>
+</filesystem>
+</pre>
+
+=== Shared Folder in Live Mode ===
+<!-- WIKI EDITORS NOTICE:
+This is almost a duplicate of:
+https://www.kicksecure.com/wiki/VirtualBox/Guest_Additions#Shared_Folder_in_Live_Mode
+-->
+
+A shared folder is a folder that is shared between the host {{os}} and the {{VM}}.
+
+In [[Live Mode]], the shared folder will not be mounted by default. (This behavior was implemented starting from version <code>17.4.4.6</code> and might be subject to change in a future version.) <ref>
+[[grub-live]]:
+
+* <u>VirtualBox unit override:</u> <code>/usr/lib/systemd/system/mnt-shared-vbox.service.d/30_grub-live.conf</code>
+* <u>KVM unit override:</u> <code>/usr/lib/systemd/system/mnt-shared-kvm.service.d/30_grub-live.conf</code>
+</ref>
+
+To enable the shared folder with read and write access in live mode, follow the instructions below.
+
+{{IconSet|h1|1}} '''Instructions from the above chapter must be applied first.'''
+
+Option-specific:
+
+* <u>Kicksecure or derivative:</u> If you are using Kicksecure (or a derivative such as Whonix), follow the steps below.
+* <u>Other operating systems:</u> If you are using other operating systems, or the generic method, this is not applicable. <ref>
+Because these systems do not use the <code>mnt-shared-kvm.service</code> systemd unit by {{project_name_short}}.
+</ref>
+
+{{IconSet|h1|2}} {{sysmaint_notice}}
+
+{{IconSet|h1|3}} {{Open with root rights|filename=
+/usr/lib/systemd/system/mnt-shared-kvm.service.d/50_user.conf
+}}
+
+{{IconSet|h1|4}} '''Paste:'''
+
+{{CodeSelect|code=
+[Unit]
+ConditionKernelCommandLine=
+}}
+
+{{IconSet|h1|5}} '''Save.'''
+
+{{IconSet|h1|6}} '''Reboot.'''
+
+{{IconSet|h1|7}} '''Done.'''
+
+The shared folder should now also be available with read-write access after booting into live mode.
+
+Forum discussion: [https://forums.whonix.org/t/shared-folder-blank-running-in-live-mode-after-update/22056 Shared folder blank running in live mode after update]
+
+== USB Passthrough ==
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' Only connect USB devices to {{project_name_workstation_short}} when it is in a clean, trusted state! The only safe and recommended way to move files out of a VM is through Shared Folders.
+}}
+
+{{mbox
+| image   = [[File:Ambox_warning_pn.svg.png|40px]]
+| text    =
+'''Warning:''' This isolation method is not foolproof for sandboxing untrusted USB devices. A sophisticated attacker could tweak a BadUSB payload to crash the guest, causing the host to take control of the device and parse malicious code.
+}}
+
+Libvirt supports passing through a computer's integrated webcam or other USB devices. <ref>https://bugzilla.redhat.com/show_bug.cgi?id=1135488</ref> <ref>https://askubuntu.com/questions/564708/qemu-kvm-virt-manager-passthrough-of-usb-webcam-to-windows-7-enterprise-creates</ref> Debian contributors have disabled USB auto-redirection by default to prevent accidental passthrough of trusted USB devices to untrusted guests. <ref>https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=765016</ref> <ref>https://salsa.debian.org/libvirt-team/virt-manager/-/commit/d81fd3c3af1abde1fa0e2bf3b79643f36836f45b</ref> These changes must be temporarily reverted. Once finished, restore safe defaults by following the steps in reverse order.
+
+<u>Limitations:</u> These steps apply to USB storage devices only. Portable devices such as phones and tablets are problematic and may not be successfully auto-redirected.
+
+The USB drive will only remain isolated while {{project_name_workstation_short}} is running. Do not close the VM GUI window or the device will be reassigned to the host. The VM window must be in focus (either mouse grabbed or fullscreen mode is safest) when plugging in the device. The VM window may be minimized after the device is detected in the guest. It is unnecessary to wait for the VM to fully boot.
+
+{{Box|text=
+'''1.''' Edit the libvirt glib-2.0 schema.
+
+{{CodeSelect|code=
+sudo nano /usr/share/glib-2.0/schemas/10_virt-manager.gschema.override
+}}
+
+'''2.''' Change the default contents.
+
+<pre>
+[org.virt-manager.virt-manager.console]
+auto-redirect=false
+</pre>
+
+Should be changed to:
+
+<pre>
+[org.virt-manager.virt-manager.console]
+</pre>
+
+'''3.''' Recompile the schemas so changes take effect. <ref>https://docs.gtk.org/gio/</ref>
+
+{{CodeSelect|code=
+sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
+}}
+
+'''4.''' Close all instances of Libvirt/Virtual Machine Manager and restart them.
+
+'''5.''' Adjust VM settings.
+
+{{Box|text=
+'''1.''' In the ''Details'' pane, change the ''Controller USB'' device model:
+
+<code>Hypervisor Default</code> &rarr; <code>USB 2</code>
+
+'''2.''' While {{project_name_workstation_short}} is turned off, add four USB Redirection devices (or as many as the host has USB ports).
+
+<code>{{project_name_workstation_short}} viewer window</code> &rarr; <code>View</code> &rarr; <code>Details</code> &rarr; <code>Add Hardware</code> &rarr; <code>USB Redirection</code>
+
+'''3.''' Start {{project_name_workstation_short}} and select the device to passthrough:
+
+<code>{{project_name_workstation_short}} viewer window</code> &rarr; <code>File</code> &rarr; <code>Redirect USB</code> &rarr; <code>Choose: Webcam (or other USB Device)</code>
+
+<u>Note:</u> This step must be performed on demand, as passthrough is not permanent across reboots. This prevents accidental passthrough when the VM is in an untrusted state.
+}}
+
+'''6.''' Boot {{project_name_workstation_short}} and connect the USB thumb drive.
+
+'''7.''' Done.
+
+The thumb drive should now be visible in the guest only.
+}}
+
+== Enable Microphone Input ==
+
+[[Hardware_Threat_Minimization#Microphones|Microphone]] input to guests can be useful for [[VoIP]] and similar applications, but it also introduces risks. It is good practice to disable the microphone on the host system in sound settings whenever it is not in active use.
+
+By default, the shipped configuration includes only a speaker (without a microphone) to prevent malware inside the VM from eavesdropping on the user.  
+
+To enable microphone input for specific guests, edit the VM configuration and change:
+
+<code><codec type='output'/></code> → <code><codec type='micro'/></code>
+
+== Creating Multiple Internal Networks ==
+
+Open the {{project_name_short}} network XML file and change the <code>name</code> attribute to something different from the internal network that is currently running.  
+
+For example: <code>Whonix-Internal2</code>, <code>Whonix-Internal3</code>, and so on.  
+
+The default network name in use is <code>Whonix-Internal</code>.
+
+== Alternative Configurations ==
+
+Libvirt supports a variety of containment mechanisms. Currently supported mechanisms include KVM on the <code>x86_64</code> platform and QEMU, but more configurations may be added in the future.  
+
+If hardware virtualization extensions are available, it is recommended to always use KVM.  
+
+To use another configuration, import its XML file with <code>virsh</code>.
+
+== How to Leave KVM when no X11 is Running ==
+{{Anchor|How to Leave KVM when no X is Running}}
+
+In the hypothetical situation where a user becomes "trapped" in a [[Desktop#Virtual_Consoles|virtual console]] inside a VM without a graphical desktop environment (labwc Wayland compositor) (for example, after running <code>sudo systemctl stop greetd.service</code>), it is still possible to switch back to the host.
+
+In other words, if the graphical desktop environment crashes or is terminated, the user may be left with a black VM window. It is possible to exit this state.
+
+The emulated tablet device normally prevents the mouse from being captured by the guest, but if it happens, use the following key combination:
+
+Press {{Keypress|Ctrl_L|Alt_L}}
+
+Todo: Re-test these instructions with Wayland running on the host.
+
+== Setting up gdb to work with qemu-kvm via libvirt ==
+
+To debug a Linux kernel running as a KVM guest, the <code>-s</code> parameter must be specified for the <code>qemu-kvm</code> command line. When using libvirt and virt-manager to manage virtual machines (instead of invoking KVM directly), this requires editing the VM’s XML configuration so that <code>-s</code> is passed to <code>qemu-kvm</code>.
+
+{{Box|text=
+'''1.''' Open the XML configuration.
+
+{{CodeSelect|code=
+sudo virsh edit $guestvm
+}}
+
+Here, <code>$guestvm</code> is the name of the VM managed by virt-manager. This opens the XML configuration in your editor.
+
+'''2.''' Edit the XML configuration.
+
+Change the first line from:
+
+<pre>
+<domain type='kvm'>
+</pre>
+
+To:
+
+<pre>
+<domain type='kvm' xmlns:qemu='https://libvirt.org/schemas/domain/qemu/1.0'>
+</pre>
+
+Add the following under the <code><domain></code> level:
+
+<pre>
+<qemu:commandline>
+  <qemu:arg value='-s'/>
+</qemu:commandline>
+</pre>
+
+'''3.''' Save the XML configuration.
+
+After saving and quitting the editor, the new configuration will take effect. When the VM is started, a local TCP port (<code>1234</code> by default) will be available for remote debugging with <code>gdb</code>.
+
+'''4.''' Connect to the local TCP port.
+
+From <code>gdb</code> running on the host machine, use:
+
+<pre>
+target remote localhost:1234
+</pre>
+
+Source: <ref>
+https://gymnasmata.wordpress.com/2010/12/02/setting-up-gdb-to-work-with-qemu-kvm-via-libvirt/
+</ref>
+}}
+
+== Unsafe Features ==
+
+The features below have serious security implications and should not be used. This applies to all hypervisors in general.
+
+=== LVM Storage ===
+
+QCOW2 virtual disk images are the recommended and default storage format for KVM. LVM or any other storage mechanism must be avoided for security and privacy. LVM misconfiguration has serious security consequences and exposes the host filesystem to the processes running on the guest. <ref>
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/virtualization_administration_guide/sect-virtualization-adding_storage_devices_to_guests-adding_hard_drives_and_other_block_devices_to_a_guest
+</ref>
+
+In the event a virtual disk was previously used by one VM and is then reused by another VM, data created by the first VM can easily be recovered and exfiltrated by malicious forensics tools run in the second VM at a later time. This is extremely dangerous and can expose all kinds of information originally created in a VM of higher trust level. This leads to deanonymization, past session linking and theft of sensitive information and keys. <ref>
+* https://github.com/fog/fog/issues/2525
+* https://news.ycombinator.com/item?id=6983097
+</ref>
+
+=== HugePages ===
+
+THP/Hugepages aid rowhammer attacks <ref>
+https://arxiv.org/pdf/1507.06955v1.pdf
+</ref> and memory de-duplication attacks (see KSM below) and therefore must be disabled for the guest and on the host. Research suggests that Debian hosts do not enable this feature and it is also disabled in cloud tenancy environments.
+
+=== Memory Ballooning ===
+
+Memory ballooning can potentially be abused by malicious guests to mount rowhammer attacks on the host. <ref>
+https://www.whonix.org/pipermail/whonix-devel/2016-September/000746.html
+</ref>
+
+=== Clipboard Sharing ===
+{{IntroLike|
+Clipboard sharing allows you to copy and paste text between the host and a {{VM}}.
+
+This documentation explains the status of clipboard sharing in {{project_name_short}} and its derivatives such as [[Whonix]].
+}}
+
+{{mbox
+| type    = notice
+| image   = [[File:Ambox_notice.png|40px|alt=Info]]
+| text    = <u>Version-specific notice:</u>
+
+* {{project_name_short}} (and Whonix) version '''17''':
+** <u>Status:</u> <u>Functional</u>
+* {{project_name_short}} (and Whonix) version '''18''':
+** <u>Status:</u> <u>Disabled/Broken</u>
+** <u>Workaround:</u> Use <code>wl-clipboard</code> and <code>xclip</code> to sync Xwayland and Wayland clipboards as documented below.
+** <u>Alternative:</u> Use a text file inside the [[#Shared_Folder|Shared Folder]] to exchange text between the host and VM.
+** <u>Reason for breakage:</u> [https://forums.whonix.org/t/port-to-wayland/17380 Port from X11 to Wayland] (security enhancement).
+** <u>Virtual Machine Manager feature request:</u> [https://github.com/virt-manager/virt-manager/issues/918 Add support for <code>dbus</code> display]
+** <u>spice-vdagent feature request:</u>: [https://gitlab.freedesktop.org/spice/linux/vd_agent/-/issues/26 Add support for Wayland clipboard]
+** <u>Forum discussion:</u> [https://forums.whonix.org/t/whonix-18-wayland-based-kvm-clipboard-sharing-broken/22212 Whonix 18 - Wayland based - KVM - Clipboard Sharing - Broken]
+}}
+
+<div class="toccolours mw-collapsible mw-collapsed">
+For <u>Clipboard Sharing Security Considerations</u>, please press Learn More on the right side.
+<div class="mw-collapsible-content">
+You may wish to leave clipboard sharing disabled for the following reasons:
+
+* To prevent the accidental copying of a link to a website that was visited anonymously to the non-anonymous host browser (or vice versa).
+* To stop malware in {{project_name_short}} Workstation from pilfering sensitive info from the clipboard.
+</div>
+</div>
+
+Clipboard sharing is disabled in Whonix 18 and higher due to security concerns. If you wish to enable it:
+
+'''1.''' Open the VM configuration file for editing.
+
+'''2.''' Locate the following setting.
+
+<code><clipboard copypaste='no'/></code>
+
+'''3.''' Change it to:
+
+<code><clipboard copypaste='yes'/></code>
+
+'''4.''' Save the file and restart the VM.
+
+'''5.''' In the VM, install the <code>xclip</code> and <code>wl-clipboard</code> packages:
+
+{{CodeSelect|code=
+sudo apt install xclip wl-clipboard
+}}
+
+'''6.''' Done.
+
+Note that clipboard sharing will not work transparently with most apps due to limitations imposed by Wayland. The clipboard will be synced with Xwayland transparently, but the Wayland compositor will not see this. Therefore, the clipboard must be manually synced between Xwayland and Wayland.
+
+To transfer Xwayland's clipboard to Wayland (for transferring text from host to guest):
+
+'''1.''' Open a terminal window in the guest.
+
+'''2.''' Run:
+
+{{CodeSelect|code=
+DISPLAY=:0 xclip -o {{!}} wl-copy --type text/plain
+}}
+
+'''3.''' Done.
+
+To transfer Wayland's clipboard to Xwayland (for transferring text from guest to host):
+
+'''1.''' Open a terminal window in the guest.
+
+'''2.''' Run:
+
+{{CodeSelect|code=
+wl-paste {{!}} DISPLAY=:0 xclip -selection clipboard
+}}
+
+'''3.''' Done.
+
+=== KSM ===
+
+KSM is a memory de-duplication feature that conserves memory by combining identical pages across VM RAM, but it is not enabled by default. Enabling this feature is dangerous because it allows cross-VM snooping by a malicious process. <ref>
+[https://www.ieee-security.org/TC/SP2016/papers/0824a987.pdf Dedup Est Machina: Memory Deduplication as an Advanced Exploitation Vector]
+</ref> It is capable of inferring what programs/pages are being visited outside the VM. <ref>
+https://web.archive.org/web/20130210040731/https://staff.aist.go.jp/c.artho/papers/EuroSec2011-suzaki.pdf
+</ref> This feature is disabled in cloud tenancy environments and can also allow attackers to modify/steal APT keys and source lists of the host. <ref>
+* [https://www.usenix.org/system/files/conference/usenixsecurity16/sec16_paper_razavi.pdf Flip Feng Shui: Hammering a Needle in the Software Stack]
+* https://archive.ph/aB7Kg
+</ref>
+
+=== File-system Dedupe ===
+
+Similar to KSM memory dedupe, filesystem dedupe introduces data leaks that violate hypervisor boundaries. The presence of certain files can be confirmed. These may develop into more advanced attacks on security in the future just like KSM related attacks have. ZFS and Btrfs have dedupe features but they are not enabled by default and should be avoided for high security environments. <ref>
+https://mjg59.dreamwidth.org/55638.html
+</ref>
+
+=== Device Passthrough ===
+
+Both USB and PCI device passthrough permit advanced attackers to flash the firmware of those devices and infect the host or other VMs. <ref>
+https://docs.openstack.org/security-guide/compute/hardening-the-virtualization-layers.html#physical-hardware-pci-passthrough
+</ref>
+
+== XML Settings ==
+
+For more information on settings, please refer to the [https://libvirt.org/formatdomain.html Libvirt manual].
+
+= Troubleshooting =
+== Videos ==
+Enabling [[KVM#3D_Graphics_Acceleration|3D Graphics Acceleration]] may not be required for watching videos (e.g. [[YouTube]]).
+
+By [[KVM#Adding_vCPUs|adding vCPUs]], a VM can play videos smoothly without 3D acceleration. <ref>
+https://forums.whonix.org/t/desktop-renders-slowly-despite-high-resource-spec/19727/18
+</ref>
+
+== Request operation not valid: blkio device weight is valid only for bfq or cfq scheduler ==
+<pre>
+Error starting domain: Request operation not valid: blkio device weight is valid only for bfq or cfq scheduler
+</pre>
+
+As of March 2019, the blkio throttling feature appears missing/unsupported on some Linux distributions (e.g. Arch Linux, Ubuntu 20.04). This causes VM startup failures. <ref>
+https://forums.whonix.org/t/problem-starting-whonix-14-after-upgrade-unable-to-write-to-sys-fs-cgroup-blkio-machine-slice-machine-qemu/6999/5
+</ref>
+
+Workaround: remove the feature from the VM config.
+
+{{Box|text=
+'''1.''' Edit the configuration file.
+
+{{CodeSelect|code=
+sudo virsh edit {{project_name_gateway_short}}
+}}
+
+'''2.''' Remove the following setting.
+
+<pre style="white-space: pre-wrap;">
+ <blkiotune>
+    <weight>250</weight>
+ </blkiotune>
+</pre>
+
+'''3.''' Save.
+
+'''4.''' Repeat steps 1 to 3 for {{project_name_workstation_short}}.
+
+'''5.''' Save and start the VMs.
+
+'''6.''' Done.
+}}
+
+* The <code>pvspinlock</code> feature may also be unsupported; removing it resolved the issue in some cases.
+
+Forum discussion: [https://forums.whonix.org/t/issues-starting-vms-in-kvm-blkio-device-weight-is-valid-only-for-bfq-or-cfq-scheduler/10160 Issues starting VMs in KVM (blkio device weight error)]
+
+== cannot set CPU affinity on process 1994: invalid argument ==
+Example error:
+
+<pre>
+libvirt.libvirtError: cannot set CPU affinity on process 1994: invalid argument
+</pre>
+
+Or: <ref>
+https://forums.whonix.org/t/i-cannot-start-the-workstation-in-kvm/21868
+</ref>
+
+<pre>
+Domain startup error: could not match processor to process 6962: Invalid argument
+</pre>
+
+Longer log:
+
+<pre>
+Traceback (most recent call last):
+File “/usr/share/virt-manager/virtManager/asyncjob.py”, line 75, in cb_wrapper
+callback(asyncjob, *args, **kwargs)
+File “/usr/share/virt-manager/virtManager/asyncjob.py”, line 111, in tmpcb
+callback(*args, **kwargs)
+File “/usr/share/virt-manager/virtManager/libvirtobject.py”, line 66, in newfn
+ret = fn(self, *args, **kwargs)
+File “/usr/share/virt-manager/virtManager/domain.py”, line 1400, in startup
+self._backend.create()
+File “/usr/lib/python3/dist-packages/libvirt.py”, line 1080, in create
+if ret == -1: raise libvirtError (‘virDomainCreate() failed’, dom=self)
+libvirt.libvirtError: cannot set CPU affinity on process 1994: invalid argument
+</pre>
+
+This occurs because <code>cpuset='1'</code> is the default to reduce the risk of side-channel attacks on cryptographic operations. However, some older hardware is incompatible.
+
+'''Solution:'''
+
+'''1.''' [[KVM#VM_Settings_Modification|Edit the VM settings]].
+
+'''2.''' Remove:
+
+{{CodeSelect|code=
+cpuset='1'
+}}
+
+'''3.''' Save and restart the VM.
+
+'''4.''' Done.
+
+* Forum discussion: [https://forums.whonix.org/t/cannot-set-cpu-affinity-on-process-1994-invalid-argument/9822 Cannot set CPU affinity error]
+* Related: [https://forums.whonix.org/t/whonix-15-increasing-allocated-cpu-number-makes-the-vm-incredibly-slow/7335 Whonix 15: VM slow after increasing CPU cores]
+* [[KVM#Adding_vCPUs|Adding vCPUs]]
+
+== Arch Linux Users ==
+
+See: [[KVM#Request_operation_not_valid:_blkio_device_weight_is_valid_only_for_bfq_or_cfq_scheduler|Request operation not valid: blkio device weight is valid only for bfq or cfq scheduler]]
+
+== Ubuntu Users ==
+
+See: [[KVM#Request_operation_not_valid:_blkio_device_weight_is_valid_only_for_bfq_or_cfq_scheduler|Request operation not valid: blkio device weight is valid only for bfq or cfq scheduler]]
+
+== Reboot Checklist ==
+
+* Did you reboot after installing KVM?
+* Did you reboot after adding your Linux user account to the required Linux user groups?
+
+Include this info in support requests.
+
+== Unable to connect to libvirt ==
+
+Error:
+
+<pre>
+Unable to connect to libvirt.
+
+Verify that the 'libvirtd' daemon is running.
+
+Libvirt URI is: qemu:///system
+</pre>
+
+Make sure you have [[KVM#Addgroup|added the groups]] and [[KVM#Reboot|rebooted]].
+
+== Unable to open a connection to the libvirt management daemon ==
+
+Error:
+
+<pre>
+Unable to open a connection to the libvirt management daemon.
+
+Libvirt URI is: qemu:///system
+
+Verify that:
+- The 'libvirtd' daemon has been started
+</pre>
+
+Check services:
+
+{{CodeSelect|code=
+sudo systemctl restart qemu-kvm.service ; echo $?
+sudo systemctl restart libvirtd.service ; echo $?
+sudo systemctl restart libvirt-guests.service ; echo $?
+}}
+
+Expected output: Nothing.
+
+If this does not help, it may be a permissions problem.
+
+== hda-duplex not supported in this QEMU binary ==
+
+* <u>Potential cause:</u> User is in <code>libvirt</code> group but not <code>kvm</code>.
+* <u>Alternative potential fix:</u> Change the sound model.
+
+From:
+
+<pre>
+<sound model='ich6'>
+</pre>
+
+To:
+
+<pre>
+<sound model='ac97'>
+</pre>
+
+== process exited while connecting to monitor: ioctl(KVM_CREATE_VM) failed ==
+
+Error:
+
+<pre>
+Error starting domain: internal error: process exited while connecting to monitor: ioctl(KVM_CREATE_VM) failed: 16 Device or resource busy
+failed to initialize KVM: Device or resource busy
+</pre>
+
+Cause: Another hypervisor (e.g. VirtualBox) is running. Two hypervisors cannot run concurrently.
+
+== error: unsupported configuration: spice graphics are not supported with this QEMU ==
+
+See: https://forums.whonix.org/t/error-s-when-importing-vm-templates-kvm/19464
+
+Fix:
+
+{{CodeSelect|code=
+sudo apt install qemu-system
+}}
+
+== Permissions Check ==
+
+{{CodeSelect|code=
+ls -la /var/run/libvirt/libvirt-sock
+}}
+
+== VT-x / SVM Errors ==
+
+Example error messages:
+
+* <code>invalid argument: could not find capabilities for domaintype=kvm</code>  
+* <code>invalid argument: could not get preferred machine for /usr/bin/qemu-system-x86_64 type=kvm</code>  
+
+These errors occur when the host's hardware virtualization extensions are not available for KVM. Possible reasons include:
+
+<!-- Same as: https://www.kicksecure.com/wiki/VirtualBox/Troubleshooting#BIOS -->
+* '''A)''' Another hypervisor is running on the system.  
+* '''B)''' An anti-virus suite is blocking virtualization.  
+* '''C)''' Virtualization support is not present or not enabled in the machine BIOS.  
+
+'''Solution:'''
+
+'''1.''' Enter the BIOS/UEFI setup menu of your machine. For general guidance, see: [https://www.wikihow.com/Change-Computer-BIOS-Settings How to Change BIOS Settings].  
+
+'''2.''' Enable hardware virtualization. This may be listed under different names depending on your system:  
+
+* <code>VT-x</code>  
+* <code>AMD-V</code>  
+* <code>Virtualization</code>  
+* <code>SVM mode</code>  
+* <code>MIT</code> (sometimes under <code>Advanced Core</code> settings)  
+
+'''3.''' Save changes.
+
+'''4.''' Reboot.
+
+'''5.''' Done.
+
+<u>Potential workaround if hardware virtualization is unavailable:</u> [[QEMU]]
+
+== VT-x vs VT-d ==
+* <u><code>VT-x</code> / <code>AMD-V</code>:</u> Required for {{project_name_short}} KVM. See [[#VT-x_/_SVM_Errors|VT-x / SVM Errors]] above.  
+* <u><code>VT-d</code> / <code>IOMMU</code> / <code>AMD-Vi</code>:</u> [https://forums.whonix.org/t/help-welcome-kvm-development-staying-the-course/166/485 {{project_name_short}} KVM does not require VT-d.]
+
+== Add Version Numbers to Support Request ==
+
+If you encounter problems, always include the versions of the key virtualization packages in your support request.  
+On Debian-based systems, you can check the versions of '''libvirt-bin''', '''qemu-kvm''', and '''virt-manager''' with:
+
+{{CodeSelect|code=
+dpkg-query --show --showformat='${Package} ${Version} \n' libvirt-bin qemu-kvm virt-manager
+}}
+
+== Check Groups ==
+Run the following commands to verify your user and group memberships.
+
+{{CodeSelect|code=
+whoami
+}}
+
+The output should be your Linux account user name (for example, <code>user</code>).  
+It should not be <code>root</code>.
+
+{{CodeSelect|code=
+groups
+}}
+
+The output should include both the <code>libvirt</code> and <code>kvm</code> groups. <ref>
+If you used <code>su</code> or <code>sudo su</code> (i.e. switched to the <code>root</code> account) before running:
+
+{{CodeSelect|code=
+sudo adduser "$(whoami)" libvirt
+sudo adduser "$(whoami)" kvm
+}}
+
+then it will fail because <code>$(whoami)</code> will expand to <code>root</code>, not your regular account name. This means the required groups will not be added to your user account.
+</ref>
+
+If these groups are missing, ensure you have [[KVM#Addgroup|added groups]] and then [[KVM#Reboot|rebooted]] the system.
+
+== Sound ==
+No audio inside VM? Try unmuting and increasing the volume.
+
+https://forums.whonix.org/t/no-audio-in-whonix-kvm/17642
+
+== Testing with a Debian VM ==
+Before diving into issues related to {{project_name_short}}, it's a good idea to first ensure that the underlying platform and software are functioning correctly.
+
+# Start by testing the KVM host software as if you've never encountered {{project_name_short}}. This will give you a baseline.
+# As a next step, try using a VM that isn't based on {{project_name_short}}. A good candidate would be Debian <code>{{Stable project version based on Debian codename}}</code>.
+# If you continue to face issues with the Debian VM, it indicates that the problem isn't specific to {{project_name_short}}. Such issues that are [[unspecific]] to {{project_name_short}} should be tackled according to these guidelines:
+
+* [[Self_Support_First_Policy|Self Support First Policy]]
+* [[Reporting_Bugs#Generic_Bug_Reproduction|Generic Bug Reproduction]]
+
+== Support ==
+{{project_name_short}} KVM maintainer availability is mostly limited to the [[#User Help Forum|User Help Forum]].
+
+Questions on Telegram, Matrix, IRC, Reddit, or similar platforms will most likely not receive attention from the {{project_name_short}} KVM maintainer.
+
+See also [[Support]].
+
+== User Help Forum ==
+
+[https://forums.whonix.org/c/kvm {{project_name_short}} KVM User Help Forum]
+
+== Alternative Guides ==
+
+For alternative installation guides contributed by community members, see: [[KVM/Minimalized_Installation|Minimalized Installation]].
+
+= Known Issues =
+== Host VPNs ==
+* [https://forums.whonix.org/t/no-internet-connection-on-workstation-when-vpn-on-host/13763 No Internet Connection inside Whonix-Workstation KVM with NordVPN with Kill-Switch on Host]
+* [https://forums.whonix.org/t/failure-to-connect-when-vpn-on-host/3133 Failure to connect when VPN on host]
+
+Potential solution: → [[#Development Help Wanted]]
+
+* https://forums.whonix.org/t/help-welcome-kvm-development-staying-the-course/166/546
+* [https://lists.libvirt.org/archives/list/users@lists.libvirt.org/thread/UUMUA4X3YWTOTQYSXTMOWDZDKXZYGS7U/ KVM static internal networking without host bridge interface (virbr)]
+* QEMU/KVM feature request: [https://gitlab.com/qemu-project/qemu/-/issues/2494 Isolated network between VMs not visible to the host]
+
+== Intel 3rd/4th Gen CPUs ==
+
+Performance is markedly degraded on 3rd and 4th generation Intel CPUs, as reported by a user on the forums and confirmed. Therefore, these should be avoided. <ref>
+https://forums.whonix.org/t/poor-performance/13385/6
+</ref>
+
+== VM disk corruption after first boot ==
+
+On Whonix 17, some users have reported that either Whonix-Gateway or Whonix-Workstation only boots into a "PERSISTENT Mode" option once. <ref>
+* https://forums.whonix.org/t/unable-to-boot-whonix-workstation/22355
+* https://forums.whonix.org/t/gateway-boots-to-blank-screen-and-then-displays-error-message-cant-find-anything-regarding-this-anywhere/22154
+</ref> Subsequent attempts result in an inability to boot into any mode whatsoever. This appears to be caused by partition table corruption after the first boot. The cause is currently unknown. Whonix 18 and later do not seem to be affected.
+
+Users who encounter this issue should try the following steps: <ref>
+https://forums.whonix.org/t/unable-to-boot-whonix-workstation/22355/2
+</ref>
+
+* Delete the affected VM.
+* Re-define the VM from the corresponding XML file as documented [[KVM#Importing_Whonix_VM_Templates|Importing Whonix VM Templates]].
+* Copy the VM's disk image to <code>/var/lib/libvirt/images</code> as documented [[KVM#Image_File_Installation|Image File Installation]].
+* On first boot, select <code>PERSISTENT Mode | SYSMAINT Session | system maintenance tasks</code> for Whonix-Workstation, or <code>PERSISTENT Mode | USER Session | daily activities</code> for Whonix-Gateway.
+* Open a terminal, and install all updates by running <code>upgrade-nonroot</code>.
+* Reboot the affected VM.
+
+If the same issue occurs, [[Verify the images]]. If your Whonix download is corrupted, re-download it and try again.
+
+= Development =
+
+* [[Dev/KVM|KVM Development]]
+* [https://phabricator.whonix.org/tag/kvm/ KVM {{project_name_short}} Bug Tracker]
+* [https://github.com/{{project_name_short}}/whonix-libvirt whonix-libvirt GitHub]
+
+= Development Help Wanted =
+* [https://forums.whonix.org/t/help-welcome-kvm-development-staying-the-course/166/546 Using <code>hubport</code> to avoid KVM network interfaces being visible on the host operating system], this would likely fix some [[Dev/VirtualBox#Why_use_VirtualBox_over_KVM.3F|{{project_name_short}} KVM issues with host operating system firewalls and VPNs]]
+
+= Footnotes =
+{{#widget:Expand or Collapse All}}
+
+<references />
+
+{{Footer}}
+
+[[Category:Documentation]]
