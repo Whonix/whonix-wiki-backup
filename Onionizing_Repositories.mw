@@ -151,7 +151,7 @@ ISOs:      iso.{{qubes_onion}}
 </ref>
 * <u>Where to apply:</u> Complete the following steps in [[#dom0|<code>dom0</code>]] and for each template.
 * <u>Limitation:</u> Not all templates can be completely onionized.
-* <u>Templates covered:</u> The instructions below consider [[#Debian Templates|Debian Templates]], [[#{{project_name_short}} Templates|{{project_name_short}} Templates]], and the [[#Fedora Template|Fedora Template]].
+* <u>Templates covered:</u> The instructions below consider [[#Debian Templates|Debian Templates]], [[#{{project_name_short}} Templates|{{project_name_short}} Templates]].
 
 === dom0 ===
 
@@ -229,8 +229,8 @@ The first code block should look similar to this.
 
 {{CodeSelect|code=
 # Main qubes updates repository
-#deb [arch=amd64] https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
-#deb-src https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
+# deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-archive-keyring-4.3.gpg] https://deb.qubes-os.org/r4.3/vm {{Stable project version based on Debian codename}} main
+#deb-src [arch=amd64 signed-by=/usr/share/keyrings/qubes-archive-keyring-4.3.gpg] https://deb.qubes-os.org/r4.3/vm {{Stable project version based on Debian codename}} main
 }} <!-- close CodeSelect -->
 
 '''3.''' Uncomment the corresponding line underneath "Qubes Tor updates repositories".
@@ -240,8 +240,8 @@ The first code block should look similar to this.
 {{CodeSelect|code=
 # Qubes Tor updates repositories
 # Main qubes updates repository
-deb [arch=amd64] tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
-#deb-src http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
+deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-archive-keyring-4.3.gpg] tor+http://deb.{{Qubes_onion}}/r4.3/vm {{Stable project version based on Debian codename}} main
+#deb-src [arch=amd64 signed-by=/usr/share/keyrings/qubes-archive-keyring-4.3.gpg ] tor+http://deb.{{Qubes_onion}}/r4.3/vm {{Stable project version based on Debian codename}} main
 }} <!-- close CodeSelect -->
 
 Save and exit.
@@ -284,8 +284,8 @@ The first code block should look similar to this.
 
 {{CodeSelect|code=
 # Main qubes updates repository
-#deb [arch=amd64] https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
-#deb-src https://deb.qubes-os.org/r4.2/vm {{Stable project version based on Debian codename}} main
+#deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-archive-keyring-4.3.gpg ] https://deb.qubes-os.org/r4.3/vm {{Stable project version based on Debian codename}} main
+#deb-src [arch=amd64 signed-by=/usr/share/keyrings/qubes-archive-keyring-4.3.gpg ] https://deb.qubes-os.org/r4.3/vm {{Stable project version based on Debian codename}} main
 }} <!-- close CodeSelect -->
 
 '''3.''' Uncomment the corresponding line underneath "Qubes Tor updates repositories".
@@ -295,8 +295,8 @@ The first code block should look similar to this.
 {{CodeSelect|code=
 # Qubes Tor updates repositories
 # Main qubes updates repository
-deb [arch=amd64] tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
-#deb-src tor+http://deb.{{Qubes_onion}}/r4.2/vm {{Stable project version based on Debian codename}} main
+deb [arch=amd64 signed-by=/usr/share/keyrings/qubes-archive-keyring-4.3.gpg] tor+http://deb.{{Qubes_onion}}/r4.3/vm {{Stable project version based on Debian codename}} main
+#deb-src [arch=amd64 signed-by=/usr/share/keyrings/qubes-archive-keyring-4.3.gpg] tor+http://deb.{{Qubes_onion}}/r4.3/vm {{Stable project version based on Debian codename}} main
 }} <!-- close CodeSelect -->
 
 Save and exit.
@@ -391,48 +391,6 @@ sudo repository-dist --enable --transport onion
 
 {{CodeSelect|code=
 upgrade-nonroot
-}} <!-- close CodeSelect -->
-}} <!-- close box -->
-
-=== Fedora Template ===
-
-<u>Note:</u> Updating Fedora templates exclusively over [[Onion_Services|Onion Services]] is not possible -- only related Qubes repositories can be onionized. The reason is Fedora does not maintain onion service repositories.
-
-{{Box|text=
-'''1.''' In Fedora Template, open the <code>qubes-r4.repo</code> file in a text editor. <ref>At the time of writing Qubes-R4 was the current stable release.</ref>
-
-{{CodeSelect|code=
-sudoedit /etc/yum.repos.d/qubes-r*.repo
-}} <!-- close CodeSelect -->
-
-* comment the lines that contain <code>yum.qubes-os.org</code>
-* uncomment the lines that contain <code>{{Qubes_onion}}</code>
-
-Once completed, each of the four code blocks will have http(s) repository lines similar to the following example.
-
-{{CodeSelect|code=
-#baseurl = https://yum.qubes-os.org/r4.2/current/vm/fc$releasever
-baseurl = http://yum.{{Qubes_onion}}/r4.2/current/vm/fc$releasever
-}} <!-- close CodeSelect -->
-
-Save and exit.
-
-'''2.''' In Fedora Template, confirm the onion service repositories are functional.
-
-{{CodeSelect|code=
-sudo dnf update
-}} <!-- close CodeSelect -->
-
-'''3.''' Import the Qubes OS signing key if prompted.
-
-Sometimes the following message may appear. Press <code>y</code> and then <code>Enter</code>. <ref>See: [https://www.qubes-os.org/security/verifying-signatures/ Verifying signatures] for further information on signing keys.</ref> <ref>All Qubes OS signing keys can be found [https://keys.qubes-os.org/keys/ here].</ref>
-
-{{CodeSelect|code=
-Importing GPG key 0x8E34D89F:
-Userid     : "Qubes OS Release 4.2 Signing Key"
-Fingerprint: 9C88 4DF3 F810 64A5 69A4 A9FA E022 E58F 8E34 D89F
-From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-qubes-4.2-primary
-Is this ok [y/N]:
 }} <!-- close CodeSelect -->
 }} <!-- close box -->
 

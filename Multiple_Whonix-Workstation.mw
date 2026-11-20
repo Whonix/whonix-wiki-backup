@@ -177,7 +177,9 @@ sudoedit /etc/network/interfaces.d/30_non-qubes-whonix
 
 Ignore all lines starting with a hashtag ("<code>#</code>"). That is because comments are only for documentation and notes. However, comments are ignored by the system.
 
-Look for line <code>address 10.152.152.11</code>. Change the last octet. For example, change <code>10.152.152.1'''1'''</code> to <code>10.152.152.1'''2'''</code>
+Look for the line <code>address 10.152.152.11</code>. Change the last octet. For example, change <code>10.152.152.1'''1'''</code> to <code>10.152.152.1'''2'''</code>.
+
+Next, look for the line <code>address fd19:c33d:88bc::11</code>. Change the last number in the address. For example, change <code>fd19:c33d:88bc::1'''1'''</code> to <code>fd19:c33d:88bc::1'''2'''</code>.
 
 Save and exit.
 
@@ -200,9 +202,16 @@ iface eth0 inet static
        address 10.152.152.12
        netmask 255.255.192.0
        gateway 10.152.152.10
+
+...
+
+iface eth0 inet6 static
+       address fd19:c33d:88bc::12
+       gateway fd19:c33d:88bc::10
+       netmask 96
 </pre>
 
-It would even be possible to replace the contents of that config file with the above contents. When using more than 1 additional Whonix-Workstation however <code>10.152.152.12</code> should be changed to <code>10.152.152.13</code> and so forth.
+When using more than 1 additional Whonix-Workstation, <code>10.152.152.12</code> and <code>fd19:c33d:88bc::12</code> should be changed to <code>10.152.152.13</code> and <code>fd19:c33d:88bc::13</code> respectively. Use <code>14</code> for a fourth workstation, and so forth.
 
 {{IconSet|h1|6}} '''Reboot or restart networking:'''
 
